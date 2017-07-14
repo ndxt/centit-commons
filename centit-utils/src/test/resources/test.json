@@ -1,0 +1,1 @@
+{"object":{"properties":{"optid":{"type":"string","index":"analyzed"},"osid":{"type":"string","index":"analyzed"}}}}

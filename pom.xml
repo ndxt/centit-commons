@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <centit.commons.version>2.2.0-SNAPSHOT</centit.commons.version>
+        <jdk.version>1.8</jdk.version>
+        <ical4j.version>2.0.0</ical4j.version>
+        <dom4j.version>2.0.0</dom4j.version>
+        <commons-lang3.version>3.5</commons-lang3.version>
+        <slf4j-api.version>1.7.25</slf4j-api.version>
+        <fastjson.version>1.2.32</fastjson.version>
+        <httpcomponents.version>4.5.3</httpcomponents.version>
+        <commons-email.version>1.4</commons-email.version>
+        <commons-net.version>3.6</commons-net.version>
+        <pinyin4j.version>2.5.1</pinyin4j.version>
+        <junit.version>4.12</junit.version>
+        <commons-dbcp2.version>2.1.1</commons-dbcp2.version>
+    </properties>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.centit.support</groupId>
+    <artifactId>centit-commons</artifactId>
+    <version>2.2.0-SNAPSHOT</version>
+    <name>com.centit.support:centit-commons</name>
+    <packaging>pom</packaging>
+    <description>java 常用工具类,作为 apache-commons的补充</description>
+    <url>https://github.com/ndxt/centit-commons</url>
+
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>杨淮生</name>
+            <email>codefan@sina.com</email>
+            <organization>centit.com</organization>
+            <organizationUrl>http://www.centit.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>
+            scm:git:https://github.com/ndxt/centit-commons.git
+        </connection>
+        <developerConnection>
+            scm:git:https://github.com/ndxt/centit-commons.git
+        </developerConnection>
+        <url>https://github.com/ndxt/centit-commons</url>
+        <tag>v1.12</tag>
+    </scm>
+
+    <modules>
+        <module>centit-utils</module>
+        <module>centit-compiler</module>
+        <module>centit-database</module>
+    </modules>
+
+    <!-- mvn deploy -DpomFile=pom.xml -->
+
+    <distributionManagement>
+       <repository>
+           <id>ossrh</id>
+           <name>sonatype-releases</name>
+           <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+       </repository>
+       <snapshotRepository>
+           <id>ossrh</id>
+           <name>sonatype-snapshots</name>
+           <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+       </snapshotRepository>
+   </distributionManagement>
+
+    <!--<distributionManagement>
+        <repository>
+            <id>centit-releases</id>
+            <name>centit-release</name>
+            <url>http://develop.centit.com:8080/nexus/content/repositories/centit-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>centit-snapshots</id>
+            <name>centit-snapshots</name>
+            <url>http://develop.centit.com:8080/nexus/content/repositories/centit-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArguments>
+                        <verbose />
+                        <bootclasspath>${java.home}/lib/rt.jar;${java.home}/lib/jce.jar</bootclasspath>
+                    </compilerArguments>
+                </configuration>
+            </plugin>
+
+            <!-- 打包时添加源码 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- GPG自动签名的插件 -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- sonatype release :
+                mvn nexus-staging:release -->
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.3</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>

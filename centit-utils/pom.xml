@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>centit-commons</artifactId>
+        <groupId>com.centit.support</groupId>
+        <version>2.2.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>centit-utils</artifactId>
+    <name>com.centit.support:centit-utils</name>
+    <packaging>jar</packaging>
+    <description>java 常用工具类,作为 apache-commons的补充</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.mnode.ical4j</groupId>
+            <artifactId>ical4j</artifactId>
+            <version>${ical4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>${dom4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
+        </dependency>
+
+        <!-- jSon -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+        <!--4.5.1 不能，肯定是某个参数不对暂时没有找到 -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpcomponents.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>${httpcomponents.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>${commons-email.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>${commons-net.version}</version>
+        </dependency>
+        <!-- 获取汉字首字母的类库  -->
+        <!-- <dependency>
+            <groupId>net.sourceforge.pinyin4j</groupId>
+            <artifactId>pinyin4j</artifactId>
+            <version>5.0</version>
+        </dependency> -->
+        <dependency>
+            <groupId>com.belerweb</groupId>
+            <artifactId>pinyin4j</artifactId>
+            <version>${pinyin4j.version}</version>
+        </dependency>
+        <!-- test -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+            <version>${jdk.version}</version>
+            <scope>system</scope>
+            <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
+            <!-- <systemPath>D:\Java\jdk1_6_0_29\lib\tools.jar</systemPath> -->
+        </dependency>
+        <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>rt</artifactId>
+            <version>${jdk.version}</version>
+            <scope>system</scope>
+            <systemPath>${env.JAVA_HOME}/jre/lib/rt.jar</systemPath>
+            <!-- <systemPath>D:\Java\jdk1_6_0_29\lib\tools.jar</systemPath> -->
+        </dependency>
+        <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>jce</artifactId>
+            <version>${jdk.version}</version>
+            <scope>system</scope>
+            <systemPath>${env.JAVA_HOME}/jre/lib/jce.jar</systemPath>
+            <!-- <systemPath>D:\Java\jdk1_6_0_29\lib\tools.jar</systemPath> -->
+        </dependency>
+
+    </dependencies>
+
+
+</project>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
+  	targetNamespace="http://www.example.org/TestXMLSchema"
+	xmlns:tns="http://www.example.org/TestXMLSchema" 
+	elementFormDefault="qualified">
+
+    <annotation>
+    	<documentation>外置SQL语句集
+	</documentation></annotation>
+    <element name="statements" type="tns:StatementsType">
+    
+    </element>
+  
+    <element name="statement" type="tns:StatementType"> 
+    </element>
+	 
+	 <complexType name="StatementType">
+	        <annotation>
+	        	<documentation>sql语句</documentation>
+	        </annotation>
+	    <attribute name="sqlId" type="string" use="required"/>
+		<attribute name="sqlType" type="string" use="required"/>
+		<attribute name="preOptType" type="string" use="optional"/>
+		<attribute name="comment" type="string" use="optional"/>
+	</complexType>
+   
+  <complexType name="StatementsType">
+  	<sequence>
+  		<element minOccurs="0"  maxOccurs="unbounded" ref="tns:statement"/>
+  	</sequence>
+  </complexType>
+
+</schema>
+
+
