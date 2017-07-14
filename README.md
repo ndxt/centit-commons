@@ -9,7 +9,7 @@ java 常用工具类,作为 apache-commons的补充
 
  通过httpClient来模拟网页的表单提交。
 
-最新版本v2.1 已经发布到http://central.maven.org/maven2/com/centit
+最新版本v2.2 已经发布到http://central.maven.org/maven2/com/centit
 
 
 # centit-compiler
@@ -17,7 +17,8 @@ java 常用工具类,作为 apache-commons的补充
 
 逻辑运算支持四则运算、逻辑运行和内置函数。
 
-最新版本v2.1 已经发布到http://central.maven.org/maven2/com/centit
+最新版本v2.2 已经发布到http://central.maven.org/maven2/com/centit
 
 # centit-database
 SQL语句分析、内置变量预处理、命名参数支持以及关系数据库访问与写入。
+最新版本v2.2 已经发布到http://central.maven.org/maven2/com/centit
