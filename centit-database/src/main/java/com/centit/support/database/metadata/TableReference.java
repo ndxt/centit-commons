@@ -4,42 +4,42 @@ import java.util.Map;
 
 public interface TableReference {
 	/**
-	 * 约束代码
-	 * @return
+	 *
+	 * @return 约束代码
 	 */
-	public String getReferenceCode();
+	String getReferenceCode();
 	/**
-	 * 约束名称
-	 * @return
+	 *
+	 * @return 约束名称
 	 */
-	public String getReferenceName();
+	String getReferenceName();
 	/**
-	 * 表名称
-	 * @return
+	 *
+	 * @return 表名称
 	 */
-	public String getTableName();
+	String getTableName();
 	
 	/**
-	 * 父表表名称
-	 * @return
+	 *
+	 * @return 父表表名称
 	 */
-	public String getParentTableName();
+	String getParentTableName();
 	
 	/*
-	 * 这个只有sql server 有用，其他可以忽略
-	 * @return
+	 *
+	 * @return 这个只有sql server 有用，其他可以忽略
 	 */
-	//public int getObjectId() ;
+	//int getObjectId() ;
 	/**
-	 * 主键外键对应关系
-	 * @return
+	 *
+	 * @return 主键外键对应关系
 	 */
-	public Map<String, String> getReferenceColumns() ;
+	Map<String, String> getReferenceColumns() ;
 	
 	/**
 	 * 判断某个字段是否是外键
-	 * @param sCol
-	 * @return
+	 * @param sCol 字段
+	 * @return  是否是外键
 	 */
-	public boolean containColumn(String sCol);
+	boolean containColumn(String sCol);
 }
