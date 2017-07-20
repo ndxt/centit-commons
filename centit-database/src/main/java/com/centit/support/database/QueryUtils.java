@@ -1214,7 +1214,7 @@ public class QueryUtils {
     /**
      * 参数表示式的完整形式是  :  表达式：(预处理,预处理2,......)参数名称
      * @param paramString paramString
-     * @return 返回为Triple <"表达式","参数名称","预处理,预处理2,......">
+     * @return 返回为Triple "表达式","参数名称","预处理,预处理2,......"
      */
     public static ImmutableTriple<String,String,String> parseParameter(String paramString){
     	if(StringUtils.isBlank(paramString))
