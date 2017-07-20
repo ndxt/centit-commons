@@ -29,6 +29,10 @@ import com.centit.support.compiler.VariableTranslate;
  */
 public class QueryUtils {
 	/**
+	 * 表示这个参数不需要
+	 */
+	public static final String SQL_PRETREAT_NO_PARAM = "NP";
+	/**
 	 * 转化为模式匹配字符串
 	 */
 	public static final String SQL_PRETREAT_LIKE = "LIKE";
@@ -659,7 +663,7 @@ public class QueryUtils {
      * @param pramePiece pramePiece
      * @return String
      */
-    private static String fetchTemplateParamName(String pramePiece){
+    public static String fetchTemplateParamName(String pramePiece){
     	String paramName=null;
 		int n = pramePiece.indexOf(':');
 		if(n<0){//四
@@ -684,7 +688,7 @@ public class QueryUtils {
      * @param paramString paramString
      * @return  Set String
      */
-    private static Set<String> fetchTemplateParamNames(String paramString){
+	public static Set<String> fetchTemplateParamNames(String paramString){
     	Set<String> params = new HashSet<>();
     	List<String> pramePieces = Lexer.splitByWord(paramString, ",");
 		for(String pramePiece : pramePieces){
@@ -700,7 +704,7 @@ public class QueryUtils {
      * @param queryPiece queryPiece
      * @return Set String
      */
-    private static Set<String> fetchParamsFromTemplateConditions(String queryPiece){
+	public static Set<String> fetchParamsFromTemplateConditions(String queryPiece){
 
 		Lexer varMorp = new Lexer(queryPiece,Lexer.LANG_TYPE_SQL);
 		String aWord = varMorp.getARawWord();
@@ -849,7 +853,7 @@ public class QueryUtils {
      * @param sFieldSql sFieldSql
      * @return 字段名子列表
      */
-    private static List<String> splitSqlFiledNames(String sFieldSql){
+	public static List<String> splitSqlFiledNames(String sFieldSql){
         List<String> fields = new ArrayList<String>();
         Lexer lex = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
 
@@ -1085,7 +1089,7 @@ public class QueryUtils {
      * @param paramValue paramValue
      * @return Object
      */
-    private static Object scalarPretreatParameter(String pretreatment,Object paramValue){
+	public static Object scalarPretreatParameter(String pretreatment,Object paramValue){
     	if(paramValue==null)
 			return null;
     	if(SQL_PRETREAT_LIKE.equalsIgnoreCase(pretreatment))
@@ -1125,8 +1129,8 @@ public class QueryUtils {
     	
     	return paramValue;
     }
-    
-    private static Object onePretreatParameter(String pretreatment,Object paramValue){
+
+	public static Object onePretreatParameter(String pretreatment,Object paramValue){
     	if(paramValue==null)
 			return null;    	
     	if(SQL_PRETREAT_STRING.equalsIgnoreCase(pretreatment))
@@ -1186,8 +1190,8 @@ public class QueryUtils {
     	}
     	return paramObj;
     }
-    
-    private static List<String> splitParamString(String paramString){
+
+	public static List<String> splitParamString(String paramString){
     	List<String> params = new ArrayList<String>();
     	Lexer lex = new Lexer(paramString,Lexer.LANG_TYPE_SQL);
     	int prePos = 0;
@@ -1210,9 +1214,9 @@ public class QueryUtils {
     /**
      * 参数表示式的完整形式是  :  表达式：(预处理,预处理2,......)参数名称
      * @param paramString paramString
-     * @return 返回为Triple <"表达式","预处理,预处理2,......","参数名称">
+     * @return 返回为Triple <"表达式","参数名称","预处理,预处理2,......">
      */
-    private static ImmutableTriple<String,String,String> parseParameter(String paramString){
+    public static ImmutableTriple<String,String,String> parseParameter(String paramString){
     	if(StringUtils.isBlank(paramString))
     		return null;
     	String paramName=null;
@@ -1354,8 +1358,8 @@ public class QueryUtils {
     	}
     	return sql;
     }
-    
-    private static boolean hasPretreatment(String pretreatStr, String onePretreat){
+
+	public static boolean hasPretreatment(String pretreatStr, String onePretreat){
     	if(pretreatStr==null) return false;
     	
     	return pretreatStr.toUpperCase().indexOf(onePretreat) >= 0;
