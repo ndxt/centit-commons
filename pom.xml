@@ -18,6 +18,11 @@
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <junit.version>4.12</junit.version>
         <commons-dbcp2.version>2.1.1</commons-dbcp2.version>
+
+        <apache.poi.version>3.16</apache.poi.version>
+        <itextpdf.version>5.5.11</itextpdf.version>
+        <jacob.version>1.14.3</jacob.version>
+        <jcom.version>2.2.1</jcom.version>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>
@@ -61,6 +66,7 @@
         <module>centit-utils</module>
         <module>centit-compiler</module>
         <module>centit-database</module>
+        <module>centit-office</module>
     </modules>
 
     <!-- mvn deploy -DpomFile=pom.xml -->

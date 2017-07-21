@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>centit-commons</artifactId>
+        <groupId>com.centit.support</groupId>
+        <version>2.2.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>centit-office</artifactId>
+    <name>com.centit.support:centit-office</name>
+    <packaging>jar</packaging>
+    <description>office(doc、xls、ppt) pdf 等文档处理</description>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-utils</artifactId>
+            <version>${centit.commons.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${apache.poi.version}</version>
+        </dependency>
+
+        <!-- java操作office（添加水印）-->
+        <dependency>
+            <groupId>net.sf.jacob-project</groupId>
+            <artifactId>jacob</artifactId>
+            <version>${jacob.version}</version>
+            <classifier>x86</classifier>
+            <type>dll</type>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jacob-project</groupId>
+            <artifactId>jacob</artifactId>
+            <version>${jacob.version}</version>
+        </dependency>
+        <!-- java操作pdf（添加水印） -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>${itextpdf.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jp.ne.so_net.ga2.no_ji</groupId>
+            <artifactId>jcom</artifactId>
+            <version>${jcom.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jp.ne.so_net.ga2.no_ji</groupId>
+            <artifactId>jcom</artifactId>
+            <version>${jcom.version}</version>
+            <type>dll</type>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+            <version>${jdk.version}</version>
+            <scope>system</scope>
+            <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
+            <!-- <systemPath>D:\Java\jdk1_6_0_29\lib\tools.jar</systemPath> -->
+        </dependency>
+
+    </dependencies>
+</project>
