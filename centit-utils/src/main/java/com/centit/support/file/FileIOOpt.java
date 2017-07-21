@@ -17,8 +17,8 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import com.alibaba.fastjson.JSON;
-
-public class FileIOOpt {
+@SuppressWarnings("unused")
+public abstract class FileIOOpt {
 
 	public static int writeInputStreamToOutputStream(InputStream in,
 			OutputStream out) throws IOException{
@@ -64,7 +64,7 @@ public class FileIOOpt {
 	public static String readStringFromRead(Reader reader) throws IOException{
         try(StringWriter writer = new StringWriter()){  
 	        char[] buf = new char[1024];
-	        int len = 0;
+	        int len;
 	        while ((len = reader.read(buf)) != -1) {
 	            writer.write(buf, 0, len);
 	        }    
@@ -105,8 +105,7 @@ public class FileIOOpt {
 	public static Object readObjectFromFile(String fileName)
 			throws IOException, ClassNotFoundException{
 		try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))){
-			Object obj = ois.readObject();
-			return obj;
+			return ois.readObject();
 		}
 	}
 	
@@ -130,6 +129,7 @@ public class FileIOOpt {
 			if (closeable != null)
 				closeable.close();
 		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }

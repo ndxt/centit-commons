@@ -1,8 +1,8 @@
 package com.centit.support.algorithm;
 
 import java.util.UUID;
-
-public class UuidOpt {
+@SuppressWarnings("unused")
+public abstract class UuidOpt {
 
     public static String digits(long val, int digits) {
         long hi = 1L << (digits * 4);

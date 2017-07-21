@@ -12,7 +12,8 @@ import java.util.Map;
  * modifyed by brmrk
  * modifyed by codefan
  * 这个类用来读取 ini配置文件，没有写的功能
- */     
+ */
+@SuppressWarnings("unused")
 public class IniReader {     
      
     protected Map<String,Map<String,String> > sections = new HashMap<String,Map<String,String> >();     

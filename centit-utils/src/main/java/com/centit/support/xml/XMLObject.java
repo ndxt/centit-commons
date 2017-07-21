@@ -24,7 +24,8 @@ import com.centit.support.algorithm.StringRegularOpt;
 /**
  * Created by codefan on 17-6-30.
  */
-public class XMLObject {
+@SuppressWarnings("unused")
+public abstract class XMLObject {
     public static Element createXMLElement(String elementName , String valueType, Object value){
         Element element = DocumentHelper.createElement(elementName);
         element.addAttribute("type",valueType);

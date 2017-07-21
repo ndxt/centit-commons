@@ -28,7 +28,8 @@ import com.centit.support.common.TreeNode;
  * @version $Rev$ <br>
  *          $Id$
  */
-public class ListOpt {
+@SuppressWarnings("unused")
+public abstract class ListOpt {
 	/**
 	 * 
 	 * 判断两个对象是否是父子关系，用于针对树形展示的数据结构进行排序

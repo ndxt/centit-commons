@@ -14,7 +14,8 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
  * Time: 下午4:19
  * Json转换时需要包含或排除属性的工具类
  */
-public class JsonPropertyUtils {
+@SuppressWarnings("unused")
+public abstract class JsonPropertyUtils {
 
     public static PropertyPreFilter getIncludePropPreFilter(Class<?> clazz, String... field) {
         if (ArrayUtils.isNotEmpty(field) && null != clazz) {

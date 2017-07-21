@@ -4,8 +4,8 @@ import java.util.Collection;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
-
-public class HtmlFormUtils {
+@SuppressWarnings("unused")
+public abstract class HtmlFormUtils {
 	/**
 	 * 请调用直接 org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4 
 	 * 或者 org.springframework.web.util.HtmlUtils.htmlEscape

@@ -25,6 +25,7 @@ import com.centit.support.algorithm.ReflectionOpt;
  * @version $Rev$ <br>
  *          $Id$
  */
+@SuppressWarnings("unused")
 public class JSONOpt {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(JSONOpt.class);

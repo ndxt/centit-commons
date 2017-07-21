@@ -4,9 +4,8 @@ import java.util.Calendar;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-
-public class StringRegularOpt {
-
+@SuppressWarnings("unused")
+public abstract class StringRegularOpt {
 
 	final static public String  trimString(String szWord)
 	{

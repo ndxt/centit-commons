@@ -35,7 +35,8 @@ import java.util.Random;
  * @author codefan
  *
  */
-public class CaptchaImageUtil {
+@SuppressWarnings("unused")
+public abstract class CaptchaImageUtil {
     private static final String range = "0123456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSRUVWXYZ";
     public static final String SESSIONCHECKCODE = "session_checkcode";
     public static final String REQUESTCHECKCODE = "j_checkcode";
@@ -93,7 +94,6 @@ public class CaptchaImageUtil {
         g.dispose();
         return image;
     }
-
 
     public static Color getRandColor(int fc, int bc) {
         Random random = new Random();

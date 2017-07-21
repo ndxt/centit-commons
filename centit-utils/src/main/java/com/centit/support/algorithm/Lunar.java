@@ -3,8 +3,8 @@ package com.centit.support.algorithm;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
-public class Lunar {
+@SuppressWarnings("unused")
+public abstract class Lunar {
 	private int year;
 	private int month;
 	private int day;

@@ -12,7 +12,7 @@ import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 
 import com.centit.support.security.AESSecurityUtils;
-
+@SuppressWarnings("unused")
 public abstract class FileEncryptWithAes {
 
 	/**

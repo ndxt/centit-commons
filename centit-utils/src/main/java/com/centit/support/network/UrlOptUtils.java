@@ -10,7 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UrlOptUtils {
+@SuppressWarnings("unused")
+public abstract class UrlOptUtils {
 	protected static final Logger logger = LoggerFactory.getLogger(UrlOptUtils.class);
 	private static final String ALLOWED_CHARS = 
 			"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()";

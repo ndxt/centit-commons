@@ -13,7 +13,8 @@ import java.util.Map;
 /**
  *  提供一些反射方面缺失功能的封装.
  */
-public class ReflectionOpt  {
+@SuppressWarnings("unused")
+public abstract class ReflectionOpt  {
 
 	protected static final Logger logger = LoggerFactory.getLogger(ReflectionOpt.class);
 

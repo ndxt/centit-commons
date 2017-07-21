@@ -2,6 +2,9 @@ package com.centit.support.office;
 
 import com.centit.support.algorithm.ReflectionOpt;
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,7 +21,8 @@ import java.util.Map;
  * @author codefan@sina.com
  * 2013-6-25
  */
-public final class ExportExcelUtil {
+@SuppressWarnings("unused")
+public class ExportExcelUtil {
 
 
     public static InputStream generateExcel(List<? extends Object> objLists) {
@@ -223,7 +227,7 @@ public final class ExportExcelUtil {
     }
 
     private static void setCellStyle(HSSFWorkbook wb, HSSFCell cell) {
-        cell.setCellType(HSSFCell.ENCODING_UTF_16);
+        cell.setCellType( CellType.forInt(HSSFCell.ENCODING_UTF_16) );
         cell.setCellStyle(getDefaultCellStyle(wb));
     }
 
@@ -237,9 +241,9 @@ public final class ExportExcelUtil {
         HSSFCellStyle cellStyle = wb.createCellStyle();
 
         // 指定单元格居中对齐
-        cellStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
         // 指定单元格垂直居中对齐
-        cellStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 //        cellStyle.setWrapText(true);// 指定单元格自动换行
 
         // 设置单元格字体

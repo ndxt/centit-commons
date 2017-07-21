@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author 朱晓文
  */
-public class FileMD5Maker {
+@SuppressWarnings("unused")
+public abstract class FileMD5Maker {
 
 	protected static final Logger logger = LoggerFactory.getLogger(FileMD5Maker.class);
 	public static String makeFileMD5(File file) throws IOException {

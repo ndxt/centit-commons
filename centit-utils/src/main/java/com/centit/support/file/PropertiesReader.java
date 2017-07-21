@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory;
  * @author sx
  * 
  */
-public class PropertiesReader {
+@SuppressWarnings("unused")
+public abstract class PropertiesReader {
     private static final Logger logger = LoggerFactory.getLogger(PropertiesReader.class);
 
     /**

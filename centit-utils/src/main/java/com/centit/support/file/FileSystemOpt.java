@@ -12,8 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-
-public class FileSystemOpt {
+@SuppressWarnings("unused")
+public abstract class FileSystemOpt {
 
 	/**
 	 * 获取指定目录下特定后缀名的文件
@@ -28,7 +28,7 @@ public class FileSystemOpt {
 		File dirFile = new File(dir);
 		File[] fileArray = dirFile.listFiles();
 
-		List<File> resFiles = new ArrayList<File>();
+		List<File> resFiles = new ArrayList<>();
 		// 如果传进来一个以文件作为对象的allList 返回0
 		if (null == fileArray) {
 			return resFiles;
@@ -134,14 +134,14 @@ public class FileSystemOpt {
 
 	/**
 	 * 创建目录
-	 * 
 	 * @param f 文件
+	 * @return 是否成功
 	 */
-	public static void createDirect(File f) {
+	public static boolean createDirect(File f) {
 		if (f.exists())
-			return;
+			return true;
 		//if (f.isDirectory())
-		f.mkdirs();
+		return f.mkdirs();
 		//else
 			//new File(f.getParent()).mkdir();
 	}
@@ -149,9 +149,10 @@ public class FileSystemOpt {
 	 * 创建目录
 	 * 
 	 * @param sDirPath 目录路径
+	 * @return 是否成功
 	 */
-	public static void createDirect(String sDirPath) {
-		createDirect(new File(sDirPath));
+	public static boolean createDirect(String sDirPath) {
+		return createDirect(new File(sDirPath));
 	}
 
 	/**

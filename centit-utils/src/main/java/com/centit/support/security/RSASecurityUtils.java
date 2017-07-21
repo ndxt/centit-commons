@@ -17,7 +17,8 @@ import com.alibaba.fastjson.JSONObject;
 import sun.security.rsa.RSAPrivateCrtKeyImpl;
 import sun.security.rsa.RSAPublicKeyImpl;
 
-public class RSASecurityUtils {
+@SuppressWarnings("unused")
+public abstract class RSASecurityUtils {
 	/** 指定加密算法为RSA */
 	private static final String ALGORITHM = "RSA";
 	/** 密钥长度，用来初始化 

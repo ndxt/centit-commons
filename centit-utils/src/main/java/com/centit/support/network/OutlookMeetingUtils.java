@@ -50,8 +50,8 @@ import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Sequence;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
-import net.fortuna.ical4j.util.UidGenerator; 
-
+import net.fortuna.ical4j.util.UidGenerator;
+@SuppressWarnings("unused")
 public class OutlookMeetingUtils {
 
 	protected static final Logger logger = LoggerFactory.getLogger(OutlookMeetingUtils.class);

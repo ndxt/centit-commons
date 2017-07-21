@@ -27,7 +27,8 @@ import org.slf4j.LoggerFactory;
  * @version $Rev$ <br>
  *          $Id$
  */
-public class XmlUtils {
+@SuppressWarnings("unused")
+public abstract class XmlUtils {
 	
 	private static Logger logger = LoggerFactory.getLogger(XmlUtils.class);
 	

@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-
-public class FtpExecutor {
+@SuppressWarnings("unused")
+public abstract class FtpExecutor {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(FtpExecutor.class);
 	/**

@@ -16,6 +16,7 @@ import com.alibaba.fastjson.serializer.PropertyPreFilter;
  * 重新实现Json格式化时属性过滤，添加排除属性，且排除属性优先级高于包含属性。
  * 可以同时过滤多个对象的多个属性
  */
+@SuppressWarnings("unused")
 public class JsonPropertyPreFilters implements PropertyPreFilter {
 
     private Set<Class<?>> clazzs;

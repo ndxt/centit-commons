@@ -16,6 +16,7 @@ package com.centit.support.common;
  * @param <K>  左边的类型
  * @param <V>   右边的类型
  */
+@SuppressWarnings("unused")
 public class KeyValuePair<K,V>{
 	private K key;
 	private V value;

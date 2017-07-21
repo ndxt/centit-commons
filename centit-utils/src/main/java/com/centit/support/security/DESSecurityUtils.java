@@ -7,7 +7,8 @@ import javax.crypto.Cipher;
 
 import org.apache.commons.codec.binary.Base64;
 
-public class DESSecurityUtils {
+@SuppressWarnings("unused")
+public abstract class DESSecurityUtils {
 	public static Cipher createEncryptCipher(String keyValue)
 			 throws GeneralSecurityException {
 		Key key = getKey(keyValue.getBytes());

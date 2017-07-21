@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
 
-public class SendMailExecutor {
+@SuppressWarnings("unused")
+public abstract class SendMailExecutor {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(SendMailExecutor.class);
 	public static String mailHost = "";

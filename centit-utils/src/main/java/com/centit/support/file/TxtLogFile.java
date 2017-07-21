@@ -20,6 +20,7 @@ import com.centit.support.algorithm.DatetimeOpt;
  * 
  * @author codefan
  */
+@SuppressWarnings("unused")
 public class TxtLogFile {
 	protected static final Logger logger = LoggerFactory.getLogger(TxtLogFile.class);
 	public static void writeLog(String sLogFileName,String slog, boolean bNewLine,boolean bShowTime){

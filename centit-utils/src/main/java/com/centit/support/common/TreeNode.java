@@ -8,8 +8,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-
-public class TreeNode<T extends Object> {
+@SuppressWarnings("unused")
+public class TreeNode<T> {
 	/**
 	 * 存储节点的值
 	 */
@@ -51,14 +51,14 @@ public class TreeNode<T extends Object> {
 	}
 	
 	public TreeNode<T> addChild(T child) {
-		TreeNode<T> treeNode = new TreeNode<T>(child);
+		TreeNode<T> treeNode = new TreeNode<>(child);
 		this.addChild(treeNode);
 		return treeNode;
 	}
 	
 	public void addChild(TreeNode<T> child) {
 		if(this.children ==null)
-			this.children = new ArrayList<TreeNode<T>>();
+			this.children = new ArrayList<>();
 		child.praent = this;
 		this.children.add(child);
 	}
@@ -93,7 +93,7 @@ public class TreeNode<T extends Object> {
 		
 		if(this.children!=null && this.children.size()>0){
 			JSONArray ja = new JSONArray();
-			for(TreeNode<T> c: this.children){
+			for(TreeNode c: this.children){
 				ja.add( c.toJSONObject(childrenPropertyName));
 			}
 			jo.put(childrenPropertyName, ja);

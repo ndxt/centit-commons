@@ -26,8 +26,8 @@ import javax.imageio.ImageIO;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
-
-public class ImageOpt {
+@SuppressWarnings("unused")
+public abstract class ImageOpt {
 	private ImageOpt() {
 	}
 

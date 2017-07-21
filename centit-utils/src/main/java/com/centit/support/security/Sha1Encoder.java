@@ -12,7 +12,8 @@ import org.apache.commons.codec.binary.Hex;
  * @author codefan
  *
  */
-public class Sha1Encoder {
+@SuppressWarnings("unused")
+public abstract class Sha1Encoder {
 
 	public static String encode(byte[] data){
 		MessageDigest SHA1;

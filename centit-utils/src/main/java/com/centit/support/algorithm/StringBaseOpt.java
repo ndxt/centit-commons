@@ -30,7 +30,8 @@ import net.sourceforge.pinyin4j.PinyinHelper;
  * @author <a href="mailto:matt@raibledesigns.com">Matt Raible</a>
  * @author 杨淮生
  */
-public class StringBaseOpt {
+@SuppressWarnings("unused")
+public abstract class StringBaseOpt {
 	
 	protected static final Logger logger = LoggerFactory.getLogger(StringBaseOpt.class);
 	// ~ Static fields/initializers

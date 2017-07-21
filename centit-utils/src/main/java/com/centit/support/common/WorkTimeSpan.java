@@ -8,6 +8,7 @@ import java.util.Date;
  * @author codefan
  *
  */
+@SuppressWarnings("unused")
 public class WorkTimeSpan implements java.io.Serializable {
 
     private static final long serialVersionUID = 1L;

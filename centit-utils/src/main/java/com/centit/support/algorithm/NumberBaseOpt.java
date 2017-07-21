@@ -1,11 +1,12 @@
 package com.centit.support.algorithm;
 
-public class NumberBaseOpt {
+@SuppressWarnings("unused")
+public abstract class NumberBaseOpt {
 
 	/*
 	 * 获得某一位上的数值，如果 nBit<0 则获得小数点后面的位数
 	 */
-	final static public char getNumByte(String szNum , int nBit)
+	static public char getNumByte(String szNum , int nBit)
 	{
 		int sl = szNum.length();
 		int nPos = 0;
@@ -25,7 +26,7 @@ public class NumberBaseOpt {
 	/*
 	 * 将数值大写
 	 */
-	final static public String capitalization(String szNum)
+	public static String capitalization(String szNum)
 	{
 		StringBuilder resstr = new StringBuilder();
 		String tmpstr = szNum.trim();		
@@ -70,10 +71,10 @@ public class NumberBaseOpt {
 						if(preiszero)
 							resstr.append("零");
 						preiszero = false;
-						resstr.append(CNum[(byte)(integerNum.charAt(sp))-48] + CBit[k]);
+						resstr.append(CNum[(byte) (integerNum.charAt(sp)) - 48]).append(CBit[k]);
 					}
 				}// end for k
-				if(j!=0 && j % 2 == 0 ){
+				if(/*j!=0 &&*/ j % 2 == 0 ){
 					if(!allzero) 
 						resstr.append("万");
 				}
@@ -102,7 +103,7 @@ public class NumberBaseOpt {
 	/*
 	 * 仅仅是把 0~9 转换为 "〇","一","二","三","四","五","六","七","八","九"
 	 */
-	final static public String	uppercaseCN(String szNum)
+	public static String uppercaseCN(String szNum)
 	{
 		StringBuilder resstr = new StringBuilder();
 		String tmpstr = szNum.trim();		
@@ -117,9 +118,9 @@ public class NumberBaseOpt {
 				resstr.append(tmpstr.charAt(sp));
 		return resstr.toString();
 	}
-	
-	
-	final static public String capitalization(String szNum,final boolean isSimple)
+
+
+	public static String capitalization(String szNum,final boolean isSimple)
 	{
 		if (isSimple){
 			return uppercaseCN(szNum);
@@ -129,8 +130,8 @@ public class NumberBaseOpt {
 	/*
 	 * 这个仅仅是对Long.parseLong进行简单的封装避免重复的输入try catch
 	 */
-	final static public Long parseLong(String sNum, Long errorValue){
-		Long lValue = null;
+	static public Long parseLong(String sNum, Long errorValue){
+		Long lValue;
 		try{
 			lValue = Long.parseLong(sNum);
 		}catch(NumberFormatException e){
@@ -140,15 +141,15 @@ public class NumberBaseOpt {
 	}
 	
 	
-	final static public Long parseLong(String sNum){
+	static public Long parseLong(String sNum){
 		return parseLong(sNum,null);
 	}
 	
 	/*
 	 * 这个仅仅是对Integer.parseInteger进行简单的封装避免重复的输入try catch
 	 */
-	final static public Integer parseInteger(String sNum, Integer errorValue){
-		Integer lValue = null;
+	static public Integer parseInteger(String sNum, Integer errorValue){
+		Integer lValue;
 		try{
 			lValue = Integer.parseInt(sNum);
 		}catch(NumberFormatException e){
@@ -162,14 +163,15 @@ public class NumberBaseOpt {
 	/*
 	 * 这个仅仅是对Integer.parseInteger进行简单的封装避免重复的输入try catch
 	 */
-	final static public Integer parseInteger(String sNum){
+	static public Integer parseInteger(String sNum){
 		return parseInteger(sNum,null);
 	}
+
 	/*
 	 * 这个仅仅是对Double.parseDouble进行简单的封装避免重复的输入try catch
 	 */
-	final static public Double parseDouble(String sNum, Double errorValue){
-		Double lValue = null;
+    public static Double parseDouble(String sNum, Double errorValue){
+		Double lValue;
 		try{
 			lValue = Double.parseDouble(sNum);
 		}catch(NumberFormatException e){
@@ -178,14 +180,14 @@ public class NumberBaseOpt {
 		return lValue;
 	}
 	
-	final static public Double parseDouble(String sNum){
+	static public Double parseDouble(String sNum){
 		return parseDouble(sNum,null);
 	}
 	
 	/*
 	 * 将一个Object转换为 long
 	 */
-	public final static Long castObjectToLong(Object obj){
+	public static Long castObjectToLong(Object obj){
 		if (obj == null)
 			return null;
 		if (obj instanceof Long)
@@ -203,7 +205,7 @@ public class NumberBaseOpt {
 		return parseLong(StringBaseOpt.objectToString(obj),null);
 	}
 	
-	public final static Integer castObjectToInteger(Object obj){
+	public static Integer castObjectToInteger(Object obj){
 		if (obj == null)
 			return null;
 		if (obj instanceof Integer)
@@ -223,7 +225,7 @@ public class NumberBaseOpt {
 	/*
 	 * 将一个Object转换为 Double
 	 */
-	public final static Double castObjectToDouble(Object obj){
+	public static Double castObjectToDouble(Object obj){
 		if (obj == null)
 			return null;
 		if (obj instanceof Double)

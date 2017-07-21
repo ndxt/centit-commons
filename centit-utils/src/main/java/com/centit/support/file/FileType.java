@@ -15,7 +15,8 @@ import org.apache.commons.lang3.StringUtils;
  * @author 朱晓文
  *
  */
-public class FileType {
+@SuppressWarnings("unused")
+public abstract class FileType {
 	
 	protected static final HashMap<String, String> mFileTypes = new HashMap<String, String>(42);
 	protected static final HashMap<String, String> extMimeTypeMap 
@@ -842,7 +843,7 @@ public class FileType {
     /** 
      * 得到文件头 
      *  
-     * @param filePath 文件路径 
+     * @param file 文件
      * @return 文件头 
      * @throws IOException 
      */  
@@ -858,7 +859,7 @@ public class FileType {
     /** 
      * 判断文件类型 
      *  
-     * @param file 文件路径
+     * @param file 文件
      * @return 文件类型 
      * @throws IOException 异常
      */  

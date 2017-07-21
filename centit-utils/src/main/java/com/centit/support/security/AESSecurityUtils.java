@@ -10,7 +10,8 @@ import javax.crypto.SecretKey;
 
 import org.apache.commons.codec.binary.Base64;
 
-public class AESSecurityUtils {
+@SuppressWarnings("unused")
+public abstract class AESSecurityUtils {
 	public static Cipher createEncryptCipher(String keyValue) throws GeneralSecurityException  {
 		Key key = getKey(keyValue);
 		Cipher encryptCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");

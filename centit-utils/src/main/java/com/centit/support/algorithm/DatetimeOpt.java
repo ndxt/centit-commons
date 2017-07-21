@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-public class DatetimeOpt {
+@SuppressWarnings("unused")
+public abstract class DatetimeOpt {
 	private static Logger log = LoggerFactory.getLogger(DatetimeOpt.class);
 
 

@@ -11,7 +11,8 @@ import org.apache.commons.codec.binary.Hex;
  * @author codefan
  *
  */
-public class Md5Encoder {
+@SuppressWarnings("unused")
+public abstract class Md5Encoder {
 	
 	public static String encode(byte[] data){
 		MessageDigest MD5;

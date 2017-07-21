@@ -15,7 +15,8 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 
-public class ZipCompressor {
+@SuppressWarnings("unused")
+public abstract  class ZipCompressor {
     static final int BUFFER = 8192;
 
     //private File zipFile;
