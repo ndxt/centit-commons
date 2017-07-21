@@ -239,5 +239,35 @@ public class NumberBaseOpt {
 		if (obj instanceof Number)
 			return ((Number) obj).doubleValue();
 		return parseDouble(StringBaseOpt.objectToString(obj),null);
-	}	
+	}
+
+	public int compareTwoLong(Long l1 , Long l2){
+		return (l1 == null && l2 == null) ? 0:(
+				l1 == null?-1:(
+						l2 == null ? 1 :(
+								Long.compare(l1,l2)
+								)
+						)
+				);
+	}
+
+	public int compareTwoInteger(Integer i1 , Integer i2){
+		return (i1 == null && i2 == null) ? 0:(
+				i1 == null?-1:(
+						i2 == null ? 1 :(
+								Integer.compare(i1,i2)
+						)
+				)
+		);
+	}
+
+	public int compareTwoDouble(Double d1 , Double d2){
+		return (d1 == null && d2 == null) ? 0:(
+				d1 == null?-1:(
+						d2 == null ? 1 :(
+								Double.compare(d1,d2)
+						)
+				)
+		);
+	}
 }
