@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum DBType {
-	Unknown,SqlServer,Oracle,DB2,Access,MySql;
+	Unknown,SqlServer,Oracle,DB2,Access,MySql,H2;
 	
 	public static DBType valueOf(int ordinal){
 		switch(ordinal){
@@ -18,6 +18,8 @@ public enum DBType {
 	  		return Access;
 	  	case 5:
 	  		return MySql;
+		case 6:
+			return H2;
 	  	default:
 	  		return Unknown;
 	  }
@@ -35,10 +37,14 @@ public enum DBType {
 		if("sqlserver".equalsIgnoreCase(connurl)
 			||	connurl.startsWith("jdbc:sqlserver"))
 			return SqlServer;
+		if("h2".equalsIgnoreCase(connurl)
+			||	connurl.startsWith("jdbc:h2"))
+			return H2;
 		if("mysql".equalsIgnoreCase(connurl)
-			||	connurl.startsWith("jdbc:mysql"))
+				||	connurl.startsWith("jdbc:mysql"))
 			return MySql;
-		if("access".equalsIgnoreCase(connurl))
+		if("access".equalsIgnoreCase(connurl)
+				||	connurl.startsWith("jdbc:odbc:driver"))
 			return Access;
 		
 		return Unknown;
@@ -55,18 +61,24 @@ public enum DBType {
 			return SqlServer;
 		if (dialectName.indexOf("MySQL")>=0)
 			return MySql;
+		//hibernate 不再对Access支持了
+		if (dialectName.indexOf("Access")>=0)
+			return Access;
+		if (dialectName.indexOf("H2")>=0)
+			return H2;
 		return Unknown;
 	}
 	
 	public static Set<DBType> allValues()
 	{
 		//DBType.values();
-		Set<DBType> dbtypes = new HashSet<DBType>();
+		Set<DBType> dbtypes = new HashSet<>();
 		dbtypes.add(Oracle);
 		dbtypes.add(DB2);
 		dbtypes.add(SqlServer);
 		dbtypes.add(MySql);
-		dbtypes.add(Access);		
+		dbtypes.add(Access);
+		dbtypes.add(H2);
 		return dbtypes;
 	}
 	
@@ -82,7 +94,9 @@ public enum DBType {
 	  	case Access:
 	  		return "sun.jdbc.odbc.JdbcOdbcDriver";
 	  	case MySql:
-	  		return "org.gjt.mm.mysql.Driver";
+	  		return "com.mysql.jdbc.Driver";
+	    case H2:
+		    return "org.h2.Driver";
 	  	default:
 	  		return "";
 	  }
@@ -101,7 +115,9 @@ public enum DBType {
 	  		return "access";
 	  	case MySql:
 	  		return "mysql";
-	  	default:
+		case H2:
+			return "h2";
+		default:
 	  		return "unknown";
 	  }
 	}
