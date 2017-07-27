@@ -21,20 +21,6 @@ public abstract class PropertiesReader {
 
     /**
      * 读取classpath下文件
-     * Deprecated 拼写错误，请调用 getClassPathProperty
-     * @param fileName
-     *            文件名前需要加 "/"，如 "/system.properties"
-     * @param key 建
-     * @return 值
-     */
-    @Deprecated
-    public static String getClassPathProperties(String fileName, String key) {
-
-        return getClassPathProperty(fileName, key);
-    }
-
-    /**
-     * 读取classpath下文件
      *
      * @param fileName
      *            文件名前需要加 "/"，如 "/system.properties"
