@@ -21,17 +21,31 @@ public abstract class PropertiesReader {
 
     /**
      * 读取classpath下文件
-     * 
+     * Deprecated 拼写错误，请调用 getClassPathProperty
      * @param fileName
      *            文件名前需要加 "/"，如 "/system.properties"
      * @param key 建
      * @return 值
      */
+    @Deprecated
     public static String getClassPathProperties(String fileName, String key) {
-        try(InputStream in = PropertiesReader.class.getResourceAsStream(fileName)){   
+
+        return getClassPathProperty(fileName, key);
+    }
+
+    /**
+     * 读取classpath下文件
+     *
+     * @param fileName
+     *            文件名前需要加 "/"，如 "/system.properties"
+     * @param key 建
+     * @return 值
+     */
+    public static String getClassPathProperty(String fileName, String key) {
+        try(InputStream in = PropertiesReader.class.getResourceAsStream(fileName)){
             return getPropertyValue(in, key);
         } catch (IOException e) {
-        	logger.error("读取系统配置文件出错", e);
+            logger.error("读取系统配置文件出错", e);
         }
 
         return "";
@@ -62,7 +76,7 @@ public abstract class PropertiesReader {
      * @param key 建
      * @return 值
      */
-    public static String getFilePathProperties(String fileName, String key) {
+    public static String getFilePathProperty(String fileName, String key) {
         try(FileInputStream fis = new FileInputStream(new File(fileName))) {
             return getPropertyValue(fis, key);
         } catch (IOException e) {
