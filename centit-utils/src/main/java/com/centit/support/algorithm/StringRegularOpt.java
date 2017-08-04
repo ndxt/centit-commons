@@ -89,17 +89,125 @@ public abstract class StringRegularOpt {
 	}
 
 
-	final static public boolean isTrue(String szCondition )
+	final static public boolean isTrue(String str )
 	{
-		if(szCondition==null)
+
+		if (str == "true") {
+			return true;
+		}
+		if (str == null) {
 			return false;
-		String szC = trimString(szCondition);
-		if("true".equalsIgnoreCase(szC) 
-				||"T".equalsIgnoreCase(szC) 
-				||"Y".equalsIgnoreCase(szC) ) return true;
-		if(! isNumber(szCondition)) return false;
-		int bRes = Double.valueOf(szCondition).intValue();
-		return bRes!=0;
+		}
+		switch (str.length()) {
+			case 1: {
+				final char ch0 = str.charAt(0);
+				if (ch0 == 'y' || ch0 == 'Y' ||
+						ch0 == 't' || ch0 == 'T' || ch0 == '1') {
+					return true;
+				}
+				break;
+			}
+			case 2: {
+				final char ch0 = str.charAt(0);
+				final char ch1 = str.charAt(1);
+				if ((ch0 == 'o' || ch0 == 'O') &&
+						(ch1 == 'n' || ch1 == 'N') ) {
+					return true;
+				}
+				break;
+			}
+			case 3: {
+				final char ch0 = str.charAt(0);
+				final char ch1 = str.charAt(1);
+				final char ch2 = str.charAt(2);
+				if ((ch0 == 'y' || ch0 == 'Y') &&
+						(ch1 == 'e' || ch1 == 'E') &&
+						(ch2 == 's' || ch2 == 'S') ) {
+					return true;
+				}
+				break;
+			}
+			case 4: {
+				final char ch0 = str.charAt(0);
+				final char ch1 = str.charAt(1);
+				final char ch2 = str.charAt(2);
+				final char ch3 = str.charAt(3);
+				if ((ch0 == 't' || ch0 == 'T') &&
+						(ch1 == 'r' || ch1 == 'R') &&
+						(ch2 == 'u' || ch2 == 'U') &&
+						(ch3 == 'e' || ch3 == 'E') ) {
+					return true;
+				}
+				break;
+			}
+			default:
+                if(! isNumber(str)) return false;
+                long bRes =  Math.round(Double.valueOf(str));
+                return bRes!=0;
+		}
+
+		return false;
+	}
+
+	final static public boolean isFalse(String str )
+	{
+
+		if (str == "false") {
+			return true;
+		}
+		if (str == null) {
+			return false;
+		}
+		switch (str.length()) {
+			case 1: {
+				final char ch0 = str.charAt(0);
+				if (ch0 == 'n' || ch0 == 'N' ||
+						ch0 == 'f' || ch0 == 'F' || ch0 == '0') {
+					return true;
+				}
+				break;
+			}
+			case 2: {
+				final char ch0 = str.charAt(0);
+				final char ch1 = str.charAt(1);
+				if ((ch0 == 'n' || ch0 == 'N') &&
+						(ch1 == 'o' || ch1 == 'O') ) {
+					return true;
+				}
+				break;
+			}
+			case 3: {
+				final char ch0 = str.charAt(0);
+				final char ch1 = str.charAt(1);
+				final char ch2 = str.charAt(2);
+				if ((ch0 == 'o' || ch0 == 'O') &&
+						(ch1 == 'f' || ch1 == 'F') &&
+						(ch2 == 'f' || ch2 == 'F') ) {
+					return true;
+				}
+				break;
+			}
+			case 5: {
+				final char ch0 = str.charAt(0);
+				final char ch1 = str.charAt(1);
+				final char ch2 = str.charAt(2);
+				final char ch3 = str.charAt(3);
+				final char ch4 = str.charAt(4);
+				if ((ch0 == 'f' || ch0 == 'F') &&
+						(ch1 == 'a' || ch1 == 'A') &&
+						(ch2 == 'l' || ch2 == 'L') &&
+						(ch3 == 's' || ch3 == 'S') &&
+						(ch4 == 'e' || ch4 == 'E') ) {
+					return true;
+				}
+				break;
+			}
+			default:
+                if(! isNumber(str)) return false;
+                long bRes =  Math.round(Double.valueOf(str));
+                return bRes==0;
+		}
+		return false;
 	}
 
 	final static public boolean isDatetime(String szTime ,Calendar  t_time)
