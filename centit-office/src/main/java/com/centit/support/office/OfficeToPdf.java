@@ -17,8 +17,6 @@ import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
 
-import jp.ne.so_net.ga2.no_ji.jcom.IDispatch;
-import jp.ne.so_net.ga2.no_ji.jcom.ReleaseManager;
 
 public abstract class OfficeToPdf {
 	private static Log logger = LogFactory.getLog(OfficeToPdf.class);
@@ -155,43 +153,49 @@ public abstract class OfficeToPdf {
 		}
 		return false;
 	}
-
 	public static boolean word2PDF(String inputFile, String pdfFile) {
-		ReleaseManager rm = null;
-		IDispatch app = null;
-		IDispatch doc;
+		ActiveXComponent app = null;
+		Dispatch doc = null;
+		//long start = System.currentTimeMillis();
 		try {
-			rm = new ReleaseManager();
-			app = new IDispatch(rm, "Word.Application");
-			app.put("Visible", Boolean.valueOf(false));
-			IDispatch docs = (IDispatch) app.get("Documents");
-			doc = (IDispatch) docs.method("Open",
-					new Object[] { inputFile, Boolean.valueOf(false), Boolean.valueOf(true) });
-			
-			File f = new File(pdfFile);
-			if(f.exists()){
-				f.delete();
+			app = new ActiveXComponent("Word.Application");
+			// 设置word不可见
+			app.setProperty("Visible", new Variant(false));
+			// 打开word文件
+			Dispatch docs = app.getProperty("Documents").toDispatch();
+			//doc = Dispatch.call(docs,  "Open" , sourceFile).toDispatch();
+			doc = Dispatch.invoke(docs,"Open",Dispatch.Method,new Object[] {
+					inputFile, new Variant(false),new Variant(true) }, new int[1]).toDispatch();
+			//System.out.println("打开文档..." + inputFile);
+			//System.out.println("转换文档到PDF..." + pdfFile);
+			File tofile = new File(pdfFile);
+			// System.err.println(getDocPageSize(new File(inputFile)));
+			if (tofile.exists()) {
+				tofile.delete();
 			}
-			doc.method("SaveAs", new Object[] { pdfFile, Integer.valueOf(17) });
-			doc.method("Close", new Object[] { Boolean.valueOf(false) });
-			app.method("Quit", null);
-			//System.out.println("word转换为PDF完成！");
-			return true;
+			// Dispatch.call(doc, "SaveAs",  destFile,  17);
+			// 作为html格式保存到临时文件：：参数 new Variant(8)其中8表示word转html;7表示word转txt;44表示Excel转html;17表示word转成pdf。。
+			Dispatch.invoke(doc, "SaveAs", Dispatch.Method, new Object[] {
+					pdfFile, new Variant(17) }, new int[1]);
+			//long end = System.currentTimeMillis();
+			//System.out.println("转换完成..用时：" + (end - start) + "ms.");
 		} catch (Exception e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-			return false;
+			e.printStackTrace();
+			System.out.println("========Error:文档转换失败：" + e.getMessage());
+		}catch(Throwable t){
+			t.printStackTrace();
 		} finally {
-			try {
-				app = null;
-				if(rm!=null){
-					rm.release();
-					rm = null;
-				}				
-			} catch (Exception e) {
-				logger.error(e.getMessage(),e);//e.printStackTrace();
-			}
+			// 关闭word
+			Dispatch.call(doc,"Close",false);
+			System.out.println("关闭文档");
+			if (app != null)
+				app.invoke("Quit", new Variant[] {});
 		}
+		//如果没有这句话,winword.exe进程将不会关闭
+	    ComThread.Release();
+	    return true;
 	}
+
 
 	public static boolean office2Pdf(String inputFile, String pdfFile) {
 		String suffix = inputFile.substring(inputFile.lastIndexOf(".") + 1).toLowerCase();

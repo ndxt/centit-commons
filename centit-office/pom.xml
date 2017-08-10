@@ -27,8 +27,15 @@
             <version>${apache.poi.version}</version>
         </dependency>
 
-        <!-- java操作office（添加水印）-->
+        <!-- java操作office转pdf-->
+
         <dependency>
+            <groupId>com.hynnet</groupId>
+            <artifactId>jacob</artifactId>
+            <version>1.18</version>
+        </dependency>
+
+     <!--   <dependency>
             <groupId>net.sf.jacob-project</groupId>
             <artifactId>jacob</artifactId>
             <version>${jacob.version}</version>
@@ -39,7 +46,7 @@
             <groupId>net.sf.jacob-project</groupId>
             <artifactId>jacob</artifactId>
             <version>${jacob.version}</version>
-        </dependency>
+        </dependency>-->
         <!-- java操作pdf（添加水印） -->
         <dependency>
             <groupId>com.itextpdf</groupId>
@@ -47,7 +54,7 @@
             <version>${itextpdf.version}</version>
         </dependency>
 
-        <dependency>
+<!--        <dependency>
             <groupId>jp.ne.so_net.ga2.no_ji</groupId>
             <artifactId>jcom</artifactId>
             <version>${jcom.version}</version>
@@ -57,7 +64,7 @@
             <artifactId>jcom</artifactId>
             <version>${jcom.version}</version>
             <type>dll</type>
-        </dependency>
+        </dependency>-->
 
         <dependency>
             <groupId>com.sun</groupId>
