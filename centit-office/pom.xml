@@ -41,6 +41,12 @@
             <version>${xdocreport.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.xdocreport.template.freemarker</artifactId>
+            <version>${xdocreport.version}</version>
+        </dependency>
+
         <!-- java操作office转pdf-->
 
         <dependency>

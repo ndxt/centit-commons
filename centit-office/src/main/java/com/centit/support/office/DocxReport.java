@@ -15,7 +15,7 @@ import java.io.OutputStream;
 @SuppressWarnings("unused")
 public abstract class DocxReport {
 
-    public static void convertPdf(String docxFilePath,String pdfFilePath) throws Exception{
+    public static void convertDocxToPdf(String docxFilePath,String pdfFilePath) throws Exception{
 
         // 1) Load docx with POI XWPFDocument
         XWPFDocument document = new XWPFDocument( new FileInputStream( new File(docxFilePath)));
@@ -28,4 +28,6 @@ public abstract class DocxReport {
         PdfOptions options = PdfOptions.create()/*.fontEncoding( "UTF-8" )*/;
         PdfConverter.getInstance().convert( document, out, options );
     }
+
+
 }
