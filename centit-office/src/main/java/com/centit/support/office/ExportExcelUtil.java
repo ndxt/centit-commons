@@ -227,7 +227,7 @@ public class ExportExcelUtil {
     }
 
     private static void setCellStyle(HSSFWorkbook wb, HSSFCell cell) {
-        cell.setCellType( CellType.forInt(HSSFCell.ENCODING_UTF_16) );
+        cell.setCellType(CellType.STRING);
         cell.setCellStyle(getDefaultCellStyle(wb));
     }
 

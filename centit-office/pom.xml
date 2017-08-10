@@ -34,25 +34,16 @@
             <artifactId>jacob</artifactId>
             <version>${jacob.version}</version>
         </dependency>
-        <dependency>
+        <!-- 将这个dll 放到java的 bin目录下，并且必须在windows下运行 -->
+        <!--<dependency>
             <groupId>com.hynnet</groupId>
             <artifactId>jacob</artifactId>
             <version>${jacob.version}</version>
             <classifier>x64</classifier>
             <type>dll</type>
+            <scope>system</scope>
         </dependency>
-     <!--   <dependency>
-            <groupId>net.sf.jacob-project</groupId>
-            <artifactId>jacob</artifactId>
-            <version>${jacob.version}</version>
-            <classifier>x64</classifier>
-            <type>dll</type>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.jacob-project</groupId>
-            <artifactId>jacob</artifactId>
-            <version>${jacob.version}</version>
-        </dependency>-->
+        -->
         <!-- java操作pdf（添加水印） -->
         <dependency>
             <groupId>com.itextpdf</groupId>

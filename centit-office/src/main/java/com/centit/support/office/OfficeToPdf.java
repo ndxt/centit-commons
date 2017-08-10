@@ -131,6 +131,7 @@ public abstract class OfficeToPdf {
  
 
 	public static boolean ppt2PDF(String inputFile, String pdfFile) {
+        ComThread.InitSTA();
 		try {
 			ActiveXComponent app = new ActiveXComponent("PowerPoint.Application");
 
@@ -147,15 +148,18 @@ public abstract class OfficeToPdf {
 			Dispatch.call(ppt, "Close");
 			app.invoke("Quit");
 			//System.out.println("ppt转换为PDF完成！");
-			return true;
+            return true;
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);//e.printStackTrace();
-		}
-		return false;
+		}finally {
+            ComThread.Release();
+        }
+        return false;
 	}
 	public static boolean word2PDF(String inputFile, String pdfFile) {
 		ActiveXComponent app = null;
 		Dispatch doc = null;
+        ComThread.InitSTA();
 		//long start = System.currentTimeMillis();
 		try {
 			app = new ActiveXComponent("Word.Application");
