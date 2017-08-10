@@ -33,14 +33,12 @@
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.xdocreport.converter</artifactId>
             <version>${xdocreport.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
             <version>${xdocreport.version}</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- java操作office转pdf-->
@@ -61,6 +59,13 @@
         </dependency>
         -->
         <!-- java操作pdf（添加水印） -->
+        <!--<dependency>
+            <groupId>com.lowagie</groupId>
+            <artifactId>itext</artifactId>
+            <version>4.2.1</version>
+        </dependency>-->
+        <!--com.lowagie itext 4.2.1 相当有 itextpdf的5.5.6，同时
+         它将覆盖 com.lowagie 2.1.7 -->
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itextpdf</artifactId>
