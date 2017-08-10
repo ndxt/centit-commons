@@ -32,7 +32,7 @@
             <groupId>net.sf.jacob-project</groupId>
             <artifactId>jacob</artifactId>
             <version>${jacob.version}</version>
-            <classifier>x86</classifier>
+            <classifier>x64</classifier>
             <type>dll</type>
         </dependency>
         <dependency>

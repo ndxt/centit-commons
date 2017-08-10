@@ -49,6 +49,12 @@
             <organization>centit.com</organization>
             <organizationUrl>http://www.centit.com</organizationUrl>
         </developer>
+        <developer>
+            <name>朱晓文</name>
+            <email>zhu_xw@centit.com</email>
+            <organization>centit.com</organization>
+            <organizationUrl>http://www.centit.com</organizationUrl>
+        </developer>
     </developers>
 
     <scm>
@@ -70,6 +76,7 @@
     </modules>
 
     <!-- mvn deploy -DpomFile=pom.xml -->
+<!--
 
     <distributionManagement>
        <repository>
@@ -83,8 +90,8 @@
            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
        </snapshotRepository>
    </distributionManagement>
+-->
 
-<!--
    <distributionManagement>
         <repository>
             <id>centit-releases</id>
@@ -97,7 +104,6 @@
             <url>http://develop.centit.com:8080/nexus/content/repositories/centit-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
--->
 
     <build>
         <plugins>
