@@ -21,8 +21,7 @@
 
         <apache.poi.version>3.16</apache.poi.version>
         <itextpdf.version>5.5.11</itextpdf.version>
-        <jacob.version>1.14.3</jacob.version>
-        <jcom.version>2.2.1</jcom.version>
+        <jacob.version>1.18</jacob.version>
     </properties>
 
     <modelVersion>4.0.0</modelVersion>

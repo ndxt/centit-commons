@@ -32,9 +32,15 @@
         <dependency>
             <groupId>com.hynnet</groupId>
             <artifactId>jacob</artifactId>
-            <version>1.18</version>
+            <version>${jacob.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.hynnet</groupId>
+            <artifactId>jacob</artifactId>
+            <version>${jacob.version}</version>
+            <classifier>x64</classifier>
+            <type>dll</type>
+        </dependency>
      <!--   <dependency>
             <groupId>net.sf.jacob-project</groupId>
             <artifactId>jacob</artifactId>
@@ -53,18 +59,6 @@
             <artifactId>itextpdf</artifactId>
             <version>${itextpdf.version}</version>
         </dependency>
-
-<!--        <dependency>
-            <groupId>jp.ne.so_net.ga2.no_ji</groupId>
-            <artifactId>jcom</artifactId>
-            <version>${jcom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jp.ne.so_net.ga2.no_ji</groupId>
-            <artifactId>jcom</artifactId>
-            <version>${jcom.version}</version>
-            <type>dll</type>
-        </dependency>-->
 
         <dependency>
             <groupId>com.sun</groupId>
