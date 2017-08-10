@@ -5,7 +5,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <centit.commons.version>2.2.2-SNAPSHOT</centit.commons.version>
+        <centit.commons.version>2.2.2</centit.commons.version>
         <jdk.version>1.8</jdk.version>
         <ical4j.version>2.0.0</ical4j.version>
         <dom4j.version>2.0.0</dom4j.version>
@@ -20,6 +20,7 @@
         <commons-dbcp2.version>2.1.1</commons-dbcp2.version>
 
         <apache.poi.version>3.16</apache.poi.version>
+        <xdocreport.version>2.0.1</xdocreport.version>
         <itextpdf.version>5.5.11</itextpdf.version>
         <jacob.version>1.18</jacob.version>
     </properties>
@@ -27,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.support</groupId>
     <artifactId>centit-commons</artifactId>
-    <version>2.2.2-SNAPSHOT</version>
+    <version>2.2.2</version>
     <name>com.centit.support:centit-commons</name>
     <packaging>pom</packaging>
     <description>java 常用工具类,作为 apache-commons的补充</description>
@@ -75,7 +76,6 @@
     </modules>
 
     <!-- mvn deploy -DpomFile=pom.xml -->
-<!--
 
     <distributionManagement>
        <repository>
@@ -89,9 +89,8 @@
            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
        </snapshotRepository>
    </distributionManagement>
--->
 
-   <distributionManagement>
+   <!--<distributionManagement>
         <repository>
             <id>centit-releases</id>
             <name>centit-release</name>
@@ -103,7 +102,7 @@
             <url>http://develop.centit.com:8080/nexus/content/repositories/centit-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
-
+-->
     <build>
         <plugins>
             <plugin>

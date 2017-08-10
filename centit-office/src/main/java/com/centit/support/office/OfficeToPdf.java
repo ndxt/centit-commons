@@ -1,12 +1,5 @@
 package com.centit.support.office;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.centit.support.file.FileSystemOpt;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
@@ -16,7 +9,12 @@ import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public abstract class OfficeToPdf {
 	private static Log logger = LogFactory.getLog(OfficeToPdf.class);
@@ -185,13 +183,14 @@ public abstract class OfficeToPdf {
 			//System.out.println("转换完成..用时：" + (end - start) + "ms.");
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("========Error:文档转换失败：" + e.getMessage());
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+			//System.out.println("========Error:文档转换失败：" + e.getMessage());
 		}catch(Throwable t){
 			t.printStackTrace();
 		} finally {
 			// 关闭word
 			Dispatch.call(doc,"Close",false);
-			System.out.println("关闭文档");
+			//System.out.println("关闭文档");
 			if (app != null)
 				app.invoke("Quit", new Variant[] {});
 		}
@@ -274,4 +273,28 @@ public abstract class OfficeToPdf {
 			System.runFinalization();
 		}
 	}
+
+
+   /* public static void convertPdf(String docxFilePath,String pdfFilePath) throws Exception{
+        File docxFile=new File(docxFilePath);
+        File pdfFile=new File(pdfFilePath);
+
+        //转换pdf文件
+        if(docxFile.exists()){
+            if(!pdfFile.exists()){
+                InputStream inStream=new FileInputStream(docxFilePath);
+                XWPFDocument document = new XWPFDocument(inStream);
+                //HWPFDocument document = new HWPFDocument(inStream);
+                OutputStream out = new FileOutputStream(pdfFilePath);
+                PdfOptions options = PdfOptions.create();
+                ExtITextFontRegistry fontProvider=ExtITextFontRegistry.getRegistry();
+                options.fontProvider(fontProvider);
+                PdfConverter.getInstance().convert(document, out, options);
+            }else{
+                System.out.println("PDF文件已存在，无需再次转换");
+            }
+        }else{
+        }
+    }*/
+
 }
