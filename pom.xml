@@ -20,7 +20,6 @@
         <commons-dbcp2.version>2.1.1</commons-dbcp2.version>
 
         <apache.poi.version>3.16</apache.poi.version>
-
         <itextpdf.version>5.5.11</itextpdf.version>
         <jacob.version>1.18</jacob.version>
     </properties>
