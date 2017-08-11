@@ -141,7 +141,7 @@ public abstract class OfficeToPdf {
 			if(f.exists()){
 				f.delete();
 			}
-			Dispatch.call(ppt, "SaveAs", pdfFile, Integer.valueOf(32));
+			Dispatch.call(ppt, "SaveAs", pdfFile.replace('/','\\'), Integer.valueOf(32));
 			Dispatch.call(ppt, "Close");
 			app.invoke("Quit");
 			//System.out.println("ppt转换为PDF完成！");
@@ -217,11 +217,12 @@ public abstract class OfficeToPdf {
 			}
 			return false;
 		}
-		if ((suffix.equalsIgnoreCase("doc")) || (suffix.equalsIgnoreCase("docx")))
+		if (suffix.equalsIgnoreCase("doc") || suffix.equalsIgnoreCase("docx"))
 			return word2Pdf(inputFile, pdfFile);
-		if ((suffix.equalsIgnoreCase("ppt")) || (suffix.equalsIgnoreCase("pptx")))
+		if (suffix.equalsIgnoreCase("ppt") || suffix.equalsIgnoreCase("pptx"))
 			return ppt2Pdf(inputFile, pdfFile);
-		if ((suffix.equalsIgnoreCase("xls")) || (suffix.equalsIgnoreCase("xlsx"))) {
+		if (suffix.equalsIgnoreCase("xls") || suffix.equalsIgnoreCase("xlsx")
+                || suffix.equalsIgnoreCase("xlsm") ) {
 			return excel2Pdf(inputFile, pdfFile);
 		}
 		//System.out.println("文件格式不支持转换为PDF!");
