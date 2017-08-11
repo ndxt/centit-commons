@@ -14,7 +14,6 @@
     <packaging>jar</packaging>
     <description>office(doc、xls、ppt) pdf 等文档处理</description>
 
-
     <dependencies>
         <dependency>
             <groupId>com.centit.support</groupId>
@@ -28,48 +27,29 @@
             <version>${apache.poi.version}</version>
         </dependency>
 
-        <!-- word(docx)的格式报表 同时可以转换pdf -->
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.converter</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.template.freemarker</artifactId>
-            <version>${xdocreport.version}</version>
-        </dependency>
-
         <!-- java操作office转pdf-->
-
         <dependency>
             <groupId>com.hynnet</groupId>
             <artifactId>jacob</artifactId>
             <version>${jacob.version}</version>
         </dependency>
+
         <!-- 将这个dll 放到java的 bin目录下，并且必须在windows下运行 -->
-        <!--<dependency>
+        <dependency>
             <groupId>com.hynnet</groupId>
             <artifactId>jacob</artifactId>
             <version>${jacob.version}</version>
             <classifier>x64</classifier>
             <type>dll</type>
-            <scope>system</scope>
         </dependency>
-        -->
+
         <!-- java操作pdf（添加水印） -->
         <!--<dependency>
             <groupId>com.lowagie</groupId>
             <artifactId>itext</artifactId>
             <version>4.2.1</version>
         </dependency>-->
+
         <!--com.lowagie itext 4.2.1 相当有 itextpdf的5.5.6，同时
          它将覆盖 com.lowagie 2.1.7 -->
         <dependency>

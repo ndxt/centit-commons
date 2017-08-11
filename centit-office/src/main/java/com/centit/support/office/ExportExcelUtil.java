@@ -20,26 +20,16 @@ import java.util.Map;
  *
  * @author codefan@sina.com
  * 2013-6-25
+ * @Deprecated 这个类迁移到  com.centit.support.report.ExcelReportUtil
+ * 在 centit-report-utils 包中， 2017-8-11
  */
+@Deprecated
 @SuppressWarnings("unused")
 public class ExportExcelUtil {
 
 
     public static InputStream generateExcel(List<? extends Object> objLists) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        HSSFSheet sheet = ExportExcelUtil.createDefaultSheet();
-        try {
-            generateObjText(sheet, objLists);
-            sheet.getWorkbook().write(baos);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return new ByteArrayInputStream(baos.toByteArray());
+        return generateExcel(objLists,null,null);
     }
 
 
@@ -54,59 +44,36 @@ public class ExportExcelUtil {
     public static InputStream generateExcel(List<? extends Object> objLists, String[] header, String[] property) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         HSSFSheet sheet = ExportExcelUtil.createDefaultSheet();
-
-        generateHeader(sheet, header);
+        if(header!=null && header.length>0) {
+            generateHeader(sheet, header);
+        }
 
         try {
-            generateText(sheet, objLists, property);
+            if(property!=null && property.length>0) {
+                generateText(sheet, objLists, property);
+            }else{
+                generateObjText(sheet, objLists);
+            }
             sheet.getWorkbook().write(baos);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchFieldException e) {
+        } catch (IOException | InvocationTargetException | NoSuchMethodException
+                | IllegalAccessException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
 
         return new ByteArrayInputStream(baos.toByteArray());
     }
 
-    /**
+    /*
      * 生成Excel字节流
      *
      * @param objLists 对象集合
-     * @param header   Excel页头
      * @param property 需要显示的属性
      * @return InputStream excel 文件流
      */
-    public static InputStream generateExcel(List<Object[]> objLists, String[] header, int[] property) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        HSSFSheet sheet = ExportExcelUtil.createDefaultSheet();
 
-        generateHeader(sheet, header);
-
-        try {
-            generateText(sheet, objLists, property);
-            sheet.getWorkbook().write(baos);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-
-        return new ByteArrayInputStream(baos.toByteArray());
-    }
-
+    /*public static InputStream generateExcel(List<? extends Object> objLists, String[] property) {
+        return generateExcel(objLists,null,property);
+    }*/
 
     /**
      * 生成Excel字节流
@@ -165,9 +132,7 @@ public class ExportExcelUtil {
                     cell.setCellValue(null == val ? "" : val.toString());
                     continue;
                 }
-
                 //List中是普通Po类型
-                
                 Method method = ReflectionOpt.getGetterMethod(objLists.get(i).getClass(), property[j]);
                 if(method == null)
                     method = ReflectionOpt.getBooleanGetterMethod(objLists.get(i).getClass(), property[j]);
@@ -175,21 +140,6 @@ public class ExportExcelUtil {
                 Object val = method.invoke(objLists.get(i));
                 
                 cell.setCellValue(null == val ? "" : val.toString());
-            }
-        }
-    }
-
-    private static void generateText(HSSFSheet sheet, List<Object[]> objLists, int[] property) throws NoSuchFieldException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        for (int i = 0; i < objLists.size(); i++) {
-            HSSFRow textRow = sheet.createRow(i + 1);
-            for (int j = 0; j < property.length; j++) {
-                HSSFCell cell = textRow.createCell(j);
-                setCellStyle(sheet.getWorkbook(), cell);
-
-                //if (ClassUtils.isAssignableValue(Object.class, objLists.get(i).getClass())) {
-                Object val = (objLists.get(i))[property[j]];
-                cell.setCellValue(null == val ? "" : val.toString());
-                //}
             }
         }
     }
@@ -202,7 +152,6 @@ public class ExportExcelUtil {
             //Field[] fields = objLists.get(i).getClass().getDeclaredFields();
             int errorLen = 0;
             for (int j = 0; j < getMethods.size(); j++) {
-              
 
                 HSSFCell cell = textRow.createCell(j - errorLen);
                 setCellStyle(sheet.getWorkbook(), cell);
@@ -258,18 +207,12 @@ public class ExportExcelUtil {
 
 
     private HSSFWorkbook wb = null;
-
     private HSSFSheet sheet = null;
-
-    private ExportExcelUtil() {
-    }
-
     /**
      * @param wb
      * @param sheet
      */
     private ExportExcelUtil(HSSFWorkbook wb, HSSFSheet sheet) {
-        super();
         this.wb = wb;
         this.sheet = sheet;
     }

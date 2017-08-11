@@ -20,7 +20,7 @@
         <commons-dbcp2.version>2.1.1</commons-dbcp2.version>
 
         <apache.poi.version>3.16</apache.poi.version>
-        <xdocreport.version>2.0.1</xdocreport.version>
+
         <itextpdf.version>5.5.11</itextpdf.version>
         <jacob.version>1.18</jacob.version>
     </properties>
@@ -46,12 +46,6 @@
         <developer>
             <name>杨淮生</name>
             <email>codefan@sina.com</email>
-            <organization>centit.com</organization>
-            <organizationUrl>http://www.centit.com</organizationUrl>
-        </developer>
-        <developer>
-            <name>朱晓文</name>
-            <email>zhu_xw@centit.com</email>
             <organization>centit.com</organization>
             <organizationUrl>http://www.centit.com</organizationUrl>
         </developer>
