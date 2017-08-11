@@ -20,13 +20,12 @@ public abstract class OfficeToPdf {
 	private static Log logger = LogFactory.getLog(OfficeToPdf.class);
 	//private static final int ppSaveAsPDF = 32;
 	/**
-	 * yang_h 2016-5-24
 	 * 修改 excel多sheet 转换PDF 问题，一张表格 超大不分页，一个sheet = 一页pdf
 	 * @param inputFile 输入excel文件
 	 * @param pdfFile 临时pdf
 	 * @return 是否成功
 	 */
-	public static boolean excel2PDF(String inputFile, String pdfFile) {
+	public static boolean excel2Pdf(String inputFile, String pdfFile) {
 		ComThread.InitSTA();
 		ActiveXComponent actcom = new ActiveXComponent("Excel.Application");
 		try {
@@ -39,61 +38,68 @@ public abstract class OfficeToPdf {
 			String outFile = pdfFile.substring(0,pdfFile.lastIndexOf("."));
 			//將每一個sheet 分開轉換成 單獨的pdf
 	        for (int i = 1; i <=count ; i++) {
-	        	//獲得當前sheet
-	           Dispatch sheet = Dispatch.invoke(sheets, "Item",
-	                       Dispatch.Get, new Object[] { i }, new int[1]).toDispatch();
-	           //設置當前sheet 內容在一頁展示
-	           Dispatch page = Dispatch.call(sheet, "PageSetup").toDispatch();
-	           Dispatch.put(page, "PrintArea", false);//false或"" 表示打印sheet页中的 整个区域， 可以使用 excel表达式指定 要打印的单元格范围 ，比如 "$A$1:$C$5" 表示打印 A1-C5的单元格区域
-	           Dispatch.put(page, "Orientation", 2);// 打印方向 1横向  2纵向
-	           /**
-	            * 将所有内容 无论行，列 有多少 都在一页显示， 
-	            * Zoom 必须为false ,FitToPagesTall、FitToPagesWide才有效！！
-	            */
-	           Dispatch.put(page, "Zoom", false);      //值为100=false， 缩放 10-400  %
-	           Dispatch.put(page, "FitToPagesTall", 1);  //所有行为一页--   页高
-	           Dispatch.put(page, "FitToPagesWide", 1);  //所有列为一页(1或false) --页宽
-        		
-	           //將當前sheet轉換成 一個pdf
-        	   //String sheetname = Dispatch.get(sheet, "name").toString();
-        		
-        		Dispatch.call(sheet, "Activate");	
-        		Dispatch.call(sheet, "Select");
-        		Dispatch.invoke(excel,"SaveAs",Dispatch.Method,
-        			 new Object[]{outFile+"-"+ i+".pdf",new Variant(57), new Variant(false),
-           		     new Variant(57), new Variant(57),new Variant(false), 
-           		     new Variant(true),new Variant(57), new Variant(false),
-           		     new Variant(true), new Variant(false) },new int[1]);
-        		//System.out.println("Excel sheet to pdf Success :"+outFile+"-"+ i+".pdf");
+                try {
+                    //獲得當前sheet
+                    Dispatch sheet = Dispatch.invoke(sheets, "Item",
+                            Dispatch.Get, new Object[]{i}, new int[1]).toDispatch();
+                    //設置當前sheet 內容在一頁展示
+                    Dispatch page = Dispatch.call(sheet, "PageSetup").toDispatch();
+                    Dispatch.put(page, "PrintArea", false);//false或"" 表示打印sheet页中的 整个区域， 可以使用 excel表达式指定 要打印的单元格范围 ，比如 "$A$1:$C$5" 表示打印 A1-C5的单元格区域
+                    Dispatch.put(page, "Orientation", 2);// 打印方向 1横向  2纵向
+                    /**
+                     * 将所有内容 无论行，列 有多少 都在一页显示，
+                     * Zoom 必须为false ,FitToPagesTall、FitToPagesWide才有效！！
+                     */
+                    Dispatch.put(page, "Zoom", false);      //值为100=false， 缩放 10-400  %
+                    Dispatch.put(page, "FitToPagesTall", 1);  //所有行为一页--   页高
+                    Dispatch.put(page, "FitToPagesWide", 1);  //所有列为一页(1或false) --页宽
+
+                    //將當前sheet轉換成 一個pdf
+                    //String sheetname = Dispatch.get(sheet, "name").toString();
+
+                    Dispatch.call(sheet, "Activate");
+                    Dispatch.call(sheet, "Select");
+                    Dispatch.invoke(excel, "SaveAs", Dispatch.Method,
+                            new Object[]{outFile + "-" + i + ".pdf", new Variant(57), new Variant(false),
+                                    new Variant(57), new Variant(57), new Variant(false),
+                                    new Variant(true), new Variant(57), new Variant(false),
+                                    new Variant(true), new Variant(false)}, new int[1]);
+                    //System.out.println("Excel sheet to pdf Success :"+outFile+"-"+ i+".pdf");
+                }catch (Exception e){
+                    logger.error("可能是因为页面 "+i+" 没有任何元素导致打印失败！ "+e.getMessage());
+                }
 	        }
 	        //將多個 pdf 合併到一個pdf,可能會有 頁面大小不一問題，需要合併之前 求出最大頁面pageSizes
 	        if(count>0){
 	        	try {
 	        		File finalPdf = new File(pdfFile);//合并pdf 临时文件
-	        		if(finalPdf.exists())
-	        		finalPdf.delete();
+	        		if(finalPdf.exists()) {
+                        finalPdf.delete();
+                    }
 	    			Document document = new Document();
 	    			FileOutputStream out = new FileOutputStream(finalPdf);
 	    			PdfCopy copy = new PdfCopy(document, out);
 	    			document.open();
 	    			for (int i = 1; i <= count; i++) {
-	    				PdfReader reader = new PdfReader(outFile+"-"+ i+".pdf");
-	    				int n = reader.getNumberOfPages();
-	    				for (int j = 1; j <= n; j++) {
-	    					document.newPage();
-	    					PdfImportedPage page = copy.getImportedPage(reader, j);
-	    					copy.addPage(page);
-	    				}
-	    				reader.close();
-	    			}
-	    			copy.close();
-	    			document.close();
-	    			out.close();
-	    			out.flush();
+                        File pdfPieceFile = new File(outFile + "-" + i + ".pdf");//合并pdf 临时文件
+                        if (pdfPieceFile.exists()) {
+                            PdfReader reader = new PdfReader(outFile + "-" + i + ".pdf");
+                            int n = reader.getNumberOfPages();
+                            for (int j = 1; j <= n; j++) {
+                                document.newPage();
+                                PdfImportedPage page = copy.getImportedPage(reader, j);
+                                copy.addPage(page);
+                            }
+                            reader.close();
+                        }
+                    }
+                    copy.close();
+                    document.close();
+                    out.close();
+                    out.flush();
 	    			//System.out.println("合并sheet pdf 到 "+pdfFile+" 成功！");
 	    		}catch (Exception e) {
 	    			logger.error(e.getMessage(),e);//e.printStackTrace();
-
 	    		}
 	        }
 	        //关闭
@@ -103,8 +109,7 @@ public abstract class OfficeToPdf {
 				actcom.invoke("Quit", new Variant[0]);
 				actcom = null;
 			}
-			//释放jcom线程
-			ComThread.Release();			
+
 			//删除 sheet pdf
 			for (int i = 1; i <= count; i++) {
 				//删除sheet pdf文件
@@ -123,19 +128,23 @@ public abstract class OfficeToPdf {
 			return true;
 		} catch (Exception es) {
 			es.printStackTrace();
-		}
-		return false;
+		}finally {
+            //释放jcom线程
+            ComThread.Release();
+        }
+        return false;
 	}
  
 
-	public static boolean ppt2PDF(String inputFile, String pdfFile) {
+	public static boolean ppt2Pdf(String inputFile, String pdfFile) {
         ComThread.InitSTA();
 		try {
 			ActiveXComponent app = new ActiveXComponent("PowerPoint.Application");
 
 			Dispatch ppts = app.getProperty("Presentations").toDispatch();
 			Dispatch ppt = Dispatch
-					.call(ppts, "Open", inputFile, Boolean.valueOf(true), Boolean.valueOf(true), Boolean.valueOf(false))
+					.call(ppts, "Open", inputFile, Boolean.valueOf(true),
+                            Boolean.valueOf(true), Boolean.valueOf(false))
 					.toDispatch();
 			
 			File f = new File(pdfFile);
@@ -154,7 +163,8 @@ public abstract class OfficeToPdf {
         }
         return false;
 	}
-	public static boolean word2PDF(String inputFile, String pdfFile) {
+
+	public static boolean word2Pdf(String inputFile, String pdfFile) {
 		ActiveXComponent app = null;
 		Dispatch doc = null;
         ComThread.InitSTA();
@@ -218,83 +228,14 @@ public abstract class OfficeToPdf {
 			return false;
 		}
 		if ((suffix.equalsIgnoreCase("doc")) || (suffix.equalsIgnoreCase("docx")))
-			return word2PDF(inputFile, pdfFile);
+			return word2Pdf(inputFile, pdfFile);
 		if ((suffix.equalsIgnoreCase("ppt")) || (suffix.equalsIgnoreCase("pptx")))
-			return ppt2PDF(inputFile, pdfFile);
+			return ppt2Pdf(inputFile, pdfFile);
 		if ((suffix.equalsIgnoreCase("xls")) || (suffix.equalsIgnoreCase("xlsx"))) {
-			return excel2PDF(inputFile, pdfFile);
+			return excel2Pdf(inputFile, pdfFile);
 		}
 		//System.out.println("文件格式不支持转换为PDF!");
 		return false;
 	}	
-	
-	public static void excelToPdf(String excelFileName, String pdfFileName, int Orientation) {
-		ComThread.InitSTA();
-		ActiveXComponent app = new ActiveXComponent("Excel.Application");
-		try {
-			app.setProperty("Visible", new Variant(false));
-			Dispatch workbooks = app.getProperty("Workbooks").toDispatch();
-			Dispatch workbook = Dispatch
-					.invoke(workbooks, "Open", 1,
-							new Object[] { excelFileName, new Variant(false), new Variant(false) }, new int[3])
-					.toDispatch();
-			Dispatch currentSheet = Dispatch.get(workbook, "ActiveSheet").toDispatch();
-			Dispatch page = Dispatch.get(currentSheet, "PageSetup").toDispatch();
-			Dispatch.put(page, "PrintArea", false);
-			Dispatch.put(page, "Orientation", Orientation);
-			Dispatch.put(page, "PaperSize", Integer.valueOf(9));
-			Dispatch.put(page, "Zoom", false);
-			Dispatch.put(page, "FitToPagesTall", false);
-			Dispatch.put(page, "FitToPagesWide", 1);
-			Variant f = new Variant(false);
-			String tempFile = "E://ZJN//ZJN_FILES//";
-			File tempDir = new File(tempFile);
-			if (!tempDir.exists()) {
-				tempDir.mkdirs();
-			}
-			tempFile = tempFile + "temp.pdf";
-			Dispatch.invoke(workbook, "SaveAs", Dispatch.Method,
-					new Object[] { tempFile, new Variant(57), new Variant(false), new Variant(57), new Variant(57),
-							new Variant(false), new Variant(true), new Variant(57), new Variant(true),
-							new Variant(true), new Variant(true) },
-					new int[1]);
-			File file = new File(tempFile);
-			file.renameTo(new File(pdfFileName));
-			file.delete();
-			Dispatch.call(workbook, "Close", f);
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-		} finally {
-			if (app != null) {
-				app.invoke("Quit", new Variant[0]);
-			}
-			ComThread.Release();
-			System.gc();
-			System.runFinalization();
-		}
-	}
-
-
-   /* public static void convertPdf(String docxFilePath,String pdfFilePath) throws Exception{
-        File docxFile=new File(docxFilePath);
-        File pdfFile=new File(pdfFilePath);
-
-        //转换pdf文件
-        if(docxFile.exists()){
-            if(!pdfFile.exists()){
-                InputStream inStream=new FileInputStream(docxFilePath);
-                XWPFDocument document = new XWPFDocument(inStream);
-                //HWPFDocument document = new HWPFDocument(inStream);
-                OutputStream out = new FileOutputStream(pdfFilePath);
-                PdfOptions options = PdfOptions.create();
-                ExtITextFontRegistry fontProvider=ExtITextFontRegistry.getRegistry();
-                options.fontProvider(fontProvider);
-                PdfConverter.getInstance().convert(document, out, options);
-            }else{
-                System.out.println("PDF文件已存在，无需再次转换");
-            }
-        }else{
-        }
-    }*/
 
 }

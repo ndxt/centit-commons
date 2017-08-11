@@ -20,7 +20,7 @@ import java.util.Map;
  *
  * @author codefan@sina.com
  * 2013-6-25
- * @Deprecated 这个类迁移到 com.centit.support ： com.centit.support.report.ExcelReportUtil
+ * 这个类迁移到 com.centit.support ： com.centit.support.report.ExcelReportUtil
  * 在 centit-report-utils 包中， 2017-8-11
  */
 @Deprecated
