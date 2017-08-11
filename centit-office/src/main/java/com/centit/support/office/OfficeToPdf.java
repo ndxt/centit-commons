@@ -28,14 +28,16 @@ public abstract class OfficeToPdf {
 	public static boolean excel2Pdf(String inputFile, String pdfFile) {
 		ComThread.InitSTA();
 		ActiveXComponent actcom = new ActiveXComponent("Excel.Application");
+        int count=0;
+        String outFile = pdfFile.substring(0,pdfFile.lastIndexOf("."));
 		try {
 			actcom.setProperty("Visible", new Variant(false));
 			Dispatch workbooks = actcom.getProperty("Workbooks").toDispatch();
 			Dispatch excel = Dispatch.invoke(workbooks,"Open",Dispatch.Method,  
 					new Object[]{inputFile,new Variant(false),new Variant(false)},  new int[9] ).toDispatch();
 			Dispatch sheets= Dispatch.get(excel, "Sheets").toDispatch();
-			int count = Dispatch.get(sheets, "Count").getInt();
-			String outFile = pdfFile.substring(0,pdfFile.lastIndexOf("."));
+			count = Dispatch.get(sheets, "Count").getInt();
+
 			//將每一個sheet 分開轉換成 單獨的pdf
 	        for (int i = 1; i <=count ; i++) {
                 try {
@@ -69,70 +71,54 @@ public abstract class OfficeToPdf {
                     logger.error("可能是因为页面 "+i+" 没有任何元素导致打印失败！ "+e.getMessage());
                 }
 	        }
-	        //將多個 pdf 合併到一個pdf,可能會有 頁面大小不一問題，需要合併之前 求出最大頁面pageSizes
-	        if(count>0){
-	        	try {
-	        		File finalPdf = new File(pdfFile);//合并pdf 临时文件
-	        		if(finalPdf.exists()) {
-                        finalPdf.delete();
-                    }
-	    			Document document = new Document();
-	    			FileOutputStream out = new FileOutputStream(finalPdf);
-	    			PdfCopy copy = new PdfCopy(document, out);
-	    			document.open();
-	    			for (int i = 1; i <= count; i++) {
-                        File pdfPieceFile = new File(outFile + "-" + i + ".pdf");//合并pdf 临时文件
-                        if (pdfPieceFile.exists()) {
-                            PdfReader reader = new PdfReader(outFile + "-" + i + ".pdf");
-                            int n = reader.getNumberOfPages();
-                            for (int j = 1; j <= n; j++) {
-                                document.newPage();
-                                PdfImportedPage page = copy.getImportedPage(reader, j);
-                                copy.addPage(page);
-                            }
-                            reader.close();
-                        }
-                    }
-                    copy.close();
-                    document.close();
-                    out.close();
-                    out.flush();
-	    			//System.out.println("合并sheet pdf 到 "+pdfFile+" 成功！");
-	    		}catch (Exception e) {
-	    			logger.error(e.getMessage(),e);//e.printStackTrace();
-	    		}
-	        }
-	        //关闭
-			Dispatch.call(excel, "Close", new Variant(false));
-			//退出
-			if (actcom != null) {
-				actcom.invoke("Quit", new Variant[0]);
-				actcom = null;
-			}
-
-			//删除 sheet pdf
-			for (int i = 1; i <= count; i++) {
-				//删除sheet pdf文件
-				File sheetPdf = new File(outFile+"-"+ i+".pdf");
-				if(sheetPdf.exists()){
-					boolean isDel = sheetPdf.delete();
-					if(isDel==false){
-						System.gc();
-						isDel = sheetPdf.delete();
-						//删除本地临时文件
-					}
-					//System.out.println("Remove Excel Sheet to pdf临时文件："+outFile+"-"+ i+".pdf" +"结果："+isDel);
-				}
-			}
-			//System.out.println("excel 转换为 PDF 完成！");
-			return true;
+            //关闭
+            Dispatch.call(excel, "Close", new Variant(false));
+            //退出
+            if (actcom != null) {
+                actcom.invoke("Quit", new Variant[0]);
+            }
 		} catch (Exception es) {
 			es.printStackTrace();
 		}finally {
             //释放jcom线程
             ComThread.Release();
         }
-        return false;
+
+        //將多個 pdf 合併到一個pdf,可能會有 頁面大小不一問題，需要合併之前 求出最大頁面pageSizes
+        if(count>0){
+            try {
+                File finalPdf = new File(pdfFile);//合并pdf 临时文件
+                if(finalPdf.exists()) {
+                    finalPdf.delete();
+                }
+                Document document = new Document();
+                FileOutputStream out = new FileOutputStream(finalPdf);
+                PdfCopy copy = new PdfCopy(document, out);
+                document.open();
+                for (int i = 1; i <= count; i++) {
+                    File pdfPieceFile = new File(outFile + "-" + i + ".pdf");//合并pdf 临时文件
+                    if (pdfPieceFile.exists()) {
+                        PdfReader reader = new PdfReader(outFile + "-" + i + ".pdf");
+                        int n = reader.getNumberOfPages();
+                        for (int j = 1; j <= n; j++) {
+                            document.newPage();
+                            PdfImportedPage page = copy.getImportedPage(reader, j);
+                            copy.addPage(page);
+                        }
+                        reader.close();
+                    }
+                }
+                copy.close();
+                document.close();
+                out.close();
+                out.flush();
+                //System.out.println("合并sheet pdf 到 "+pdfFile+" 成功！");
+            }catch (Exception e) {
+                logger.error(e.getMessage(),e);//e.printStackTrace();
+            }
+        }
+        return true;
+
 	}
  
 
