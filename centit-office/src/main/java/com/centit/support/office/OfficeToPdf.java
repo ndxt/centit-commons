@@ -27,6 +27,7 @@ public abstract class OfficeToPdf {
 	 */
 	public static boolean excel2Pdf(String inputFile, String pdfFile) {
 		ComThread.InitSTA();
+        boolean successed =true;
 		ActiveXComponent actcom = new ActiveXComponent("Excel.Application");
         int count=0;
         String outFile = pdfFile.substring(0,pdfFile.lastIndexOf("."));
@@ -78,6 +79,7 @@ public abstract class OfficeToPdf {
                 actcom.invoke("Quit", new Variant[0]);
             }
 		} catch (Exception es) {
+            successed =false;
 			es.printStackTrace();
 		}finally {
             //释放jcom线程
@@ -107,17 +109,19 @@ public abstract class OfficeToPdf {
                         }
                         reader.close();
                     }
+                    pdfPieceFile.delete();
                 }
                 copy.close();
                 document.close();
-                out.close();
                 out.flush();
+                out.close();
                 //System.out.println("合并sheet pdf 到 "+pdfFile+" 成功！");
             }catch (Exception e) {
+                successed =false;
                 logger.error(e.getMessage(),e);//e.printStackTrace();
             }
         }
-        return true;
+        return successed;
 
 	}
  
