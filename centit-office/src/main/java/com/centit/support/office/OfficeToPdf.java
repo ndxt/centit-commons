@@ -301,4 +301,37 @@ public abstract class OfficeToPdf {
 		return false;
 	}
 
+	public static boolean office2Pdf(String suffix, String inputFile, String pdfFile) {
+//		String suffix = fileStoreInfo.getFileType();
+//		String inputFile = fileStoreInfo.getFileStorePath();
+//				String suffix = inputFile.substring(inputFile.lastIndexOf(".") + 1).toLowerCase();
+		//System.out.println("文件后缀："+suffix);
+		File file = new File(inputFile);
+		if (!(file.exists())) {
+			//System.err.println("文件不存在！");
+			return false;
+		}
+		if (suffix.equalsIgnoreCase("pdf")) {
+			//System.out.println("PDF文件无需转换为PDF!");
+			try {
+				FileSystemOpt.fileCopy(inputFile, pdfFile);
+				return true;
+			} catch (IOException e) {
+			}
+			return false;
+		}
+        if (suffix.equalsIgnoreCase("doc") || suffix.equalsIgnoreCase("docx")) {
+            return word2Pdf(inputFile, pdfFile);
+        }else if (suffix.equalsIgnoreCase("ppt") || suffix.equalsIgnoreCase("pptx")) {
+            return ppt2Pdf(inputFile, pdfFile);
+        }else if (suffix.equalsIgnoreCase("xls") || suffix.equalsIgnoreCase("xlsx")
+                || suffix.equalsIgnoreCase("xlsm") ){
+            return excel2Pdf(inputFile, pdfFile);
+        }else if (suffix.equalsIgnoreCase("wps")) {
+            return wps2Pdf(inputFile, pdfFile);
+        }
+		//System.out.println("文件格式不支持转换为PDF!");
+		return false;
+	}
+
 }
