@@ -1,5 +1,6 @@
-package com.centit.support.database;
+package com.centit.support.database.utils;
 
+import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,6 +49,14 @@ public enum DBType {
 			return Access;
 		
 		return Unknown;
+	}
+
+	public static DBType mapDBType(Connection conn){
+		try {
+			return mapDBType(conn.getMetaData().getURL());
+		}catch (Exception e){
+			return Unknown;
+		}
 	}
 	
 	public static DBType mapDialectToDBType(String dialectName){
@@ -120,5 +129,10 @@ public enum DBType {
 		default:
 	  		return "unknown";
 	  }
+	}
+
+	@Override
+	public String toString(){
+		return DBType.getDBTypeName(this);
 	}
 }

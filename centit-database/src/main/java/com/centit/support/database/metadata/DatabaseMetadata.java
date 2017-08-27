@@ -1,9 +1,10 @@
 package com.centit.support.database.metadata;
 
-import com.centit.support.database.DBConnect;
+
+import java.sql.Connection;
 
 public interface DatabaseMetadata {
-	public void setDBConfig(DBConnect dbc);
+	public void setDBConfig(Connection dbc);
 	public SimpleTableInfo getTableMetadata(String tabName);
 	public String getDBSchema();
 	public void setDBSchema(String schema);	

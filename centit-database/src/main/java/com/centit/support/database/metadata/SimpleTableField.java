@@ -1,6 +1,6 @@
 package com.centit.support.database.metadata;
 
-import com.centit.support.database.DBType;
+import com.centit.support.database.utils.DBType;
 
 public class SimpleTableField implements TableField {
 	private String propertyName;// 字段属性名称 

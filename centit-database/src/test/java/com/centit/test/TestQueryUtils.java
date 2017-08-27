@@ -7,8 +7,8 @@ import java.util.Map;
 
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.KeyValuePair;
-import com.centit.support.database.QueryAndNamedParams;
-import com.centit.support.database.QueryUtils;
+import com.centit.support.database.utils.QueryAndNamedParams;
+import com.centit.support.database.utils.QueryUtils;
 
 public class TestQueryUtils {
 	

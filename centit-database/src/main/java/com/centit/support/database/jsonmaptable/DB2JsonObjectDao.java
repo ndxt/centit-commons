@@ -11,8 +11,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.database.DatabaseAccess;
-import com.centit.support.database.QueryUtils;
+import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.database.metadata.TableInfo;
 
 public class DB2JsonObjectDao extends GeneralJsonObjectDao {

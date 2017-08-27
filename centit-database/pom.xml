@@ -11,6 +11,9 @@
     <artifactId>centit-database</artifactId>
     <name>com.centit.support:centit-database</name>
     <packaging>jar</packaging>
+
+    <version>2.2.2.1-SNAPSHOT</version>
+
     <description>数据库操作通用方法和函数，从以前的util包中分离出来，并且整合了部分sys-module中的函数</description>
 
     <dependencies>
@@ -23,7 +26,16 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
             <version>${commons-dbcp2.version}</version>
-        </dependency><!-- test -->
+        </dependency>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>${persistence-api.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

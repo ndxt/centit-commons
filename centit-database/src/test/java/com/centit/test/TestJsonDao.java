@@ -3,9 +3,9 @@ package com.centit.test;
 import java.sql.SQLException;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DbcpConnect;
-import com.centit.support.database.DbcpConnectPools;
+import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.DbcpConnect;
+import com.centit.support.database.utils.DbcpConnectPools;
 import com.centit.support.database.ddl.DDLOperations;
 import com.centit.support.database.ddl.OracleDDLOperations;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;

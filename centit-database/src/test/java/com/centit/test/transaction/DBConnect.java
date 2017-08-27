@@ -1,4 +1,6 @@
-package com.centit.support.database;
+package com.centit.test.transaction;
+
+import com.centit.support.database.utils.DBType;
 
 import java.sql.Connection;
 
@@ -7,7 +9,7 @@ import java.sql.Connection;
  * @author codefan
  *
  */
-public interface DBConnect extends Connection {
+public interface DBConnect extends Connection{
 	
 	String getDatabaseCode(); 
 	

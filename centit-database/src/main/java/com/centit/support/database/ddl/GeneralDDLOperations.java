@@ -9,8 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.centit.support.database.DatabaseAccess;
-import com.centit.support.database.QueryUtils;
+import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;

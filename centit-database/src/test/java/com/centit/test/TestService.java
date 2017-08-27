@@ -3,8 +3,8 @@ package com.centit.test;
 import java.sql.SQLException;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.support.database.DBConnect;
-import com.centit.support.database.transaction.Transactional;
+import com.centit.support.database.utils.DBConnect;
+import com.centit.test.transaction.Transactional;
 
 public interface TestService {
 	@Transactional

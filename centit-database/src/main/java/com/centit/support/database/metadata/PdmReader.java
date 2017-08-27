@@ -1,26 +1,19 @@
 package com.centit.support.database.metadata;
 
+import com.centit.support.xml.IgnoreDTDEntityResolver;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.dom4j.*;
+import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.Node;
-import org.dom4j.QName;
-import org.dom4j.io.SAXReader;
-
-import com.centit.support.database.DBConnect;
-import com.centit.support.xml.IgnoreDTDEntityResolver;
 
 public class PdmReader implements DatabaseMetadata {
 	protected static final Logger logger = LoggerFactory.getLogger(PdmReader.class);
@@ -308,9 +301,8 @@ public class PdmReader implements DatabaseMetadata {
 	}
 */
 	@Override
-	public void setDBConfig(DBConnect dbc) {
+	public void setDBConfig(Connection dbc) {
 		// not needed
-		
 	}
 
 }

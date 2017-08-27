@@ -3,10 +3,10 @@ package com.centit.test;
 import java.sql.SQLException;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DbcpConnect;
-import com.centit.support.database.DbcpConnectPools;
-import com.centit.support.database.transaction.TransactionInvocationHandler;
+import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.DbcpConnect;
+import com.centit.support.database.utils.DbcpConnectPools;
+import com.centit.test.transaction.TransactionInvocationHandler;
 
 public class TestTransaction {
 	public  static void  main(String[] args)   {

@@ -5,10 +5,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DatabaseAccess;
-import com.centit.support.database.DbcpConnect;
-import com.centit.support.database.DbcpConnectPools;
+import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.DbcpConnect;
+import com.centit.support.database.utils.DbcpConnectPools;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableInfo;
 

@@ -1,4 +1,4 @@
-package com.centit.support.database;
+package com.centit.support.database.utils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -41,7 +41,7 @@ public class DbcpConnectPools {
 		return ds;
 	}
 	
-	public static synchronized DbcpConnect getDbcpConnect(DataSourceDescription dsDesc) throws SQLException{
+	public static synchronized Connection getDbcpConnect(DataSourceDescription dsDesc) throws SQLException{
 		BasicDataSource ds = dbcpDataSourcePools.get(dsDesc);
 		if(ds==null)
 			ds = addDataSource(dsDesc);
@@ -49,8 +49,7 @@ public class DbcpConnectPools {
 		conn = ds.getConnection();  
         conn.setAutoCommit(false);  
         ///*dsDesc.getUsername(),dsDesc.getDbType(),*/
-        return new DbcpConnect(
-        		dsDesc.getDatabaseCode(),conn);
+        return conn;
 	}
 	
 	/* 获得数据源连接状态 */

@@ -6,10 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import com.alibaba.fastjson.JSONArray;
-import com.centit.support.database.DataSourceDescription;
-import com.centit.support.database.DatabaseAccess;
-import com.centit.support.database.DbcpConnect;
-import com.centit.support.database.DbcpConnectPools;
+import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.DbcpConnect;
+import com.centit.support.database.utils.DbcpConnectPools;
 
 public class TestOraClob {
 	

@@ -1,30 +1,25 @@
 package com.centit.support.database.jsonmaptable;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.ListOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.database.DBConnect;
-import com.centit.support.database.DatabaseAccess;
-import com.centit.support.database.QueryUtils;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
+import com.centit.support.database.utils.DBType;
+import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.QueryUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
 
 
 public abstract class GeneralJsonObjectDao implements JsonObjectDao {
@@ -36,7 +31,27 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 	public GeneralJsonObjectDao(){
 		
 	}
-	
+
+	public static JsonObjectDao createJsonObjectDao(final Connection conn,final TableInfo tableInfo )
+			throws SQLException {
+		DBType dbtype = DBType.mapDBType(conn.getMetaData().getURL());
+		switch (dbtype){
+			case Oracle:
+				return new OracleJsonObjectDao(conn,tableInfo);
+			case DB2:
+				return new DB2JsonObjectDao(conn,tableInfo);
+			case SqlServer:
+				return new SqlSvrJsonObjectDao(conn,tableInfo);
+			case MySql:
+				return new MySqlJsonObjectDao(conn,tableInfo);
+			case Access:
+			case H2:
+			default:
+				throw new  SQLException("不支持的数据库类型："+dbtype.toString());
+		}
+	}
+
+
 	public GeneralJsonObjectDao(final TableInfo tableInfo) {
 		this.tableInfo = tableInfo;
 	}
@@ -50,7 +65,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 		this.tableInfo = tableInfo;
 	}
 		
-	public void setConnect(final DBConnect conn) {
+	public void setConnect(final Connection conn) {
 		this.conn = conn;
 	}
 	

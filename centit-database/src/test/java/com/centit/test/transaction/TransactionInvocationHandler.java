@@ -1,12 +1,12 @@
-package com.centit.support.database.transaction;
+package com.centit.test.transaction;
+
+import com.centit.support.database.utils.DBConnect;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.List;
 import java.util.ArrayList;
-
-import com.centit.support.database.DBConnect;
+import java.util.List;
 /**
  * 
  * @author codefan@sina.com

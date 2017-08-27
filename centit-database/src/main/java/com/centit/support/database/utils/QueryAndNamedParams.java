@@ -1,4 +1,4 @@
-package com.centit.support.database;
+package com.centit.support.database.utils;
 
 import java.util.HashMap;
 import java.util.Map;

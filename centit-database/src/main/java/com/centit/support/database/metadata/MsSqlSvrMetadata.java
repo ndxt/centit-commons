@@ -1,14 +1,12 @@
 package com.centit.support.database.metadata;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Iterator;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.centit.support.database.DBConnect;
 
 
 public class MsSqlSvrMetadata implements DatabaseMetadata {
@@ -54,10 +52,10 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 	//参数对应与上面的 object_id
 	
 	private String sDBSchema ;
-	private DBConnect dbc;
+	private Connection dbc;
 	
 	@Override
-	public void setDBConfig(DBConnect dbc){
+	public void setDBConfig(Connection dbc){
 		this.dbc=dbc;
 	}
 	
@@ -75,10 +73,9 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 		PreparedStatement pStmt= null;
 		ResultSet rs = null;
 		try {
-			Connection conn = dbc.getConn();
 			tab.setSchema( dbc.getSchema().toUpperCase());
 			// get columns
-			pStmt= conn.prepareStatement(sqlGetTabColumns);
+			pStmt= dbc.prepareStatement(sqlGetTabColumns);
 			pStmt.setString(1, tabName);
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
@@ -98,7 +95,7 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 			pStmt.close();
 			
 			// get primary key
-			pStmt= conn.prepareStatement(sqlPKName);
+			pStmt= dbc.prepareStatement(sqlPKName);
 			pStmt.setString(1, tabName);
 			rs = pStmt.executeQuery();
 			if (rs.next()) {
@@ -110,7 +107,7 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 			rs.close();
 			pStmt.close();
 			
-			pStmt= conn.prepareStatement(sqlPKColumns);
+			pStmt= dbc.prepareStatement(sqlPKColumns);
 			pStmt.setInt(1, table_id);
 			pStmt.setInt(2, pk_ind_id);
 			rs = pStmt.executeQuery();
@@ -121,7 +118,7 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 			pStmt.close();
 			// get reference info 
 			 
-			pStmt= conn.prepareStatement(sqlFKNames);
+			pStmt= dbc.prepareStatement(sqlFKNames);
 			pStmt.setInt(1, table_id);
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
@@ -138,7 +135,7 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 			// get reference detail
 			for(Iterator<SimpleTableReference> it= tab.getReferences().iterator();it.hasNext(); ){
 				SimpleTableReference ref = it.next();
-				pStmt= conn.prepareStatement(sqlFKColumns);
+				pStmt= dbc.prepareStatement(sqlFKColumns);
 				pStmt.setInt(1,ref.getObjectId());
 				rs = pStmt.executeQuery();
 				while (rs.next()) {
@@ -165,7 +162,7 @@ public class MsSqlSvrMetadata implements DatabaseMetadata {
 				if(pStmt!=null)
 					pStmt.close();
 				if(rs!=null)
-					pStmt.close();
+					rs.close();
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);//e.printStackTrace();
 			} 

@@ -1,4 +1,4 @@
-package com.centit.support.database;
+package com.centit.support.database.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +25,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
+
+import javax.sql.ConnectionPoolDataSource;
 
 public class DatabaseAccess {
 	
@@ -120,6 +122,7 @@ public class DatabaseAccess {
 
 	
 	public final static void setQueryStmtParameters(PreparedStatement stmt,Object[] paramObjs) throws SQLException{
+		//query.getParameterMetadata().isOrdinalParametersZeroBased()?0:1;
 		if (paramObjs != null) {
 			for (int i = 0; i < paramObjs.length; i++) {
 				if (paramObjs[i] == null)
@@ -710,130 +713,33 @@ public class DatabaseAccess {
 
 		return NumberBaseOpt.castObjectToLong(scalarObj);
 	}
-	/**
-	 * 执行一个带参数的分页查询，这个是完全基于jdbc实现的，对不同的数据库来说效率差别可能很大
-	 * 
-	 * @param conn conn
-	 * @param sSql sSql
-	 * @param values values
-	 * @param pageNo 第几页
-	 * @param pageSize 每页大小 ，小于1 为不分页
-	 * @return List Object[]
-     * @throws SQLException SQLException
-     * @throws IOException IOException
-	 */
-	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object[] values, int pageNo,
-			int pageSize) throws SQLException, IOException {
-		try{
-			PreparedStatement stmt = conn.prepareStatement(sSql);
-			setQueryStmtParameters(stmt,values);
-			
-			if (pageNo > 0 && pageSize > 0)
-				stmt.setMaxRows(pageNo * pageSize);
-	
-			ResultSet rs = stmt.executeQuery();
-	
-			if (pageNo > 1 && pageSize > 0)
-				rs.absolute((pageNo - 1) * pageSize);
-	
-			List<Object[]> datas = DatabaseAccess.fetchResultSetToObjectsList(rs);
-			rs.close();
-			stmt.close();
-			return datas;
-		}catch (SQLException e) {
-			throw new DatabaseAccessException(sSql,e);
+
+
+
+	private static String makePageQuerySql(Connection conn, String sSql,  int pageNo,
+										   int pageSize ){
+		int offset = (pageNo > 1 && pageSize > 0)?(pageNo - 1) * pageSize:0;
+		String query;
+		switch(DBType.mapDBType(conn)){
+			case Oracle:
+				query = QueryUtils.buildOracleLimitQuerySQL(sSql, offset, pageSize, false);
+				break;
+			case DB2:
+				query = QueryUtils.buildDB2LimitQuerySQL(sSql, offset, pageSize);
+				break;
+			case SqlServer:
+				query = QueryUtils.buildSqlServerLimitQuerySQL(sSql, offset, pageSize);
+				break;
+			case MySql:
+				query = QueryUtils.buildMySqlLimitQuerySQL(sSql, offset, pageSize, false);
+				break;
+			default:
+				query = sSql;
+				break;
 		}
+		return query;
 	}
 
-	/**
-	 * 
-	 * @param conn
-	 *            数据库连接
-	 * @param sSql
-	 *            sql语句，这个语句必须用命名参数
-	 * @param values
-	 *            命名参数对应的变量
-	 * @param fieldnames 对字段重命名
-	 * @param pageNo 第几页
-	 * @param pageSize 每页大小 ，小于1 为不分页
-	 *            字段名称作为json中Map的key，没有这个参数的函数会自动从sql语句中解析字段名作为json中map的
-	 * @return JSONArray实现了List JSONObject 接口，JSONObject实现了Map String,
-	 *         Object 接口。所以可以直接转换为List Map String,Object
-     * @throws SQLException SQLException
-     * @throws IOException IOException
-	 */
-	public final static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames,
-			int pageNo, int pageSize) throws SQLException, IOException {
-		try{
-			PreparedStatement stmt = conn.prepareStatement(sSql);
-			setQueryStmtParameters(stmt,values);
-	
-			if (pageNo > 0 && pageSize > 0)
-				stmt.setMaxRows(pageNo * pageSize);
-	
-			ResultSet rs = stmt.executeQuery();
-	
-			if (rs == null)
-				return new JSONArray();
-	
-			if (pageNo > 1 && pageSize > 0)
-				rs.absolute((pageNo - 1) * pageSize);
-	
-			String[] fns = fieldnames;
-			if(ArrayUtils.isEmpty(fns)){
-				List<String> fields = QueryUtils.getSqlFiledNames(sSql);			
-				fns = mapColumnsNameToFields(fields);
-			}		
-			JSONArray ja = fetchResultSetToJSONArray(rs, fns);
-	
-			rs.close();
-			stmt.close();
-			return ja;
-		}catch (SQLException e) {
-			throw new DatabaseAccessException(sSql,e);
-		}
-	}
-	
-	/*
-	 * 执行分页一个带命名参数的查询
-	 * 
-	 */
-	public final static List<Object[]> findObjectsByNamedSql(
-			Connection conn, String sSql, Map<String, Object> values,
-			int pageNo, int pageSize)
-			throws SQLException, IOException {
-
-		QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
-
-		return findObjectsBySql(conn, qap.getQuery(), qap.getParams(),pageNo,pageSize);
-	}
-	
-	/**
-	 * 执行一个带命名参数的查询并返回JSONArray
-	 *
-     * @param conn
-     *            数据库连接
-     * @param sSql
-     *            sql语句，这个语句必须用命名参数
-     * @param values
-     *            命名参数对应的变量
-     * @param fieldnames 对字段重命名
-	 *            对字段重命名
-	 * @param pageNo 第几页
-	 * @param pageSize 每页大小 ，小于1 为不分页
-	 * @return JSONArray
-     * @throws SQLException SQLException
-     * @throws IOException IOException
-	 */
-	public final static JSONArray findObjectsByNamedSqlAsJSON(
-			Connection conn, String sSql, Map<String, Object> values,
-			String[] fieldnames,int pageNo, int pageSize)throws SQLException, IOException {
-
-		QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
-
-		return findObjectsAsJSON(conn, qap.getQuery(), qap.getParams(), fieldnames,pageNo,pageSize);
-	}
-	
 	/* 下面是根据不同数据库生成不同的查询语句进行分页查询相关的语句 */
 	/*----------------------------------------------------------------------------- */
 	
@@ -852,32 +758,34 @@ public class DatabaseAccess {
      * @throws SQLException SQLException
      * @throws IOException IOException
 	 */
-	public final static List<Object[]> findObjectsBySql(DBConnect conn, String sSql, Object[] values, int pageNo,
-			int pageSize) throws SQLException, IOException {
+	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object[] values, int pageNo,
+														int pageSize) throws SQLException, IOException {
+		String query = makePageQuerySql(conn,  sSql,   pageNo, pageSize );
+		if(query.equals(sSql)){
+			try{
+				PreparedStatement stmt = conn.prepareStatement(sSql);
+				setQueryStmtParameters(stmt,values);
 
-		int offset = (pageNo > 1 && pageSize > 0)?(pageNo - 1) * pageSize:0;
-		
-		String query;
-		switch(conn.getDatabaseType()){
-		case Oracle:
-			query = QueryUtils.buildOracleLimitQuerySQL(sSql, offset, pageSize, false);
-			break;
-		case DB2:
-			query = QueryUtils.buildDB2LimitQuerySQL(sSql, offset, pageSize);
-			break;
-		case SqlServer:
-			query = QueryUtils.buildSqlServerLimitQuerySQL(sSql, offset, pageSize);
-			break;
-		case MySql:
-			query = QueryUtils.buildMySqlLimitQuerySQL(sSql, offset, pageSize, false);
-			break;
-		default:
-			query = sSql;
-			break;
-		}
-		
-		return findObjectsBySql((Connection)conn,query,values);
+				if (pageNo > 0 && pageSize > 0)
+					stmt.setMaxRows(pageNo * pageSize);
+
+				ResultSet rs = stmt.executeQuery();
+
+				if (pageNo > 1 && pageSize > 0)
+					rs.absolute((pageNo - 1) * pageSize);
+
+				List<Object[]> datas = DatabaseAccess.fetchResultSetToObjectsList(rs);
+				rs.close();
+				stmt.close();
+				return datas;
+			}catch (SQLException e) {
+				throw new DatabaseAccessException(sSql,e);
+			}
+		}else
+			return findObjectsBySql(conn,query,values);
 	}
+
+
 
 	/**
 	 * 
@@ -896,31 +804,42 @@ public class DatabaseAccess {
      * @throws SQLException SQLException
      * @throws IOException IOException
 	 */
-	public final static JSONArray findObjectsAsJSON(DBConnect conn, String sSql, Object[] values, String[] fieldnames,
+	public final static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames,
 			int pageNo, int pageSize) throws SQLException, IOException {
+		
+		String query = makePageQuerySql(conn,  sSql,   pageNo, pageSize );
 
-		int offset = (pageNo > 1 && pageSize > 0)?(pageNo - 1) * pageSize:0;
-		
-		String query;
-		switch(conn.getDatabaseType()){
-		case Oracle:
-			query = QueryUtils.buildOracleLimitQuerySQL(sSql, offset, pageSize, false);
-			break;
-		case DB2:
-			query = QueryUtils.buildDB2LimitQuerySQL(sSql, offset, pageSize);
-			break;
-		case SqlServer:
-			query = QueryUtils.buildSqlServerLimitQuerySQL(sSql, offset, pageSize);
-			break;
-		case MySql:
-			query = QueryUtils.buildMySqlLimitQuerySQL(sSql, offset, pageSize, false);
-			break;
-		default:
-			query = sSql;
-			break;
-		}
-		
-		return findObjectsAsJSON((Connection)conn,query,values,fieldnames);
+		if(query.equals(sSql)) {
+			try {
+				PreparedStatement stmt = conn.prepareStatement(sSql);
+				setQueryStmtParameters(stmt, values);
+
+				if (pageNo > 0 && pageSize > 0)
+					stmt.setMaxRows(pageNo * pageSize);
+
+				ResultSet rs = stmt.executeQuery();
+
+				if (rs == null)
+					return new JSONArray();
+
+				if (pageNo > 1 && pageSize > 0)
+					rs.absolute((pageNo - 1) * pageSize);
+
+				String[] fns = fieldnames;
+				if (ArrayUtils.isEmpty(fns)) {
+					List<String> fields = QueryUtils.getSqlFiledNames(sSql);
+					fns = mapColumnsNameToFields(fields);
+				}
+				JSONArray ja = fetchResultSetToJSONArray(rs, fns);
+
+				rs.close();
+				stmt.close();
+				return ja;
+			} catch (SQLException e) {
+				throw new DatabaseAccessException(sSql, e);
+			}
+		}else
+			return findObjectsAsJSON(conn,query,values,fieldnames);
 	}
 	
 	/**
@@ -939,7 +858,7 @@ public class DatabaseAccess {
      * @throws SQLException SQLException
      * @throws IOException IOException
      * */
-	public final static JSONArray findObjectsAsJSON(DBConnect conn, String sSql, Object[] values, 
+	public final static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values,
 			int pageNo, int pageSize) throws SQLException, IOException {		
 		return findObjectsAsJSON((Connection)conn,sSql,values,null,pageNo,pageSize);
 	}
@@ -960,7 +879,7 @@ public class DatabaseAccess {
      * @throws IOException IOException
 	 */
 	public final static List<Object[]> findObjectsByNamedSql(
-			DBConnect conn, String sSql, Map<String, Object> values,
+			Connection conn, String sSql, Map<String, Object> values,
 			int pageNo, int pageSize)
 			throws SQLException, IOException {
 
@@ -968,25 +887,28 @@ public class DatabaseAccess {
 
 		return findObjectsBySql(conn, qap.getQuery(), qap.getParams(),pageNo,pageSize);
 	}
-	
+
+
+
 	/**
 	 * 执行一个带命名参数的查询并返回JSONArray
-     * @param conn
-     *            数据库连接
-     * @param sSql
-     *            sql语句，这个语句必须用命名参数
-     * @param values
-     *            命名参数对应的变量
-	 * @param fieldnames
+	 *
+	 * @param conn
+	 *            数据库连接
+	 * @param sSql
+	 *            sql语句，这个语句必须用命名参数
+	 * @param values
+	 *            命名参数对应的变量
+	 * @param fieldnames 对字段重命名
 	 *            对字段重命名
 	 * @param pageNo 第几页
 	 * @param pageSize 每页大小 ，小于1 为不分页
 	 * @return JSONArray
-     * @throws SQLException SQLException
-     * @throws IOException IOException
+	 * @throws SQLException SQLException
+	 * @throws IOException IOException
 	 */
 	public final static JSONArray findObjectsByNamedSqlAsJSON(
-			DBConnect conn, String sSql, Map<String, Object> values,
+			Connection conn, String sSql, Map<String, Object> values,
 			String[] fieldnames,int pageNo, int pageSize)throws SQLException, IOException {
 
 		QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));

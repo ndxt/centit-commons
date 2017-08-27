@@ -1,14 +1,12 @@
 package com.centit.support.database.metadata;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Iterator;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.centit.support.database.DBConnect;
 
 public class OracleMetadata implements DatabaseMetadata {
 	
@@ -43,10 +41,10 @@ public class OracleMetadata implements DatabaseMetadata {
 
 	
 	private String sDBSchema ;
-	private DBConnect dbc;
+	private Connection dbc;
 	
 	@Override
-	public void setDBConfig(DBConnect dbc){
+	public void setDBConfig(Connection dbc){
 		this.dbc=dbc;
 	}
 
@@ -62,12 +60,11 @@ public class OracleMetadata implements DatabaseMetadata {
 		SimpleTableInfo tab = new SimpleTableInfo(tabName);
 		PreparedStatement pStmt= null;
 		ResultSet rs = null;
-		
+
 		try {
-			Connection conn = dbc.getConn();
 			tab.setSchema( dbc.getSchema().toUpperCase());
 			// get columns
-			pStmt= conn.prepareStatement(sqlGetTabColumns);
+			pStmt= dbc.prepareStatement(sqlGetTabColumns);
 			pStmt.setString(1, tabName);
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
@@ -85,7 +82,7 @@ public class OracleMetadata implements DatabaseMetadata {
 			rs.close();
 			pStmt.close();
 			// get primary key
-			pStmt= conn.prepareStatement(sqlPKName);
+			pStmt= dbc.prepareStatement(sqlPKName);
 			pStmt.setString(1, tabName);
 			rs = pStmt.executeQuery();
 			if (rs.next()) {
@@ -94,7 +91,7 @@ public class OracleMetadata implements DatabaseMetadata {
 			rs.close();
 			pStmt.close();
 			
-			pStmt= conn.prepareStatement(sqlPKColumns);
+			pStmt= dbc.prepareStatement(sqlPKColumns);
 			pStmt.setString(1, tab.getPkName());
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
@@ -104,7 +101,7 @@ public class OracleMetadata implements DatabaseMetadata {
 			pStmt.close();
 			// get reference info 
 			 
-			pStmt= conn.prepareStatement(sqlFKNames);
+			pStmt= dbc.prepareStatement(sqlFKNames);
 			pStmt.setString(1, tab.getPkName());
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
@@ -119,7 +116,7 @@ public class OracleMetadata implements DatabaseMetadata {
 			// get reference detail
 			for(Iterator<SimpleTableReference> it= tab.getReferences().iterator();it.hasNext(); ){
 				SimpleTableReference ref = it.next();
-				pStmt= conn.prepareStatement(sqlFKColumns);
+				pStmt= dbc.prepareStatement(sqlFKColumns);
 				pStmt.setString(1,ref.getReferenceCode());
 				rs = pStmt.executeQuery();
 				while (rs.next()) {
@@ -145,7 +142,7 @@ public class OracleMetadata implements DatabaseMetadata {
 				if(pStmt!=null)
 					pStmt.close();
 				if(rs!=null)
-					pStmt.close();
+					rs.close();
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);//e.printStackTrace();
 			} 

@@ -1,5 +1,6 @@
 package com.centit.support.database.metadata;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,14 +10,13 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.centit.support.database.DBConnect;
 
 public class JdbcMetadata implements DatabaseMetadata {
 	protected static final Logger logger = LoggerFactory.getLogger(JdbcMetadata.class);
-	private DBConnect dbc;
+	private Connection dbc;
 
 	@Override
-	public void setDBConfig(DBConnect dbc) {
+	public void setDBConfig(Connection dbc) {
 		this.dbc = dbc;
 	}
 

@@ -1,14 +1,12 @@
 package com.centit.support.database.metadata;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Iterator;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.centit.support.database.DBConnect;
 
 public class IbmDb2Metadata implements DatabaseMetadata {
 	
@@ -38,10 +36,10 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 	
 	private String sDBSchema ;
 
-	private DBConnect dbc;
+	private Connection dbc;
 	
 	@Override
-	public void setDBConfig(DBConnect dbc){
+	public void setDBConfig(Connection dbc){
 		this.dbc=dbc;
 	}	
 	public String getDBSchema() {
@@ -58,10 +56,9 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 		PreparedStatement pStmt= null;
 		ResultSet rs = null;
 		try {
-			Connection conn = dbc.getConn();
 			tab.setSchema( dbc.getSchema().toUpperCase());
 			// get columns
-			pStmt= conn.prepareStatement(sqlGetTabColumns);
+			pStmt= dbc.prepareStatement(sqlGetTabColumns);
 			pStmt.setString(1, sDBSchema);
 			pStmt.setString(2, tabName);
 			rs = pStmt.executeQuery();
@@ -80,7 +77,7 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 			rs.close();
 			pStmt.close();
 			// get primary key
-			pStmt= conn.prepareStatement(sqlPKInfo);
+			pStmt= dbc.prepareStatement(sqlPKInfo);
 			pStmt.setString(1, sDBSchema);
 			pStmt.setString(2, tabName);
 			rs = pStmt.executeQuery();
@@ -92,7 +89,7 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 			pStmt.close();
 			// get reference info 
 	 
-			pStmt= conn.prepareStatement(sqlFKInfo);
+			pStmt= dbc.prepareStatement(sqlFKInfo);
 			pStmt.setString(1, tab.getPkName());
 			rs = pStmt.executeQuery();
 			while (rs.next()) {
@@ -124,7 +121,7 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 				SimpleTableReference ref = it.next();
 				for(Iterator<SimpleTableField> it2= ref.getFkColumns().iterator();it2.hasNext(); ){
 					SimpleTableField field = it2.next();
-					pStmt= conn.prepareStatement(sqlFKColumn);
+					pStmt= dbc.prepareStatement(sqlFKColumn);
 					pStmt.setString(1,sDBSchema);
 					pStmt.setString(2,ref.getTableName());
 					pStmt.setString(3,field.getColumnName());
@@ -149,7 +146,7 @@ public class IbmDb2Metadata implements DatabaseMetadata {
 				if(pStmt!=null)
 					pStmt.close();
 				if(rs!=null)
-					pStmt.close();
+					rs.close();
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);//e.printStackTrace();
 			} 
