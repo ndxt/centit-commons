@@ -1,12 +1,10 @@
-package com.centit.test;
-
-import java.sql.SQLException;
+package com.centit.test.transaction;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.database.utils.DataSourceDescription;
-import com.centit.support.database.utils.DbcpConnect;
 import com.centit.support.database.utils.DbcpConnectPools;
-import com.centit.test.transaction.TransactionInvocationHandler;
+
+import java.sql.SQLException;
 
 public class TestTransaction {
 	public  static void  main(String[] args)   {
@@ -19,7 +17,8 @@ public class TestTransaction {
 		dbc.setUsername("fdemo2");
 		dbc.setPassword("fdemo2");
 		try {
-			DbcpConnect conn= DbcpConnectPools.getDbcpConnect(dbc);
+			DbcpConnect conn = new DbcpConnect(
+					DbcpConnectPools.getDbcpConnect(dbc));
 			JSONObject object = new JSONObject();
 			object.put("id", 3);
 			object.put("userName", "yang huaisheng");

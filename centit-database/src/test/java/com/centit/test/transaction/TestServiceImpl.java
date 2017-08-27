@@ -1,13 +1,12 @@
-package com.centit.test;
-
-import java.sql.SQLException;
+package com.centit.test.transaction;
 
 import com.alibaba.fastjson.JSONObject;
-import com.centit.support.database.utils.DBConnect;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.jsonmaptable.OracleJsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableInfo;
+
+import java.sql.SQLException;
 
 public class TestServiceImpl implements TestService{
 	

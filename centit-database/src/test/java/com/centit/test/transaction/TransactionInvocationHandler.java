@@ -1,7 +1,5 @@
 package com.centit.test.transaction;
 
-import com.centit.support.database.utils.DBConnect;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
