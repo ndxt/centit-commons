@@ -9,8 +9,8 @@ import java.sql.ResultSet;
 import java.util.Iterator;
 
 
-public class MsSqlSvrMetadata implements DatabaseMetadata {
-	protected static final Logger logger = LoggerFactory.getLogger(MsSqlSvrMetadata.class);
+public class SqlSvrMetadata implements DatabaseMetadata {
+	protected static final Logger logger = LoggerFactory.getLogger(SqlSvrMetadata.class);
 	
 	private final static String sqlGetTabColumns=
 		"SELECT  a.name, c.name AS typename, a.length , a.xprec, a.xscale, isnullable "+

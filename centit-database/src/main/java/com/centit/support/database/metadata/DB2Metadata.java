@@ -8,9 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Iterator;
 
-public class IbmDb2Metadata implements DatabaseMetadata {
+public class DB2Metadata implements DatabaseMetadata {
 	
-	protected static final Logger logger = LoggerFactory.getLogger(IbmDb2Metadata.class);
+	protected static final Logger logger = LoggerFactory.getLogger(DB2Metadata.class);
 	private final static String sqlGetTabColumns=
 		"select a.name,a.coltype,a.length, a.scale, a.nulls "+
 		"from sysibm.systables b , sysibm.syscolumns a "+
