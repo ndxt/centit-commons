@@ -32,7 +32,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 		
 	}
 
-	public static JsonObjectDao createJsonObjectDao(final Connection conn,final TableInfo tableInfo )
+	public static GeneralJsonObjectDao createJsonObjectDao(final Connection conn,final TableInfo tableInfo )
 			throws SQLException {
 		DBType dbtype = DBType.mapDBType(conn.getMetaData().getURL());
 		switch (dbtype){
