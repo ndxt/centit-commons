@@ -32,7 +32,7 @@ public abstract class GeneralDDLOperations implements DDLOperations {
 		this.conn = conn;
 	}
 
-	public static GeneralDDLOperations createDDLOperations(final Connection conn)
+	public static DDLOperations createDDLOperations(final Connection conn)
 			throws SQLException {
 		DBType dbtype = DBType.mapDBType(conn.getMetaData().getURL());
 		switch (dbtype){
