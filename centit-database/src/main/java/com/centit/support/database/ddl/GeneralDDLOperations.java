@@ -32,23 +32,30 @@ public abstract class GeneralDDLOperations implements DDLOperations {
 		this.conn = conn;
 	}
 
-	public static DDLOperations createDDLOperations(final Connection conn)
+    public static GeneralDDLOperations createDDLOperations(final DBType dbtype)
+            throws SQLException {
+        switch (dbtype){
+            case Oracle:
+                return new OracleDDLOperations();
+            case DB2:
+                return new DB2DDLOperations();
+            case SqlServer:
+                return new SqlSvrDDLOperations();
+            case MySql:
+                return new MySqlDDLOperations();
+            case Access:
+            case H2:
+            default:
+                throw new  SQLException("不支持的数据库类型："+dbtype.toString());
+        }
+    }
+
+	public static GeneralDDLOperations createDDLOperations(final Connection conn)
 			throws SQLException {
 		DBType dbtype = DBType.mapDBType(conn.getMetaData().getURL());
-		switch (dbtype){
-			case Oracle:
-				return new OracleDDLOperations(conn);
-			case DB2:
-				return new DB2DDLOperations(conn);
-			case SqlServer:
-				return new SqlSvrDDLOperations(conn);
-			case MySql:
-				return new MySqlDDLOperations(conn);
-			case Access:
-			case H2:
-			default:
-				throw new  SQLException("不支持的数据库类型："+dbtype.toString());
-		}
+        GeneralDDLOperations dllOperations = createDDLOperations(dbtype);
+        dllOperations.setConnect(conn);
+        return dllOperations;
 	}
 	/**
 	 * checkLabelName 判断一个字符串是否符合标识符，是否可以作为字段名或者表名
