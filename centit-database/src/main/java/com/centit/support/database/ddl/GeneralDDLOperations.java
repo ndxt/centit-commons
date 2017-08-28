@@ -1,19 +1,19 @@
 package com.centit.support.database.ddl;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.centit.support.database.metadata.SimpleTableField;
+import com.centit.support.database.metadata.TableField;
+import com.centit.support.database.metadata.TableInfo;
+import com.centit.support.database.utils.DBType;
+import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.centit.support.database.utils.DatabaseAccess;
-import com.centit.support.database.utils.QueryUtils;
-import com.centit.support.database.metadata.SimpleTableField;
-import com.centit.support.database.metadata.TableField;
-import com.centit.support.database.metadata.TableInfo;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class GeneralDDLOperations implements DDLOperations {
 
@@ -31,7 +31,25 @@ public abstract class GeneralDDLOperations implements DDLOperations {
 	public void setConnect(Connection conn) {
 		this.conn = conn;
 	}
-	
+
+	public static GeneralDDLOperations createDDLOperations(final Connection conn)
+			throws SQLException {
+		DBType dbtype = DBType.mapDBType(conn.getMetaData().getURL());
+		switch (dbtype){
+			case Oracle:
+				return new OracleDDLOperations(conn);
+			case DB2:
+				return new DB2DDLOperations(conn);
+			case SqlServer:
+				return new SqlSvrDDLOperations(conn);
+			case MySql:
+				return new MySqlDDLOperations(conn);
+			case Access:
+			case H2:
+			default:
+				throw new  SQLException("不支持的数据库类型："+dbtype.toString());
+		}
+	}
 	/**
 	 * checkLabelName 判断一个字符串是否符合标识符，是否可以作为字段名或者表名
 	 * @param seq CharSequence
