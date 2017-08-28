@@ -3,9 +3,10 @@ package com.centit.test;
 import com.alibaba.fastjson.JSONArray;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DatabaseAccess;
-import com.centit.support.database.utils.DbcpConnect;
 import com.centit.support.database.utils.DbcpConnectPools;
 import com.centit.support.database.utils.QueryUtils;
+
+import java.sql.Connection;
 
 public class TestJDBC {
 	
@@ -20,7 +21,7 @@ public class TestJDBC {
 		  dbc.setUsername("fdemo2");
 		  dbc.setPassword("fdemo2");
 		  try {
-			DbcpConnect conn= DbcpConnectPools.getDbcpConnect(dbc);
+			Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
 			JSONArray ja = DatabaseAccess.fetchResultSetToJSONArray(
 					conn.getMetaData().getTables(null, "FDEMO2","F_USERINFO", null) , null);			
 			System.out.println(ja.toJSONString());
@@ -52,10 +53,10 @@ public class TestJDBC {
 	  /*QueryAndParams qp = QueryAndParams.createFromQueryAndNamedParams(sql,
 			 QueryUtils.createSqlParamsMap("userCodes",new Object[]{"U0000041","U0001013"}));*/
 	  try {
-		DbcpConnect conn= DbcpConnectPools.getDbcpConnect(dbc);
-		JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, sql,  QueryUtils.createSqlParamsMap("userCodes",new Object[]{"U0000041","U0001013"}));
-		conn.close();
-		System.out.println(ja.toJSONString());
+		  Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
+		  JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, sql,  QueryUtils.createSqlParamsMap("userCodes",new Object[]{"U0000041","U0001013"}));
+		  conn.close();
+		  System.out.println(ja.toJSONString());
 	} catch (Exception e) {
 		//e.printStackTrace();
 	}

@@ -1,4 +1,5 @@
 package com.centit.test;
+import java.sql.Connection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -7,7 +8,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DatabaseAccess;
-import com.centit.support.database.utils.DbcpConnect;
 import com.centit.support.database.utils.DbcpConnectPools;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableInfo;
@@ -28,7 +28,7 @@ public class ImportTableInfo2Database {
 			return;
 		}	
 		try {
-			DbcpConnect conn= DbcpConnectPools.getDbcpConnect(dbc);
+			Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
 			for(Pair<String, String> t : tables){
 				try {
 					Long tableId =  NumberBaseOpt.castObjectToLong(DatabaseAccess.getScalarObjectQuery(

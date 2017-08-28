@@ -1,10 +1,10 @@
 package com.centit.test;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.database.utils.DataSourceDescription;
-import com.centit.support.database.utils.DbcpConnect;
 import com.centit.support.database.utils.DbcpConnectPools;
 import com.centit.support.database.ddl.DDLOperations;
 import com.centit.support.database.ddl.OracleDDLOperations;
@@ -25,7 +25,7 @@ public class TestJsonDao {
 		dbc.setUsername("metaform");
 		dbc.setPassword("metaform");
 		try {
-			DbcpConnect conn= DbcpConnectPools.getDbcpConnect(dbc);
+			Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
 			SimpleTableInfo tableInfo = new SimpleTableInfo("TEST_TABLE");
 			SimpleTableField field = new SimpleTableField();
 			field.setColumnName("ID");

@@ -1,14 +1,10 @@
 package com.centit.test;
 
-import java.sql.Blob;
-import java.sql.Clob;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DatabaseAccess;
-import com.centit.support.database.utils.DbcpConnect;
 import com.centit.support.database.utils.DbcpConnectPools;
 
 public class TestOraClob {
@@ -23,7 +19,7 @@ public class TestOraClob {
 	  dbc.setPassword("fdemo2");
 	  
 	  try {
-		DbcpConnect conn= DbcpConnectPools.getDbcpConnect(dbc);
+		  Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
 		String sSql = 
 		"select T.VC_ID as id, T.VC_DUETYPE as vcDuetype, T.VC_OPINION as vcOpinion "+
         "from WP_REQUEST_DEP T "+
@@ -50,7 +46,7 @@ public class TestOraClob {
 	  dbc.setPassword("fdemo2");
 	  
 	  try {
-		DbcpConnect conn= DbcpConnectPools.getDbcpConnect(dbc);
+		  Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
 		PreparedStatement pStmt= conn.prepareStatement(
 		"select NO, internal_no,item_id,STUFF , length(stuff),CENTIT_LOB.ClobToBlob(stuff) as bstuff " +
         "from inf_apply where  no='JS000000HD0000000481' ");
