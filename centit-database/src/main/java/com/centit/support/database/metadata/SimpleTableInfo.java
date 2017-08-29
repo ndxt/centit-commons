@@ -330,8 +330,12 @@ public class SimpleTableInfo implements TableInfo{
 
 	public List<SimpleTableField> getColumns() {
 		if(columns==null)
-			columns = new ArrayList<SimpleTableField>();
+			columns = new ArrayList<SimpleTableField>(20);
 		return columns;
+	}
+
+	public void addColumn(SimpleTableField column) {
+		getColumns().add(column);
 	}
 
 	public void setColumns(List<SimpleTableField> columns) {
@@ -340,14 +344,17 @@ public class SimpleTableInfo implements TableInfo{
 
 	public List<String> getPkColumns() {
 		if(pkColumns==null)
-			pkColumns = new ArrayList<String>();
+			pkColumns = new ArrayList<String>(4);
 		return pkColumns;
+	}
+
+	public void addPkColumns(String pkColumn) {
+		getPkColumns().add(pkColumn);
 	}
 
 	public void setPkColumns(List<String> pkColumns) {
 		this.pkColumns = pkColumns;
 	}
-
 
 	public String getClassName() {
 		String sClassName = SimpleTableField.mapPropName(tableName);
@@ -357,9 +364,14 @@ public class SimpleTableInfo implements TableInfo{
 
 	public List<SimpleTableReference> getReferences() {
 		if(references==null)
-			references = new ArrayList<SimpleTableReference>();
+			references = new ArrayList<SimpleTableReference>(4);
 		return references;
 	}
+
+	public void addReference(SimpleTableReference reference) {
+		getReferences().add(reference);
+	}
+
 
 	public void setReferences(List<SimpleTableReference> references) {
 		this.references = references;

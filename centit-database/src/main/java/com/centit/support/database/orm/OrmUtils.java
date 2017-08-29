@@ -6,12 +6,25 @@ import java.util.List;
 /**
  * Created by codefan on 17-8-27.
  */
+@SuppressWarnings("unused")
 public class OrmUtils {
-    public <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz) {
+
+    public static <T> T prepareObjectForInsert(T object){
+        return object;
+    }
+
+    public static <T> T prepareObjectForUpdate(T object){
+        return object;
+    }
+
+    public static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz) {
+
         return null;
     }
 
-    public <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz) {
+    public static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz) {
+
         return null;
     }
+
 }

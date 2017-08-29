@@ -1,6 +1,7 @@
 package com.centit.support.database.metadata;
 
 import com.centit.support.database.utils.DBType;
+import com.centit.support.file.FileType;
 
 public class SimpleTableField implements TableField {
 	private String propertyName;// 字段属性名称 
@@ -144,6 +145,14 @@ public class SimpleTableField implements TableField {
 	
 	public void setJavaType(String st) {
 		javaType = trimType(st);
+	}
+
+	public void setJavaType(Class<?> type) {
+        if(type.isPrimitive()){
+            String typeName = type.getTypeName();
+            javaType = FileType.getFileExtName(typeName);
+        }else
+		    javaType = type.getTypeName();
 	}
 	
 	/**
