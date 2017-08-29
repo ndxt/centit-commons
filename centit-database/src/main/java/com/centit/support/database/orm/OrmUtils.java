@@ -8,6 +8,7 @@ import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -112,6 +113,20 @@ public class OrmUtils {
         return prepareObjectForExecuteSql(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
     }
 
+    public static Map<String, Object> fetchObjectField(Object object)
+            throws NoSuchFieldException {
+        if(object instanceof Map) {
+            return (Map<String, Object>) object;
+        }
+        Field[] objFields = object.getClass().getDeclaredFields();
+        Map<String, Object> fields = new HashMap<>(objFields.length*2);
+        for(Field field :objFields){
+            Object value = ReflectionOpt.forceGetFieldValue(object,field);
+            fields.put(field.getName() ,value);
+        }
+        return fields;
+    }
+
     public static Map<String, Object> fetchObjectDatabaseField(Object object, TableInfo tableInfo)
             throws NoSuchFieldException {
 
@@ -135,18 +150,20 @@ public class OrmUtils {
             return null;
         ResultSetMetaData resMeta = rs.getMetaData();
         int fieldCount = resMeta.getColumnCount();
-
-        T object = clazz.newInstance();
-        for(int i=1;i<=fieldCount;i++){
-            String columnName = resMeta.getColumnName(i);
-            SimpleTableField filed = mapInfo.findFieldByColumn(columnName);
-            if(filed!=null){
-                //filed.getJavaType()
-                setObjectFieldValue(object,filed.getPropertyName(),
-                        rs.getObject(i),filed.getJavaType());
+        if(rs.next()) {
+            T object = clazz.newInstance();
+            for (int i = 1; i <= fieldCount; i++) {
+                String columnName = resMeta.getColumnName(i);
+                SimpleTableField filed = mapInfo.findFieldByColumn(columnName);
+                if (filed != null) {
+                    //filed.getJavaType()
+                    setObjectFieldValue(object, filed.getPropertyName(),
+                            rs.getObject(i), filed.getJavaType());
+                }
             }
+            return object;
         }
-        return object;
+        return null;
     }
 
     public static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz)

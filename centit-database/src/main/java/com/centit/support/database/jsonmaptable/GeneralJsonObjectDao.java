@@ -130,16 +130,19 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 		TableField field = tableInfo.findFieldByName(propertyName);
 		return tableInfo.getPkColumns().contains(field.getColumnName());
 	}
-	
+
+    public static boolean checkHasAllPkColumns(TableInfo tableInfo, Map<String, Object> properties){
+        for(String pkc : tableInfo.getPkColumns() ){
+            TableField field = tableInfo.findFieldByColumn(pkc);
+            if( field != null &&
+                    properties.get(field.getPropertyName()) == null)
+                return false;
+        }
+        return true;
+    }
 	
 	public boolean checkHasAllPkColumns(Map<String, Object> properties){
-		for(String pkc : tableInfo.getPkColumns() ){
-			TableField field = tableInfo.findFieldByColumn(pkc);
-			if( field != null &&
-					properties.get(field.getPropertyName()) == null)
-				return false;
-		}
-		return true;
+		return GeneralJsonObjectDao.checkHasAllPkColumns(tableInfo,properties) ;
 	}
 	
 	public static String buildFilterSqlByPk(TableInfo ti,String alias){
