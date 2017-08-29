@@ -228,19 +228,29 @@ public interface JsonObjectDao {
 	 */
 	int replaceObjectsAsTabulation(final JSONArray newObjects,
 			final Map<String, Object> properties) throws SQLException, IOException;
-	
+
 	///////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * 查询带参数的SQL语句
-	 * @param sSql String
-	 * @param values Object []
+	 * @param sSql String sql语句
+	 * @param values Object [] 参数
 	 * @return List Object []
 	 * @throws SQLException SQLException
 	 * @throws IOException IOException
 	 */
 	List<Object[]> findObjectsBySql(final String sSql,final Object[] values)
 			throws SQLException, IOException;
-	
+
+	/**
+	 *
+	 * @param sSql String sql语句
+	 * @param values Object [] 参数
+	 * @param pageNo 当前页码
+	 * @param pageSize 每页大小
+	 * @return List Object []
+	 * @throws SQLException SQLException
+	 * @throws IOException IOException
+	 */
 	List<Object[]> findObjectsBySql(final String sSql,final Object[] values,
 			final int pageNo, final int pageSize)
 			throws SQLException, IOException;

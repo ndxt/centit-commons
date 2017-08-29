@@ -2,17 +2,19 @@ package com.centit.support.database.orm;
 
 import com.centit.support.algorithm.*;
 import com.centit.support.common.KeyValuePair;
-import com.centit.support.database.dialect.Dialect;
+import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
-import com.centit.support.database.utils.DBType;
+import com.centit.support.database.metadata.TableField;
+import com.centit.support.database.metadata.TableInfo;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by codefan on 17-8-27.
@@ -20,74 +22,6 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class OrmUtils {
 
-    private static <T> T prepareObjectForExecuteSql(T object, Dialect sqlDialect, GeneratorTime generatorTime)
-            throws SQLException, NoSuchFieldException, IOException {
-        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        if(mapInfo == null)
-            return object;
-        List<KeyValuePair<String, ValueGenerator>>  valueGenerators = mapInfo.getValueGenerators();
-        if(valueGenerators == null || valueGenerators.size()<1 )
-            return object;
-        for(KeyValuePair<String, ValueGenerator> ent :  valueGenerators) {
-            ValueGenerator valueGenerator =  ent.getValue();
-            if ( generatorTime == valueGenerator.occasion()
-                       || valueGenerator.occasion() == GeneratorTime.ALWAYS ){
-                SimpleTableField filed = mapInfo.findFieldByName(ent.getKey());
-                Object fieldValue = ReflectionOpt.forceGetProperty(object, filed.getPropertyName());
-                if( fieldValue == null || valueGenerator.condition() == GeneratorCondition.ALWAYS ){
-                    switch (valueGenerator.strategy()){
-                        case UUID:
-                            setObjectFieldValue(object, filed.getPropertyName(),
-                                    UuidOpt.getUuidAsString32(), filed.getJavaType());
-                            break;
-                        case SEQUENCE:
-                            setObjectFieldValue(object, filed.getPropertyName(),
-                                    sqlDialect.getSequence(
-                                            valueGenerator.value()
-                                    ), filed.getJavaType());
-                            break;
-                        case CONSTANT:
-                            setObjectFieldValue(object, filed.getPropertyName(),
-                                    valueGenerator.value(), filed.getJavaType());
-                            break;
-                        case FUNCTIION: {
-                            switch (valueGenerator.value()){
-                                case "now":
-                                case "currentTime":
-                                case "sysdate":
-                                    setObjectFieldValue(object, filed.getPropertyName(),
-                                            DatetimeOpt.currentUtilDate(), filed.getJavaType());
-                                    break;
-                            }
-                        }
-                            break;
-                    }
-                }
-            }
-        }
-        return object;
-    }
-
-    public static <T> T prepareObjectForInsert(T object,Dialect sqlDialect)
-            throws SQLException, NoSuchFieldException, IOException {
-        return prepareObjectForExecuteSql(object, sqlDialect,GeneratorTime.NEW);
-    }
-
-    public static <T> T prepareObjectForUpdate(T object,Dialect sqlDialect)
-            throws SQLException, NoSuchFieldException, IOException {
-        return prepareObjectForExecuteSql(object, sqlDialect, GeneratorTime.UPDATE);
-    }
-
-
-    public static <T> T prepareObjectForInsert(T object,Connection connection)
-            throws SQLException, NoSuchFieldException, IOException {
-        return prepareObjectForExecuteSql(object, Dialect.createDialect(connection),GeneratorTime.NEW);
-    }
-
-    public static <T> T prepareObjectForUpdate(T object,Connection connection)
-            throws SQLException, NoSuchFieldException, IOException {
-        return prepareObjectForExecuteSql(object, Dialect.createDialect(connection), GeneratorTime.UPDATE);
-    }
 
     public static void setObjectFieldValue(Object object, String propertyName,
                                            Object newValue, String fieldJavaType) throws NoSuchFieldException {
@@ -120,6 +54,78 @@ public class OrmUtils {
                         ));
                 break;
         }
+    }
+
+    private static <T> T prepareObjectForExecuteSql(T object, TableMapInfo mapInfo,
+                                                    JsonObjectDao sqlDialect, GeneratorTime generatorTime)
+            throws SQLException, NoSuchFieldException, IOException {
+        List<KeyValuePair<String, ValueGenerator>>  valueGenerators = mapInfo.getValueGenerators();
+        if(valueGenerators == null || valueGenerators.size()<1 )
+            return object;
+        for(KeyValuePair<String, ValueGenerator> ent :  valueGenerators) {
+            ValueGenerator valueGenerator =  ent.getValue();
+            if ( generatorTime == valueGenerator.occasion()
+                       || valueGenerator.occasion() == GeneratorTime.ALWAYS ){
+                SimpleTableField filed = mapInfo.findFieldByName(ent.getKey());
+                Object fieldValue = ReflectionOpt.forceGetProperty(object, filed.getPropertyName());
+                if( fieldValue == null || valueGenerator.condition() == GeneratorCondition.ALWAYS ){
+                    switch (valueGenerator.strategy()){
+                        case UUID:
+                            setObjectFieldValue(object, filed.getPropertyName(),
+                                    UuidOpt.getUuidAsString32(), filed.getJavaType());
+                            break;
+                        case SEQUENCE:
+                            setObjectFieldValue(object, filed.getPropertyName(),
+                                    sqlDialect.getSequenceNextValue(
+                                            valueGenerator.value()
+                                    ), filed.getJavaType());
+                            break;
+                        case CONSTANT:
+                            setObjectFieldValue(object, filed.getPropertyName(),
+                                    valueGenerator.value(), filed.getJavaType());
+                            break;
+                        case FUNCTIION: {
+                            switch (valueGenerator.value()){
+                                case "now":
+                                case "currentTime":
+                                case "sysdate":
+                                    setObjectFieldValue(object, filed.getPropertyName(),
+                                            DatetimeOpt.currentUtilDate(), filed.getJavaType());
+                                    break;
+                            }
+                        }
+                            break;
+                    }
+                }
+            }
+        }
+        return object;
+    }
+
+    public static <T> T prepareObjectForInsert(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
+            throws SQLException, NoSuchFieldException, IOException {
+        return prepareObjectForExecuteSql(object, mapInfo, sqlDialect,GeneratorTime.NEW);
+    }
+
+    public static <T> T prepareObjectForUpdate(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
+            throws SQLException, NoSuchFieldException, IOException {
+        return prepareObjectForExecuteSql(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
+    }
+
+    public static Map<String, Object> fetchObjectDatabaseField(Object object, TableInfo tableInfo)
+            throws NoSuchFieldException {
+
+        List<? extends TableField> tableFields = tableInfo.getColumns();
+        if(tableFields == null)
+            return null;
+        Map<String, Object> fields = new HashMap<>(tableFields.size()*2);
+        for(TableField column : tableFields){
+            Object value = ReflectionOpt.forceGetProperty(object, column.getPropertyName());
+            if(value!=null){
+                fields.put(column.getPropertyName(),value);
+            }
+        }
+        return fields;
     }
 
     public static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz)

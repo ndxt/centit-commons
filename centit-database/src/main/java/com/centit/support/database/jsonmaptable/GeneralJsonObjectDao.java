@@ -51,6 +51,25 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 		}
 	}
 
+	public static GeneralJsonObjectDao createJsonObjectDao(final Connection conn)
+			throws SQLException {
+		DBType dbtype = DBType.mapDBType(conn.getMetaData().getURL());
+		switch (dbtype){
+			case Oracle:
+				return new OracleJsonObjectDao(conn);
+			case DB2:
+				return new DB2JsonObjectDao(conn);
+			case SqlServer:
+				return new SqlSvrJsonObjectDao(conn);
+			case MySql:
+				return new MySqlJsonObjectDao(conn);
+			case Access:
+			case H2:
+			default:
+				throw new  SQLException("不支持的数据库类型："+dbtype.toString());
+		}
+	}
+
 
 	public GeneralJsonObjectDao(final TableInfo tableInfo) {
 		this.tableInfo = tableInfo;

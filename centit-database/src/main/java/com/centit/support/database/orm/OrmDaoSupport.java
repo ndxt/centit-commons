@@ -1,8 +1,12 @@
 package com.centit.support.database.orm;
 
+import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
+import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.json.JSONOpt;
 
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +23,11 @@ public class OrmDaoSupport {
         this.connection = connection;
     }
 
-    public <T> T saveNewObject(T object){
+    public <T> T saveNewObject(T object) throws NoSuchFieldException, SQLException, IOException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+        object = OrmUtils.prepareObjectForInsert(object,mapInfo,sqlDialect );
+        sqlDialect.saveNewObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
         return object;
     }
 
