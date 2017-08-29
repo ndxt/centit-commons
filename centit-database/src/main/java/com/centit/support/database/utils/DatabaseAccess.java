@@ -631,8 +631,15 @@ public class DatabaseAccess {
 		return firstRow[0];
 	}
 
-	/*
-	 * *执行一个标量查询
+
+	/**
+	 * 执行一个标量查询
+	 * @param conn 数据库链接
+	 * @param sSql sql 语句
+	 * @param values 参数
+	 * @return 返回值 object
+	 * @throws SQLException SQLException
+	 * @throws IOException SQLException
 	 */
 	public final static Object getScalarObjectQuery(Connection conn, String sSql, Map<String,Object> values)
 			throws SQLException, IOException {

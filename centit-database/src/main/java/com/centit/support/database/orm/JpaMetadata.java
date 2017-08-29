@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by codefan on 17-8-27.
  */
-public class JpaMetadata {
+public abstract class JpaMetadata {
     public static final ConcurrentHashMap<String , TableMapInfo> jpaMetaData =
             new ConcurrentHashMap<>(100);
 

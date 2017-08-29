@@ -11,13 +11,17 @@ import java.util.List;
  */
 public class TableMapInfo extends SimpleTableInfo {
 
-    private List<KeyValuePair<String,ValueGenerator>> defaultValueGenerators;
+    public List<KeyValuePair<String, ValueGenerator>> getValueGenerators() {
+        return valueGenerators;
+    }
+
+    private List<KeyValuePair<String,ValueGenerator>> valueGenerators;
 
     public TableMapInfo addValueGenerator(String fieldName, ValueGenerator generator ){
-        if(defaultValueGenerators==null)
-            defaultValueGenerators = new ArrayList<>(5);
+        if(valueGenerators ==null)
+            valueGenerators = new ArrayList<>(5);
         /*boolean add = */
-        defaultValueGenerators.add(new KeyValuePair<>(fieldName, generator));
+        valueGenerators.add(new KeyValuePair<>(fieldName, generator));
         return this;
     }
 }

@@ -5,9 +5,11 @@ package com.centit.support.database.orm;
  */
 public enum GeneratorType {
 
-    SEQUENCE,
+    SEQUENCE, //数据库序列
 
-    UUID,
+    UUID, //uuid 32bit
 
-    FUNCTIION
+    CONSTANT, //常量
+
+    FUNCTIION // 函数，比如 当前日期
 }
