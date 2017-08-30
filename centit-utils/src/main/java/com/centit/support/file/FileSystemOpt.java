@@ -27,19 +27,18 @@ public abstract class FileSystemOpt {
 	public static List<File> findFilesByExt(String dir, String extName) {
 		File dirFile = new File(dir);
 		File[] fileArray = dirFile.listFiles();
-
+        String fileExtName = extName.startsWith(".")?extName:"."+extName;
 		List<File> resFiles = new ArrayList<>();
 		// 如果传进来一个以文件作为对象的allList 返回0
 		if (null == fileArray) {
 			return resFiles;
 		}
-
 		// 偏历目录下的文件
 		for (int i = 0; i < fileArray.length; i++) {
 			// 如果是个目录
 			if (fileArray[i].isFile()) {
 				// 如果是以“”结尾的文件
-				if (fileArray[i].getName().endsWith(extName)) {
+				if (StringUtils.endsWithIgnoreCase(fileArray[i].getName(),fileExtName)) {
 					resFiles.add(fileArray[i]);
 				}
 			}
