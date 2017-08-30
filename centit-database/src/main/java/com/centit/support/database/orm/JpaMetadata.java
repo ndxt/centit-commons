@@ -97,9 +97,14 @@ public abstract class JpaMetadata {
         for(Field field :objFields){
             if(field.isAnnotationPresent(Column.class)){
                 SimpleTableField column = obtainColumnFromFile(field);
-                mapInfo.addColumn(column);
+
                 if(field.isAnnotationPresent(Id.class) ){
+                    mapInfo.addColumn(column);
                     mapInfo.addPkColumns(column.getPropertyName());
+                }else if( field.isAnnotationPresent(Lazy.class) ){
+                    mapInfo.addLazyColumn(column);
+                } else {
+                    mapInfo.addColumn(column);
                 }
                 if(field.isAnnotationPresent(ValueGenerator.class) ){
                     ValueGenerator valueGenerator = field.getAnnotation(ValueGenerator.class);
@@ -111,7 +116,6 @@ public abstract class JpaMetadata {
                 EmbeddedId embeddedId = field.getAnnotation(EmbeddedId.class);
                 mapInfo.setPkName(field.getName());
                 for(Field idField : field.getType().getDeclaredFields()){
-
                     if(idField.isAnnotationPresent(Column.class)) {
                         SimpleTableField column = obtainColumnFromFile(field);
                         mapInfo.addColumn(column);

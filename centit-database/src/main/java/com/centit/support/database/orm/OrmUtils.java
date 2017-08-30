@@ -147,19 +147,30 @@ public abstract class OrmUtils {
         return fields;
     }
 
-    public static Map<String, Object> fetchObjectDatabaseField(Object object, TableInfo tableInfo)
+    public static Map<String, Object> fetchObjectDatabaseField(Object object, TableMapInfo tableInfo)
             throws NoSuchFieldException {
 
         List<? extends TableField> tableFields = tableInfo.getColumns();
         if(tableFields == null)
             return null;
-        Map<String, Object> fields = new HashMap<>(tableFields.size()*2);
+        Map<String, Object> fields = new HashMap<>(tableFields.size()*2+6);
         for(TableField column : tableFields){
             Object value = ReflectionOpt.getFieldValue(object, column.getPropertyName());
             if(value!=null){
                 fields.put(column.getPropertyName(),value);
             }
         }
+
+        tableFields = tableInfo.getLazyColumns();
+        if(tableFields != null) {
+            for (TableField column : tableFields) {
+                Object value = ReflectionOpt.getFieldValue(object, column.getPropertyName());
+                if (value != null) {
+                    fields.put(column.getPropertyName(), value);
+                }
+            }
+        }
+
         return fields;
     }
 

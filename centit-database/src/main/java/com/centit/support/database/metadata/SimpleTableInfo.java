@@ -128,6 +128,7 @@ public class SimpleTableInfo implements TableInfo{
 	 * @param name 字段属性名
 	 * @return 字段信息
 	 */
+	@Override
 	public SimpleTableField findFieldByName(String name){
 		for(Iterator<SimpleTableField> it = columns.iterator();it.hasNext();){
 			SimpleTableField col = it.next();
@@ -147,6 +148,7 @@ public class SimpleTableInfo implements TableInfo{
 	 * @param name 属性名
 	 * @return 字段信息
 	 */
+	@Override
 	public SimpleTableField findFieldByColumn(String name){
 		for(Iterator<SimpleTableField> it = columns.iterator();it.hasNext();){
 			SimpleTableField col = it.next();
@@ -160,7 +162,8 @@ public class SimpleTableInfo implements TableInfo{
 		}
 		return null;
 	}
-	
+
+	@Override
 	public boolean isParmaryKey(String colname){
 		if(pkColumns==null)
 			return false;
