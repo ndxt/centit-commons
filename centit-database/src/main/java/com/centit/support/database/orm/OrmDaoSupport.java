@@ -62,6 +62,10 @@ public class OrmDaoSupport {
         return sqlDialect.mergeObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
     }
 
+    public interface FetchDataWork<T> {
+        T execute(ResultSet rs) throws SQLException, IOException,NoSuchFieldException,
+                InstantiationException, IllegalAccessException;
+    }
     /**
      * 查询数据库模板代码
      * @param conn 数据库链接
