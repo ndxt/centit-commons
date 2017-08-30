@@ -21,8 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by codefan on 17-8-27.
  */
+@SuppressWarnings("unused")
 public abstract class JpaMetadata {
-    public static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA =
+    private static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA =
             new ConcurrentHashMap<>(100);
 
     /**
@@ -51,6 +52,10 @@ public abstract class JpaMetadata {
     public static final void loadExtendedSqlMap(String extendedSqlXmlFile, DBType dbtype)
             throws DocumentException,IOException {
         loadExtendedSqlMap(JpaMetadata.class.getResourceAsStream(extendedSqlXmlFile), dbtype);
+    }
+
+    public static final String getExtendedSql(String extendedSqlId){
+        return EXTENDED_SQL_MAP.get(extendedSqlId);
     }
 
     public static TableMapInfo fetchTableMapInfo(Class<?> type){
