@@ -422,7 +422,7 @@ public abstract class ListOpt {
      * 			insert T update(old,new) T,T  delete T
      */
     public static <T> Triple<List<T>, List<Pair<T,T>>, List<T>> 
-    	compareTwoList(List<T> oldList,List<T> newList,Comparator<T> compare){
+    	compareTwoList(List<T> oldList, List<T> newList,Comparator<T> compare){
     	if(oldList==null ||oldList.size()==0)
     		return new ImmutableTriple<List<T>, List<Pair<T,T>>, List<T>> (
     				newList,null,null);

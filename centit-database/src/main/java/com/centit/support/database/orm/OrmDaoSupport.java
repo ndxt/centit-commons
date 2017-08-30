@@ -1,13 +1,19 @@
 package com.centit.support.database.orm;
 
+import com.alibaba.fastjson.JSONObject;
+import com.centit.support.algorithm.ListOpt;
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableReference;
+import com.centit.support.database.metadata.TableField;
+import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.*;
 import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -194,6 +200,20 @@ public class OrmDaoSupport {
         }
     }
 
+    public <T> T getObjectByProperties(Map<String, Object> properties, Class<T> type)
+            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
+        String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
+        String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
+        if(StringUtils.isNotBlank(filter))
+            sql = sql + " where " + filter;
+        return queryNamedParamsSql(
+                connection, new QueryAndNamedParams(sql,
+                        properties),
+                (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type));
+    }
+
     public <T> List<T> listObjectByProperties(Map<String, Object> properties, Class<T> type)
             throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
@@ -271,17 +291,15 @@ public class OrmDaoSupport {
                 (rs) -> OrmUtils.fetchFieldsFormResultSet(rs,object,mapInfo));
     }
 
-    public <T,F> T fetchObjectReference(T object, String reference, Class<F> refType)
+    private <T> T fetchObjectReference(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
             throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
-        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        SimpleTableReference ref = mapInfo.findReference(reference);
+
         if(ref==null || ref.getReferenceColumns().size()<1)
             return object;
 
-        //ReflectionOpt.isArray()
-
+        Class<?> refType = ref.getTargetEntityType();
         TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
-        if( refMapInfo == null)
+        if( refMapInfo == null )
             return object;
 
         Map<String, Object> properties = new HashMap<>(6);
@@ -289,38 +307,207 @@ public class OrmDaoSupport {
             properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
         }
 
-        List<F> refs = listObjectByProperties( properties, refType);
+        List<?> refs = listObjectByProperties( properties, refType);
+
         if(refs!=null && refs.size()>0) {
             if (ref.getReferenceType().equals(refType)){
-                ReflectionOpt.setFieldValue(object, reference, refs.get(0) );
+                ReflectionOpt.setFieldValue(object, ref.getReferenceName(), refs.get(0) );
             }else if(ref.getReferenceType().isAssignableFrom(Set.class)){
-                ReflectionOpt.setFieldValue(object, reference, new HashSet<F>(refs));
+                ReflectionOpt.setFieldValue(object, ref.getReferenceName(), new HashSet<>(refs));
             }else if(ref.getReferenceType().isAssignableFrom(List.class)){
-                ReflectionOpt.setFieldValue(object, reference, refs);
+                ReflectionOpt.setFieldValue(object, ref.getReferenceName(), refs);
             }
-            //Object oldValue =
+        }
+        return object;
+    }
+
+    public <T> T fetchObjectReference(T object, String reference  )
+            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        SimpleTableReference ref = mapInfo.findReference(reference);
+
+        return fetchObjectReference(object,ref,mapInfo);
+    }
+
+    public <T> T fetchObjectReferences(T object)
+            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        if(mapInfo.hasReferences()) {
+            for (SimpleTableReference ref : mapInfo.getReferences()) {
+                fetchObjectReference(object, ref, mapInfo);
+            }
         }
         return object;
     }
 
 
-    public <T> int replaceObjectsAsTabulation(Collection<T> dbObjects,Collection<T> newObjects){
+    public <T> int deleteObjectByProperties(Map<String, Object> properties, Class<T> type)
+            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+        JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+        return sqlDialect.deleteObjectsByProperties(properties);
+    }
 
-        return 0;
+    private <T> int deleteObjectReference(T object,SimpleTableReference ref)
+            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+
+        if(ref==null || ref.getReferenceColumns().size()<1)
+            return 0;
+
+        Class<?> refType = ref.getTargetEntityType();
+        TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
+        if( refMapInfo == null )
+            return 0;
+
+        Map<String, Object> properties = new HashMap<>(6);
+        for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
+            properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
+        }
+
+        return deleteObjectByProperties(properties, refType);
+    }
+
+    public <T> int deleteObjectReference(T object, String reference)
+            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        SimpleTableReference ref = mapInfo.findReference(reference);
+        return deleteObjectReference(object,ref);
+    }
+
+    public <T> int deleteObjectReferences(T object)
+            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        int  n=0;
+        if(mapInfo.hasReferences()) {
+            for (SimpleTableReference ref : mapInfo.getReferences()) {
+                n+= deleteObjectReference(object,ref);
+            }
+        }
+        return n;
+    }
+
+    public <T> int deleteObjectCascadeShallow(T object)
+            throws NoSuchFieldException, SQLException, IllegalAccessException, IOException, InstantiationException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
+
+        if(mapInfo.hasReferences()) {
+            for (SimpleTableReference ref : mapInfo.getReferences()) {
+                deleteObjectReference(object,ref);
+            }
+        }
+
+        return deleteObjectById(idMap,mapInfo);
+    }
+
+    public <T> int deleteObjectCascade(T object)
+            throws NoSuchFieldException, SQLException, IllegalAccessException, IOException, InstantiationException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
+        if(mapInfo.hasReferences()) {
+            for (SimpleTableReference ref : mapInfo.getReferences()) {
+                Map<String, Object> properties = new HashMap<>(6);
+                Class<?> refType = ref.getTargetEntityType();
+                for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
+                    properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
+                }
+
+                List<?> refs = listObjectByProperties( properties, refType);
+                for(Object refObject : refs){
+                    deleteObjectCascade(refObject);
+                }
+            }
+        }
+        return deleteObject(object);
+    }
+
+    public <T> int deleteObjectCascadeShallowById(Object id, final Class<T> type)
+            throws NoSuchFieldException, SQLException, IllegalAccessException, IOException, InstantiationException {
+
+        return deleteObjectCascadeShallow(getObjectById(id, type));
+    }
+
+    public <T> int deleteObjectCascadeById(Object id, final Class<T> type)
+            throws NoSuchFieldException, SQLException, IllegalAccessException, IOException, InstantiationException {
+
+        return deleteObjectCascade(getObjectById(id, type));
+    }
+
+    public class OrmObjectComparator<T> implements Comparator<T>{
+        private TableInfo tableInfo;
+        public OrmObjectComparator(TableMapInfo tableInfo){
+            this.tableInfo = tableInfo;
+        }
+        @Override
+        public int compare(T o1, T o2) {
+            for(String pkc : tableInfo.getPkColumns() ){
+                Object f1 = ReflectionOpt.getFieldValue(o1,pkc);
+                Object f2 = ReflectionOpt.getFieldValue(o2,pkc);
+                if(f1==null){
+                    if(f2!=null)
+                        return -1;
+                }else{
+                    if(f2==null)
+                        return 1;
+                    if( ReflectionOpt.isNumberType(f1.getClass())){
+                        double db1 = ((Number)f1).doubleValue();
+                        double db2 = ((Number)f2).doubleValue();
+                        if(db1>db2)
+                            return 1;
+                        if(db1<db2)
+                            return -1;
+                    }else{
+                        String s1 = StringBaseOpt.objectToString(f1);
+                        String s2 = StringBaseOpt.objectToString(f2);
+                        int nc = s1.compareTo(s2);
+                        if(nc!=0)
+                            return nc;
+                    }
+                }
+            }
+            return 0;
+        }
+
+    }
+
+    public <T> int replaceObjectsAsTabulation(List<T> dbObjects,List<T> newObjects)
+            throws NoSuchFieldException, IOException, SQLException {
+        Class<T> objType =(Class<T>) newObjects.iterator().next().getClass();
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(objType);
+        Triple<List<T>, List<Pair<T,T>>, List<T>>
+                comRes=
+                ListOpt.compareTwoList(dbObjects, newObjects,
+                        new OrmObjectComparator<>(mapInfo) );
+        int resN = 0;
+        for(T obj:comRes.getLeft()){
+            resN += saveNewObject( obj);
+        }
+        for(T obj:comRes.getRight()){
+            resN += deleteObject(obj);
+        }
+        for(Pair<T,T> pobj:comRes.getMiddle()){
+            resN += updateObject(pobj.getRight());
+        }
+        return resN;
     }
 
 
-    public <T> int replaceObjectsAsTabulation(Collection<T> newObjects,
-                                               final String propertyName,
-                                               final Object propertyValue ){
+    public <T> int replaceObjectsAsTabulation(List<T> newObjects,
+                           final String propertyName, final Object propertyValue )
+            throws SQLException, NoSuchFieldException, InstantiationException, IOException, IllegalAccessException {
         return replaceObjectsAsTabulation(newObjects,
                 JSONOpt.createHashMap(propertyName,propertyValue));
     }
 
-    public <T> int replaceObjectsAsTabulation(Collection<T> newObjects,
-                                               Map<String, Object> properties){
-
-        return 0;
+    public <T> int replaceObjectsAsTabulation(List<T> newObjects,
+                                               Map<String, Object> properties)
+            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+        if(newObjects==null || newObjects.size()<1)
+            return 0;
+        Class<T> objType =(Class<T>) newObjects.iterator().next().getClass();
+        List<T> dbObjects = this.listObjectByProperties(properties, objType);
+        return replaceObjectsAsTabulation(dbObjects,newObjects);
     }
 
 }

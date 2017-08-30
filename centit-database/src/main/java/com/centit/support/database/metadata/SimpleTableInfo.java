@@ -365,6 +365,10 @@ public class SimpleTableInfo implements TableInfo{
 		return references;
 	}
 
+	public boolean hasReferences(){
+		return references!=null && references.size()>0;
+	}
+
 	public void addReference(SimpleTableReference reference) {
 		getReferences().add(reference);
 	}

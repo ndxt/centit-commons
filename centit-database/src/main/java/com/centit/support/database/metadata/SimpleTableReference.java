@@ -12,6 +12,7 @@ public class SimpleTableReference implements TableReference{
 	private String referenceName;
 	private String referenceCode;
 	private Class<?> referenceType;
+	private Class<?> targetEntityType;
 	private List<SimpleTableField> fkColumns;
 
 	private Map<String, String> referenceColumns;
@@ -105,5 +106,13 @@ public class SimpleTableReference implements TableReference{
 
 	public void setReferenceType(Class<?> referenceType) {
 		this.referenceType = referenceType;
+	}
+
+	public Class<?> getTargetEntityType() {
+		return targetEntityType;
+	}
+
+	public void setTargetEntityType(Class<?> targetEntityType) {
+		this.targetEntityType = targetEntityType;
 	}
 }
