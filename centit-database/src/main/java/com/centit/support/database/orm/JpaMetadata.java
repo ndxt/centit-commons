@@ -2,26 +2,59 @@ package com.centit.support.database.orm;
 
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableReference;
-import com.centit.support.database.metadata.TableInfo;
+import com.centit.support.database.utils.DBType;
+import com.centit.support.xml.IgnoreDTDEntityResolver;
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
 import javax.persistence.*;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by codefan on 17-8-27.
  */
 public abstract class JpaMetadata {
-    public static final ConcurrentHashMap<String , TableMapInfo> jpaMetaData =
+    public static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA =
             new ConcurrentHashMap<>(100);
+
+    /**
+     * 通过XML文件加载
+     */
+    private static final Map<String,String> EXTENDED_SQL_MAP=new HashMap<>();
+
+    public static final void loadExtendedSqlMap(String extendedSqlXmlFile, DBType dbtype)
+            throws DocumentException,IOException {
+
+        SAXReader builder = new SAXReader(false);
+        builder.setValidation(false);
+        builder.setEntityResolver(new IgnoreDTDEntityResolver());
+        Document doc = builder.read(JpaMetadata.class.getResourceAsStream(extendedSqlXmlFile));
+        Element root = doc.getRootElement();//获取根元素
+        for(Object element : root.elements()){
+            String strDbType = ((Element)element).attributeValue("dbtype");
+            if(StringUtils.isBlank(strDbType) || dbtype == DBType.valueOf(strDbType) ) {
+                EXTENDED_SQL_MAP.put(
+                        ((Element) element).attributeValue("id"),
+                        ((Element) element).getStringValue());
+            }
+        }
+
+    }
 
     public static TableMapInfo fetchTableMapInfo(Class<?> type){
         String className = type.getName();
-        TableMapInfo mapInfo = jpaMetaData.get(className);
+        TableMapInfo mapInfo = ORM_JPA_METADATA.get(className);
         if(mapInfo == null){
             mapInfo = obtainMapInfoFromClass(type);
             if(mapInfo!=null){
-                jpaMetaData.put(className,mapInfo);
+                ORM_JPA_METADATA.put(className,mapInfo);
             }
         }
         return mapInfo;

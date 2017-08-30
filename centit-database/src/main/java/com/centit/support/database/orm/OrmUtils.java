@@ -6,12 +6,11 @@ import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
+import com.centit.support.database.utils.DatabaseAccess;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,8 @@ public class OrmUtils {
 
 
     public static void setObjectFieldValue(Object object, String propertyName,
-                                           Object newValue, String fieldJavaType) throws NoSuchFieldException {
+                                           Object newValue, String fieldJavaType)
+            throws NoSuchFieldException, IOException {
         switch (fieldJavaType) {
             case "Double":
             case "Float":
@@ -40,8 +40,16 @@ public class OrmUtils {
                         NumberBaseOpt.castObjectToInteger(newValue));
                 break;
             case "String":
-                ReflectionOpt.forceSetProperty(object,propertyName,
-                        StringBaseOpt.objectToString(newValue));
+                if (newValue instanceof Clob) {
+                    ReflectionOpt.forceSetProperty(object,propertyName,
+                            DatabaseAccess.fetchClobString((Clob) newValue));
+                }else if (newValue instanceof Blob) {
+                    ReflectionOpt.forceSetProperty(object,propertyName,
+                            DatabaseAccess.fetchBlobAsBase64((Blob) newValue));
+                } else {
+                    ReflectionOpt.forceSetProperty(object, propertyName,
+                            StringBaseOpt.objectToString(newValue));
+                }
                 break;
             case "Date":
             case "Timestamp":
@@ -53,6 +61,17 @@ public class OrmUtils {
                         StringRegularOpt.isTrue(
                                 StringBaseOpt.objectToString(newValue)
                         ));
+                break;
+            default:
+                if (newValue instanceof Clob) {
+                    ReflectionOpt.forceSetProperty(object,propertyName,
+                            DatabaseAccess.fetchClobString((Clob) newValue));
+                }else if (newValue instanceof Blob) {
+                    ReflectionOpt.forceSetProperty(object,propertyName,
+                            DatabaseAccess.fetchBlobBytes((Blob) newValue));
+                } else {
+                    ReflectionOpt.forceSetProperty(object, propertyName,newValue);
+                }
                 break;
         }
     }
@@ -144,7 +163,7 @@ public class OrmUtils {
     }
 
     public static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz)
-            throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException {
+            throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)
             return null;
@@ -167,7 +186,7 @@ public class OrmUtils {
     }
 
     public static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz)
-            throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException {
+            throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException, IOException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)

@@ -8,6 +8,7 @@ public enum DBType {
 	Unknown,SqlServer,Oracle,DB2,Access,MySql,H2;
 	
 	public static DBType valueOf(int ordinal){
+
 		switch(ordinal){
 	  	case 1:
 	  		return SqlServer;
@@ -25,7 +26,8 @@ public enum DBType {
 	  		return Unknown;
 	  }
 	}
-	
+
+
 	public static DBType mapDBType(String connurl){
 		if(connurl==null)
 			return Unknown;
