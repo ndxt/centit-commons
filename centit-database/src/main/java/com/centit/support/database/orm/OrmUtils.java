@@ -197,6 +197,24 @@ public abstract class OrmUtils {
         return null;
     }
 
+    public static <T> T fetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo )
+            throws SQLException, NoSuchFieldException, IOException {
+        ResultSetMetaData resMeta = rs.getMetaData();
+        int fieldCount = resMeta.getColumnCount();
+        if(rs.next()) {
+            for (int i = 1; i <= fieldCount; i++) {
+                String columnName = resMeta.getColumnName(i);
+                SimpleTableField filed = mapInfo.findFieldByColumn(columnName);
+                if (filed != null) {
+                    setObjectFieldValue(object, filed.getPropertyName(),
+                            rs.getObject(i), filed.getJavaType());
+                }
+            }
+            return object;
+        }
+        return object;
+    }
+
     public static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz)
             throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException, IOException {
 

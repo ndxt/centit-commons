@@ -18,7 +18,7 @@ import org.dom4j.Element;
 import org.dom4j.io.XMLWriter;
 
 import com.centit.support.file.FileSystemOpt;
-
+@SuppressWarnings("unused")
 public class SimpleTableInfo implements TableInfo{
 	
 	protected static final Logger logger = LoggerFactory.getLogger(SimpleTableInfo.class);
@@ -115,8 +115,7 @@ public class SimpleTableInfo implements TableInfo{
 	 * @return 字段信息
 	 */
 	public SimpleTableField findField(String colname){
-		for(Iterator<SimpleTableField> it = columns.iterator();it.hasNext();){
-			SimpleTableField col = it.next();
+		for(SimpleTableField col : columns){
 			if(col.getColumnName().equals(colname))
 				return col;
 		}
@@ -130,13 +129,11 @@ public class SimpleTableInfo implements TableInfo{
 	 */
 	@Override
 	public SimpleTableField findFieldByName(String name){
-		for(Iterator<SimpleTableField> it = columns.iterator();it.hasNext();){
-			SimpleTableField col = it.next();
+		for(SimpleTableField col : columns){
 			if(col.getPropertyName().equals(name))
 				return col;
 		}
-		for(Iterator<SimpleTableField> it = columns.iterator();it.hasNext();){
-			SimpleTableField col = it.next();
+		for(SimpleTableField col : columns){
 			if(col.getColumnName().equals(name))
 				return col;
 		}
@@ -150,13 +147,11 @@ public class SimpleTableInfo implements TableInfo{
 	 */
 	@Override
 	public SimpleTableField findFieldByColumn(String name){
-		for(Iterator<SimpleTableField> it = columns.iterator();it.hasNext();){
-			SimpleTableField col = it.next();
+		for(SimpleTableField col : columns){
 			if(col.getColumnName().equals(name))
 				return col;
 		}
-		for(Iterator<SimpleTableField> it = columns.iterator();it.hasNext();){
-			SimpleTableField col = it.next();
+		for(SimpleTableField col : columns){
 			if(col.getPropertyName().equals(name))
 				return col;
 		}
@@ -167,8 +162,7 @@ public class SimpleTableInfo implements TableInfo{
 	public boolean isParmaryKey(String colname){
 		if(pkColumns==null)
 			return false;
-		for(Iterator<String> it = pkColumns.iterator();it.hasNext();){
-			String col = it.next();
+		for(String col : pkColumns){
 			if(col.equals(colname))
 				return true;
 		}
@@ -347,7 +341,7 @@ public class SimpleTableInfo implements TableInfo{
 
 	public List<String> getPkColumns() {
 		if(pkColumns==null)
-			pkColumns = new ArrayList<String>(4);
+			pkColumns = new ArrayList<>(4);
 		return pkColumns;
 	}
 
@@ -367,7 +361,7 @@ public class SimpleTableInfo implements TableInfo{
 
 	public List<SimpleTableReference> getReferences() {
 		if(references==null)
-			references = new ArrayList<SimpleTableReference>(4);
+			references = new ArrayList<>(4);
 		return references;
 	}
 
@@ -375,6 +369,16 @@ public class SimpleTableInfo implements TableInfo{
 		getReferences().add(reference);
 	}
 
+	public SimpleTableReference findReference(String reference){
+		if(references==null)
+			return null;
+
+		for(SimpleTableReference ref : references){
+			if(ref.getReferenceName().equals(reference))
+				return ref;
+		}
+		return null;
+	}
 
 	public void setReferences(List<SimpleTableReference> references) {
 		this.references = references;

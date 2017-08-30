@@ -627,9 +627,25 @@ public abstract class ReflectionOpt  {
 			return true;
 		return false;
 	}
-	
-	/*
+
+	/**
+	 * 判断一个类型是否是 数组[]、Collection(List)
+	 * @param tp 类型
+	 * @return 否是 数组[]
+	 */
+	public static boolean isArrayType(Class<?>  tp){
+		if(tp.isArray())
+			return true;
+		if(tp.isAssignableFrom(Collection.class))
+			return true;
+		return false;
+	}
+
+	/**
 	 * 将两个对象加+起来，可能是数字相加，也可能是字符串连接
+	 * @param a object1
+	 * @param b object2
+	 * @return 相加结果
 	 */
 	public static Object addTwoObject(Object a,Object b){
 		if(a==null)

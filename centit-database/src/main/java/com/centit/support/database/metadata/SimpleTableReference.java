@@ -78,7 +78,7 @@ public class SimpleTableReference implements TableReference{
 	@Override
 	public Map<String, String> getReferenceColumns() {
 		if(this.referenceColumns==null)
-			this.referenceColumns = new HashMap<String, String>(6);
+			this.referenceColumns = new HashMap<>(6);
 		return this.referenceColumns;
 	}
 

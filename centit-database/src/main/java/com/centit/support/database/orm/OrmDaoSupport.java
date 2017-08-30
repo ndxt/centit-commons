@@ -3,8 +3,10 @@ package com.centit.support.database.orm;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
+import com.centit.support.database.metadata.SimpleTableReference;
 import com.centit.support.database.utils.*;
 import com.centit.support.json.JSONOpt;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
@@ -12,9 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by codefan on 17-8-29.
@@ -99,28 +99,21 @@ public class OrmDaoSupport {
      * @throws InstantiationException 异常
      * @throws IllegalAccessException 异常
      */
-    private final static <T> T queryNamedParamsSql(Connection conn, QueryAndNamedParams sqlAndParams,
+    private static <T> T queryNamedParamsSql(Connection conn, QueryAndNamedParams sqlAndParams,
                                                    FetchDataWork<T> fetchDataWork)
             throws SQLException, IOException,NoSuchFieldException,  InstantiationException, IllegalAccessException {
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(sqlAndParams);
         return queryParamsSql(conn, qap ,fetchDataWork);
     }
 
-    public <T> T getObjectBySql(String sql, Map<String, Object> properties, Class<T> type, TableMapInfo mapInfo)
+    public <T> T getObjectBySql(String sql, Map<String, Object> properties, Class<T> type)
             throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
-        JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+        //JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(sql,
                         properties),
                 (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type)
         );
-    }
-
-    public <T> T getObjectBySql(String sql, Map<String, Object> properties, Class<T> type)
-            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
-
-        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        return getObjectBySql(sql, properties,  type,  mapInfo);
     }
 
     public <T> T getObjectById(Object id, final Class<T> type)
@@ -133,35 +126,36 @@ public class OrmDaoSupport {
             if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
                 throw new SQLException("表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return getObjectBySql(q.getKey(),
-                    QueryUtils.createSqlParamsMap(mapInfo.getPkColumns().get(0),id), type,  mapInfo);
+                    QueryUtils.createSqlParamsMap(mapInfo.getPkColumns().get(0),id), type);
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
             if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idObj)){
                 throw new SQLException("缺少主键对应的属性。");
             }
             return getObjectBySql(q.getKey(),
-                    idObj, type,  mapInfo);
+                    idObj, type);
         }
     }
 
     public <T> T getObjectIncludeLzayById(Object id, final Class<T> type)
             throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        String  sql = mapInfo.buildFieldIncludeLazySql("");
+        String  sql =  "select " + mapInfo.buildFieldIncludeLazySql("") +
+                " from " +mapInfo.getTableName() + " where " +
+                GeneralJsonObjectDao.buildFilterSqlByPk(mapInfo,null);
 
         if(ReflectionOpt.isScalarType(id.getClass())){
             if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
                 throw new SQLException("表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return getObjectBySql(sql,
-                    QueryUtils.createSqlParamsMap(mapInfo.getPkColumns().get(0),id), type,  mapInfo);
+                    QueryUtils.createSqlParamsMap(mapInfo.getPkColumns().get(0),id), type);
 
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
             if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idObj)){
                 throw new SQLException("缺少主键对应的属性。");
             }
-            return getObjectBySql(sql,
-                    idObj, type,  mapInfo);
+            return getObjectBySql(sql, idObj, type);
         }
     }
 
@@ -200,49 +194,115 @@ public class OrmDaoSupport {
         }
     }
 
+    public <T> List<T> listObjectByProperties(Map<String, Object> properties, Class<T> type)
+            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
+        String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
+        String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
+        if(StringUtils.isNotBlank(filter))
+            sql = sql + " where " + filter;
 
-    public <T> List<T> listObjectByProperties(Map<String, Object> properties, Class<T> type){
-
-        return null;
+        return queryNamedParamsSql(
+                connection, new QueryAndNamedParams(sql,
+                        properties),
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
 
-    public <T> List<T> queryObjectsBySql(String sql, Class<T> type){
-
-        return null;
+    public <T> List<T> queryObjectsBySql(String sql, Class<T> type)
+            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+        return queryNamedParamsSql(
+                connection, new QueryAndNamedParams(sql,
+                        new HashMap<>()),
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
 
-    public <T> List<T> queryObjectsByParamsSql(String sql, Object[] params, Class<T> type){
-
-        return null;
+    public <T> List<T> queryObjectsByParamsSql(String sql, Object[] params, Class<T> type)
+            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+        return queryParamsSql(
+                connection, new QueryAndParams(sql,params),
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
 
     public <T> List<T> queryObjectsByNamedParamsSql(String sql,
-                                              Map<String,Object> params, Class<T> type){
-
-        return null;
+                                              Map<String,Object> params, Class<T> type)
+            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+        return queryNamedParamsSql(
+                connection, new QueryAndNamedParams(sql,params),
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
 
-    public <T> T fetchObjectLazyColumn(T object,String columnName){
+    public <T> T fetchObjectLazyColumn(T object,String columnName)
+            throws NoSuchFieldException, SQLException,
+            IllegalAccessException, IOException, InstantiationException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
+        if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idMap)){
+            throw new SQLException("缺少主键对应的属性。");
+        }
+
+        String  sql =  "select " + mapInfo.findFieldByName(columnName).getColumnName() +
+                " from " +mapInfo.getTableName() + " where " +
+                GeneralJsonObjectDao.buildFilterSqlByPk(mapInfo,null);
+
+        return queryNamedParamsSql(
+                connection, new QueryAndNamedParams(sql,idMap),
+                (rs) -> OrmUtils.fetchFieldsFormResultSet(rs,object,mapInfo));
+    }
+
+    public <T> T fetchObjectLazyColumns(T object)
+            throws SQLException, NoSuchFieldException, InstantiationException,
+            IllegalAccessException, IOException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        String fieldSql = mapInfo.buildLazyFieldSql(null);
+        if(fieldSql==null)
+            return object;
+        Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
+        if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idMap)){
+            throw new SQLException("缺少主键对应的属性。");
+        }
+
+        String  sql =  "select " + fieldSql +
+                " from " +mapInfo.getTableName() + " where " +
+                GeneralJsonObjectDao.buildFilterSqlByPk(mapInfo,null);
+
+        return queryNamedParamsSql(
+                connection, new QueryAndNamedParams(sql,idMap),
+                (rs) -> OrmUtils.fetchFieldsFormResultSet(rs,object,mapInfo));
+    }
+
+    public <T,F> T fetchObjectReference(T object, String reference, Class<F> refType)
+            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        SimpleTableReference ref = mapInfo.findReference(reference);
+        if(ref==null || ref.getReferenceColumns().size()<1)
+            return object;
+
+        //ReflectionOpt.isArray()
+
+        TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
+        if( refMapInfo == null)
+            return object;
+
+        Map<String, Object> properties = new HashMap<>(6);
+        for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
+            properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
+        }
+
+        List<F> refs = listObjectByProperties( properties, refType);
+        if(refs!=null && refs.size()>0) {
+            if (ref.getReferenceType().equals(refType)){
+                ReflectionOpt.setFieldValue(object, reference, refs.get(0) );
+            }else if(ref.getReferenceType().isAssignableFrom(Set.class)){
+                ReflectionOpt.setFieldValue(object, reference, new HashSet<F>(refs));
+            }else if(ref.getReferenceType().isAssignableFrom(List.class)){
+                ReflectionOpt.setFieldValue(object, reference, refs);
+            }
+            //Object oldValue =
+        }
         return object;
     }
 
-    public <T> T fetchObjectLazyColumns(T object){
-        return object;
-    }
-
-    public <T> T fetchObjectReference(T object,String reference){
-        return object;
-    }
-
-    /**
-     * 加载对象所有的 关联 对象
-     * @param object 主对象
-     * @param <T> 类型
-     * @return 对象
-     */
-    public <T> T fetchObjectReferences(T object){
-        return object;
-    }
 
     public <T> int replaceObjectsAsTabulation(Collection<T> dbObjects,Collection<T> newObjects){
 
@@ -257,7 +317,7 @@ public class OrmDaoSupport {
                 JSONOpt.createHashMap(propertyName,propertyValue));
     }
 
-    public  <T> int replaceObjectsAsTabulation(Collection<T> newObjects,
+    public <T> int replaceObjectsAsTabulation(Collection<T> newObjects,
                                                Map<String, Object> properties){
 
         return 0;

@@ -39,7 +39,7 @@ public class TableMapInfo extends SimpleTableInfo {
 
     public List<SimpleTableField> getLazyColumns() {
         if(lazyColumns==null)
-            lazyColumns = new ArrayList<SimpleTableField>(20);
+            lazyColumns = new ArrayList<>(20);
         return lazyColumns;
     }
 
@@ -54,27 +54,23 @@ public class TableMapInfo extends SimpleTableInfo {
      */
     @Override
     public SimpleTableField findFieldByName(String name){
-        for(Iterator<SimpleTableField> it = getColumns().iterator(); it.hasNext();){
-            SimpleTableField col = it.next();
+        for(SimpleTableField col : getColumns()){
             if(col.getPropertyName().equals(name))
                 return col;
         }
         if(lazyColumns!=null) {
-            for (Iterator<SimpleTableField> it = lazyColumns.iterator(); it.hasNext(); ) {
-                SimpleTableField col = it.next();
+            for ( SimpleTableField col : lazyColumns){
                 if (col.getPropertyName().equals(name))
                     return col;
             }
         }
 
-        for(Iterator<SimpleTableField> it = getColumns().iterator();it.hasNext();){
-            SimpleTableField col = it.next();
+        for(SimpleTableField col : getColumns()){
             if(col.getColumnName().equals(name))
                 return col;
         }
         if(lazyColumns!=null) {
-            for(Iterator<SimpleTableField> it = lazyColumns.iterator();it.hasNext();){
-                SimpleTableField col = it.next();
+            for ( SimpleTableField col : lazyColumns){
                 if(col.getColumnName().equals(name))
                     return col;
             }
@@ -90,28 +86,24 @@ public class TableMapInfo extends SimpleTableInfo {
      */
     @Override
     public SimpleTableField findFieldByColumn(String name){
-        for(Iterator<SimpleTableField> it = getColumns().iterator();it.hasNext();){
-            SimpleTableField col = it.next();
+        for(SimpleTableField col : getColumns()){
             if(col.getColumnName().equals(name))
                 return col;
         }
         if(lazyColumns!=null) {
-            for(Iterator<SimpleTableField> it = lazyColumns.iterator();it.hasNext();){
-                SimpleTableField col = it.next();
+            for ( SimpleTableField col : lazyColumns){
                 if(col.getColumnName().equals(name))
                     return col;
             }
         }
 
-        for(Iterator<SimpleTableField> it = getColumns().iterator();it.hasNext();){
-            SimpleTableField col = it.next();
+        for(SimpleTableField col : getColumns()){
             if(col.getPropertyName().equals(name))
                 return col;
         }
 
         if(lazyColumns!=null) {
-            for (Iterator<SimpleTableField> it = lazyColumns.iterator(); it.hasNext(); ) {
-                SimpleTableField col = it.next();
+            for ( SimpleTableField col : lazyColumns){
                 if (col.getPropertyName().equals(name))
                     return col;
             }
@@ -151,5 +143,26 @@ public class TableMapInfo extends SimpleTableInfo {
         }
         return sBuilder.toString();
     }
+
+    public String buildLazyFieldSql(String alias){
+        if(lazyColumns==null || lazyColumns.size()<1)
+            return null;
+        StringBuilder sBuilder= new StringBuilder();
+        boolean addAlias = StringUtils.isNotBlank(alias);
+        int i=0;
+        if(lazyColumns!=null){
+            for(TableField col : lazyColumns){
+                if(i>0)
+                    sBuilder.append(", ");
+                else
+                    sBuilder.append(" ");
+                if(addAlias)
+                    sBuilder.append(alias).append('.');
+                sBuilder.append(col.getColumnName());
+            }
+        }
+        return sBuilder.toString();
+    }
+
 
 }

@@ -25,7 +25,9 @@ public class TestQueryUtils {
 	}
 
 	public static void main(String[] args) {
-		testGetTemplateParams();
+		List<String> arys = new ArrayList<>();
+		System.out.println(arys.getClass().getName());
+		System.out.println(arys.getClass().getEnclosingClass().getTypeName());
 		/*System.out.println(QueryUtils.trimSqlOrderByField(" , 1 2 nulls last, 2 desc ,"));
 		System.out.println(QueryUtils.trimSqlOrderByField("%27+%2B+%27+%2B+%27createDate"));
 		System.out.println(QueryUtils.trimSqlOrderByField("  	reateDate nulls first, orderind desc ,"));
