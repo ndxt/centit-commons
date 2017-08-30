@@ -112,7 +112,32 @@ public abstract class ReflectionOpt  {
 		}
 		return null;
 	}
-	
+
+	public static void setFieldValue(Object object, String fieldName, Object newValue)
+			throws NoSuchFieldException {
+
+		Method md=null;
+		try {
+			md = object.getClass().getMethod("set" + StringUtils.capitalize(fieldName));
+		}catch (NoSuchMethodException noSet ){
+				logger.error(noSet.getMessage(), noSet);
+		}catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		}
+		if(md==null){
+			try{
+				forceSetProperty(object, fieldName, newValue);
+			}catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
+		}else{
+			try{
+				md.invoke(object,newValue);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
+	}
 	/*
 	 * 获得get field value by getter
 	 */

@@ -20,7 +20,7 @@ import java.util.Map;
  * Created by codefan on 17-8-27.
  */
 @SuppressWarnings("unused")
-public class OrmUtils {
+public abstract class OrmUtils {
 
 
     public static void setObjectFieldValue(Object object, String propertyName,
@@ -29,48 +29,48 @@ public class OrmUtils {
         switch (fieldJavaType) {
             case "Double":
             case "Float":
-                ReflectionOpt.forceSetProperty(object,propertyName,
+                ReflectionOpt.setFieldValue(object,propertyName,
                         NumberBaseOpt.castObjectToDouble(newValue));
                 break;
             case "Long":
-                ReflectionOpt.forceSetProperty(object,propertyName,
+                ReflectionOpt.setFieldValue(object,propertyName,
                         NumberBaseOpt.castObjectToLong(newValue));
             case "Integer":
-                ReflectionOpt.forceSetProperty(object,propertyName,
+                ReflectionOpt.setFieldValue(object,propertyName,
                         NumberBaseOpt.castObjectToInteger(newValue));
                 break;
             case "String":
                 if (newValue instanceof Clob) {
-                    ReflectionOpt.forceSetProperty(object,propertyName,
+                    ReflectionOpt.setFieldValue(object,propertyName,
                             DatabaseAccess.fetchClobString((Clob) newValue));
                 }else if (newValue instanceof Blob) {
-                    ReflectionOpt.forceSetProperty(object,propertyName,
+                    ReflectionOpt.setFieldValue(object,propertyName,
                             DatabaseAccess.fetchBlobAsBase64((Blob) newValue));
                 } else {
-                    ReflectionOpt.forceSetProperty(object, propertyName,
+                    ReflectionOpt.setFieldValue(object, propertyName,
                             StringBaseOpt.objectToString(newValue));
                 }
                 break;
             case "Date":
             case "Timestamp":
-                ReflectionOpt.forceSetProperty(object,propertyName,
+                ReflectionOpt.setFieldValue(object,propertyName,
                         DatetimeOpt.castObjectToDate(newValue));
                 break;
             case "Boolean":
-                ReflectionOpt.forceSetProperty(object,propertyName,
+                ReflectionOpt.setFieldValue(object,propertyName,
                         StringRegularOpt.isTrue(
                                 StringBaseOpt.objectToString(newValue)
                         ));
                 break;
             default:
                 if (newValue instanceof Clob) {
-                    ReflectionOpt.forceSetProperty(object,propertyName,
+                    ReflectionOpt.setFieldValue(object,propertyName,
                             DatabaseAccess.fetchClobString((Clob) newValue));
                 }else if (newValue instanceof Blob) {
-                    ReflectionOpt.forceSetProperty(object,propertyName,
+                    ReflectionOpt.setFieldValue(object,propertyName,
                             DatabaseAccess.fetchBlobBytes((Blob) newValue));
                 } else {
-                    ReflectionOpt.forceSetProperty(object, propertyName,newValue);
+                    ReflectionOpt.setFieldValue(object, propertyName,newValue);
                 }
                 break;
         }
@@ -137,6 +137,7 @@ public class OrmUtils {
         if(object instanceof Map) {
             return (Map<String, Object>) object;
         }
+
         Field[] objFields = object.getClass().getDeclaredFields();
         Map<String, Object> fields = new HashMap<>(objFields.length*2);
         for(Field field :objFields){
@@ -154,7 +155,7 @@ public class OrmUtils {
             return null;
         Map<String, Object> fields = new HashMap<>(tableFields.size()*2);
         for(TableField column : tableFields){
-            Object value = ReflectionOpt.forceGetProperty(object, column.getPropertyName());
+            Object value = ReflectionOpt.getFieldValue(object, column.getPropertyName());
             if(value!=null){
                 fields.put(column.getPropertyName(),value);
             }
