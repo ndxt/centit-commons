@@ -1,13 +1,12 @@
 package com.centit.support.database.orm;
 
-import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.ListOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableReference;
-import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.*;
 import com.centit.support.json.JSONOpt;
@@ -492,7 +491,6 @@ public class OrmDaoSupport {
         return resN;
     }
 
-
     public <T> int replaceObjectsAsTabulation(List<T> newObjects,
                            final String propertyName, final Object propertyValue )
             throws SQLException, NoSuchFieldException, InstantiationException, IOException, IllegalAccessException {
@@ -510,4 +508,240 @@ public class OrmDaoSupport {
         return replaceObjectsAsTabulation(dbObjects,newObjects);
     }
 
+    private <T> int saveNewObjectReferenceCascade(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
+            throws SQLException, NoSuchFieldException, InstantiationException, IOException, IllegalAccessException {
+
+        if(ref==null || ref.getReferenceColumns().size()<1)
+            return 0;
+
+        Object newObj = ReflectionOpt.getFieldValue( object, ref.getReferenceName());
+        if(newObj==null){
+            return 0;
+        }
+
+        Class<?> refType = ref.getTargetEntityType();
+        TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
+        if( refMapInfo == null )
+            return 0;
+        if (ref.getReferenceType().equals(refType)){ // OneToOne
+            saveNewObjectCascade(newObj);
+        }else if(newObj instanceof Collection){
+            for(Object subObj : (Collection<Object>)newObj){
+                saveNewObjectCascade(subObj);
+            }
+        }
+        return 1;
+    }
+
+    private <T> int saveObjectReference(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
+            throws SQLException, NoSuchFieldException, InstantiationException, IOException, IllegalAccessException {
+
+        if(ref==null || ref.getReferenceColumns().size()<1)
+            return 0;
+
+        Object newObj = ReflectionOpt.getFieldValue( object, ref.getReferenceName());
+        if(newObj==null){
+            return deleteObjectReference(object,ref);
+        }
+
+        Class<?> refType = ref.getTargetEntityType();
+        TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
+        if( refMapInfo == null )
+            return 0;
+
+        Map<String, Object> properties = new HashMap<>(6);
+        for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
+            properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
+        }
+
+        List<?> refs = listObjectByProperties( properties, refType);
+
+        if (ref.getReferenceType().equals(refType)){ // OneToOne
+            if(refs!=null && refs.size()>0){
+                updateObject(newObj);
+            }else{
+                saveNewObject(newObj);
+            }
+        }else if(ref.getReferenceType().isAssignableFrom(Set.class)){
+
+                replaceObjectsAsTabulation( (List<Object>) refs,
+                        new ArrayList<>((Set<?>) newObj));
+        }else if(ref.getReferenceType().isAssignableFrom(List.class)){
+            replaceObjectsAsTabulation( (List<Object>) refs,
+                    (List<Object>) newObj );
+        }
+
+        return 1;
+    }
+
+    public <T> int saveObjectReference (T object, String reference)
+            throws SQLException, InstantiationException, IllegalAccessException,
+            IOException, NoSuchFieldException {
+
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        SimpleTableReference ref = mapInfo.findReference(reference);
+        return saveObjectReference(object,ref,mapInfo);
+    }
+
+    public <T> int saveObjectReferences (T object)
+            throws SQLException, InstantiationException, IllegalAccessException,
+            IOException, NoSuchFieldException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        int n=0;
+        if(mapInfo.hasReferences()) {
+            for (SimpleTableReference ref : mapInfo.getReferences()) {
+                n += saveObjectReference(object, ref, mapInfo);
+            }
+        }
+        return n;
+    }
+
+    public <T> int saveNewObjectCascadeShallow (T object)
+            throws NoSuchFieldException, IOException, SQLException,
+            IllegalAccessException, InstantiationException {
+        return saveNewObject(object)
+                + saveObjectReferences(object);
+    }
+
+    public <T> int saveNewObjectCascade (T object)
+            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        int n= saveNewObject(object);
+        if(mapInfo.hasReferences()) {
+            for (SimpleTableReference ref : mapInfo.getReferences()) {
+                n += saveNewObjectReferenceCascade(object, ref, mapInfo);
+            }
+        }
+        return n;
+    }
+
+    public <T> int updateObjectCascadeShallow (T object)
+            throws NoSuchFieldException, SQLException, IOException,
+            IllegalAccessException, InstantiationException {
+        return updateObject(object)
+           + saveObjectReferences(object);
+    }
+
+    private <T> int replaceObjectsAsTabulationCascade(List<T> dbObjects,List<T> newObjects)
+            throws NoSuchFieldException, IOException, SQLException, InstantiationException, IllegalAccessException {
+        Class<T> objType =(Class<T>) newObjects.iterator().next().getClass();
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(objType);
+        Triple<List<T>, List<Pair<T,T>>, List<T>>
+                comRes=
+                ListOpt.compareTwoList(dbObjects, newObjects,
+                        new OrmObjectComparator<>(mapInfo) );
+        int resN = 0;
+        for(T obj:comRes.getLeft()){
+            resN += saveNewObjectCascade( obj);
+        }
+        for(T obj:comRes.getRight()){
+            resN += deleteObjectCascade(obj);
+        }
+        for(Pair<T,T> pobj:comRes.getMiddle()){
+            resN += updateObjectCascade(pobj.getRight());
+        }
+        return resN;
+    }
+
+    private <T> int updateObjectReferenceCascade(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
+            throws SQLException, NoSuchFieldException, InstantiationException, IOException, IllegalAccessException {
+
+        if(ref==null || ref.getReferenceColumns().size()<1)
+            return 0;
+
+        Object newObj = ReflectionOpt.getFieldValue( object, ref.getReferenceName());
+        Class<?> refType = ref.getTargetEntityType();
+        TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
+        if( refMapInfo == null )
+            return 0;
+
+        Map<String, Object> properties = new HashMap<>(6);
+        for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
+            properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
+        }
+        int  n = 0;
+        List<?> refs = listObjectByProperties( properties, refType);
+        if(newObj==null){
+            if(refs!=null && refs.size()>0) {
+                if (ref.getReferenceType().equals(refType)) { // OneToOne
+                    n += deleteObjectCascade(refs.get(0));
+                } else {
+                    for (Object subObj : refs) {
+                        n += deleteObjectCascade(subObj);
+                    }
+                }
+            }
+            return n;
+        }
+
+        if (ref.getReferenceType().equals(refType)){ // OneToOne
+            if(refs!=null && refs.size()>0){
+                updateObjectCascade(newObj);
+            }else{
+                saveNewObjectCascade(newObj);
+            }
+        }else if(ref.getReferenceType().isAssignableFrom(Set.class)){
+            replaceObjectsAsTabulationCascade( (List<Object>) refs,
+                    new ArrayList<>((Set<?>) newObj));
+        }else if(ref.getReferenceType().isAssignableFrom(List.class)){
+            replaceObjectsAsTabulationCascade( (List<Object>) refs,
+                    (List<Object>) newObj );
+        }
+
+        return 1;
+    }
+
+    public <T> int updateObjectCascade (T object) throws NoSuchFieldException, SQLException,
+            IOException, IllegalAccessException, InstantiationException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        int n= updateObject(object);
+        if(mapInfo.hasReferences()) {
+            for (SimpleTableReference ref : mapInfo.getReferences()) {
+                n += updateObjectReferenceCascade(object, ref, mapInfo);
+            }
+        }
+        return n;
+    }
+
+    public <T> int checkObjectExists(T object)
+            throws NoSuchFieldException, SQLException, IOException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        Map<String,Object> objectMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
+
+        if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,objectMap)){
+            throw new SQLException("缺少主键对应的属性。");
+        }
+        String sql =
+                "select count(1) as checkExists from " + mapInfo.getTableName()
+                        + " where " +  GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,null);
+        Long checkExists = NumberBaseOpt.castObjectToLong(
+                DatabaseAccess.getScalarObjectQuery(connection, sql, objectMap));
+        return checkExists==null?0:checkExists.intValue();
+    }
+
+    public <T> int mergeObjectCascadeShallow(T object)
+            throws SQLException, NoSuchFieldException, IOException, InstantiationException, IllegalAccessException {
+        int  checkExists = checkObjectExists(object);
+        if(checkExists == 0){
+            return saveNewObjectCascadeShallow(object);
+        }else if(checkExists == 1){
+            return updateObjectCascadeShallow(object);
+        }else{
+            throw new SQLException("主键属性有误，返回多个条记录。");
+        }
+    }
+
+    public <T> int mergeObjectCascade(T object) throws SQLException, NoSuchFieldException, IOException, InstantiationException, IllegalAccessException {
+        int  checkExists = checkObjectExists(object);
+        if(checkExists == 0){
+            return saveNewObjectCascadeShallow(object);
+        }else if(checkExists == 1){
+            return saveNewObjectCascade(object);
+        }else if(checkExists == 1){
+            return updateObjectCascade(object);
+        }else{
+            throw new SQLException("主键属性有误，返回多个条记录。");
+        }
+    }
 }
