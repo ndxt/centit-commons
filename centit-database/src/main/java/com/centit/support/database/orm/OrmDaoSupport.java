@@ -1,5 +1,6 @@
 package com.centit.support.database.orm;
 
+import com.alibaba.fastjson.JSONArray;
 import com.centit.support.algorithm.ListOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
@@ -139,6 +140,15 @@ public class OrmDaoSupport {
             throw  new PersistenceException(PersistenceException.ILLEGALACCESS_EXCEPTION,e);
         }
     }
+
+    private final static <T> T queryParamsSql(Connection conn, QueryAndParams sqlAndParams ,
+                                              int startPos, int maxSize, FetchDataWork<T> fetchDataWork)
+            throws PersistenceException {
+        sqlAndParams.setSql( QueryUtils.buildLimitQuerySQL(
+                sqlAndParams.getSql(),  startPos , maxSize , false , DBType.mapDBType(conn)
+            ));
+        return queryParamsSql(conn,  sqlAndParams , fetchDataWork);
+    }
     /**
      * 查询数据库模板代码
      * @param conn 数据库链接
@@ -154,6 +164,14 @@ public class OrmDaoSupport {
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(sqlAndParams);
         return queryParamsSql(conn, qap ,fetchDataWork);
     }
+
+    private static <T> T queryNamedParamsSql(Connection conn, QueryAndNamedParams sqlAndParams,
+                                             int startPos, int maxSize, FetchDataWork<T> fetchDataWork)
+            throws PersistenceException {
+        QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(sqlAndParams);
+        return queryParamsSql(conn, qap,  startPos, maxSize ,fetchDataWork);
+    }
+
 
     public <T> T getObjectBySql(String sql, Map<String, Object> properties, Class<T> type)
             throws PersistenceException{
@@ -298,6 +316,27 @@ public class OrmDaoSupport {
                         properties),
                 (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
+
+    public <T> List<T> listObjectsByProperties(Map<String, Object> properties, Class<T> type,
+                                               final int startPos, final int maxSize)
+            throws PersistenceException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
+        String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
+        String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
+        if(StringUtils.isNotBlank(filter))
+            sql = sql + " where " + filter;
+        if(StringUtils.isNotBlank(mapInfo.getOrderBy()))
+            sql = sql + " order by " + mapInfo.getOrderBy();
+
+        return queryNamedParamsSql(
+                connection, new QueryAndNamedParams(sql,
+                        properties),startPos, maxSize,
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
+    }
+
+
+
 
     public <T> List<T> queryObjectsBySql(String sql, Class<T> type)
             throws PersistenceException {

@@ -1,5 +1,6 @@
 package com.centit.support.database.utils;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -10,6 +11,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import com.centit.support.database.ddl.DB2DDLOperations;
+import com.centit.support.database.ddl.MySqlDDLOperations;
+import com.centit.support.database.ddl.OracleDDLOperations;
+import com.centit.support.database.ddl.SqlSvrDDLOperations;
+import com.centit.support.database.orm.PersistenceException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 
@@ -460,9 +466,10 @@ public class QueryUtils {
      * @param sql sql
      * @return sql
      */
-    public static String buildGetCountSQL(String sql) {
-    	return buildGetCountSQLBySubSelect(sql);
-    }
+
+	public static String buildGetCountSQL(String sql) {
+		return buildGetCountSQLBySubSelect(sql);
+	}
     /**
      * hql语句不能用子查询的方式，只能用buildGetCountSQLByReplaceFields
      * @param hql sql
@@ -598,6 +605,25 @@ public class QueryUtils {
 					.toString();
     	}
     }
+
+	public static String buildLimitQuerySQL(String sql,int offset,int maxsize,
+											boolean asParameter, DBType dbType){
+		switch (dbType){
+			case Oracle:
+				return buildOracleLimitQuerySQL(sql,offset, maxsize,asParameter);
+			case DB2:
+				return buildDB2LimitQuerySQL(sql,offset, maxsize);
+			case SqlServer:
+				return buildSqlServerLimitQuerySQL(sql,offset, maxsize);
+			case MySql:
+				return buildMySqlLimitQuerySQL(sql,offset, maxsize,asParameter);
+			case Access:
+			case H2:
+			default:
+				throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,
+						"不支持的数据库类型："+dbType.toString());
+		}
+	}
 
     /**
      * 返回sql语句中所有的 命令变量（:变量名）,最后一个String 为转换为？变量的sql语句
