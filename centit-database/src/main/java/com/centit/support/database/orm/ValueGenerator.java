@@ -13,7 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD})
 @Retention(RUNTIME)
 public @interface ValueGenerator {
-    GeneratorType strategy() default GeneratorType.UUID;
+    GeneratorType strategy() default GeneratorType.AUTO;
     GeneratorTime occasion() default GeneratorTime.NEW;
     GeneratorCondition condition() default GeneratorCondition.IFNULL;
     String value() default "";
