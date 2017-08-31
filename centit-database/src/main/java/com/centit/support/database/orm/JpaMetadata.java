@@ -141,7 +141,10 @@ public abstract class JpaMetadata {
                 SimpleTableReference reference = new SimpleTableReference();
                 if (field.isAnnotationPresent(OneToOne.class)) {
                     OneToOne oneToOne = field.getAnnotation(OneToOne.class);
-                    reference.setTargetEntityType(oneToOne.targetEntity());
+                    Class targetClass = oneToOne.targetEntity();
+                    if(targetClass ==null || targetClass.equals(void.class) )
+                        targetClass = field.getType();
+                    reference.setTargetEntityType(targetClass);
                 }else if (field.isAnnotationPresent(OneToMany.class)) {
                     OneToMany oneToMany = field.getAnnotation(OneToMany.class);
                     reference.setTargetEntityType(oneToMany.targetEntity());
