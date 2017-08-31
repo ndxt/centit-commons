@@ -27,7 +27,11 @@ public interface TableInfo {
 	 * @return 表的模式名称
 	 */
 	String getSchema();
-	
+
+	/**
+	 * @return 默认排序语句
+	 */
+	String getOrderBy();
 	/**
 	 * @return 根据属性名查找 字段信息
 	 * @param name 属性名

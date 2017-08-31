@@ -106,12 +106,19 @@ public abstract class JpaMetadata {
                 } else {
                     mapInfo.addColumn(column);
                 }
+
                 if(field.isAnnotationPresent(ValueGenerator.class) ){
                     ValueGenerator valueGenerator = field.getAnnotation(ValueGenerator.class);
                     mapInfo.addValueGenerator(
                             column.getPropertyName(),
                             valueGenerator);
                 }
+
+                if(field.isAnnotationPresent(OrderBy.class) ){
+                    OrderBy orderBy = field.getAnnotation(OrderBy.class);
+                    mapInfo.appendOrderBy(column, orderBy.value());
+                }
+
             }else if(field.isAnnotationPresent(EmbeddedId.class)){
                 EmbeddedId embeddedId = field.getAnnotation(EmbeddedId.class);
                 mapInfo.setPkName(field.getName());

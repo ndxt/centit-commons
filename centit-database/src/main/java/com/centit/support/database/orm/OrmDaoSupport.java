@@ -225,6 +225,8 @@ public class OrmDaoSupport {
         String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
         if(StringUtils.isNotBlank(filter))
             sql = sql + " where " + filter;
+        if(StringUtils.isNotBlank(mapInfo.getOrderBy()))
+            sql = sql + " order by " + mapInfo.getOrderBy();
 
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(sql,

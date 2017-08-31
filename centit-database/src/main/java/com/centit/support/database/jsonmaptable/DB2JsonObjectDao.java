@@ -42,7 +42,9 @@ public class DB2JsonObjectDao extends GeneralJsonObjectDao {
 		String filter = buildFilterSql(tableInfo,null,properties.keySet());
 		String sql = "select " + q.getLeft() +" from " +tableInfo.getTableName();
 		if(StringUtils.isNotBlank(filter))
-			sql = sql + " where " + filter;	
+			sql = sql + " where " + filter;
+		if(StringUtils.isNotBlank(tableInfo.getOrderBy()))
+			sql = sql + " order by " + tableInfo.getOrderBy();
 		return DatabaseAccess.findObjectsByNamedSqlAsJSON(
 					getConnect(),
 					QueryUtils.buildDB2LimitQuerySQL(

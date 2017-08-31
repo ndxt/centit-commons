@@ -31,6 +31,7 @@ public class SimpleTableInfo implements TableInfo{
 	 */
 	private List<String> pkColumns=null;
 	private String schema;
+	private String orderBy;
 
 	private String tableName;// 其实是table 代码 code
 	//private String sClassName;//表对应的类名 同时作为业务模块名
@@ -51,8 +52,8 @@ public class SimpleTableInfo implements TableInfo{
 	public void setTableName(String tabName) {
 		tableName = tabName;
 
-	}	
-	
+	}
+
 	/**
 	 * @return 数据库表中文名，对应pdm中的name,对应元数据中的 tabname
 	 */
@@ -96,7 +97,17 @@ public class SimpleTableInfo implements TableInfo{
 
 	public void setSchema(String schema) {
 		this.schema = schema;
-	}	
+	}
+
+	@Override
+	public String getOrderBy() {
+		return orderBy;
+	}
+
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
+	}
+
 	protected static void writerXMLFile(Document doc, String xmlFile){
 		XMLWriter output;
 		try {
