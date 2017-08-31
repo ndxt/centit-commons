@@ -268,7 +268,21 @@ public class OrmDaoSupport {
                 (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type));
     }
 
-    public <T> List<T> listObjectByProperties(Map<String, Object> properties, Class<T> type)
+    public <T> List<T> listAllObjects(Class<T> type)
+            throws PersistenceException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
+        String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
+
+        if(StringUtils.isNotBlank(mapInfo.getOrderBy()))
+            sql = sql + " order by " + mapInfo.getOrderBy();
+        return queryNamedParamsSql(
+                connection, new QueryAndNamedParams(sql,
+                        new HashMap<>(1)),
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
+    }
+
+    public <T> List<T> listObjectsByProperties(Map<String, Object> properties, Class<T> type)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
@@ -361,7 +375,7 @@ public class OrmDaoSupport {
             properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
         }
 
-        List<?> refs = listObjectByProperties( properties, refType);
+        List<?> refs = listObjectsByProperties( properties, refType);
 
         if(refs!=null && refs.size()>0) {
             if (ref.getReferenceType().equals(refType) /*||
@@ -472,7 +486,7 @@ public class OrmDaoSupport {
                     properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
                 }
 
-                List<?> refs = listObjectByProperties( properties, refType);
+                List<?> refs = listObjectsByProperties( properties, refType);
                 for(Object refObject : refs){
                     deleteObjectCascade(refObject);
                 }
@@ -564,7 +578,7 @@ public class OrmDaoSupport {
         if(newObjects==null || newObjects.size()<1)
             return 0;
         Class<T> objType =(Class<T>) newObjects.iterator().next().getClass();
-        List<T> dbObjects = this.listObjectByProperties(properties, objType);
+        List<T> dbObjects = this.listObjectsByProperties(properties, objType);
         return replaceObjectsAsTabulation(dbObjects,newObjects);
     }
 
@@ -614,7 +628,7 @@ public class OrmDaoSupport {
             properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
         }
 
-        List<?> refs = listObjectByProperties( properties, refType);
+        List<?> refs = listObjectsByProperties( properties, refType);
 
         if (ref.getReferenceType().equals(refType)){ // OneToOne
             if(refs!=null && refs.size()>0){
@@ -717,7 +731,7 @@ public class OrmDaoSupport {
             properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
         }
         int  n = 0;
-        List<?> refs = listObjectByProperties( properties, refType);
+        List<?> refs = listObjectsByProperties( properties, refType);
         if(newObj==null){
             if(refs!=null && refs.size()>0) {
                 if (ref.getReferenceType().equals(refType)) { // OneToOne
