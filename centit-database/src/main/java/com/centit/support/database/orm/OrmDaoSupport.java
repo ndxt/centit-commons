@@ -39,6 +39,33 @@ public class OrmDaoSupport {
         this.connection = connection;
     }
 
+    public JsonObjectDao getJsonObjectDao(){
+        try {
+            return GeneralJsonObjectDao.createJsonObjectDao(connection);
+        } catch (SQLException e) {
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }
+    }
+
+    public Long getSequenceNextValue(final String sequenceName) {
+        try {
+            return GeneralJsonObjectDao.createJsonObjectDao(connection)
+                    .getSequenceNextValue(sequenceName);
+        } catch (SQLException e) {
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        } catch (IOException e) {
+            throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
+        }
+    }
+
+    public JsonObjectDao getJsonObjectDao(TableMapInfo mapInfo){
+        try {
+            return GeneralJsonObjectDao.createJsonObjectDao(connection,mapInfo);
+        } catch (SQLException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }
+    }
+
     public <T> int saveNewObject(T object) throws PersistenceException {
         try {
             TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());

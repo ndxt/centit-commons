@@ -70,7 +70,7 @@ public abstract class JpaMetadata {
         return mapInfo;
     }
 
-    private static SimpleTableField obtainColumnFromFile(Field field){
+    private static SimpleTableField obtainColumnFromField(Field field){
         SimpleTableField column = new SimpleTableField();
         Column colInfo = field.getAnnotation(Column.class);
         column.setColumnName( column.getColumnName());
@@ -96,7 +96,7 @@ public abstract class JpaMetadata {
         Field[] objFields = objType.getDeclaredFields();
         for(Field field :objFields){
             if(field.isAnnotationPresent(Column.class)){
-                SimpleTableField column = obtainColumnFromFile(field);
+                SimpleTableField column = obtainColumnFromField(field);
 
                 if(field.isAnnotationPresent(Id.class) ){
                     mapInfo.addColumn(column);
@@ -123,15 +123,22 @@ public abstract class JpaMetadata {
                 EmbeddedId embeddedId = field.getAnnotation(EmbeddedId.class);
                 mapInfo.setPkName(field.getName());
                 for(Field idField : field.getType().getDeclaredFields()){
+
                     if(idField.isAnnotationPresent(Column.class)) {
-                        SimpleTableField column = obtainColumnFromFile(field);
+                        SimpleTableField column = obtainColumnFromField(idField);
                         mapInfo.addColumn(column);
                         mapInfo.addPkColumns(column.getPropertyName());
-                        if(field.isAnnotationPresent(ValueGenerator.class) ){
-                            ValueGenerator valueGenerator = field.getAnnotation(ValueGenerator.class);
+
+                        if(idField.isAnnotationPresent(ValueGenerator.class) ){
+                            ValueGenerator valueGenerator = idField.getAnnotation(ValueGenerator.class);
                             mapInfo.addValueGenerator(
                                     column.getPropertyName(),
                                     valueGenerator);
+                        }
+
+                        if(idField.isAnnotationPresent(OrderBy.class) ){
+                            OrderBy orderBy = idField.getAnnotation(OrderBy.class);
+                            mapInfo.appendOrderBy(column, orderBy.value());
                         }
                     }
                 }
