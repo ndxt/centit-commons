@@ -315,7 +315,8 @@ public class OrmDaoSupport {
         List<?> refs = listObjectByProperties( properties, refType);
 
         if(refs!=null && refs.size()>0) {
-            if (ref.getReferenceType().equals(refType)){
+            if (ref.getReferenceType().equals(refType) /*||
+                    ref.getReferenceType().isAssignableFrom(refType) */){
                 ReflectionOpt.setFieldValue(object, ref.getReferenceName(), refs.get(0) );
             }else if(ref.getReferenceType().isAssignableFrom(Set.class)){
                 ReflectionOpt.setFieldValue(object, ref.getReferenceName(), new HashSet<>(refs));

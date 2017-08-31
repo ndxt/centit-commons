@@ -135,7 +135,8 @@ public abstract class JpaMetadata {
                         }
                     }
                 }
-            }else if ( field.isAnnotationPresent(OneToOne.class) || field.isAnnotationPresent(OneToMany.class) ) {
+            }else if ( field.isAnnotationPresent(OneToOne.class)
+                    || field.isAnnotationPresent(OneToMany.class) ) {
 
                 SimpleTableReference reference = new SimpleTableReference();
                 if (field.isAnnotationPresent(OneToOne.class)) {
@@ -146,20 +147,23 @@ public abstract class JpaMetadata {
                     reference.setTargetEntityType(oneToMany.targetEntity());
                 }
 
-                if (field.isAnnotationPresent(JoinColumn.class)) {
-                    JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
-                    reference.setReferenceName(field.getName());
-                    reference.setReferenceType(field.getType());
-                    reference.addReferenceColumn(joinColumn.name(), joinColumn.referencedColumnName());
-                    mapInfo.addReference(reference);
-                } else if (field.isAnnotationPresent(JoinColumns.class)) {
-                    JoinColumns joinColumns = field.getAnnotation(JoinColumns.class);
-                    reference.setReferenceName(field.getName());
-                    reference.setReferenceType(field.getType());
-                    for (JoinColumn joinColumn : joinColumns.value()) {
+                if(reference.getTargetEntityType() !=null
+                        &&  ! reference.getTargetEntityType().equals(void.class) ) {
+                    if (field.isAnnotationPresent(JoinColumn.class)) {
+                        JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
+                        reference.setReferenceName(field.getName());
+                        reference.setReferenceType(field.getType());
                         reference.addReferenceColumn(joinColumn.name(), joinColumn.referencedColumnName());
+                        mapInfo.addReference(reference);
+                    } else if (field.isAnnotationPresent(JoinColumns.class)) {
+                        JoinColumns joinColumns = field.getAnnotation(JoinColumns.class);
+                        reference.setReferenceName(field.getName());
+                        reference.setReferenceType(field.getType());
+                        for (JoinColumn joinColumn : joinColumns.value()) {
+                            reference.addReferenceColumn(joinColumn.name(), joinColumn.referencedColumnName());
+                        }
+                        mapInfo.addReference(reference);
                     }
-                    mapInfo.addReference(reference);
                 }
             }
         }
