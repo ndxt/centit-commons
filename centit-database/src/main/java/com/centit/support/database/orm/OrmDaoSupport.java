@@ -257,6 +257,22 @@ public class OrmDaoSupport {
 
     }
 
+    public <T> T getObjectCascadeShallow(Object id, final Class<T> type)
+            throws PersistenceException {
+
+        T object = getObjectIncludeLzayById(id, type);
+        fetchObjectReferences(object);
+        return object;
+    }
+
+    public <T> T getObjectCascade(Object id, final Class<T> type)
+            throws PersistenceException {
+
+        T object = getObjectIncludeLzayById(id, type);
+        fetchObjectReferencesCascade(object,type);
+        return object;
+    }
+
     private int deleteObjectById(Map<String, Object> id, TableMapInfo mapInfo) throws PersistenceException {
         try{
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
@@ -448,7 +464,7 @@ public class OrmDaoSupport {
                 (rs) -> OrmUtils.fetchFieldsFormResultSet(rs,object,mapInfo));
     }
 
-    private <T> T fetchObjectReference(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
+    private <T> T fetchObjectReference(T object,SimpleTableReference ref ,TableMapInfo mapInfo , boolean casecade)
             throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
@@ -465,8 +481,12 @@ public class OrmDaoSupport {
         }
 
         List<?> refs = listObjectsByProperties( properties, refType);
-
         if(refs!=null && refs.size()>0) {
+            if(casecade){
+                for(Object refObject : refs){
+                    fetchObjectReferencesCascade(refObject,refType);
+                }
+            }
             if (ref.getReferenceType().equals(refType) /*||
                     ref.getReferenceType().isAssignableFrom(refType) */){
                 ReflectionOpt.setFieldValue(object, ref.getReferenceName(), refs.get(0) );
@@ -478,6 +498,27 @@ public class OrmDaoSupport {
         }
         return object;
     }
+
+    private <T> T fetchObjectReference(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
+            throws PersistenceException {
+        return fetchObjectReference(object,ref ,mapInfo , false);
+    }
+
+    private <T> T fetchObjectReferenceCascade(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
+            throws PersistenceException {
+        return fetchObjectReference(object,ref ,mapInfo , true);
+    }
+
+    private <T> T fetchObjectReferencesCascade(T object, Class<?> objType ){
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+        if(mapInfo.hasReferences()) {
+            for (SimpleTableReference ref : mapInfo.getReferences()) {
+                fetchObjectReferenceCascade(object, ref, mapInfo);
+            }
+        }
+        return object;
+    }
+
 
     public <T> T fetchObjectReference(T object, String reference  )
             throws PersistenceException {
