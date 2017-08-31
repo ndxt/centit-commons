@@ -39,6 +39,7 @@ public class Lexer {
 		languageType = LANG_TYPE_JAVA;
 		setFormula(sFormula);
 	}
+
 	public Lexer(int langType)
 	{
 		this.languageType = langType;
@@ -516,5 +517,9 @@ public class Lexer {
 		curPos = varMorp.getCurrPos();
 		res.add(sourceString.substring(prePos,curPos));
 		return res;
+	}
+
+	public static String getFirstWord(String str){
+		return new Lexer(str).getARawWord();
 	}
 }

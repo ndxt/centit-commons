@@ -1,6 +1,5 @@
 package com.centit.support.database.orm;
 
-import com.alibaba.fastjson.JSONArray;
 import com.centit.support.algorithm.ListOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
@@ -275,7 +274,7 @@ public class OrmDaoSupport {
     public <T> T getObjectByProperties(Map<String, Object> properties, Class<T> type)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(mapInfo,null);
         String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
         String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
         if(StringUtils.isNotBlank(filter))
@@ -289,7 +288,7 @@ public class OrmDaoSupport {
     public <T> List<T> listAllObjects(Class<T> type)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(mapInfo,null);
         String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
 
         if(StringUtils.isNotBlank(mapInfo.getOrderBy()))
@@ -303,7 +302,7 @@ public class OrmDaoSupport {
     public <T> List<T> listObjectsByProperties(Map<String, Object> properties, Class<T> type)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(mapInfo,null);
         String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
         String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
         if(StringUtils.isNotBlank(filter))
@@ -321,7 +320,7 @@ public class OrmDaoSupport {
                                                final int startPos, final int maxSize)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(mapInfo,null);
         String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
         String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
         if(StringUtils.isNotBlank(filter))
@@ -334,9 +333,6 @@ public class OrmDaoSupport {
                         properties),startPos, maxSize,
                 (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
-
-
-
 
     public <T> List<T> queryObjectsBySql(String sql, Class<T> type)
             throws PersistenceException {
@@ -358,6 +354,33 @@ public class OrmDaoSupport {
             throws PersistenceException {
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(sql,params),
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
+    }
+
+
+    public <T> List<T> queryObjectsBySql(String sql, Class<T> type,
+                                         int startPos,  int maxSize)
+            throws PersistenceException {
+        return queryNamedParamsSql(
+                connection, new QueryAndNamedParams(sql,
+                        new HashMap<>()), startPos, maxSize,
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
+    }
+
+    public <T> List<T> queryObjectsByParamsSql(String sql, Object[] params, Class<T> type,
+                                               int startPos,  int maxSize)
+            throws PersistenceException {
+        return queryParamsSql(
+                connection, new QueryAndParams(sql,params),startPos, maxSize,
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
+    }
+
+    public <T> List<T> queryObjectsByNamedParamsSql(String sql,
+                                                    Map<String,Object> params, Class<T> type,
+                                                    int startPos,  int maxSize)
+            throws PersistenceException {
+        return queryNamedParamsSql(
+                connection, new QueryAndNamedParams(sql,params), startPos, maxSize,
                 (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
 
@@ -831,6 +854,31 @@ public class OrmDaoSupport {
         }catch (SQLException e) {
             throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
         }catch (IOException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
+        }
+    }
+
+    public <T> int fetchObjectsCount(Map<String, Object> properties, Class<T> type)
+            throws PersistenceException {
+        try {
+            TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+            return sqlDialect.fetchObjectsCount(properties).intValue();
+        } catch (SQLException e) {
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        } catch (IOException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
+        }
+    }
+
+    public <T> int fetchObjectsCount(String sql , Map<String, Object> properties)
+            throws PersistenceException {
+        try {
+            return NumberBaseOpt.castObjectToInteger(
+                    DatabaseAccess.getScalarObjectQuery(connection,sql,properties));
+        } catch (SQLException e) {
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        } catch (IOException e){
             throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
         }
     }

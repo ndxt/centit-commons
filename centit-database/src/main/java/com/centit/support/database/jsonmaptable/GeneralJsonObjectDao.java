@@ -100,13 +100,37 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 		return this.tableInfo;
 	}
 
+    /**
+     * 返回 sql 语句 和 属性名数组
+     * @param ti TableInfo
+     * @param alias String
+     * @return Pair String String []
+     */
+    public static String buildFieldSql(TableInfo ti, String alias){
+        StringBuilder sBuilder= new StringBuilder();
+        List<? extends TableField> columns = ti.getColumns();
+        boolean addAlias = StringUtils.isNotBlank(alias);
+        int i=0;
+        for(TableField col : columns){
+            if(i>0)
+                sBuilder.append(", ");
+            else
+                sBuilder.append(" ");
+            if(addAlias)
+                sBuilder.append(alias).append('.');
+            sBuilder.append(col.getColumnName());
+            i++;
+        }
+        return sBuilder.toString();
+    }
+
 	/**
 	 * 返回 sql 语句 和 属性名数组
 	 * @param ti TableInfo
 	 * @param alias String
 	 * @return Pair String String []
 	 */
-	public static Pair<String,String[]> buildFieldSql(TableInfo ti,String alias){
+	public static Pair<String,String[]> buildFieldSqlWithFieldName(TableInfo ti, String alias){
 		StringBuilder sBuilder= new StringBuilder();
 		List<? extends TableField> columns = ti.getColumns();
 		String [] fieldNames = new String[columns.size()];
@@ -176,7 +200,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 	}
 	
 	public static Pair<String,String[]> buildGetObjectSqlByPk(TableInfo ti){
-		Pair<String,String[]> q = buildFieldSql(ti,null);
+		Pair<String,String[]> q = buildFieldSqlWithFieldName(ti,null);
 		String filter = buildFilterSqlByPk(ti,null);
 		return new ImmutablePair<String,String[]>(
 				"select " + q.getLeft() +" from " +ti.getTableName() + " where " + filter,
@@ -216,7 +240,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 	@Override
 	public JSONObject getObjectByProperties(final Map<String, Object> properties) throws SQLException, IOException {
 		
-		Pair<String,String[]> q = buildFieldSql(tableInfo,null);
+		Pair<String,String[]> q = buildFieldSqlWithFieldName(tableInfo,null);
 		String filter = buildFilterSql(tableInfo,null,properties.keySet());
 		JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(
 				 conn,
@@ -230,7 +254,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 
 	@Override
 	public JSONArray listObjectsByProperties(final Map<String, Object> properties) throws SQLException, IOException {
-		Pair<String,String[]> q = buildFieldSql(tableInfo,null);
+		Pair<String,String[]> q = buildFieldSqlWithFieldName(tableInfo,null);
 		String filter = buildFilterSql(tableInfo,null,properties.keySet());
 		String sql = "select " + q.getLeft() +" from " +tableInfo.getTableName();
 		if(StringUtils.isNotBlank(filter))
