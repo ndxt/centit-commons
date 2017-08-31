@@ -63,7 +63,7 @@ public abstract class ReflectionOpt  {
 	 * @return
 	 * @throws NoSuchFieldException
 	 */
-	public static Object forceGetFieldValue(Object object,Field field )  throws NoSuchFieldException {
+	public static Object forceGetFieldValue(Object object,Field field ) {
 		assert(object != null); 
 	
 		boolean accessible = field.isAccessible();
@@ -113,8 +113,7 @@ public abstract class ReflectionOpt  {
 		return null;
 	}
 
-	public static void setFieldValue(Object object, String fieldName, Object newValue)
-			throws NoSuchFieldException {
+	public static void setFieldValue(Object object, String fieldName, Object newValue) {
 
 		Method md=null;
 		try {

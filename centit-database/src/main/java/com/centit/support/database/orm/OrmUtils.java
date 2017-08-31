@@ -133,7 +133,7 @@ public abstract class OrmUtils {
     }
 
     public static Map<String, Object> fetchObjectField(Object object)
-            throws NoSuchFieldException {
+             {
         if(object instanceof Map) {
             return (Map<String, Object>) object;
         }
@@ -147,9 +147,7 @@ public abstract class OrmUtils {
         return fields;
     }
 
-    public static Map<String, Object> fetchObjectDatabaseField(Object object, TableMapInfo tableInfo)
-            throws NoSuchFieldException {
-
+    public static Map<String, Object> fetchObjectDatabaseField(Object object, TableMapInfo tableInfo) {
         List<? extends TableField> tableFields = tableInfo.getColumns();
         if(tableFields == null)
             return null;
@@ -170,7 +168,6 @@ public abstract class OrmUtils {
                 }
             }
         }
-
         return fields;
     }
 

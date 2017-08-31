@@ -29,37 +29,77 @@ public class OrmDaoSupport {
 
     private Connection connection;
 
+    public OrmDaoSupport(){}
+
+    public OrmDaoSupport(Connection connection) {
+        this.connection = connection;
+    }
+
     public void setConnection(Connection connection) {
         this.connection = connection;
     }
 
-    public <T> int saveNewObject(T object) throws NoSuchFieldException, SQLException, IOException {
-        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
-        object = OrmUtils.prepareObjectForInsert(object,mapInfo,sqlDialect );
-        return sqlDialect.saveNewObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
+    public <T> int saveNewObject(T object) throws PersistenceException {
+        try {
+            TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+            object = OrmUtils.prepareObjectForInsert(object, mapInfo, sqlDialect);
+            return sqlDialect.saveNewObject(OrmUtils.fetchObjectDatabaseField(object, mapInfo));
+        }catch (NoSuchFieldException e){
+            throw  new PersistenceException(PersistenceException.NOSUCHFIELD_EXCEPTION,e);
+        }catch (IOException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
+        }catch (SQLException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }
     }
 
-    public <T> int updateObject(T object) throws SQLException, NoSuchFieldException, IOException {
-        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
-        object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
-        return sqlDialect.updateObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
+    public <T> int updateObject(T object) throws PersistenceException {
+        try {
+            TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+            object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
+
+            return sqlDialect.updateObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
+        }catch (NoSuchFieldException e){
+            throw  new PersistenceException(PersistenceException.NOSUCHFIELD_EXCEPTION,e);
+        }catch (IOException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
+        }catch (SQLException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }
     }
 
     public <T> int updateObject(Collection<String> fields,  T object)
-            throws SQLException, NoSuchFieldException, IOException {
-        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
-        object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
-        return sqlDialect.updateObject(fields, OrmUtils.fetchObjectDatabaseField(object,mapInfo));
+            throws PersistenceException  {
+        try {
+            TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+            object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
+
+            return sqlDialect.updateObject(fields, OrmUtils.fetchObjectDatabaseField(object,mapInfo));
+        }catch (NoSuchFieldException e){
+            throw  new PersistenceException(PersistenceException.NOSUCHFIELD_EXCEPTION,e);
+        }catch (IOException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
+        }catch (SQLException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }
     }
 
-    public <T> int mergeObject(T object)throws SQLException, NoSuchFieldException, IOException {
-        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
-        object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
-        return sqlDialect.mergeObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
+    public <T> int mergeObject(T object) throws PersistenceException {
+        try {
+            TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+            object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
+            return sqlDialect.mergeObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
+        }catch (NoSuchFieldException e){
+            throw  new PersistenceException(PersistenceException.NOSUCHFIELD_EXCEPTION,e);
+        }catch (IOException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
+        }catch (SQLException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }
     }
 
     public interface FetchDataWork<T> {
@@ -73,16 +113,12 @@ public class OrmDaoSupport {
      * @param fetchDataWork 获取数据的方法
      * @param <T> 返回类型嗯
      * @return 返回结果
-     * @throws SQLException 异常
-     * @throws IOException 异常
-     * @throws NoSuchFieldException 异常
-     * @throws InstantiationException 异常
-     * @throws IllegalAccessException 异常
+     * @throws PersistenceException 异常
      */
 
     private final static <T> T queryParamsSql(Connection conn, QueryAndParams sqlAndParams ,
                                              FetchDataWork<T> fetchDataWork)
-            throws SQLException, IOException,NoSuchFieldException,  InstantiationException, IllegalAccessException {
+            throws PersistenceException {
          try{
             PreparedStatement stmt = conn.prepareStatement(sqlAndParams.getSql());
             DatabaseAccess.setQueryStmtParameters(stmt,sqlAndParams.getParams());
@@ -92,7 +128,15 @@ public class OrmDaoSupport {
             stmt.close();
             return obj;
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sqlAndParams.getSql(),e);
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }catch (NoSuchFieldException e){
+            throw  new PersistenceException(PersistenceException.NOSUCHFIELD_EXCEPTION,e);
+        }catch (IOException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
+        }catch (InstantiationException e){
+            throw  new PersistenceException(PersistenceException.INSTANTIATION_EXCEPTION,e);
+        }catch (IllegalAccessException e){
+            throw  new PersistenceException(PersistenceException.ILLEGALACCESS_EXCEPTION,e);
         }
     }
     /**
@@ -102,21 +146,17 @@ public class OrmDaoSupport {
      * @param fetchDataWork 获取数据的方法
      * @param <T> 返回类型嗯
      * @return 返回结果
-     * @throws SQLException 异常
-     * @throws IOException 异常
-     * @throws NoSuchFieldException 异常
-     * @throws InstantiationException 异常
-     * @throws IllegalAccessException 异常
+     * @throws PersistenceException 异常
      */
     private static <T> T queryNamedParamsSql(Connection conn, QueryAndNamedParams sqlAndParams,
                                                    FetchDataWork<T> fetchDataWork)
-            throws SQLException, IOException,NoSuchFieldException,  InstantiationException, IllegalAccessException {
+            throws PersistenceException {
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(sqlAndParams);
         return queryParamsSql(conn, qap ,fetchDataWork);
     }
 
     public <T> T getObjectBySql(String sql, Map<String, Object> properties, Class<T> type)
-            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+            throws PersistenceException{
         //JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(sql,
@@ -126,28 +166,32 @@ public class OrmDaoSupport {
     }
 
     public <T> T getObjectById(Object id, final Class<T> type)
-            throws IOException, SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException {
+            throws PersistenceException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String,String[]> q = GeneralJsonObjectDao.buildGetObjectSqlByPk(mapInfo);
 
         if(ReflectionOpt.isScalarType(id.getClass())){
             if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
-                throw new SQLException("表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
+                throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,
+                        "表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return getObjectBySql(q.getKey(),
                     QueryUtils.createSqlParamsMap(mapInfo.getPkColumns().get(0),id), type);
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
             if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idObj)){
-                throw new SQLException("缺少主键对应的属性。");
+                throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,
+                        "缺少主键对应的属性。");
             }
             return getObjectBySql(q.getKey(),
                     idObj, type);
         }
+
     }
 
     public <T> T getObjectIncludeLzayById(Object id, final Class<T> type)
-            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+            throws PersistenceException {
+
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         String  sql =  "select " + mapInfo.buildFieldIncludeLazySql("") +
                 " from " +mapInfo.getTableName() + " where " +
@@ -155,41 +199,48 @@ public class OrmDaoSupport {
 
         if(ReflectionOpt.isScalarType(id.getClass())){
             if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
-                throw new SQLException("表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
+                throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return getObjectBySql(sql,
                     QueryUtils.createSqlParamsMap(mapInfo.getPkColumns().get(0),id), type);
 
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
             if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idObj)){
-                throw new SQLException("缺少主键对应的属性。");
+                throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"缺少主键对应的属性。");
             }
             return getObjectBySql(sql, idObj, type);
         }
+
     }
 
-    private int deleteObjectById(Map<String, Object> id, TableMapInfo mapInfo) throws SQLException {
-        JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
-        return sqlDialect.deleteObjectById(id);
+    private int deleteObjectById(Map<String, Object> id, TableMapInfo mapInfo) throws PersistenceException {
+        try{
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+            return sqlDialect.deleteObjectById(id);
+        }catch (SQLException e) {
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }
     }
 
-    public <T> int deleteObjectById(Map<String, Object> id,  Class<T> type) throws SQLException {
+    public <T> int deleteObjectById(Map<String, Object> id,  Class<T> type) throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         return deleteObjectById(id,mapInfo);
     }
 
-    public <T> int deleteObject(T object) throws NoSuchFieldException, SQLException {
+    public <T> int deleteObject(T object) throws PersistenceException {
+
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
         return deleteObjectById(idMap,mapInfo);
     }
 
     public <T> int deleteObjectById(Object id, Class<T> type)
-            throws NoSuchFieldException, SQLException {
+            throws PersistenceException {
+
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         if(ReflectionOpt.isScalarType(id.getClass())){
             if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
-                throw new SQLException("表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
+                throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return deleteObjectById(
                     QueryUtils.createSqlParamsMap(mapInfo.getPkColumns().get(0),id),
                     mapInfo);
@@ -197,14 +248,14 @@ public class OrmDaoSupport {
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
             if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idObj)){
-                throw new SQLException("缺少主键对应的属性。");
+                throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"缺少主键对应的属性。");
             }
             return deleteObjectById(idObj, mapInfo);
         }
     }
 
     public <T> T getObjectByProperties(Map<String, Object> properties, Class<T> type)
-            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
         String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
@@ -218,7 +269,7 @@ public class OrmDaoSupport {
     }
 
     public <T> List<T> listObjectByProperties(Map<String, Object> properties, Class<T> type)
-            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSql(mapInfo,null);
         String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
@@ -235,7 +286,7 @@ public class OrmDaoSupport {
     }
 
     public <T> List<T> queryObjectsBySql(String sql, Class<T> type)
-            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+            throws PersistenceException {
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(sql,
                         new HashMap<>()),
@@ -243,7 +294,7 @@ public class OrmDaoSupport {
     }
 
     public <T> List<T> queryObjectsByParamsSql(String sql, Object[] params, Class<T> type)
-            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+            throws PersistenceException {
         return queryParamsSql(
                 connection, new QueryAndParams(sql,params),
                 (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
@@ -251,19 +302,18 @@ public class OrmDaoSupport {
 
     public <T> List<T> queryObjectsByNamedParamsSql(String sql,
                                               Map<String,Object> params, Class<T> type)
-            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+            throws PersistenceException {
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(sql,params),
                 (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
 
     public <T> T fetchObjectLazyColumn(T object,String columnName)
-            throws NoSuchFieldException, SQLException,
-            IllegalAccessException, IOException, InstantiationException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
         if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idMap)){
-            throw new SQLException("缺少主键对应的属性。");
+            throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION, "缺少主键对应的属性。");
         }
 
         String  sql =  "select " + mapInfo.findFieldByName(columnName).getColumnName() +
@@ -276,15 +326,14 @@ public class OrmDaoSupport {
     }
 
     public <T> T fetchObjectLazyColumns(T object)
-            throws SQLException, NoSuchFieldException, InstantiationException,
-            IllegalAccessException, IOException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         String fieldSql = mapInfo.buildLazyFieldSql(null);
         if(fieldSql==null)
             return object;
         Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
         if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idMap)){
-            throw new SQLException("缺少主键对应的属性。");
+            throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"缺少主键对应的属性。");
         }
 
         String  sql =  "select " + fieldSql +
@@ -297,7 +346,7 @@ public class OrmDaoSupport {
     }
 
     private <T> T fetchObjectReference(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
-            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+            throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
             return object;
@@ -328,7 +377,7 @@ public class OrmDaoSupport {
     }
 
     public <T> T fetchObjectReference(T object, String reference  )
-            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         SimpleTableReference ref = mapInfo.findReference(reference);
 
@@ -336,7 +385,7 @@ public class OrmDaoSupport {
     }
 
     public <T> T fetchObjectReferences(T object)
-            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+            throws PersistenceException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         if(mapInfo.hasReferences()) {
@@ -349,14 +398,18 @@ public class OrmDaoSupport {
 
 
     public <T> int deleteObjectByProperties(Map<String, Object> properties, Class<T> type)
-            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
-        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
-        return sqlDialect.deleteObjectsByProperties(properties);
+            throws PersistenceException {
+        try{
+            TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+            return sqlDialect.deleteObjectsByProperties(properties);
+        }catch (SQLException e) {
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }
     }
 
     private <T> int deleteObjectReference(T object,SimpleTableReference ref)
-            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+            throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
             return 0;
@@ -375,14 +428,14 @@ public class OrmDaoSupport {
     }
 
     public <T> int deleteObjectReference(T object, String reference)
-            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         SimpleTableReference ref = mapInfo.findReference(reference);
         return deleteObjectReference(object,ref);
     }
 
     public <T> int deleteObjectReferences(T object)
-            throws SQLException, NoSuchFieldException, InstantiationException, IllegalAccessException, IOException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         int  n=0;
         if(mapInfo.hasReferences()) {
@@ -394,7 +447,7 @@ public class OrmDaoSupport {
     }
 
     public <T> int deleteObjectCascadeShallow(T object)
-            throws NoSuchFieldException, SQLException, IllegalAccessException, IOException, InstantiationException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
 
@@ -408,7 +461,7 @@ public class OrmDaoSupport {
     }
 
     public <T> int deleteObjectCascade(T object)
-            throws NoSuchFieldException, SQLException, IllegalAccessException, IOException, InstantiationException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
         if(mapInfo.hasReferences()) {
@@ -429,13 +482,13 @@ public class OrmDaoSupport {
     }
 
     public <T> int deleteObjectCascadeShallowById(Object id, final Class<T> type)
-            throws NoSuchFieldException, SQLException, IllegalAccessException, IOException, InstantiationException {
+            throws PersistenceException {
 
         return deleteObjectCascadeShallow(getObjectById(id, type));
     }
 
     public <T> int deleteObjectCascadeById(Object id, final Class<T> type)
-            throws NoSuchFieldException, SQLException, IllegalAccessException, IOException, InstantiationException {
+            throws PersistenceException {
 
         return deleteObjectCascade(getObjectById(id, type));
     }
@@ -478,7 +531,7 @@ public class OrmDaoSupport {
     }
 
     public <T> int replaceObjectsAsTabulation(List<T> dbObjects,List<T> newObjects)
-            throws NoSuchFieldException, IOException, SQLException {
+            throws PersistenceException {
         Class<T> objType =(Class<T>) newObjects.iterator().next().getClass();
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(objType);
         Triple<List<T>, List<Pair<T,T>>, List<T>>
@@ -500,14 +553,14 @@ public class OrmDaoSupport {
 
     public <T> int replaceObjectsAsTabulation(List<T> newObjects,
                            final String propertyName, final Object propertyValue )
-            throws SQLException, NoSuchFieldException, InstantiationException, IOException, IllegalAccessException {
+            throws PersistenceException {
         return replaceObjectsAsTabulation(newObjects,
                 JSONOpt.createHashMap(propertyName,propertyValue));
     }
 
     public <T> int replaceObjectsAsTabulation(List<T> newObjects,
                                                Map<String, Object> properties)
-            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+            throws PersistenceException {
         if(newObjects==null || newObjects.size()<1)
             return 0;
         Class<T> objType =(Class<T>) newObjects.iterator().next().getClass();
@@ -516,7 +569,7 @@ public class OrmDaoSupport {
     }
 
     private <T> int saveNewObjectReferenceCascade(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
-            throws SQLException, NoSuchFieldException, InstantiationException, IOException, IllegalAccessException {
+            throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
             return 0;
@@ -541,7 +594,7 @@ public class OrmDaoSupport {
     }
 
     private <T> int saveObjectReference(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
-            throws SQLException, NoSuchFieldException, InstantiationException, IOException, IllegalAccessException {
+            throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
             return 0;
@@ -582,8 +635,7 @@ public class OrmDaoSupport {
     }
 
     public <T> int saveObjectReference (T object, String reference)
-            throws SQLException, InstantiationException, IllegalAccessException,
-            IOException, NoSuchFieldException {
+            throws PersistenceException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         SimpleTableReference ref = mapInfo.findReference(reference);
@@ -591,8 +643,7 @@ public class OrmDaoSupport {
     }
 
     public <T> int saveObjectReferences (T object)
-            throws SQLException, InstantiationException, IllegalAccessException,
-            IOException, NoSuchFieldException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         int n=0;
         if(mapInfo.hasReferences()) {
@@ -604,14 +655,13 @@ public class OrmDaoSupport {
     }
 
     public <T> int saveNewObjectCascadeShallow (T object)
-            throws NoSuchFieldException, IOException, SQLException,
-            IllegalAccessException, InstantiationException {
+            throws PersistenceException {
         return saveNewObject(object)
                 + saveObjectReferences(object);
     }
 
     public <T> int saveNewObjectCascade (T object)
-            throws SQLException, InstantiationException, IllegalAccessException, IOException, NoSuchFieldException {
+            throws PersistenceException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         int n= saveNewObject(object);
@@ -624,14 +674,13 @@ public class OrmDaoSupport {
     }
 
     public <T> int updateObjectCascadeShallow (T object)
-            throws NoSuchFieldException, SQLException, IOException,
-            IllegalAccessException, InstantiationException {
+            throws PersistenceException {
         return updateObject(object)
            + saveObjectReferences(object);
     }
 
     private <T> int replaceObjectsAsTabulationCascade(List<T> dbObjects,List<T> newObjects)
-            throws NoSuchFieldException, IOException, SQLException, InstantiationException, IllegalAccessException {
+            throws PersistenceException {
         Class<T> objType =(Class<T>) newObjects.iterator().next().getClass();
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(objType);
         Triple<List<T>, List<Pair<T,T>>, List<T>>
@@ -652,7 +701,7 @@ public class OrmDaoSupport {
     }
 
     private <T> int updateObjectReferenceCascade(T object,SimpleTableReference ref ,TableMapInfo mapInfo )
-            throws SQLException, NoSuchFieldException, InstantiationException, IOException, IllegalAccessException {
+            throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
             return 0;
@@ -699,8 +748,7 @@ public class OrmDaoSupport {
         return 1;
     }
 
-    public <T> int updateObjectCascade (T object) throws NoSuchFieldException, SQLException,
-            IOException, IllegalAccessException, InstantiationException {
+    public <T> int updateObjectCascade (T object) throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         int n= updateObject(object);
         if(mapInfo.hasReferences()) {
@@ -712,34 +760,41 @@ public class OrmDaoSupport {
     }
 
     public <T> int checkObjectExists(T object)
-            throws NoSuchFieldException, SQLException, IOException {
+            throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         Map<String,Object> objectMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
 
         if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,objectMap)){
-            throw new SQLException("缺少主键对应的属性。");
+            throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"缺少主键对应的属性。");
         }
         String sql =
                 "select count(1) as checkExists from " + mapInfo.getTableName()
                         + " where " +  GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,null);
-        Long checkExists = NumberBaseOpt.castObjectToLong(
-                DatabaseAccess.getScalarObjectQuery(connection, sql, objectMap));
-        return checkExists==null?0:checkExists.intValue();
+
+        try {
+            Long checkExists = NumberBaseOpt.castObjectToLong(
+                    DatabaseAccess.getScalarObjectQuery(connection, sql, objectMap));
+            return checkExists==null?0:checkExists.intValue();
+        }catch (SQLException e) {
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }catch (IOException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
+        }
     }
 
     public <T> int mergeObjectCascadeShallow(T object)
-            throws SQLException, NoSuchFieldException, IOException, InstantiationException, IllegalAccessException {
+            throws PersistenceException {
         int  checkExists = checkObjectExists(object);
         if(checkExists == 0){
             return saveNewObjectCascadeShallow(object);
         }else if(checkExists == 1){
             return updateObjectCascadeShallow(object);
         }else{
-            throw new SQLException("主键属性有误，返回多个条记录。");
+            throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"主键属性有误，返回多个条记录。");
         }
     }
 
-    public <T> int mergeObjectCascade(T object) throws SQLException, NoSuchFieldException, IOException, InstantiationException, IllegalAccessException {
+    public <T> int mergeObjectCascade(T object) throws PersistenceException {
         int  checkExists = checkObjectExists(object);
         if(checkExists == 0){
             return saveNewObjectCascadeShallow(object);
@@ -748,7 +803,7 @@ public class OrmDaoSupport {
         }else if(checkExists == 1){
             return updateObjectCascade(object);
         }else{
-            throw new SQLException("主键属性有误，返回多个条记录。");
+            throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"主键属性有误，返回多个条记录。");
         }
     }
 }

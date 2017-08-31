@@ -479,17 +479,13 @@ public class JSONOpt {
 	    	for (Field fl : fls) {
 	    		if(methodNames.contains(fl.getName())) 
 	    			continue;
-				try {
-					if(includePrivateField || Modifier.isPublic(fl.getModifiers())){
-					//fl.isAccessible()
-						Object value = ReflectionOpt.forceGetFieldValue(obj,fl);
-						jObj.put(fl.getName(), 
-		    					makeJSONValue(value,methodOnly, fieldOnly));
-					}
-		    	} catch (NoSuchFieldException e) {
-					logger.error(e.getMessage(),e);//e.printStackTrace();
+
+				if(includePrivateField || Modifier.isPublic(fl.getModifiers())){
+				//fl.isAccessible()
+					Object value = ReflectionOpt.forceGetFieldValue(obj,fl);
+					jObj.put(fl.getName(),
+							makeJSONValue(value,methodOnly, fieldOnly));
 				}
-				
 			}
     	}
     	
