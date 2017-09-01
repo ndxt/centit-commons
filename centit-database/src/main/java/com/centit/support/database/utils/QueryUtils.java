@@ -1,39 +1,22 @@
 package com.centit.support.database.utils;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import com.centit.support.database.ddl.DB2DDLOperations;
-import com.centit.support.database.ddl.MySqlDDLOperations;
-import com.centit.support.database.ddl.OracleDDLOperations;
-import com.centit.support.database.ddl.SqlSvrDDLOperations;
-import com.centit.support.database.orm.PersistenceException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.common.KeyValuePair;
-import com.centit.support.compiler.EmbedFunc;
-import com.centit.support.compiler.Formula;
-import com.centit.support.compiler.Lexer;
-import com.centit.support.compiler.MapTranslate;
-import com.centit.support.compiler.VariableTranslate;
+import com.centit.support.compiler.*;
+import com.centit.support.database.orm.PersistenceException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+
+import java.util.*;
 
 /**
  * @author codefan@hotmail.com
  */
-public class QueryUtils {
+@SuppressWarnings("unused")
+public abstract class QueryUtils {
 	/**
 	 * 表示这个参数不需要
 	 */
@@ -299,8 +282,21 @@ public class QueryUtils {
     	}
     	return n;
     }
-    
 
+
+	/**
+	 * 去掉 order by 语句
+	 * @param sql sql
+	 * @return sql
+	 */
+	public static boolean hasOrderBy(String sql){
+		Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+		String aWord = lex.getAWord();
+		while (aWord != null && !"".equals(aWord) && !"order".equalsIgnoreCase(aWord)) {
+			aWord = lex.getAWord();
+		}
+		return "order".equalsIgnoreCase(aWord);
+	}
     
 	/**
 	 * 去掉 order by 语句
