@@ -1,4 +1,4 @@
-package com.centit.support.database.orm;
+package com.centit.support.database.utils;
 @SuppressWarnings("unused")
 public class PersistenceException extends RuntimeException {
 

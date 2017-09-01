@@ -6,7 +6,6 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.common.KeyValuePair;
 import com.centit.support.compiler.*;
-import com.centit.support.database.orm.PersistenceException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 

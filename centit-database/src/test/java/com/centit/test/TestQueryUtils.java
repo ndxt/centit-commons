@@ -1,18 +1,14 @@
 package com.centit.test;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.KeyValuePair;
+import com.centit.support.database.utils.QueryAndNamedParams;
+import com.centit.support.database.utils.QueryUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.common.KeyValuePair;
-import com.centit.support.database.orm.TableMapInfo;
-import com.centit.support.database.utils.QueryAndNamedParams;
-import com.centit.support.database.utils.QueryUtils;
 
 public class TestQueryUtils {
 	
@@ -30,19 +26,7 @@ public class TestQueryUtils {
 
 	public static void main(String[] args) {
 
-		List<TableMapInfo> arys = new ArrayList<>();
 
-		Class<?> arrayClass = arys.getClass();
-
-		TypeVariable<?>[] typeVariables=  arrayClass.getTypeParameters();
-
-	  for(TypeVariable param : typeVariables  ){
-			//Class<?> poClass = param.getBounds()
-
-			System.out.println(param.getName());
-		}
-
-		System.out.println(arys.getClass().getName());
 		/*System.out.println(QueryUtils.trimSqlOrderByField(" , 1 2 nulls last, 2 desc ,"));
 		System.out.println(QueryUtils.trimSqlOrderByField("%27+%2B+%27+%2B+%27createDate"));
 		System.out.println(QueryUtils.trimSqlOrderByField("  	reateDate nulls first, orderind desc ,"));
