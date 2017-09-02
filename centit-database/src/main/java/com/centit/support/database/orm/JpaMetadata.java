@@ -30,14 +30,13 @@ public abstract class JpaMetadata {
     private static SimpleTableField obtainColumnFromField(Field field){
         SimpleTableField column = new SimpleTableField();
         Column colInfo = field.getAnnotation(Column.class);
-        column.setColumnName( column.getColumnName());
-        column.setColumnType( column.getColumnType());
+        column.setColumnName( colInfo.name());
+        //column.setColumnType( colInfo.);
         column.setJavaType(field.getType());
         column.setPropertyName( field.getName());
         column.setMaxLength( colInfo.length());
         column.setScale( colInfo.scale());
         column.setPrecision( colInfo.precision());
-
         return column;
     }
 
