@@ -77,6 +77,7 @@ public abstract class OrmDaoUtils {
         }
     }
 
+
     public static <T> int updateObject(Connection connection, Collection<String> fields,  T object)
             throws PersistenceException  {
         try {
@@ -85,6 +86,27 @@ public abstract class OrmDaoUtils {
             object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
 
             return sqlDialect.updateObject(fields, OrmUtils.fetchObjectDatabaseField(object,mapInfo));
+        }catch (NoSuchFieldException e){
+            throw  new PersistenceException(PersistenceException.NOSUCHFIELD_EXCEPTION,e);
+        }catch (IOException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_IO_EXCEPTION,e);
+        }catch (SQLException e){
+            throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
+        }
+    }
+
+    public static <T> int batchUpdateObject(
+            Connection connection, Collection<String> fields,   T object, Map<String, Object> properties)
+            throws PersistenceException  {
+        try {
+            TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+            object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
+
+            return sqlDialect.updateObjectsByProperties(
+                    fields,
+                    OrmUtils.fetchObjectDatabaseField(object,mapInfo),
+                    properties);
         }catch (NoSuchFieldException e){
             throw  new PersistenceException(PersistenceException.NOSUCHFIELD_EXCEPTION,e);
         }catch (IOException e){
@@ -213,7 +235,7 @@ public abstract class OrmDaoUtils {
 
     }
 
-    public static <T> T getObjectIncludeLzayById(Connection connection, Object id, final Class<T> type)
+    public static <T> T getObjectIncludeLazyById(Connection connection, Object id, final Class<T> type)
             throws PersistenceException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
@@ -240,7 +262,7 @@ public abstract class OrmDaoUtils {
     public static <T> T getObjectCascadeShallow(Connection connection, Object id, final Class<T> type)
             throws PersistenceException {
 
-        T object = getObjectIncludeLzayById(connection, id, type);
+        T object = getObjectIncludeLazyById(connection, id, type);
         fetchObjectReferences(connection, object);
         return object;
     }
@@ -248,7 +270,7 @@ public abstract class OrmDaoUtils {
     public static <T> T getObjectCascade(Connection connection, Object id, final Class<T> type)
             throws PersistenceException {
 
-        T object = getObjectIncludeLzayById(connection, id, type);
+        T object = getObjectIncludeLazyById(connection, id, type);
         fetchObjectReferencesCascade(connection, object,type);
         return object;
     }
