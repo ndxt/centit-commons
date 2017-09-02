@@ -312,6 +312,53 @@ public class DatabaseAccess {
 		}	
 	}
 
+
+    public final static JSONObject getObjectAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames)
+            throws SQLException, IOException {
+        try(PreparedStatement stmt = conn.prepareStatement(sSql)){
+            setQueryStmtParameters(stmt,values);
+
+            try(ResultSet rs = stmt.executeQuery()) {
+                if (rs == null)
+                    return null;
+
+                String[] fns = fieldnames;
+                if (ArrayUtils.isEmpty(fns)) {
+                    List<String> fields = QueryUtils.getSqlFiledNames(sSql);
+                    fns = mapColumnsNameToFields(fields);
+                }
+                return fetchResultSetRowToJSONObject(rs, fns);
+                //rs.close();
+                //stmt.close();
+                //return ja;
+            }
+        }catch (SQLException e) {
+            throw new DatabaseAccessException(sSql,e);
+        }
+    }
+
+    public final static JSONObject getObjectAsJSON(Connection conn, String sSql, Object[] values)
+            throws SQLException, IOException {
+        return getObjectAsJSON(conn,sSql,values,null);
+    }
+
+    public final static JSONObject getObjectAsJSON(Connection conn, String sSql)
+            throws SQLException, IOException {
+        return getObjectAsJSON(conn,sSql,(Object[]) null,null);
+    }
+
+    public final static JSONObject getObjectAsJSON(Connection conn, String sSql, Map<String,Object> values, String[] fieldnames)
+            throws SQLException, IOException {
+        QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
+        return getObjectAsJSON(conn,qap.getSql(),qap.getParams(),fieldnames);
+    }
+
+    public final static JSONObject getObjectAsJSON(Connection conn, String sSql, Map<String,Object> values)
+            throws SQLException, IOException {
+        QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
+        return getObjectAsJSON(conn,qap.getSql(),qap.getParams(),null);
+    }
+
 	public final static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values)
 			throws SQLException, IOException {
 		return findObjectsAsJSON(conn, sSql, values, null);
