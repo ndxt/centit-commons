@@ -43,7 +43,7 @@ public abstract class JpaMetadata {
 
     public static TableMapInfo obtainMapInfoFromClass(Class<?> objType){
 
-        if(objType.isAnnotationPresent( Table.class ))
+        if(!objType.isAnnotationPresent( Table.class ))
             return null;
         Table tableInfo = objType.getAnnotation(Table.class);
         TableMapInfo mapInfo = new TableMapInfo();
