@@ -88,11 +88,10 @@ public class DatabaseAccess {
 				else
 					stmt.setObject(i + 1, paramObjs[i]);
 			}
-			stmt.execute();
+			return stmt.execute();
 		}catch (SQLException e) {
 			throw new DatabaseAccessException(procDesc.toString(),e);
-		}	
-		return true;
+		}
 	}
 
 	/**
