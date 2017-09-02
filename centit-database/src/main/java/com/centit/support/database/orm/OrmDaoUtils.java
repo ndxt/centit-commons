@@ -148,14 +148,14 @@ public abstract class OrmDaoUtils {
     private final static <T> T queryParamsSql(Connection conn, QueryAndParams sqlAndParams ,
                                              FetchDataWork<T> fetchDataWork)
             throws PersistenceException {
-         try{
-            PreparedStatement stmt = conn.prepareStatement(sqlAndParams.getSql());
+         try(PreparedStatement stmt = conn.prepareStatement(sqlAndParams.getSql())){
             DatabaseAccess.setQueryStmtParameters(stmt,sqlAndParams.getParams());
-            ResultSet rs = stmt.executeQuery();
-            T obj =fetchDataWork.execute(rs);
-            rs.close();
-            stmt.close();
-            return obj;
+            try(ResultSet rs = stmt.executeQuery()) {
+                return fetchDataWork.execute(rs);
+            }
+            //rs.close();
+            //stmt.close();
+            //return obj;
         }catch (SQLException e) {
             throw  new PersistenceException(PersistenceException.DATABASE_SQL_EXCEPTION,e);
         }catch (NoSuchFieldException e){
