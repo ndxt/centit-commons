@@ -20,10 +20,19 @@
             <artifactId>centit-compiler</artifactId>
             <version>${centit.commons.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
             <version>${commons-dbcp2.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>${persistence-api.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!-- test -->
