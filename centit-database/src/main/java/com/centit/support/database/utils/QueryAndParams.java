@@ -62,10 +62,10 @@ public class QueryAndParams {
         this.params = values;
     }
     
-    public static QueryAndParams creepArrayParamFoInQuery(String sql, Object[] sqlParams){
+    public static QueryAndParams creepArrayParamForInQuery(String sql, Object[] sqlParams){
  
     	StringBuilder sqlb = new StringBuilder();
-        List<Object> params = new ArrayList<Object>();
+        List<Object> params = new ArrayList<>();
         Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);       
         
         int prePos = 0;
@@ -171,8 +171,8 @@ public class QueryAndParams {
     	return new QueryAndParams(sqlb.toString(),params.toArray()); 
     }
     
-    public static QueryAndParams creepArrayParamFoInQuery(QueryAndParams queryParam){
-    	return creepArrayParamFoInQuery(
+    public static QueryAndParams creepArrayParamForInQuery(QueryAndParams queryParam){
+    	return creepArrayParamForInQuery(
     			queryParam.getQuery(),queryParam.getParams());
     }
     
