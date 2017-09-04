@@ -1,4 +1,8 @@
 package com.centit.support.database.utils;
+
+import java.io.IOException;
+import java.sql.SQLException;
+
 @SuppressWarnings("unused")
 public class PersistenceException extends RuntimeException {
 
@@ -58,6 +62,23 @@ public class PersistenceException extends RuntimeException {
 		this.exceptionCode = UNKNOWN_EXCEPTION;
 	}
 
+	/**
+	 *
+	 * @param exception Throwable
+	 */
+	public PersistenceException(SQLException exception) {
+		super(exception);
+		this.exceptionCode = DATABASE_SQL_EXCEPTION;
+	}
+
+	/**
+	 *
+	 * @param exception Throwable
+	 */
+	public PersistenceException(IOException exception) {
+		super(exception);
+		this.exceptionCode = DATABASE_IO_EXCEPTION;
+	}
 	/**
 	 *
 	 * @param message String
