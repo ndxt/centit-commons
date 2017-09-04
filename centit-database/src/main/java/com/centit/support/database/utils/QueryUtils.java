@@ -1032,17 +1032,17 @@ public abstract class QueryUtils {
     public static Map<String,Object> createSqlParamsMap(Object... objs){
     	if(objs==null || objs.length<2)
     		return null;
-    	Map<String,Object> paramsMap = new HashMap<String,Object>();
+    	Map<String,Object> paramsMap = new HashMap<>();
     	for(int i=0;i<objs.length / 2;i++){
     		paramsMap.put(String.valueOf(objs[i*2]), objs[i*2+1]);
     	}    	
     	return paramsMap;
     }
     
-    public static interface IFilterTranslater extends VariableTranslate {
-    	public void setTableAlias(Map<String, String> tableAlias);
-    	public String translateColumn(String columnDesc);
-    	public KeyValuePair<String,Object> translateParam(String paramName);
+    public interface IFilterTranslater extends VariableTranslate {
+    	void setTableAlias(Map<String, String> tableAlias);
+    	String translateColumn(String columnDesc);
+    	KeyValuePair<String,Object> translateParam(String paramName);
     }
     
     public static class SimpleFilterTranslater implements IFilterTranslater{
