@@ -116,12 +116,14 @@ public abstract class ReflectionOpt  {
 	public static void setFieldValue(Object object, String fieldName, Object newValue) {
 
 		Method md=null;
-		try {
-			md = object.getClass().getMethod("set" + StringUtils.capitalize(fieldName));
-		}catch (NoSuchMethodException noSet ){
+		if(newValue != null) {
+			try {
+				md = object.getClass().getMethod("set" + StringUtils.capitalize(fieldName), newValue.getClass());
+			} catch (NoSuchMethodException noSet) {
 				logger.error(noSet.getMessage(), noSet);
-		}catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
 		}
 		if(md==null){
 			try{
