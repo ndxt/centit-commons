@@ -1,5 +1,6 @@
 package com.centit.support.database.metadata;
 
+import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.database.utils.DBType;
 import com.centit.support.file.FileType;
 
@@ -148,7 +149,7 @@ public class SimpleTableField implements TableField {
 	}
 
 	public void setJavaType(Class<?> type) {
-        if(type.isPrimitive()){
+        if(ReflectionOpt.isScalarType(type)){
             String typeName = type.getTypeName();
             javaType = FileType.getFileExtName(typeName);
         }else

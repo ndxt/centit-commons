@@ -118,7 +118,7 @@ public abstract class ReflectionOpt  {
 		boolean hasSetValue=false;
 		if(relParamType != null) {
 			try {
-				Method md = object.getClass().getMethod("set" + StringUtils.capitalize(fieldName), paramType);
+				Method md = object.getClass().getMethod("set" + StringUtils.capitalize(fieldName), relParamType);
 				md.invoke(object, newValue);
 				hasSetValue = true;
 			} catch (NoSuchMethodException noSet) {
