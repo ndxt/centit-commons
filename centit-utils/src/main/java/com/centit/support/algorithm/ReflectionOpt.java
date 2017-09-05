@@ -113,31 +113,33 @@ public abstract class ReflectionOpt  {
 		return null;
 	}
 
-	public static void setFieldValue(Object object, String fieldName, Object newValue) {
-
-		Method md=null;
-		if(newValue != null) {
+	public static boolean setFieldValue(Object object, String fieldName, Object newValue, Class<?> paramType) {
+		Class<?> relParamType = (paramType!=null)?paramType:(newValue!=null?newValue.getClass():null);
+		boolean hasSetValue=false;
+		if(relParamType != null) {
 			try {
-				md = object.getClass().getMethod("set" + StringUtils.capitalize(fieldName), newValue.getClass());
+				Method md = object.getClass().getMethod("set" + StringUtils.capitalize(fieldName), paramType);
+				md.invoke(object, newValue);
+				hasSetValue = true;
 			} catch (NoSuchMethodException noSet) {
 				logger.error(noSet.getMessage(), noSet);
 			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}
 		}
-		if(md==null){
+		if(!hasSetValue){
 			try{
 				forceSetProperty(object, fieldName, newValue);
+				hasSetValue = true;
 			}catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}
-		}else{
-			try{
-				md.invoke(object,newValue);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
 		}
+		return hasSetValue;
+	}
+
+	public static boolean setFieldValue(Object object, String fieldName, Object newValue) {
+			return setFieldValue(object, fieldName, newValue, null);
 	}
 	/*
 	 * 获得get field value by getter

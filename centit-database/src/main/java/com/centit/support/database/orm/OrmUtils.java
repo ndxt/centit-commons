@@ -27,47 +27,53 @@ public abstract class OrmUtils {
             throws NoSuchFieldException, IOException {
         switch (fieldJavaType) {
             case "Double":
+                ReflectionOpt.setFieldValue(object,propertyName,
+                        NumberBaseOpt.castObjectToDouble(newValue),Double.class);
+                break;
             case "Float":
                 ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToDouble(newValue));
+                        NumberBaseOpt.castObjectToDouble(newValue),Float.class);
                 break;
             case "Long":
                 ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToLong(newValue));
+                        NumberBaseOpt.castObjectToLong(newValue),Long.class);
             case "Integer":
                 ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToInteger(newValue));
+                        NumberBaseOpt.castObjectToInteger(newValue),Integer.class);
                 break;
             case "String":
                 if (newValue instanceof Clob) {
                     ReflectionOpt.setFieldValue(object,propertyName,
-                            DatabaseAccess.fetchClobString((Clob) newValue));
+                            DatabaseAccess.fetchClobString((Clob) newValue),String.class);
                 }else if (newValue instanceof Blob) {
                     ReflectionOpt.setFieldValue(object,propertyName,
-                            DatabaseAccess.fetchBlobAsBase64((Blob) newValue));
+                            DatabaseAccess.fetchBlobAsBase64((Blob) newValue),String.class);
                 } else {
                     ReflectionOpt.setFieldValue(object, propertyName,
-                            StringBaseOpt.objectToString(newValue));
+                            StringBaseOpt.objectToString(newValue),String.class);
                 }
                 break;
             case "Date":
+                ReflectionOpt.setFieldValue(object,propertyName,
+                        DatetimeOpt.castObjectToDate(newValue),java.util.Date.class);
+                break;
             case "Timestamp":
                 ReflectionOpt.setFieldValue(object,propertyName,
-                        DatetimeOpt.castObjectToDate(newValue));
+                        DatetimeOpt.castObjectToDate(newValue),java.sql.Timestamp.class);
                 break;
             case "Boolean":
                 ReflectionOpt.setFieldValue(object,propertyName,
                         StringRegularOpt.isTrue(
                                 StringBaseOpt.objectToString(newValue)
-                        ));
+                        ),Boolean.class);
                 break;
             default:
                 if (newValue instanceof Clob) {
                     ReflectionOpt.setFieldValue(object,propertyName,
-                            DatabaseAccess.fetchClobString((Clob) newValue));
+                            DatabaseAccess.fetchClobString((Clob) newValue),String.class);
                 }else if (newValue instanceof Blob) {
                     ReflectionOpt.setFieldValue(object,propertyName,
-                            DatabaseAccess.fetchBlobBytes((Blob) newValue));
+                            DatabaseAccess.fetchBlobBytes((Blob) newValue),byte[].class);
                 } else {
                     ReflectionOpt.setFieldValue(object, propertyName,newValue);
                 }
