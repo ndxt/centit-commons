@@ -1,5 +1,6 @@
 package com.centit.support.database.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.DatetimeOpt;
@@ -103,6 +104,7 @@ public class DatabaseAccess {
 	 */
 	public final static boolean doExecuteSql(Connection conn, String sSql) throws SQLException {
 		try(PreparedStatement stmt = conn.prepareStatement(sSql)){
+            logger.debug(sSql);
 			return stmt.execute();
 		}catch (SQLException e) {
 			throw new DatabaseAccessException(sSql,e);
@@ -140,6 +142,7 @@ public class DatabaseAccess {
 	 * 直接运行行带参数的 SQL,update delete insert
 	 */
 	public final static int doExecuteSql(Connection conn, String sSql, Object[] values) throws SQLException {
+		logger.debug( sSql +" :" + JSON.toJSONString(values) );
 		try(PreparedStatement stmt = conn.prepareStatement(sSql)){
 			setQueryStmtParameters(stmt,values);
 			return stmt.executeUpdate();
@@ -289,6 +292,7 @@ public class DatabaseAccess {
 	 */
 	public final static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames)
 			throws SQLException, IOException {
+		logger.debug( sSql +" :" + JSON.toJSONString(values) );
 		try(PreparedStatement stmt = conn.prepareStatement(sSql)){
 			setQueryStmtParameters(stmt,values);
 
@@ -314,6 +318,7 @@ public class DatabaseAccess {
 
     public final static JSONObject getObjectAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames)
             throws SQLException, IOException {
+        logger.debug( sSql +" :" + JSON.toJSONString(values) );
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
             setQueryStmtParameters(stmt,values);
 
@@ -520,6 +525,7 @@ public class DatabaseAccess {
 	 */
 	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object[] values)
 			throws SQLException, IOException {
+        logger.debug( sSql +" :" + JSON.toJSONString(values) );
 		try(PreparedStatement stmt = conn.prepareStatement(sSql)){
 			setQueryStmtParameters(stmt,values);
 			// stmt.setMaxRows(max);
@@ -540,6 +546,7 @@ public class DatabaseAccess {
 	 */
 	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql, List<Object> values)
 			throws SQLException, IOException {
+        logger.debug( sSql +" :" + JSON.toJSONString(values) );
 		try(PreparedStatement stmt = conn.prepareStatement(sSql)){
 			setQueryStmtParameters(stmt,values);
 	
@@ -560,6 +567,7 @@ public class DatabaseAccess {
 	 */
 	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object value)
 			throws SQLException, IOException {
+        logger.debug( sSql +" :" + JSON.toJSONString(value) );
 		try(PreparedStatement stmt = conn.prepareStatement(sSql)){
 			setQueryStmtParameters(stmt,new Object[]{value});
 	
@@ -579,6 +587,7 @@ public class DatabaseAccess {
 	 * 
 	 */
 	public final static List<Object[]> findObjectsBySql(Connection conn, String sSql) throws SQLException, IOException {
+        logger.debug(sSql);
 		try(PreparedStatement stmt = conn.prepareStatement(sSql);
 			ResultSet rs = stmt.executeQuery()){
 			return fetchResultSetToObjectsList(rs);
