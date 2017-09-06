@@ -491,11 +491,14 @@ public abstract class OrmDaoUtils {
             }
             if (ref.getReferenceType().equals(refType) /*||
                     ref.getReferenceType().isAssignableFrom(refType) */){
-                ReflectionOpt.setFieldValue(object, ref.getReferenceName(), refs.get(0) );
+                ReflectionOpt.setFieldValue(object, ref.getReferenceName(),
+                        refs.get(0), ref.getReferenceType());
             }else if(ref.getReferenceType().isAssignableFrom(Set.class)){
-                ReflectionOpt.setFieldValue(object, ref.getReferenceName(), new HashSet<>(refs));
+                ReflectionOpt.setFieldValue(object, ref.getReferenceName(),
+                        new HashSet<>(refs), ref.getReferenceType());
             }else if(ref.getReferenceType().isAssignableFrom(List.class)){
-                ReflectionOpt.setFieldValue(object, ref.getReferenceName(), refs);
+                ReflectionOpt.setFieldValue(object, ref.getReferenceName(),
+                        refs, ref.getReferenceType());
             }
         }
         return object;

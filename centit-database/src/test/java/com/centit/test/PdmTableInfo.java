@@ -2,6 +2,7 @@ package com.centit.test;
 
 import java.util.List;
 
+import com.centit.support.database.metadata.SimpleTableField;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.centit.support.database.metadata.PdmReader;
@@ -9,11 +10,14 @@ import com.centit.support.database.metadata.SimpleTableInfo;
 
 public class PdmTableInfo{
 	public  static void  main(String[] args)   {
+		SimpleTableField field = new SimpleTableField();
+		field.setJavaType(int.class);
+		System.out.println(field.getJavaType());
 		//System.out.println(DBType.valueOf("Oracle"));
-		List<Pair<String, String>> tables = listTablesInPdm("D:/temp/im.pdm");
+		/*List<Pair<String, String>> tables = listTablesInPdm("D:/temp/im.pdm");
 		for(Pair<String, String> t : tables )
 			System.out.println("table "+ t.getKey() +" name "+ t.getValue());
-		System.out.println("Done!");
+		System.out.println("Done!");*/
 	}
 	public static List<Pair<String, String>> listTablesInPdm(String pdmFilePath) {
 		PdmReader pdmReader = new PdmReader();
