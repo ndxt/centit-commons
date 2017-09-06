@@ -1,5 +1,6 @@
 package com.centit.support.database.orm;
 
+import com.alibaba.fastjson.JSON;
 import com.centit.support.algorithm.ListOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
@@ -13,6 +14,8 @@ import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -26,7 +29,7 @@ import java.util.*;
  */
 @SuppressWarnings("unused")
 public abstract class OrmDaoUtils {
-
+    private static final Logger logger = LoggerFactory.getLogger(OrmDaoUtils.class);
     public static Long getSequenceNextValue(Connection connection, final String sequenceName) {
         try {
             return GeneralJsonObjectDao.createJsonObjectDao(connection)
@@ -148,6 +151,7 @@ public abstract class OrmDaoUtils {
     private final static <T> T queryParamsSql(Connection conn, QueryAndParams sqlAndParams ,
                                              FetchDataWork<T> fetchDataWork)
             throws PersistenceException {
+         logger.debug( sqlAndParams.getSql() +" :" + JSON.toJSONString(sqlAndParams.getParams()) );
          try(PreparedStatement stmt = conn.prepareStatement(sqlAndParams.getSql())){
             DatabaseAccess.setQueryStmtParameters(stmt,sqlAndParams.getParams());
             try(ResultSet rs = stmt.executeQuery()) {
