@@ -11,7 +11,7 @@ import com.centit.support.database.metadata.SimpleTableInfo;
 public class PdmTableInfo{
 	public  static void  main(String[] args)   {
 		SimpleTableField field = new SimpleTableField();
-		field.setJavaType(int.class);
+		field.setJavaType(byte[].class);
 		System.out.println(field.getJavaType());
 		//System.out.println(DBType.valueOf("Oracle"));
 		/*List<Pair<String, String>> tables = listTablesInPdm("D:/temp/im.pdm");

@@ -4,6 +4,8 @@ import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.database.utils.DBType;
 import com.centit.support.file.FileType;
 
+import java.math.BigDecimal;
+
 public class SimpleTableField implements TableField {
 	private String propertyName;// 字段属性名称 
 	private String fieldLabelName;// 字段的中文名称 label ，PDM中的 Name 和 元数据表格中的Name对应
@@ -149,10 +151,16 @@ public class SimpleTableField implements TableField {
 	}
 
 	public void setJavaType(Class<?> type) {
-        if(ReflectionOpt.isScalarType(type)){
-            String typeName = type.getTypeName();
-            javaType = FileType.getFileExtName(typeName);
-        }else
+		String typeName = type.getTypeName();
+		if(typeName.indexOf('.')<1) {
+			javaType = typeName;
+		} else if(typeName.startsWith("java.lang.") || typeName.startsWith("java.sql.")
+				|| "java.util.Date".equals(typeName)
+				|| "java.util.UUID".equals(typeName)
+				|| "java.math.BigDecimal".equals(typeName)
+				|| "java.math.BigInteger".equals(typeName)) {
+			javaType = FileType.getFileExtName(typeName);
+		} else
 		    javaType = type.getTypeName();
 	}
 	

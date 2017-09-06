@@ -1,5 +1,8 @@
 package com.centit.support.algorithm;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 @SuppressWarnings("unused")
 public abstract class NumberBaseOpt {
 
@@ -241,6 +244,28 @@ public abstract class NumberBaseOpt {
 		if (obj instanceof Number)
 			return ((Number) obj).doubleValue();
 		return parseDouble(StringBaseOpt.objectToString(obj),null);
+	}
+
+
+	public static BigInteger castObjectToBigInteger(Object obj){
+		if (obj == null)
+			return null;
+		if (obj instanceof BigInteger)
+			return (BigInteger) obj;
+		return new BigInteger(StringBaseOpt.objectToString(obj));
+	}
+
+	public static BigDecimal castObjectToBigDecimal(Object obj){
+		if (obj == null)
+			return null;
+		if (obj instanceof BigDecimal)
+			return (BigDecimal) obj;
+		if (obj instanceof BigDecimal)
+			return new BigDecimal((BigInteger)obj);
+		if(double.class.equals(obj.getClass())){
+			return new BigDecimal((double)obj);
+		}
+		return new BigDecimal(StringBaseOpt.objectToString(obj));
 	}
 
 	public int compareTwoLong(Long l1 , Long l2){

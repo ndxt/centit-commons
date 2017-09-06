@@ -9,6 +9,8 @@ import com.centit.support.database.utils.DatabaseAccess;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +28,31 @@ public abstract class OrmUtils {
                                            Object newValue, String fieldJavaType)
             throws NoSuchFieldException, IOException {
         switch (fieldJavaType) {
+            case "int":
+                ReflectionOpt.setFieldValue(object,propertyName,
+                        NumberBaseOpt.castObjectToInteger(newValue),int.class);
+                break;
+            case "long":
+                ReflectionOpt.setFieldValue(object,propertyName,
+                        NumberBaseOpt.castObjectToLong(newValue),long.class);
+                break;
+            case "float":
+                ReflectionOpt.setFieldValue(object,propertyName,
+                        NumberBaseOpt.castObjectToDouble(newValue),float.class);
+                break;
+            case "double":
+                ReflectionOpt.setFieldValue(object,propertyName,
+                        NumberBaseOpt.castObjectToDouble(newValue),double.class);
+                break;
+            case "byte[]"://BLOB字段
+                if (newValue instanceof Blob) {
+                    ReflectionOpt.setFieldValue(object, propertyName,
+                            DatabaseAccess.fetchBlobBytes((Blob) newValue), byte[].class);
+                }else{
+                    ReflectionOpt.setFieldValue(object, propertyName,
+                            StringBaseOpt.objectToString(newValue).getBytes(), byte[].class);
+                }
+                break;
             case "Double":
                 ReflectionOpt.setFieldValue(object,propertyName,
                         NumberBaseOpt.castObjectToDouble(newValue),Double.class);
@@ -41,14 +68,22 @@ public abstract class OrmUtils {
                 ReflectionOpt.setFieldValue(object,propertyName,
                         NumberBaseOpt.castObjectToInteger(newValue),Integer.class);
                 break;
+            case "BigDecimal":
+                ReflectionOpt.setFieldValue(object,propertyName,
+                        NumberBaseOpt.castObjectToBigDecimal(newValue),BigDecimal.class);
+                break;
+            case "BigInteger":
+                ReflectionOpt.setFieldValue(object,propertyName,
+                        NumberBaseOpt.castObjectToBigInteger(newValue),BigInteger.class);
+                break;
             case "String":
                 if (newValue instanceof Clob) {
                     ReflectionOpt.setFieldValue(object,propertyName,
                             DatabaseAccess.fetchClobString((Clob) newValue),String.class);
-                }else if (newValue instanceof Blob) {
+                } /*else if (newValue instanceof Blob) {
                     ReflectionOpt.setFieldValue(object,propertyName,
                             DatabaseAccess.fetchBlobAsBase64((Blob) newValue),String.class);
-                } else {
+                } */else {
                     ReflectionOpt.setFieldValue(object, propertyName,
                             StringBaseOpt.objectToString(newValue),String.class);
                 }
@@ -66,6 +101,14 @@ public abstract class OrmUtils {
                         StringRegularOpt.isTrue(
                                 StringBaseOpt.objectToString(newValue)
                         ),Boolean.class);
+                break;
+            case "Clob":
+                ReflectionOpt.setFieldValue(object,propertyName,
+                        /*(Clob)*/ newValue ,Clob.class);
+                break;
+            case "Blob":
+                ReflectionOpt.setFieldValue(object,propertyName,
+                        /*(Blob)*/ newValue ,Blob.class);
                 break;
             default:
                 if (newValue instanceof Clob) {
@@ -181,22 +224,8 @@ public abstract class OrmUtils {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)
             return null;
-        ResultSetMetaData resMeta = rs.getMetaData();
-        int fieldCount = resMeta.getColumnCount();
-        if(rs.next()) {
-            T object = clazz.newInstance();
-            for (int i = 1; i <= fieldCount; i++) {
-                String columnName = resMeta.getColumnName(i);
-                SimpleTableField filed = mapInfo.findFieldByColumn(columnName);
-                if (filed != null) {
-                    //filed.getJavaType()
-                    setObjectFieldValue(object, filed.getPropertyName(),
-                            rs.getObject(i), filed.getJavaType());
-                }
-            }
-            return object;
-        }
-        return null;
+        T object = clazz.newInstance();
+        return fetchFieldsFormResultSet(rs,  object, mapInfo);
     }
 
     public static <T> T fetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo )
