@@ -219,29 +219,38 @@ public abstract class OrmUtils {
         return fields;
     }
 
+    private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo )
+            throws SQLException, NoSuchFieldException, IOException {
+        ResultSetMetaData resMeta = rs.getMetaData();
+        int fieldCount = resMeta.getColumnCount();
+        for (int i = 1; i <= fieldCount; i++) {
+            String columnName = resMeta.getColumnName(i);
+            SimpleTableField filed = mapInfo.findFieldByColumn(columnName);
+            if (filed != null) {
+                setObjectFieldValue(object, filed.getPropertyName(),
+                        rs.getObject(i), filed.getJavaType());
+            }
+        }
+        return object;
+
+    }
+
     public static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz)
             throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)
             return null;
-        T object = clazz.newInstance();
-        return fetchFieldsFormResultSet(rs,  object, mapInfo);
+        if(rs.next()) {
+            return insideFetchFieldsFormResultSet(rs, clazz.newInstance(), mapInfo);
+        }else {
+            return null;
+        }
     }
 
     public static <T> T fetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo )
             throws SQLException, NoSuchFieldException, IOException {
-        ResultSetMetaData resMeta = rs.getMetaData();
-        int fieldCount = resMeta.getColumnCount();
         if(rs.next()) {
-            for (int i = 1; i <= fieldCount; i++) {
-                String columnName = resMeta.getColumnName(i);
-                SimpleTableField filed = mapInfo.findFieldByColumn(columnName);
-                if (filed != null) {
-                    setObjectFieldValue(object, filed.getPropertyName(),
-                            rs.getObject(i), filed.getJavaType());
-                }
-            }
-            return object;
+            object = insideFetchFieldsFormResultSet(rs, object, mapInfo);
         }
         return object;
     }
