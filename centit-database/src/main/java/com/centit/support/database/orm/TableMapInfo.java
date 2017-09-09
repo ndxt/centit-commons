@@ -63,12 +63,12 @@ public class TableMapInfo extends SimpleTableInfo {
         }
 
         for(SimpleTableField col : getColumns()){
-            if(col.getColumnName().equals(name))
+            if(col.getColumnName().equalsIgnoreCase(name))
                 return col;
         }
         if(lazyColumns!=null) {
             for ( SimpleTableField col : lazyColumns){
-                if(col.getColumnName().equals(name))
+                if(col.getColumnName().equalsIgnoreCase(name))
                     return col;
             }
         }
@@ -84,12 +84,12 @@ public class TableMapInfo extends SimpleTableInfo {
     @Override
     public SimpleTableField findFieldByColumn(String name){
         for(SimpleTableField col : getColumns()){
-            if(col.getColumnName().equals(name))
+            if(col.getColumnName().equalsIgnoreCase(name))
                 return col;
         }
         if(lazyColumns!=null) {
             for ( SimpleTableField col : lazyColumns){
-                if(col.getColumnName().equals(name))
+                if(col.getColumnName().equalsIgnoreCase(name))
                     return col;
             }
         }
