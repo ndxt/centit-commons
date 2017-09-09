@@ -64,6 +64,7 @@ public abstract class OrmUtils {
             case "Long":
                 ReflectionOpt.setFieldValue(object,propertyName,
                         NumberBaseOpt.castObjectToLong(newValue),Long.class);
+                break;
             case "Integer":
                 ReflectionOpt.setFieldValue(object,propertyName,
                         NumberBaseOpt.castObjectToInteger(newValue),Integer.class);
