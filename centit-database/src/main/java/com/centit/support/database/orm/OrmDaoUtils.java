@@ -34,9 +34,7 @@ public abstract class OrmDaoUtils {
         try {
             return GeneralJsonObjectDao.createJsonObjectDao(connection)
                     .getSequenceNextValue(sequenceName);
-        } catch (SQLException e) {
-            throw  new PersistenceException(e);
-        } catch (IOException e) {
+        } catch (SQLException| IOException e) {
             throw  new PersistenceException(e);
         }
     }
@@ -55,11 +53,7 @@ public abstract class OrmDaoUtils {
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
             object = OrmUtils.prepareObjectForInsert(object, mapInfo, sqlDialect);
             return sqlDialect.saveNewObject(OrmUtils.fetchObjectDatabaseField(object, mapInfo));
-        }catch (NoSuchFieldException e){
-            throw  new PersistenceException(e);
-        }catch (IOException e){
-            throw  new PersistenceException(e);
-        }catch (SQLException e){
+        }catch (NoSuchFieldException | IOException | SQLException e){
             throw  new PersistenceException(e);
         }
     }
@@ -71,11 +65,7 @@ public abstract class OrmDaoUtils {
             object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
 
             return sqlDialect.updateObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
-        }catch (NoSuchFieldException e){
-            throw  new PersistenceException(e);
-        }catch (IOException e){
-            throw  new PersistenceException(e);
-        }catch (SQLException e){
+        }catch (NoSuchFieldException | IOException | SQLException e){
             throw  new PersistenceException(e);
         }
     }
@@ -89,11 +79,7 @@ public abstract class OrmDaoUtils {
             object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
 
             return sqlDialect.updateObject(fields, OrmUtils.fetchObjectDatabaseField(object,mapInfo));
-        }catch (NoSuchFieldException e){
-            throw  new PersistenceException(e);
-        }catch (IOException e){
-            throw  new PersistenceException(e);
-        }catch (SQLException e){
+        }catch (NoSuchFieldException | IOException | SQLException e){
             throw  new PersistenceException(e);
         }
     }
@@ -110,11 +96,7 @@ public abstract class OrmDaoUtils {
                     fields,
                     OrmUtils.fetchObjectDatabaseField(object,mapInfo),
                     properties);
-        }catch (NoSuchFieldException e){
-            throw  new PersistenceException(e);
-        }catch (IOException e){
-            throw  new PersistenceException(e);
-        }catch (SQLException e){
+        }catch (NoSuchFieldException | IOException | SQLException e){
             throw  new PersistenceException(e);
         }
     }
@@ -125,11 +107,7 @@ public abstract class OrmDaoUtils {
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
             object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
             return sqlDialect.mergeObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
-        }catch (NoSuchFieldException e){
-            throw  new PersistenceException(e);
-        }catch (IOException e){
-            throw  new PersistenceException(e);
-        }catch (SQLException e){
+        }catch (NoSuchFieldException | IOException | SQLException e){
             throw  new PersistenceException(e);
         }
     }
@@ -162,13 +140,7 @@ public abstract class OrmDaoUtils {
             //return obj;
         }catch (SQLException e) {
             throw  new PersistenceException(sqlAndParams.getSql(), e);
-        }catch (NoSuchFieldException e){
-            throw  new PersistenceException(e);
-        }catch (IOException e){
-            throw  new PersistenceException(e);
-        }catch (InstantiationException e){
-            throw  new PersistenceException(PersistenceException.INSTANTIATION_EXCEPTION,e);
-        }catch (IllegalAccessException e){
+        }catch (NoSuchFieldException | IOException | InstantiationException | IllegalAccessException e){
             throw  new PersistenceException(PersistenceException.ILLEGALACCESS_EXCEPTION,e);
         }
     }
@@ -941,9 +913,7 @@ public abstract class OrmDaoUtils {
             TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
             return sqlDialect.fetchObjectsCount(properties).intValue();
-        } catch (SQLException e) {
-            throw  new PersistenceException(e);
-        } catch (IOException e){
+        } catch (SQLException | IOException e){
             throw  new PersistenceException(e);
         }
     }
@@ -975,8 +945,6 @@ public abstract class OrmDaoUtils {
     public static <T> int mergeObjectCascade(Connection connection, T object) throws PersistenceException {
         int  checkExists = checkObjectExists(connection,object);
         if(checkExists == 0){
-            return saveNewObjectCascadeShallow(connection,object);
-        }else if(checkExists == 1){
             return saveNewObjectCascade(connection,object);
         }else if(checkExists == 1){
             return updateObjectCascade(connection, object);
