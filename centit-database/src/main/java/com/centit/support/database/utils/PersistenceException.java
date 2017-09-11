@@ -71,6 +71,20 @@ public class PersistenceException extends RuntimeException {
 		this.exceptionCode = DATABASE_SQL_EXCEPTION;
 	}
 
+
+
+	public PersistenceException(String sql , SQLException e){
+		super(sql +" raise "+ e.getMessage(), e.getCause());
+		//this.setNextException(e.getNextException());
+		//this.setStackTrace(e.getStackTrace());
+		this.exceptionCode = DATABASE_SQL_EXCEPTION;
+	}
+
+	public PersistenceException(DatabaseAccessException exception) {
+		super(exception);
+		this.exceptionCode = DATABASE_SQL_EXCEPTION;
+	}
+
 	/**
 	 *
 	 * @param exception Throwable
