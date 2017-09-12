@@ -436,7 +436,7 @@ public abstract class QueryUtils {
  	        return sqlPieces.get(0) + " count(1) as rowcount from " +
  	                removeOrderBy(sqlPieces.get(2));
          return sqlPieces.get(0) + " count(1) as rowcount from (select "+
-         	groupByField  + " from " + removeOrderBy(sqlPieces.get(2)) + ")";
+         	groupByField  + " from " + removeOrderBy(sqlPieces.get(2)) + ") a";
     }
     /**
      * 通过子查询来实现获取计数语句
