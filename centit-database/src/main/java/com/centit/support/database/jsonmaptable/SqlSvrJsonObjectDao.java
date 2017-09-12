@@ -52,9 +52,15 @@ public class SqlSvrJsonObjectDao extends GeneralJsonObjectDao {
 				 properties,
 				 q.getRight());
 	}
-	
-	/**
-	 * create table sequence_table (sequence_Name varchar(100) not null primary key, current_value integer);
+
+	/** 用表来模拟sequence
+	 * create table simulate_sequence (seqname varchar(100) not null primary key,
+	 * currvalue integer, increment integer);
+	 *
+	 * @param sequenceName sequenceName
+	 * @return Long
+	 * @throws SQLException SQLException
+	 * @throws IOException IOException
 	 */
 	@Override
 	public Long getSequenceNextValue(final String sequenceName) throws SQLException, IOException {
