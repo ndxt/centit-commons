@@ -4,7 +4,7 @@ import java.sql.Connection;
 
 import com.centit.support.database.metadata.TableField;
 
-public class SqlSvrDDLOperations extends GeneralDDLOperations implements DDLOperations {
+public class SqlSvrDDLOperations extends GeneralDDLOperations {
 
 	
 	public SqlSvrDDLOperations(){

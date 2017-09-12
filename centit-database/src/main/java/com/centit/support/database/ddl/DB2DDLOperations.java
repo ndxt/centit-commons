@@ -5,7 +5,7 @@ import java.sql.Connection;
 import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.database.metadata.TableField;
 
-public class DB2DDLOperations extends GeneralDDLOperations implements DDLOperations {
+public class DB2DDLOperations extends GeneralDDLOperations{
 
 	public DB2DDLOperations() {
 

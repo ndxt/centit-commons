@@ -8,7 +8,7 @@ import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.TableField;
 
-public class OracleDDLOperations extends GeneralDDLOperations implements DDLOperations {
+public class OracleDDLOperations extends GeneralDDLOperations {
 	
 	public OracleDDLOperations(){
 		

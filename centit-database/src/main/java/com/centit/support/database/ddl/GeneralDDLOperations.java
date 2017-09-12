@@ -43,8 +43,10 @@ public abstract class GeneralDDLOperations implements DDLOperations {
                 return new SqlSvrDDLOperations();
             case MySql:
                 return new MySqlDDLOperations();
+			case H2:
+				return new H2DDLOperations();
+
             case Access:
-            case H2:
             default:
                 throw new  SQLException("不支持的数据库类型："+dbtype.toString());
         }

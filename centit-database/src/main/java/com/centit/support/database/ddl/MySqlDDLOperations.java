@@ -5,7 +5,7 @@ import java.sql.Connection;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 
-public class MySqlDDLOperations extends GeneralDDLOperations implements DDLOperations {
+public class MySqlDDLOperations extends GeneralDDLOperations {
 	
 	
 	public MySqlDDLOperations(){
