@@ -20,6 +20,9 @@ import java.io.IOException;
 
 @SuppressWarnings("unused")
 public abstract class OfficeToPdf {
+	private OfficeToPdf() {
+		throw new IllegalAccessError("Utility class");
+	}
 	private static Log logger = LogFactory.getLog(OfficeToPdf.class);
 	//private static final int ppSaveAsPDF = 32;
 	/**

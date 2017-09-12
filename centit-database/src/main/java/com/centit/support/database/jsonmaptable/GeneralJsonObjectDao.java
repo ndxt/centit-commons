@@ -44,8 +44,10 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 				return new SqlSvrJsonObjectDao(conn,tableInfo);
 			case MySql:
 				return new MySqlJsonObjectDao(conn,tableInfo);
-			case Access:
 			case H2:
+				return new H2JsonObjectDao(conn,tableInfo);
+
+			case Access:
 			default:
 				throw new  SQLException("不支持的数据库类型："+dbtype.toString());
 		}
@@ -63,8 +65,10 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 				return new SqlSvrJsonObjectDao(conn);
 			case MySql:
 				return new MySqlJsonObjectDao(conn);
-			case Access:
 			case H2:
+				return new H2JsonObjectDao(conn);
+
+			case Access:
 			default:
 				throw new  SQLException("不支持的数据库类型："+dbtype.toString());
 		}

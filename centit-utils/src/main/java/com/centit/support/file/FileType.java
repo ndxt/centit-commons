@@ -12,12 +12,16 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * 
- * @author 朱晓文
+ * @author 朱晓文 杨淮生 codefan@sina.com
  *
  */
 @SuppressWarnings("unused")
 public abstract class FileType {
-	
+
+	private FileType() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	protected static final HashMap<String, String> mFileTypes = new HashMap<String, String>(42);
 	protected static final HashMap<String, String> extMimeTypeMap 
 				= new HashMap<String, String>(1280);

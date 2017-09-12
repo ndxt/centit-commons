@@ -19,8 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DatabaseAccess {
-	
+public abstract class DatabaseAccess {
+
+	private DatabaseAccess() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	protected static final Logger logger = LoggerFactory.getLogger(DatabaseAccess.class);
 	/**
 	 * 调用数据库函数

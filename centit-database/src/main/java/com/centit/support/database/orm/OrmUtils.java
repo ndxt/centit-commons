@@ -22,7 +22,9 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 public abstract class OrmUtils {
-
+    private OrmUtils() {
+        throw new IllegalAccessError("Utility class");
+    }
 
     public static void setObjectFieldValue(Object object, String propertyName,
                                            Object newValue, String fieldJavaType)

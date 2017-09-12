@@ -6,6 +6,9 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 @SuppressWarnings("unused")
 public abstract class HtmlFormUtils {
+	private HtmlFormUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
 	/**
 	 * 请调用直接 org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4 
 	 * 或者 org.springframework.web.util.HtmlUtils.htmlEscape

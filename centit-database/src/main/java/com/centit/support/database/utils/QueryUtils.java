@@ -16,6 +16,10 @@ import java.util.*;
  */
 @SuppressWarnings("unused")
 public abstract class QueryUtils {
+
+	private QueryUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
 	/**
 	 * 表示这个参数不需要
 	 */

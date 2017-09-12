@@ -30,6 +30,9 @@ import com.centit.support.common.TreeNode;
  */
 @SuppressWarnings("unused")
 public abstract class ListOpt {
+	private ListOpt() {
+		throw new IllegalAccessError("Utility class");
+	}
 	/**
 	 * 
 	 * 判断两个对象是否是父子关系，用于针对树形展示的数据结构进行排序

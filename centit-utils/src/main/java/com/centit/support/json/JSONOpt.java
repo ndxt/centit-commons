@@ -1,21 +1,16 @@
 package com.centit.support.json;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.ReflectionOpt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
 /**
  * 
  * 对JSON对象进行操作，目前只能对一维数组进行操作，
@@ -26,8 +21,10 @@ import com.centit.support.algorithm.ReflectionOpt;
  *          $Id$
  */
 @SuppressWarnings("unused")
-public class JSONOpt {
-	
+public abstract class JSONOpt {
+	private JSONOpt() {
+		throw new IllegalAccessError("Utility class");
+	}
 	protected static final Logger logger = LoggerFactory.getLogger(JSONOpt.class);
 	
 	static class JSONPath{

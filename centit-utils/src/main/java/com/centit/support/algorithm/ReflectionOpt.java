@@ -16,10 +16,11 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public abstract class ReflectionOpt  {
 
-	protected static final Logger logger = LoggerFactory.getLogger(ReflectionOpt.class);
-
 	private ReflectionOpt() {
+		throw new IllegalAccessError("Utility class");
 	}
+
+	protected static final Logger logger = LoggerFactory.getLogger(ReflectionOpt.class);
 
 	/*
 	 * 循环向上转型,获取对象的DeclaredField.

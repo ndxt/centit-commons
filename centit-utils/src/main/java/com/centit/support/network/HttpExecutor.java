@@ -59,7 +59,11 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
 public abstract class HttpExecutor {
-	
+
+	private HttpExecutor() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	protected static final Logger logger = LoggerFactory.getLogger(HttpExecutor.class);
 	
 	public static final ContentType APPLICATION_FORM_URLENCODED = ContentType.create(

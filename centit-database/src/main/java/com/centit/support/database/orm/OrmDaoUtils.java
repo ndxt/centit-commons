@@ -29,6 +29,10 @@ import java.util.*;
  */
 @SuppressWarnings("unused")
 public abstract class OrmDaoUtils {
+    private OrmDaoUtils() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(OrmDaoUtils.class);
     public static Long getSequenceNextValue(Connection connection, final String sequenceName) {
         try {

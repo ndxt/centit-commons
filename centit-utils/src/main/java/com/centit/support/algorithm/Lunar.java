@@ -4,7 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 @SuppressWarnings("unused")
-public abstract class Lunar {
+public class Lunar {
+
 	private int year;
 	private int month;
 	private int day;

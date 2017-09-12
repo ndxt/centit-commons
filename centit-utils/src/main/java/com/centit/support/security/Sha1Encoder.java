@@ -1,10 +1,10 @@
 package com.centit.support.security;
 
+import org.apache.commons.codec.binary.Hex;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import org.apache.commons.codec.binary.Hex;
 /**
  * Secure Hash Algorithm  安全散列算法 
  * 算法比MD5效率低（算法复杂度高）所以更为安全
@@ -14,6 +14,10 @@ import org.apache.commons.codec.binary.Hex;
  */
 @SuppressWarnings("unused")
 public abstract class Sha1Encoder {
+
+	private Sha1Encoder() {
+		throw new IllegalAccessError("Utility class");
+	}
 
 	public static String encode(byte[] data){
 		MessageDigest SHA1;

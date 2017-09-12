@@ -1,5 +1,9 @@
 package com.centit.support.algorithm;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -7,12 +11,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 @SuppressWarnings("unused")
 public abstract class DatetimeOpt {
+	private DatetimeOpt() {
+		throw new IllegalAccessError("Utility class");
+	}
 	private static Logger log = LoggerFactory.getLogger(DatetimeOpt.class);
 
 

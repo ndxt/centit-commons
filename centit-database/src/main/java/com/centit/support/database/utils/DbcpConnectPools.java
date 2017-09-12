@@ -1,16 +1,18 @@
 package com.centit.support.database.utils;
 
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.dbcp2.BasicDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class DbcpConnectPools {
-	
+public abstract class DbcpConnectPools {
+	private DbcpConnectPools() {
+		throw new IllegalAccessError("Utility class");
+	}
 	protected static final Logger logger = LoggerFactory.getLogger(DbcpConnectPools.class);
 	private static final
 		Map<DataSourceDescription,BasicDataSource> dbcpDataSourcePools

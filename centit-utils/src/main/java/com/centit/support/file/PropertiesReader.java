@@ -17,6 +17,11 @@ import org.slf4j.LoggerFactory;
  */
 @SuppressWarnings("unused")
 public abstract class PropertiesReader {
+
+    private PropertiesReader() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(PropertiesReader.class);
 
     /**

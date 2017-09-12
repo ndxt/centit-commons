@@ -17,6 +17,10 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 @SuppressWarnings("unused")
 public abstract class JsonPropertyUtils {
 
+    private JsonPropertyUtils() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     public static PropertyPreFilter getIncludePropPreFilter(Class<?> clazz, String... field) {
         if (ArrayUtils.isNotEmpty(field) && null != clazz) {
             return new SimplePropertyPreFilter(clazz, field);

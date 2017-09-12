@@ -9,7 +9,10 @@ import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 
-public class EmbedFunc {
+public abstract class EmbedFunc {
+	private EmbedFunc() {
+		throw new IllegalAccessError("Utility class");
+	}
 
 	final static public int functionsSum = 46;
 	final static protected FunctionInfo functionsList[]={

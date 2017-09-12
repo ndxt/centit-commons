@@ -13,7 +13,9 @@ import org.apache.commons.codec.binary.Hex;
  */
 @SuppressWarnings("unused")
 public abstract class Md5Encoder {
-	
+	private Md5Encoder() {
+		throw new IllegalAccessError("Utility class");
+	}
 	public static String encode(byte[] data){
 		MessageDigest MD5;
 		try {

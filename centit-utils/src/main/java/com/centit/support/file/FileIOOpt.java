@@ -19,7 +19,9 @@ import java.io.Writer;
 import com.alibaba.fastjson.JSON;
 @SuppressWarnings("unused")
 public abstract class FileIOOpt {
-
+	private FileIOOpt() {
+		throw new IllegalAccessError("Utility class");
+	}
 	public static int writeInputStreamToOutputStream(InputStream in,
 			OutputStream out) throws IOException{
 		int read = 0;

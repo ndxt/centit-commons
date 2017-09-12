@@ -16,7 +16,9 @@ import org.slf4j.LoggerFactory;
  */
 @SuppressWarnings("unused")
 public abstract class FileMD5Maker {
-
+    private FileMD5Maker() {
+        throw new IllegalAccessError("Utility class");
+    }
 	protected static final Logger logger = LoggerFactory.getLogger(FileMD5Maker.class);
 	public static String makeFileMD5(File file) throws IOException {
 

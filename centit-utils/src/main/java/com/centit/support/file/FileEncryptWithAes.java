@@ -1,20 +1,16 @@
 package com.centit.support.file;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.GeneralSecurityException;
+import com.centit.support.security.AESSecurityUtils;
 
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
-
-import com.centit.support.security.AESSecurityUtils;
+import java.io.*;
+import java.security.GeneralSecurityException;
 @SuppressWarnings("unused")
 public abstract class FileEncryptWithAes {
-
+	private FileEncryptWithAes() {
+		throw new IllegalAccessError("Utility class");
+	}
 	/**
 	 * 文件file进行加密并保存目标文件destFile中
 	 * 

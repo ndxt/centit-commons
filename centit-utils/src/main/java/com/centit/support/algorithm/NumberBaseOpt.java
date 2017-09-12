@@ -5,7 +5,9 @@ import java.math.BigInteger;
 
 @SuppressWarnings("unused")
 public abstract class NumberBaseOpt {
-
+    private NumberBaseOpt() {
+        throw new IllegalAccessError("Utility class");
+    }
 	/*
 	 * 获得某一位上的数值，如果 nBit<0 则获得小数点后面的位数
 	 */
@@ -207,7 +209,11 @@ public abstract class NumberBaseOpt {
 			return ((Number) obj).longValue();
 		return parseLong(StringBaseOpt.objectToString(obj),null);
 	}
-	
+
+	public static Long castObjectToLong(Object obj, Long defaultValue){
+		return GeneralAlgorithm.nvl(castObjectToLong(obj),defaultValue);
+	}
+
 	public static Integer castObjectToInteger(Object obj){
 		if (obj == null)
 			return null;
@@ -224,6 +230,10 @@ public abstract class NumberBaseOpt {
 		if (obj instanceof Number)
 			return ((Number) obj).intValue();
 		return parseInteger(StringBaseOpt.objectToString(obj),null);
+	}
+
+	public static Integer castObjectToInteger(Object obj, Integer defaultValue){
+		return GeneralAlgorithm.nvl(castObjectToInteger(obj),defaultValue);
 	}
 	/*
 	 * 将一个Object转换为 Double
@@ -246,6 +256,9 @@ public abstract class NumberBaseOpt {
 		return parseDouble(StringBaseOpt.objectToString(obj),null);
 	}
 
+	public static Double castObjectToDouble(Object obj, Double defaultValue){
+		return GeneralAlgorithm.nvl(castObjectToDouble(obj),defaultValue);
+	}
 
 	public static BigInteger castObjectToBigInteger(Object obj){
 		if (obj == null)
@@ -255,18 +268,27 @@ public abstract class NumberBaseOpt {
 		return new BigInteger(StringBaseOpt.objectToString(obj));
 	}
 
+	public static BigInteger castObjectToBigInteger(Object obj, BigInteger defaultValue){
+		return GeneralAlgorithm.nvl(castObjectToBigInteger(obj),defaultValue);
+	}
+
 	public static BigDecimal castObjectToBigDecimal(Object obj){
 		if (obj == null)
 			return null;
 		if (obj instanceof BigDecimal)
 			return (BigDecimal) obj;
-		if (obj instanceof BigDecimal)
+		if (obj instanceof BigInteger)
 			return new BigDecimal((BigInteger)obj);
-		if(double.class.equals(obj.getClass())){
-			return new BigDecimal((double)obj);
+        if (obj instanceof Double){
+			return new BigDecimal((Double)obj);
 		}
 		return new BigDecimal(StringBaseOpt.objectToString(obj));
 	}
+
+	public static BigDecimal castObjectToBigDecimal(Object obj, BigDecimal defaultValue){
+		return GeneralAlgorithm.nvl(castObjectToBigDecimal(obj),defaultValue);
+	}
+
 
 	public int compareTwoLong(Long l1 , Long l2){
 		return (l1 == null && l2 == null) ? 0:(
@@ -294,6 +316,22 @@ public abstract class NumberBaseOpt {
 						d2 == null ? 1 :(
 								Double.compare(d1,d2)
 						)
+				)
+		);
+	}
+
+	public int compareTwoBigInteger(BigInteger bi1 , BigInteger bi2){
+		return (bi1 == null && bi2 == null) ? 0:(
+				bi1 == null?-1:(
+						bi2 == null ? 1 : bi1.compareTo(bi2)
+				)
+		);
+	}
+
+	public int compareTwoBigDecimal(BigDecimal d1 , BigDecimal d2){
+		return (d1 == null && d2 == null) ? 0:(
+				d1 == null?-1:(
+						d2 == null ? 1 : d1.compareTo(d2)
 				)
 		);
 	}

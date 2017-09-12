@@ -1,14 +1,18 @@
 package com.centit.support.security;
 
+import org.apache.commons.codec.binary.Base64;
+
+import javax.crypto.Cipher;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 
-import javax.crypto.Cipher;
-
-import org.apache.commons.codec.binary.Base64;
-
 @SuppressWarnings("unused")
 public abstract class DESSecurityUtils {
+
+	private DESSecurityUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	public static Cipher createEncryptCipher(String keyValue)
 			 throws GeneralSecurityException {
 		Key key = getKey(keyValue.getBytes());
