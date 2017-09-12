@@ -1,5 +1,12 @@
 package com.centit.support.security;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.net.util.Base64;
+import sun.security.rsa.RSAPrivateCrtKeyImpl;
+import sun.security.rsa.RSAPublicKeyImpl;
+
+import javax.crypto.Cipher;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -7,18 +14,13 @@ import java.security.KeyPairGenerator;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.Cipher;
-
-import org.apache.commons.net.util.Base64;
-
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-
-import sun.security.rsa.RSAPrivateCrtKeyImpl;
-import sun.security.rsa.RSAPublicKeyImpl;
-
 @SuppressWarnings("unused")
 public abstract class RSASecurityUtils {
+
+	private RSASecurityUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	/** 指定加密算法为RSA */
 	private static final String ALGORITHM = "RSA";
 	/** 密钥长度，用来初始化 

@@ -5,7 +5,9 @@ import java.math.BigInteger;
 
 @SuppressWarnings("unused")
 public abstract class NumberBaseOpt {
-
+    private NumberBaseOpt() {
+        throw new IllegalAccessError("Utility class");
+    }
 	/*
 	 * 获得某一位上的数值，如果 nBit<0 则获得小数点后面的位数
 	 */

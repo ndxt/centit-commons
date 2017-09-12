@@ -1,17 +1,21 @@
 package com.centit.support.security;
 
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.SecureRandom;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-
-import org.apache.commons.codec.binary.Base64;
+import java.security.GeneralSecurityException;
+import java.security.Key;
+import java.security.SecureRandom;
 
 @SuppressWarnings("unused")
 public abstract class AESSecurityUtils {
+
+	private AESSecurityUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	public static Cipher createEncryptCipher(String keyValue) throws GeneralSecurityException  {
 		Key key = getKey(keyValue);
 		Cipher encryptCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");

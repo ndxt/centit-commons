@@ -6,6 +6,10 @@ package com.centit.support.algorithm;
 @SuppressWarnings("unused")
 public abstract  class GeneralAlgorithm {
 
+    private GeneralAlgorithm() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     public static <T> T nvl(T obj, T obj2){
         return obj==null ? obj2 : obj;
     }

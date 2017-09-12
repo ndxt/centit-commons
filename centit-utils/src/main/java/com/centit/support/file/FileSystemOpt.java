@@ -14,7 +14,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 @SuppressWarnings("unused")
 public abstract class FileSystemOpt {
-
+	private FileSystemOpt() {
+		throw new IllegalAccessError("Utility class");
+	}
 	/**
 	 * 获取指定目录下特定后缀名的文件
 	 * 

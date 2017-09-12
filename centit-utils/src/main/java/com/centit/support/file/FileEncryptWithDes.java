@@ -14,7 +14,9 @@ import javax.crypto.CipherOutputStream;
 import com.centit.support.security.DESSecurityUtils;
 @SuppressWarnings("unused")
 public abstract class FileEncryptWithDes {
-
+	private FileEncryptWithDes() {
+		throw new IllegalAccessError("Utility class");
+	}
 	/**
 	 * 文件file进行加密并保存目标文件destFile中
 	 * 

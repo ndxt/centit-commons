@@ -1,17 +1,21 @@
 package com.centit.support.network;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @SuppressWarnings("unused")
 public abstract class UrlOptUtils {
+	private UrlOptUtils() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	protected static final Logger logger = LoggerFactory.getLogger(UrlOptUtils.class);
 	private static final String ALLOWED_CHARS = 
 			"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()";

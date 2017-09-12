@@ -7,6 +7,10 @@ import org.apache.commons.lang3.StringUtils;
 @SuppressWarnings("unused")
 public abstract class StringRegularOpt {
 
+	private StringRegularOpt() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	final static public String  trimString(String szWord)
 	{
 		if(szWord==null)

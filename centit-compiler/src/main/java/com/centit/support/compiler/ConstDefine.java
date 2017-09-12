@@ -1,6 +1,11 @@
 package com.centit.support.compiler;
 
-public class ConstDefine {
+public abstract class ConstDefine {
+
+	private ConstDefine() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	final static public int   TYPE_NUM = 1;
 	final static public int   TYPE_STR = 2;
 	final static public int   TYPE_ANY = 0;

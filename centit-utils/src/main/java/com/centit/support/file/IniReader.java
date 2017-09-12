@@ -14,8 +14,12 @@ import java.util.Map;
  * 这个类用来读取 ini配置文件，没有写的功能
  */
 @SuppressWarnings("unused")
-public class IniReader {     
-     
+public class IniReader {
+
+    private IniReader() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     protected Map<String,Map<String,String> > sections = new HashMap<String,Map<String,String> >();     
     private transient String currentSecion = null;     
     private transient Map<String,String> current=null;     

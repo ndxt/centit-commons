@@ -1,23 +1,22 @@
 package com.centit.support.office;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.centit.support.algorithm.DatetimeOpt;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfGState;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfStamper;
+import com.itextpdf.text.pdf.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+@SuppressWarnings("unused")
 public abstract class Watermark4Pdf {
+	private Watermark4Pdf() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	public static boolean runFlag = false;
 
 	private static Log logger = LogFactory.getLog(Watermark4Pdf.class);

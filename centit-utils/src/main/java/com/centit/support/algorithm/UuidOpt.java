@@ -4,6 +4,10 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 public abstract class UuidOpt {
 
+    private UuidOpt() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     public static String digits(long val, int digits) {
         long hi = 1L << (digits * 4);
         return Long.toHexString(hi | (val & (hi - 1))).substring(1);

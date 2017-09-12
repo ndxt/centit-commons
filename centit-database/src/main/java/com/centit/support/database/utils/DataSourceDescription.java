@@ -1,19 +1,18 @@
 package com.centit.support.database.utils;
 
+import com.centit.support.xml.IgnoreDTDEntityResolver;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-
-import com.centit.support.xml.IgnoreDTDEntityResolver;
 
 /**
  * 数据源描述信息，这些信息和参数是创建连接池的参数

@@ -12,6 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @SuppressWarnings("unused")
 public abstract class JpaMetadata {
+    private JpaMetadata() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     private static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA =
             new ConcurrentHashMap<>(100);
 

@@ -1,6 +1,10 @@
 package com.centit.support.compiler;
 
-public class Pretreatment {
+public abstract class Pretreatment {
+
+	private Pretreatment() {
+		throw new IllegalAccessError("Utility class");
+	}
 
 	/**get value and label from formula and translate 
 	 * 变量 形式如 ${变量名}

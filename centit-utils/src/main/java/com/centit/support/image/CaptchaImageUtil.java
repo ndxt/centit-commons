@@ -1,7 +1,6 @@
 package com.centit.support.image;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
@@ -37,6 +36,11 @@ import java.util.Random;
  */
 @SuppressWarnings("unused")
 public abstract class CaptchaImageUtil {
+
+    private CaptchaImageUtil() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     private static final String range = "0123456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSRUVWXYZ";
     public static final String SESSIONCHECKCODE = "session_checkcode";
     public static final String REQUESTCHECKCODE = "j_checkcode";

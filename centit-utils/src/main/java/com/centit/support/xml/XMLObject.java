@@ -26,6 +26,11 @@ import com.centit.support.algorithm.StringRegularOpt;
  */
 @SuppressWarnings("unused")
 public abstract class XMLObject {
+
+    private XMLObject() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     public static Element createXMLElement(String elementName , String valueType, Object value){
         Element element = DocumentHelper.createElement(elementName);
         element.addAttribute("type",valueType);

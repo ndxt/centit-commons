@@ -21,8 +21,9 @@ public abstract  class ZipCompressor {
 
     //private File zipFile;
     private ZipCompressor() {
-        //zipFile = new File(pathName);
+        throw new IllegalAccessError("Utility class");
     }
+
     /**
      * 将OutputStream 转换为 ZipOutputStream 并作为 compressFile 的输入参数
      * 这个可以用于 打包下载

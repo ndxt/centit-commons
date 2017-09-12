@@ -1,20 +1,20 @@
 package com.centit.support.network;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Proxy;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.Proxy;
 @SuppressWarnings("unused")
 public abstract class FtpExecutor {
-	
+
+	private FtpExecutor() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	protected static final Logger logger = LoggerFactory.getLogger(FtpExecutor.class);
 	/**
 	 * Description: 向FTP服务器上传文件

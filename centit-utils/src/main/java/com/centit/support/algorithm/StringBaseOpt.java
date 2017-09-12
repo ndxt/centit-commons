@@ -32,7 +32,10 @@ import net.sourceforge.pinyin4j.PinyinHelper;
  */
 @SuppressWarnings("unused")
 public abstract class StringBaseOpt {
-	
+	private StringBaseOpt() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	protected static final Logger logger = LoggerFactory.getLogger(StringBaseOpt.class);
 	// ~ Static fields/initializers
 	// =============================================

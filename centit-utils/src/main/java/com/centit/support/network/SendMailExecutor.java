@@ -1,16 +1,20 @@
 package com.centit.support.network;
 
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.MultiPartEmail;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.MultiPartEmail;
-
 @SuppressWarnings("unused")
 public abstract class SendMailExecutor {
-	
+
+	private SendMailExecutor() {
+		throw new IllegalAccessError("Utility class");
+	}
+
 	protected static final Logger logger = LoggerFactory.getLogger(SendMailExecutor.class);
 	public static String mailHost = "";
 	public static String mailUser = "";
