@@ -64,6 +64,7 @@ public abstract class UrlOptUtils {
 				try {
 					value = java.net.URLDecoder.decode(value, "utf-8");
 				} catch (UnsupportedEncodingException e) {
+					logger.error(e.getMessage(),e);//e.printStackTrace();
 				}
 				params.put(name, value);
 				bpos = n2 + 1;
@@ -117,6 +118,7 @@ public abstract class UrlOptUtils {
 		try{
 			return new URL(curl).getHost();
 		}catch(Exception e){
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
 	}

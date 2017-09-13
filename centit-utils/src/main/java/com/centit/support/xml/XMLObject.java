@@ -1,26 +1,15 @@
 package com.centit.support.xml;
 
+import com.centit.support.algorithm.*;
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.StringRegularOpt;
 /**
  * Created by codefan on 17-6-30.
  */
@@ -30,6 +19,8 @@ public abstract class XMLObject {
     private XMLObject() {
         throw new IllegalAccessError("Utility class");
     }
+
+    protected static final Logger logger = LoggerFactory.getLogger(XMLObject.class);
 
     public static Element createXMLElement(String elementName , String valueType, Object value){
         Element element = DocumentHelper.createElement(elementName);
@@ -141,8 +132,7 @@ public abstract class XMLObject {
         }else if(StringUtils.equals("Number", stype)){
             return NumberBaseOpt.castObjectToDouble(element.getTextTrim());
         }else if(StringUtils.equals("Boolean", stype)){
-            return Boolean.valueOf(
-            		StringRegularOpt.isTrue(element.getTextTrim()));
+            return StringRegularOpt.isTrue(element.getTextTrim());
         }else if(StringUtils.equals("BigDecimal", stype)){
             return new BigDecimal(element.getTextTrim());
         }else if(StringUtils.equals("Array", stype)){
@@ -185,7 +175,7 @@ public abstract class XMLObject {
             Document doc = DocumentHelper.parseText(xmlString);
             return elementToJSONObject(doc.getRootElement());
         } catch (DocumentException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);//e.printStackTrace();
             return null;
         }
     }
@@ -195,7 +185,7 @@ public abstract class XMLObject {
             Document doc = DocumentHelper.parseText(xmlString);
             return elementToObject(doc.getRootElement());
         } catch (DocumentException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(),e);//e.printStackTrace();
             return null;
         }
     }

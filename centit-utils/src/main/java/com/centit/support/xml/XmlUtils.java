@@ -47,7 +47,7 @@ public abstract class XmlUtils {
 //			xmlDoc = saxReader.read(isReader);
 			xmlDoc = DocumentHelper.parseText(xmlStr);
 		} catch (DocumentException e) {
-			logger.error(e.getMessage(),e.getCause());
+			logger.error(e.getMessage(),e);
 		}
 //		} catch (UnsupportedEncodingException e) {
 //			logger.error(e.getMessage(),e.getCause());

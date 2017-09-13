@@ -1,10 +1,12 @@
 package com.centit.support.security;
 
+import org.apache.commons.codec.binary.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import org.apache.commons.codec.binary.Hex;
 
 /**
  * MD5 散列算法返回的128bit的编码，HEX编码后的长度为32Byte
@@ -16,6 +18,9 @@ public abstract class Md5Encoder {
 	private Md5Encoder() {
 		throw new IllegalAccessError("Utility class");
 	}
+
+	protected static final Logger logger = LoggerFactory.getLogger(Md5Encoder.class);
+
 	public static String encode(byte[] data){
 		MessageDigest MD5;
 		try {
@@ -23,6 +28,7 @@ public abstract class Md5Encoder {
 			MD5.update(data, 0, data.length);
 			return new String(Hex.encodeHex(MD5.digest()));
 		} catch (NoSuchAlgorithmException e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
 	}
@@ -31,6 +37,7 @@ public abstract class Md5Encoder {
 		try {
 			return encode(data.getBytes("utf8"));
 		} catch (UnsupportedEncodingException e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
 	}
@@ -64,6 +71,7 @@ public abstract class Md5Encoder {
 				hashedBytes = MD5.digest(hashedBytes);
 			return new String(Hex.encodeHex(hashedBytes));
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
 	}

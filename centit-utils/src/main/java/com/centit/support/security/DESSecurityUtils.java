@@ -1,17 +1,26 @@
 package com.centit.support.security;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 
+/**
+ * 推荐使用 AES加密方式
+ * @see AESSecurityUtils
+ */
+@Deprecated
 @SuppressWarnings("unused")
 public abstract class DESSecurityUtils {
 
 	private DESSecurityUtils() {
 		throw new IllegalAccessError("Utility class");
 	}
+
+	protected static final Logger logger = LoggerFactory.getLogger(DESSecurityUtils.class);
 
 	public static Cipher createEncryptCipher(String keyValue)
 			 throws GeneralSecurityException {
@@ -86,6 +95,7 @@ public abstract class DESSecurityUtils {
     	try {
 			return new String(Base64.encodeBase64(encrypt(str.getBytes(),keyValue)));
 		} catch (Exception e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
     }
@@ -99,6 +109,7 @@ public abstract class DESSecurityUtils {
     	try {
 			return new String(decrypt(Base64.decodeBase64(str.getBytes()),keyValue));
 		} catch (Exception e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
     }

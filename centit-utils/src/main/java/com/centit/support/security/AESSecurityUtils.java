@@ -1,6 +1,8 @@
 package com.centit.support.security;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -15,6 +17,8 @@ public abstract class AESSecurityUtils {
 	private AESSecurityUtils() {
 		throw new IllegalAccessError("Utility class");
 	}
+
+	protected static final Logger logger = LoggerFactory.getLogger(AESSecurityUtils.class);
 
 	public static Cipher createEncryptCipher(String keyValue) throws GeneralSecurityException  {
 		Key key = getKey(keyValue);
@@ -63,7 +67,7 @@ public abstract class AESSecurityUtils {
 	 * @return 解密后的字节数组
 	 * @throws Exception  父类抛出的异常
 	 */
-	public static byte[] decrypt(byte[] arrB,String keyValue) throws Exception {
+	public static byte[] decrypt(byte[] arrB,String keyValue) throws GeneralSecurityException {
 		return createDencryptCipher(keyValue).doFinal(arrB);
 	}
 	
@@ -77,9 +81,10 @@ public abstract class AESSecurityUtils {
      */
 
     public static String encryptAndBase64(String str,String keyValue){
-    	try {
+		try {
 			return new String(Base64.encodeBase64(encrypt(str.getBytes(),keyValue)));
-		} catch (Exception e) {
+		} catch (GeneralSecurityException e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
     }
@@ -92,7 +97,8 @@ public abstract class AESSecurityUtils {
     public static String decryptBase64String(String str,String keyValue){
     	try {
 			return new String(decrypt(Base64.decodeBase64(str.getBytes()),keyValue));
-		} catch (Exception e) {
+		} catch (GeneralSecurityException e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
     }

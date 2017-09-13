@@ -21,8 +21,8 @@ public abstract class FileEncryptWithAes {
 	 * @param keyValue 密码
 	 * @throws Exception 异常
 	 */
-	public static void encrypt(String sourceFileName, String diminationFileName,String keyValue) 
-			throws Exception {
+	public static void encrypt(String sourceFileName, String diminationFileName,String keyValue)
+			throws IOException, GeneralSecurityException {
 		encrypt(new File(sourceFileName), new File( diminationFileName), keyValue);
 	}
 

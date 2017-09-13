@@ -255,7 +255,7 @@ public abstract class ReflectionOpt  {
 		List<Field> list = new ArrayList<Field>();
 		Field[] fields = object.getClass().getDeclaredFields();
 		for (Field field : fields) {
-			if (field.getType().isAssignableFrom(type)) {
+			if (type.isAssignableFrom(field.getType())) {
 				list.add(field);
 			}
 		}
@@ -278,7 +278,7 @@ public abstract class ReflectionOpt  {
 		//Assert.notNull(type, "Type required");
 		//Assert.hasText(fieldName, "FieldName required");
 
-		if ("boolean".equals(type.getName())) {
+		if (Boolean.class.equals(type) || boolean.class.equals(type)) {
 			return "is" + StringUtils.capitalize(fieldName);
 		} else {
 			return "get" + StringUtils.capitalize(fieldName);
@@ -462,7 +462,8 @@ public abstract class ReflectionOpt  {
 			for (Method mth : mths) 
 				if( ( mth.getName().startsWith("get") ||  mth.getName().startsWith("is") )
 						&& ! mth.getName().equals("getClass")
-						&& ! mth.getReturnType().getName().equals("void")
+                        && ! void.class.equals(mth.getReturnType())
+						//&& ! mth.getReturnType().getName().equals("void")
 						&& mth.getGenericParameterTypes().length < 1 )
 					getMths.add(mth);
 			return getMths;
@@ -601,20 +602,22 @@ public abstract class ReflectionOpt  {
 	public static boolean isScalarType(Class<?>  tp){
 		if(tp.isPrimitive())
 			return true;
-		if(tp.getName().startsWith("java.lang."))
+        String tpName = tp.getName();
+		if(tpName.startsWith("java.lang."))
 			return true;
-		if(tp.getName().startsWith("java.sql."))
+		if(tpName.startsWith("java.sql."))
 			return true;
-		if("java.util.Date".equals(tp.getName()))
+		if( java.util.Date.class.isAssignableFrom(tp))// "java.util.Date".equals(tp.getName()))
 			return true;
-		if("java.util.UUID".equals(tp.getName()))
+		if( java.util.UUID.class.isAssignableFrom(tp))// "java.util.UUID".equals(tp.getName()))
 			return true;
 
 		return false;		
 	}
 	
 	public static boolean isNumberType(Class<?>  tp){
-		return tp.getSuperclass().equals(Number.class) || tp.equals(Number.class);	
+		return java.lang.Number.class.isAssignableFrom(tp);
+                //tp.getSuperclass().equals(Number.class) || tp.equals(Number.class);
 	}
 	/**
 	 * 判断一个对象是否是 数组[]、Collection(List)
@@ -640,7 +643,7 @@ public abstract class ReflectionOpt  {
 	public static boolean isArrayType(Class<?>  tp){
 		if(tp.isArray())
 			return true;
-		if(tp.isAssignableFrom(Collection.class))
+		if(Collection.class.isAssignableFrom(tp))
 			return true;
 		return false;
 	}

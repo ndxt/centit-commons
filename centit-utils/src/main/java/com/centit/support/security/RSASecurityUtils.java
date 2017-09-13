@@ -6,11 +6,11 @@ import org.apache.commons.net.util.Base64;
 import sun.security.rsa.RSAPrivateCrtKeyImpl;
 import sun.security.rsa.RSAPublicKeyImpl;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +28,7 @@ public abstract class RSASecurityUtils {
 	 * 当KEYSIZE为1024时最多加密117个字节，长度为2048时可以加密245个字节*/
 	private static final int KEYSIZE = 1024;
 
-	public static KeyPair generateKeyPair() throws Exception {
+	public static KeyPair generateKeyPair() throws NoSuchAlgorithmException {
 		return generateKeyPair(KEYSIZE);
 	}	
 	/**
@@ -37,7 +37,7 @@ public abstract class RSASecurityUtils {
 	 * @return  密钥对
 	 * @throws Exception 父类抛出的异常
 	 */
-	public static KeyPair generateKeyPair(int keysize) throws Exception {
+	public static KeyPair generateKeyPair(int keysize) throws NoSuchAlgorithmException {
 
 		// /** RSA算法要求有一个可信任的随机数源 */
 		// SecureRandom secureRandom = new SecureRandom();
@@ -62,7 +62,9 @@ public abstract class RSASecurityUtils {
 	 * @return 密文
 	 * @throws Exception 父类抛出的异常
 	 */
-	public static String encrypt(String source,Key key) throws Exception {
+	public static String encrypt(String source,Key key) throws
+			BadPaddingException, IllegalBlockSizeException,
+			NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
 		generateKeyPair();
 		Key publicKey = key;
 		
@@ -85,7 +87,9 @@ public abstract class RSASecurityUtils {
      * @return 密文
 	 * @throws Exception 父类抛出的异常
 	 */
-	public static String decrypt(String cryptograph,Key key) throws Exception {
+	public static String decrypt(String cryptograph,Key key) throws NoSuchPaddingException,
+			NoSuchAlgorithmException, InvalidKeyException,
+			BadPaddingException, IllegalBlockSizeException {
 		Key privateKey = key;
 		/** 得到Cipher对象对已用公钥加密的数据进行RSA解密 */
 		Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -99,14 +103,14 @@ public abstract class RSASecurityUtils {
 	}
 
 	public static String keyPairToJson(KeyPair keyPair) {
-		Map<String,String> keyJson = new HashMap<String,String>();
+		Map<String,String> keyJson = new HashMap<>();
 		keyJson.put("private", Base64.encodeBase64String(keyPair.getPrivate().getEncoded()));
 		keyJson.put("public", Base64.encodeBase64String(keyPair.getPublic().getEncoded()));
 		return JSON.toJSONString(keyJson);
 	}
 	
 	public static KeyPair keyPairFromJson(String keyJsonString) throws InvalidKeyException{		
-		JSONObject keyJson =  (JSONObject) JSON.parseObject(keyJsonString);
+		JSONObject keyJson =  JSON.parseObject(keyJsonString);
 		return new KeyPair(
 				new RSAPublicKeyImpl(Base64.decodeBase64(keyJson.getString("public"))),
 				RSAPrivateCrtKeyImpl.newKey(

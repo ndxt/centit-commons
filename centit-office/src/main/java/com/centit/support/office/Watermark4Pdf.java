@@ -104,7 +104,7 @@ public abstract class Watermark4Pdf {
 			}
 			
 		} catch (IOException | DocumentException e1) {
-			e1.printStackTrace();
+			logger.error(e1.getMessage(),e1);//e1.printStackTrace();
 			return false;
 		} finally {
 			content = null;

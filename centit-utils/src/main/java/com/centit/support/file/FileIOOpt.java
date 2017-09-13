@@ -1,27 +1,19 @@
 package com.centit.support.file;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-
 import com.alibaba.fastjson.JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+
 @SuppressWarnings("unused")
 public abstract class FileIOOpt {
 	private FileIOOpt() {
 		throw new IllegalAccessError("Utility class");
 	}
+
+	protected static final Logger logger = LoggerFactory.getLogger(FileIOOpt.class);
+
 	public static int writeInputStreamToOutputStream(InputStream in,
 			OutputStream out) throws IOException{
 		int read = 0;
@@ -131,7 +123,7 @@ public abstract class FileIOOpt {
 			if (closeable != null)
 				closeable.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
 	}
 }

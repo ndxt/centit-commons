@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -21,6 +23,8 @@ public abstract class FileType {
 	private FileType() {
 		throw new IllegalAccessError("Utility class");
 	}
+
+	protected static final Logger logger = LoggerFactory.getLogger(FileIOOpt.class);
 
 	protected static final HashMap<String, String> mFileTypes = new HashMap<String, String>(42);
 	protected static final HashMap<String, String> extMimeTypeMap 
@@ -991,6 +995,7 @@ public abstract class FileType {
 			if(fileHead.startsWith(mFileTypes.get("officeX"))) 
 				return true;
 		} catch (IOException e) {
+			logger.error(e.getMessage(),e);
 		}
 		return false;
 	}
@@ -1006,6 +1011,7 @@ public abstract class FileType {
 				return true;
 			
 		} catch (IOException e) {
+			logger.error(e.getMessage(),e);
 		}
 		return false;
 	}

@@ -61,6 +61,7 @@ public abstract class FtpExecutor {
 				try {
 					ftp.disconnect();
 				} catch (IOException ioe) {
+					logger.error(ioe.getMessage(),ioe);//ioe.printStackTrace();
 				}
 			}
 		}
@@ -120,7 +121,8 @@ public abstract class FtpExecutor {
 	        if (ftp.isConnected()) { 
 	            try { 
 	                ftp.disconnect(); 
-	            } catch (IOException ioe) { 
+	            } catch (IOException ioe) {
+					logger.error(ioe.getMessage(),ioe);//ioe.printStackTrace();
 	            } 
 	        } 
 	    } 

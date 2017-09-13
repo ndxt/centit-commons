@@ -532,27 +532,27 @@ public abstract class JSONOpt {
     		}    		
     	}else{
     		//System.out.println( objArray.getClass().getName());
-    		if("[I".equals(objArray.getClass().getName())){
+    		if(int[].class.equals(objArray.getClass())){
     			int[] objList = (int[])objArray;
         		for(int obj:objList ){
         			jArray.add(obj);//String.valueOf
         		}	
-    		}else if("[J".equals(objArray.getClass().getName())){//是J不是L没有写错。
+    		}else if(long[].class.equals(objArray.getClass())){//是J不是L没有写错。
     			long[] objList = (long[])objArray;
         		for(long obj:objList ){
         			jArray.add(obj);
         		}	
-    		}else if("[F".equals(objArray.getClass().getName())){
+    		}else if(float[].class.equals(objArray.getClass())){
     			float[] objList = (float[])objArray;
         		for(float obj:objList ){
         			jArray.add(obj);
         		}	
-    		}else if("[D".equals(objArray.getClass().getName())){
+    		}else if(double[].class.equals(objArray.getClass())){
     			double[] objList = (double[])objArray;
         		for(double obj:objList ){
         			jArray.add(obj);
         		}	
-    		}else if("[C".equals(objArray.getClass().getName())){
+    		}else if(char[].class.equals(objArray.getClass())){
     			char[] objList = (char[])objArray;
         		for(char obj:objList ){
         			jArray.add(obj);

@@ -1,6 +1,8 @@
 package com.centit.support.security;
 
 import org.apache.commons.codec.binary.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -19,6 +21,8 @@ public abstract class Sha1Encoder {
 		throw new IllegalAccessError("Utility class");
 	}
 
+	protected static final Logger logger = LoggerFactory.getLogger(Sha1Encoder.class);
+
 	public static String encode(byte[] data){
 		MessageDigest SHA1;
 		try {
@@ -26,6 +30,7 @@ public abstract class Sha1Encoder {
 			SHA1.update(data, 0, data.length);
 			return new String(Hex.encodeHex(SHA1.digest()));
 		} catch (NoSuchAlgorithmException e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
 	}
@@ -34,6 +39,7 @@ public abstract class Sha1Encoder {
 		try {
 			return encode(data.getBytes("utf8"));
 		} catch (UnsupportedEncodingException e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
 	}
