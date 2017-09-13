@@ -16,7 +16,6 @@ public class TestDateTimeOpt {
 			System.out.println(Hex.encodeHex("{u0000000}".getBytes("utf8")));
 			System.out.println(Hex.encodeHex("000000{u0000000}".getBytes("utf8")));
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			//e.printStackTrace();
 		}*/		
 		//System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "yyyyMMddHHmmssSSS"));

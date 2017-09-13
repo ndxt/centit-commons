@@ -147,17 +147,17 @@ public class TableMapInfo extends SimpleTableInfo {
         StringBuilder sBuilder= new StringBuilder();
         boolean addAlias = StringUtils.isNotBlank(alias);
         int i=0;
-        if(lazyColumns!=null){
-            for(TableField col : lazyColumns){
-                if(i>0)
-                    sBuilder.append(", ");
-                else
-                    sBuilder.append(" ");
-                if(addAlias)
-                    sBuilder.append(alias).append('.');
-                sBuilder.append(col.getColumnName());
-            }
+
+        for(TableField col : lazyColumns){
+            if(i>0)
+                sBuilder.append(", ");
+            else
+                sBuilder.append(" ");
+            if(addAlias)
+                sBuilder.append(alias).append('.');
+            sBuilder.append(col.getColumnName());
         }
+
         return sBuilder.toString();
     }
 

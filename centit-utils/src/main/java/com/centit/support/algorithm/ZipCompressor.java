@@ -140,20 +140,19 @@ public abstract  class ZipCompressor {
         if (!file.exists()) {   
             return;   
         }
-        try {   
-            BufferedInputStream bis = new BufferedInputStream(   
-                    new FileInputStream(file));   
+        try(BufferedInputStream bis = new BufferedInputStream(
+                    new FileInputStream(file))){
+
             ZipEntry entry = new ZipEntry(basedir +fileName);   
             out.putNextEntry(entry);   
             int count;
             byte data[] = new byte[BUFFER];   
             while ((count = bis.read(data, 0, BUFFER)) != -1) {   
                 out.write(data, 0, count);   
-            }   
-            bis.close();   
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);   
-        }   
+        }
     }   
 
     public static void compressFile(File file,  ZipOutputStream out, String basedir) {   
@@ -186,13 +185,12 @@ public abstract  class ZipCompressor {
 		if (!pathFile.exists()) {
 			pathFile.mkdirs();
 		}
-		try{
-			ZipFile zip = new ZipFile(zipFile);
+		try(ZipFile zip = new ZipFile(zipFile)){
 			// zip.entries()
 			for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
-				ZipEntry entry = (ZipEntry) entries.nextElement();
+				ZipEntry entry = entries.nextElement();
 				String zipEntryName = entry.getName();
-				InputStream in = zip.getInputStream(entry);
+
 				String outPath = (descDir + zipEntryName).replaceAll("\\*", "/");
 				
 				// 判断路径是否存在,不存在则创建文件路径
@@ -206,17 +204,16 @@ public abstract  class ZipCompressor {
 				}
 				// 输出文件路径信息
 				//System.out.println(outPath);
-	
-				OutputStream out = new FileOutputStream(outPath);
-				byte[] buf1 = new byte[1024];
-				int len;
-				while ((len = in.read(buf1)) > 0) {
-					out.write(buf1, 0, len);
-				}
-				in.close();
-				out.close();
+                try ( InputStream in = zip.getInputStream(entry);
+				    OutputStream out = new FileOutputStream(outPath)) {
+                    byte[] buf1 = new byte[1024];
+                    int len;
+                    while ((len = in.read(buf1)) > 0) {
+                        out.write(buf1, 0, len);
+                    }
+                }
 			}
-			zip.close();
+			//zip.close();
 		}catch (Exception e) {
             throw new RuntimeException(e);   
         }   

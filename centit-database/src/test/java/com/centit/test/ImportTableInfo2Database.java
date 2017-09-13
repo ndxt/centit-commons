@@ -53,12 +53,13 @@ public class ImportTableInfo2Database {
 				} catch (Exception e) {
 					conn.rollback();
 					System.out.println("导入表:"+t.getRight()+"("+t.getLeft()+")失败!"+e.getMessage());
+					e.printStackTrace();
 				}
 			}
 			conn.close();
 			
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 	    System.out.println("done!");
 	}

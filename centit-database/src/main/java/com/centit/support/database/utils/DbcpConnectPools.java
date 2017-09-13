@@ -99,12 +99,13 @@ public abstract class DbcpConnectPools {
 			}
 			ds.close();
 		} catch (SQLException e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
+		}finally {
 			try {
 				ds.close();
 			} catch (SQLException e1) {
-				//e1.printStackTrace();
+				logger.error(e1.getMessage(),e1);//e1.printStackTrace();
 			}
-			logger.error(e.getMessage(),e);//e.printStackTrace();
 		}
 		return connOk;
 	}

@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Contract;
+
 @SuppressWarnings("unused")
 public abstract class StringRegularOpt {
 
@@ -11,7 +13,7 @@ public abstract class StringRegularOpt {
 		throw new IllegalAccessError("Utility class");
 	}
 
-	final static public String  trimString(String szWord)
+	public static String  trimString(String szWord)
 	{
 		if(szWord==null)
 			return "";
@@ -29,18 +31,18 @@ public abstract class StringRegularOpt {
 	}
 	
 		
-	final static public String  quotedString(String szWord)
+	public static String  quotedString(String szWord)
 	{
 		if(szWord==null)
 			return "\"\"";
 		return "\"" + StringUtils.replace(szWord.trim(), "\"", "'") + "\"";
 	}
 	
-	final static public boolean isDigit(String pszNum){
+	public static boolean isDigit(String pszNum){
 		return StringUtils.isNumeric(pszNum);		
 	}
 	
-	final static public boolean isNumber(String pszNum)
+	public static boolean isNumber(String pszNum)
 	{
 		String szNum = trimString(pszNum);
 		int sl = szNum.length();
@@ -72,7 +74,7 @@ public abstract class StringRegularOpt {
 		return true;
 	}
 	
-	final static public boolean isString(String szWord)
+	public static boolean isString(String szWord)
 	{
 		if(szWord==null)
 			return false;		
@@ -92,10 +94,11 @@ public abstract class StringRegularOpt {
 		return (str == null) || "".equals(str.trim());
 	}
 
-
-	final static public boolean isTrue(String str )
+    public static boolean isTrue(String str )
 	{
-
+		/**
+		 * //SONAR 检查不通过，但是这个是对的，式作为常量的加速判断
+		 */
 		if (str == "true") {
 			return true;
 		}
@@ -153,9 +156,11 @@ public abstract class StringRegularOpt {
 		return false;
 	}
 
-	final static public boolean isFalse(String str )
+	public static boolean isFalse(String str )
 	{
-
+		/**
+		 * //SONAR 检查不通过，但是这个是对的，式作为常量的加速判断
+		 */
 		if (str == "false") {
 			return true;
 		}
@@ -214,7 +219,7 @@ public abstract class StringRegularOpt {
 		return false;
 	}
 
-	final static public boolean isDatetime(String szTime ,Calendar  t_time)
+	public static boolean isDatetime(String szTime ,Calendar  t_time)
 	{
 		if(szTime==null)
 			return false;
@@ -320,13 +325,13 @@ public abstract class StringRegularOpt {
 		return true;
 	}
 	
-	final static public boolean isDatetime(String szTime ){
+	public static boolean isDatetime(String szTime ){
 		Calendar t_time = Calendar.getInstance();
 		boolean b = isDatetime(szTime ,t_time);
 		return b;
 	}
 	
-	final static public boolean isDate(String szTime ,Calendar  t_time)
+	public static boolean isDate(String szTime ,Calendar  t_time)
 	{
 		if(szTime==null)
 			return false;
@@ -388,13 +393,13 @@ public abstract class StringRegularOpt {
 		return true;
 	}
 
-	final static public boolean isDate(String szTime ){
+	public static boolean isDate(String szTime ){
 		Calendar t_time = Calendar.getInstance();
 		boolean b = isDate(szTime ,t_time);
 		return b;
 	}
 	
-	final static public boolean isTime(String szTime ,Calendar   t_time)
+	public static boolean isTime(String szTime ,Calendar   t_time)
 	{
 		if(szTime==null)
 			return false;
@@ -453,13 +458,13 @@ public abstract class StringRegularOpt {
 		return true;
 	}
 
-	final static public boolean isTime(String szTime ){
+	public static boolean isTime(String szTime ){
 		Calendar t_time = Calendar.getInstance();
 		boolean b = isTime(szTime ,t_time);
 		return b;
 	}
 	
-	final static public String trimDateString(String szDateStr)
+	public static String trimDateString(String szDateStr)
 	{
 		if(szDateStr==null)
 			return null;
@@ -525,7 +530,7 @@ public abstract class StringRegularOpt {
 		return sB.toString();
 	}
 	
-	final static public String trimDigits(String szDigits)
+	public static String trimDigits(String szDigits)
 	{
 		if(szDigits==null)
 			return null;
@@ -540,7 +545,7 @@ public abstract class StringRegularOpt {
 	
 	
 	
-	final static public String trimNumber(String szNumber)
+	public static String trimNumber(String szNumber)
 	{
 		if(szNumber==null)
 			return null;
@@ -558,7 +563,7 @@ public abstract class StringRegularOpt {
 		return sTmp2.toString();
 	}
 	
-	final static public String sqlMatchToRegex(String sTempl){
+	public static String sqlMatchToRegex(String sTempl){
 		return "^"+sTempl.replaceAll("%", "\\\\S*").replaceAll("_", "\\\\S")+"$";
 	}
 	
@@ -611,7 +616,7 @@ public abstract class StringRegularOpt {
 			return (i==nLV && j==nLT);
 		}
 	*/
-	final static public boolean  isMatch(String szValue , String szTempl)
+	public static boolean  isMatch(String szValue , String szTempl)
 	{// ?_  *% 是通配符
 		if( szValue == null || szTempl == null) return false;
 		if( szValue.equals(szTempl)) return true;

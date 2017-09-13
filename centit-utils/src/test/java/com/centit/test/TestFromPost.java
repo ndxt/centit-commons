@@ -33,7 +33,6 @@ public class TestFromPost {
 			        files);
 			System.out.println(jsonStr);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("ERROE");
 		}

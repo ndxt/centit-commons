@@ -44,14 +44,14 @@ public class TxtLogFile {
 		         new FileWriter(sLogFileName))){
 			if(bShowTime){
 				bw.write(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
-				System.out.print(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
+				//System.out.print(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
 			}
 			if(bNewLine){
 				bw.write(slog+"\r\n");
-				System.out.println(slog);
+				//System.out.println(slog);
 			}else{
 				bw.write(slog);
-				System.out.print(slog);
+				//System.out.print(slog);
 			}
 			//bw.close();
 		} catch (IOException e) {
@@ -71,13 +71,14 @@ public class TxtLogFile {
 	}
 	
 	private BufferedWriter logWriter;
+	private FileWriter fileWriter;
 	
 	public boolean openLogFile(String sLogFileName){
 		closeLogFile();
 		boolean bOpened = false;
 		try {
-			logWriter = new BufferedWriter(
-			         new FileWriter(sLogFileName));
+			fileWriter = new FileWriter(sLogFileName);
+			logWriter = new BufferedWriter(fileWriter);
 			bOpened = true;
 		} catch (IOException e) {
 			logger.error(e.getMessage(),e);//e.printStackTrace();
@@ -88,8 +89,10 @@ public class TxtLogFile {
 	public boolean closeLogFile(){
 		boolean bClosed = false;
 		try {
-			if(logWriter!=null )
+			if(logWriter!=null ) {
 				logWriter.close();
+				fileWriter.close();
+			}
 			logWriter = null;
 			bClosed = true;
 		} catch (IOException e) {
@@ -120,10 +123,10 @@ public class TxtLogFile {
 			}
 			if(bNewLine){
 				logWriter.write(slog+"\r\n");
-				System.out.println(slog);
+				//System.out.println(slog);
 			}else{
 				logWriter.write(slog);
-				System.out.print(slog);
+				//System.out.print(slog);
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage(),e);//e.printStackTrace();

@@ -20,7 +20,7 @@ public abstract class UrlOptUtils {
 	private static final String ALLOWED_CHARS = 
 			"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()";
 
-	final static public String getUrlParamter(String szUrl) {
+	public static final String getUrlParamter(String szUrl) {
 		String sQuery;
 		try {
 			java.net.URL url = new java.net.URL(szUrl);
@@ -41,7 +41,7 @@ public abstract class UrlOptUtils {
 		return sQuery;
 	}
 
-	final static public Map<String, String> splitUrlParamter(
+	public static final Map<String, String> splitUrlParamter(
 			String szUrlParameter) {
 		Map<String, String> params = new HashMap<String, String>();
 		int bpos = 0;

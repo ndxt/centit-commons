@@ -2,28 +2,28 @@ package com.centit.support.compiler;
 
 public class OptStack {
 
-	/*final static public int   OP_BASE        = 30;	// +
-	final static public int   OP_ADD         = 30;	// +
-	final static public int   OP_SUB		 = 31;  // -
-	final static public int   OP_MUL		 = 32;  // *
-	final static public int   OP_DIV		 = 33;  // /
-	final static public int   OP_EQ          = 34;	//==
-	final static public int   OP_BG          = 35;  //>
-	final static public int   OP_LT          = 36;  //<
-	final static public int   OP_EL          = 37;  //<=
-	final static public int   OP_EB          = 38;  //>=
-	final static public int   OP_NE          = 39;  //!=
-	final static public int   OP_BITOR		 = 40;  //|	
-	final static public int   OP_BITAND      = 41;  //&
-	final static public int   OP_NOT         = 42;  //!	
-	final static public int   OP_POWER       = 43;  //^
-	final static public int   OP_LMOV        = 44;  // >>
-	final static public int   OP_RMOV        = 45;  // <<
-	final static public int   OP_LIKE        = 46;  //LIKE
-	final static public int   OP_IN          = 47 ; //IN
-	final static public int   OP_LOGICOR	 = 48;  // or 	
-	final static public int   OP_AND         = OP_BITAND;  //&&
-	final static public int   OP_LOGICAND	 = 49;  // and	
+	/*public static final int   OP_BASE        = 30;	// +
+	public static final int   OP_ADD         = 30;	// +
+	public static final int   OP_SUB		 = 31;  // -
+	public static final int   OP_MUL		 = 32;  // *
+	public static final int   OP_DIV		 = 33;  // /
+	public static final int   OP_EQ          = 34;	//==
+	public static final int   OP_BG          = 35;  //>
+	public static final int   OP_LT          = 36;  //<
+	public static final int   OP_EL          = 37;  //<=
+	public static final int   OP_EB          = 38;  //>=
+	public static final int   OP_NE          = 39;  //!=
+	public static final int   OP_BITOR		 = 40;  //|
+	public static final int   OP_BITAND      = 41;  //&
+	public static final int   OP_NOT         = 42;  //!
+	public static final int   OP_POWER       = 43;  //^
+	public static final int   OP_LMOV        = 44;  // >>
+	public static final int   OP_RMOV        = 45;  // <<
+	public static final int   OP_LIKE        = 46;  //LIKE
+	public static final int   OP_IN          = 47 ; //IN
+	public static final int   OP_LOGICOR	 = 48;  // or
+	public static final int   OP_AND         = OP_BITAND;  //&&
+	public static final int   OP_LOGICAND	 = 49;  // and
 	*/	
 	/**
 	 * @param args 数值越小优先级越低

@@ -14,8 +14,8 @@ public abstract class EmbedFunc {
 		throw new IllegalAccessError("Utility class");
 	}
 
-	final static public int functionsSum = 46;
-	final static protected FunctionInfo functionsList[]={
+	public static final int functionsSum = 46;
+	protected static final FunctionInfo functionsList[]={
 		new FunctionInfo("ave",-1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),	//求均值  ave (1,2,3)=2
 		new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
 		new FunctionInfo("byte",2, ConstDefine.FUNC_BYTE,ConstDefine.TYPE_NUM),	//求位值  byte (4321.789,2)=2  
@@ -78,7 +78,7 @@ public abstract class EmbedFunc {
 		new FunctionInfo("getpy",1,ConstDefine.FUNC_GET_PY,ConstDefine.TYPE_STR)//取汉字拼音
 	};
 	
-	final static public int	getFuncNo(String sFuncName)
+	public static final int	getFuncNo(String sFuncName)
 	{
 		for(int i=0; i<functionsSum; i++)
 			if( sFuncName.equalsIgnoreCase(functionsList[i].sName)) return i;
@@ -86,7 +86,7 @@ public abstract class EmbedFunc {
 	}
 	
 
-	final static public String runFunc(List<String> slOperand,int funcID)
+	public static final String runFunc(List<String> slOperand,int funcID)
 	{
 		int nOpSum = 0;
 

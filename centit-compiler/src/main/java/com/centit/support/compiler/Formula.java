@@ -22,7 +22,7 @@ public class Formula {
 		return EmbedFunc.getFuncNo(sFuncName);
 	}
 	
-	final static public int getOptID(String sOptName)
+	public static final int getOptID(String sOptName)
 	{
 		int sl = sOptName.length();
 		if(sl == 0) return -1;
@@ -93,7 +93,7 @@ public class Formula {
 		return EmbedFunc.runFunc(slOperand, funcID);
 	}
 	
-	final static public boolean isKeyWord(String sWord)
+	public static final boolean isKeyWord(String sWord)
 	{
 		if (sWord == null || sWord.length()==0)
 			return false;

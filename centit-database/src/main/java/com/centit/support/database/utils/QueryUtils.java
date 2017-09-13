@@ -8,6 +8,7 @@ import com.centit.support.common.KeyValuePair;
 import com.centit.support.compiler.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.jetbrains.annotations.Contract;
 
 import java.util.*;
 
@@ -372,7 +373,7 @@ public abstract class QueryUtils {
     public static List<String> splitSqlByFields(String sql){
         
         Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
-        List<String> sqlPiece = new ArrayList<String>();
+        List<String> sqlPiece = new ArrayList<>();
         int sl = sql.length();
         String aWord = lex.getAWord();
 
@@ -429,17 +430,19 @@ public abstract class QueryUtils {
      * @return sql
      */
     public static String buildGetCountSQLByReplaceFields(String sql) {    	
-    	 List<String> sqlPieces = splitSqlByFields(sql);
-         if (sqlPieces == null || sqlPieces.size() < 3)
-             return "";
-        if("".equals(sqlPieces.get(0)))
-     	   sqlPieces.set(0, "select");
+    	List<String> sqlPieces = splitSqlByFields(sql);
+        if (sqlPieces == null || sqlPieces.size() < 3)
+            return "";
+        if(StringUtils.isBlank(sqlPieces.get(0))) {
+			sqlPieces.set(0, "select");
+		}
          
-         String groupByField = QueryUtils.getGroupByField(sqlPieces.get(2));
-         if(groupByField==null)        
+        String groupByField = QueryUtils.getGroupByField(sqlPieces.get(2));
+        if(groupByField==null)
  	        return sqlPieces.get(0) + " count(1) as rowcount from " +
  	                removeOrderBy(sqlPieces.get(2));
-         return sqlPieces.get(0) + " count(1) as rowcount from (select "+
+
+        return sqlPieces.get(0) + " count(1) as rowcount from (select "+
          	groupByField  + " from " + removeOrderBy(sqlPieces.get(2)) + ")";
     }
     /**
@@ -451,11 +454,16 @@ public abstract class QueryUtils {
         List<String> sqlPieces = splitSqlByFields(sql);
         if (sqlPieces == null || sqlPieces.size() < 3)
             return "";
-       if("".equals(sqlPieces.get(0)))
-    	   sqlPieces.set(0, "select");
-       if("from".equalsIgnoreCase(sqlPieces.get(1).trim()))
-    	   sqlPieces.set(1, "* from");
-        return sqlPieces.get(0) + " count(1) as rowcount from (select "+
+
+		if(StringUtils.isBlank(sqlPieces.get(0))) {
+			sqlPieces.set(0, "select");
+		}
+
+        if("from".equalsIgnoreCase(sqlPieces.get(1).trim())) {
+			sqlPieces.set(1, " * from");
+		}
+
+		return sqlPieces.get(0) + " count(1) as rowcount from (select "+
         	sqlPieces.get(1) + sqlPieces.get(2) + ") a";
     }
     /**
@@ -1242,10 +1250,10 @@ public abstract class QueryUtils {
      * @return 返回为Triple "表达式","参数名称","预处理,预处理2,......"
      */
     public static ImmutableTriple<String,String,String> parseParameter(String paramString){
-    	if(StringUtils.isBlank(paramString))
-    		return null;
-    	String paramName=null;
-    	String paramRight=null;
+    	/*if(StringUtils.isBlank(paramString))
+    		return null;*/
+    	String paramName;
+    	String paramRight;
     	String paramPretreatment=null;
 		String paramAlias=null;
 		int n = paramString.indexOf(':');
@@ -1275,7 +1283,7 @@ public abstract class QueryUtils {
 			}else		
 				paramName = paramString;
 		}
-    	return new ImmutableTriple<String,String,String>
+    	return new ImmutableTriple<>
     		(paramName,paramAlias,paramPretreatment);
     }
     
@@ -1384,9 +1392,10 @@ public abstract class QueryUtils {
     	return sql;
     }
 
+
 	public static boolean hasPretreatment(String pretreatStr, String onePretreat){
-    	if(pretreatStr==null) return false;
-    	
+    	if(pretreatStr == null || onePretreat == null)
+    		return false;
     	return pretreatStr.toUpperCase().indexOf(onePretreat) >= 0;
     }
     /**
@@ -1423,17 +1432,19 @@ public abstract class QueryUtils {
 				varMorp.seekToRightBrace();//('}');
 				prePos = varMorp.getCurrPos();
 				String param =  filter.substring(curPos,prePos-1).trim();
-				
+				if(StringUtils.isBlank(param)){
+					return null;
+				}
 				ImmutableTriple<String,String,String> paramMeta= parseParameter(param);
 				//{paramName,paramAlias,paramPretreatment};
-				
+
 				String paramName=StringUtils.isBlank(paramMeta.left)?paramMeta.middle:paramMeta.left;
 				String paramAlias=StringUtils.isBlank(paramMeta.middle)?paramMeta.left:paramMeta.middle;
-				
+
 				KeyValuePair<String,Object> paramPair = translater.translateParam(paramName);
 				if(paramPair==null)
 					return null;
-				
+
 				if(paramPair.getValue()!=null){
 					Object realParam = pretreatParameter(paramMeta.right, paramPair.getValue());
 					if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
@@ -1442,7 +1453,7 @@ public abstract class QueryUtils {
 						hqlAndParams.addAllParams(inSt.getParams());
 					}else if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_INPLACE)){
 						hqlPiece.append(cleanSqlStatement(StringBaseOpt.objectToString(realParam)));
-					}else  {	    		
+					}else  {
 						hqlPiece.append(":").append(paramAlias);
 						hqlAndParams.addParam(paramAlias,realParam);
 					}

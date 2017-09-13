@@ -17,7 +17,7 @@ public abstract class Watermark4Pdf {
 		throw new IllegalAccessError("Utility class");
 	}
 
-	public static boolean runFlag = false;
+	public static final boolean runFlag = false;
 
 	private static Log logger = LogFactory.getLog(Watermark4Pdf.class);
 	
@@ -77,7 +77,7 @@ public abstract class Watermark4Pdf {
 			
 			base = BaseFont.createFont("STSongStd-Light", "UniGB-UCS2-H",
 					BaseFont.NOT_EMBEDDED);
-			if (base == null || pdfStamper == null) {
+			if (base == null) {
 				return false;
 			}
 			// 设置透明度为0.4

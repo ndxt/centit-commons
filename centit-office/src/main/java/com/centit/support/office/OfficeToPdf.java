@@ -1,5 +1,6 @@
 package com.centit.support.office;
 
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
 import com.itextpdf.text.Document;
@@ -156,10 +157,8 @@ public abstract class OfficeToPdf {
 
 			Dispatch.call(excel, "Close",new Variant(false));
 
-			if(ax!=null){
-				ax.invoke("Quit",new Variant[]{});
-				ax=null;
-			}
+			ax.invoke("Quit",new Variant[]{});
+
 			ComThread.Release();
 			return true;
 		}catch(Exception es){
@@ -180,11 +179,8 @@ public abstract class OfficeToPdf {
 					.call(ppts, "Open",  inputFile, Boolean.valueOf(true),
                             Boolean.valueOf(true), Boolean.valueOf(false))
 					.toDispatch();
-			
-			File f = new File(pdfFile);
-			if(f.exists()){
-				f.delete();
-			}
+
+			FileSystemOpt.deleteFile(pdfFile);
 			/*Dispatch.invoke(ppt, "SaveAs", Dispatch.Method, new Object[] {
 					new Variant(pdfFile) , new Variant(32) }, new int[0]);*/
 
@@ -219,11 +215,7 @@ public abstract class OfficeToPdf {
 					inputFile, new Variant(false),new Variant(true) }, new int[1]).toDispatch();
 			//System.out.println("打开文档..." + inputFile);
 			//System.out.println("转换文档到PDF..." + pdfFile);
-			File tofile = new File(pdfFile);
-			// System.err.println(getDocPageSize(new File(inputFile)));
-			if (tofile.exists()) {
-				tofile.delete();
-			}
+			FileSystemOpt.deleteFile(pdfFile);
 			// Dispatch.call(doc, "SaveAs",  destFile,  17);
 			// 作为html格式保存到临时文件：：参数 new Variant(8)其中8表示word转html;7表示word转txt;44表示Excel转html;17表示word转成pdf。。
 			Dispatch.invoke(doc, "SaveAs", Dispatch.Method, new Object[] {
@@ -231,11 +223,9 @@ public abstract class OfficeToPdf {
 			//long end = System.currentTimeMillis();
 			//System.out.println("转换完成..用时：" + (end - start) + "ms.");
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
             logger.error(e.getMessage(),e);//e.printStackTrace();
 			//System.out.println("========Error:文档转换失败：" + e.getMessage());
-		}catch(Throwable t){
-			t.printStackTrace();
 		} finally {
 			// 关闭word
 			Dispatch.call(doc,"Close",false);
@@ -294,6 +284,7 @@ public abstract class OfficeToPdf {
 				FileSystemOpt.fileCopy(inputFile, pdfFile);
 				return true;
 			} catch (IOException e) {
+				logger.error(e.getMessage(),e);//e.printStackTrace();
 			}
 			return false;
 		}

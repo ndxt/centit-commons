@@ -12,7 +12,6 @@ public class TestReadStringFromFile {
 			System.out.println(FileIOOpt.readStringFromFile
 					("D:/temp/static_system_config.json","GBK"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			//e.printStackTrace();
 		}
 	}

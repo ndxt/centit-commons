@@ -91,6 +91,7 @@ public class JdbcMetadata implements DatabaseMetadata {
 		try {
 			return dbc.getSchema();
 		} catch (SQLException e) {
+			logger.error(e.getMessage(),e);//e.printStackTrace();
 			return null;
 		}
 	}

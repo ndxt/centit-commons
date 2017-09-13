@@ -163,11 +163,14 @@ public class TreeNode<T> {
 	 * @return 根节点的值
 	 */
 	public T getRootValue() {
-       for(TreeNode<T> path = this; path != null; path = path.getPraent()) {
-    	   if(path.isRoot())
-    		   return path.getValue();
-       }
-       return this.getValue();
+
+		T rootValue = this.getValue();
+		TreeNode<T> path = this.getPraent();
+		while(path != null ){
+			rootValue = path.getValue();
+		    path = path.getPraent();
+		}
+        return rootValue;
    }
 	
 }
