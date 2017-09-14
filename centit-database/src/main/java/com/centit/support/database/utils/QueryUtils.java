@@ -446,7 +446,7 @@ public abstract class QueryUtils {
     }
     /**
      * 通过子查询来实现获取计数语句
-     * @param sql sql
+     * @param sql sql 或者 hql 语句
      * @return sql
      */
     public static String buildGetCountSQLBySubSelect(String sql) {
@@ -457,12 +457,12 @@ public abstract class QueryUtils {
 		if(StringUtils.isBlank(sqlPieces.get(0))) {
 			sqlPieces.set(0, "select");
 		}
-
+		//这个仅仅为了兼容hibernate
         if("from".equalsIgnoreCase(sqlPieces.get(1).trim())) {
 			sqlPieces.set(1, " * from");
 		}
 
-		return sqlPieces.get(0) + " count(1) as rowcount from (select "+
+		return sqlPieces.get(0) + " count(1) as rowCount from (select "+
         	sqlPieces.get(1) + sqlPieces.get(2) + ") a";
     }
     /**
