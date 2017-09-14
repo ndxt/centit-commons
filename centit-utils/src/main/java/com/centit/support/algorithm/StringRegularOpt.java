@@ -1,10 +1,9 @@
 package com.centit.support.algorithm;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Calendar;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Contract;
 
 @SuppressWarnings("unused")
 public abstract class StringRegularOpt {
