@@ -43,7 +43,7 @@ public abstract class UrlOptUtils {
 
 	public static final Map<String, String> splitUrlParamter(
 			String szUrlParameter) {
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, String> params = new HashMap<>();
 		int bpos = 0;
 		while (true) {
 			int n = szUrlParameter.indexOf('=', bpos);
@@ -56,6 +56,7 @@ public abstract class UrlOptUtils {
 				try {
 					value = java.net.URLDecoder.decode(value, "utf-8");
 				} catch (UnsupportedEncodingException e) {
+					logger.error(e.getMessage(),e);//e.printStackTrace();
 				}
 				params.put(name, value);
 				break;

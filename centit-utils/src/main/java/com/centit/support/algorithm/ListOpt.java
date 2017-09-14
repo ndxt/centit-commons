@@ -394,7 +394,7 @@ public abstract class ListOpt {
     public static <T> List<T> cloneList(List<T> souList){
     	if(souList==null)
     		return null;
-    	ArrayList<T> deslist = new ArrayList<T>(souList.size()+1);
+    	ArrayList<T> deslist = new ArrayList<>(souList.size()+1);
     	deslist.addAll(souList);
     	return deslist;    	
     }

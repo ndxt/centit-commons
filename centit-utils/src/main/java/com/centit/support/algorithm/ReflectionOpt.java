@@ -509,13 +509,8 @@ public abstract class ReflectionOpt  {
 /*			if(setV == null) 
 				return;	*/			
 			setV.invoke(demander);			
-		} catch (SecurityException e) {
-			logger.error(e.getMessage(), e);
-		} catch (NoSuchMethodException e) {
-			logger.info("没有函数 "+smethod );
-		} catch (IllegalAccessException e) {
-			logger.error(e.getMessage(), e);
-		} catch (InvocationTargetException e) {
+		} catch (NoSuchMethodException | SecurityException
+                | IllegalAccessException | InvocationTargetException e) {
 			logger.error(e.getMessage(), e);
 		}
 	}
@@ -531,17 +526,10 @@ public abstract class ReflectionOpt  {
 /*			if(setV == null) 
 				return;	*/			
 			setV.invoke(demander,param);			
-		} catch (SecurityException e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-		}
+		} catch (NoSuchMethodException | SecurityException | IllegalArgumentException
+                | IllegalAccessException | InvocationTargetException e) {
+            logger.error(e.getMessage(), e);
+        }
 	}
 	
 	/**

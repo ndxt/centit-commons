@@ -78,7 +78,7 @@ public abstract class OfficeToPdf {
                                     new Variant(true), new Variant(false)}, new int[1]);
                     //System.out.println("Excel sheet to pdf Success :"+outFile+"-"+ i+".pdf");
                 }catch (Exception e){
-                    logger.error("可能是因为页面 "+i+" 没有任何元素导致打印失败！ "+e.getMessage());
+                    logger.error("可能是因为页面 "+i+" 没有任何元素导致打印失败！ "+e.getMessage(), e);
                 }
 	        }
             //关闭
@@ -89,7 +89,7 @@ public abstract class OfficeToPdf {
             }
 		} catch (Exception es) {
             successed =false;
-			es.printStackTrace();
+            logger.error(es.getMessage(), es);
 		}finally {
             //释放jcom线程
             ComThread.Release();
@@ -97,13 +97,11 @@ public abstract class OfficeToPdf {
 
         //將多個 pdf 合併到一個pdf,可能會有 頁面大小不一問題，需要合併之前 求出最大頁面pageSizes
         if(count>0){
+            FileSystemOpt.deleteFile(pdfFile);
             try {
-                File finalPdf = new File(pdfFile);//合并pdf 临时文件
-                if(finalPdf.exists()) {
-                    finalPdf.delete();
-                }
+
                 Document document = new Document();
-                FileOutputStream out = new FileOutputStream(finalPdf);
+                FileOutputStream out = new FileOutputStream(new File(pdfFile));
                 PdfCopy copy = new PdfCopy(document, out);
                 document.open();
                 for (int i = 1; i <= count; i++) {
@@ -162,7 +160,7 @@ public abstract class OfficeToPdf {
 			ComThread.Release();
 			return true;
 		}catch(Exception es){
-			logger.error(es.getMessage());
+			logger.error(es.getMessage(),es);
 			return false;
 		}
 	}
@@ -252,7 +250,7 @@ public abstract class OfficeToPdf {
             doc.invoke("Close");
             doc.safeRelease();
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(),e);
             successed=false;
         } finally {
             if (wps != null) {

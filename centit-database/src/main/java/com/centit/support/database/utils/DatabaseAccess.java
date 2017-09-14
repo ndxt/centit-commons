@@ -181,17 +181,19 @@ public abstract class DatabaseAccess {
 		
 		if (rs.next()) {
 			int cc = rs.getMetaData().getColumnCount();
+            String[] fieldNames = new String[cc];
 			int asFn = 0;
-			if (fieldnames != null)
-				asFn = fieldnames.length;
-	
-			String[] fieldNames = new String[cc];
-			for (int i = 0; i < cc; i++) {
-				if (i < asFn)
-					fieldNames[i] = fieldnames[i];
-				else
-					fieldNames[i] = mapColumnNameToField(
-							rs.getMetaData().getColumnLabel(i + 1));
+			if (fieldnames != null) {
+                asFn = fieldnames.length;
+                System.arraycopy(fieldnames,0,fieldNames,0,asFn);
+                /*for (int i = 0; i < asFn; i++) {
+                    fieldNames[i] = fieldnames[i];
+                }*/
+            }
+
+			for (int i = asFn; i < cc; i++) {
+				fieldNames[i] = mapColumnNameToField(
+					rs.getMetaData().getColumnLabel(i + 1));
 			}
 		
 
@@ -205,18 +207,18 @@ public abstract class DatabaseAccess {
 
 		JSONArray ja = new JSONArray();
 		int cc = rs.getMetaData().getColumnCount();
-		int asFn = 0;
-		if (fieldnames != null)
-			asFn = fieldnames.length;
 
 		String[] fieldNames = new String[cc];
-		for (int i = 0; i < cc; i++) {
-			if (i < asFn)
-				fieldNames[i] = fieldnames[i];
-			else
-				fieldNames[i] = mapColumnNameToField(
-						rs.getMetaData().getColumnLabel(i + 1));
-		}
+        int asFn = 0;
+        if (fieldnames != null) {
+            asFn = fieldnames.length;
+            System.arraycopy(fieldnames,0,fieldNames,0,asFn);
+        }
+
+        for (int i = asFn; i < cc; i++) {
+            fieldNames[i] = mapColumnNameToField(
+                    rs.getMetaData().getColumnLabel(i + 1));
+        }
 
 		while (rs.next()) {
 			ja.add(innerFetchResultSetRowToJSONObject(rs,cc,fieldNames));

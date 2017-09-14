@@ -1248,11 +1248,11 @@ public abstract class QueryUtils {
      * @param paramString paramString
      * @return 返回为Triple "表达式","参数名称","预处理,预处理2,......"
      */
-    public static ImmutableTriple<String,String,String> parseParameter(String paramString){
-    	if(StringUtils.isBlank(paramString))
-    		return null;
-    	String paramName=null;
-    	String paramRight=null;
+    private static ImmutableTriple<String,String,String> parseParameter(String paramString){
+    	/*if(StringUtils.isBlank(paramString))
+    		return null;*/
+    	String paramName;
+    	String paramRight;
     	String paramPretreatment=null;
 		String paramAlias=null;
 		int n = paramString.indexOf(':');
@@ -1423,39 +1423,39 @@ public abstract class QueryUtils {
 			
 				hqlPiece.append(qp);
 
-			}else if( sWord.equals("{")){
+			}else if( sWord.equals("{")) {
 				int curPos = varMorp.getCurrPos();
-				if(curPos-1>prePos)
-					hqlPiece.append( filter.substring(prePos, curPos-1));				
+				if (curPos - 1 > prePos)
+					hqlPiece.append(filter.substring(prePos, curPos - 1));
 				varMorp.seekToRightBrace();//('}');
 				prePos = varMorp.getCurrPos();
-				String param =  filter.substring(curPos,prePos-1).trim();
-				
-				ImmutableTriple<String,String,String> paramMeta= parseParameter(param);
-				//{paramName,paramAlias,paramPretreatment};
-				
-				String paramName=StringUtils.isBlank(paramMeta.left)?paramMeta.middle:paramMeta.left;
-				String paramAlias=StringUtils.isBlank(paramMeta.middle)?paramMeta.left:paramMeta.middle;
-				
-				KeyValuePair<String,Object> paramPair = translater.translateParam(paramName);
-				if(paramPair==null)
-					return null;
-				
-				if(paramPair.getValue()!=null){
-					Object realParam = pretreatParameter(paramMeta.right, paramPair.getValue());
-					if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
-						QueryAndNamedParams inSt = buildInStatement(paramAlias,realParam);
-						hqlPiece.append(inSt.getQuery());
-						hqlAndParams.addAllParams(inSt.getParams());
-					}else if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_INPLACE)){
-						hqlPiece.append(cleanSqlStatement(StringBaseOpt.objectToString(realParam)));
-					}else  {	    		
-						hqlPiece.append(":").append(paramAlias);
-						hqlAndParams.addParam(paramAlias,realParam);
-					}
+				String param = filter.substring(curPos, prePos - 1).trim();
+				if (StringUtils.isNotBlank(param)) {
+					ImmutableTriple<String, String, String> paramMeta = parseParameter(param);
+					//{paramName,paramAlias,paramPretreatment};
+					String paramName = StringUtils.isBlank(paramMeta.left) ? paramMeta.middle : paramMeta.left;
+					String paramAlias = StringUtils.isBlank(paramMeta.middle) ? paramMeta.left : paramMeta.middle;
 
-				}else{
-					hqlPiece.append(paramPair.getKey());
+					KeyValuePair<String, Object> paramPair = translater.translateParam(paramName);
+					if (paramPair == null)
+						return null;
+
+					if (paramPair.getValue() != null) {
+						Object realParam = pretreatParameter(paramMeta.right, paramPair.getValue());
+						if (hasPretreatment(paramMeta.right, SQL_PRETREAT_CREEPFORIN)) {
+							QueryAndNamedParams inSt = buildInStatement(paramAlias, realParam);
+							hqlPiece.append(inSt.getQuery());
+							hqlAndParams.addAllParams(inSt.getParams());
+						} else if (hasPretreatment(paramMeta.right, SQL_PRETREAT_INPLACE)) {
+							hqlPiece.append(cleanSqlStatement(StringBaseOpt.objectToString(realParam)));
+						} else {
+							hqlPiece.append(":").append(paramAlias);
+							hqlAndParams.addParam(paramAlias, realParam);
+						}
+
+					} else {
+						hqlPiece.append(paramPair.getKey());
+					}
 				}
 			}
 			
