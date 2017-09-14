@@ -8,7 +8,6 @@ import com.centit.support.common.KeyValuePair;
 import com.centit.support.compiler.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.jetbrains.annotations.Contract;
 
 import java.util.*;
 
@@ -373,7 +372,7 @@ public abstract class QueryUtils {
     public static List<String> splitSqlByFields(String sql){
         
         Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
-        List<String> sqlPiece = new ArrayList<>();
+        List<String> sqlPiece = new ArrayList<String>();
         int sl = sql.length();
         String aWord = lex.getAWord();
 
@@ -443,7 +442,7 @@ public abstract class QueryUtils {
  	                removeOrderBy(sqlPieces.get(2));
 
         return sqlPieces.get(0) + " count(1) as rowcount from (select "+
-         	groupByField  + " from " + removeOrderBy(sqlPieces.get(2)) + ")";
+         	groupByField  + " from " + removeOrderBy(sqlPieces.get(2)) + ") a";
     }
     /**
      * 通过子查询来实现获取计数语句
@@ -1250,10 +1249,10 @@ public abstract class QueryUtils {
      * @return 返回为Triple "表达式","参数名称","预处理,预处理2,......"
      */
     public static ImmutableTriple<String,String,String> parseParameter(String paramString){
-    	/*if(StringUtils.isBlank(paramString))
-    		return null;*/
-    	String paramName;
-    	String paramRight;
+    	if(StringUtils.isBlank(paramString))
+    		return null;
+    	String paramName=null;
+    	String paramRight=null;
     	String paramPretreatment=null;
 		String paramAlias=null;
 		int n = paramString.indexOf(':');
@@ -1283,7 +1282,7 @@ public abstract class QueryUtils {
 			}else		
 				paramName = paramString;
 		}
-    	return new ImmutableTriple<>
+    	return new ImmutableTriple<String,String,String>
     		(paramName,paramAlias,paramPretreatment);
     }
     
@@ -1392,10 +1391,9 @@ public abstract class QueryUtils {
     	return sql;
     }
 
-
 	public static boolean hasPretreatment(String pretreatStr, String onePretreat){
-    	if(pretreatStr == null || onePretreat == null)
-    		return false;
+    	if(pretreatStr==null) return false;
+    	
     	return pretreatStr.toUpperCase().indexOf(onePretreat) >= 0;
     }
     /**
@@ -1432,19 +1430,17 @@ public abstract class QueryUtils {
 				varMorp.seekToRightBrace();//('}');
 				prePos = varMorp.getCurrPos();
 				String param =  filter.substring(curPos,prePos-1).trim();
-				if(StringUtils.isBlank(param)){
-					return null;
-				}
+				
 				ImmutableTriple<String,String,String> paramMeta= parseParameter(param);
 				//{paramName,paramAlias,paramPretreatment};
-
+				
 				String paramName=StringUtils.isBlank(paramMeta.left)?paramMeta.middle:paramMeta.left;
 				String paramAlias=StringUtils.isBlank(paramMeta.middle)?paramMeta.left:paramMeta.middle;
-
+				
 				KeyValuePair<String,Object> paramPair = translater.translateParam(paramName);
 				if(paramPair==null)
 					return null;
-
+				
 				if(paramPair.getValue()!=null){
 					Object realParam = pretreatParameter(paramMeta.right, paramPair.getValue());
 					if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
@@ -1453,7 +1449,7 @@ public abstract class QueryUtils {
 						hqlAndParams.addAllParams(inSt.getParams());
 					}else if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_INPLACE)){
 						hqlPiece.append(cleanSqlStatement(StringBaseOpt.objectToString(realParam)));
-					}else  {
+					}else  {	    		
 						hqlPiece.append(":").append(paramAlias);
 						hqlAndParams.addParam(paramAlias,realParam);
 					}
