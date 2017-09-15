@@ -14,14 +14,14 @@ import java.sql.Connection;
 public class H2DDLOperations extends MySqlDDLOperations  {
 
 
-	public H2DDLOperations(){
+    public H2DDLOperations(){
 
-	}
+    }
 
-	public H2DDLOperations(Connection conn) {
-		super(conn);
-	}	
-	
+    public H2DDLOperations(Connection conn) {
+        super(conn);
+    }
 
-	
+
+
 }

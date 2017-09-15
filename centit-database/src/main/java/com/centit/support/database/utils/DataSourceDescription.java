@@ -20,209 +20,209 @@ import java.sql.SQLException;
  *
  */
 public final class DataSourceDescription implements  Serializable{
-	protected static final Logger logger = LoggerFactory.getLogger(DataSourceDescription.class);
+    protected static final Logger logger = LoggerFactory.getLogger(DataSourceDescription.class);
     private static final long serialVersionUID = 1L;
-	private String connUrl ;
-	private String username ;
-	private String driver ;
-	private String password ;
-	private DBType dbType;
-	private int    maxTotal ;
-	private int    maxIdle ;
-	private int    minIdle ;
-	private int    maxWaitMillis;
-	private int    initialSize ;
-	private String databaseCode;
-	
-	public String getDatabaseCode() {
-		return databaseCode;
-	}
+    private String connUrl ;
+    private String username ;
+    private String driver ;
+    private String password ;
+    private DBType dbType;
+    private int    maxTotal ;
+    private int    maxIdle ;
+    private int    minIdle ;
+    private int    maxWaitMillis;
+    private int    initialSize ;
+    private String databaseCode;
 
-	public void setDatabaseCode(String databaseCode) {
-		this.databaseCode = databaseCode;
-	}
-	
-	public DataSourceDescription(){
-		this.maxTotal  = 10;
-		this.maxIdle  = 5;
-		this.setMinIdle(1);
-		this.initialSize = 3;
-		this.maxWaitMillis = 10000;
-	}
-	
-	public DataSourceDescription(String connectURI, String username){
-		this();
-		this.setConnUrl(connectURI);
-		this.username = username;
-	}
-	
-	public DataSourceDescription(String connectURI, String username, String pswd){
-		this();
-		this.setConnUrl(connectURI);
-		this.username = username;
-		this.password = pswd;
-	}	
+    public String getDatabaseCode() {
+        return databaseCode;
+    }
 
-	public String getConnUrl() {
-		return connUrl;
-	}
+    public void setDatabaseCode(String databaseCode) {
+        this.databaseCode = databaseCode;
+    }
 
-	public void setConnUrl(String connUrl) {
-		this.connUrl = connUrl;
-		this.dbType = DBType.mapDBType(connUrl);
-		this.driver = DBType.getDbDriver(this.dbType);
-	}
+    public DataSourceDescription(){
+        this.maxTotal  = 10;
+        this.maxIdle  = 5;
+        this.setMinIdle(1);
+        this.initialSize = 3;
+        this.maxWaitMillis = 10000;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public DataSourceDescription(String connectURI, String username){
+        this();
+        this.setConnUrl(connectURI);
+        this.username = username;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public DataSourceDescription(String connectURI, String username, String pswd){
+        this();
+        this.setConnUrl(connectURI);
+        this.username = username;
+        this.password = pswd;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getConnUrl() {
+        return connUrl;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setConnUrl(String connUrl) {
+        this.connUrl = connUrl;
+        this.dbType = DBType.mapDBType(connUrl);
+        this.driver = DBType.getDbDriver(this.dbType);
+    }
 
-	public int getMaxTotal() {
-		return maxTotal;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public void setMaxTotal(int maxTotal) {
-		this.maxTotal = maxTotal;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public int getMaxIdle() {
-		return maxIdle;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setMaxIdle(int maxIdle) {
-		this.maxIdle = maxIdle;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public int getMaxWaitMillis() {
-		return maxWaitMillis;
-	}
+    public int getMaxTotal() {
+        return maxTotal;
+    }
 
-	public void setMaxWaitMillis(int maxWaitMillis) {
-		this.maxWaitMillis = maxWaitMillis;
-	}
+    public void setMaxTotal(int maxTotal) {
+        this.maxTotal = maxTotal;
+    }
 
-	public int getInitialSize() {
-		return initialSize;
-	}
+    public int getMaxIdle() {
+        return maxIdle;
+    }
 
-	public void setInitialSize(int initialSize) {
-		this.initialSize = initialSize;
-	}
+    public void setMaxIdle(int maxIdle) {
+        this.maxIdle = maxIdle;
+    }
 
-	public String getDriver() {
-		return driver;
-	}
+    public int getMaxWaitMillis() {
+        return maxWaitMillis;
+    }
 
-	public DBType getDbType() {
-		return dbType;
-	}
+    public void setMaxWaitMillis(int maxWaitMillis) {
+        this.maxWaitMillis = maxWaitMillis;
+    }
 
-	@Override
-	public boolean equals(Object dbco){
-		if(this==dbco)
-			return true;
-		
-		if( dbco instanceof DataSourceDescription ){
-			DataSourceDescription dbc =(DataSourceDescription) dbco;
-			return connUrl !=null && connUrl.equals(dbc.getConnUrl())
-				&& username != null && username.equals(dbc.getUsername());
-		}else
-			return false;
-	}
-	
-	
-	@Override
-	public int hashCode(){
-		int result = 17;
-		result = 37 * result +
-		 	(this.connUrl == null ? 0 :this.connUrl.hashCode());
+    public int getInitialSize() {
+        return initialSize;
+    }
+
+    public void setInitialSize(int initialSize) {
+        this.initialSize = initialSize;
+    }
+
+    public String getDriver() {
+        return driver;
+    }
+
+    public DBType getDbType() {
+        return dbType;
+    }
+
+    @Override
+    public boolean equals(Object dbco){
+        if(this==dbco)
+            return true;
+
+        if( dbco instanceof DataSourceDescription ){
+            DataSourceDescription dbc =(DataSourceDescription) dbco;
+            return connUrl !=null && connUrl.equals(dbc.getConnUrl())
+                && username != null && username.equals(dbc.getUsername());
+        }else
+            return false;
+    }
+
+
+    @Override
+    public int hashCode(){
+        int result = 17;
+        result = 37 * result +
+             (this.connUrl == null ? 0 :this.connUrl.hashCode());
   
-		result = 37 * result +
-		 	(this.username == null ? 0 :this.username.hashCode());
-	
-		return result;
-	}
-	
-	public void loadHibernateConfig(String sConfFile,String sDbBeanName){
-		SAXReader  builder = new SAXReader(false);
-		builder.setValidation(false);
-		builder.setEntityResolver(new IgnoreDTDEntityResolver());
-		
-		Document doc = null;
-		Element bean = null;
+        result = 37 * result +
+             (this.username == null ? 0 :this.username.hashCode());
 
-		try {			
-			if(sConfFile.indexOf(':')>=0){
-				if(sConfFile.startsWith("classpath:")){
-					doc= builder.read(this.getClass().getResourceAsStream(sConfFile.substring(10)));
-				}else
-					doc= builder.read(new File(sConfFile));
-			}else
-				doc= builder.read(this.getClass().getResourceAsStream(sConfFile));
-			Element root  = doc.getRootElement();//获取根元素 
-			bean = (Element) root.selectSingleNode("bean[@id=\""+sDbBeanName+"\"]");
-			if(bean != null){ // 
-				Element property;			
+        return result;
+    }
 
-				property = (Element)bean.selectSingleNode("property[@name=\"url\"]");
-				if(property!=null)
-					connUrl = property.attributeValue("value");
-				property = (Element)bean.selectSingleNode("property[@name=\"driverClassName\"]");
-				if(property!=null)
-					driver = property.attributeValue("value");
-				property = (Element)bean.selectSingleNode("property[@name=\"username\"]");
-				if(property!=null)
-					username = property.attributeValue("value");
-				property = (Element)bean.selectSingleNode("property[@name=\"password\"]");
-				if(property!=null)
-					password = property.attributeValue("value");
-			}
-		} catch (DocumentException e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-		}	
-		
-		dbType = DBType.mapDBType(connUrl);
-	}
+    public void loadHibernateConfig(String sConfFile,String sDbBeanName){
+        SAXReader  builder = new SAXReader(false);
+        builder.setValidation(false);
+        builder.setEntityResolver(new IgnoreDTDEntityResolver());
 
-	public void setDriver(String driver) {
-		this.driver = driver;
-	}
+        Document doc = null;
+        Element bean = null;
 
-	public int getMinIdle() {
-		return minIdle;
-	}
+        try {
+            if(sConfFile.indexOf(':')>=0){
+                if(sConfFile.startsWith("classpath:")){
+                    doc= builder.read(this.getClass().getResourceAsStream(sConfFile.substring(10)));
+                }else
+                    doc= builder.read(new File(sConfFile));
+            }else
+                doc= builder.read(this.getClass().getResourceAsStream(sConfFile));
+            Element root  = doc.getRootElement();//获取根元素
+            bean = (Element) root.selectSingleNode("bean[@id=\""+sDbBeanName+"\"]");
+            if(bean != null){ //
+                Element property;
 
-	public void setMinIdle(int minIdle) {
-		this.minIdle = minIdle;
-	}
-	
+                property = (Element)bean.selectSingleNode("property[@name=\"url\"]");
+                if(property!=null)
+                    connUrl = property.attributeValue("value");
+                property = (Element)bean.selectSingleNode("property[@name=\"driverClassName\"]");
+                if(property!=null)
+                    driver = property.attributeValue("value");
+                property = (Element)bean.selectSingleNode("property[@name=\"username\"]");
+                if(property!=null)
+                    username = property.attributeValue("value");
+                property = (Element)bean.selectSingleNode("property[@name=\"password\"]");
+                if(property!=null)
+                    password = property.attributeValue("value");
+            }
+        } catch (DocumentException e) {
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+        }
+
+        dbType = DBType.mapDBType(connUrl);
+    }
+
+    public void setDriver(String driver) {
+        this.driver = driver;
+    }
+
+    public int getMinIdle() {
+        return minIdle;
+    }
+
+    public void setMinIdle(int minIdle) {
+        this.minIdle = minIdle;
+    }
+
     public static boolean testConntect(DataSourceDescription dsDesc){
-		boolean connOk = false;
-		try {
-			Class.forName(dsDesc.getDriver());//.newInstance();
-			Connection conn = DriverManager.getConnection(dsDesc.getConnUrl(),
-					dsDesc.getUsername(),dsDesc.getPassword());
-			connOk = true;
-			conn.close();
-		} catch (ReflectiveOperationException |SQLException e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-		}
-		return connOk;
-	}
-	
+        boolean connOk = false;
+        try {
+            Class.forName(dsDesc.getDriver());//.newInstance();
+            Connection conn = DriverManager.getConnection(dsDesc.getConnUrl(),
+                    dsDesc.getUsername(),dsDesc.getPassword());
+            connOk = true;
+            conn.close();
+        } catch (ReflectiveOperationException |SQLException e) {
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+        }
+        return connOk;
+    }
+
     public boolean testConntect(){
-		return DataSourceDescription.testConntect(this);
-	}
+        return DataSourceDescription.testConntect(this);
+    }
 }

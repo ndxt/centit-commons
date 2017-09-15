@@ -28,7 +28,7 @@ public class IniReader {
         //modifyed by brmrk     
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(     
                 new FileInputStream(filename), "GBK"))){   
-        	read(reader); 
+            read(reader);
         }  
     }     
      
@@ -49,9 +49,9 @@ public class IniReader {
             currentSecion = line.substring(1, line.length() - 1);     
             current = sections.get(currentSecion);
             if(current==null)
-            	current = new HashMap<String,String> ();     
+                current = new HashMap<String,String> ();
         }else if (current != null && currentSecion != null && 
-        		 ! line.startsWith(";") && (line.indexOf('=') >= 0)) {     
+                 ! line.startsWith(";") && (line.indexOf('=') >= 0)) {
             int i = line.indexOf('=');     
             String name = line.substring(0, i).trim();     
             String value = line.substring(i + 1).trim();     
@@ -61,7 +61,7 @@ public class IniReader {
     }     
      
     public String getValue(String section, String name) {     
-    	Map<String,String> p = sections.get(section);     
+        Map<String,String> p = sections.get(section);
      
         if (p == null) {     
             return null;     

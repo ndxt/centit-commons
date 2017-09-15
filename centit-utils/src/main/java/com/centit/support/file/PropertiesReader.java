@@ -41,7 +41,7 @@ public abstract class PropertiesReader {
 
         return "";
     }
-	/**
+    /**
      * 读取classpath下文件
      * @param clazz 任意类型
      * @param fileName
@@ -53,7 +53,7 @@ public abstract class PropertiesReader {
         try(InputStream in = clazz.getResourceAsStream(fileName)){  
             return getPropertyValue(in, key);
         } catch (IOException e) {
-        	logger.error("读取系统配置文件出错", e);
+            logger.error("读取系统配置文件出错", e);
         }
 
         return "";
@@ -71,7 +71,7 @@ public abstract class PropertiesReader {
         try(FileInputStream fis = new FileInputStream(new File(fileName))) {
             return getPropertyValue(fis, key);
         } catch (IOException e) {
-        	logger.error("读取系统配置文件出错", e);
+            logger.error("读取系统配置文件出错", e);
         }
 
         return "";
@@ -86,18 +86,18 @@ public abstract class PropertiesReader {
      */
     public static Properties getClassPathProperties(String fileName) {
         try(InputStream in = PropertiesReader.class.getResourceAsStream(fileName)){
-        	return loadProperties(in);
+            return loadProperties(in);
         } catch (IOException e) {
-        	logger.error("读取系统配置文件出错", e);
+            logger.error("读取系统配置文件出错", e);
         }
         return null;
     }
     
     public static Properties getClassPathProperties( Class<?> clazz, String fileName) {
-        try(InputStream in = clazz.getResourceAsStream(fileName)){         	
+        try(InputStream in = clazz.getResourceAsStream(fileName)){
             return loadProperties(in);
         } catch (IOException e) {
-        	logger.error("读取系统配置文件出错", e);
+            logger.error("读取系统配置文件出错", e);
         }
         return null;
     }
@@ -114,7 +114,7 @@ public abstract class PropertiesReader {
         try(FileInputStream fis =new FileInputStream(new File(fileName))){
             return loadProperties(fis);
         } catch (IOException e) {
-        	logger.error("读取系统配置文件出错", e);
+            logger.error("读取系统配置文件出错", e);
         }
 
         return null;

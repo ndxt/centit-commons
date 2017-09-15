@@ -32,8 +32,8 @@ public abstract  class ZipCompressor {
      */
     public static ZipOutputStream convertToZipOutputStream(OutputStream os){
          return new ZipOutputStream( 
-        		 new CheckedOutputStream(os,
-        				 new CRC32()));
+                 new CheckedOutputStream(os,
+                         new CRC32()));
     }
     
     public static void compress(String zipFilePathName,  String fileName, String srcPathName) {
@@ -41,7 +41,7 @@ public abstract  class ZipCompressor {
         if (!file.exists())
             throw new RuntimeException(srcPathName + "不存在！");
         try {
-        	File zipFile = new File(zipFilePathName);
+            File zipFile = new File(zipFilePathName);
             FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
             /*CheckedOutputStream cos = new CheckedOutputStream(fileOutputStream,
                     new CRC32());*/
@@ -57,11 +57,11 @@ public abstract  class ZipCompressor {
     }
     
     public static void compress(String zipFilePathName,  String srcPathName) {
-    	File file = new File(srcPathName);
+        File file = new File(srcPathName);
         if (!file.exists())
             throw new RuntimeException(srcPathName + "不存在！");
         try {
-        	File zipFile = new File(zipFilePathName);
+            File zipFile = new File(zipFilePathName);
             FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
             /*CheckedOutputStream cos = new CheckedOutputStream(fileOutputStream,
                     new CRC32());*/
@@ -81,7 +81,7 @@ public abstract  class ZipCompressor {
         if (!file.exists())
             throw new RuntimeException(srcPathName + "不存在！");
         try {
-        	File zipFile = new File(zipFilePathName);
+            File zipFile = new File(zipFilePathName);
             FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
             /*CheckedOutputStream cos = new CheckedOutputStream(fileOutputStream,
                     new CRC32());*/
@@ -156,67 +156,67 @@ public abstract  class ZipCompressor {
     }   
 
     public static void compressFile(File file,  ZipOutputStream out, String basedir) {   
-    	compressFile( file, file.getName(), out,  basedir);
+        compressFile( file, file.getName(), out,  basedir);
     }
-	/**
-	 * 解压到指定目录
-	 * 
-	 * @param zipPath zipPath
-	 * @param dirPath dirPath
-	 * @author isea533
-	 */
-	public static void release(String zipPath, String dirPath) {
-		release(new File(zipPath), dirPath);
-	}
+    /**
+     * 解压到指定目录
+     *
+     * @param zipPath zipPath
+     * @param dirPath dirPath
+     * @author isea533
+     */
+    public static void release(String zipPath, String dirPath) {
+        release(new File(zipPath), dirPath);
+    }
 
-	/**
-	 * 解压文件到指定目录
-	 * 
-	 * @param zipFile zipFile
-	 * @param dirPath dirPath
-	 * @author isea533
-	 */
-	public static void release(File zipFile, String dirPath) {
-		String descDir = dirPath;
-		if(!descDir.endsWith("/"))
-			descDir = dirPath+"/";
-			
-		File pathFile = new File(descDir);
-		if (!pathFile.exists()) {
-			pathFile.mkdirs();
-		}
-		try(ZipFile zip = new ZipFile(zipFile)){
-			// zip.entries()
-			for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
-				ZipEntry entry = entries.nextElement();
-				String zipEntryName = entry.getName();
+    /**
+     * 解压文件到指定目录
+     *
+     * @param zipFile zipFile
+     * @param dirPath dirPath
+     * @author isea533
+     */
+    public static void release(File zipFile, String dirPath) {
+        String descDir = dirPath;
+        if(!descDir.endsWith("/"))
+            descDir = dirPath+"/";
 
-				String outPath = (descDir + zipEntryName).replaceAll("\\*", "/");
-				
-				// 判断路径是否存在,不存在则创建文件路径
-				File file = new File(outPath.substring(0, outPath.lastIndexOf('/')));
-				if (!file.exists()) {
-					file.mkdirs();
-				}
-				// 判断文件全路径是否为文件夹,如果是上面已经上传,不需要解压
-				if (new File(outPath).isDirectory()) {
-					continue;
-				}
-				// 输出文件路径信息
-				//System.out.println(outPath);
+        File pathFile = new File(descDir);
+        if (!pathFile.exists()) {
+            pathFile.mkdirs();
+        }
+        try(ZipFile zip = new ZipFile(zipFile)){
+            // zip.entries()
+            for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
+                ZipEntry entry = entries.nextElement();
+                String zipEntryName = entry.getName();
+
+                String outPath = (descDir + zipEntryName).replaceAll("\\*", "/");
+
+                // 判断路径是否存在,不存在则创建文件路径
+                File file = new File(outPath.substring(0, outPath.lastIndexOf('/')));
+                if (!file.exists()) {
+                    file.mkdirs();
+                }
+                // 判断文件全路径是否为文件夹,如果是上面已经上传,不需要解压
+                if (new File(outPath).isDirectory()) {
+                    continue;
+                }
+                // 输出文件路径信息
+                //System.out.println(outPath);
                 try ( InputStream in = zip.getInputStream(entry);
-				    OutputStream out = new FileOutputStream(outPath)) {
+                    OutputStream out = new FileOutputStream(outPath)) {
                     byte[] buf1 = new byte[1024];
                     int len;
                     while ((len = in.read(buf1)) > 0) {
                         out.write(buf1, 0, len);
                     }
                 }
-			}
-			//zip.close();
-		}catch (Exception e) {
+            }
+            //zip.close();
+        }catch (Exception e) {
             throw new RuntimeException(e);   
         }   
-		// System.out.println("******************解压完毕********************");
-	}
+        // System.out.println("******************解压完毕********************");
+    }
 }

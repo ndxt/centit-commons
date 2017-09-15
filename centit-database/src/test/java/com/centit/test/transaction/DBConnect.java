@@ -12,28 +12,28 @@ import java.sql.SQLException;
  *
  */
 public interface DBConnect extends Connection{
-	
-	String getDatabaseCode(); 
-	
-	DBType getDatabaseType();
-	
-	Connection getConn();
-	
-	boolean startTransaction();
-	
-	boolean isInTransaction();
 
-	static DBConnect valueOf(Connection conn){
-		if( conn instanceof DBConnect){
-			return (DBConnect)conn;
-		}
-		String dataCode;
-		try {
-			dataCode = conn.getSchema();
-		} catch (SQLException e) {
-			dataCode = UuidOpt.getUuidAsString32();
-		}
-		DbcpConnect dbcpConn = new DbcpConnect(dataCode, conn );
-		return dbcpConn;
-	}
+    String getDatabaseCode();
+
+    DBType getDatabaseType();
+
+    Connection getConn();
+
+    boolean startTransaction();
+
+    boolean isInTransaction();
+
+    static DBConnect valueOf(Connection conn){
+        if( conn instanceof DBConnect){
+            return (DBConnect)conn;
+        }
+        String dataCode;
+        try {
+            dataCode = conn.getSchema();
+        } catch (SQLException e) {
+            dataCode = UuidOpt.getUuidAsString32();
+        }
+        DbcpConnect dbcpConn = new DbcpConnect(dataCode, conn );
+        return dbcpConn;
+    }
 }

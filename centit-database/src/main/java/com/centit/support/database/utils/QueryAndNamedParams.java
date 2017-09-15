@@ -7,9 +7,9 @@ import java.util.Map;
  * @author codefan
  */
 public class QueryAndNamedParams {
-	/**
-	 * 查询语句，可以是hql也可能是sql
-	 */	
+    /**
+     * 查询语句，可以是hql也可能是sql
+     */
     private String queryStmt;
     /**
      * 变量和变量值的对应map
@@ -17,7 +17,7 @@ public class QueryAndNamedParams {
     private Map<String, Object> params;
 
     public QueryAndNamedParams() {
-    	this.queryStmt = null;
+        this.queryStmt = null;
         this.params = null;
     }
 
@@ -56,14 +56,14 @@ public class QueryAndNamedParams {
     }
 
     public Map<String, Object> getParams() {
-    	if(params == null)
-        	params = new HashMap<String, Object> ();
+        if(params == null)
+            params = new HashMap<String, Object> ();
         return params;
     }
     
     public Object getParam(String paramName){
         if( params==null)
-        	return null;
+            return null;
        
         return params.get(paramName);
     }
@@ -81,19 +81,19 @@ public class QueryAndNamedParams {
      */
     public QueryAndNamedParams addParam(String paramName,Object paramValue) {
         if(params == null)
-        	params = new HashMap<String, Object> ();
+            params = new HashMap<String, Object> ();
         params.put(paramName, paramValue);
         return this;
     }
     
     public QueryAndNamedParams addAllParams(Map<String, Object> oParams) {
-    	if(oParams==null)
-    		return this;
+        if(oParams==null)
+            return this;
         if(params == null)
-        	params = new HashMap<String, Object> ();
+            params = new HashMap<String, Object> ();
         params.putAll(oParams);
         /*for(Map.Entry<String, Object> param : oParams.entrySet())
-        	params.put(param.getKey(), param.getValue());*/
+            params.put(param.getKey(), param.getValue());*/
         return this;
     }
 }

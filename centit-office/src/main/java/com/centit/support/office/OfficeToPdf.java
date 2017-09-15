@@ -21,35 +21,35 @@ import java.io.IOException;
 
 @SuppressWarnings("unused")
 public abstract class OfficeToPdf {
-	private OfficeToPdf() {
-		throw new IllegalAccessError("Utility class");
-	}
-	private static Log logger = LogFactory.getLog(OfficeToPdf.class);
-	//private static final int ppSaveAsPDF = 32;
-	/**
-	 * 修改 excel多sheet 转换PDF 问题，一张表格 超大不分页，一个sheet = 一页pdf
-	 * @param inExcelFile 输入excel文件
-	 * @param outPdfFile 临时pdf
-	 * @return 是否成功
-	 */
-	public static boolean excel2Pdf(String inExcelFile, String outPdfFile) {
+    private OfficeToPdf() {
+        throw new IllegalAccessError("Utility class");
+    }
+    private static Log logger = LogFactory.getLog(OfficeToPdf.class);
+    //private static final int ppSaveAsPDF = 32;
+    /**
+     * 修改 excel多sheet 转换PDF 问题，一张表格 超大不分页，一个sheet = 一页pdf
+     * @param inExcelFile 输入excel文件
+     * @param outPdfFile 临时pdf
+     * @return 是否成功
+     */
+    public static boolean excel2Pdf(String inExcelFile, String outPdfFile) {
         String inputFile = inExcelFile.replace('/','\\');
         String pdfFile   = outPdfFile.replace('/','\\');
-		ComThread.InitSTA();
+        ComThread.InitSTA();
         boolean successed =true;
-		ActiveXComponent actcom = new ActiveXComponent("Excel.Application");
+        ActiveXComponent actcom = new ActiveXComponent("Excel.Application");
         int count=0;
         String outFile = pdfFile.substring(0,pdfFile.lastIndexOf("."));
-		try {
-			actcom.setProperty("Visible", new Variant(false));
-			Dispatch workbooks = actcom.getProperty("Workbooks").toDispatch();
-			Dispatch excel = Dispatch.invoke(workbooks,"Open",Dispatch.Method,  
-					new Object[]{inputFile,new Variant(false),new Variant(false)},  new int[9] ).toDispatch();
-			Dispatch sheets= Dispatch.get(excel, "Sheets").toDispatch();
-			count = Dispatch.get(sheets, "Count").getInt();
+        try {
+            actcom.setProperty("Visible", new Variant(false));
+            Dispatch workbooks = actcom.getProperty("Workbooks").toDispatch();
+            Dispatch excel = Dispatch.invoke(workbooks,"Open",Dispatch.Method,
+                    new Object[]{inputFile,new Variant(false),new Variant(false)},  new int[9] ).toDispatch();
+            Dispatch sheets= Dispatch.get(excel, "Sheets").toDispatch();
+            count = Dispatch.get(sheets, "Count").getInt();
 
-			//將每一個sheet 分開轉換成 單獨的pdf
-	        for (int i = 1; i <=count ; i++) {
+            //將每一個sheet 分開轉換成 單獨的pdf
+            for (int i = 1; i <=count ; i++) {
                 try {
                     //獲得當前sheet
                     Dispatch sheet = Dispatch.invoke(sheets, "Item",
@@ -80,17 +80,17 @@ public abstract class OfficeToPdf {
                 }catch (Exception e){
                     logger.error("可能是因为页面 "+i+" 没有任何元素导致打印失败！ "+e.getMessage(), e);
                 }
-	        }
+            }
             //关闭
             Dispatch.call(excel, "Close", new Variant(false));
             //退出
             if (actcom != null) {
                 actcom.invoke("Quit", new Variant[0]);
             }
-		} catch (Exception es) {
+        } catch (Exception es) {
             successed =false;
             logger.error(es.getMessage(), es);
-		}finally {
+        }finally {
             //释放jcom线程
             ComThread.Release();
         }
@@ -130,111 +130,111 @@ public abstract class OfficeToPdf {
         }
         return successed;
 
-	}
+    }
 
-	public static boolean excelExportToPdf(String inExcelFile, String outPdfFile) {
+    public static boolean excelExportToPdf(String inExcelFile, String outPdfFile) {
         String inFilePath = inExcelFile.replace('/','\\');
         String outFilePath   = outPdfFile.replace('/','\\');
-		ComThread.InitSTA();
-		ActiveXComponent ax=new ActiveXComponent("Excel.Application");
-		try{
-			ax.setProperty("Visible", new Variant(false));
-			ax.setProperty("AutomationSecurity", new Variant(3)); //禁用宏
-			Dispatch excels=ax.getProperty("Workbooks").toDispatch();
+        ComThread.InitSTA();
+        ActiveXComponent ax=new ActiveXComponent("Excel.Application");
+        try{
+            ax.setProperty("Visible", new Variant(false));
+            ax.setProperty("AutomationSecurity", new Variant(3)); //禁用宏
+            Dispatch excels=ax.getProperty("Workbooks").toDispatch();
 
-			Dispatch excel=Dispatch.invoke(excels,"Open",Dispatch.Method,new Object[]{
-							inFilePath,
-							new Variant(false),
-							new Variant(false)
-					},
-					new int[9]).toDispatch();
-			//转换格式
-			Dispatch.call(excel,"ExportAsFixedFormat",
+            Dispatch excel=Dispatch.invoke(excels,"Open",Dispatch.Method,new Object[]{
+                            inFilePath,
+                            new Variant(false),
+                            new Variant(false)
+                    },
+                    new int[9]).toDispatch();
+            //转换格式
+            Dispatch.call(excel,"ExportAsFixedFormat",
                     new Variant(0), //PDF格式=0
-					outFilePath);
+                    outFilePath);
 
-			Dispatch.call(excel, "Close",new Variant(false));
+            Dispatch.call(excel, "Close",new Variant(false));
 
-			ax.invoke("Quit",new Variant[]{});
+            ax.invoke("Quit",new Variant[]{});
 
-			ComThread.Release();
-			return true;
-		}catch(Exception es){
-			logger.error(es.getMessage(),es);
-			return false;
-		}
-	}
+            ComThread.Release();
+            return true;
+        }catch(Exception es){
+            logger.error(es.getMessage(),es);
+            return false;
+        }
+    }
 
-	public static boolean ppt2Pdf(String inPptFile, String outPdfFile) {
+    public static boolean ppt2Pdf(String inPptFile, String outPdfFile) {
         String inputFile = inPptFile.replace('/','\\');
         String pdfFile   = outPdfFile.replace('/','\\');
         ComThread.InitSTA();
-		try {
-			ActiveXComponent app = new ActiveXComponent("PowerPoint.Application");
+        try {
+            ActiveXComponent app = new ActiveXComponent("PowerPoint.Application");
 
-			Dispatch ppts = app.getProperty("Presentations").toDispatch();
-			Dispatch ppt = Dispatch
-					.call(ppts, "Open",  inputFile, Boolean.valueOf(true),
+            Dispatch ppts = app.getProperty("Presentations").toDispatch();
+            Dispatch ppt = Dispatch
+                    .call(ppts, "Open",  inputFile, Boolean.valueOf(true),
                             Boolean.valueOf(true), Boolean.valueOf(false))
-					.toDispatch();
+                    .toDispatch();
 
-			FileSystemOpt.deleteFile(pdfFile);
-			/*Dispatch.invoke(ppt, "SaveAs", Dispatch.Method, new Object[] {
-					new Variant(pdfFile) , new Variant(32) }, new int[0]);*/
+            FileSystemOpt.deleteFile(pdfFile);
+            /*Dispatch.invoke(ppt, "SaveAs", Dispatch.Method, new Object[] {
+                    new Variant(pdfFile) , new Variant(32) }, new int[0]);*/
 
-			Dispatch.call(ppt, "SaveAs", pdfFile, Integer.valueOf(32));
-			Dispatch.call(ppt, "Close");
-			app.invoke("Quit");
-			//System.out.println("ppt转换为PDF完成！");
+            Dispatch.call(ppt, "SaveAs", pdfFile, Integer.valueOf(32));
+            Dispatch.call(ppt, "Close");
+            app.invoke("Quit");
+            //System.out.println("ppt转换为PDF完成！");
             return true;
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-		}finally {
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+        }finally {
             ComThread.Release();
         }
         return false;
-	}
+    }
 
-	public static boolean word2Pdf(String inWordFile, String outPdfFile) {
+    public static boolean word2Pdf(String inWordFile, String outPdfFile) {
         String inputFile = inWordFile.replace('/','\\');
         String pdfFile   = outPdfFile.replace('/','\\');
-		ActiveXComponent app = null;
-		Dispatch doc = null;
+        ActiveXComponent app = null;
+        Dispatch doc = null;
         ComThread.InitSTA();
-		//long start = System.currentTimeMillis();
-		try {
-			app = new ActiveXComponent("Word.Application");
-			// 设置word不可见
-			app.setProperty("Visible", new Variant(false));
-			// 打开word文件
-			Dispatch docs = app.getProperty("Documents").toDispatch();
-			//doc = Dispatch.call(docs,  "Open" , sourceFile).toDispatch();
-			doc = Dispatch.invoke(docs,"Open",Dispatch.Method,new Object[] {
-					inputFile, new Variant(false),new Variant(true) }, new int[1]).toDispatch();
-			//System.out.println("打开文档..." + inputFile);
-			//System.out.println("转换文档到PDF..." + pdfFile);
-			FileSystemOpt.deleteFile(pdfFile);
-			// Dispatch.call(doc, "SaveAs",  destFile,  17);
-			// 作为html格式保存到临时文件：：参数 new Variant(8)其中8表示word转html;7表示word转txt;44表示Excel转html;17表示word转成pdf。。
-			Dispatch.invoke(doc, "SaveAs", Dispatch.Method, new Object[] {
-					pdfFile, new Variant(17) }, new int[1]);
-			//long end = System.currentTimeMillis();
-			//System.out.println("转换完成..用时：" + (end - start) + "ms.");
-		} catch (Exception e) {
-			//e.printStackTrace();
+        //long start = System.currentTimeMillis();
+        try {
+            app = new ActiveXComponent("Word.Application");
+            // 设置word不可见
+            app.setProperty("Visible", new Variant(false));
+            // 打开word文件
+            Dispatch docs = app.getProperty("Documents").toDispatch();
+            //doc = Dispatch.call(docs,  "Open" , sourceFile).toDispatch();
+            doc = Dispatch.invoke(docs,"Open",Dispatch.Method,new Object[] {
+                    inputFile, new Variant(false),new Variant(true) }, new int[1]).toDispatch();
+            //System.out.println("打开文档..." + inputFile);
+            //System.out.println("转换文档到PDF..." + pdfFile);
+            FileSystemOpt.deleteFile(pdfFile);
+            // Dispatch.call(doc, "SaveAs",  destFile,  17);
+            // 作为html格式保存到临时文件：：参数 new Variant(8)其中8表示word转html;7表示word转txt;44表示Excel转html;17表示word转成pdf。。
+            Dispatch.invoke(doc, "SaveAs", Dispatch.Method, new Object[] {
+                    pdfFile, new Variant(17) }, new int[1]);
+            //long end = System.currentTimeMillis();
+            //System.out.println("转换完成..用时：" + (end - start) + "ms.");
+        } catch (Exception e) {
+            //e.printStackTrace();
             logger.error(e.getMessage(),e);//e.printStackTrace();
-			//System.out.println("========Error:文档转换失败：" + e.getMessage());
-		} finally {
-			// 关闭word
-			Dispatch.call(doc,"Close",false);
-			//System.out.println("关闭文档");
-			if (app != null)
-				app.invoke("Quit", new Variant[] {});
-		}
-		//如果没有这句话,winword.exe进程将不会关闭
-	    ComThread.Release();
-	    return true;
-	}
+            //System.out.println("========Error:文档转换失败：" + e.getMessage());
+        } finally {
+            // 关闭word
+            Dispatch.call(doc,"Close",false);
+            //System.out.println("关闭文档");
+            if (app != null)
+                app.invoke("Quit", new Variant[] {});
+        }
+        //如果没有这句话,winword.exe进程将不会关闭
+        ComThread.Release();
+        return true;
+    }
 
     public static boolean wps2Pdf(String inWpsFile, String outPdfFile) {
         File sFile = new File(inWpsFile.replace('/','\\'));
@@ -262,30 +262,30 @@ public abstract class OfficeToPdf {
         return successed;
     }
 
-	public static boolean office2Pdf(String inputFile, String pdfFile) {
-		String suffix = StringUtils.toLowerCase(
-				FileType.getFileExtName(inputFile));
-		//System.out.println("文件格式不支持转换为PDF!");
-		return office2Pdf(suffix,inputFile, pdfFile);
-	}
+    public static boolean office2Pdf(String inputFile, String pdfFile) {
+        String suffix = StringUtils.toLowerCase(
+                FileType.getFileExtName(inputFile));
+        //System.out.println("文件格式不支持转换为PDF!");
+        return office2Pdf(suffix,inputFile, pdfFile);
+    }
 
-	public static boolean office2Pdf(String suffix, String inputFile, String pdfFile) {
+    public static boolean office2Pdf(String suffix, String inputFile, String pdfFile) {
 
-		File file = new File(inputFile);
-		if (!(file.exists())) {
-			//System.err.println("文件不存在！");
-			return false;
-		}
-		if (suffix.equalsIgnoreCase("pdf")) {
-			//System.out.println("PDF文件无需转换为PDF!");
-			try {
-				FileSystemOpt.fileCopy(inputFile, pdfFile);
-				return true;
-			} catch (IOException e) {
-				logger.error(e.getMessage(),e);//e.printStackTrace();
-			}
-			return false;
-		}
+        File file = new File(inputFile);
+        if (!(file.exists())) {
+            //System.err.println("文件不存在！");
+            return false;
+        }
+        if (suffix.equalsIgnoreCase("pdf")) {
+            //System.out.println("PDF文件无需转换为PDF!");
+            try {
+                FileSystemOpt.fileCopy(inputFile, pdfFile);
+                return true;
+            } catch (IOException e) {
+                logger.error(e.getMessage(),e);//e.printStackTrace();
+            }
+            return false;
+        }
         if (suffix.equalsIgnoreCase("doc") || suffix.equalsIgnoreCase("docx")) {
             return word2Pdf(inputFile, pdfFile);
         }else if (suffix.equalsIgnoreCase("ppt") || suffix.equalsIgnoreCase("pptx")) {
@@ -296,8 +296,8 @@ public abstract class OfficeToPdf {
         }else if (suffix.equalsIgnoreCase("wps")) {
             return wps2Pdf(inputFile, pdfFile);
         }
-		//System.out.println("文件格式不支持转换为PDF!");
-		return false;
-	}
+        //System.out.println("文件格式不支持转换为PDF!");
+        return false;
+    }
 
 }

@@ -67,13 +67,13 @@ public abstract class CaptchaImageUtil {
                        .replaceAll("I", "1").replaceAll("i", "1")
                        .replaceAll("L", "1").replaceAll("l", "1"));
     }
-    /*	public static BufferedImage generateCaptchaImage(String captchaKey){
-		DefaultKaptcha producer = new DefaultKaptcha();
-		producer.setConfig(new Config(new Properties()));
-		BufferedImage image = producer.createImage(captchaKey);
-		return image;
+    /*    public static BufferedImage generateCaptchaImage(String captchaKey){
+        DefaultKaptcha producer = new DefaultKaptcha();
+        producer.setConfig(new Config(new Properties()));
+        BufferedImage image = producer.createImage(captchaKey);
+        return image;
 
-	}*/
+    }*/
 
     public static BufferedImage generateCaptchaImage(String captchaKey) {
         // 设置图片的长宽

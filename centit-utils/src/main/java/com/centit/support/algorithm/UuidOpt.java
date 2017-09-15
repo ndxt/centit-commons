@@ -30,14 +30,14 @@ public abstract class UuidOpt {
     }
     
     public static String getUuidAsString36(){
-    	return uuidToString36(UUID.randomUUID());
+        return uuidToString36(UUID.randomUUID());
     }
     
     public static String getUuidAsString32(){
-    	return uuidToString32(UUID.randomUUID());
+        return uuidToString32(UUID.randomUUID());
     }
     
     public static String getUuidAsString(){
-    	return uuidToString32(UUID.randomUUID());
+        return uuidToString32(UUID.randomUUID());
     }
 }

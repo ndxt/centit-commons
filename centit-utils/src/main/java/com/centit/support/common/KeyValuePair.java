@@ -2,10 +2,10 @@ package com.centit.support.common;
 
 /**
  * key value 数值对; 我们经常想在一个方法中返回多个值，比如返回错误编号和错误文字说明，有 KeyValuePair 就很方便
- * 	return new KeyValuePair(Integer,String)(5,"error message");
+ *     return new KeyValuePair(Integer,String)(5,"error message");
  * 返回三个值可以用
  *  return new KeyValuePair ( Integer,KeyValuePair(String,Object))(5,
- *  	new KeyValuePair(String,Object)("error message",otherObje));
+ *      new KeyValuePair(String,Object)("error message",otherObje));
  * 以此类推可以返回多个数值
  * 
  * 建议使用 org.apache.commons.lang3.tuple.MutablePair
@@ -18,46 +18,46 @@ package com.centit.support.common;
  */
 @SuppressWarnings("unused")
 public class KeyValuePair<K,V>{
-	private K key;
-	private V value;
-	
-	public KeyValuePair(){
-		
-	}
-	
-	public KeyValuePair(K key,V value){
-		this.key = key;
-		this.value = value;
-	}
+    private K key;
+    private V value;
 
-	public K getKey() {
-		return key;
-	}
-	
-	public K getLeft() {
-		return key;
-	}
-	
-	public void setKey(K key) {
-		this.key = key;
-	}
-	
-	public V getValue() {
-		return value;
-	}
-	
-	public V getRight() {
-		return value;
-	}
-	
-	public void setValue(V value) {
-		this.value = value;
-	}
-	
-	/*public V setValue(V value) {
-		V oldValue = this.value;
-		this.value = value;
-		return oldValue;
-	}*/
+    public KeyValuePair(){
+
+    }
+
+    public KeyValuePair(K key,V value){
+        this.key = key;
+        this.value = value;
+    }
+
+    public K getKey() {
+        return key;
+    }
+
+    public K getLeft() {
+        return key;
+    }
+
+    public void setKey(K key) {
+        this.key = key;
+    }
+
+    public V getValue() {
+        return value;
+    }
+
+    public V getRight() {
+        return value;
+    }
+
+    public void setValue(V value) {
+        this.value = value;
+    }
+
+    /*public V setValue(V value) {
+        V oldValue = this.value;
+        this.value = value;
+        return oldValue;
+    }*/
 
 }

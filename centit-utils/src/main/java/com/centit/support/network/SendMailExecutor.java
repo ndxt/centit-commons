@@ -11,33 +11,33 @@ import java.util.List;
 @SuppressWarnings("unused")
 public abstract class SendMailExecutor {
 
-	private SendMailExecutor() {
-		throw new IllegalAccessError("Utility class");
-	}
+    private SendMailExecutor() {
+        throw new IllegalAccessError("Utility class");
+    }
 
-	protected static final Logger logger = LoggerFactory.getLogger(SendMailExecutor.class);
-	public static String mailHost = "";
-	public static String mailUser = "";
-	public static String mailPassword = "";
-	public static int smtpPort = 25;
+    protected static final Logger logger = LoggerFactory.getLogger(SendMailExecutor.class);
+    public static String mailHost = "";
+    public static String mailUser = "";
+    public static String mailPassword = "";
+    public static int smtpPort = 25;
 
 
-	public static void setMailServer(String mailHost,String mailUser,String mailPassword) {
-		SendMailExecutor.mailHost = mailHost;
-		SendMailExecutor.mailUser = mailUser;
-		SendMailExecutor.mailPassword = mailPassword;
-	}
-	
-	public static void setMailServer(String mailHost,String mailUser,String mailPassword,int smtpPort) {
-		SendMailExecutor.mailHost = mailHost;
-		SendMailExecutor.mailUser = mailUser;
-		SendMailExecutor.mailPassword = mailPassword;
-		SendMailExecutor.smtpPort = smtpPort;
-	}
-	
+    public static void setMailServer(String mailHost,String mailUser,String mailPassword) {
+        SendMailExecutor.mailHost = mailHost;
+        SendMailExecutor.mailUser = mailUser;
+        SendMailExecutor.mailPassword = mailPassword;
+    }
 
-	public static boolean sendEmail(String [] mailTo, String mailFrom, 
-			String msgSubject, String msgContent) {
+    public static void setMailServer(String mailHost,String mailUser,String mailPassword,int smtpPort) {
+        SendMailExecutor.mailHost = mailHost;
+        SendMailExecutor.mailUser = mailUser;
+        SendMailExecutor.mailPassword = mailPassword;
+        SendMailExecutor.smtpPort = smtpPort;
+    }
+
+
+    public static boolean sendEmail(String [] mailTo, String mailFrom,
+            String msgSubject, String msgContent) {
 
         MultiPartEmail multMail = new MultiPartEmail();
         // SMTP
@@ -45,7 +45,7 @@ public abstract class SendMailExecutor {
         multMail.setSmtpPort(smtpPort);
          // 需要提供公用的邮件用户名和密码
         multMail.setAuthentication(
-        		mailUser,
+                mailUser,
                 mailPassword);
         try {
             //multMail.setFrom(CodeRepositoryUtil.getValue("SysMail", "admin_email"));
@@ -53,11 +53,11 @@ public abstract class SendMailExecutor {
             multMail.addTo(mailTo);
             multMail.setSubject(msgSubject);
             msgContent = msgContent.trim();
-			if(msgContent.endsWith("</html>") || msgContent.endsWith("</HTML>")){
-				multMail.addPart(msgContent, "text/html;charset=utf-8");
-			}else{
-				multMail.setMsg(msgContent);
-			}
+            if(msgContent.endsWith("</html>") || msgContent.endsWith("</HTML>")){
+                multMail.addPart(msgContent, "text/html;charset=utf-8");
+            }else{
+                multMail.setMsg(msgContent);
+            }
             multMail.send();
             return true;
         } catch (EmailException e) {
@@ -65,15 +65,15 @@ public abstract class SendMailExecutor {
         }
         return false;
     }
-	
-	public static boolean sendEmail(String mailTo, String mailFrom, 
-			String msgSubject, String msgContent) {
-		return sendEmail(new String[] {mailTo},  mailFrom, 
-				 msgSubject,  msgContent);
-	}
-	
-	public static boolean sendEmail(String [] mailTo, String mailFrom, 
-			String msgSubject, String msgContent,List<File> annexs) {
+
+    public static boolean sendEmail(String mailTo, String mailFrom,
+            String msgSubject, String msgContent) {
+        return sendEmail(new String[] {mailTo},  mailFrom,
+                 msgSubject,  msgContent);
+    }
+
+    public static boolean sendEmail(String [] mailTo, String mailFrom,
+            String msgSubject, String msgContent,List<File> annexs) {
 
         MultiPartEmail multMail = new MultiPartEmail();        
         // SMTP
@@ -81,7 +81,7 @@ public abstract class SendMailExecutor {
         multMail.setSmtpPort(smtpPort);
          // 需要提供公用的邮件用户名和密码
         multMail.setAuthentication(
-        		mailUser,
+                mailUser,
                 mailPassword);
         try {
             //multMail.setFrom(CodeRepositoryUtil.getValue("SysMail", "admin_email"));
@@ -91,7 +91,7 @@ public abstract class SendMailExecutor {
             multMail.setMsg(msgContent);
             
             for(File attachment: annexs){
-            	multMail.attach(attachment);
+                multMail.attach(attachment);
             }
 
             multMail.send();
@@ -103,10 +103,10 @@ public abstract class SendMailExecutor {
         return false;
     }
 
-	public static boolean sendEmail(String mailTo, String mailFrom, 
-			String msgSubject, String msgContent,List<File> annexs){
-		return sendEmail(new String[] {mailTo},  mailFrom, 
-				 msgSubject,  msgContent, annexs);
-	}
-	
+    public static boolean sendEmail(String mailTo, String mailFrom,
+            String msgSubject, String msgContent,List<File> annexs){
+        return sendEmail(new String[] {mailTo},  mailFrom,
+                 msgSubject,  msgContent, annexs);
+    }
+
 }

@@ -30,8 +30,8 @@ public abstract class XMLObject {
     }
   
     @SuppressWarnings("unchecked")
-	public static Element createXMLElementFromObject(String elementName , Object object){
-    	
+    public static Element createXMLElementFromObject(String elementName , Object object){
+
         if(object instanceof String){
             return createXMLElement(elementName ,"String", object);
         }
@@ -58,7 +58,7 @@ public abstract class XMLObject {
             return createXMLElement(elementName ,"Date", object);
         }
         if(object instanceof Map){
-        	Element element = DocumentHelper.createElement(elementName);
+            Element element = DocumentHelper.createElement(elementName);
             element.addAttribute("type","Object");
             for(Map.Entry<Object,Object> jo : ((Map<Object,Object>)object).entrySet()){
                 if(jo.getValue()!=null)
@@ -89,22 +89,22 @@ public abstract class XMLObject {
         }
         
         if(ReflectionOpt.isScalarType(object.getClass())){
-        	 return createXMLElement(elementName ,"String", object);
-		}else{
-			Field[] fields = ReflectionOpt.getFields(object);
-			if(fields==null)
-				return createXMLElement(elementName ,"String", object);
-			
-			Element element = DocumentHelper.createElement(elementName);
+             return createXMLElement(elementName ,"String", object);
+        }else{
+            Field[] fields = ReflectionOpt.getFields(object);
+            if(fields==null)
+                return createXMLElement(elementName ,"String", object);
+
+            Element element = DocumentHelper.createElement(elementName);
             element.addAttribute("type","Object");
             for(Field field: fields){
-            	Object obj = ReflectionOpt.getFieldValue( object,   field);
-            	if(obj!=null)
-            		element.add(createXMLElementFromObject(field.getName(), obj));
+                Object obj = ReflectionOpt.getFieldValue( object,   field);
+                if(obj!=null)
+                    element.add(createXMLElementFromObject(field.getName(), obj));
              
             }
             return element;
-		}
+        }
     }
     
     public static String jsonObjectToXMLString(Map<String, Object> json){
@@ -163,7 +163,7 @@ public abstract class XMLObject {
     }
     
     @SuppressWarnings("unchecked")
-	public static Map<String, Object> elementToJSONObject(Element element ){
+    public static Map<String, Object> elementToJSONObject(Element element ){
         Object obj = elementToObject(element);
         if(obj instanceof Map)
             return (Map<String, Object> ) obj;

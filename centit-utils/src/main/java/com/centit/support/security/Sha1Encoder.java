@@ -17,31 +17,31 @@ import java.security.NoSuchAlgorithmException;
 @SuppressWarnings("unused")
 public abstract class Sha1Encoder {
 
-	private Sha1Encoder() {
-		throw new IllegalAccessError("Utility class");
-	}
+    private Sha1Encoder() {
+        throw new IllegalAccessError("Utility class");
+    }
 
-	protected static final Logger logger = LoggerFactory.getLogger(Sha1Encoder.class);
+    protected static final Logger logger = LoggerFactory.getLogger(Sha1Encoder.class);
 
-	public static String encode(byte[] data){
-		MessageDigest SHA1;
-		try {
-			SHA1 = MessageDigest.getInstance("SHA-1");		
-			SHA1.update(data, 0, data.length);
-			return new String(Hex.encodeHex(SHA1.digest()));
-		} catch (NoSuchAlgorithmException e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-			return null;
-		}
-	}
-	
-	public static String encode(String data){
-		try {
-			return encode(data.getBytes("utf8"));
-		} catch (UnsupportedEncodingException e) {
-			logger.error(e.getMessage(),e);//e.printStackTrace();
-			return null;
-		}
-	}
+    public static String encode(byte[] data){
+        MessageDigest SHA1;
+        try {
+            SHA1 = MessageDigest.getInstance("SHA-1");
+            SHA1.update(data, 0, data.length);
+            return new String(Hex.encodeHex(SHA1.digest()));
+        } catch (NoSuchAlgorithmException e) {
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String encode(String data){
+        try {
+            return encode(data.getBytes("utf8"));
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+            return null;
+        }
+    }
 
 }

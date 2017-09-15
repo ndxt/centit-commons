@@ -12,41 +12,41 @@ import org.apache.http.impl.client.HttpClients;
 import com.centit.support.network.HttpExecutor;
 
 public class TestFromPost {
-	
+
     public static void main(String[] args) {
 
-    	testUploadFile();
-    	
+        testUploadFile();
+
     }
-    public static void testUploadFile(){	
-    	CloseableHttpClient httpClient = HttpClients.createDefault();
-	    Map<String, File> files = new HashMap<>();
-	    files.put("file",new File("D:/temp/server-productsvr.cer"));
-	    Map<String,Object> params = new HashMap<>();
-	    params.put("osId", "FILE_SVR");
-	    params.put("optId","LOCAL_FILE");
-	    String jsonStr;
-		try {
-			jsonStr = HttpExecutor.formPostWithFileUpload(httpClient,
-			        "http://codefanpc:8180/product-file/service/upload/file",
-			        params,
-			        files);
-			System.out.println(jsonStr);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("ERROE");
-		}
-	    
+    public static void testUploadFile(){
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        Map<String, File> files = new HashMap<>();
+        files.put("file",new File("D:/temp/server-productsvr.cer"));
+        Map<String,Object> params = new HashMap<>();
+        params.put("osId", "FILE_SVR");
+        params.put("optId","LOCAL_FILE");
+        String jsonStr;
+        try {
+            jsonStr = HttpExecutor.formPostWithFileUpload(httpClient,
+                    "http://codefanpc:8180/product-file/service/upload/file",
+                    params,
+                    files);
+            System.out.println(jsonStr);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("ERROE");
+        }
+
     }
     
-	public static void testSession(){	
+    public static void testSession(){
 
 
         try {
 
 
-        	CloseableHttpClient httpClient = HttpClients.createDefault();
-        	
+            CloseableHttpClient httpClient = HttpClients.createDefault();
+
        
            String s = HttpExecutor.simpleGet(httpClient, null, 
                     "http://codefanbook:8180/TestSession/TestSession",(String)null);
@@ -67,20 +67,20 @@ public class TestFromPost {
             //e.printStackTrace();
         }
         
-	}
-	    
-	
+    }
+
+
     
-public static void testLogin(){	
+public static void testLogin(){
 
     
     //CloseableHttpClient client2 = HttpClients.createDefault();
-	HttpClientContext context = HttpClientContext.create(); 
+    HttpClientContext context = HttpClientContext.create();
    
     CloseableHttpClient httpClient = HttpExecutor.createHttpClient();
 
     try {
-    	        	
+
         Map<String,String> params = new HashMap<String,String>();
         params.put("j_username", "admin");
         params.put("j_password", "000000");

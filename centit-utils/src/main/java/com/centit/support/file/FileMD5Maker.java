@@ -19,25 +19,25 @@ public abstract class FileMD5Maker {
     private FileMD5Maker() {
         throw new IllegalAccessError("Utility class");
     }
-	protected static final Logger logger = LoggerFactory.getLogger(FileMD5Maker.class);
-	public static String makeFileMD5(File file) throws IOException {
+    protected static final Logger logger = LoggerFactory.getLogger(FileMD5Maker.class);
+    public static String makeFileMD5(File file) throws IOException {
 
         try(FileInputStream fis = new FileInputStream(file)) {
             return makeFileMD5(fis);
         }
     }
-	
-	public static String makeFileMD5(InputStream is) throws IOException{
+
+    public static String makeFileMD5(InputStream is) throws IOException{
         try {
-        	MessageDigest MD5 = MessageDigest.getInstance("MD5");
+            MessageDigest MD5 = MessageDigest.getInstance("MD5");
             byte[] buffer = new byte[8192];
             int length;
             while ((length = is.read(buffer)) != -1) {
-            	MD5.update(buffer, 0, length);
+                MD5.update(buffer, 0, length);
             }
             return new String(Hex.encodeHex(MD5.digest()));
         } catch (NoSuchAlgorithmException e) {
-        	logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(),e);//e.printStackTrace();
             return null;
         } 
     }

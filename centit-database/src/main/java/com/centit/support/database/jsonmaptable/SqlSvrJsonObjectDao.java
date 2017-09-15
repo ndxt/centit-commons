@@ -15,105 +15,105 @@ import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.database.metadata.TableInfo;
 
 public class SqlSvrJsonObjectDao extends GeneralJsonObjectDao {
-	
-	public SqlSvrJsonObjectDao(){
-		
-	}
-	
-	public SqlSvrJsonObjectDao(Connection conn) {
-		super(conn);
-	}	
-	
-	public SqlSvrJsonObjectDao(TableInfo tableInfo) {
-		super(tableInfo);
-	}
-	
-	public SqlSvrJsonObjectDao(Connection conn,TableInfo tableInfo) {
-		super(conn,tableInfo);
-	}
-	
-	@Override
-	public JSONArray listObjectsByProperties(final Map<String, Object> properties,
-			final int startPos,final int maxSize)
-	throws SQLException, IOException {		
-		TableInfo tableInfo = this.getTableInfo();		
-		Pair<String,String[]> q = buildFieldSqlWithFieldName(tableInfo,null);
-		String filter = buildFilterSql(tableInfo,null,properties.keySet());
-		String sql = "select " + q.getLeft() +" from " +tableInfo.getTableName();
-		if(StringUtils.isNotBlank(filter))
-			sql = sql + " where " + filter;
-		if(StringUtils.isNotBlank(tableInfo.getOrderBy()))
-			sql = sql + " order by " + tableInfo.getOrderBy();
-		return DatabaseAccess.findObjectsByNamedSqlAsJSON(
-					getConnect(),
-					QueryUtils.buildSqlServerLimitQuerySQL(
-							sql,
-							startPos, maxSize),
-				 properties,
-				 q.getRight());
-	}
 
-	/** 用表来模拟sequence
-	 * create table simulate_sequence (seqname varchar(100) not null primary key,
-	 * currvalue integer, increment integer);
-	 *
-	 * @param sequenceName sequenceName
-	 * @return Long
-	 * @throws SQLException SQLException
-	 * @throws IOException IOException
-	 */
-	@Override
-	public Long getSequenceNextValue(final String sequenceName) throws SQLException, IOException {
-		return getSimulateSequenceNextValue(sequenceName);
-	}
-	
-	@Override
-	public List<Object[]> findObjectsBySql(final String sSql, final Object[] values, 
-			final int pageNo, final int pageSize)
-			throws SQLException, IOException {
-		int startPos=pageNo>1?(pageNo-1)*pageSize:0;
-		return DatabaseAccess.findObjectsBySql(
-				getConnect(),
-				QueryUtils.buildSqlServerLimitQuerySQL(
-						sSql,
-						startPos, pageSize),
-				values);
-	}	
+    public SqlSvrJsonObjectDao(){
 
-	@Override
-	public List<Object[]> findObjectsByNamedSql(final String sSql, final Map<String, Object> values, 
-			final int pageNo,final int pageSize) throws SQLException, IOException {
-		int startPos=pageNo>1?(pageNo-1)*pageSize:0;
-		return DatabaseAccess.findObjectsByNamedSql(
-				getConnect(),
-				QueryUtils.buildSqlServerLimitQuerySQL(
-						sSql,
-						startPos, pageSize),
-				values);
-	}
+    }
 
-	@Override
-	public JSONArray findObjectsAsJSON(final String sSql, final Object[] values, final String[] fieldnames,
-			final int pageNo, final int pageSize)
-			throws SQLException, IOException {
-		int startPos=pageNo>1?(pageNo-1)*pageSize:0;
-		return DatabaseAccess.findObjectsAsJSON(
-				getConnect(),
-				QueryUtils.buildSqlServerLimitQuerySQL(
-						sSql,
-						startPos, pageSize),
-				values,fieldnames);
-	}
+    public SqlSvrJsonObjectDao(Connection conn) {
+        super(conn);
+    }
 
-	@Override
-	public JSONArray findObjectsByNamedSqlAsJSON(final String sSql, final Map<String, Object> values,
-			final String[] fieldnames, final int pageNo, final int pageSize) throws SQLException, IOException {
-		int startPos=pageNo>1?(pageNo-1)*pageSize:0;
-		return DatabaseAccess.findObjectsByNamedSqlAsJSON(
-				getConnect(),
-				QueryUtils.buildSqlServerLimitQuerySQL(
-						sSql,
-						startPos, pageSize),
-				values,fieldnames);
-	}
+    public SqlSvrJsonObjectDao(TableInfo tableInfo) {
+        super(tableInfo);
+    }
+
+    public SqlSvrJsonObjectDao(Connection conn,TableInfo tableInfo) {
+        super(conn,tableInfo);
+    }
+
+    @Override
+    public JSONArray listObjectsByProperties(final Map<String, Object> properties,
+            final int startPos,final int maxSize)
+    throws SQLException, IOException {
+        TableInfo tableInfo = this.getTableInfo();
+        Pair<String,String[]> q = buildFieldSqlWithFieldName(tableInfo,null);
+        String filter = buildFilterSql(tableInfo,null,properties.keySet());
+        String sql = "select " + q.getLeft() +" from " +tableInfo.getTableName();
+        if(StringUtils.isNotBlank(filter))
+            sql = sql + " where " + filter;
+        if(StringUtils.isNotBlank(tableInfo.getOrderBy()))
+            sql = sql + " order by " + tableInfo.getOrderBy();
+        return DatabaseAccess.findObjectsByNamedSqlAsJSON(
+                    getConnect(),
+                    QueryUtils.buildSqlServerLimitQuerySQL(
+                            sql,
+                            startPos, maxSize),
+                 properties,
+                 q.getRight());
+    }
+
+    /** 用表来模拟sequence
+     * create table simulate_sequence (seqname varchar(100) not null primary key,
+     * currvalue integer, increment integer);
+     *
+     * @param sequenceName sequenceName
+     * @return Long
+     * @throws SQLException SQLException
+     * @throws IOException IOException
+     */
+    @Override
+    public Long getSequenceNextValue(final String sequenceName) throws SQLException, IOException {
+        return getSimulateSequenceNextValue(sequenceName);
+    }
+
+    @Override
+    public List<Object[]> findObjectsBySql(final String sSql, final Object[] values,
+            final int pageNo, final int pageSize)
+            throws SQLException, IOException {
+        int startPos=pageNo>1?(pageNo-1)*pageSize:0;
+        return DatabaseAccess.findObjectsBySql(
+                getConnect(),
+                QueryUtils.buildSqlServerLimitQuerySQL(
+                        sSql,
+                        startPos, pageSize),
+                values);
+    }
+
+    @Override
+    public List<Object[]> findObjectsByNamedSql(final String sSql, final Map<String, Object> values,
+            final int pageNo,final int pageSize) throws SQLException, IOException {
+        int startPos=pageNo>1?(pageNo-1)*pageSize:0;
+        return DatabaseAccess.findObjectsByNamedSql(
+                getConnect(),
+                QueryUtils.buildSqlServerLimitQuerySQL(
+                        sSql,
+                        startPos, pageSize),
+                values);
+    }
+
+    @Override
+    public JSONArray findObjectsAsJSON(final String sSql, final Object[] values, final String[] fieldnames,
+            final int pageNo, final int pageSize)
+            throws SQLException, IOException {
+        int startPos=pageNo>1?(pageNo-1)*pageSize:0;
+        return DatabaseAccess.findObjectsAsJSON(
+                getConnect(),
+                QueryUtils.buildSqlServerLimitQuerySQL(
+                        sSql,
+                        startPos, pageSize),
+                values,fieldnames);
+    }
+
+    @Override
+    public JSONArray findObjectsByNamedSqlAsJSON(final String sSql, final Map<String, Object> values,
+            final String[] fieldnames, final int pageNo, final int pageSize) throws SQLException, IOException {
+        int startPos=pageNo>1?(pageNo-1)*pageSize:0;
+        return DatabaseAccess.findObjectsByNamedSqlAsJSON(
+                getConnect(),
+                QueryUtils.buildSqlServerLimitQuerySQL(
+                        sSql,
+                        startPos, pageSize),
+                values,fieldnames);
+    }
 }

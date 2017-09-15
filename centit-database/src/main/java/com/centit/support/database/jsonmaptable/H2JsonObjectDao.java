@@ -17,35 +17,35 @@ import java.sql.SQLException;
  */
 public class H2JsonObjectDao extends MySqlJsonObjectDao {
 
-	public H2JsonObjectDao(){
+    public H2JsonObjectDao(){
 
-	}
+    }
 
-	public H2JsonObjectDao(Connection conn) {
-		super(conn);
-	}
+    public H2JsonObjectDao(Connection conn) {
+        super(conn);
+    }
 
-	public H2JsonObjectDao(TableInfo tableInfo) {
-		super(tableInfo);
-	}
+    public H2JsonObjectDao(TableInfo tableInfo) {
+        super(tableInfo);
+    }
 
-	public H2JsonObjectDao(Connection conn, TableInfo tableInfo) {
-		super(conn,tableInfo);
-	}
-	
+    public H2JsonObjectDao(Connection conn, TableInfo tableInfo) {
+        super(conn,tableInfo);
+    }
 
-	/** 用表来模拟sequence
-	 * create table simulate_sequence (seqname varchar(100) not null primary key,
-	 * currvalue integer, increment integer);
-	 *
-	 * @param sequenceName sequenceName
-	 * @return Long
-	 * @throws SQLException SQLException
-	 * @throws IOException IOException
-	 */
-	@Override
-	public Long getSequenceNextValue(final String sequenceName) throws SQLException, IOException {
-		return getSimulateSequenceNextValue(sequenceName);
-	}
+
+    /** 用表来模拟sequence
+     * create table simulate_sequence (seqname varchar(100) not null primary key,
+     * currvalue integer, increment integer);
+     *
+     * @param sequenceName sequenceName
+     * @return Long
+     * @throws SQLException SQLException
+     * @throws IOException IOException
+     */
+    @Override
+    public Long getSequenceNextValue(final String sequenceName) throws SQLException, IOException {
+        return getSimulateSequenceNextValue(sequenceName);
+    }
 
 }

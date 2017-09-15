@@ -7,6 +7,6 @@ import com.centit.test.transaction.Transactional;
 import java.sql.SQLException;
 
 public interface TestService {
-	@Transactional
-	public void insertUser(DBConnect conn, JSONObject userInfo) throws SQLException;
+    @Transactional
+    public void insertUser(DBConnect conn, JSONObject userInfo) throws SQLException;
 }

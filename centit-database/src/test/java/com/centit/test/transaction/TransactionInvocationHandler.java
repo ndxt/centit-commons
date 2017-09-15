@@ -11,12 +11,12 @@ import java.util.List;
  *
  */
 public class TransactionInvocationHandler implements InvocationHandler{
-	
+
     private Object obj;
     
     public TransactionInvocationHandler(Object obj){
-    	/*if(obj instanceof TransactionSupport)
-    		throw new Exception("not support TransactionSupport");*/
+        /*if(obj instanceof TransactionSupport)
+            throw new Exception("not support TransactionSupport");*/
         this.obj = obj;
     }
     
@@ -34,36 +34,36 @@ public class TransactionInvocationHandler implements InvocationHandler{
     @Override
     public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable {
-    	Object retObj=null;
-    	boolean inTransaction = false;
-    	List<DBConnect> needCommitConn = new ArrayList<>(3);
+        Object retObj=null;
+        boolean inTransaction = false;
+        List<DBConnect> needCommitConn = new ArrayList<>(3);
         try{
-        	inTransaction = method.isAnnotationPresent(Transactional.class);
-        	//method.getParameterTypes()
-        	//method.getParameterAnnotations()
-        	if(inTransaction && args!=null){
-        		for(Object arg:args){
-        			if(arg instanceof DBConnect){
-        				DBConnect conn = (DBConnect) arg;
-        				if(conn.startTransaction()){
-        					needCommitConn.add(conn);
-        				}
-        			}
-        		}
-        	}
-         	retObj = method.invoke(obj, args);
-        	if(inTransaction && needCommitConn.size()>0){
-        		for(DBConnect conn : needCommitConn){
-        			conn.commit();
-        		}
-        	}
+            inTransaction = method.isAnnotationPresent(Transactional.class);
+            //method.getParameterTypes()
+            //method.getParameterAnnotations()
+            if(inTransaction && args!=null){
+                for(Object arg:args){
+                    if(arg instanceof DBConnect){
+                        DBConnect conn = (DBConnect) arg;
+                        if(conn.startTransaction()){
+                            needCommitConn.add(conn);
+                        }
+                    }
+                }
+            }
+             retObj = method.invoke(obj, args);
+            if(inTransaction && needCommitConn.size()>0){
+                for(DBConnect conn : needCommitConn){
+                    conn.commit();
+                }
+            }
         }catch(Exception e){
-        	if(inTransaction && needCommitConn.size()>0){
-        		for(DBConnect conn : needCommitConn){
-        			conn.rollback();
-        		}
-        	}
-        	throw e;
+            if(inTransaction && needCommitConn.size()>0){
+                for(DBConnect conn : needCommitConn){
+                    conn.rollback();
+                }
+            }
+            throw e;
         }        
         return retObj;
     }

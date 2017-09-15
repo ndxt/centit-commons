@@ -13,50 +13,48 @@ public class TestJsonObject {
         System.out.println(JSON.toJSONString(new Object[]{5,6,"hello"}));
 
         Map<String,Object> mp = JSONOpt.createHashMap("osid",
-    			JSONOpt.createHashMap("type","string","index","analyzed"), 
-    			"optid",
-    			JSONOpt.createHashMap("type","string","index","analyzed"));
-    	
-    	
-      	JSONObject jo = new JSONObject();
-      	JSONOpt.setAttribute(jo,"object.properties",mp);
-    	System.out.println( jo.toString());	
-    	
-    	//testObjectToJson();
+                JSONOpt.createHashMap("type","string","index","analyzed"),
+                "optid",
+                JSONOpt.createHashMap("type","string","index","analyzed"));
+        JSONObject jo = new JSONObject();
+        JSONOpt.setAttribute(jo,"object.properties",mp);
+        System.out.println( jo.toString());
+
+        testObjectToJson();
 
     }
     
     public static void testObjectToJson(){
-      /*	B b = new B();
-      	A a = new A();
+      /*    B b = new B();
+          A a = new A();
 
-      	a.firstValue = "a1";
-      	b.firstValue = 100;
-      	a.setSecondValue("a2");
-      	b.setThirdValueTemp(a);
-      	b.setSecondValue("b2");
-      	
-      	
-      	char [][] aInt = new char[5][2];
-      	aInt[0][0] = 1;
-      	aInt[1][0] = 2;
-      	aInt[2][0] = 3;
-      	aInt[3][0] = 4;
-      	aInt[4][0] = 5;
-      	aInt[0][1] = 1;
-      	aInt[1][1] = 2;
-      	aInt[2][1] = 3;
-      	aInt[3][1] = 4;
-      	aInt[4][1] = 5;
-      	System.out.println( (ReflectionOpt.isArray(aInt[0]))?"array":"simple");
-      	JSONArray jAray= JSONOpt.arrayToJSONArray(aInt);
-    	System.out.println( jAray.toString());	
-      	
-      	JSONObject jObj = JSONOpt.objectToJSONObject(b);
-    	System.out.println( jObj.toString());
-    	a.setSecondValue("a22");
-    	JSONOpt.appendData(jObj , "thirdValue", JSONOpt.objectToJSONObject(a));
-    	System.out.println( jObj.toString());*/
+          a.firstValue = "a1";
+          b.firstValue = 100;
+          a.setSecondValue("a2");
+          b.setThirdValueTemp(a);
+          b.setSecondValue("b2");
+
+
+          char [][] aInt = new char[5][2];
+          aInt[0][0] = 1;
+          aInt[1][0] = 2;
+          aInt[2][0] = 3;
+          aInt[3][0] = 4;
+          aInt[4][0] = 5;
+          aInt[0][1] = 1;
+          aInt[1][1] = 2;
+          aInt[2][1] = 3;
+          aInt[3][1] = 4;
+          aInt[4][1] = 5;
+          System.out.println( (ReflectionOpt.isArray(aInt[0]))?"array":"simple");
+          JSONArray jAray= JSONOpt.arrayToJSONArray(aInt);
+        System.out.println( jAray.toString());
+
+          JSONObject jObj = JSONOpt.objectToJSONObject(b);
+        System.out.println( jObj.toString());
+        a.setSecondValue("a22");
+        JSONOpt.appendData(jObj , "thirdValue", JSONOpt.objectToJSONObject(a));
+        System.out.println( jObj.toString());*/
         JSONObject json = new JSONObject();
          //json.fromString("{a:{b:[{h:{c:\"hello\"}},{c:[\"chartDiv\",\"chartDiv2\",\"chartDiv3\"]}]}}");
         /*Map<String ,Object> map = new HashMap<String ,Object>();

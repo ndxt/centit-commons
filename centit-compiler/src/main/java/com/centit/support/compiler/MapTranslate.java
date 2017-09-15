@@ -8,16 +8,16 @@ import java.util.Map;
  */
 public class MapTranslate extends ObjectTranslate {
 
-	//public
-	public MapTranslate(){
-		super();
-	}
-	public MapTranslate(Map<String,Object> varMap) {
-		super(varMap);
-	}
-	
-	public void setVarMap(Map<String,Object> varMap) {
-		super.setVarObject(varMap);
-	}
+    //public
+    public MapTranslate(){
+        super();
+    }
+    public MapTranslate(Map<String,Object> varMap) {
+        super(varMap);
+    }
+
+    public void setVarMap(Map<String,Object> varMap) {
+        super.setVarObject(varMap);
+    }
 }
 

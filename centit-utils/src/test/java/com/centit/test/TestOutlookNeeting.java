@@ -16,7 +16,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.centit.support.network.OutlookMeetingUtils;
 
 public class TestOutlookNeeting {
-	 /**
+     /**
     *
     * 通过对比，不难发现发送更新，其实日历头结构只需要改变DTSTART（开始时间）和DTEND（结束时间）到新的时间点就行 唯一需要注意的是要保持UID一致。
     * 取消约会稍有不同的是：METHOD:CANCEL 取消的时候METHOD属性需要修改为 CANCEL,操作代码如下：
@@ -26,7 +26,7 @@ public class TestOutlookNeeting {
     * @throws Exception
     */
    public static void main(String[] args) throws Exception {
-	   testDelete();
+       testDelete();
        //testUpdate("20160620T111107Z-uidGen@fe80:0:0:0:510b:a9b8:b8ab:d716%4");
 //       testUpdate("20160429T042917Z-uidGen@fe80:0:0:0:9c7c:67ff:fe46:f13f%8");
        //deleteTask("20160620T111107Z-uidGen@fe80:0:0:0:510b:a9b8:b8ab:d716%4");
@@ -50,13 +50,13 @@ public class TestOutlookNeeting {
        OutlookMeetingUtils.setOutlookServer("mail.centit.com","fan_cf@centit.com", "BSD@2008redhat");
        
        String uidString =  OutlookMeetingUtils.createMeeting(
-    		   startTime, endTime, title, organizerName, organizerEmail, location, description,participators);
+               startTime, endTime, title, organizerName, organizerEmail, location, description,participators);
 
        location = "南大先腾会议室";
        description = "会议室被占用，换一个会议室";
        
        OutlookMeetingUtils.updateMeeting(uidString,
-    		   startTime, endTime, title, organizerName, organizerEmail, location, description, participators);
+               startTime, endTime, title, organizerName, organizerEmail, location, description, participators);
      
        System.out.println(uidString);
        
@@ -79,7 +79,7 @@ public class TestOutlookNeeting {
        OutlookMeetingUtils.setOutlookServer("mail.centit.com","fan_cf@centit.com", "BSD@2008redhat");
        
        OutlookMeetingUtils.deleteMeeting("UID:20170512T102523Z-uidGen@fe80:0:0:0:cdc0:b539:4f9b:dc5b%2",
-    		   startTime, endTime, title, organizerName, organizerEmail, location, description, participators);
+               startTime, endTime, title, organizerName, organizerEmail, location, description, participators);
    }
    
 }
