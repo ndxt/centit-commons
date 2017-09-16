@@ -273,21 +273,7 @@ public abstract class ReflectionOpt  {
         return getDeclaredField(type, name).getType();
     }
 
-    /*
-     * 获得field的getter函数名称.
-     */
-    public static String getGetterName(Class<?> type, String fieldName) {
-        assert(type != null);
-        assert(fieldName != null && !fieldName.isEmpty());
-        //Assert.notNull(type, "Type required");
-        //Assert.hasText(fieldName, "FieldName required");
 
-        if (Boolean.class.equals(type) || boolean.class.equals(type)) {
-            return "is" + StringUtils.capitalize(fieldName);
-        } else {
-            return "get" + StringUtils.capitalize(fieldName);
-        }
-    }
 
     /*
      * 获得field的getter函数名称.
@@ -310,11 +296,17 @@ public abstract class ReflectionOpt  {
      */
     public static Method getGetterMethod(Class<?> classType, Class<?> propertyType, String fieldName) {
         try {
-            return classType.getMethod(getGetterName(propertyType, fieldName));
+            String getFuncName = (boolean.class.equals(propertyType) || Boolean.class.isAssignableFrom(propertyType))?
+                  "is" + StringUtils.capitalize(fieldName) : "get" + StringUtils.capitalize(fieldName);
+            Method md = classType.getMethod(getFuncName);
+            if(propertyType.isAssignableFrom( md.getReturnType()))
+                return md;
+            else
+                return null;
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage(), e);
+            return null;
         }
-        return null;
     }
 
     /*
@@ -322,13 +314,28 @@ public abstract class ReflectionOpt  {
      */
     public static Method getGetterMethod(Class<?> classType,  String fieldName) {
         try {
-            return classType.getMethod("get" + StringUtils.capitalize(fieldName));
+            Method md = classType.getMethod("get" + StringUtils.capitalize(fieldName));
+            if(void.class.equals(md.getReturnType()))
+                return null;
+            else
+                return md;
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage(), e);
+            return null;
         }
-        return null;
     }
 
+    /*
+     * 获得field的getter函数,如果找不到该方法,返回null.
+     */
+    public static Method getSetterMethod(Class<?> classType, Class<?> propertyType, String fieldName) {
+        try {
+            return classType.getMethod("set" + StringUtils.capitalize(fieldName), propertyType);
+        } catch (NoSuchMethodException e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
 
     /*
      * 获得 对象的 属性

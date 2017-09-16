@@ -1,5 +1,6 @@
 package com.centit.support.database.orm;
 
+import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableReference;
 import org.apache.commons.lang3.StringUtils;
@@ -50,15 +51,9 @@ public abstract class JpaMetadata {
         column.setPrecision(colInfo.precision());
 
         column.setObjectField(field);
-        try {
-            Method funcSetter = objType.getMethod("set" + StringUtils.capitalize(field.getName()), field.getType());
-            Method funcGetter =
-                    (boolean.class.equals(field.getType()) || Boolean.class.isAssignableFrom(field.getType())) ?
-                            objType.getMethod("is" + StringUtils.capitalize(field.getName())):
-                            objType.getMethod("get" + StringUtils.capitalize(field.getName()));
-        } catch (NoSuchMethodException e) {
-            logger.error(e.getMessage(),e);
-        }
+        column.setObjectGetFieldValueFunc(ReflectionOpt.getGetterMethod(objType, field.getType(), field.getName()));
+        column.setObjectSetFieldValueFunc(ReflectionOpt.getSetterMethod(objType, field.getType(), field.getName()));
+
         return column;
     }
 
