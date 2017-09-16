@@ -26,102 +26,84 @@ public abstract class OrmUtils {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static void setObjectFieldValue(Object object, String propertyName,
-                                           Object newValue, String fieldJavaType)
+    public static void setObjectFieldValue(Object object, SimpleTableField field,
+                                           Object newValue)
             throws NoSuchFieldException, IOException {
-        switch (fieldJavaType) {
+        switch (field.getJavaType()) {
             case "int":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToInteger(newValue),int.class);
+            case "Integer":
+                field.setObjectFieldValue(object,
+                        NumberBaseOpt.castObjectToInteger(newValue));
                 break;
             case "long":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToLong(newValue),long.class);
+            case "Long":
+                field.setObjectFieldValue(object,
+                        NumberBaseOpt.castObjectToLong(newValue));
                 break;
             case "float":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToDouble(newValue),float.class);
-                break;
+            case "Float":
             case "double":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToDouble(newValue),double.class);
+            case "Double":
+                field.setObjectFieldValue(object,
+                        NumberBaseOpt.castObjectToDouble(newValue));
                 break;
+
             case "byte[]"://BLOB字段
                 if (newValue instanceof Blob) {
-                    ReflectionOpt.setFieldValue(object, propertyName,
-                            DatabaseAccess.fetchBlobBytes((Blob) newValue), byte[].class);
+                    field.setObjectFieldValue(object,
+                            DatabaseAccess.fetchBlobBytes((Blob) newValue));
                 }else{
-                    ReflectionOpt.setFieldValue(object, propertyName,
-                            StringBaseOpt.objectToString(newValue).getBytes(), byte[].class);
+                    field.setObjectFieldValue(object,
+                            StringBaseOpt.objectToString(newValue).getBytes());
                 }
                 break;
-            case "Double":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToDouble(newValue),Double.class);
-                break;
-            case "Float":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToDouble(newValue),Float.class);
-                break;
-            case "Long":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToLong(newValue),Long.class);
-                break;
-            case "Integer":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToInteger(newValue),Integer.class);
-                break;
+
+
             case "BigDecimal":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToBigDecimal(newValue),BigDecimal.class);
+                field.setObjectFieldValue(object,
+                        NumberBaseOpt.castObjectToBigDecimal(newValue));
                 break;
             case "BigInteger":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        NumberBaseOpt.castObjectToBigInteger(newValue),BigInteger.class);
+                field.setObjectFieldValue(object,
+                        NumberBaseOpt.castObjectToBigInteger(newValue));
                 break;
             case "String":
                 if (newValue instanceof Clob) {
-                    ReflectionOpt.setFieldValue(object,propertyName,
-                            DatabaseAccess.fetchClobString((Clob) newValue),String.class);
+                    field.setObjectFieldValue(object,
+                            DatabaseAccess.fetchClobString((Clob) newValue));
                 } /*else if (newValue instanceof Blob) {
                     ReflectionOpt.setFieldValue(object,propertyName,
                             DatabaseAccess.fetchBlobAsBase64((Blob) newValue),String.class);
                 } */else {
-                    ReflectionOpt.setFieldValue(object, propertyName,
-                            StringBaseOpt.objectToString(newValue),String.class);
+                    field.setObjectFieldValue(object,
+                            StringBaseOpt.objectToString(newValue));
                 }
                 break;
             case "Date":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        DatetimeOpt.castObjectToDate(newValue),java.util.Date.class);
-                break;
             case "Timestamp":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        DatetimeOpt.castObjectToDate(newValue),java.sql.Timestamp.class);
+                field.setObjectFieldValue(object,
+                        DatetimeOpt.castObjectToDate(newValue));
                 break;
+            case "boolean":
             case "Boolean":
-                ReflectionOpt.setFieldValue(object,propertyName,
+                field.setObjectFieldValue(object,
                         StringRegularOpt.isTrue(
-                                StringBaseOpt.objectToString(newValue)
-                        ),Boolean.class);
+                                StringBaseOpt.objectToString(newValue)));
                 break;
             case "Clob":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        /*(Clob)*/ newValue ,Clob.class);
-                break;
             case "Blob":
-                ReflectionOpt.setFieldValue(object,propertyName,
-                        /*(Blob)*/ newValue ,Blob.class);
+                field.setObjectFieldValue(object,
+                        /*(Clob)*/ newValue );
                 break;
             default:
                 if (newValue instanceof Clob) {
-                    ReflectionOpt.setFieldValue(object,propertyName,
-                            DatabaseAccess.fetchClobString((Clob) newValue),String.class);
+                    field.setObjectFieldValue(object,
+                            DatabaseAccess.fetchClobString((Clob) newValue));
                 }else if (newValue instanceof Blob) {
-                    ReflectionOpt.setFieldValue(object,propertyName,
-                            DatabaseAccess.fetchBlobBytes((Blob) newValue),byte[].class);
+                    field.setObjectFieldValue(object,
+                            DatabaseAccess.fetchBlobBytes((Blob) newValue));
                 } else {
-                    ReflectionOpt.setFieldValue(object, propertyName,newValue);
+                    field.setObjectFieldValue(object, newValue);
                 }
                 break;
         }
@@ -142,30 +124,26 @@ public abstract class OrmUtils {
                 if( fieldValue == null || valueGenerator.condition() == GeneratorCondition.ALWAYS ){
                     switch (valueGenerator.strategy()){
                         case UUID:
-                            setObjectFieldValue(object, filed.getPropertyName(),
-                                    UuidOpt.getUuidAsString32(), filed.getJavaType());
+                            filed.setObjectFieldValue(object, UuidOpt.getUuidAsString32());
                             break;
                         case SEQUENCE:
-                            setObjectFieldValue(object, filed.getPropertyName(),
-                                    sqlDialect.getSequenceNextValue(
-                                            valueGenerator.value()
-                                    ), filed.getJavaType());
+                            filed.setObjectFieldValue(object, sqlDialect.getSequenceNextValue(
+                                    valueGenerator.value()));
                             break;
                         case CONSTANT:
-                            setObjectFieldValue(object, filed.getPropertyName(),
-                                    valueGenerator.value(), filed.getJavaType());
+                            filed.setObjectFieldValue(object, valueGenerator.value());
+
                             break;
                         case FUNCTIION: {
                             switch (valueGenerator.value()){
                                 case "now":
                                 case "currentTime":
                                 case "sysdate":
-                                    setObjectFieldValue(object, filed.getPropertyName(),
-                                            DatetimeOpt.currentUtilDate(), filed.getJavaType());
+                                    filed.setObjectFieldValue(object, DatetimeOpt.currentUtilDate());
                                     break;
                             }
-                        }
                             break;
+                        }
                     }
                 }
             }
@@ -199,12 +177,13 @@ public abstract class OrmUtils {
     }
 
     public static Map<String, Object> fetchObjectDatabaseField(Object object, TableMapInfo tableInfo) {
-        List<? extends TableField> tableFields = tableInfo.getColumns();
+        List<SimpleTableField> tableFields = tableInfo.getColumns();
         if(tableFields == null)
             return null;
         Map<String, Object> fields = new HashMap<>(tableFields.size()*2+6);
-        for(TableField column : tableFields){
-            Object value = ReflectionOpt.getFieldValue(object, column.getPropertyName());
+        for(SimpleTableField column : tableFields){
+            Object value = column.getObjectFieldValue(object);
+            //ReflectionOpt.getFieldValue(object, column.getPropertyName());
             if(value!=null){
                 fields.put(column.getPropertyName(),value);
             }
@@ -212,8 +191,9 @@ public abstract class OrmUtils {
 
         tableFields = tableInfo.getLazyColumns();
         if(tableFields != null) {
-            for (TableField column : tableFields) {
-                Object value = ReflectionOpt.getFieldValue(object, column.getPropertyName());
+            for (SimpleTableField column : tableFields) {
+                Object value = column.getObjectFieldValue(object);
+                //ReflectionOpt.getFieldValue(object, column.getPropertyName());
                 if (value != null) {
                     fields.put(column.getPropertyName(), value);
                 }
@@ -230,8 +210,7 @@ public abstract class OrmUtils {
             String columnName = resMeta.getColumnName(i);
             SimpleTableField filed = mapInfo.findFieldByColumn(columnName);
             if (filed != null) {
-                setObjectFieldValue(object, filed.getPropertyName(),
-                        rs.getObject(i), filed.getJavaType());
+                filed.setObjectFieldValue(object, rs.getObject(i));
             }
         }
         return object;
@@ -277,8 +256,7 @@ public abstract class OrmUtils {
             T object = clazz.newInstance();
             for(int i=1;i<=fieldCount;i++){
                 if(fields[i] != null){
-                    setObjectFieldValue(object,fields[i].getPropertyName(),
-                            rs.getObject(i),fields[i].getJavaType());
+                    fields[i].setObjectFieldValue(object, rs.getObject(i));
                 }
             }
             listObj.add(object);

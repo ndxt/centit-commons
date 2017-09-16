@@ -473,10 +473,10 @@ public abstract class OrmDaoUtils {
                     ref.getReferenceType().isAssignableFrom(refType) */){
                 ReflectionOpt.setFieldValue(object, ref.getReferenceName(),
                         refs.get(0), ref.getReferenceType());
-            }else if(ref.getReferenceType().isAssignableFrom(Set.class)){
+            }else if(Set.class.isAssignableFrom(ref.getReferenceType())){
                 ReflectionOpt.setFieldValue(object, ref.getReferenceName(),
                         new HashSet<>(refs), ref.getReferenceType());
-            }else if(ref.getReferenceType().isAssignableFrom(List.class)){
+            }else if(List.class.isAssignableFrom(ref.getReferenceType())){
                 ReflectionOpt.setFieldValue(object, ref.getReferenceName(),
                         refs, ref.getReferenceType());
             }
@@ -751,11 +751,10 @@ public abstract class OrmDaoUtils {
             }else{
                 saveNewObject(connection, newObj);
             }
-        }else if(ref.getReferenceType().isAssignableFrom(Set.class)){
-
+        }else if(Set.class.isAssignableFrom(ref.getReferenceType())){
                 replaceObjectsAsTabulation(connection,  (List<Object>) refs,
                         new ArrayList<>((Set<?>) newObj));
-        }else if(ref.getReferenceType().isAssignableFrom(List.class)){
+        }else if(List.class.isAssignableFrom(ref.getReferenceType())){
             replaceObjectsAsTabulation( connection, (List<Object>) refs,
                     (List<Object>) newObj );
         }
@@ -866,10 +865,10 @@ public abstract class OrmDaoUtils {
             }else{
                 saveNewObjectCascade(connection, newObj);
             }
-        }else if(ref.getReferenceType().isAssignableFrom(Set.class)){
+        }else if(Set.class.isAssignableFrom(ref.getReferenceType())){
             replaceObjectsAsTabulationCascade(connection,  (List<Object>) refs,
                     new ArrayList<>((Set<?>) newObj));
-        }else if(ref.getReferenceType().isAssignableFrom(List.class)){
+        }else if(List.class.isAssignableFrom(ref.getReferenceType())){
             replaceObjectsAsTabulationCascade(connection,  (List<Object>) refs,
                     (List<Object>) newObj );
         }

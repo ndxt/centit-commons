@@ -1,12 +1,17 @@
 package com.centit.support.database.metadata;
 
-import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.database.utils.DBType;
 import com.centit.support.file.FileType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class SimpleTableField implements TableField {
+    private static final Logger logger = LoggerFactory.getLogger(SimpleTableField.class);
+
     private String propertyName;// 字段属性名称
     private String fieldLabelName;// 字段的中文名称 label ，PDM中的 Name 和 元数据表格中的Name对应
     private String javaType;// 类型
@@ -18,6 +23,12 @@ public class SimpleTableField implements TableField {
     private int     maxLength;//最大长度 Only used when sType=String
     private int  precision;//有效数据位数 Only used when sType=Long Number Float
     private int  scale;//精度 Only used when sType= Long Number Float
+
+    private Method objectSetFieldValueFunc;
+    private Method objectGetFieldValueFunc;
+
+
+    private Field  objectField;
 
     public static String mapPropName(String dbObjectName){
         String sTempName = dbObjectName.toLowerCase();
@@ -79,9 +90,11 @@ public class SimpleTableField implements TableField {
         }else if("TIMESTAMP".equalsIgnoreCase(columnType) ){
             return "Timestamp";
         }else if("CLOB".equalsIgnoreCase(columnType) /*||
-                   "LOB".equalsIgnoreCase(sDBType)||
-                   "BLOB".equalsIgnoreCase(sDBType)*/ ){
+                   "LOB".equalsIgnoreCase(columnType)||
+                   "BLOB".equalsIgnoreCase(columnType)*/ ){
             return "String";
+        }else if("BLOB".equalsIgnoreCase(columnType) ) {
+            return "byte[]";
         }else
             return columnType;
     }
@@ -103,6 +116,8 @@ public class SimpleTableField implements TableField {
             return "DATE";
         case "Timestamp":
             return "TIMESTAMP";
+        case "byte[]":
+            return "BLOB";
         default:
             return javaType;
         }
@@ -290,5 +305,52 @@ public class SimpleTableField implements TableField {
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    public void setObjectField(Field objectField) {
+        this.objectField = objectField;
+    }
+
+    public void setObjectSetFieldValueFunc(Method objectSetFieldValueFunc) {
+        this.objectSetFieldValueFunc = objectSetFieldValueFunc;
+    }
+
+    public void setObjectGetFieldValueFunc(Method objectGetFieldValueFunc) {
+        this.objectGetFieldValueFunc = objectGetFieldValueFunc;
+    }
+
+    public void setObjectFieldValue(Object obj, Object fieldValue) {
+        try {
+            if (objectSetFieldValueFunc != null) {
+                objectSetFieldValueFunc.invoke(obj, fieldValue);
+            } else {
+
+                boolean accessible = objectField.isAccessible();
+                if (!accessible) {
+                    objectField.setAccessible(true);
+                }
+
+                objectField.set(obj, fieldValue);
+
+                if (!accessible) {
+                    objectField.setAccessible(accessible);
+                }
+            }
+        } catch (InvocationTargetException | IllegalAccessException e){
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    public Object getObjectFieldValue(Object obj) {
+        try {
+            if (objectGetFieldValueFunc != null) {
+                return objectGetFieldValueFunc.invoke(obj);
+            } else {
+                return objectField.get(obj);
+            }
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
     }
 }

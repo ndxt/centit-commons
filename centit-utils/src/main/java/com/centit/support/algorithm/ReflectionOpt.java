@@ -188,13 +188,17 @@ public abstract class ReflectionOpt  {
             return;
         }*/
         boolean accessible = field.isAccessible();
-        field.setAccessible(true);
+        if(!accessible) {
+            field.setAccessible(true);
+        }
         try {
             field.set(object, newValue);
         } catch (IllegalAccessException e) {
-            logger.info("Error won't happen."+e.getMessage());
+            logger.error("Error won't happen."+e.getMessage(), e);
         }
-        field.setAccessible(accessible);
+        if(!accessible) {
+            field.setAccessible(accessible);
+        }
     }
 
     /*
@@ -252,7 +256,7 @@ public abstract class ReflectionOpt  {
      * 按Filed的类型取得Field列表.
      */
     public static List<Field> getFieldsByType(Object object, Class<?> type) {
-        List<Field> list = new ArrayList<Field>();
+        List<Field> list = new ArrayList<>();
         Field[] fields = object.getClass().getDeclaredFields();
         for (Field field : fields) {
             if (type.isAssignableFrom(field.getType())) {

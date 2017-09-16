@@ -2,9 +2,13 @@ package com.centit.support.database.orm;
 
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableReference;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -12,9 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @SuppressWarnings("unused")
 public abstract class JpaMetadata {
+
     private JpaMetadata() {
         throw new IllegalAccessError("Utility class");
     }
+
+    private static final Logger logger = LoggerFactory.getLogger(JpaMetadata.class);
 
     private static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA =
             new ConcurrentHashMap<>(100);
@@ -31,16 +38,27 @@ public abstract class JpaMetadata {
         return mapInfo;
     }
 
-    private static SimpleTableField obtainColumnFromField(Field field){
+    private static SimpleTableField obtainColumnFromField(Class<?> objType, Field field) {
         SimpleTableField column = new SimpleTableField();
         Column colInfo = field.getAnnotation(Column.class);
-        column.setColumnName( colInfo.name());
+        column.setColumnName(colInfo.name());
         //column.setColumnType( colInfo.);
         column.setJavaType(field.getType());
-        column.setPropertyName( field.getName());
-        column.setMaxLength( colInfo.length());
-        column.setScale( colInfo.scale());
-        column.setPrecision( colInfo.precision());
+        column.setPropertyName(field.getName());
+        column.setMaxLength(colInfo.length());
+        column.setScale(colInfo.scale());
+        column.setPrecision(colInfo.precision());
+
+        column.setObjectField(field);
+        try {
+            Method funcSetter = objType.getMethod("set" + StringUtils.capitalize(field.getName()), field.getType());
+            Method funcGetter =
+                    (boolean.class.equals(field.getType()) || Boolean.class.isAssignableFrom(field.getType())) ?
+                            objType.getMethod("is" + StringUtils.capitalize(field.getName())):
+                            objType.getMethod("get" + StringUtils.capitalize(field.getName()));
+        } catch (NoSuchMethodException e) {
+            logger.error(e.getMessage(),e);
+        }
         return column;
     }
 
@@ -56,7 +74,7 @@ public abstract class JpaMetadata {
         Field[] objFields = objType.getDeclaredFields();
         for(Field field :objFields){
             if(field.isAnnotationPresent(Column.class)){
-                SimpleTableField column = obtainColumnFromField(field);
+                SimpleTableField column = obtainColumnFromField(objType, field);
 
                 if(field.isAnnotationPresent(Id.class) ){
                     mapInfo.addColumn(column);
@@ -85,7 +103,7 @@ public abstract class JpaMetadata {
                 for(Field idField : field.getType().getDeclaredFields()){
 
                     if(idField.isAnnotationPresent(Column.class)) {
-                        SimpleTableField column = obtainColumnFromField(idField);
+                        SimpleTableField column = obtainColumnFromField(objType, idField);
                         mapInfo.addColumn(column);
                         mapInfo.addPkColumns(column.getPropertyName());
 
