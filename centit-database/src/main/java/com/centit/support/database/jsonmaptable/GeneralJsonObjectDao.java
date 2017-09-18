@@ -192,13 +192,16 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         StringBuilder sBuilder= new StringBuilder();
         int i=0;
         for(String plCol : properties){
-            if(i>0)
-                sBuilder.append(" and ");
             TableField col = ti.findFieldByName(plCol);
-            if(StringUtils.isNotBlank(alias))
-                sBuilder.append(alias).append('.');
-            sBuilder.append(col.getColumnName()).append(" = :").append(col.getPropertyName());
-            i++;
+            if( col != null ) {
+                if (i > 0)
+                    sBuilder.append(" and ");
+
+                if (StringUtils.isNotBlank(alias))
+                    sBuilder.append(alias).append('.');
+                sBuilder.append(col.getColumnName()).append(" = :").append(col.getPropertyName());
+                i++;
+            }
         }
         return sBuilder.toString();
     }
@@ -206,7 +209,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public static Pair<String,String[]> buildGetObjectSqlByPk(TableInfo ti){
         Pair<String,String[]> q = buildFieldSqlWithFieldName(ti,null);
         String filter = buildFilterSqlByPk(ti,null);
-        return new ImmutablePair<String,String[]>(
+        return new ImmutablePair<>(
                 "select " + q.getLeft() +" from " +ti.getTableName() + " where " + filter,
                 q.getRight());
     }
