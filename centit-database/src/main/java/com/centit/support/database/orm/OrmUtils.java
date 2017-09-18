@@ -140,7 +140,7 @@ public abstract class OrmUtils {
                                 case "now":
                                 case "currentTime":
                                 case "sysdate":
-                                    filed.setObjectFieldValue(object, DatetimeOpt.currentUtilDate());
+                                    setObjectFieldValue(object, filed, DatetimeOpt.currentUtilDate());
                                     break;
                             }
                             break;
