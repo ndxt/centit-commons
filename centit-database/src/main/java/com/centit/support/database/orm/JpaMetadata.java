@@ -134,6 +134,9 @@ public abstract class JpaMetadata {
                 }else if (field.isAnnotationPresent(OneToMany.class)) {
                     OneToMany oneToMany = field.getAnnotation(OneToMany.class);
                     reference.setTargetEntityType(oneToMany.targetEntity());
+                }else if (field.isAnnotationPresent(ManyToMany.class)) {
+                    ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
+                    reference.setTargetEntityType(manyToMany.targetEntity());
                 }
 
                 if(reference.getTargetEntityType() !=null
