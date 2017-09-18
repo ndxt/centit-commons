@@ -19,6 +19,7 @@ import java.util.Map;
 
 /**
  * Created by codefan on 17-8-27.
+ * @Author codefan@sina.com
  */
 @SuppressWarnings("unused")
 public abstract class OrmUtils {
@@ -127,11 +128,11 @@ public abstract class OrmUtils {
                             filed.setObjectFieldValue(object, UuidOpt.getUuidAsString32());
                             break;
                         case SEQUENCE:
-                            filed.setObjectFieldValue(object, sqlDialect.getSequenceNextValue(
+                            setObjectFieldValue(object, filed, sqlDialect.getSequenceNextValue(
                                     valueGenerator.value()));
                             break;
                         case CONSTANT:
-                            filed.setObjectFieldValue(object, valueGenerator.value());
+                            setObjectFieldValue(object, filed, valueGenerator.value());
 
                             break;
                         case FUNCTIION: {
@@ -210,7 +211,7 @@ public abstract class OrmUtils {
             String columnName = resMeta.getColumnName(i);
             SimpleTableField filed = mapInfo.findFieldByColumn(columnName);
             if (filed != null) {
-                filed.setObjectFieldValue(object, rs.getObject(i));
+                setObjectFieldValue(object, filed, rs.getObject(i));
             }
         }
         return object;
@@ -256,7 +257,7 @@ public abstract class OrmUtils {
             T object = clazz.newInstance();
             for(int i=1;i<=fieldCount;i++){
                 if(fields[i] != null){
-                    fields[i].setObjectFieldValue(object, rs.getObject(i));
+                    setObjectFieldValue(object, fields[i], rs.getObject(i));
                 }
             }
             listObj.add(object);
