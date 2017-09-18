@@ -1,5 +1,7 @@
 package com.centit.support.database.metadata;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +99,8 @@ public class SimpleTableReference implements TableReference{
     }
 
     public void addReferenceColumn(String column, String referencedColumn) {
-        getReferenceColumns().put(column, referencedColumn);
+        getReferenceColumns().put(column,
+                StringUtils.isBlank(referencedColumn)?column:referencedColumn);
     }
 
     public Class<?> getReferenceType() {
