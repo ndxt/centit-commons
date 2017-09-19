@@ -11,14 +11,16 @@ public class QueryAndParams {
     public String queryStmt;
     public Object[] params;
 
+    @Deprecated
     public String getSql() {
         return queryStmt;
     }
 
+    @Deprecated
     public void setSql(String hql) {
         this.queryStmt = hql;
     }
-    
+
     public String getQuery() {
         return queryStmt;
     }
@@ -26,11 +28,13 @@ public class QueryAndParams {
     public void setQuery(String hql) {
         this.queryStmt = hql;
     }
-    
+
+    @Deprecated
     public String getHql() {
         return queryStmt;
     }
 
+    @Deprecated
     public void setHql(String hql) {
         this.queryStmt = hql;
     }
@@ -83,7 +87,7 @@ public class QueryAndParams {
                     obj = sqlParams[paramInd];
 
                 if(obj==null){
-                    params.add(obj);
+                    params.add(null);
                     sqlb.append("?");
                 }else if (obj instanceof Collection) {
                     int n=0;

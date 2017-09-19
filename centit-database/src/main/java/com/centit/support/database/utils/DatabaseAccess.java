@@ -154,7 +154,7 @@ public abstract class DatabaseAccess {
     public static int doExecuteNamedSql(Connection conn, String sSql, Map<String, Object> values)
             throws SQLException {
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
-        return doExecuteSql(conn, qap.getSql(), qap.getParams());
+        return doExecuteSql(conn, qap.getQuery(), qap.getParams());
     }
 
     private static JSONObject innerFetchResultSetRowToJSONObject(ResultSet rs,int cc, String[] fieldNames)
@@ -345,13 +345,13 @@ public abstract class DatabaseAccess {
     public static JSONObject getObjectAsJSON(Connection conn, String sSql, Map<String,Object> values, String[] fieldnames)
             throws SQLException, IOException {
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
-        return getObjectAsJSON(conn,qap.getSql(),qap.getParams(),fieldnames);
+        return getObjectAsJSON(conn,qap.getQuery(),qap.getParams(),fieldnames);
     }
 
     public static JSONObject getObjectAsJSON(Connection conn, String sSql, Map<String,Object> values)
             throws SQLException, IOException {
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
-        return getObjectAsJSON(conn,qap.getSql(),qap.getParams(),null);
+        return getObjectAsJSON(conn,qap.getQuery(),qap.getParams(),null);
     }
 
     public static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values)

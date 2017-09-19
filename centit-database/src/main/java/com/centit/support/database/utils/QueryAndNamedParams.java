@@ -30,11 +30,13 @@ public class QueryAndNamedParams {
         this.queryStmt = shql;
         this.params = values;
     }
-    
+
+    @Deprecated
     public String getSql() {
         return queryStmt;
     }
 
+    @Deprecated
     public void setSql(String hql) {
         this.queryStmt = hql;
     }
@@ -46,18 +48,18 @@ public class QueryAndNamedParams {
     public void setQuery(String hql) {
         this.queryStmt = hql;
     }
-    
+    @Deprecated
     public String getHql() {
         return queryStmt;
     }
-
+    @Deprecated
     public void setHql(String hql) {
         this.queryStmt = hql;
     }
 
     public Map<String, Object> getParams() {
         if(params == null)
-            params = new HashMap<String, Object> ();
+            params = new HashMap<> ();
         return params;
     }
     
@@ -81,7 +83,7 @@ public class QueryAndNamedParams {
      */
     public QueryAndNamedParams addParam(String paramName,Object paramValue) {
         if(params == null)
-            params = new HashMap<String, Object> ();
+            params = new HashMap<> ();
         params.put(paramName, paramValue);
         return this;
     }
@@ -90,7 +92,7 @@ public class QueryAndNamedParams {
         if(oParams==null)
             return this;
         if(params == null)
-            params = new HashMap<String, Object> ();
+            params = new HashMap<> ();
         params.putAll(oParams);
         /*for(Map.Entry<String, Object> param : oParams.entrySet())
             params.put(param.getKey(), param.getValue());*/

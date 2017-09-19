@@ -133,8 +133,8 @@ public abstract class OrmDaoUtils {
     private final static <T> T queryParamsSql(Connection conn, QueryAndParams sqlAndParams ,
                                              FetchDataWork<T> fetchDataWork)
             throws PersistenceException {
-         logger.debug( sqlAndParams.getSql() +" :" + JSON.toJSONString(sqlAndParams.getParams()) );
-         try(PreparedStatement stmt = conn.prepareStatement(sqlAndParams.getSql())){
+         logger.debug( sqlAndParams.getQuery() +" :" + JSON.toJSONString(sqlAndParams.getParams()) );
+         try(PreparedStatement stmt = conn.prepareStatement(sqlAndParams.getQuery())){
             DatabaseAccess.setQueryStmtParameters(stmt,sqlAndParams.getParams());
             try(ResultSet rs = stmt.executeQuery()) {
                 return fetchDataWork.execute(rs);
@@ -143,7 +143,7 @@ public abstract class OrmDaoUtils {
             //stmt.close();
             //return obj;
         }catch (SQLException e) {
-            throw  new PersistenceException(sqlAndParams.getSql(), e);
+            throw  new PersistenceException(sqlAndParams.getQuery(), e);
         }catch (NoSuchFieldException | IOException | InstantiationException | IllegalAccessException e){
             throw  new PersistenceException(PersistenceException.ILLEGALACCESS_EXCEPTION,e);
         }
@@ -153,7 +153,7 @@ public abstract class OrmDaoUtils {
                                               int startPos, int maxSize, FetchDataWork<T> fetchDataWork)
             throws PersistenceException {
         sqlAndParams.setSql( QueryUtils.buildLimitQuerySQL(
-                sqlAndParams.getSql(),  startPos , maxSize , false , DBType.mapDBType(conn)
+                sqlAndParams.getQuery(),  startPos , maxSize , false , DBType.mapDBType(conn)
             ));
         return queryParamsSql(conn,  sqlAndParams , fetchDataWork);
     }

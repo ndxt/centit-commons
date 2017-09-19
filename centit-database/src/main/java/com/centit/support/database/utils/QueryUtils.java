@@ -640,7 +640,7 @@ public abstract class QueryUtils {
      */
     public static KeyValuePair<String,List<String>> transNamedParamSqlToParamSql(String sql){
         StringBuilder sqlb = new StringBuilder();
-        List<String> params = new ArrayList<String>();
+        List<String> params = new ArrayList<>();
         Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
         int prePos = 0;
         String aWord = lex.getAWord();
@@ -663,7 +663,7 @@ public abstract class QueryUtils {
         }
         sqlb.append(sql.substring(prePos));
         //params.add(sqlb.toString());
-        return new KeyValuePair<String,List<String>>(sqlb.toString(),params);
+        return new KeyValuePair<>(sqlb.toString(),params);
     }
     
     /**
