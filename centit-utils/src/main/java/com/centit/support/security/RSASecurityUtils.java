@@ -35,7 +35,7 @@ public abstract class RSASecurityUtils {
      * 生成密钥对
      * @param  keysize 密码大小
      * @return  密钥对
-     * @throws Exception 父类抛出的异常
+     * @throws NoSuchAlgorithmException 父类抛出的异常
      */
     public static KeyPair generateKeyPair(int keysize) throws NoSuchAlgorithmException {
 
@@ -60,7 +60,11 @@ public abstract class RSASecurityUtils {
      *            源数据  加密字符串长度受秘钥长度的限制，最多加密245个字节
      * @param key 密码
      * @return 密文
-     * @throws Exception 父类抛出的异常
+     * @throws BadPaddingException 父类抛出的异常
+     * @throws IllegalBlockSizeException 父类抛出的异常
+     * @throws NoSuchAlgorithmException 父类抛出的异常
+     * @throws NoSuchPaddingException 父类抛出的异常
+     * @throws InvalidKeyException 父类抛出的异常
      */
     public static String encrypt(String source,Key key) throws
             BadPaddingException, IllegalBlockSizeException,
@@ -85,7 +89,11 @@ public abstract class RSASecurityUtils {
      *            密文
      * @param key 密码
      * @return 密文
-     * @throws Exception 父类抛出的异常
+     * @throws BadPaddingException 父类抛出的异常
+     * @throws IllegalBlockSizeException 父类抛出的异常
+     * @throws NoSuchAlgorithmException 父类抛出的异常
+     * @throws NoSuchPaddingException 父类抛出的异常
+     * @throws InvalidKeyException 父类抛出的异常
      */
     public static String decrypt(String cryptograph,Key key) throws NoSuchPaddingException,
             NoSuchAlgorithmException, InvalidKeyException,

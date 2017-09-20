@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * Created by codefan on 17-8-27.
- * @Author codefan@sina.com
+ * @author codefan@sina.com
  */
 @SuppressWarnings("unused")
 public abstract class OrmUtils {

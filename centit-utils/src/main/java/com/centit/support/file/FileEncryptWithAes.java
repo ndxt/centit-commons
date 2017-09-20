@@ -19,8 +19,9 @@ public abstract class FileEncryptWithAes {
      * @param diminationFileName
      *            加密后存放的文件名 如c:/加密后文件.txt
      * @param keyValue 密码
-     * @throws Exception 异常
-     */
+     * @throws IOException 异常
+     * @throws GeneralSecurityException 异常
+     * */
     public static void encrypt(String sourceFileName, String diminationFileName,String keyValue)
             throws IOException, GeneralSecurityException {
         encrypt(new File(sourceFileName), new File( diminationFileName), keyValue);

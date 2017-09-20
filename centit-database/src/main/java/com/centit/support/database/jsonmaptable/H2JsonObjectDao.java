@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 /**
  * 使用H2数据库时请打开MySql兼容模式
- *  jdbc:h2:<url>;MODE=<databaseType>
+ *  jdbc:h2: &lt;url&gt;;MODE=&lt;databaseType&gt;
  *  MODE=MySQL：兼容模式，H2兼容多种数据库，
  *  该值可以为：DB2、Derby、HSQLDB、MSSQLServer、MySQL、Oracle、PostgreSQL
  *

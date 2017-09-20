@@ -65,7 +65,7 @@ public abstract class AESSecurityUtils {
      * @param arrB  需解密的字节数组
      * @param keyValue 密码
      * @return 解密后的字节数组
-     * @throws Exception  父类抛出的异常
+     * @throws GeneralSecurityException  父类抛出的异常
      */
     public static byte[] decrypt(byte[] arrB,String keyValue) throws GeneralSecurityException {
         return createDencryptCipher(keyValue).doFinal(arrB);
