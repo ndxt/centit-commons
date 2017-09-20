@@ -112,11 +112,15 @@ public abstract class XMLObject {
         return element.asXML();
         //return DocumentHelper.createDocument(element).asXML();
     }
-        
-    public static String objectToXMLString(Object object){
-        Element element = createXMLElementFromObject("object",object);
+
+    public static String objectToXMLString(String rootName, Object object){
+        Element element = createXMLElementFromObject(rootName,object);
         return element.asXML();
         //return DocumentHelper.createDocument(element).asXML();
+    }
+
+    public static String objectToXMLString(Object object){
+        return objectToXMLString("object", object);
     }
     
     public static Object elementToObject(Element element ){
