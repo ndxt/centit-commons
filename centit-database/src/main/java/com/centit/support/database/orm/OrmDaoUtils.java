@@ -242,7 +242,7 @@ public abstract class OrmDaoUtils {
     public static <T> T getObjectCascadeShallowById(Connection connection, Object id, final Class<T> type)
             throws PersistenceException {
 
-        T object = getObjectIncludeLazyById(connection, id, type);
+        T object = getObjectById(connection, id, type);
         fetchObjectReferences(connection, object);
         return object;
     }
@@ -250,7 +250,7 @@ public abstract class OrmDaoUtils {
     public static <T> T getObjectCascadeById(Connection connection, Object id, final Class<T> type)
             throws PersistenceException {
 
-        T object = getObjectIncludeLazyById(connection, id, type);
+        T object = getObjectById(connection, id, type);
         fetchObjectReferencesCascade(connection, object,type);
         return object;
     }
