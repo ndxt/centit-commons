@@ -24,7 +24,7 @@ public abstract class DatetimeOpt {
     private static String timeWithSecondPattern = "HH:mm:ss";
     private static String datetimePattern = "yyyy-MM-dd HH:mm:ss";
     private static String timestampPattern = "yyyy-MM-dd HH:mm:ss.SSS";
-
+    private static String gmtDatePattern = "d MMM yyyy HH:mm:ss 'GMT'";
     /**
      * 获得当前日期的字符串 ，格式为 "yyyy-MM-dd" 示例 2015-08-24
      * @return 当前时间
@@ -190,22 +190,18 @@ public abstract class DatetimeOpt {
      * @return a converted Date object
      * @see java.text.SimpleDateFormat 的说明
      */
-    public static final Date convertStringToDate(String strDate,String aMask) {
-        SimpleDateFormat df = null;
-        Date date = null;
-        df = new SimpleDateFormat(aMask);
-
+    public static Date convertStringToDate(String strDate,String aMask) {
         try {
+            SimpleDateFormat df = new SimpleDateFormat(aMask);
             if(strDate == null || strDate.equals(""))
                 return null;
-            date = df.parse(strDate);
+            return df.parse(strDate);
         } catch (ParseException pe) {
             log.error("converting '" + strDate + "' to date with mask '"
                     + aMask + "'");
             return null;
             //throw new ParseException(pe.getMessage(), pe.getErrorOffset());
         }
-        return date;
     }
 
     /**
@@ -220,7 +216,7 @@ public abstract class DatetimeOpt {
      *
      * @see java.text.SimpleDateFormat 的说明
      */
-    public static final String convertDateToString( Date aDate,String aMask) {
+    public static String convertDateToString( Date aDate,String aMask) {
         String returnValue = "";
 
         if (aDate == null) {
@@ -241,13 +237,13 @@ public abstract class DatetimeOpt {
      *            A date to convert
      * @return a string representation of the date
      */
-    public static final String convertTimeToString(Date aDate) {
+    public static String convertTimeToString(Date aDate) {
         return convertDateToString( aDate,timePattern);
     }
     /*
      * 返回时间 字符串
      */
-    public static final String convertTimeWithSecondToString(Date aDate) {
+    public static String convertTimeWithSecondToString(Date aDate) {
         return convertDateToString( aDate,timeWithSecondPattern);
     }
     /**
@@ -255,8 +251,18 @@ public abstract class DatetimeOpt {
      * @param aDate 时间
      * @return 字符串
      */
-    public static final String convertDateToString(Date aDate) {
+    public static String convertDateToString(Date aDate) {
         return convertDateToString( aDate,defaultDatePattern);
+    }
+
+    /**
+     * 返回日期字符串  toUTCString( ) 和 javaScript 一致
+     * // d MMM yyyy HH:mm:ss 'GMT'
+     * @param aDate 时间
+     * @return 字符串
+     */
+    public static String convertDateToGMTString(Date aDate) {
+        return convertDateToString( aDate,gmtDatePattern);
     }
 
     /**
@@ -264,11 +270,11 @@ public abstract class DatetimeOpt {
      * @param aDate 时间
      * @return 字符串
      */
-    public static final String convertDatetimeToString(Date aDate) {
+    public static String convertDatetimeToString(Date aDate) {
         return convertDateToString( aDate,datetimePattern);
     }
 
-    public static final String convertTimestampToString(Date aDate) {
+    public static String convertTimestampToString(Date aDate) {
         return convertDateToString( aDate,timestampPattern);
     }
 
@@ -276,7 +282,7 @@ public abstract class DatetimeOpt {
      * 获得当前时间字符串，格式为   "yyyy-MM-dd HH:mm:ss"
      * @return string
      */
-    public static final String getNowDateTime4String() {
+    public static String getNowDateTime4String() {
         return convertDateToString( currentUtilDate(),getDateTimePattern());
     }
 

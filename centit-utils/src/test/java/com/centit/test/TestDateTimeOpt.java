@@ -1,5 +1,7 @@
 package com.centit.test;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +11,7 @@ import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.UrlOptUtils;
 
 public class TestDateTimeOpt {
-    public  static void  main(String[] args)   {
+    public  static void  main(String[] args) throws Exception  {
 
         /*try {
             System.out.println(Hex.encodeHex("000000".getBytes("utf8")));
@@ -19,13 +21,23 @@ public class TestDateTimeOpt {
             //e.printStackTrace();
         }*/
         //System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "yyyyMMddHHmmssSSS"));
-        testDateTime();
+        testTPTime() ;
+        //testDateTime();
 /*        System.out.println(FileSystemOpt.extractFileName(""));
         System.out.println(FileSystemOpt.extractFileName("D:\\Projects\\RunData\\dde\\temp\\export-01\\export-010002.zip"));
         System.out.println(FileSystemOpt.extractFileName("D:/Projects/RunData/dde/temp/export-01/export-010002.zip"));
         System.out.println(FileSystemOpt.extractFileName("D:\\Projects\\RunData\\dde\\temp\\export-01\\export-010002"));
         System.out.println(FileSystemOpt.extractFileName("export-010002.zip"));
 */    }
+
+    //T代表后面跟着时间，Z代表UTC统一时间
+
+
+    public static void testTPTime() throws Exception {
+        System.out.println(DatetimeOpt.convertDateToString(
+                DatetimeOpt.currentUtilDate(),"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+    }
+
     public static void testUrlOpt(){
 
         String sUrl="http://codefan:781023@dl13.yunpan.360.cn/intf.php?method=Preview.outputPic&qid=260381977&fname=%2F马甸中学20周年聚会%2FIMG_2802.JPG&fhash=342e16140c54055cf578363b27016a7b9b0afcec&dt=13.6b894db11bd878296829f48cca0f4739&v=1.0.1&rtick=13953917127584&devtype=web&sign=020a79ce62b5ad6fd644ee56b532198e&#pagemake";
