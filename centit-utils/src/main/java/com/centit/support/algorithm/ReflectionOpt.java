@@ -1,5 +1,6 @@
 package com.centit.support.algorithm;
 
+import com.centit.support.file.FileType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -706,6 +707,23 @@ public abstract class ReflectionOpt  {
             logger.error(e.getMessage(), e);
         }
         return obj;
+    }
+
+
+    public static String getJavaTypeName(Class<?> type) {
+
+        String typeName = type.getTypeName();
+        if(typeName.indexOf('.')<1) {
+            return typeName;
+        } else if(typeName.startsWith("java.lang.") || typeName.startsWith("java.sql.")
+                || "java.util.Date".equals(typeName)
+                || "java.util.UUID".equals(typeName)
+                || "java.math.BigDecimal".equals(typeName)
+                || "java.math.BigInteger".equals(typeName)) {
+            return FileType.getFileExtName(typeName);
+        } else {
+            return typeName;
+        }
     }
 }
 

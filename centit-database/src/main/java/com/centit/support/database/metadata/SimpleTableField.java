@@ -1,12 +1,12 @@
 package com.centit.support.database.metadata;
 
+import com.centit.support.common.JavaBeanField;
 import com.centit.support.database.utils.DBType;
 import com.centit.support.file.FileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class SimpleTableField implements TableField {
@@ -14,21 +14,17 @@ public class SimpleTableField implements TableField {
 
     private String propertyName;// 字段属性名称
     private String fieldLabelName;// 字段的中文名称 label ，PDM中的 Name 和 元数据表格中的Name对应
-    private String javaType;// 类型
     private String columnType;// 数据库中的字段类型
     private String columnName;// 字段代码 PDM中的CODE
     private String columnComment;// 字段注释
     private String defaultValue;
+    private String javaType;
     private boolean mandatory;
     private int     maxLength;//最大长度 Only used when sType=String
     private int  precision;//有效数据位数 Only used when sType=Long Number Float
     private int  scale;//精度 Only used when sType= Long Number Float
+    private JavaBeanField beanField;
 
-    private Method objectSetFieldValueFunc;
-    private Method objectGetFieldValueFunc;
-
-
-    private Field  objectField;
 
     public static String mapPropName(String dbObjectName){
         String sTempName = dbObjectName.toLowerCase();
@@ -308,49 +304,28 @@ public class SimpleTableField implements TableField {
     }
 
     public void setObjectField(Field objectField) {
-        this.objectField = objectField;
+        if(beanField==null)
+            beanField = new JavaBeanField();
+        beanField.setObjectField(objectField);
     }
 
     public void setObjectSetFieldValueFunc(Method objectSetFieldValueFunc) {
-        this.objectSetFieldValueFunc = objectSetFieldValueFunc;
+        if(beanField==null)
+            beanField = new JavaBeanField();
+        beanField.setSetFieldValueFunc(objectSetFieldValueFunc);
     }
 
     public void setObjectGetFieldValueFunc(Method objectGetFieldValueFunc) {
-        this.objectGetFieldValueFunc = objectGetFieldValueFunc;
+        if(beanField==null)
+            beanField = new JavaBeanField();
+        beanField.setGetFieldValueFunc(objectGetFieldValueFunc);
     }
 
     public void setObjectFieldValue(Object obj, Object fieldValue) {
-        try {
-            if (objectSetFieldValueFunc != null) {
-                objectSetFieldValueFunc.invoke(obj, fieldValue);
-            } else {
-
-                boolean accessible = objectField.isAccessible();
-                if (!accessible) {
-                    objectField.setAccessible(true);
-                }
-
-                objectField.set(obj, fieldValue);
-
-                if (!accessible) {
-                    objectField.setAccessible(accessible);
-                }
-            }
-        } catch (InvocationTargetException | IllegalAccessException e){
-            logger.error(e.getMessage(), e);
-        }
+        beanField.setObjectFieldValue(obj,fieldValue);
     }
 
     public Object getObjectFieldValue(Object obj) {
-        try {
-            if (objectGetFieldValueFunc != null) {
-                return objectGetFieldValueFunc.invoke(obj);
-            } else {
-                return objectField.get(obj);
-            }
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            logger.error(e.getMessage(), e);
-            return null;
-        }
+        return beanField.getObjectFieldValue(obj);
     }
 }
