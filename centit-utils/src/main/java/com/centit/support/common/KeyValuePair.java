@@ -1,5 +1,7 @@
 package com.centit.support.common;
 
+import org.apache.commons.lang3.tuple.MutablePair;
+
 /**
  * key value 数值对; 我们经常想在一个方法中返回多个值，比如返回错误编号和错误文字说明，有 KeyValuePair 就很方便
  *     return new KeyValuePair(Integer,String)(5,"error message");
@@ -8,7 +10,8 @@ package com.centit.support.common;
  *      new KeyValuePair(String,Object)("error message",otherObje));
  * 以此类推可以返回多个数值
  * 
- * 建议使用 org.apache.commons.lang3.tuple.MutablePair
+ * 建议使用
+ * @see org.apache.commons.lang3.tuple.MutablePair
  * 为什么会有这个类是因为写这个类的时候我不知道有MutablePair类。
  * 这个键值用于返回多个值，这样的变量一般都是不可变的在这种情况下可以使用 ImmutablePair类
  * 
@@ -28,6 +31,10 @@ public class KeyValuePair<K,V>{
     public KeyValuePair(K key,V value){
         this.key = key;
         this.value = value;
+    }
+
+    public static <K,V> KeyValuePair<K,V> of(final K key, final V value) {
+        return new KeyValuePair<>(key, value);
     }
 
     public K getKey() {
