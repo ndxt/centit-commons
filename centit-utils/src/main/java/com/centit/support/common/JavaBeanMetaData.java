@@ -5,8 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.sql.Blob;
-import java.sql.Clob;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
