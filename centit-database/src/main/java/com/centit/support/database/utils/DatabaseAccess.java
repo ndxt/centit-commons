@@ -165,7 +165,7 @@ public abstract class DatabaseAccess {
             if(obj!=null){
                 if (obj instanceof Clob) {
                     jo.put(fieldNames[i], fetchClobString((Clob) obj));
-                }else if (obj instanceof Blob) {
+                } else if (obj instanceof Blob) {
                     jo.put(fieldNames[i], fetchBlobAsBase64((Blob) obj));
                 } else {
                     jo.put(fieldNames[i], obj);
@@ -493,7 +493,7 @@ public abstract class DatabaseAccess {
             Object obj = rs.getObject(i);
             if (obj instanceof Clob) {
                 objs[i - 1] = fetchClobString((Clob) obj);
-            }else if (obj instanceof Blob) {
+            } else if (obj instanceof Blob) {
                 objs[i - 1] = fetchBlobAsBase64((Blob) obj);
             } else {
                 objs[i - 1] = obj;
