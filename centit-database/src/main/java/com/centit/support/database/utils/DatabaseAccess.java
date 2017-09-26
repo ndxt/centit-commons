@@ -165,8 +165,7 @@ public abstract class DatabaseAccess {
             if(obj!=null){
                 if (obj instanceof Clob) {
                     jo.put(fieldNames[i], fetchClobString((Clob) obj));
-                }
-                if (obj instanceof Blob) {
+                }else if (obj instanceof Blob) {
                     jo.put(fieldNames[i], fetchBlobAsBase64((Blob) obj));
                 } else {
                     jo.put(fieldNames[i], obj);
@@ -456,13 +455,15 @@ public abstract class DatabaseAccess {
             if (fieldData instanceof Clob) {
                 return DatabaseAccess.fetchClobString((Clob) fieldData);
             }
+
             if (fieldData instanceof Blob) {
                 if (blobAsBase64String)
                     return DatabaseAccess.fetchBlobAsBase64((Blob) fieldData);
                 else
                     return DatabaseAccess.fetchBlobBytes((Blob) fieldData);
-            } else
-                return fieldData;
+            }
+
+            return fieldData;
         } catch (IOException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
         }
@@ -492,11 +493,11 @@ public abstract class DatabaseAccess {
             Object obj = rs.getObject(i);
             if (obj instanceof Clob) {
                 objs[i - 1] = fetchClobString((Clob) obj);
-            }
-            if (obj instanceof Blob) {
+            }else if (obj instanceof Blob) {
                 objs[i - 1] = fetchBlobAsBase64((Blob) obj);
-            } else
+            } else {
                 objs[i - 1] = obj;
+            }
         }
         return objs;
 
