@@ -423,7 +423,7 @@ public abstract class QueryUtils {
 
     /**
      * 将查询语句转换为相同条件的查询符合条件的记录数的语句, 需要考虑with语句
-     * 即将 select 的字段部分替换为 count(1) 并去掉 order by排序部分 
+     * 即将 select 的字段部分替换为 count(*) 并去掉 order by排序部分
      * 对查询语句中有distinct的sql语句不使用
      * @param sql sql
      * @return sql
@@ -438,10 +438,10 @@ public abstract class QueryUtils {
          
         String groupByField = QueryUtils.getGroupByField(sqlPieces.get(2));
         if(groupByField==null)
-             return sqlPieces.get(0) + " count(1) as rowcount from " +
+             return sqlPieces.get(0) + " count(*) as rowcount from " +
                      removeOrderBy(sqlPieces.get(2));
 
-        return sqlPieces.get(0) + " count(1) as rowcount from (select "+
+        return sqlPieces.get(0) + " count(*) as rowcount from (select "+
              groupByField  + " from " + removeOrderBy(sqlPieces.get(2)) + ") a";
     }
     /**
@@ -462,7 +462,7 @@ public abstract class QueryUtils {
             sqlPieces.set(1, " * from");
         }
 
-        return sqlPieces.get(0) + " count(1) as rowCount from (select "+
+        return sqlPieces.get(0) + " count(*) as rowCount from (select "+
             sqlPieces.get(1) + sqlPieces.get(2) + ") a";
     }
     /**

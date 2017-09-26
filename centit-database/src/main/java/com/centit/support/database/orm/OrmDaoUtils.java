@@ -896,7 +896,7 @@ public abstract class OrmDaoUtils {
             throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"缺少主键对应的属性。");
         }
         String sql =
-                "select count(1) as checkExists from " + mapInfo.getTableName()
+                "select count(*) as checkExists from " + mapInfo.getTableName()
                         + " where " +  GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,null);
 
         try {

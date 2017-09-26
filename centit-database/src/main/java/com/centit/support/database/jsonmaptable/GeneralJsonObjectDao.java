@@ -281,7 +281,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public Long fetchObjectsCount(final Map<String, Object> properties)
             throws SQLException, IOException {
         String filter = buildFilterSql(tableInfo,null,properties.keySet());
-        String sql = "select count(1) as rs from " +tableInfo.getTableName();
+        String sql = "select count(*) as rs from " +tableInfo.getTableName();
         if(StringUtils.isNotBlank(filter))
             sql = sql + " where " + filter;
         Object object = DatabaseAccess.getScalarObjectQuery(
@@ -366,7 +366,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             throw new SQLException("缺少主键对应的属性。");
         }
         String sql =
-                "select count(1) as checkExists from " + tableInfo.getTableName()
+                "select count(*) as checkExists from " + tableInfo.getTableName()
                 + " where " +  buildFilterSqlByPk(tableInfo,null);
         Long checkExists = NumberBaseOpt.castObjectToLong(
                 DatabaseAccess.getScalarObjectQuery(conn, sql, object));
@@ -551,7 +551,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public Long getSimulateSequenceNextValue(final String sequenceName) throws SQLException, IOException {
         Object object = DatabaseAccess.getScalarObjectQuery(
                  conn,
-                 "SELECT count(1) hasValue from simulate_sequence "
+                 "SELECT count(*) hasValue from simulate_sequence "
                  + " where seqname = ?",
                 new Object[]{sequenceName});
         Long l = NumberBaseOpt.castObjectToLong(object);

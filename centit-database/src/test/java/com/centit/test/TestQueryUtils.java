@@ -43,7 +43,7 @@ public class TestQueryUtils {
         System.out.println(QueryUtils.trimSqlOrderByField(""));
         System.out.println(QueryUtils.buildGetCountSQL("From UserInfo"));
         System.out.println(QueryUtils.buildGetCountSQL("with(select * from table group by 1,2 order by ab) a "
-                + "select distinct a,b,c,count(1) From (select * from UserInfo group by a, b order by a,b) "
+                + "select distinct a,b,c,count(*) From (select * from UserInfo group by a, b order by a,b) "
                 + " atable group cute by a.a,b.v,b.c order by 1,2"));
     }
 
