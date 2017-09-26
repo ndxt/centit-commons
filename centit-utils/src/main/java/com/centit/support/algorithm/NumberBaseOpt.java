@@ -185,6 +185,20 @@ public abstract class NumberBaseOpt {
         return lValue;
     }
 
+    /*
+    * 这个仅仅是对Float.parseDouble进行简单的封装避免重复的输入try catch
+    */
+    public static Float parseFloat(String sNum, Float errorValue){
+        Float lValue;
+        try{
+            lValue = Float.parseFloat(sNum);
+        }catch(NumberFormatException e){
+            lValue = errorValue;
+        }
+        return lValue;
+    }
+
+
     static public Double parseDouble(String sNum){
         return parseDouble(sNum,null);
     }
@@ -234,6 +248,31 @@ public abstract class NumberBaseOpt {
 
     public static Integer castObjectToInteger(Object obj, Integer defaultValue){
         return GeneralAlgorithm.nvl(castObjectToInteger(obj),defaultValue);
+    }
+
+    /*
+     * 将一个Object转换为 Float
+     */
+    public static Float castObjectToFloat(Object obj){
+        if (obj == null)
+            return null;
+        if (obj instanceof Float)
+            return (Float) obj;
+        if (obj instanceof Integer)
+            return ((Integer) obj).floatValue();
+        if (obj instanceof Long)
+            return ((Long) obj).floatValue();
+        if (obj instanceof Float)
+            return ((Float) obj).floatValue();
+        if (obj instanceof String)
+            return parseFloat((String)obj,null);
+        if (obj instanceof Number)
+            return ((Number) obj).floatValue();
+        return parseFloat(StringBaseOpt.objectToString(obj),null);
+    }
+
+    public static Float castObjectToFloat(Object obj, Float defaultValue){
+        return GeneralAlgorithm.nvl(castObjectToFloat(obj),defaultValue);
     }
     /*
      * 将一个Object转换为 Double
