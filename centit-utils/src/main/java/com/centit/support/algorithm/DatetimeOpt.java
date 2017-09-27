@@ -3,21 +3,23 @@ package com.centit.support.algorithm;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Pattern;
+
 @SuppressWarnings("unused")
 public abstract class DatetimeOpt {
+
     private DatetimeOpt() {
         throw new IllegalAccessError("Utility class");
     }
-    private static Logger log = LoggerFactory.getLogger(DatetimeOpt.class);
 
+    private static Logger log = LoggerFactory.getLogger(DatetimeOpt.class);
 
     private static String defaultDatePattern = "yyyy-MM-dd";
     private static String timePattern = "HH:mm";
@@ -190,7 +192,7 @@ public abstract class DatetimeOpt {
      * @return a converted Date object
      * @see java.text.SimpleDateFormat 的说明
      */
-    public static Date convertStringToDate(String strDate,String aMask) {
+    public static Date convertStringToDate(String strDate, String aMask) {
         try {
             SimpleDateFormat df = new SimpleDateFormat(aMask);
             if(strDate == null || strDate.equals(""))
@@ -216,7 +218,7 @@ public abstract class DatetimeOpt {
      *
      * @see java.text.SimpleDateFormat 的说明
      */
-    public static String convertDateToString( Date aDate,String aMask) {
+    public static String convertDateToString(Date aDate, String aMask) {
         String returnValue = "";
 
         if (aDate == null) {
@@ -238,7 +240,7 @@ public abstract class DatetimeOpt {
      * @return a string representation of the date
      */
     public static String convertTimeToString(Date aDate) {
-        return convertDateToString( aDate,timePattern);
+        return convertDateToString(aDate, timePattern);
     }
     /*
      * 返回时间 字符串
@@ -252,7 +254,7 @@ public abstract class DatetimeOpt {
      * @return 字符串
      */
     public static String convertDateToString(Date aDate) {
-        return convertDateToString( aDate,defaultDatePattern);
+        return convertDateToString(aDate, defaultDatePattern);
     }
 
     /**
@@ -271,11 +273,11 @@ public abstract class DatetimeOpt {
      * @return 字符串
      */
     public static String convertDatetimeToString(Date aDate) {
-        return convertDateToString( aDate,datetimePattern);
+        return convertDateToString(aDate, datetimePattern);
     }
 
     public static String convertTimestampToString(Date aDate) {
-        return convertDateToString( aDate,timestampPattern);
+        return convertDateToString(aDate, timestampPattern);
     }
 
     /**
@@ -283,7 +285,7 @@ public abstract class DatetimeOpt {
      * @return string
      */
     public static String getNowDateTime4String() {
-        return convertDateToString( currentUtilDate(),getDateTimePattern());
+        return convertDateToString(currentUtilDate(), getDateTimePattern());
     }
 
     /**
@@ -298,7 +300,7 @@ public abstract class DatetimeOpt {
     public static Date convertStringToDate(String strDate)
             throws ParseException {
 
-        return convertStringToDate(strDate,getDatePattern());
+        return convertStringToDate(strDate, getDatePattern());
     }
 
     /**
@@ -406,67 +408,72 @@ public abstract class DatetimeOpt {
         cal.setTime(date);
         return createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,cal.get(Calendar.DAY_OF_MONTH));
     }
+
     public static java.util.Date truncateToMonth(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         return createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,1);
     }
+
     public static java.util.Date truncateToYear(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         return createUtilDate(cal.get(Calendar.YEAR),1,1);
     }
+
     //跳转到年的最后一天
     public static java.util.Date seekEndOfYear(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         return createUtilDate(cal.get(Calendar.YEAR),12,31);
     }
+
     //跳转到月的最后一天
     public static java.util.Date seekEndOfMonth(java.util.Date date){
         return addDays(truncateToMonth(addMonths(date,1)),-1);
     }
 
-    public static java.util.Date addSeconds(java.util.Date date,int nSeconds) {
+    public static java.util.Date addSeconds(java.util.Date date, int nSeconds) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         cal.add(Calendar.SECOND, nSeconds);
         return cal.getTime();
     }
 
-    public static java.util.Date addMinutes(java.util.Date date,int nMinutes) {
+    public static java.util.Date addMinutes(java.util.Date date, int nMinutes) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         cal.add(Calendar.MINUTE, nMinutes);
         return cal.getTime();
     }
 
-    public static java.util.Date addHours(java.util.Date date,int nHours) {
+    public static java.util.Date addHours(java.util.Date date, int nHours) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         cal.add(Calendar.HOUR, nHours);
         return cal.getTime();
     }
 
-    public static java.util.Date addDays(java.util.Date date,int nDays) {
+    public static java.util.Date addDays(java.util.Date date, int nDays) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         cal.add(Calendar.DATE, nDays);
         return cal.getTime();
     }
-    public static java.util.Date addMonths(java.util.Date date,int nMonths) {
+
+    public static java.util.Date addMonths(java.util.Date date, int nMonths) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         cal.add(Calendar.MONTH, nMonths);
         return cal.getTime();
     }
-    public static java.util.Date addYears(java.util.Date date,int nYears) {
+
+    public static java.util.Date addYears(java.util.Date date, int nYears) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         cal.add(Calendar.YEAR, nYears);
         return cal.getTime();
     }
-
 
     /**
      *
@@ -477,19 +484,17 @@ public abstract class DatetimeOpt {
     public static int calcSpanDays(java.util.Date beginDate, java.util.Date endDate) {
         java.util.Date bD = (beginDate.getTime() > endDate.getTime()) ? truncateToDay(endDate) : truncateToDay(beginDate);
         java.util.Date eD = (beginDate.getTime() > endDate.getTime()) ? beginDate : endDate;
-        return  (int) ( (eD.getTime() - bD.getTime())  / 1000 / 60 / 60 / 24 + 1 );
-
+        return (int) ((eD.getTime() - bD.getTime()) / 1000 / 60 / 60 / 24 + 1 );
     }
    
     /*
      * 计算周的第一天始日期
      */
     public static java.util.Date calcWeek1stDay(int nYear, int nWeekNo){
-         Calendar  cal = Calendar.getInstance();
+         Calendar cal = Calendar.getInstance();
          cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);      
          cal.set(Calendar.YEAR, nYear);
          cal.set(Calendar.WEEK_OF_YEAR, nWeekNo);
-         
          return cal.getTime();
     }
     
@@ -498,12 +503,10 @@ public abstract class DatetimeOpt {
      */
     public static java.util.Date calcWeekLastDay(int nYear, int nWeekNo){
         Calendar  cal = Calendar.getInstance();
-     cal.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);      
-     cal.set(Calendar.YEAR, nYear);
-     cal.set(Calendar.WEEK_OF_YEAR, nWeekNo);
-     
-     return cal.getTime();
-
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+        cal.set(Calendar.YEAR, nYear);
+        cal.set(Calendar.WEEK_OF_YEAR, nWeekNo);
+        return cal.getTime();
     }
     
     /**
@@ -517,11 +520,9 @@ public abstract class DatetimeOpt {
            int m = calcSpanDays( beginDate,endDate);
            int weekEnds = (m+nWeekDay) / 7;
            int nWeekDay2 = (m+nWeekDay) % 7;
-           
            int days = weekEnds * 2 - (nWeekDay==0?0:1) + (nWeekDay2>0?1:0) ;
            return days;
        }
-       
     
     /**
      * 计算这个周期中 工作日的天数,不包括 周六和周日，但是因为不知道其他的假期，所以只是去掉周末
@@ -578,7 +579,7 @@ public abstract class DatetimeOpt {
             return -1;
         if(otherDate==null)
             return 1;
-        if( oneDate.getTime() == otherDate.getTime())
+        if(oneDate.getTime() == otherDate.getTime())
             return 0;
         if(oneDate.getTime() > otherDate.getTime())
             return 1;
@@ -595,38 +596,39 @@ public abstract class DatetimeOpt {
         int sl = sTD.length();
         switch(sl){
         case 5:
-            return convertStringToDate(sTD,"yy-MM");
+            return convertStringToDate(sTD, "yy-MM");
         case 7:
-            return convertStringToDate(sTD,"yyyy-MM");
+            return convertStringToDate(sTD, "yyyy-MM");
         case 8:
-            return convertStringToDate(sTD,"yy-MM-dd");
+            return convertStringToDate(sTD, "yy-MM-dd");
         case 10:
-            return convertStringToDate(sTD,"yyyy-MM-dd");
+            return convertStringToDate(sTD, "yyyy-MM-dd");
         case 11:
-            return convertStringToDate(sTD,"yy-MM-dd HH");
+            return convertStringToDate(sTD, "yy-MM-dd HH");
         case 13:
-            return convertStringToDate(sTD,"yyyy-MM-dd HH");
+            return convertStringToDate(sTD, "yyyy-MM-dd HH");
         case 14:
-            return convertStringToDate(sTD,"yy-MM-dd HH:mm");
+            return convertStringToDate(sTD, "yy-MM-dd HH:mm");
         case 16:
-            return convertStringToDate(sTD,"yyyy-MM-dd HH:mm");
+            return convertStringToDate(sTD, "yyyy-MM-dd HH:mm");
         case 17:
-            return convertStringToDate(sTD,"yy-MM-dd HH:mm:ss");
+            return convertStringToDate(sTD, "yy-MM-dd HH:mm:ss");
         case 19:
-            return convertStringToDate(sTD,"yyyy-MM-dd HH:mm:ss");
+            return convertStringToDate(sTD, "yyyy-MM-dd HH:mm:ss");
         case 20:
         case 21:
         case 22:
         case 23:
-            return convertStringToDate(sTD,"yyyy-MM-dd HH:mm:ss.SSS");
+            return convertStringToDate(sTD, "yyyy-MM-dd HH:mm:ss.SSS");
         default:
             return null;
         }
     }
+
     /*
      * 将一个Object转换为 Date
      */
-    public final static java.util.Date  castObjectToDate(Object obj){
+    public final static java.util.Date castObjectToDate(Object obj){
         if (obj == null)
             return null;
         if (obj instanceof java.util.Date)
