@@ -1,6 +1,7 @@
 package com.centit.test;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +35,8 @@ public class TestDateTimeOpt {
 
 
     public static void testTPTime() throws Exception {
+        System.out.println(System.currentTimeMillis());
+        System.out.println(Instant.now().toString());
         System.out.println(DatetimeOpt.convertDateToString(
                 DatetimeOpt.currentUtilDate(),"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
     }
