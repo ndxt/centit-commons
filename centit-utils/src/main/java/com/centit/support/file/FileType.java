@@ -26,9 +26,9 @@ public abstract class FileType {
 
     protected static final Logger logger = LoggerFactory.getLogger(FileIOOpt.class);
 
-    protected static final HashMap<String, String> mFileTypes = new HashMap<String, String>(42);
+    protected static final HashMap<String, String> mFileTypes = new HashMap<>(42);
     protected static final HashMap<String, String> extMimeTypeMap
-                = new HashMap<String, String>(1280);
+                = new HashMap<>(1280);
 
     static {
         // images
@@ -847,7 +847,20 @@ public abstract class FileType {
         extMimeTypeMap.put("zmm", "application/vnd.handheld-entertainment+xml");
 
     }
-   
+
+    /**
+     * 得到文件头
+     *
+     * @param inputStream 文件
+     * @return 文件头
+     * @throws IOException
+     */
+    private static String getFileHeadContent(InputStream inputStream) throws IOException {
+            byte[] b = new byte[28];
+            inputStream.read(b, 0, 28);
+            return String.valueOf(Hex.encodeHex(b,false));
+    }
+
     /** 
      * 得到文件头 
      *  
@@ -858,12 +871,35 @@ public abstract class FileType {
     private static String getFileHeadContent(File file) throws IOException {
 
         try(InputStream inputStream = new FileInputStream(file)) {
-            byte[] b = new byte[28];
-            inputStream.read(b, 0, 28);
-            return String.valueOf(Hex.encodeHex(b,false));  
+            return getFileHeadContent(inputStream);
         }
-    }  
-      
+    }
+
+
+    /**
+     * 判断文件类型
+     *
+     * @param file 文件
+     * @return 文件类型
+     * @throws IOException 异常
+     */
+    public static String getFileType(InputStream file) throws IOException {
+        String fileHead = getFileHeadContent(file);
+
+        if (fileHead == null || fileHead.length() == 0) {
+            return null;
+        }
+
+        fileHead = fileHead.toUpperCase();
+        for(Entry<String,String> entry : mFileTypes.entrySet()){
+            if(fileHead.startsWith(entry.getKey())){
+                return entry.getValue();
+            }
+        }
+        //System.out.println("\n空");
+        return "unknown";
+    }
+
     /** 
      * 判断文件类型 
      *  
