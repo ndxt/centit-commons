@@ -29,7 +29,8 @@ public abstract class FileType {
     protected static final HashMap<String, String> mFileTypes = new HashMap<>(42);
     protected static final HashMap<String, String> extMimeTypeMap
                 = new HashMap<>(1280);
-
+    public static final String OFFICE2003_FILE_HEAD = "D0CF11E0";
+    public static final String OFFICE_XML_FILE_HEAD = "504B0304";
     static {
         // images
         mFileTypes.put("FFD8FF", "jpg");
@@ -44,11 +45,11 @@ public abstract class FileType {
         mFileTypes.put("3C3F786D6C", "xml");
         mFileTypes.put("68746D6C3E", "html");
         mFileTypes.put("44656C69766572792D646174653A", "eml"); // 邮件
-        mFileTypes.put("D0CF11E0", "office2003");
+        mFileTypes.put(OFFICE2003_FILE_HEAD, "office2003");
         mFileTypes.put("5374616E64617264204A", "mdb");
         mFileTypes.put("252150532D41646F6265", "ps");
         mFileTypes.put("255044462D312E", "pdf");
-        mFileTypes.put("504B0304", "officeX");
+        mFileTypes.put(OFFICE_XML_FILE_HEAD, "officeX");
         mFileTypes.put("52617221", "rar");
         mFileTypes.put("57415645", "wav");
         mFileTypes.put("41564920", "avi");
@@ -348,7 +349,7 @@ public abstract class FileType {
         extMimeTypeMap.put("jpg", "image/jpeg");
         extMimeTypeMap.put("jpgv", "video/jpeg");
         extMimeTypeMap.put("jpm", "video/jpm");
-        extMimeTypeMap.put("js", "application/x-javascript");
+        //extMimeTypeMap.put("js", "application/x-javascript");
         extMimeTypeMap.put("js", "application/javascript");
         extMimeTypeMap.put("json", "application/json");
         extMimeTypeMap.put("karbon", "application/vnd.kde.karbon");
@@ -1026,9 +1027,9 @@ public abstract class FileType {
     public static boolean isOfficeFile(File file){
         try {
             String fileHead = getFileHeadContent(file);
-            if(fileHead.startsWith("D0CF11E0"))//mFileTypes.get("office2003")))
+            if(fileHead.startsWith(OFFICE2003_FILE_HEAD))//mFileTypes.get("office2003")))
                 return true;
-            if(fileHead.startsWith("504B0304"))//mFileTypes.get("officeX")))
+            if(fileHead.startsWith(OFFICE_XML_FILE_HEAD))//mFileTypes.get("officeX")))
                 return true;
         } catch (IOException e) {
             logger.error(e.getMessage(),e);
@@ -1043,7 +1044,7 @@ public abstract class FileType {
     public static boolean isOffice2003File(File file){
         try {
             String fileHead = getFileHeadContent(file);
-            if(fileHead.startsWith("D0CF11E0"))//mFileTypes.get("office2003")))
+            if(fileHead.startsWith(OFFICE2003_FILE_HEAD))//mFileTypes.get("office2003")))
                 return true;
 
         } catch (IOException e) {
