@@ -1026,9 +1026,9 @@ public abstract class FileType {
     public static boolean isOfficeFile(File file){
         try {
             String fileHead = getFileHeadContent(file);
-            if(fileHead.startsWith(mFileTypes.get("office2003")))
+            if(fileHead.startsWith("D0CF11E0"))//mFileTypes.get("office2003")))
                 return true;
-            if(fileHead.startsWith(mFileTypes.get("officeX")))
+            if(fileHead.startsWith("504B0304"))//mFileTypes.get("officeX")))
                 return true;
         } catch (IOException e) {
             logger.error(e.getMessage(),e);
@@ -1043,7 +1043,7 @@ public abstract class FileType {
     public static boolean isOffice2003File(File file){
         try {
             String fileHead = getFileHeadContent(file);
-            if(fileHead.startsWith(mFileTypes.get("office2003")))
+            if(fileHead.startsWith("D0CF11E0"))//mFileTypes.get("office2003")))
                 return true;
 
         } catch (IOException e) {
