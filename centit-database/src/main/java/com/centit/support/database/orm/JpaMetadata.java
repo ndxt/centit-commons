@@ -105,8 +105,7 @@ public abstract class JpaMetadata {
      * @param propertyName  表名或者类名.属性名称
      * @return 字段名称
      */
-    public String translatePropertyNameToColumnName(String propertyName ){
-
+    public static String translatePropertyNameToColumnName(String propertyName ){
         return translatePropertyNameToColumnName(propertyName, null);
     }
 
