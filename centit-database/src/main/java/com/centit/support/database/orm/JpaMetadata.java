@@ -1,6 +1,7 @@
 package com.centit.support.database.orm;
 
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableReference;
 import org.apache.commons.lang3.StringUtils;
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -24,20 +24,92 @@ public abstract class JpaMetadata {
 
     private static final Logger logger = LoggerFactory.getLogger(JpaMetadata.class);
 
-    private static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA =
+    private static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA_CLASSPATH =
+            new ConcurrentHashMap<>(100);
+
+    private static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA_CLASSNAME =
+            new ConcurrentHashMap<>(100);
+
+    private static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA_TABLENAME =
             new ConcurrentHashMap<>(100);
 
     public static TableMapInfo fetchTableMapInfo(Class<?> type){
         String className = type.getName();
-        TableMapInfo mapInfo = ORM_JPA_METADATA.get(className);
+        TableMapInfo mapInfo = ORM_JPA_METADATA_CLASSPATH.get(className);
         if(mapInfo == null){
             mapInfo = obtainMapInfoFromClass(type);
             if(mapInfo!=null){
-                ORM_JPA_METADATA.put(className,mapInfo);
+                ORM_JPA_METADATA_CLASSPATH.put(className,mapInfo);
+                ORM_JPA_METADATA_TABLENAME.put(mapInfo.getTableName(),mapInfo);
+                ORM_JPA_METADATA_CLASSNAME.put(/*type.getSimpleName()*/
+                        className.substring(className.lastIndexOf(".")+1),mapInfo);
             }
         }
         return mapInfo;
     }
+
+    /**
+     * 将属性名称转换为字段名称
+     * @param type 类型
+     * @param propertyName 属性名称
+     * @return 字段名称
+     */
+    public static String translatePropertyNameToColumnName(Class<?> type, String propertyName ){
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+        SimpleTableField field = mapInfo.findFieldByName(propertyName);
+        return field==null?propertyName:field.getColumnName();
+    }
+
+    /**
+     * 将属性名称转换为字段名称;
+     * 这里有一个问题就是这个类一定是已经扫描过得，不然会找不到这个对象
+     * @param propertyName  表名或者类名.属性名称
+     * @param tableAlias  表的笔名
+     * @return 字段名称
+     */
+    public static String translatePropertyNameToColumnName(String propertyName , String tableAlias){
+        int n = propertyName.indexOf('.');
+        if(n<0) {
+            return propertyName;
+        }
+        String tableName =   propertyName.substring(0,n);
+        String fieldName =   propertyName.substring(n+1);
+
+        TableMapInfo mapInfo = ORM_JPA_METADATA_CLASSNAME.get(tableName);
+        if(mapInfo ==null){
+            mapInfo = ORM_JPA_METADATA_TABLENAME.get(tableName);
+        }
+        if(mapInfo ==null){
+            return propertyName;
+        }
+
+        tableName = mapInfo.getTableName();
+
+        SimpleTableField field = mapInfo.findFieldByName(propertyName);
+
+        if(field!=null){
+            fieldName = field.getColumnName();
+        }
+
+        if(StringUtils.isNotBlank(tableAlias)){
+            return tableAlias +"."+fieldName;
+        }
+
+        return tableName +"."+fieldName;
+    }
+
+
+    /**
+     * 将属性名称转换为字段名称;
+     * 这里有一个问题就是这个类一定是已经扫描过得，不然会找不到这个对象
+     * @param propertyName  表名或者类名.属性名称
+     * @return 字段名称
+     */
+    public String translatePropertyNameToColumnName(String propertyName ){
+
+        return translatePropertyNameToColumnName(propertyName, null);
+    }
+
 
     private static SimpleTableField obtainColumnFromField(Class<?> objType, Field field) {
         SimpleTableField column = new SimpleTableField();
