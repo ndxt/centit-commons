@@ -1073,11 +1073,10 @@ public abstract class HttpExecutor {
     protected static String extraFileName(CloseableHttpResponse response) {
         Header[] contentDispositionHeader = response
                 .getHeaders("Content-disposition");
-        Pattern p = Pattern.compile(".*filename=\"(.*)\"");
-        Matcher m = p.matcher(contentDispositionHeader[0].getValue());
+
+        Matcher m = Pattern.compile(".*filename=\"(.*)\"").matcher(contentDispositionHeader[0].getValue());
         if(m.matches()) {
-            String fileName = m.group(1);
-            return fileName;
+            return m.group(1);
         }
         return null;
     }

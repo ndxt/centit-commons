@@ -559,7 +559,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             DatabaseAccess.doExecuteSql(conn,
                     "insert into simulate_sequence(seqname,currvalue,increment)"
                     + " values(?,?,1)", new Object[]{sequenceName,1});
-            return 1l;
+            return 1L;
         }else{
             DatabaseAccess.doExecuteSql(conn,
                     "update simulate_sequence currvalue = currvalue + increment "
