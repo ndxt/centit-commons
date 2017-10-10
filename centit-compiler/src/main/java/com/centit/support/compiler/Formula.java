@@ -352,7 +352,7 @@ public class Formula {
         int prmNo = 0;
         String sRes = "";
         // IF 语句单独处理
-        if( EmbedFunc.functionsList[nFuncNo].nFuncID == ConstDefine.FUNC_IF){
+        if( EmbedFunc.FUNCTIONS_LIST[nFuncNo].nFuncID == ConstDefine.FUNC_IF){
             String sCondition = getFormula();
             if(sCondition==null) return null;
 
@@ -401,10 +401,10 @@ public class Formula {
         }
         //str = m_lex.getAWord();
         if(/* str==null || str.length()==0 || */ !str.equals(")") ) return null;
-        if( EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
+        if( EmbedFunc.FUNCTIONS_LIST[nFuncNo].nPrmSum != -1
             //&& prmNo != m_sFunctionList[nFuncNo].nPrmSum) return null;
-            && prmNo < EmbedFunc.functionsList[nFuncNo].nPrmSum) return null;
-        str = runFunc(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
+            && prmNo < EmbedFunc.FUNCTIONS_LIST[nFuncNo].nPrmSum) return null;
+        str = runFunc(slOperand,EmbedFunc.FUNCTIONS_LIST[nFuncNo].nFuncID);
         return str;
     }
     //不一致的问题 需要修改

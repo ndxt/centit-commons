@@ -14,8 +14,8 @@ public abstract class EmbedFunc {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static final int functionsSum = 46;
-    protected static final FunctionInfo functionsList[]={
+    public static final int FUNCTIONS_SUM = 46;
+    protected static final FunctionInfo FUNCTIONS_LIST[]={
         new FunctionInfo("ave",-1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte",2, ConstDefine.FUNC_BYTE,ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,2)=2
@@ -80,8 +80,8 @@ public abstract class EmbedFunc {
 
     public static final int    getFuncNo(String sFuncName)
     {
-        for(int i=0; i<functionsSum; i++)
-            if( sFuncName.equalsIgnoreCase(functionsList[i].sName)) return i;
+        for(int i = 0; i< FUNCTIONS_SUM; i++)
+            if( sFuncName.equalsIgnoreCase(FUNCTIONS_LIST[i].sName)) return i;
         return -1;
     }
 
@@ -462,22 +462,22 @@ public abstract class EmbedFunc {
         case ConstDefine.FUNC_CASE:// 116
             {
                 if (nOpSum < 2) return "";
-                tempstr = StringRegularOpt.trimString( slOperand.get(0));
-                int MatchType = 0;
+                tempstr = StringRegularOpt.trimString(slOperand.get(0));
+                int matchType = 0;
                 if(tempstr.equalsIgnoreCase("true") )
-                    MatchType = 1;
+                    matchType = 1;
                 else{
                     if(StringRegularOpt.isNumber(tempstr)){
                         dbtemp = Double.valueOf(tempstr);
-                        MatchType = 2;
+                        matchType = 2;
                     }
                 }
                 int i=1;
                 for( ;i+1<nOpSum; i+=2){
-                    if( MatchType ==1 ){
+                    if( matchType ==1 ){
                         if (StringRegularOpt.isTrue(slOperand.get(i)))
                             return slOperand.get(i+1);
-                    }else if ( MatchType == 2 ){
+                    }else if ( matchType == 2 ){
                         if (StringRegularOpt.isNumber(slOperand.get(i))){
                             if( Math.abs( dbtemp - Double.valueOf(
                                     StringRegularOpt.trimString(slOperand.get(i)))) < 0.0001)
