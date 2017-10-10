@@ -1,6 +1,5 @@
 package com.centit.support.office;
 
-import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
 import com.itextpdf.text.Document;
@@ -11,7 +10,7 @@ import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.ComThread;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
-import com.sun.tools.javac.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -255,7 +254,7 @@ public abstract class OfficeToPdf {
     }
 
     public static boolean office2Pdf(String inputFile, String pdfFile) {
-        String suffix = StringUtils.toLowerCase(
+        String suffix = StringUtils.lowerCase(
                 FileType.getFileExtName(inputFile));
         //System.out.println("文件格式不支持转换为PDF!");
         return office2Pdf(suffix,inputFile, pdfFile);
