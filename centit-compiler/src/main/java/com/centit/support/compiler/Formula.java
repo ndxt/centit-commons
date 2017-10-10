@@ -296,7 +296,7 @@ public class Formula {
                 String sInRes = "0";
                 String str1Operand = StringRegularOpt.trimString(slOperand.remove(0));
                 str = lex.getAWord();
-                if( str==null || str.length()==0 || !str.equals("(") ) return null;
+                if( str==null || str.length()==0 || !"(".equals(str) ) return null;
                 List<String> slInnerOperand = new ArrayList<String>();
 
                 while(true)
@@ -304,8 +304,8 @@ public class Formula {
                     str = getFormula();
                     slInnerOperand.add(str);
                     str = lex.getAWord();
-                    if( str==null || str.length()==0 ||(  !str.equals(",")  && !str.equals(")") ) ) return null;
-                    if( str.equals(")") )
+                    if( str==null || str.length()==0 || (!",".equals(str) && !")".equals(str)) ) return null;
+                    if(")".equals(str))
                         break;
                 }
                 for(int i=0; i< slInnerOperand.size(); i++){
@@ -357,27 +357,27 @@ public class Formula {
             if(sCondition==null) return null;
 
             str = lex.getAWord();
-            if( str==null || str.length()==0 ||  !str.equals(",") ) return null;
+            if( str==null || str.length()==0 ||  !",".equals(str) ) return null;
 
             if( StringRegularOpt.isTrue(sCondition) ){
                 sRes =  getFormula();
                 str = lex.getAWord();
-                if( str==null || str.length()==0 || ( !str.equals(",") && !str.equals(")")) ) return null;
-                if( str.equals(")") ) return sRes;
+                if( str==null || str.length()==0 || (!",".equals(str) && !")".equals(str)) ) return null;
+                if( ")".equals(str) ) return sRes;
                 // 特殊处理的地方就在这儿
                 lex.skipAOperand();
                 str = lex.getAWord();
-                if( str==null || str.length()==0 || !str.equals(")") ) return null;
+                if( str==null || str.length()==0 || !")".equals(str) ) return null;
                 return sRes;
             }else {
                 // 特殊处理的地方就在这儿
                 lex.skipAOperand();
                 str = lex.getAWord();
-                if( str==null || str.length()==0 || !str.equals(",") && !str.equals(")") ) return null;
-                if( str.equals(")") ) return sRes;
+                if( str==null || str.length()==0 || !",".equals(str) && !")".equals(str) ) return null;
+                if( ")".equals(str) ) return sRes;
                 sRes = getFormula();
                 str = lex.getAWord();
-                if( str==null || str.length()==0 || !str.equals(")") ) return null;
+                if( str==null || str.length()==0 || !")".equals(str) ) return null;
                 return sRes;
             }
             //return sRes;
@@ -393,14 +393,14 @@ public class Formula {
             str = getFormula();
             slOperand.add(str);
             str = lex.getAWord();
-            if( str==null || str.length()==0 || ( !str.equals(",") && !str.equals(")"))  )
+            if( str==null || str.length()==0 || ( !",".equals(str) && !")".equals(str))  )
                 return null;
-            if( str.equals(")") ){
+            if(")".equals(str)){
                 break;
             }
         }
         //str = m_lex.getAWord();
-        if(/* str==null || str.length()==0 || */ !str.equals(")") ) return null;
+        if(/* str==null || str.length()==0 || */ !")".equals(str) ) return null;
         if( EmbedFunc.FUNCTIONS_LIST[nFuncNo].nPrmSum != -1
             //&& prmNo != m_sFunctionList[nFuncNo].nPrmSum) return null;
             && prmNo < EmbedFunc.FUNCTIONS_LIST[nFuncNo].nPrmSum) return null;
