@@ -83,10 +83,7 @@ public abstract class OfficeToPdf {
             }
             //关闭
             Dispatch.call(excel, "Close", new Variant(false));
-            //退出
-            if (actcom != null) {
-                actcom.invoke("Quit", new Variant[0]);
-            }
+            actcom.invoke("Quit", new Variant[0]);
         } catch (Exception es) {
             successed =false;
             logger.error(es.getMessage(), es);
@@ -156,12 +153,12 @@ public abstract class OfficeToPdf {
             Dispatch.call(excel, "Close",new Variant(false));
 
             ax.invoke("Quit",new Variant[]{});
-
-            ComThread.Release();
             return true;
         }catch(Exception es){
             logger.error(es.getMessage(),es);
             return false;
+        }finally {
+            ComThread.Release();
         }
     }
 
@@ -198,41 +195,36 @@ public abstract class OfficeToPdf {
     public static boolean word2Pdf(String inWordFile, String outPdfFile) {
         String inputFile = inWordFile.replace('/','\\');
         String pdfFile   = outPdfFile.replace('/','\\');
-        ActiveXComponent app = null;
-        Dispatch doc = null;
         ComThread.InitSTA();
         //long start = System.currentTimeMillis();
         try {
-            app = new ActiveXComponent("Word.Application");
+            ActiveXComponent app = new ActiveXComponent("Word.Application");
             // 设置word不可见
             app.setProperty("Visible", new Variant(false));
             // 打开word文件
             Dispatch docs = app.getProperty("Documents").toDispatch();
             //doc = Dispatch.call(docs,  "Open" , sourceFile).toDispatch();
-            doc = Dispatch.invoke(docs,"Open",Dispatch.Method,new Object[] {
+            Dispatch doc = Dispatch.invoke(docs,"Open",Dispatch.Method,new Object[] {
                     inputFile, new Variant(false),new Variant(true) }, new int[1]).toDispatch();
             //System.out.println("打开文档..." + inputFile);
             //System.out.println("转换文档到PDF..." + pdfFile);
             FileSystemOpt.deleteFile(pdfFile);
             // Dispatch.call(doc, "SaveAs",  destFile,  17);
-            // 作为html格式保存到临时文件：：参数 new Variant(8)其中8表示word转html;7表示word转txt;44表示Excel转html;17表示word转成pdf。。
+            // 作为html格式保存到临时文件：：参数 new Variant(8)其中8表示word转html;7表示word转txt;
+            //   44表示Excel转html;17表示word转成pdf。。
             Dispatch.invoke(doc, "SaveAs", Dispatch.Method, new Object[] {
                     pdfFile, new Variant(17) }, new int[1]);
-            //long end = System.currentTimeMillis();
-            //System.out.println("转换完成..用时：" + (end - start) + "ms.");
+            Dispatch.call(doc,"Close",false);
+            app.invoke("Quit", new Variant[] {});
         } catch (Exception e) {
             //e.printStackTrace();
             logger.error(e.getMessage(),e);//e.printStackTrace();
             //System.out.println("========Error:文档转换失败：" + e.getMessage());
         } finally {
-            // 关闭word
-            Dispatch.call(doc,"Close",false);
-            //System.out.println("关闭文档");
-            if (app != null)
-                app.invoke("Quit", new Variant[] {});
+            ComThread.Release();
         }
         //如果没有这句话,winword.exe进程将不会关闭
-        ComThread.Release();
+
         return true;
     }
 
