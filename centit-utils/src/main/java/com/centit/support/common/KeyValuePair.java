@@ -1,7 +1,5 @@
 package com.centit.support.common;
 
-import org.apache.commons.lang3.tuple.MutablePair;
-
 /**
  * key value 数值对; 我们经常想在一个方法中返回多个值，比如返回错误编号和错误文字说明，有 KeyValuePair 就很方便
  *     return new KeyValuePair(Integer,String)(5,"error message");

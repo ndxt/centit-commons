@@ -3,6 +3,16 @@ package com.centit.support.algorithm;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+/**
+ *
+ 1. capitalization 将数据转换为大写，用户发票中的大写输出。
+ 2. uppercaseCN 将数据转换为中文，比如 2017 - 二〇一七。
+ 3. getNumByte 获取数据字符串中某一位上的数值，比如获取十位上的数据参数就传入 2
+ 4. castObjectTo* 一组类型转换算法
+ 5. compareTwo* 数据之间比较，主要是为了避免 NullPointerException。
+ 6. parse* 转换字符串为数值类型， 主要是为了避免 NullPointerException。
+ * @author codefan
+ */
 @SuppressWarnings("unused")
 public abstract class NumberBaseOpt {
     private NumberBaseOpt() {

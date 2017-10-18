@@ -2,6 +2,7 @@ package com.centit.support.algorithm;
 
 /**
  * Created by codefan on 17-9-7.
+ * @author codefan
  */
 @SuppressWarnings("unused")
 public abstract  class GeneralAlgorithm {

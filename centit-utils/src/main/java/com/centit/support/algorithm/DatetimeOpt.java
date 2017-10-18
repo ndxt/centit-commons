@@ -3,15 +3,31 @@ package com.centit.support.algorithm;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.regex.Pattern;
 
+/**
+ * 几乎每一个框架都有重写这个类，这个类中的方法比较多，可以归纳为一下几类：
+ 1. create* 这类方法式创建一个日期类，不同的方法有不同的参数
+ 2. current* 获取当前时间，不同的方法返回不同的类型，可能是 utils.Date、sql.Data、timeStamp等等
+ 3. convert* 在土工日期类型、日期和时间 等等之间进行转换
+ 4. equal* 判断两个日期在不同时间精度上是否相等，比如是否是同一月、同一天、同一分钟等等。
+ 5. calc* 一组关于日期的计算函数，比如：计算两个日期之间的时机差calcSpanDays，
+        计算两个日期之间的工作日 calcWeekDays， 计算两个日期之间的周末天数 calcWeekendDays，
+        计算一周的第一天和最后一天等等。
+ 6. add* 给日期做加减计算，参数为负数就是减。
+ 7. get* 获得日期的属性，比如星期几、是一年的第几天、当前时分秒等等。
+ 8. seek* 移动到这个月的最后一天、这年的最后一天等等。
+ 9. truncate* 截取日期到天、周、月等等，和seek*操作相对。
+ 10. smartPraseDate 和 castObjectToDate 前者将字符串转换为日期，后者将object转换为日期
+ * @author codefan
+ */
 @SuppressWarnings("unused")
 public abstract class DatetimeOpt {
 
@@ -20,7 +36,6 @@ public abstract class DatetimeOpt {
     }
 
     private static Logger log = LoggerFactory.getLogger(DatetimeOpt.class);
-
     private static String defaultDatePattern = "yyyy-MM-dd";
     private static String timePattern = "HH:mm";
     private static String timeWithSecondPattern = "HH:mm:ss";
@@ -59,7 +74,6 @@ public abstract class DatetimeOpt {
         String sCurDate = formatter.format(dt);
         return sCurDate;
     }
-
 
     /**
      * 根据 年、月、日、时、分、秒  创建一个日期 类型为 java.util.Date
@@ -569,8 +583,15 @@ public abstract class DatetimeOpt {
         return oneDate.getTime() / 86400000 == otherDate.getTime() / 86400000;
     }
 
-    /*
-     * 比较两个日期大小
+    /**
+     * 比较两个日期大小 ,避免 发生 NullPointerException 异常
+     * Compares two Dates for ordering.
+     * @param   oneDate   the <code>Date</code> to be compared.
+     * @param   otherDate   the <code>Date</code> to be compared.
+     * @return  the value <code>0</code> if the argument otherDate is equal to
+     *          oneDate ; a value less than <code>0</code> if this Date
+     *          is before the Date argument; and a value greater than
+     *        if oneDate is after the otherDate.
      */
     public static int compareTwoDate(java.util.Date oneDate, java.util.Date otherDate) {
         if(oneDate==null && otherDate==null)
@@ -579,11 +600,7 @@ public abstract class DatetimeOpt {
             return -1;
         if(otherDate==null)
             return 1;
-        if(oneDate.getTime() == otherDate.getTime())
-            return 0;
-        if(oneDate.getTime() > otherDate.getTime())
-            return 1;
-        return -1;
+        return oneDate.compareTo(otherDate);
     }
 
     /*

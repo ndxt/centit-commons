@@ -3,6 +3,11 @@ package com.centit.support.algorithm;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
+/**
+ * 这个是从网络上检索来的一个计算农历的类。
+ * @author codefan
+ */
 @SuppressWarnings("unused")
 public class Lunar {
 

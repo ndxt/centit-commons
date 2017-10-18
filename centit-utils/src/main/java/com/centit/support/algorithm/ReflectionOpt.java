@@ -13,6 +13,7 @@ import java.util.Map;
 
 /**
  *  提供一些反射方面缺失功能的封装.
+ *  @author codefan
  */
 @SuppressWarnings("unused")
 public abstract class ReflectionOpt  {

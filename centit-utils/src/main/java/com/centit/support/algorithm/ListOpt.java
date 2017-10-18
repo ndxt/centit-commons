@@ -23,7 +23,15 @@ import com.centit.support.common.TreeNode;
 /**
  * 
  * 一些通用的算法，这些算法都和具体的业务数据结构解耦
- * 
+ *1. sortAsTree* 将list按照树形结构进行排序，这个方式是这个类最重要的一个方法，也是这个类存在的一个原因。
+ 2. compareTwoList 比较两个list，将他们相同的、删除的、新增的分别找出来，
+        刚好对应sql的 update、delete和insert操作。
+ 3. listToArray 和 arrayToList 通过反射的方式简化了传入的参数。
+ 4. remove* 一组对集合元素清理操作。
+ 5. moveListItem 和 changeListItem ，前者为移动元素位置两个元素之间的所有item位置都有变化，
+        后者为仅仅交换两个元素的位置
+ 6. clone* 复制集合。
+ 7. storedAsTree、treeToJSONArray 对属性结构的存储或者序列化。
  * @author codefan
  * @version $Rev$ <br>
  *          $Id$
@@ -45,21 +53,7 @@ public abstract class ListOpt {
         boolean parentAndChild(T p,T c);
     }
 
-    /**
-     * 交换List中两个对象的位置
-     * @param <T> 泛型类型
-     * @param list 输入列表
-     * @param p1 位置1
-     * @param p2 位置2
-     */
-    public static <T> void changeListItem(List<T> list, int p1,int p2) {
-        if(p1==p2)
-            return;
-        Collections.swap(list, p1, p2);
-        /*T tmp = list.get(p1);
-        list.set(p1, list.get(p2));
-        list.set(p2, tmp);    */
-    }
+
     /**
      * 移动List一个对象到新的位置
      * @param <T> 泛型类型
@@ -85,7 +79,21 @@ public abstract class ListOpt {
         }
     }
 
-
+    /**
+     * 交换List中两个对象的位置
+     * @param <T> 泛型类型
+     * @param list 输入列表
+     * @param p1 位置1
+     * @param p2 位置2
+     */
+    public static <T> void changeListItem(List<T> list, int p1,int p2) {
+        if(p1==p2)
+            return;
+        Collections.swap(list, p1, p2);
+        /*T tmp = list.get(p1);
+        list.set(p1, list.get(p2));
+        list.set(p2, tmp);    */
+    }
     /**
      * 将数组结构按照树形展示的形式进行排序，将所有孩子元素放到父元素的下面
      * 深度优先的排序
