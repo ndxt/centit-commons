@@ -45,9 +45,9 @@ public class PdmReader implements DatabaseMetadata {
     {
         String uri="attribute";
         // xmlns:a="attribute" xmlns:c="collection" xmlns:o="object">
-        if(sPreFix.equals("c"))
+        if("c".equals(sPreFix))
             uri="collection";
-        else if(sPreFix.equals("o"))
+        else if("o".equals(sPreFix))
             uri="object";
         return new QName(sName,Namespace.get(sPreFix, uri), sPreFix+':'+sName);
     }

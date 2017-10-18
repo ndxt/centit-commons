@@ -37,7 +37,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.sun:tools:1.8">
         <CLASSES>
-          <root url="jar:///opt/develop/jvm/jdk1.8.0_102/lib/tools.jar!/" />
+          <root url="jar://C:/develop/jvm/jdk1_8_0_05/lib/tools.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -46,7 +46,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.sun:rt:1.8">
         <CLASSES>
-          <root url="jar:///opt/develop/jvm/jdk1.8.0_102/jre/lib/rt.jar!/" />
+          <root url="jar://C:/develop/jvm/jdk1_8_0_05/jre/lib/rt.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -55,7 +55,7 @@
     <orderEntry type="module-library">
       <library name="Maven: com.sun:jce:1.8">
         <CLASSES>
-          <root url="jar:///opt/develop/jvm/jdk1.8.0_102/jre/lib/jce.jar!/" />
+          <root url="jar://C:/develop/jvm/jdk1_8_0_05/jre/lib/jce.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

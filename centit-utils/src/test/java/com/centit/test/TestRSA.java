@@ -5,16 +5,42 @@ import java.security.KeyPair;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.security.AESSecurityUtils;
 import com.centit.support.security.DESSecurityUtils;
 import com.centit.support.security.RSASecurityUtils;
 
 public class TestRSA {
 
     public static void main(String[] args) throws Exception {
-        testDes();
-        testCreateKey();
-        testRsa();
+        testAes();
+        //testDes();
+        //testCreateKey();
+        //testRsa();
     }
+
+    public static void testAes(){
+        String str="恭喜发财!恭喜发财!恭喜发财!恭喜发财";
+        String key = "0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
+        System.out.println("密码为:"+key);
+        System.out.println("---------------加密方法AES- 中文--------------------");
+        System.out.println("原文为:("+str.length()+")"+str);
+
+
+        String sec = AESSecurityUtils.encryptAndBase64(str, key);
+        System.out.println("加密后密文为：("+sec.length()+")"+ sec);
+        sec = AESSecurityUtils.decryptBase64String(sec, key);
+        System.out.println("解密后为:"+sec);
+
+        str="codefan@sina.com+www.centit.com";
+        System.out.println("---------------加密方法AES-- 英文和数字-------------------");
+        System.out.println("原文为:("+str.length()+")"+str);
+
+        sec = AESSecurityUtils.encryptAndBase64(str, key);
+        System.out.println("加密后密文为：("+sec.length()+")"+ sec);
+        sec = AESSecurityUtils.decryptBase64String(sec, key);
+        System.out.println("解密后为:"+sec);
+    }
+
 
     public static void testDes(){
         String str="恭喜发财!恭喜发财!恭喜发财!恭喜发财";
