@@ -16,22 +16,22 @@ public class FormulaTest {
 
     public static void testFormula2() {
 
-        Formula f = new Formula();
+        VariableFormula f = new VariableFormula();
         Map<String,Object> varMap = new HashMap<String,Object>();
         Map<String,Object> varA = new HashMap<String,Object>();
         varA.put("aa", new Integer[]{100,200,300});
         varA.put("ab", 200);
-        Map<String,Object> varB = new HashMap<String,Object>();
+        Map<String,Object> varB = new HashMap<>();
         varB.put("ba", 300);
         varB.put("bb", 400);
         varMap.put("a", varA);
-        varMap.put("b", varB);
-        varMap.put("c", "8aa080845");
+        varMap.put("depart", varB);
+        varMap.put("c", null);
         varMap.put("ideaCode", "T");
         //System.out.println(f.checkFormula("a.aa[1]+a.aa[2]"));
         //String s = f.calculate("${a.aa[0]}+ ${a.aa[2]}",varMap);
         //System.out.println(s);
-        String s = f.calculate(" c=='d0038' && ideaCode == 'T' ",varMap);
+        Object s = f.calculate(" depart =='d0038' && ideaCode == 'T' || isempty(c)",varMap);
         System.out.println(s);
         System.out.println("Done!");
     }

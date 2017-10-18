@@ -422,7 +422,7 @@ public class Formula {
      */
     public String calculate(String szExpress,Map<String,Object> varMap)
     {
-        return calculate(szExpress,new MapTranslate(varMap));
+        return calculate(szExpress,new ObjectTranslate(varMap));
     }
 
     public String calculate(String szExpress,VariableTranslate varTrans)

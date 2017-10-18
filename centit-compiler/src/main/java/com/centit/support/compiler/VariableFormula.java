@@ -35,7 +35,7 @@ public class VariableFormula {
     public Object calculate(String szExpress,Map<String,Object> varMap)
     {
         setFormula(szExpress);
-        setTrans(new MapTranslate(varMap));
+        setTrans(new ObjectTranslate(varMap));
         return calcFormula();
     }
 
@@ -56,10 +56,10 @@ public class VariableFormula {
             return null;
         }
         if(str.charAt(0) == '('){
-            Object resstr = calcFormula();
+            Object resStr = calcFormula();
             str = lex.getAWord();
             if( str == null || str.length()==0 || str.charAt(0) != ')') return null;
-            return resstr;
+            return resStr;
         }else if( (str.charAt(0) == '!') || str.equalsIgnoreCase("NOT") ) {
             Object obj = calcItem();
             if(BooleanBaseOpt.castObjectToBoolean(obj,false))
