@@ -147,12 +147,13 @@ public abstract class StringRegularOpt {
                 break;
             }
             default:
-                if(! isNumber(str)) return false;
-                long bRes =  Math.round(Double.valueOf(str));
-                return bRes!=0;
+                break;
         }
-
-        return false;
+        if(! isNumber(str)){
+            return false;
+        }
+        long bRes =  Math.round(Double.valueOf(str));
+        return bRes!=0;
     }
 
     public static boolean isFalse(String str )
@@ -211,11 +212,13 @@ public abstract class StringRegularOpt {
                 break;
             }
             default:
-                if(! isNumber(str)) return false;
-                long bRes =  Math.round(Double.valueOf(str));
-                return bRes==0;
+               break;
         }
-        return false;
+        if(! isNumber(str)){
+            return false;
+        }
+        long bRes =  Math.round(Double.valueOf(str));
+        return bRes==0;
     }
 
     public static boolean isDatetime(String szTime ,Calendar  t_time)

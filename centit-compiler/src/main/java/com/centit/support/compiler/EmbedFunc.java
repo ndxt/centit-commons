@@ -1,21 +1,20 @@
 package com.centit.support.compiler;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.ListOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.algorithm.*;
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class EmbedFunc {
     private EmbedFunc() {
         throw new IllegalAccessError("Utility class");
     }
-
-    public static final int FUNCTIONS_SUM = 46;
-    protected static final FunctionInfo FUNCTIONS_LIST[]={
+    private static double MIN_DOUBLE = 0.00000001;
+    public static final int functionsSum = 46;
+    protected static final FunctionInfo functionsList[]={
         new FunctionInfo("ave",-1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte",2, ConstDefine.FUNC_BYTE,ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,2)=2
@@ -23,7 +22,7 @@ public abstract class EmbedFunc {
                                         //          byte ("4321.789",2)=3
         new FunctionInfo("capital",1,ConstDefine.FUNC_CAPITAL,ConstDefine.TYPE_STR),  // capital (123.45)="一百二十三点四五"
         new FunctionInfo("if",3,ConstDefine.FUNC_IF,ConstDefine.TYPE_STR),      // if (1,2,3)= 2  if (0,"2","3")= "3"
-        new FunctionInfo("case",2,ConstDefine.FUNC_CASE,ConstDefine.TYPE_STR),      // if (1,2,3)= 2  if o(0,"2","3")= "3"
+        new FunctionInfo("case",2,ConstDefine.FUNC_CASE,ConstDefine.TYPE_STR),      // case(1,2,3)= null  case(1,2,3,1,"5")= "5"  case(0,1,"2","3")= "3"
         new FunctionInfo("match",2,ConstDefine.FUNC_MATCH,ConstDefine.TYPE_NUM), //匹配*?为通配符 match ("abcd","a??d")=1
                                             //             match ("abcd","a*d")=1
         new FunctionInfo("max",-1,ConstDefine.FUNC_MAX,ConstDefine.TYPE_NUM),   // 求最大值 max (1,2,3,5,4) = 5
@@ -78,569 +77,1077 @@ public abstract class EmbedFunc {
         new FunctionInfo("getpy",1,ConstDefine.FUNC_GET_PY,ConstDefine.TYPE_STR)//取汉字拼音
     };
 
-    public static final int    getFuncNo(String sFuncName)
+    public static final int getFuncNo(String sFuncName)
     {
-        for(int i = 0; i< FUNCTIONS_SUM; i++)
-            if( sFuncName.equalsIgnoreCase(FUNCTIONS_LIST[i].sName)) return i;
+        for(int i=0; i<functionsSum; i++)
+            if( sFuncName.equalsIgnoreCase(functionsList[i].sName)) return i;
         return -1;
     }
 
 
     public static final String runFunc(List<String> slOperand,int funcID)
     {
-        int nOpSum = 0;
+        int nOpSum = ( slOperand == null )? 0: slOperand.size();
 
-        if( slOperand != null )
-            nOpSum = slOperand.size();
-        String str = "",tempstr;
+        String str,tempstr;
         double dbtemp = 0.0;
         switch(funcID){
-
-        case ConstDefine.FUNC_AVE :// 100
-            for(int i=0; i<nOpSum; i++){
-                if(StringRegularOpt.isNumber(slOperand.get(i) ))
-                    dbtemp += Double.valueOf(StringRegularOpt.trimString(slOperand.get(i)));
-            }
-            if (nOpSum > 0)
-                str = String.format("%f",dbtemp/nOpSum);//"%f",
-            else
-                str = "0";
-            return str;
-        case ConstDefine.FUNC_GET_AT://148
-            if (nOpSum < 2)
-                return "";
-            tempstr = slOperand.get(0);
-            if( StringRegularOpt.isNumber(tempstr)){
-                int nbit = Integer.valueOf(tempstr);
-                if(nbit < nOpSum -1){
-                    return slOperand.get(nbit+1);
+            case ConstDefine.FUNC_AVE :// 100
+                for(int i=0; i<nOpSum; i++){
+                    if(StringRegularOpt.isNumber(slOperand.get(i) ))
+                        dbtemp += Double.valueOf(StringRegularOpt.trimString(slOperand.get(i)));
                 }
-            }
-            return "";
-        case ConstDefine.FUNC_BYTE:// 101
-            if(nOpSum<2 || ! StringRegularOpt.isNumber(slOperand.get(1)) )
-                return "";
-            tempstr = slOperand.get(0);
-            int nbit = Integer.valueOf(slOperand.get(1));
-            if( StringRegularOpt.isNumber(tempstr)){
-                str = String.valueOf(NumberBaseOpt.getNumByte(tempstr,nbit));
-            }else{
-                int sl = tempstr.length();
-                if( nbit >=0 && nbit < sl)
-                    str = String.valueOf(tempstr.charAt(nbit));
+                if (nOpSum > 0)
+                    str = String.format("%f",dbtemp/nOpSum);//"%f",
                 else
-                    str = "";
-            }
-            return str;
+                    str = "0";
+                return str;
+            case ConstDefine.FUNC_GET_AT://148
+                if (nOpSum < 2)
+                    return "";
+                tempstr = slOperand.get(0);
+                if( StringRegularOpt.isNumber(tempstr)){
+                    int nbit = Integer.valueOf(tempstr);
+                    if(nbit < nOpSum -1){
+                        return slOperand.get(nbit+1);
+                    }
+                }
+                return "";
+            case ConstDefine.FUNC_BYTE:// 101
+                if(nOpSum<2 || ! StringRegularOpt.isNumber(slOperand.get(1)) )
+                    return "";
+                tempstr = slOperand.get(0);
+                int nbit = Integer.valueOf(slOperand.get(1));
+                if( StringRegularOpt.isNumber(tempstr)){
+                    str = String.valueOf(NumberBaseOpt.getNumByte(tempstr,nbit));
+                }else{
+                    int sl = tempstr.length();
+                    if( nbit >=0 && nbit < sl)
+                        str = String.valueOf(tempstr.charAt(nbit));
+                    else
+                        str = "";
+                }
+                return str;
 
-        case ConstDefine.FUNC_MATCH:
-            if(nOpSum<2) return "0";
-            if(StringRegularOpt.isMatch(slOperand.get(0),slOperand.get(1))) return "1";
-            return "0";
+            case ConstDefine.FUNC_MATCH:
+                if(nOpSum<2) return "0";
+                if(StringRegularOpt.isMatch(slOperand.get(0),slOperand.get(1))) return "1";
+                return "0";
 
-        case ConstDefine.FUNC_CAPITAL:// 102
-            {
+            case ConstDefine.FUNC_CAPITAL:// 102
+                {
+                    if (nOpSum <1) return "";
+                    boolean nT = false;
+                    if(nOpSum > 1)
+                        nT = StringRegularOpt.isTrue(slOperand.get(1));
+                    if( !StringRegularOpt.isNumber(slOperand.get(0)) ) return "";
+                    str = NumberBaseOpt.capitalization(slOperand.get(0),nT);
+                }
+                return str;
+            case ConstDefine.FUNC_MAX:{// 103
                 if (nOpSum <1) return "";
-                boolean nT = false;
-                if(nOpSum > 1)
-                    nT = StringRegularOpt.isTrue(slOperand.get(1));
-                if( !StringRegularOpt.isNumber(slOperand.get(0)) ) return "";
-                str = NumberBaseOpt.capitalization(slOperand.get(0),nT);
-            }
-            return str;
-        case ConstDefine.FUNC_MAX:{// 103
-            if (nOpSum <1) return "";
-            List<String> trimOperand = ListOpt.removeNullItem(slOperand);
-            if(trimOperand==null||trimOperand.size()<1)
-                return "";
-            boolean hasNotNumber=false;
-            dbtemp = -1;
-            if(StringRegularOpt.isNumber(trimOperand.get(0)))
-                dbtemp = Double.valueOf(StringRegularOpt.trimString(trimOperand.get(0)));
-            else
-                hasNotNumber = true;
-
-            for(int i=1; i<trimOperand.size(); i++){
-                if(StringRegularOpt.isNumber(trimOperand.get(i))){
-                    double tMidF = Double.valueOf(
-                            StringRegularOpt.trimString(trimOperand.get(i)));
-                    if (dbtemp < tMidF)
-                        dbtemp = tMidF;
-                }else
-                    hasNotNumber  = true;
-            }
-            if(! hasNotNumber)
-                return String.valueOf(dbtemp);
-
-            String strRet = trimOperand.get(0);
-            for(int i=1; i<trimOperand.size(); i++){
-                if(strRet.compareTo(trimOperand.get(i))<0)
-                    strRet=trimOperand.get(i);
-            }
-            return strRet;
-        }
-        case ConstDefine.FUNC_MIN:{// 104
-
-            if (nOpSum <1) return "";
-            List<String> trimOperand = ListOpt.removeNullItem(slOperand);
-            if(trimOperand==null||trimOperand.size()<1)
-                return "";
-            dbtemp = -1;
-            boolean hasNotNumber=false;
-
-            if(StringRegularOpt.isNumber(trimOperand.get(0)))
-                dbtemp = Double.valueOf(StringRegularOpt.trimString(trimOperand.get(0)));
-            else
-                hasNotNumber = true;
-            for(int i=1; i<trimOperand.size(); i++){
-                if(StringRegularOpt.isNumber(trimOperand.get(i))){
-                    double tMidF = Double.valueOf(StringRegularOpt.trimString(trimOperand.get(i)));
-                    if (dbtemp > tMidF)
-                        dbtemp = tMidF;
-                }else
+                List<String> trimOperand = ListOpt.removeNullItem(slOperand);
+                if(trimOperand==null||trimOperand.size()<1)
+                    return "";
+                boolean hasNotNumber=false;
+                dbtemp = -1;
+                if(StringRegularOpt.isNumber(trimOperand.get(0)))
+                    dbtemp = Double.valueOf(StringRegularOpt.trimString(trimOperand.get(0)));
+                else
                     hasNotNumber = true;
-            }
 
-            if(! hasNotNumber)
-                return String.valueOf(dbtemp);
-
-            String strRet = trimOperand.get(0);
-            for(int i=1; i<trimOperand.size(); i++){
-                if(strRet.compareTo(trimOperand.get(i))>0)
-                    strRet=trimOperand.get(i);
-            }
-            return strRet;
-        }
-        case ConstDefine.FUNC_COUNT:// 112
-            return String.valueOf(nOpSum);
-
-        case ConstDefine.FUNC_COUNTNOTNULL:// 145
-            {
-                if(nOpSum==0)
-                    return "0";
-                int nc=0;
-                for(String s:slOperand){
-                    if(s!=null && s.length()>0 &&
-                            !"''".equals(s)  && !"\"\"".equals(s))
-                        nc++;
+                for(int i=1; i<trimOperand.size(); i++){
+                    if(StringRegularOpt.isNumber(trimOperand.get(i))){
+                        double tMidF = Double.valueOf(
+                                StringRegularOpt.trimString(trimOperand.get(i)));
+                        if (dbtemp < tMidF)
+                            dbtemp = tMidF;
+                    }else
+                        hasNotNumber  = true;
                 }
-                return String.valueOf(nc);
-            }
-        case ConstDefine.FUNC_COUNTNULL:// 144
-            {
-                if(nOpSum==0)
-                    return "0";
-                int nc=0;
-                for(String s:slOperand){
-                    if(s==null || s.length()==0 ||
-                            "''".equals(s) || "\"\"".equals(s))
-                        nc++;
+                if(! hasNotNumber)
+                    return String.valueOf(dbtemp);
+
+                String strRet = trimOperand.get(0);
+                for(int i=1; i<trimOperand.size(); i++){
+                    if(strRet.compareTo(trimOperand.get(i))<0)
+                        strRet=trimOperand.get(i);
                 }
-                return String.valueOf(nc);
+                return strRet;
             }
-        case ConstDefine.FUNC_SUM:// 105
-            for(int i=0; i<nOpSum; i++)
-                if(StringRegularOpt.isNumber(slOperand.get(i)))
-                    dbtemp += Double.valueOf(StringRegularOpt.trimString(slOperand.get(i)));
+            case ConstDefine.FUNC_MIN:{// 104
 
-            return String.valueOf(dbtemp);
+                if (nOpSum <1) return "";
+                List<String> trimOperand = ListOpt.removeNullItem(slOperand);
+                if(trimOperand==null||trimOperand.size()<1)
+                    return "";
+                dbtemp = -1;
+                boolean hasNotNumber=false;
 
-        case ConstDefine.FUNC_STDDEV:// 133
-            {
+                if(StringRegularOpt.isNumber(trimOperand.get(0)))
+                    dbtemp = Double.valueOf(StringRegularOpt.trimString(trimOperand.get(0)));
+                else
+                    hasNotNumber = true;
+                for(int i=1; i<trimOperand.size(); i++){
+                    if(StringRegularOpt.isNumber(trimOperand.get(i))){
+                        double tMidF = Double.valueOf(StringRegularOpt.trimString(trimOperand.get(i)));
+                        if (dbtemp > tMidF)
+                            dbtemp = tMidF;
+                    }else
+                        hasNotNumber = true;
+                }
 
-                if(nOpSum<2) return  "0";
+                if(! hasNotNumber)
+                    return String.valueOf(dbtemp);
+
+                String strRet = trimOperand.get(0);
+                for(int i=1; i<trimOperand.size(); i++){
+                    if(strRet.compareTo(trimOperand.get(i))>0)
+                        strRet=trimOperand.get(i);
+                }
+                return strRet;
+            }
+            case ConstDefine.FUNC_COUNT:// 112
+                return String.valueOf(nOpSum);
+
+            case ConstDefine.FUNC_COUNTNOTNULL:// 145
+                {
+                    if(nOpSum==0)
+                        return "0";
+                    int nc=0;
+                    for(String s:slOperand){
+                        if(s!=null && s.length()>0 &&
+                                !"''".equals(s)  && !"\"\"".equals(s))
+                            nc++;
+                    }
+                    return String.valueOf(nc);
+                }
+            case ConstDefine.FUNC_COUNTNULL:// 144
+                {
+                    if(nOpSum==0)
+                        return "0";
+                    int nc=0;
+                    for(String s:slOperand){
+                        if(s==null || s.length()==0 ||
+                                "''".equals(s) || "\"\"".equals(s))
+                            nc++;
+                    }
+                    return String.valueOf(nc);
+                }
+            case ConstDefine.FUNC_SUM:// 105
                 for(int i=0; i<nOpSum; i++)
                     if(StringRegularOpt.isNumber(slOperand.get(i)))
                         dbtemp += Double.valueOf(StringRegularOpt.trimString(slOperand.get(i)));
 
-                double dbAvg = dbtemp/nOpSum;
+                return String.valueOf(dbtemp);
+
+            case ConstDefine.FUNC_STDDEV:// 133
+                {
+
+                    if(nOpSum<2) return  "0";
+                    for(int i=0; i<nOpSum; i++)
+                        if(StringRegularOpt.isNumber(slOperand.get(i)))
+                            dbtemp += Double.valueOf(StringRegularOpt.trimString(slOperand.get(i)));
+
+                    double dbAvg = dbtemp/nOpSum;
+                    dbtemp = 0.0;
+                    for(int i=0; i<nOpSum; i++)
+                        if(StringRegularOpt.isNumber(slOperand.get(i))){
+                            double dtp = Double.valueOf(StringRegularOpt.trimString(slOperand.get(i)))
+                                    - dbAvg;
+                            dbtemp += dtp*dtp;
+                        }
+
+                    dbtemp = Math.sqrt(dbtemp/(nOpSum-1));
+                    str = String.format("%f",dbtemp);
+                    return str;
+                }
+            case ConstDefine.FUNC_STRCAT:// 106
+                {
+                    if (nOpSum <1) return "";
+                    StringBuilder sb= new StringBuilder("\"");
+
+                    for(int i=0; i<nOpSum; i++)
+                        sb.append(StringRegularOpt.trimString(slOperand.get(i)));
+
+                    sb.append('\"');
+                    return sb.toString();
+                }
+            case ConstDefine.FUNC_SUBSTR:{
+                if(nOpSum<2 )
+                    return slOperand.get(0);
+                if(slOperand.get(0)==null)
+                    return "";
+                int nStart=0,nLength;
+                if( StringRegularOpt.isNumber(slOperand.get(1) ))
+                    nStart = Integer.valueOf(StringRegularOpt.trimString(slOperand.get(1)));
+
+                if(nOpSum>2 && StringRegularOpt.isNumber(slOperand.get(2)))
+                    nLength = Integer.valueOf(StringRegularOpt.trimString(slOperand.get(2)));
+                else
+                    nLength = slOperand.get(0).length();
+
+                if(nLength<=0) nLength = 1;
+
+                tempstr = slOperand.get(0).substring(nStart,nStart + nLength);
+                str  = '"' +tempstr + '"';
+                return str;
+                         }
+
+            case ConstDefine.FUNC_FIND:{ //index
+                    if (nOpSum < 2) return "-1";
+                    int nStart = 0;
+                    if(nOpSum>2 && StringRegularOpt.isNumber(slOperand.get(2)))
+                        nStart = Integer.valueOf(StringRegularOpt.trimString(slOperand.get(2)));
+                    tempstr = StringRegularOpt.trimString(slOperand.get(0));
+                    str = StringRegularOpt.trimString(slOperand.get(1));
+                    int nS = tempstr.indexOf(str,nStart);
+                    return String.format("%d",nS);
+                         }
+
+
+
+            case ConstDefine.FUNC_UPCASE://upcase
+            {
+                if (nOpSum <1) return "";
+                return slOperand.get(0).toUpperCase();
+            }
+            case ConstDefine.FUNC_LOWCASE://lowcase
+            {
+                if (nOpSum <1)
+                    return "";
+                return slOperand.get(0).toLowerCase();
+            }
+            case ConstDefine.FUNC_FREQUENCE:{
+                if (nOpSum < 2) return "-1";
+                if(slOperand.get(0)==null)
+                    return "0";
+                tempstr = StringRegularOpt.trimString(slOperand.get(0));
+                str = StringRegularOpt.trimString(slOperand.get(1));
+
+                int nSt = 0,sl=str.length(),nC=0;
+                nSt = tempstr.indexOf(str,nSt);
+                while(nSt>=0){
+                    nC++;
+                    nSt+=sl;
+                    nSt = tempstr.indexOf(str,nSt);
+                }
+                return String.valueOf(nC);
+                                }
+            case ConstDefine.FUNC_ROUND:{
+                if (nOpSum <1) return "";
+                if (StringRegularOpt.isNumber(slOperand.get(0)) )
+                    return slOperand.get(0);
+                int nS = 0;
+                if ( nOpSum > 1 && StringRegularOpt.isNumber(slOperand.get(1)) )
+                    nS = Double.valueOf(StringRegularOpt.trimString(slOperand.get(1))).intValue();
+                if(nS<0)
+                    nS = 0;
+                return String.format("%."+String.valueOf(nS)+"f",slOperand.get(0));
+                            }
+
+            case ConstDefine.FUNC_ISEMPTY: //判断参数是否为空
+                if (nOpSum <1)
+                    return "1";
+
+                if (StringBaseOpt.isNvl(slOperand.get(0))
+                        || "''".equals(slOperand.get(0))|| "\"\"".equals(slOperand.get(0)))
+                    return "1";
+                return "0";
+
+            case ConstDefine.FUNC_NOTEMPTY: //判断参数是否为空
+                if (nOpSum <1)
+                    return "0";
+
+                if (StringBaseOpt.isNvl(slOperand.get(0))
+                        || "''".equals(slOperand.get(0))|| "\"\"".equals(slOperand.get(0)))
+                    return "0";
+                return "1";
+
+            case ConstDefine.FUNC_LN:
+                {
+                    if (nOpSum <1) return "";
+                    if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
+                    double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
+                    af = Math.log(af);
+                    return String.valueOf(af);
+                }
+            case ConstDefine.FUNC_LOG:
+                {
+                    if (nOpSum <1) return "";
+                    if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
+                    double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
+                    af = Math.log10(af);
+                    return String.valueOf(af);
+                }
+            case ConstDefine.FUNC_SIN://sin
+                {
+                    if (nOpSum <1) return "";
+                    if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
+                    double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
+                    af = Math.sin(af);
+                    return String.valueOf(af);
+                }
+            case ConstDefine.FUNC_COS://cos
+                {
+                    if (nOpSum <1) return "";
+                    if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
+                    double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
+                    af = Math.cos(af);
+                    return String.valueOf(af);
+                }
+            case ConstDefine.FUNC_TAN://tan
+                {
+                    if (nOpSum <1) return "";
+                    if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
+                    double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
+                    af = Math.tan(af);
+                    return String.valueOf(af);
+                }
+            case ConstDefine.FUNC_CTAN://ctan
+                {
+                    if (nOpSum <1) return "";
+                    if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
+                    double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
+                    af = Math.atan(af);
+                    return String.valueOf(af);
+                }
+            case ConstDefine.FUNC_INT://取整
+                {
+                    if (nOpSum <1) return "";
+                    if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
+                    int nN = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0))).intValue();
+                    return String.valueOf(nN);
+                }
+            case ConstDefine.FUNC_FRAC://取小数
+                {
+                    if (nOpSum <1) return "";
+                    if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
+                    double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
+                    int nN = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0))).intValue();
+                    return String.valueOf(af - nN);
+                }
+
+            case ConstDefine.FUNC_EXP:
+                {
+                    if (nOpSum <1) return "";
+                    if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
+                    double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
+                    af = Math.exp(af);
+                    return String.valueOf(af);
+
+                }
+            case ConstDefine.FUNC_SQRT:
+                {
+                    if (nOpSum <1) return "";
+                    if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
+                    double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
+                    af = Math.sqrt(af);
+                    return String.valueOf(af);
+                }
+
+            case ConstDefine.FUNC_IF:
+                {// 108
+                    if (nOpSum < 2) return "";
+                    String str1="";
+                    if(nOpSum>2)
+                        str1 = slOperand.get(2);
+                    if(StringRegularOpt.isTrue(slOperand.get(0)) )
+                         return slOperand.get(1);
+                    return str1;
+                }
+
+            case ConstDefine.FUNC_CASE:// 116
+                {
+                    if (nOpSum < 2) return "";
+                    tempstr = StringRegularOpt.trimString( slOperand.get(0));
+                    int MatchType = 0;
+                    if(tempstr.equalsIgnoreCase("true") )
+                        MatchType = 1;
+                    else{
+                        if(StringRegularOpt.isNumber(tempstr)){
+                            dbtemp = Double.valueOf(tempstr);
+                            MatchType = 2;
+                        }
+                    }
+                    int i=1;
+                    for( ;i+1<nOpSum; i+=2){
+                        if( MatchType ==1 ){
+                            if (StringRegularOpt.isTrue(slOperand.get(i)))
+                                return slOperand.get(i+1);
+                        }else if ( MatchType == 2 ){
+                            if (StringRegularOpt.isNumber(slOperand.get(i))){
+                                if( Math.abs( dbtemp - Double.valueOf(
+                                        StringRegularOpt.trimString(slOperand.get(i)))) < MIN_DOUBLE)
+                                    return slOperand.get(i+1);
+                            }
+                        }else {
+                            if ( tempstr.equals(StringRegularOpt.trimString(slOperand.get(i))) )
+                                return slOperand.get(i+1);
+                        }
+                    }
+                    if( nOpSum % 2 == 0 )
+                        return slOperand.get(nOpSum-1);
+                    return "";
+                }
+            case ConstDefine.FUNC_TODAY://
+            {
+                return DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate());
+            }
+
+            case ConstDefine.FUNC_DAY://
+            {
+                Date dt = null;
+                if (nOpSum > 0){
+                    tempstr = StringRegularOpt.trimString( slOperand.get(0));
+                    dt = DatetimeOpt.smartPraseDate(tempstr);
+                }
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+                return String.valueOf(DatetimeOpt.getDay(dt));
+            }
+            case ConstDefine.FUNC_MONTH://
+            {
+                Date dt = null;
+                if (nOpSum > 0){
+                    tempstr = StringRegularOpt.trimString( slOperand.get(0));
+                    dt = DatetimeOpt.smartPraseDate(tempstr);
+                }
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+                return String.valueOf(DatetimeOpt.getMonth(dt));
+            }
+            case ConstDefine.FUNC_YEAR://
+            {
+                Date dt = null;
+                if (nOpSum > 0){
+                    tempstr = StringRegularOpt.trimString( slOperand.get(0));
+                    dt = DatetimeOpt.smartPraseDate(tempstr);
+                }
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+                return String.valueOf(DatetimeOpt.getYear(dt));
+            }
+            case ConstDefine.FUNC_DAY_SPAN://
+            {
+                if (nOpSum < 2) return "";
+                str = StringRegularOpt.trimString( slOperand.get(0));
+                tempstr = StringRegularOpt.trimString( slOperand.get(1));
+                Date dt = DatetimeOpt.smartPraseDate(str);
+                Date dt2 = DatetimeOpt.smartPraseDate(tempstr);
+
+                if(dt==null || dt2==null)
+                    return "";
+                return String.valueOf(DatetimeOpt.calcSpanDays(dt, dt2));
+            }
+
+            case ConstDefine.FUNC_ADD_DAYS://
+            {
+                if (nOpSum < 2) return "";
+                str = StringRegularOpt.trimString( slOperand.get(0));
+                tempstr = StringRegularOpt.trimString( slOperand.get(1));
+                Date dt = DatetimeOpt.smartPraseDate(str);
+                if(dt==null )
+                    return "";
+                if (!StringRegularOpt.isNumber(tempstr))
+                    return DatetimeOpt.convertDateToString(dt);
+
+                int ti = Double.valueOf(StringRegularOpt.trimString(tempstr)).intValue();
+
+                return DatetimeOpt.convertDateToString(DatetimeOpt.addDays(dt, ti));
+            }
+            case ConstDefine.FUNC_ADD_MONTHS://
+            {
+                if (nOpSum < 2) return "";
+                str = StringRegularOpt.trimString( slOperand.get(0));
+                tempstr = StringRegularOpt.trimString( slOperand.get(1));
+                Date dt = DatetimeOpt.smartPraseDate(str);
+                if(dt==null )
+                    return "";
+                if (!StringRegularOpt.isNumber(tempstr))
+                    return DatetimeOpt.convertDateToString(dt);
+
+                int ti = Double.valueOf(tempstr).intValue();
+
+                return DatetimeOpt.convertDateToString(DatetimeOpt.addMonths(dt, ti));
+            }
+
+            case ConstDefine.FUNC_ADD_YEARS://
+            {
+                if (nOpSum < 2) return "";
+                str = StringRegularOpt.trimString( slOperand.get(0));
+                tempstr = StringRegularOpt.trimString( slOperand.get(1));
+                Date dt = DatetimeOpt.smartPraseDate(str);
+                if(dt==null )
+                    return "";
+                if (!StringRegularOpt.isNumber(tempstr))
+                    return DatetimeOpt.convertDateToString(dt);
+
+                int ti = Double.valueOf(tempstr).intValue();
+
+                return DatetimeOpt.convertDateToString(DatetimeOpt.addYears(dt, ti));
+            }
+
+            case ConstDefine.FUNC_TRUNC_DAY://
+            {
+                if (nOpSum < 1) return "";
+                str = StringRegularOpt.trimString( slOperand.get(0));
+                Date dt = DatetimeOpt.smartPraseDate(str);
+                if(dt==null )
+                    return "";
+                tempstr = "D";
+                if(nOpSum>1){
+                    tempstr = StringRegularOpt.trimString( slOperand.get(1));
+                }
+                if("M".equalsIgnoreCase(tempstr))
+                    dt = DatetimeOpt.truncateToMonth(dt);
+                else if("Y".equalsIgnoreCase(tempstr))
+                    dt = DatetimeOpt.truncateToYear(dt);
+                else
+                    dt = DatetimeOpt.truncateToDay(dt);
+
+                return DatetimeOpt.convertDateToString(dt);
+            }
+
+            case ConstDefine.FUNC_FIRST_OF_MONTH://
+            {
+                Date dt = null;
+                if (nOpSum > 0){
+                    tempstr = StringRegularOpt.trimString( slOperand.get(0));
+                    dt = DatetimeOpt.smartPraseDate(tempstr);
+                }
+                if(dt==null )
+                    dt = DatetimeOpt.currentUtilDate();
+
+                dt = DatetimeOpt.truncateToMonth(dt);
+                return DatetimeOpt.convertDateToString(dt);
+            }
+
+            case ConstDefine.FUNC_GET_PY://
+            {
+                if (nOpSum < 1) return "";
+                tempstr = StringRegularOpt.trimString( slOperand.get(0));
+                return StringBaseOpt.getFirstLetter(tempstr);
+            }
+            default:
+                break;
+        }
+        return "";
+    }
+    public static Object runFuncWithRaw(List<Object> rawOperand,int funcID)
+    {
+        List<Object> slOperand = new ArrayList<>(rawOperand.size() + 1);
+        for(Object objValue : rawOperand){
+            if(objValue instanceof Object[]){
+                Object [] objs=(Object[]) objValue;
+                for(int i=0;i<objs.length;i++) {
+                    slOperand.add(objs[i]);
+                }
+            }else if(objValue instanceof Collection){
+                Collection<?> valueList = (Collection<?> )objValue;
+                slOperand.addAll(valueList);
+            }else{
+                slOperand.add(objValue);
+            }
+        }
+        return runFuncWithObject(slOperand, funcID);
+    }
+
+    public static Object runFuncWithObject(List<Object> slOperand,int funcID)
+    {
+        int nOpSum = ( slOperand == null )? 0: slOperand.size();
+        double dbtemp = 0.0;
+        switch(funcID){
+            case ConstDefine.FUNC_AVE :// 100
+                for(int i=0; i<nOpSum; i++){
+                    dbtemp += NumberBaseOpt.castObjectToDouble(slOperand.get(i),0.0);
+                }
+                if (nOpSum > 0)
+                    return dbtemp /nOpSum;//"%f",
+                else
+                    return null;
+            case ConstDefine.FUNC_GET_AT: {//148
+                if (nOpSum < 2)
+                    return null;
+                Object objTemp = slOperand.get(0);
+                if (NumberBaseOpt.isNumber(objTemp)) {
+                    int nbit = NumberBaseOpt.castObjectToInteger(objTemp);
+                    if (nbit < nOpSum - 1) {
+                        return slOperand.get(nbit + 1);
+                    }
+                }
+                return null;
+            }
+            case ConstDefine.FUNC_BYTE:// 101
+                if(nOpSum<2 || ! NumberBaseOpt.isNumber(slOperand.get(1)) )
+                    return null;
+                Object objTemp = slOperand.get(0);
+                int nbit = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
+                if( NumberBaseOpt.isNumber(objTemp)){
+                    return String.valueOf(
+                            NumberBaseOpt.getNumByte(
+                                    StringBaseOpt.objectToString(objTemp),nbit));
+                }else if(objTemp!=null){
+                    String tempstr = StringBaseOpt.objectToString(objTemp);
+                    int sl = tempstr.length();
+                    if( nbit >=0 && nbit < sl) {
+                        return String.valueOf(tempstr.charAt(nbit));
+                    }
+                }
+                return null;
+
+            case ConstDefine.FUNC_MATCH:
+                if(nOpSum<2)
+                    return false;
+                return StringRegularOpt.isMatch(
+                        StringBaseOpt.objectToString(slOperand.get(0)),
+                        StringBaseOpt.objectToString(slOperand.get(1)));
+
+            case ConstDefine.FUNC_CAPITAL:// 102
+            {
+                if (nOpSum <1) return null;
+                boolean nT = false;
+                if(nOpSum > 1)
+                    nT = BooleanBaseOpt.castObjectToBoolean(slOperand.get(1));
+                if( !NumberBaseOpt.isNumber(slOperand.get(0)) )
+                    return StringUtils.upperCase(
+                            StringBaseOpt.objectToString(slOperand.get(0)));
+                return NumberBaseOpt.capitalization(
+                        StringBaseOpt.objectToString(slOperand.get(0)),nT);
+            }
+            case ConstDefine.FUNC_MAX:{// 103
+                if (nOpSum <1) return null;
+                List<Object> trimOperand = new ArrayList<>(slOperand.size());
+                boolean hasNotNumber=false;
+                for(Object obj : slOperand) {
+                    if(obj != null){
+                        trimOperand.add(obj);
+                        if(! NumberBaseOpt.isNumber(obj))
+                            hasNotNumber = true;
+                    }
+                }
+                if(hasNotNumber) {
+                    Double tempDouble = NumberBaseOpt.castObjectToDouble(trimOperand.get(0));
+                    for (int i = 1; i < trimOperand.size(); i++) {
+                        Double temp = NumberBaseOpt.castObjectToDouble(trimOperand.get(i));
+                        if (tempDouble.compareTo(temp) < 0) {
+                            tempDouble = temp;
+                        }
+                    }
+                    return tempDouble;
+                }else{
+                    String tempString = StringBaseOpt.objectToString(trimOperand.get(0));
+                    for (int i = 1; i < trimOperand.size(); i++) {
+                        String temp = StringBaseOpt.objectToString(trimOperand.get(i));
+                        if (tempString.compareTo(temp) < 0) {
+                            tempString = temp;
+                        }
+                    }
+                    return tempString;
+                }
+            }
+            case ConstDefine.FUNC_MIN:{// 104
+                if (nOpSum <1) return null;
+                List<Object> trimOperand = new ArrayList<>(slOperand.size());
+                boolean hasNotNumber=false;
+                for(Object obj : slOperand) {
+                    if(obj != null){
+                        trimOperand.add(obj);
+                        if(! NumberBaseOpt.isNumber(obj))
+                            hasNotNumber = true;
+                    }
+                }
+                if(hasNotNumber) {
+                    Double tempDouble = NumberBaseOpt.castObjectToDouble(trimOperand.get(0));
+                    for (int i = 1; i < trimOperand.size(); i++) {
+                        Double temp = NumberBaseOpt.castObjectToDouble(trimOperand.get(i));
+                        if (tempDouble.compareTo(temp) > 0) {
+                            tempDouble = temp;
+                        }
+                    }
+                    return tempDouble;
+                }else{
+                    String tempString = StringBaseOpt.objectToString(trimOperand.get(0));
+                    for (int i = 1; i < trimOperand.size(); i++) {
+                        String temp = StringBaseOpt.objectToString(trimOperand.get(i));
+                        if (tempString.compareTo(temp) > 0) {
+                            tempString = temp;
+                        }
+                    }
+                    return tempString;
+                }
+            }
+            case ConstDefine.FUNC_COUNT:// 112
+                return String.valueOf(nOpSum);
+
+            case ConstDefine.FUNC_COUNTNOTNULL:// 145
+            {
+                if(nOpSum==0)
+                    return 0;
+                int nc=0;
+                for(Object obj:slOperand){
+                    if(obj !=null){
+                        String s = StringBaseOpt.objectToString(obj);
+                        if(StringUtils.isNotBlank(s) &&
+                            !"''".equals(s)  && !"\"\"".equals(s))
+                        nc++;
+                    }
+                }
+                return nc;
+            }
+            case ConstDefine.FUNC_COUNTNULL:// 144
+            {
+                if(nOpSum==0)
+                    return 0;
+                int nc=0;
+                for(Object obj:slOperand){
+                    if(obj ==null) {
+                        nc ++;
+                    }else{
+                        String s = StringBaseOpt.objectToString(obj);
+                        if(StringUtils.isBlank(s) ||
+                                "''".equals(s) ||  "\"\"".equals(s))
+                            nc++;
+                    }
+                }
+                return nc;
+            }
+            case ConstDefine.FUNC_SUM:// 105
+                for(int i=0; i<nOpSum; i++){
+                    dbtemp += NumberBaseOpt.castObjectToDouble(slOperand.get(i),0.0);
+                }
+                return dbtemp;
+
+            case ConstDefine.FUNC_STDDEV:// 133
+            {
+
+                if(nOpSum<2)
+                    return  0;
+                int numberSum = 0;
+                for(int i=0; i<nOpSum; i++) {
+                    if(NumberBaseOpt.isNumber(slOperand.get(i) )) {
+                        numberSum ++;
+                        dbtemp += NumberBaseOpt.castObjectToDouble(slOperand.get(i), 0.0);
+                    }
+                }
+                double dbAvg = dbtemp/numberSum;
                 dbtemp = 0.0;
                 for(int i=0; i<nOpSum; i++)
-                    if(StringRegularOpt.isNumber(slOperand.get(i))){
-                        double dtp = Double.valueOf(StringRegularOpt.trimString(slOperand.get(i)))
+                    if(NumberBaseOpt.isNumber(slOperand.get(i) )) {
+                        double dtp = NumberBaseOpt.castObjectToDouble(slOperand.get(i), 0.0)
                                 - dbAvg;
                         dbtemp += dtp*dtp;
                     }
 
-                dbtemp = Math.sqrt(dbtemp/(nOpSum-1));
-                str = String.format("%f",dbtemp);
-                return str;
+                return  Math.sqrt(dbtemp/(numberSum-1));
             }
-        case ConstDefine.FUNC_STRCAT:// 106
+            case ConstDefine.FUNC_STRCAT:// 106
             {
-                if (nOpSum <1) return "";
-                StringBuilder sb= new StringBuilder("\"");
-
-                for(int i=0; i<nOpSum; i++)
-                    sb.append(StringRegularOpt.trimString(slOperand.get(i)));
-
-                sb.append('\"');
+                if (nOpSum <1)
+                    return "";
+                StringBuilder sb= new StringBuilder();
+                for(int i=0; i<nOpSum; i++) {
+                    sb.append(StringBaseOpt.objectToString(slOperand.get(i)));
+                }
                 return sb.toString();
             }
-        case ConstDefine.FUNC_SUBSTR:{
-            if(nOpSum<2 )
-                return slOperand.get(0);
-            if(slOperand.get(0)==null)
-                return "";
-            int nStart=0,nLength;
-            if( StringRegularOpt.isNumber(slOperand.get(1) ))
-                nStart = Integer.valueOf(StringRegularOpt.trimString(slOperand.get(1)));
+            case ConstDefine.FUNC_SUBSTR:{
+                if(nOpSum<2 )
+                    return slOperand.get(0);
+                if(slOperand.get(0)==null)
+                    return null;
+                int nStart=0,nLength;
+                if( NumberBaseOpt.isNumber(slOperand.get(1) ))
+                    nStart = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
+                String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
+                if(nOpSum>2 && NumberBaseOpt.isNumber(slOperand.get(2)))
+                    nLength = NumberBaseOpt.castObjectToInteger(slOperand.get(2));
+                else
+                    nLength = tempStr.length();
 
-            if(nOpSum>2 && StringRegularOpt.isNumber(slOperand.get(2)))
-                nLength = Integer.valueOf(StringRegularOpt.trimString(slOperand.get(2)));
-            else
-                nLength = slOperand.get(0).length();
+                if(nLength<=0)
+                    nLength = 1;
 
-            if(nLength<=0) nLength = 1;
+                return tempStr.substring(nStart,nStart + nLength);
+            }
 
-            tempstr = slOperand.get(0).substring(nStart,nStart + nLength);
-            str  = '"' +tempstr + '"';
-            return str;
-                     }
-
-        case ConstDefine.FUNC_FIND:{ //index
-                if (nOpSum < 2) return "-1";
+            case ConstDefine.FUNC_FIND:{ //index
+                if (nOpSum < 2)
+                    return -1;
                 int nStart = 0;
-                if(nOpSum>2 && StringRegularOpt.isNumber(slOperand.get(2)))
-                    nStart = Integer.valueOf(StringRegularOpt.trimString(slOperand.get(2)));
-                tempstr = StringRegularOpt.trimString(slOperand.get(0));
-                str = StringRegularOpt.trimString(slOperand.get(1));
-                int nS = tempstr.indexOf(str,nStart);
-                return String.format("%d",nS);
-                     }
-
-
-
-        case ConstDefine.FUNC_UPCASE://upcase
-        {
-            if (nOpSum <1) return "";
-            return slOperand.get(0).toUpperCase();
-        }
-        case ConstDefine.FUNC_LOWCASE://lowcase
-        {
-            if (nOpSum <1)
-                return "";
-            return slOperand.get(0).toLowerCase();
-        }
-        case ConstDefine.FUNC_FREQUENCE:{
-            if (nOpSum < 2) return "-1";
-            if(slOperand.get(0)==null)
-                return "0";
-            tempstr = StringRegularOpt.trimString(slOperand.get(0));
-            str = StringRegularOpt.trimString(slOperand.get(1));
-
-            int nSt = 0,sl=str.length(),nC=0;
-            nSt = tempstr.indexOf(str,nSt);
-            while(nSt>=0){
-                nC++;
-                nSt+=sl;
-                nSt = tempstr.indexOf(str,nSt);
+                if(nOpSum>2 && NumberBaseOpt.isNumber(slOperand.get(2)))
+                    nStart =  NumberBaseOpt.castObjectToInteger(slOperand.get(2));
+                String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
+                return tempStr.indexOf(
+                        StringBaseOpt.objectToString(slOperand.get(1)) ,nStart);
             }
-            return String.valueOf(nC);
-                            }
-        case ConstDefine.FUNC_ROUND:{
-            if (nOpSum <1) return "";
-            if ( StringRegularOpt.isNumber(slOperand.get(0)) ) return slOperand.get(0);
-            int nS = 0;
-            if ( nOpSum > 1 && StringRegularOpt.isNumber(slOperand.get(1)) )
-                nS = Double.valueOf(StringRegularOpt.trimString(slOperand.get(1))).intValue();
-            if(nS<0) nS = 0;
-            return String.format("%."+String.valueOf(nS)+"f",slOperand.get(1));
-                        }
 
-        case ConstDefine.FUNC_ISEMPTY: //判断参数是否为空
-            if (nOpSum <1)
-                return "1";
-
-            if (StringBaseOpt.isNvl(slOperand.get(0))
-                    || "''".equals(slOperand.get(0))|| "\"\"".equals(slOperand.get(0)))
-                return "1";
-            return "0";
-
-        case ConstDefine.FUNC_NOTEMPTY: //判断参数是否为空
-            if (nOpSum <1)
-                return "0";
-
-            if (StringBaseOpt.isNvl(slOperand.get(0))
-                    || "''".equals(slOperand.get(0))|| "\"\"".equals(slOperand.get(0)))
-                return "0";
-            return "1";
-
-        case ConstDefine.FUNC_LN:
+            case ConstDefine.FUNC_UPCASE://upcase
             {
                 if (nOpSum <1) return "";
-                if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
-                double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
-                af = Math.log(af);
-                return String.valueOf(af);
+                return StringUtils.upperCase(StringBaseOpt.objectToString(slOperand.get(0)));
             }
-        case ConstDefine.FUNC_LOG:
+            case ConstDefine.FUNC_LOWCASE://lowcase
             {
                 if (nOpSum <1) return "";
-                if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
-                double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
-                af = Math.log10(af);
-                return String.valueOf(af);
+                return StringUtils.lowerCase(StringBaseOpt.objectToString(slOperand.get(0)));
             }
-        case ConstDefine.FUNC_SIN://sin
-            {
-                if (nOpSum <1) return "";
-                if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
-                double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
-                af = Math.sin(af);
-                return String.valueOf(af);
+            case ConstDefine.FUNC_FREQUENCE:{
+                if (nOpSum < 2) return -1;
+                if(slOperand.get(0)==null || slOperand.get(1)==null)
+                    return 0;
+                String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
+                String str =  StringBaseOpt.objectToString(slOperand.get(1));
+                int nSt = 0,sl=str.length(),nC=0;
+                if(sl==0){
+                    return 0;
+                }
+                nSt = tempStr.indexOf(str,nSt);
+                while(nSt>=0){
+                    nC++;
+                    nSt+=sl;
+                    nSt = tempStr.indexOf(str,nSt);
+                }
+                return nC;
             }
-        case ConstDefine.FUNC_COS://cos
-            {
-                if (nOpSum <1) return "";
-                if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
-                double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
-                af = Math.cos(af);
-                return String.valueOf(af);
-            }
-        case ConstDefine.FUNC_TAN://tan
-            {
-                if (nOpSum <1) return "";
-                if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
-                double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
-                af = Math.tan(af);
-                return String.valueOf(af);
-            }
-        case ConstDefine.FUNC_CTAN://ctan
-            {
-                if (nOpSum <1) return "";
-                if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
-                double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
-                af = Math.atan(af);
-                return String.valueOf(af);
-            }
-        case ConstDefine.FUNC_INT://取整
-            {
-                if (nOpSum <1) return "";
-                if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
-                int nN = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0))).intValue();
-                return String.valueOf(nN);
-            }
-        case ConstDefine.FUNC_FRAC://取小数
-            {
-                if (nOpSum <1) return "";
-                if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
-                double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
-                int nN = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0))).intValue();
-                return String.valueOf(af - nN);
+            case ConstDefine.FUNC_INT:{//取整
+                if (nOpSum <1)
+                    return null;
+                if (! NumberBaseOpt.isNumber(slOperand.get(0)) )
+                    return slOperand.get(0);
+                return NumberBaseOpt.castObjectToInteger(slOperand.get(0));
             }
 
-        case ConstDefine.FUNC_EXP:
-            {
-                if (nOpSum <1) return "";
-                if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
-                double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
-                af = Math.exp(af);
-                return String.valueOf(af);
-
-            }
-        case ConstDefine.FUNC_SQRT:
-            {
-                if (nOpSum <1) return "";
-                if(!StringRegularOpt.isNumber(slOperand.get(0))) return "";
-                double af = Double.valueOf(StringRegularOpt.trimString(slOperand.get(0)));
-                af = Math.sqrt(af);
-                return String.valueOf(af);
+            case ConstDefine.FUNC_ROUND:{
+                if (nOpSum <1)
+                    return null;
+                if (! NumberBaseOpt.isNumber(slOperand.get(0)) )
+                    return slOperand.get(0);
+                Double tempDouble = NumberBaseOpt.castObjectToDouble(slOperand.get(0))+0.5;
+                return tempDouble.intValue();
             }
 
-        case ConstDefine.FUNC_IF:
-            {// 108
-                if (nOpSum < 2) return "";
-                String str1="";
-                if(nOpSum>2)
-                    str1 = slOperand.get(2);
-                if(StringRegularOpt.isTrue(slOperand.get(0)) )
-                     return slOperand.get(1);
-                return str1;
+            case ConstDefine.FUNC_ISEMPTY: //判断参数是否为空
+                if (nOpSum <1 || slOperand.get(0) == null)
+                    return true;
+                return StringUtils.isBlank(StringBaseOpt.objectToString(slOperand.get(0)));
+
+            case ConstDefine.FUNC_NOTEMPTY: //判断参数是否为空
+                if (nOpSum <1 || slOperand.get(0) == null)
+                    return false;
+                return StringUtils.isNotBlank(StringBaseOpt.objectToString(slOperand.get(0)));
+
+            case ConstDefine.FUNC_LN:{
+                if (nOpSum <1) return null;
+                if(!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                return Math.log(af);
+            }
+            case ConstDefine.FUNC_LOG:{
+                if (nOpSum <1) return null;
+                if(!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                return Math.log10(af);
+            }
+            case ConstDefine.FUNC_SIN:{//sin
+                if (nOpSum <1) return null;
+                if(!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                return Math.sin(af);
+            }
+            case ConstDefine.FUNC_COS:{//cos
+                if (nOpSum <1) return null;
+                if(!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                return Math.cos(af);
+            }
+            case ConstDefine.FUNC_TAN:{//tan
+                if (nOpSum <1) return null;
+                if(!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                return Math.tan(af);
+
+            }
+            case ConstDefine.FUNC_CTAN:{//ctan
+                if (nOpSum <1) return null;
+                if(!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                return Math.atan(af);
             }
 
-        case ConstDefine.FUNC_CASE:// 116
-            {
-                if (nOpSum < 2) return "";
-                tempstr = StringRegularOpt.trimString(slOperand.get(0));
-                int matchType = 0;
-                if(tempstr.equalsIgnoreCase("true") )
-                    matchType = 1;
+            case ConstDefine.FUNC_FRAC:{//取小数
+                if (nOpSum <1) return null;
+                if(!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                Double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                return af - af.intValue();
+            }
+            case ConstDefine.FUNC_EXP:{
+                if (nOpSum <1) return null;
+                if(!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                return Math.exp(af);
+            }
+            case ConstDefine.FUNC_SQRT:{
+                if (nOpSum <1) return null;
+                if(!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                return Math.sqrt(af);
+            }
+
+            case ConstDefine.FUNC_IF:{// 108
+                if (nOpSum < 2) return null;
+                if(BooleanBaseOpt.castObjectToBoolean(slOperand.get(0)) ) {
+                    return slOperand.get(1);
+                }else{
+                    if(nOpSum>2)
+                        return slOperand.get(2);
+                    else
+                        return null;
+                }
+            }
+
+            case ConstDefine.FUNC_CASE:{// 116
+                if (nOpSum < 2) return null;
+                String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
+                int MatchType = 0;
+                if(tempStr.equalsIgnoreCase("true") )
+                    MatchType = 1;
                 else{
-                    if(StringRegularOpt.isNumber(tempstr)){
-                        dbtemp = Double.valueOf(tempstr);
-                        matchType = 2;
+                    if(NumberBaseOpt.isNumber(slOperand.get(0))){
+                        dbtemp = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                        MatchType = 2;
                     }
                 }
                 int i=1;
                 for( ;i+1<nOpSum; i+=2){
-                    if( matchType ==1 ){
-                        if (StringRegularOpt.isTrue(slOperand.get(i)))
+                    if( MatchType ==1 ){
+                        if (BooleanBaseOpt.castObjectToBoolean(slOperand.get(i)))
                             return slOperand.get(i+1);
-                    }else if ( matchType == 2 ){
-                        if (StringRegularOpt.isNumber(slOperand.get(i))){
-                            if( Math.abs( dbtemp - Double.valueOf(
-                                    StringRegularOpt.trimString(slOperand.get(i)))) < 0.0001)
+                    }else if ( MatchType == 2 ){
+                        if (NumberBaseOpt.isNumber(slOperand.get(i))){
+                            if( Math.abs( dbtemp -
+                                    NumberBaseOpt.castObjectToDouble(slOperand.get(i))) < MIN_DOUBLE)
                                 return slOperand.get(i+1);
                         }
                     }else {
-                        if ( tempstr.equals(StringRegularOpt.trimString(slOperand.get(i))) )
+                        if ( tempStr.equals(StringBaseOpt.objectToString(slOperand.get(i))) )
                             return slOperand.get(i+1);
                     }
                 }
                 if( nOpSum % 2 == 0 )
                     return slOperand.get(nOpSum-1);
-                return "";
+                return null;
             }
-        case ConstDefine.FUNC_TODAY://
-        {
-            return DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate());
-        }
-
-        case ConstDefine.FUNC_DAY://
-        {
-            Date dt = null;
-            if (nOpSum > 0){
-                tempstr = StringRegularOpt.trimString( slOperand.get(0));
-                dt = DatetimeOpt.smartPraseDate(tempstr);
+            case ConstDefine.FUNC_TODAY://
+            {
+                return DatetimeOpt.currentUtilDate();
             }
-            if(dt==null)
-                dt = DatetimeOpt.currentUtilDate();
-            return String.valueOf(DatetimeOpt.getDay(dt));
-        }
-        case ConstDefine.FUNC_MONTH://
-        {
-            Date dt = null;
-            if (nOpSum > 0){
-                tempstr = StringRegularOpt.trimString( slOperand.get(0));
-                dt = DatetimeOpt.smartPraseDate(tempstr);
+
+            case ConstDefine.FUNC_DAY://
+            {
+                Date dt = (nOpSum > 0)?DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+                return dt;
             }
-            if(dt==null)
-                dt = DatetimeOpt.currentUtilDate();
-            return String.valueOf(DatetimeOpt.getMonth(dt));
-        }
-        case ConstDefine.FUNC_YEAR://
-        {
-            Date dt = null;
-            if (nOpSum > 0){
-                tempstr = StringRegularOpt.trimString( slOperand.get(0));
-                dt = DatetimeOpt.smartPraseDate(tempstr);
+            case ConstDefine.FUNC_MONTH://
+            {
+                Date dt = (nOpSum > 0)?DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+                return DatetimeOpt.getMonth(dt);
             }
-            if(dt==null)
-                dt = DatetimeOpt.currentUtilDate();
-            return String.valueOf(DatetimeOpt.getYear(dt));
-        }
-        case ConstDefine.FUNC_DAY_SPAN://
-        {
-            if (nOpSum < 2) return "";
-            str = StringRegularOpt.trimString( slOperand.get(0));
-            tempstr = StringRegularOpt.trimString( slOperand.get(1));
-            Date dt = DatetimeOpt.smartPraseDate(str);
-            Date dt2 = DatetimeOpt.smartPraseDate(tempstr);
-
-            if(dt==null || dt2==null)
-                return "";
-            return String.valueOf(DatetimeOpt.calcSpanDays(dt, dt2));
-        }
-
-        case ConstDefine.FUNC_ADD_DAYS://
-        {
-            if (nOpSum < 2) return "";
-            str = StringRegularOpt.trimString( slOperand.get(0));
-            tempstr = StringRegularOpt.trimString( slOperand.get(1));
-            Date dt = DatetimeOpt.smartPraseDate(str);
-            if(dt==null )
-                return "";
-            if (!StringRegularOpt.isNumber(tempstr))
-                return DatetimeOpt.convertDateToString(dt);
-
-            int ti = Double.valueOf(StringRegularOpt.trimString(tempstr)).intValue();
-
-            return DatetimeOpt.convertDateToString(DatetimeOpt.addDays(dt, ti));
-        }
-        case ConstDefine.FUNC_ADD_MONTHS://
-        {
-            if (nOpSum < 2) return "";
-            str = StringRegularOpt.trimString( slOperand.get(0));
-            tempstr = StringRegularOpt.trimString( slOperand.get(1));
-            Date dt = DatetimeOpt.smartPraseDate(str);
-            if(dt==null )
-                return "";
-            if (!StringRegularOpt.isNumber(tempstr))
-                return DatetimeOpt.convertDateToString(dt);
-
-            int ti = Double.valueOf(tempstr).intValue();
-
-            return DatetimeOpt.convertDateToString(DatetimeOpt.addMonths(dt, ti));
-        }
-
-        case ConstDefine.FUNC_ADD_YEARS://
-        {
-            if (nOpSum < 2) return "";
-            str = StringRegularOpt.trimString( slOperand.get(0));
-            tempstr = StringRegularOpt.trimString( slOperand.get(1));
-            Date dt = DatetimeOpt.smartPraseDate(str);
-            if(dt==null )
-                return "";
-            if (!StringRegularOpt.isNumber(tempstr))
-                return DatetimeOpt.convertDateToString(dt);
-
-            int ti = Double.valueOf(tempstr).intValue();
-
-            return DatetimeOpt.convertDateToString(DatetimeOpt.addYears(dt, ti));
-        }
-
-        case ConstDefine.FUNC_TRUNC_DAY://
-        {
-            if (nOpSum < 1) return "";
-            str = StringRegularOpt.trimString( slOperand.get(0));
-            Date dt = DatetimeOpt.smartPraseDate(str);
-            if(dt==null )
-                return "";
-            tempstr = "D";
-            if(nOpSum>1){
-                tempstr = StringRegularOpt.trimString( slOperand.get(1));
+            case ConstDefine.FUNC_YEAR://
+            {
+                Date dt = (nOpSum > 0)?DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+                return DatetimeOpt.getYear(dt);
             }
-            if("M".equalsIgnoreCase(tempstr))
-                dt = DatetimeOpt.truncateToMonth(dt);
-            else if("Y".equalsIgnoreCase(tempstr))
-                dt = DatetimeOpt.truncateToYear(dt);
-            else
-                dt = DatetimeOpt.truncateToDay(dt);
+            case ConstDefine.FUNC_DAY_SPAN://
+            {
+                if (nOpSum < 2) return null;
+                Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
+                Date dt2 =DatetimeOpt.castObjectToDate(slOperand.get(1));
 
-            return DatetimeOpt.convertDateToString(dt);
-        }
-
-        case ConstDefine.FUNC_FIRST_OF_MONTH://
-        {
-            Date dt = null;
-            if (nOpSum > 0){
-                tempstr = StringRegularOpt.trimString( slOperand.get(0));
-                dt = DatetimeOpt.smartPraseDate(tempstr);
+                if(dt==null || dt2==null)
+                    return null;
+                return DatetimeOpt.calcSpanDays(dt, dt2);
             }
-            if(dt==null )
-                dt = DatetimeOpt.currentUtilDate();
 
-            dt = DatetimeOpt.truncateToMonth(dt);
-            return DatetimeOpt.convertDateToString(dt);
-        }
+            case ConstDefine.FUNC_ADD_DAYS://
+            {
+                if (nOpSum < 2) return null;
+                Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
+                if(dt==null )
+                    return null;
+                if (!NumberBaseOpt.isNumber(slOperand.get(1)))
+                    return DatetimeOpt.convertDateToString(dt);
 
-        case ConstDefine.FUNC_GET_PY://
-        {
-            if (nOpSum < 1) return "";
-            tempstr = StringRegularOpt.trimString( slOperand.get(0));
-            return StringBaseOpt.getFirstLetter(tempstr);
-        }
+                int ti = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
 
-            /*s
-             *
-        new FunctionInfo("truncday",-1,ConstDefine.FUNC_TRUNC_DAY,ConstDefine.TYPE_STR),//日期函数   截断日期  第二个参数  Y ，M , D 分别返回一年、月的第一天 ，或者一日的零点
-        new FunctionInfo("fisrtOfMonth",1,ConstDefine.FUNC_FIRST_OF_MONTH,ConstDefine.TYPE_STR),//日期函数   求这个月的第一天
+                return DatetimeOpt.addDays(dt, ti);
+            }
+            case ConstDefine.FUNC_ADD_MONTHS://
+            {
+                if (nOpSum < 2) return null;
+                Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
+                if(dt==null )
+                    return null;
+                if (!NumberBaseOpt.isNumber(slOperand.get(1)))
+                    return DatetimeOpt.convertDateToString(dt);
 
-        //new FunctionInfo("getsysstr",1,ConstDefine.FUNC_GET_STR,ConstDefine.TYPE_STR),//取系统字符串
-        new FunctionInfo("getpy",1,ConstDefine.FUNC_GET_PY,ConstDefine.TYPE_STR)//取汉字拼音
-        */
+                int ti = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
 
+                return DatetimeOpt.addMonths(dt, ti);
+            }
+
+            case ConstDefine.FUNC_ADD_YEARS://
+            {
+                if (nOpSum < 2) return null;
+                Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
+                if(dt==null )
+                    return null;
+                if (!NumberBaseOpt.isNumber(slOperand.get(1)))
+                    return DatetimeOpt.convertDateToString(dt);
+
+                int ti = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
+
+                return DatetimeOpt.addYears(dt, ti);
+            }
+
+            case ConstDefine.FUNC_TRUNC_DAY:{//
+                Date dt = (nOpSum > 0)?DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+
+                if (nOpSum < 2)
+                    return DatetimeOpt.truncateToDay(dt);
+
+                String tempStr = StringBaseOpt.objectToString(slOperand.get(1));
+                if("M".equalsIgnoreCase(tempStr))
+                    return DatetimeOpt.truncateToMonth(dt);
+                else if("Y".equalsIgnoreCase(tempStr))
+                    return DatetimeOpt.truncateToYear(dt);
+                else
+                    return DatetimeOpt.truncateToDay(dt);
+            }
+
+            case ConstDefine.FUNC_FIRST_OF_MONTH:{//
+                Date dt = (nOpSum > 0)?DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+                return DatetimeOpt.truncateToMonth(dt);
+            }
+
+            case ConstDefine.FUNC_GET_PY://
+            {
+                if (nOpSum < 1) return null;
+                return StringBaseOpt.getFirstLetter(
+                        StringBaseOpt.objectToString(slOperand.get(0)));
+            }
+            default:
+                break;
         }
         return "";
     }

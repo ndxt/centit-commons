@@ -1,0 +1,427 @@
+package com.centit.support.compiler;
+
+import com.centit.support.algorithm.*;
+import org.apache.commons.lang3.ObjectUtils;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class VariableFormula {
+
+    private Lexer lex;
+    private VariableTranslate trans;
+    public VariableFormula()
+    {
+        lex = new Lexer();
+        //m_preTreat.setVariableTranslate(new SimpleTranslate("1"));
+    }
+
+    public void setTrans(VariableTranslate trans) {
+        this.trans = trans;
+    }
+
+    public void setFormula(String formula) {
+        lex.setFormula(formula);
+    }
+
+    public Object calculate(String szExpress)
+    {
+        setFormula(szExpress);
+        return calcFormula();
+    }
+
+    public Object calculate(String szExpress,Map<String,Object> varMap)
+    {
+        setFormula(szExpress);
+        setTrans(new ObjectTranslate(varMap));
+        return calcFormula();
+    }
+
+    public Object calculate(String szExpress,VariableTranslate varTrans)
+    {
+        setFormula(szExpress);
+        setTrans(varTrans);
+        return calcFormula();
+    }
+
+
+    private Object calcItem()
+    {
+        String str = lex.getAWord();
+        if( str == null || str.length()==0) return null;
+        if(str.charAt(0) == ')' || str.charAt(0) == ',' ){
+            lex.setPreword(str);
+            return null;
+        }
+        if(str.charAt(0) == '('){
+            Object resStr = calcFormula();
+            str = lex.getAWord();
+            if( str == null || str.length()==0 || str.charAt(0) != ')') return null;
+            return resStr;
+        }else if( (str.charAt(0) == '!') || str.equalsIgnoreCase("NOT") ) {
+            Object obj = calcItem();
+            if(BooleanBaseOpt.castObjectToBoolean(obj,false))
+                return  "0";
+            else
+                return  "1";
+        }
+
+        int funcNo = Formula.getFuncNo(str);
+        if( funcNo != -1) {
+            return calcFunc(funcNo, str);
+        }
+        if(trans!=null && Lexer.isLabel(str)){
+            return trans.getLabelValue(str);
+        }
+        return StringRegularOpt.trimString(str);
+    }
+
+    private Object calcOperate(Object operand, Object operand2, int optID)
+    {
+        switch(optID) {
+            case ConstDefine.OP_LOGICOR: {
+                return BooleanBaseOpt.castObjectToBoolean(operand, false) ||
+                        BooleanBaseOpt.castObjectToBoolean(operand2, false);
+            }
+            case ConstDefine.OP_AND:
+            case ConstDefine.OP_LOGICAND: {
+                return BooleanBaseOpt.castObjectToBoolean(operand, false) &&
+                        BooleanBaseOpt.castObjectToBoolean(operand2, false);
+            }
+
+            case ConstDefine.OP_OR: {
+                if ((BooleanBaseOpt.isBoolean(operand) || NumberBaseOpt.isNumber(operand))
+                        && (BooleanBaseOpt.isBoolean(operand2) || NumberBaseOpt.isNumber(operand2))) {
+                    return BooleanBaseOpt.castObjectToBoolean(operand) ||
+                            BooleanBaseOpt.castObjectToBoolean(operand2);
+                }
+                return String.format("\"%s%s\"",
+                        StringBaseOpt.objectToString(operand), StringBaseOpt.objectToString(operand2));
+            }
+
+            case ConstDefine.OP_ADD: {
+                if (NumberBaseOpt.isNumber(operand)
+                        && NumberBaseOpt.isNumber(operand2)) {
+                    return NumberBaseOpt.castObjectToDouble(operand,0.0) +
+                            NumberBaseOpt.castObjectToDouble(operand2,0.0);
+                }
+                return String.format("\"%s%s\"",
+                        StringBaseOpt.objectToString(operand), StringBaseOpt.objectToString(operand2));
+
+            }
+            case ConstDefine.OP_MUL: {
+                if (NumberBaseOpt.isNumber(operand)
+                        && NumberBaseOpt.isNumber(operand2)) {
+                    return NumberBaseOpt.castObjectToDouble(operand,0.0) *
+                            NumberBaseOpt.castObjectToDouble(operand2,0.0);
+                }
+                return String.format("\"%s%s\"",
+                        StringBaseOpt.objectToString(operand), StringBaseOpt.objectToString(operand2));
+
+            }
+            case ConstDefine.OP_EQ: {
+
+                if (operand == null && operand2 == null) {
+                    return true;
+                }
+
+                if (operand == null || operand2 == null) {
+                    return false;
+                }
+
+                return operand.equals(operand2);
+            }
+
+            case ConstDefine.OP_BG: {
+                if (operand == null) {
+                    return false;
+                }
+
+                if (operand2 == null) {
+                    return true;
+                }
+
+                if (NumberBaseOpt.isNumber(operand)
+                        && NumberBaseOpt.isNumber(operand2)) {
+                    return NumberBaseOpt.castObjectToDouble(operand) >
+                            NumberBaseOpt.castObjectToDouble(operand2);
+                }
+
+                return ObjectUtils.compare(
+                        StringBaseOpt.objectToString(operand),
+                        StringBaseOpt.objectToString(operand2)) > 0;
+
+            }
+
+            case ConstDefine.OP_LT: {
+                if (operand2 == null) {
+                    return false;
+                }
+                if (operand == null) {
+                    return true;
+                }
+
+                if (NumberBaseOpt.isNumber(operand)
+                        && NumberBaseOpt.isNumber(operand2)) {
+                    return NumberBaseOpt.castObjectToDouble(operand) <
+                            NumberBaseOpt.castObjectToDouble(operand2);
+                }
+
+                return ObjectUtils.compare(
+                        StringBaseOpt.objectToString(operand),
+                        StringBaseOpt.objectToString(operand2)) < 0;
+
+            }
+            case ConstDefine.OP_EL:{
+                if (operand2 == null && operand == null ) {
+                    return true;
+                }
+                if (operand2 == null) {
+                    return false;
+                }
+                if (operand == null) {
+                    return true;
+                }
+
+                if (NumberBaseOpt.isNumber(operand)
+                        && NumberBaseOpt.isNumber(operand2)) {
+                    return NumberBaseOpt.castObjectToDouble(operand) <=
+                            NumberBaseOpt.castObjectToDouble(operand2);
+                }
+
+                return ObjectUtils.compare(
+                        StringBaseOpt.objectToString(operand),
+                        StringBaseOpt.objectToString(operand2)) <= 0;
+
+            }
+            case ConstDefine.OP_EB:{
+                if (operand2 == null && operand == null ) {
+                    return true;
+                }
+                if (operand == null) {
+                    return false;
+                }
+                if (operand2 == null) {
+                    return true;
+                }
+
+                if (NumberBaseOpt.isNumber(operand)
+                        && NumberBaseOpt.isNumber(operand2)) {
+                    return NumberBaseOpt.castObjectToDouble(operand) >=
+                            NumberBaseOpt.castObjectToDouble(operand2);
+                }
+
+                return ObjectUtils.compare(
+                        StringBaseOpt.objectToString(operand),
+                        StringBaseOpt.objectToString(operand2)) >= 0;
+
+            }
+            case ConstDefine.OP_NE: {
+                if (operand == null && operand2 == null) {
+                    return false;
+                }
+                if (operand == null || operand2 == null) {
+                    return true;
+                }
+                return ! operand.equals(operand2);
+            }
+            case ConstDefine.OP_LMOV:
+
+                if( NumberBaseOpt.isNumber(operand2) ){
+                    int nP2 = NumberBaseOpt.castObjectToInteger(operand2);
+
+                    if( NumberBaseOpt.isNumber(operand) ) {
+                        int nP = NumberBaseOpt.castObjectToInteger(operand);
+                        return nP << nP2;
+                    }
+                    String str1 = StringBaseOpt.objectToString(operand);
+
+                    if(nP2>=0 && str1.length() > nP2){
+                        return str1.substring(nP2);
+                    }
+                }
+                return null;
+            case ConstDefine.OP_RMOV:
+
+                if( NumberBaseOpt.isNumber(operand2) ){
+                    int nP2 = NumberBaseOpt.castObjectToInteger(operand2);
+
+                    if( NumberBaseOpt.isNumber(operand) ) {
+                        int nP = NumberBaseOpt.castObjectToInteger(operand);
+                        return nP >> nP2;
+                    }
+                    String str1 = StringBaseOpt.objectToString(operand);
+
+                    if(nP2>=0 && str1.length() > nP2){
+                        return str1.substring(0,str1.length() - nP2);
+                    }
+                }
+                return null;
+            case ConstDefine.OP_LIKE:
+                return StringRegularOpt.isMatch(StringBaseOpt.objectToString(operand),
+                        StringBaseOpt.objectToString(operand2));
+
+            case ConstDefine.OP_SUB:
+                return NumberBaseOpt.castObjectToDouble(operand,0.0) -
+                        NumberBaseOpt.castObjectToDouble(operand2,0.0);
+
+            case ConstDefine.OP_DIV:
+            {
+                Double dbop = NumberBaseOpt.castObjectToDouble(operand);
+                Double dbop2 = NumberBaseOpt.castObjectToDouble(operand2);
+                if(dbop==null || dbop2==null ||
+                        BigDecimal.valueOf(dbop2).compareTo(BigDecimal.ZERO)==0)
+                    return null;
+                return dbop/dbop2;
+            }
+
+            case ConstDefine.OP_POWER: {
+                Double dbop = NumberBaseOpt.castObjectToDouble(operand);
+                Double dbop2 = NumberBaseOpt.castObjectToDouble(operand2);
+                if (dbop == null || dbop2 == null)
+                    return null;
+                return Math.pow(dbop, dbop2);
+            }
+            default:
+                break;
+        }
+
+        return null;
+    }
+
+    public Object calcFormula()
+    {
+        List<Object> slOperand = new ArrayList<>();
+        OptStack  optStack = new OptStack();
+
+        String str;
+        while(true){
+            Object item = calcItem();
+            slOperand.add(0,item);
+            str = lex.getAWord();
+            if( str==null || str.length()==0)
+                break;
+
+            int optID = Formula.getOptID(str);
+            if( optID == -1){
+                lex.setPreword(str);
+                break;
+            }
+    //--------run OP_IN----------------------------------
+            if(optID == ConstDefine.OP_IN){ // Specail Opt For In multi operand
+                Boolean bInRes = false;
+                Object operand = slOperand.remove(0);
+                str = lex.getAWord();
+                if( str==null || str.length()==0 || !str.equals("(") ) return null;
+
+
+                while(true)
+                {
+                    item = calcFormula();
+                    if( GeneralAlgorithm.compareTwoObject(operand,item) == 0 ){
+                        bInRes = true;
+                    }
+                    str = lex.getAWord();
+                    if( str==null || str.length()==0 ||(  !str.equals(",")  && !str.equals(")") ) ) return null;
+                    if( str.equals(")") ) {
+                        lex.setPreword(str);
+                        break;
+                    }
+                }
+
+                lex.seekToRightBracket();
+
+                slOperand.add(0,bInRes);
+                str = lex.getAWord();
+                optID = Formula.getOptID(str);
+                if( optID == -1){
+                    lex.setPreword(str);
+                    break;
+                }
+            }
+    //----------end opt in--------------------------------
+            for(int op = optStack.pushOpt(optID); op != 0; op = optStack.pushOpt(optID)){
+                Object operand2 = slOperand.remove(0);
+                Object operand = slOperand.remove(0);
+                slOperand.add(0, calcOperate(operand,operand2,op));
+            }
+        }
+
+        for(int op = optStack.popOpt(); op != 0; op = optStack.popOpt()){
+            Object operand2 = slOperand.remove(0);
+            Object operand = slOperand.remove(0);
+            slOperand.add(0, calcOperate(operand,operand2,op));
+        }
+        return  slOperand.get(0);
+    }
+
+    private Object calcFunc(int nFuncNo, String funcName)
+    {
+        String str = lex.getAWord();
+        if( str==null || str.length()==0 || !str.equals("(") ) {
+            if(str!=null && str.length()>0)
+                lex.setPreword(str);
+            return funcName;
+        }
+        int prmNo = 0;
+
+        // IF 语句单独处理
+        if( EmbedFunc.functionsList[nFuncNo].nFuncID == ConstDefine.FUNC_IF){
+            Object sCondition = calcFormula();
+            if(sCondition==null) return null;
+
+            str = lex.getAWord();
+            if( str==null || str.length()==0 ||  !str.equals(",") ) return null;
+
+            if( BooleanBaseOpt.castObjectToBoolean(sCondition,false) ){
+                Object objRes =  calcFormula();
+                str = lex.getAWord();
+                if( str==null || str.length()==0 || ( !str.equals(",") && !str.equals(")")) ) return null;
+                if( str.equals(")") )
+                    return objRes;
+                // 特殊处理的地方就在这儿
+                lex.skipAOperand();
+                str = lex.getAWord();
+                if( str==null || str.length()==0 || !str.equals(")") ) return null;
+                return objRes;
+            }else {
+                // 特殊处理的地方就在这儿
+                lex.skipAOperand();
+                str = lex.getAWord();
+                if( str==null || str.length()==0 || !str.equals(",") && !str.equals(")") ) return null;
+                if( str.equals(")") ) return null;
+                Object objRes = calcFormula();
+                str = lex.getAWord();
+                if( str==null || str.length()==0 || !str.equals(")") ) return null;
+                return objRes;
+            }
+            //return sRes;
+        }
+
+        List<Object> slOperand = new ArrayList<>(5);
+
+        while( true )
+            //( m_sFunctionList[nFuncNo].nPrmSum == -1
+            //  || prmNo < m_sFunctionList[nFuncNo].nPrmSum )
+        {
+            prmNo ++;
+            Object item = calcFormula();
+            slOperand.add(item);
+            str = lex.getAWord();
+            if( str==null || str.length()==0 || ( !str.equals(",") && !str.equals(")"))  )
+                return null;
+            if( str.equals(")") ){
+                break;
+            }
+        }
+        //str = m_lex.getAWord();
+        if(/* str==null || str.length()==0 || */ !str.equals(")") ) return null;
+        if( EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
+            //&& prmNo != m_sFunctionList[nFuncNo].nPrmSum) return null;
+            && prmNo < EmbedFunc.functionsList[nFuncNo].nPrmSum) return null;
+        return  EmbedFunc.runFuncWithRaw(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
+    }
+
+}

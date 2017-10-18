@@ -142,6 +142,14 @@ public abstract class NumberBaseOpt {
         }
         return capitalization(szNum);
     }
+
+    static public boolean isNumber(Object obj){
+        if(obj==null)
+            return false;
+        if(obj instanceof Number)
+            return true;
+        return StringRegularOpt.isNumber(StringBaseOpt.objectToString(obj));
+    }
     /*
      * 这个仅仅是对Long.parseLong进行简单的封装避免重复的输入try catch
      */
@@ -221,12 +229,12 @@ public abstract class NumberBaseOpt {
             return null;
         if (obj instanceof Long)
             return (Long) obj;
-        if (obj instanceof Double)
+        /*if (obj instanceof Double)
             return ((Double) obj).longValue();
         if (obj instanceof Integer)
             return ((Integer) obj).longValue();
         if (obj instanceof Float)
-            return ((Float) obj).longValue();
+            return ((Float) obj).longValue();*/
         if (obj instanceof String)
             return parseLong((String)obj,null);
         if (obj instanceof Number)
@@ -243,12 +251,12 @@ public abstract class NumberBaseOpt {
             return null;
         if (obj instanceof Integer)
             return (Integer) obj;
-        if (obj instanceof Long)
+        /*if (obj instanceof Long)
             return ((Long) obj).intValue();
         if (obj instanceof Double)
             return ((Double) obj).intValue();
         if (obj instanceof Float)
-            return ((Float) obj).intValue();
+            return ((Float) obj).intValue();*/
         if (obj instanceof String)
             return parseInteger((String)obj,null);
         if (obj instanceof Number)
@@ -268,12 +276,12 @@ public abstract class NumberBaseOpt {
             return null;
         if (obj instanceof Float)
             return (Float) obj;
-        if (obj instanceof Integer)
+        /*if (obj instanceof Integer)
             return ((Integer) obj).floatValue();
         if (obj instanceof Long)
             return ((Long) obj).floatValue();
-        if (obj instanceof Float)
-            return ((Float) obj).floatValue();
+        if (obj instanceof Double)
+            return ((Double) obj).floatValue();*/
         if (obj instanceof String)
             return parseFloat((String)obj,null);
         if (obj instanceof Number)
@@ -292,12 +300,12 @@ public abstract class NumberBaseOpt {
             return null;
         if (obj instanceof Double)
             return (Double) obj;
-        if (obj instanceof Integer)
+        /*if (obj instanceof Integer)
             return ((Integer) obj).doubleValue();
         if (obj instanceof Long)
             return ((Long) obj).doubleValue();
         if (obj instanceof Float)
-            return ((Float) obj).doubleValue();
+            return ((Float) obj).doubleValue();*/
         if (obj instanceof String)
             return parseDouble((String)obj,null);
         if (obj instanceof Number)
