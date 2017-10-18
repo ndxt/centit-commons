@@ -1059,12 +1059,12 @@ public abstract class QueryUtils {
     public static class SimpleFilterTranslater implements IFilterTranslater{
         private Map<String,Object> paramsMap;
         private Map<String,String> tableAlias;
-        private MapTranslate mapTranslate;
+        private ObjectTranslate mapTranslate;
         public SimpleFilterTranslater(Map<String, Object> paramsMap)
         {
             this.tableAlias = null;
             this.paramsMap = paramsMap;
-            this.mapTranslate = new MapTranslate(paramsMap);
+            this.mapTranslate = new ObjectTranslate(paramsMap);
         }
 
         @Override
@@ -1102,16 +1102,16 @@ public abstract class QueryUtils {
                 if(StringUtils.isBlank((String)obj))
                     return null;
             }
-            return new KeyValuePair<String,Object>(paramName, obj);
+            return new KeyValuePair<>(paramName, obj);
         }
 
         @Override
-        public String getVarValue(String varName) {
+        public Object getVarValue(String varName) {
             return mapTranslate.getVarValue(varName);
         }
 
         @Override
-        public String getLabelValue(String labelName) {
+        public Object getLabelValue(String labelName) {
             return mapTranslate.getLabelValue(labelName);
         }
     }

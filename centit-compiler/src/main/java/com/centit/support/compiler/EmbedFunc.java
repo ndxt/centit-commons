@@ -472,7 +472,7 @@ public abstract class EmbedFunc {
                     }
                     int i=1;
                     for( ;i+1<nOpSum; i+=2){
-                        if( MatchType ==1 ){
+                        if(MatchType == 1){
                             if (StringRegularOpt.isTrue(slOperand.get(i)))
                                 return slOperand.get(i+1);
                         }else if ( MatchType == 2 ){
@@ -634,6 +634,7 @@ public abstract class EmbedFunc {
         }
         return "";
     }
+
     public static Object runFuncWithRaw(List<Object> rawOperand,int funcID)
     {
         List<Object> slOperand = new ArrayList<>(rawOperand.size() + 1);
@@ -653,7 +654,7 @@ public abstract class EmbedFunc {
         return runFuncWithObject(slOperand, funcID);
     }
 
-    public static Object runFuncWithObject(List<Object> slOperand,int funcID)
+    private static Object runFuncWithObject(List<Object> slOperand,int funcID)
     {
         int nOpSum = ( slOperand == null )? 0: slOperand.size();
         double dbtemp = 0.0;
@@ -844,7 +845,7 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_STRCAT:// 106
             {
                 if (nOpSum <1)
-                    return "";
+                    return null;
                 StringBuilder sb= new StringBuilder();
                 for(int i=0; i<nOpSum; i++) {
                     sb.append(StringBaseOpt.objectToString(slOperand.get(i)));
@@ -884,12 +885,12 @@ public abstract class EmbedFunc {
 
             case ConstDefine.FUNC_UPCASE://upcase
             {
-                if (nOpSum <1) return "";
+                if (nOpSum <1) return null;
                 return StringUtils.upperCase(StringBaseOpt.objectToString(slOperand.get(0)));
             }
             case ConstDefine.FUNC_LOWCASE://lowcase
             {
-                if (nOpSum <1) return "";
+                if (nOpSum <1) return null;
                 return StringUtils.lowerCase(StringBaseOpt.objectToString(slOperand.get(0)));
             }
             case ConstDefine.FUNC_FREQUENCE:{
@@ -1149,6 +1150,6 @@ public abstract class EmbedFunc {
             default:
                 break;
         }
-        return "";
+        return null;
     }
 }
