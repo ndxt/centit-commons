@@ -81,8 +81,8 @@ public abstract class ConstDefine {
     public static final int   OP_BITAND      = 41;  //&
     public static final int   OP_NOT         = 42;  //!
     public static final int   OP_POWER       = 43;  //^
-    public static final int   OP_LMOV        = 44;  // >>
-    public static final int   OP_RMOV        = 45;  // <<
+    public static final int   OP_LMOV        = 44;  // <<
+    public static final int   OP_RMOV        = 45;  // >>
     public static final int   OP_LIKE        = 46;  //LIKE
     public static final int   OP_IN          = 47 ; //IN
     public static final int   OP_EVALUATE    = OP_EQ;      //=

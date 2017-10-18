@@ -174,7 +174,7 @@ public abstract class ListOpt {
     public static <T> List<T> removeNullItem(List<T> list) {
         if(list==null||list.size()<1)
             return null;
-        List<T> retList = new ArrayList<T>();
+        List<T> retList = new ArrayList<>(list.size());
         for(T t:list){
             if(t!=null)
                 retList.add(t);

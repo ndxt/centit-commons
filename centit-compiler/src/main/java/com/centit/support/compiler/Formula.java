@@ -17,12 +17,12 @@ public class Formula {
         //m_preTreat.setVariableTranslate(new SimpleTranslate("1"));
     }
 
-    final static private int getFuncNo(String  sFuncName)
+    public static int getFuncNo(String  sFuncName)
     {
         return EmbedFunc.getFuncNo(sFuncName);
     }
 
-    public static final int getOptID(String sOptName)
+    public static int getOptID(String sOptName)
     {
         int sl = sOptName.length();
         if(sl == 0) return -1;
@@ -44,7 +44,7 @@ public class Formula {
                     return(ConstDefine.OP_EB);//    return ConstDefine.OP_EB;    m_iPreIsn = ConstDefine.OP_EB ;
                 }
                 if(sp2 == '>')
-                    return (ConstDefine.OP_LMOV);
+                    return (ConstDefine.OP_RMOV);
                 return(ConstDefine.OP_BG);//m_iPreIsn = ConstDefine.OP_BG ;    return ConstDefine.OP_BG ;
             case '<':
                 if(sp2 == '=') {
@@ -54,7 +54,7 @@ public class Formula {
                     return(ConstDefine.OP_NE);//    return ConstDefine.OP_NE;    m_iPreIsn = ConstDefine.OP_NE ;
                 }
                 if(sp2 == '<') {
-                    return(ConstDefine.OP_RMOV);//    return ConstDefine.OP_NE;    m_iPreIsn = ConstDefine.OP_NE ;
+                    return(ConstDefine.OP_LMOV);//    return ConstDefine.OP_NE;    m_iPreIsn = ConstDefine.OP_NE ;
                 }
                 return(ConstDefine.OP_LT);//m_iPreIsn = ConstDefine.OP_LT ;return ConstDefine.OP_LT ;
             case '&':
@@ -88,10 +88,6 @@ public class Formula {
         return -1;
     }
 
-    final static private String runFunc(List<String> slOperand,int funcID)
-    {
-        return EmbedFunc.runFunc(slOperand, funcID);
-    }
 
     public static final boolean isKeyWord(String sWord)
     {
@@ -104,7 +100,7 @@ public class Formula {
         return getOptID(sWord)>0;
     }
 
-    private String getItem()
+    private String calcItem()
     {
         String str = lex.getAWord();
         if( str == null || str.length()==0) return null;
@@ -113,27 +109,25 @@ public class Formula {
             return null;
         }
         if(str.charAt(0) == '('){
-            String resstr = getFormula();
+            String resstr = calcFormula();
             str = lex.getAWord();
             if( str == null || str.length()==0 || str.charAt(0) != ')') return null;
             return resstr;
         }else if( (str.charAt(0) == '!') || str.equalsIgnoreCase("NOT") ) {
-            str = getItem();
+            str = calcItem();
             if(StringRegularOpt.isTrue(str))
                 return  "0";
             else
                 return  "1";
         }
 
-        String optstr = str.toLowerCase();
-
-        int funcNo = getFuncNo(optstr);
+        int funcNo = getFuncNo(str);
         if( funcNo != -1)
-            str = getFunc(funcNo,str);
+            str = calcFunc(funcNo,str);
         return str;
     }
 
-    private String runOperate(String operand,String operand2,int optID)
+    private String calcOperate(String operand, String operand2, int optID)
     {
         String str = "";
         String str1 = StringRegularOpt.trimString(operand);
@@ -185,7 +179,7 @@ public class Formula {
                         int nP2 = Double.valueOf(str2).intValue();
 
                         if(nP2>=0 && str1.length() > nP2){
-                            str = str1.substring(0,str1.length() - nP2);
+                            str = str1.substring(nP2);
                             return str;
                         }
                     }
@@ -194,7 +188,7 @@ public class Formula {
                     if( StringRegularOpt.isNumber(str2) ){
                         int nP2 = Double.valueOf(str2).intValue();
                         if(nP2>=0 && str1.length() > nP2){
-                            str = str1.substring(nP2);
+                            str = str1.substring(0,str1.length() - nP2);
                             return str;
                         }
                     }
@@ -256,12 +250,12 @@ public class Formula {
         case ConstDefine.OP_LMOV:{
             int nP= Double.valueOf(dbop).intValue(); //int(dbop);
             int nP2 = Double.valueOf(dbop2).intValue();// int (dbop2);
-            return String.format("%d",nP>>nP2);
+            return String.format("%d",nP << nP2);
                      }
         case ConstDefine.OP_RMOV:{
             int nP= Double.valueOf(dbop).intValue(); //int(dbop);
             int nP2 = Double.valueOf(dbop2).intValue();// int (dbop2);
-            return String.format("%d",nP<<nP2);
+            return String.format("%d",nP >> nP2);
                      }
         case ConstDefine.OP_LIKE:
             if(StringRegularOpt.isMatch(str1,str2)) return "1";
@@ -271,13 +265,13 @@ public class Formula {
         return null;
     }
 
-    private String getFormula()
+    public String calcFormula()
     {
         List<String> slOperand = new ArrayList<String>();
         OptStack  optStack = new OptStack();
         String str;
         while(true){
-            str = getItem();
+            str = calcItem();
             slOperand.add(0,str);
             if( str == null || str.length() == 0)
                 break;
@@ -301,7 +295,7 @@ public class Formula {
 
                 while(true)
                 {
-                    str = getFormula();
+                    str = calcFormula();
                     slInnerOperand.add(str);
                     str = lex.getAWord();
                     if( str==null || str.length()==0 ||(  !str.equals(",")  && !str.equals(")") ) ) return null;
@@ -328,20 +322,20 @@ public class Formula {
             for(int op = optStack.pushOpt(optID); op != 0; op = optStack.pushOpt(optID)){
                 String operand2 = slOperand.remove(0);
                 String operand = slOperand.remove(0);
-                str = runOperate(operand,operand2,op);
+                str = calcOperate(operand,operand2,op);
                 slOperand.add(0,str);
             }
         }
         for(int op = optStack.popOpt(); op != 0; op = optStack.popOpt()){
             String operand2 = slOperand.remove(0);
             String operand = slOperand.remove(0);
-            str = runOperate(operand,operand2,op);
+            str = calcOperate(operand,operand2,op);
             slOperand.add(0,str);
         }
         return  slOperand.get(0);
     }
 
-    private String getFunc(int nFuncNo,String funcName)
+    private String calcFunc(int nFuncNo, String funcName)
     {
         String str = lex.getAWord();
         if( str==null || str.length()==0 || !str.equals("(") ) {
@@ -353,14 +347,14 @@ public class Formula {
         String sRes = "";
         // IF 语句单独处理
         if( EmbedFunc.functionsList[nFuncNo].nFuncID == ConstDefine.FUNC_IF){
-            String sCondition = getFormula();
+            String sCondition = calcFormula();
             if(sCondition==null) return null;
 
             str = lex.getAWord();
             if( str==null || str.length()==0 ||  !str.equals(",") ) return null;
 
             if( StringRegularOpt.isTrue(sCondition) ){
-                sRes =  getFormula();
+                sRes =  calcFormula();
                 str = lex.getAWord();
                 if( str==null || str.length()==0 || ( !str.equals(",") && !str.equals(")")) ) return null;
                 if( str.equals(")") ) return sRes;
@@ -374,8 +368,8 @@ public class Formula {
                 lex.skipAOperand();
                 str = lex.getAWord();
                 if( str==null || str.length()==0 || !str.equals(",") && !str.equals(")") ) return null;
-                if( str.equals(")") ) return sRes;
-                sRes = getFormula();
+                if( str.equals(")") ) return "";
+                sRes = calcFormula();
                 str = lex.getAWord();
                 if( str==null || str.length()==0 || !str.equals(")") ) return null;
                 return sRes;
@@ -390,7 +384,7 @@ public class Formula {
             //  || prmNo < m_sFunctionList[nFuncNo].nPrmSum )
         {
             prmNo ++;
-            str = getFormula();
+            str = calcFormula();
             slOperand.add(str);
             str = lex.getAWord();
             if( str==null || str.length()==0 || ( !str.equals(",") && !str.equals(")"))  )
@@ -404,7 +398,7 @@ public class Formula {
         if( EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
             //&& prmNo != m_sFunctionList[nFuncNo].nPrmSum) return null;
             && prmNo < EmbedFunc.functionsList[nFuncNo].nPrmSum) return null;
-        str = runFunc(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
+        str = EmbedFunc.runFunc(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
         return str;
     }
     //不一致的问题 需要修改
@@ -416,7 +410,7 @@ public class Formula {
     public String calculate(String szExpress)
     {
         lex.setFormula(szExpress);
-        String sRes = getFormula();
+        String sRes = calcFormula();
         if(sRes == null || sRes.length()==0) return "";
         return StringRegularOpt.trimString(sRes);
     }

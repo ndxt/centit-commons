@@ -26,11 +26,12 @@ public class FormulaTest {
         varB.put("bb", 400);
         varMap.put("a", varA);
         varMap.put("b", varB);
-        varMap.put("c", "500");
+        varMap.put("c", "8aa080845");
+        varMap.put("ideaCode", "T");
         //System.out.println(f.checkFormula("a.aa[1]+a.aa[2]"));
         //String s = f.calculate("${a.aa[0]}+ ${a.aa[2]}",varMap);
         //System.out.println(s);
-        String s = f.calculate("getAt(0,a.aa) + getAt(2,a.aa)",varMap);
+        String s = f.calculate(" c=='d0038' && ideaCode == 'T' ",varMap);
         System.out.println(s);
         System.out.println("Done!");
     }
