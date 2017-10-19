@@ -6,10 +6,10 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void testFormula() {
+        String formula = " T == 'T' ";
+
         Formula f = new Formula();
-        //f.setVariableTranslate(new MapTranslate());
-        //System.out.println(f.m_preTreat.runPretreatment(" if(2>1,${userinfo.usercode},case(true,3<2,'hello',4*5<19,'helleo, weror','nihao,地球')) + ' !' "));
-        String s = f.calculate("countnull(1,2,\"\",4,6,,3,,1)");
+        String s = f.calculate(formula, new HashMap<>());
         System.out.println(s);
         //assertEquals("nihao,地球 !",s);
     }
@@ -25,13 +25,15 @@ public class FormulaTest {
         varB.put("ba", 300);
         varB.put("bb", 400);
         varMap.put("a", varA);
-        varMap.put("depart", varB);
+        varMap.put("depart", "你好");
         varMap.put("c", null);
         varMap.put("ideaCode", "T");
         //System.out.println(f.checkFormula("a.aa[1]+a.aa[2]"));
         //String s = f.calculate("${a.aa[0]}+ ${a.aa[2]}",varMap);
         //System.out.println(s);
-        Object s = f.calculate(" depart =='d0038' && ideaCode == 'T' || isempty(c)",varMap);
+        String formula = " depart != '你好' ";
+        System.out.println(formula);
+        Object s = f.calculate(formula, varMap);
         System.out.println(s);
         System.out.println("Done!");
     }
@@ -42,16 +44,25 @@ public class FormulaTest {
         System.out.println(l.findWord("jan",true,true));
         //assertEquals("nihao,地球 !",s);
 
-        Formula f = new Formula();
-        Map<String,Object> varMap = new HashMap<String,Object>();
-        varMap.put("usercode", "000001");
-        String s = f.calculate("today +  today() + ' '+'usercode' +usercode + ${otherValue} + ':' + ${usercode}",varMap);
+        VariableFormula f = new VariableFormula();
+        Map<String,Object> varMap = new HashMap<>();
+        varMap.put("usercode", "U00001");
+
+        Map<String,Object> varB = new HashMap<>();
+        varB.put("usercode", 300);
+        varB.put("unitcode", 500);
+        varMap.put("user", varB);
+        Object s = f.calculate(
+                "today +':'+  today() + ' '+'usercode' + usercode +'$'+ $ { otherValue } + ':' + $ { user . usercode }",
+                varMap);
         System.out.println(s);
     }
 
     public  static void  main(String[] args)   {
-        testFormula2();
-        //System.out.println(Double.valueOf("123123.4545").intValue());
+        //testFormula2();//
+        // testFormula2();
+        testLexer();
+        System.out.println("123123.4545" + (String)null );
 
     }
 }

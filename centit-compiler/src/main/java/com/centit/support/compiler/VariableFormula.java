@@ -62,10 +62,15 @@ public class VariableFormula {
             return resStr;
         }else if( (str.charAt(0) == '!') || str.equalsIgnoreCase("NOT") ) {
             Object obj = calcItem();
-            if(BooleanBaseOpt.castObjectToBoolean(obj,false))
-                return  "0";
-            else
-                return  "1";
+            return ! BooleanBaseOpt.castObjectToBoolean(obj,false);
+        }else if(str.charAt(0) == '$'){
+            str = lex.getAWord();
+            if(str.equals("{")){
+                str = lex.getStringUntil("}");
+                return trans.getLabelValue(str);
+            }else {
+                return null;
+            }
         }
 
         int funcNo = Formula.getFuncNo(str);
@@ -97,8 +102,7 @@ public class VariableFormula {
                     return BooleanBaseOpt.castObjectToBoolean(operand) ||
                             BooleanBaseOpt.castObjectToBoolean(operand2);
                 }
-                return String.format("\"%s%s\"",
-                        StringBaseOpt.objectToString(operand), StringBaseOpt.objectToString(operand2));
+                return StringBaseOpt.concat(operand, operand2);
             }
 
             case ConstDefine.OP_ADD: {
@@ -107,8 +111,7 @@ public class VariableFormula {
                     return NumberBaseOpt.castObjectToDouble(operand,0.0) +
                             NumberBaseOpt.castObjectToDouble(operand2,0.0);
                 }
-                return String.format("\"%s%s\"",
-                        StringBaseOpt.objectToString(operand), StringBaseOpt.objectToString(operand2));
+                return StringBaseOpt.concat(operand, operand2);
 
             }
             case ConstDefine.OP_MUL: {
@@ -117,8 +120,7 @@ public class VariableFormula {
                     return NumberBaseOpt.castObjectToDouble(operand,0.0) *
                             NumberBaseOpt.castObjectToDouble(operand2,0.0);
                 }
-                return String.format("\"%s%s\"",
-                        StringBaseOpt.objectToString(operand), StringBaseOpt.objectToString(operand2));
+                return StringBaseOpt.concat(operand, operand2);
 
             }
             case ConstDefine.OP_EQ: {

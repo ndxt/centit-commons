@@ -355,11 +355,12 @@ public abstract class ReflectionOpt  {
         String fieldValue;
         String restExpression=".";
         if(nPos>0){
-            fieldValue = expression.substring(0,nPos);
+            fieldValue = expression.substring(0,nPos).trim();
             if(expression.length()>nPos+1)
                 restExpression = expression.substring(nPos+1);
         }else
-            fieldValue = expression;
+            fieldValue = expression.trim();
+
         int nAarrayInd = -1;
         nPos = fieldValue.indexOf('[');
         if(nPos>0){
@@ -369,7 +370,7 @@ public abstract class ReflectionOpt  {
             fieldValue = fieldValue.substring(0,nPos);
         }
 
-        Object retObj = null;
+        Object retObj;
         if(sourceObj instanceof Map ){
             @SuppressWarnings("unchecked")
             Map<String ,Object> objMap = (Map<String ,Object>) sourceObj;

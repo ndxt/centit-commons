@@ -123,25 +123,45 @@ public abstract class StringBaseOpt {
       }
 
     /**
-     * 连接字符串
+     * 连接字符串 null 自动忽略 不会拼接一个 'null'
+     * @param objs 字符串数组
+     * @return 返回 链接号的字符串
+     */
+    public static String concat(Object ...objs) {
+        StringBuilder sb = new StringBuilder();
+        if (objs !=null &&  objs.length > 0) {
+            for (int i = 0; i < objs.length; i++) {
+                if(objs[i]!=null) {
+                    sb.append(StringBaseOpt.objectToString(objs[i]));
+                }
+            }
+        }
+        return sb.toString();
+    }
+    /**
+     * 连接字符串 null 自动忽略 不会拼接一个 'null'
      * @param objs 字符串数组
      * @param str 连接 分隔符
      * @return 返回 链接号的字符串
      */
     public static String concat(Object objs[], String str) {
         StringBuilder sb = new StringBuilder();
+        int objInd=0;
         if (objs !=null &&  objs.length > 0) {
             for (int i = 0; i < objs.length; i++) {
-                if (i > 0)
-                    sb.append(str);
-                sb.append(StringBaseOpt.objectToString(objs[i]));
+                if(objs[i]!=null) {
+                    if (objInd > 0)
+                        sb.append(str);
+                    objInd++;
+                    sb.append(StringBaseOpt.objectToString(objs[i]));
+                }
             }
         }
         return sb.toString();
     }
 
     /**
-     * 连接字符串
+     * 连接字符串 null 自动忽略 不会拼接一个 'null'
      * @param objs 字符串数组
      * @param str 连接 分隔符
      * @return 返回 链接号的字符串
@@ -151,10 +171,12 @@ public abstract class StringBaseOpt {
         if (objs !=null && objs.size() > 0) {
             int i=0;
             for (Object obj : objs) {
-                if (i > 0)
-                    sb.append(str);
-                i++;
-                sb.append(StringBaseOpt.objectToString(obj));
+                if(obj !=null) {
+                    if (i > 0)
+                        sb.append(str);
+                    i++;
+                    sb.append(StringBaseOpt.objectToString(obj));
+                }
             }
         }
         return sb.toString();

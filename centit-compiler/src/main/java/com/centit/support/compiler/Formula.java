@@ -115,10 +115,7 @@ public class Formula {
             return resstr;
         }else if( (str.charAt(0) == '!') || str.equalsIgnoreCase("NOT") ) {
             str = calcItem();
-            if(StringRegularOpt.isTrue(str))
-                return  "0";
-            else
-                return  "1";
+            return StringRegularOpt.isTrue(str)? "0":"1";
         }
 
         int funcNo = getFuncNo(str);
@@ -129,7 +126,7 @@ public class Formula {
 
     private String calcOperate(String operand, String operand2, int optID)
     {
-        String str = "";
+        String str;
         String str1 = StringRegularOpt.trimString(operand);
         String str2 = StringRegularOpt.trimString(operand2);
 
