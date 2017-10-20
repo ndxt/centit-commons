@@ -22,7 +22,9 @@ public class TestDateTimeOpt {
             //e.printStackTrace();
         }*/
         //System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "yyyyMMddHHmmssSSS"));
-        testTPTime() ;
+        System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.smartPraseDate("2017-9  3")));
+        System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.smartPraseDate("201793")));
+        //testTPTime() ;
         //testDateTime();
 /*        System.out.println(FileSystemOpt.extractFileName(""));
         System.out.println(FileSystemOpt.extractFileName("D:\\Projects\\RunData\\dde\\temp\\export-01\\export-010002.zip"));

@@ -475,11 +475,11 @@ public abstract class StringRegularOpt {
         String sTmp2 ="";
         int nPart = 0;
         boolean bDot = false;
+        boolean hasYearPart = false;
         for( int j=0; j< sl; j++){
             if (szDateStr.charAt(j) >= '0' && szDateStr.charAt(j) <= '9'){
                 if (bDot){
                     if(!"".equals(sTmp2)){
-
                         if(nPart>0 && nPart<3)
                             sB.append('-');
                         else if(nPart==3)
@@ -502,9 +502,17 @@ public abstract class StringRegularOpt {
                     }
                     bDot = false;
                 }
+
                 if(nPart>=6)
                     break;
+
                 sTmp2 = sTmp2 + szDateStr.charAt(j);
+                if( (hasYearPart || nPart>3) && (sTmp2.length()==2 || sTmp2.charAt(0)>'5' ) ){
+                    bDot = true;
+                }else if( (nPart<3 && sTmp2.length()==4)) {
+                    hasYearPart = true;
+                    bDot = true;
+                }
             }else{ //if(! sTmp2.equals(""))
                 bDot = true;
             }
@@ -512,7 +520,6 @@ public abstract class StringRegularOpt {
         }
 
         if(!"".equals(sTmp2)){
-
             if(nPart>0 && nPart<3)
                 sB.append('-');
             else if(nPart==3)

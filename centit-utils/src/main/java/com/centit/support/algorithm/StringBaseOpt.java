@@ -1,24 +1,16 @@
 package com.centit.support.algorithm;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-
+import net.sourceforge.pinyin4j.PinyinHelper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.sourceforge.pinyin4j.PinyinHelper;
+import java.io.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * String Utility Class This is used to encode passwords programmatically
@@ -113,7 +105,7 @@ public abstract class StringBaseOpt {
           // 使用默认缓冲区大小创建新的输入流
           GZIPInputStream gzip = new GZIPInputStream(in);
           byte[] buffer = new byte[256];
-          int n = 0;
+          int n;
           while ((n = gzip.read(buffer)) >= 0) {// 将未压缩数据读入字节数组
               // 将指定 byte 数组中从偏移量 off 开始的 len 个字节写入此 byte数组输出流
               out.write(buffer, 0, n);
@@ -187,13 +179,15 @@ public abstract class StringBaseOpt {
      * @return 如果字符串str在数组strs返回true
      */
     public static boolean contains(String strs[], String str) {
-        boolean in = false;
+
         if (strs == null)
-            return in;
-        for (int i = 0; i < strs.length; i++)
-            if (strs[i].contains(str))
-                in = true;
-        return in;
+            return false;
+
+        for (String str1 : strs) {
+            if (str1.contains(str))
+                return true;
+        }
+        return false;
     }
     /**
      * copyProperties(),删除备份条件的后缀,如"value_CODE"过滤成"value"
@@ -296,7 +290,7 @@ public abstract class StringBaseOpt {
             return String.valueOf(currNo);
 
         String sDocNo = templet;
-        if (sDocNo.indexOf("$N") != -1) {
+        if (sDocNo.contains("$N")) {
              int firstBegin = sDocNo.indexOf("$N");
              int firstEnd = firstBegin + 2;
              int secondBegin = sDocNo.indexOf("$", firstEnd);
@@ -350,7 +344,7 @@ public abstract class StringBaseOpt {
             }
         }
         if(i>0)
-            sRes = sCode.substring(0,i) + sRes;;
+            sRes = sCode.substring(0,i) + sRes;
         return sRes;
     }
 
@@ -422,8 +416,6 @@ public abstract class StringBaseOpt {
             int l = in.read(readBytes);
             if(l>0)
                 return new String(readBytes);
-        } catch (FileNotFoundException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
         } catch (IOException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
         }
@@ -433,13 +425,12 @@ public abstract class StringBaseOpt {
     public static String readJarResourceToBuffer(Class<?> clazz, String sResourceName)
     {
         //一次性全部读出
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         String line; // 用来保存每行读取的内容
         InputStream in;
         try {
             //URL fileURL=clazz.getResource(sResourceName);
             //log.debug(fileURL.getFile());
-
             in = clazz.getResourceAsStream(sResourceName);
 
             BufferedReader br=new BufferedReader(new InputStreamReader(in));
@@ -452,8 +443,6 @@ public abstract class StringBaseOpt {
             br.close();
             in.close();
             return buffer.toString();
-        } catch (FileNotFoundException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
         } catch (IOException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
         }
@@ -476,11 +465,11 @@ public abstract class StringBaseOpt {
                     if(objs[i]!=null){
                         if(objs[i] instanceof java.util.Date)
                             sb.append(DatetimeOpt.convertDatetimeToString((java.util.Date) objs[i]));
-                        else if(objs[i] instanceof java.sql.Date)
+                        /*else if(objs[i] instanceof java.sql.Date)
                             sb.append(DatetimeOpt.convertDatetimeToString(
                                     DatetimeOpt.convertUtilDate(
                                             (java.sql.Date) objs[i])));
-                        else
+                        */else
                             sb.append(objs[i].toString());
                     }
                 }
@@ -498,10 +487,10 @@ public abstract class StringBaseOpt {
                         sb.append(",");
                     if(ov instanceof java.util.Date)
                         sb.append(DatetimeOpt.convertDatetimeToString((java.util.Date) ov));
-                    else if(ov instanceof java.sql.Date)
+                    /*else if(ov instanceof java.sql.Date)
                         sb.append(DatetimeOpt.convertDatetimeToString(
                                 DatetimeOpt.convertUtilDate(
-                                        (java.sql.Date) ov)));
+                                        (java.sql.Date) ov)));*/
                     else
                         sb.append(ov.toString());
                     vc++;
@@ -510,12 +499,20 @@ public abstract class StringBaseOpt {
             return sb.toString();
         }else if(objValue instanceof java.util.Date){
             return DatetimeOpt.convertDatetimeToString((java.util.Date) objValue);
-        }else if(objValue instanceof java.sql.Date){
+        }/*else if(objValue instanceof java.sql.Date){
             return DatetimeOpt.convertDatetimeToString(
                     DatetimeOpt.convertUtilDate(
                     (java.sql.Date) objValue));
-        }else
+        }*/else
             return objValue.toString();
+    }
+
+    public static String castObjectToString(Object obj){
+        return objectToString(obj);
+    }
+
+    public static String castObjectToString(Object obj,String defaultValue){
+        return GeneralAlgorithm.nvl(castObjectToString(obj),defaultValue);
     }
 
 }
