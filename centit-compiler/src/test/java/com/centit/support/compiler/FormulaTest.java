@@ -53,7 +53,7 @@ public class FormulaTest {
         varB.put("unitcode", 500);
         varMap.put("user", varB);
         Object s = f.calculate(
-                "today +':'+  today() + ' '+'usercode' + usercode +'$'+ $ { otherValue } + ':' + $ { user . usercode }",
+                "today +':'+  today() + ' usercode' + usercode + $ { otherValue } + ':' +user.usercode }",
                 varMap);
         System.out.println(s);
     }
