@@ -1,5 +1,7 @@
 package com.centit.support.database.ddl;
 
+import com.centit.support.database.utils.QueryUtils;
+
 import java.sql.Connection;
 
 /**
@@ -23,5 +25,9 @@ public class H2DDLOperations extends MySqlDDLOperations  {
     }
 
 
+    @Override
+    public String makeCreateSequenceSql(final String sequenceName){
+        return "create sequence " + QueryUtils.cleanSqlStatement(sequenceName);
+    }
 
 }

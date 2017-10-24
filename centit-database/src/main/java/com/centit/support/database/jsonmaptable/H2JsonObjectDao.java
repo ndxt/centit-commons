@@ -1,6 +1,8 @@
 package com.centit.support.database.jsonmaptable;
 
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.database.metadata.TableInfo;
+import com.centit.support.database.utils.DatabaseAccess;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -45,7 +47,10 @@ public class H2JsonObjectDao extends MySqlJsonObjectDao {
      */
     @Override
     public Long getSequenceNextValue(final String sequenceName) throws SQLException, IOException {
-        return getSimulateSequenceNextValue(sequenceName);
+        Object object = DatabaseAccess.getScalarObjectQuery(
+                getConnect(),
+                "SELECT NEXT VALUE FOR " + sequenceName);
+        return NumberBaseOpt.castObjectToLong(object);
     }
 
 }
