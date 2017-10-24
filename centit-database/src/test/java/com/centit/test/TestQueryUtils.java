@@ -4,6 +4,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.KeyValuePair;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class TestQueryUtils {
     }
 
     public static void main(String[] args) {
-
+        testSpiltFieldPiece();
 
         /*System.out.println(QueryUtils.trimSqlOrderByField(" , 1 2 nulls last, 2 desc ,"));
         System.out.println(QueryUtils.trimSqlOrderByField("%27+%2B+%27+%2B+%27createDate"));
@@ -39,6 +40,30 @@ public class TestQueryUtils {
         //System.out.println(CodeRepositoryUtil.getExtendedSql("QUERY_ID_1"));
     }
 
+    public  static void testSpiltFieldPiece() {
+        String querySql = " select col_a, column col_b, col1+col2 ," +
+                " col1 + col2 col_c , " +
+                " col1 + col2 + col3 as col_d , " +
+                " col1+(select count(1) from table_c c where c.a=b.col_a), " +
+                " (select count(1) from table_c c where c.a=b.col_a) col_e, " +
+                " b.fieldf ," +
+                " b.field_name as field2," +
+                " f.field_name field" +
+                "  from table b";
+
+        List<Pair<String,String>> p = QueryUtils.getSqlFieldNamePieceMap(querySql);
+        for(Pair<String,String> f : p ){
+            System.out.println(f.getKey()+" : "+f.getValue());
+        }
+        System.out.println("--------------------");
+        for(String s : QueryUtils.getSqlFieldPieces(querySql) ){
+            System.out.println(s);
+        }
+        System.out.println("--------------------");
+        for(String s : QueryUtils.getSqlFiledNames(querySql) ){
+            System.out.println(s);
+        }
+    }
     public static void testBuildGetCountSQL() {
         System.out.println(QueryUtils.trimSqlOrderByField(""));
         System.out.println(QueryUtils.buildGetCountSQL("From UserInfo"));

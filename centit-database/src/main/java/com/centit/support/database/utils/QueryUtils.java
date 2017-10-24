@@ -8,6 +8,8 @@ import com.centit.support.common.KeyValuePair;
 import com.centit.support.compiler.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
@@ -372,7 +374,7 @@ public abstract class QueryUtils {
     public static List<String> splitSqlByFields(String sql){
         
         Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
-        List<String> sqlPiece = new ArrayList<String>();
+        List<String> sqlPiece = new ArrayList<>(5);
         int sl = sql.length();
         String aWord = lex.getAWord();
 
@@ -841,9 +843,93 @@ public abstract class QueryUtils {
      * @param sql sql
      * @return 返回feild字句，这个用户 sql语句编辑界面，在dde，stat项目中使用，一般用不到。
      */
-    public static List<String> getSqlFiledPieces(String sql){
+    public static List<Pair<String,String>> getSqlFieldNamePieceMap(String sql){
 
-        List<String> fields = new ArrayList<String>();
+        List<Pair<String,String>>  fields = new ArrayList<>(20);
+        List<String> sqlPieces = splitSqlByFields(sql);
+        if (sqlPieces == null || sqlPieces.size() < 3)
+            return fields;
+
+        String sFieldSql = sqlPieces.get(1);
+        Lexer lex = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
+        int nFiledNo=0;
+        int nPos = 0;
+        String aWord = lex.getAWord();
+
+        while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
+            int nPos2 = lex.getCurrPos();
+            int nPosEnd=-1;
+            String filedName = null;
+            boolean prewordIsOpt = false;
+            while ( (!"".equals(aWord) &&
+                     !",".equals(aWord) &&
+                     !"from".equalsIgnoreCase(aWord))) {
+                if ("(".equals(aWord)){
+                    lex.seekToRightBracket();
+                    prewordIsOpt = false;
+                } else {
+                    if ("as".equalsIgnoreCase(aWord)) {
+                        nPosEnd = nPos2;
+                        aWord = lex.getAWord();
+                        filedName = aWord;
+                    } else {
+                        if (Lexer.isLabel(aWord)) {
+                            if (!prewordIsOpt) {
+                                nPosEnd = nPos2;
+                                filedName = aWord;
+                            }
+                            prewordIsOpt = false;
+                        } else {
+                            prewordIsOpt = Formula.getOptID(aWord) > 0;
+                            if (prewordIsOpt) {
+                                filedName = null;
+                            }
+                        }
+                    }
+                }
+                nPos2 = lex.getCurrPos();
+                aWord = lex.getAWord();
+
+            }
+
+            nFiledNo ++;
+            if(filedName==null) {
+                filedName = "column" + String.valueOf(nFiledNo);
+                nPosEnd = -1;
+            }else {
+                /*if(filedName.endsWith("*"))
+                    return null;*/
+                int n = filedName.lastIndexOf('.');
+                if (n > 0) {
+                    filedName = filedName.substring(n + 1);
+                }
+            }
+            fields.add(new MutablePair<>(
+                    filedName, sFieldSql.substring(nPos, (nPosEnd>nPos ? nPosEnd: nPos2)).trim()));
+
+            nPos = nPos2;
+            if (",".equals(aWord)) {
+                nPos = lex.getCurrPos();
+                aWord = lex.getAWord();
+                //filedName = aWord;
+            }
+        }
+
+        return fields;
+    }
+
+   /* public static String trimFieldPiece(String fieldPiece){
+
+    }*/
+    /**
+     * 返回sql语句中所有的 字段 语句表达式
+     * 获得查询语句中的所有 字段描述 ,比如 select a, (b+c) as d, f fn from ta 语句 返回 [ a, (b+c) as d , f fn ]
+     * @param sql sql
+     * @return 返回feild字句，这个用户 sql语句编辑界面，在dde，stat项目中使用，一般用不到。
+     */
+    public static List<String> getSqlFieldPieces(String sql){
+
+        List<String> fields = new ArrayList<>(5);
         List<String> sqlPieces = splitSqlByFields(sql);
         if (sqlPieces == null || sqlPieces.size() < 3)
             return fields;
@@ -853,16 +939,12 @@ public abstract class QueryUtils {
 
         int nPos = 0;
         String aWord = lex.getAWord();
-
         while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
             int nPos2 = lex.getCurrPos();
-
-            int nLeftBracket = 0;
-            while (nLeftBracket > 0 || (!"".equals(aWord) && !",".equals(aWord) && !"from".equalsIgnoreCase(aWord))) {
-                if ("(".equals(aWord)) nLeftBracket++;
-                else if (")".equals(aWord)) nLeftBracket--;
-                if (nLeftBracket < 0)
-                    break;
+            while (!"".equals(aWord) && !",".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
+                if ("(".equals(aWord)){
+                    lex.seekToRightBracket();
+                }
                 nPos2 = lex.getCurrPos();
                 aWord = lex.getAWord();
             }
@@ -885,45 +967,56 @@ public abstract class QueryUtils {
      * @param sFieldSql sFieldSql
      * @return 字段名子列表
      */
-    public static List<String> splitSqlFiledNames(String sFieldSql){
-        List<String> fields = new ArrayList<String>();
+    public static List<String> splitSqlFieldNames(String sFieldSql){
+        List<String> fields = new ArrayList<>(20);
         Lexer lex = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
 
         String aWord = lex.getAWord();
         String filedName = aWord;
         int nFiledNo=0;
-        while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {            
-
-            int nLeftBracket = 0;
-            while (nLeftBracket > 0 || (!"".equals(aWord) && !",".equals(aWord) 
-                                    && !"from".equalsIgnoreCase(aWord))) {
-                if ("(".equals(aWord)) nLeftBracket++;
-                else if (")".equals(aWord)) nLeftBracket--;
-                if (nLeftBracket < 0)
-                    break;
-                filedName = aWord;
+        while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
+            boolean prewordIsOpt = false;
+            while (!"".equals(aWord) && !",".equals(aWord)
+                                    && !"from".equalsIgnoreCase(aWord)) {
+                if ("(".equals(aWord)){
+                    lex.seekToRightBracket();
+                    prewordIsOpt = false;
+                } else {
+                    if (Lexer.isLabel(aWord)) {
+                        if (!prewordIsOpt) {
+                            filedName = aWord;
+                        }
+                        prewordIsOpt = false;
+                    } else {
+                        prewordIsOpt = Formula.getOptID(aWord) > 0;
+                        if (prewordIsOpt) {
+                            filedName = null;
+                        }
+                    }
+                }
                 aWord = lex.getAWord();
             }
             
             nFiledNo ++;
-            if(")".equals(filedName))
-                filedName = "column"+String.valueOf(nFiledNo);      
-            if(filedName.endsWith("*"))
-                return null;
+
+            if(filedName==null) {
+                filedName = "column" + String.valueOf(nFiledNo);
+            }else {
+                /*if(filedName.endsWith("*"))
+                    return null;*/
+                int n = filedName.lastIndexOf('.');
+                if (n > 0) {
+                    filedName = filedName.substring(n + 1);
+                }
+            }
+
             fields.add(filedName);
-            
             if (",".equals(aWord)) {
                 filedName = aWord;
                 aWord = lex.getAWord();
             }
         }
-        
-        for(int i=0;i<fields.size();i++){
-            String field = fields.get(i);
-            int n = field.lastIndexOf('.');
-            if(n>0)
-                fields.set(i, field.substring(n+1));
-        }
+
         return fields;
     }
 
@@ -937,7 +1030,7 @@ public abstract class QueryUtils {
         List<String> sqlPieces = splitSqlByFields(sql);
         if (sqlPieces == null || sqlPieces.size() < 3)
             return null;
-        return splitSqlFiledNames(sqlPieces.get(1));
+        return splitSqlFieldNames(sqlPieces.get(1));
      }
     
     
@@ -982,7 +1075,7 @@ public abstract class QueryUtils {
         }
         sbSql.append(sFieldSql.substring(prePos));
 
-        return splitSqlFiledNames(sbSql.toString());
+        return splitSqlFieldNames(sbSql.toString());
     }
     /**
      * 过滤 order by 语句中无效信息，在可能带入乱码和注入的情况下使用
@@ -1462,7 +1555,7 @@ public abstract class QueryUtils {
             sWord = varMorp.getAWord();
         }
         hqlPiece.append(filter.substring(prePos));
-        hqlAndParams.setHql(hqlPiece.toString());
+        hqlAndParams.setQuery(hqlPiece.toString());
         return hqlAndParams;
     }
 
@@ -1482,7 +1575,7 @@ public abstract class QueryUtils {
                 else
                     hqlBuilder.append(isUnion ? " or ":" and ");
                 haveSql = true;
-                hqlBuilder.append(hqlPiece.getHql());
+                hqlBuilder.append(hqlPiece.getQuery());
                 hqlAndParams.addAllParams(hqlPiece.getParams());
             }
         }
@@ -1490,7 +1583,7 @@ public abstract class QueryUtils {
         if(haveSql)
             hqlBuilder.append(" )");
 
-        hqlAndParams.setHql(hqlBuilder.toString());
+        hqlAndParams.setQuery(hqlBuilder.toString());
         return hqlAndParams;
     }
 
@@ -1650,8 +1743,8 @@ public abstract class QueryUtils {
                         translateQueryFilter(filters,
                                  translater,isUnion);
 
-                if(hqlPiece!=null && !StringBaseOpt.isNvl(hqlPiece.getHql())){
-                    hqlBuilder.append(" and ").append(hqlPiece.getHql());
+                if(hqlPiece!=null && !StringBaseOpt.isNvl(hqlPiece.getQuery())){
+                    hqlBuilder.append(" and ").append(hqlPiece.getQuery());
                     hqlAndParams.addAllParams(hqlPiece.getParams());
                 }
             }else if( sWord.equals("[")){
@@ -1666,15 +1759,15 @@ public abstract class QueryUtils {
                 QueryAndNamedParams hqlPiece =
                         translateQueryPiece(queryPiece ,translater);
 
-                if(hqlPiece!=null && !StringBaseOpt.isNvl(hqlPiece.getHql())){
-                    hqlBuilder.append(hqlPiece.getHql());
+                if(hqlPiece!=null && !StringBaseOpt.isNvl(hqlPiece.getQuery())){
+                    hqlBuilder.append(hqlPiece.getQuery());
                     hqlAndParams.addAllParams(hqlPiece.getParams());
                 }
             }
             sWord = varMorp.getAWord();
         }
         hqlBuilder.append(queryStatement.substring(prePos));
-        hqlAndParams.setHql(hqlBuilder.toString());
+        hqlAndParams.setQuery(hqlBuilder.toString());
         return hqlAndParams;
     }
 

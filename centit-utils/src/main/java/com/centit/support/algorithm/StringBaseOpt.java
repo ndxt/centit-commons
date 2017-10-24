@@ -242,6 +242,16 @@ public abstract class StringBaseOpt {
     public static String nvlAsBlank(String str) {
         return str==null?"":str;
     }
+
+    /**
+     * 如果字符串str为null返回""，返回 emptyValue 否则返回 str
+     * @param str  字符串
+     * @param emptyValue  字符串
+     * @return   如果输入的字符串为null返回""
+     */
+    public static String emptyValue(String str, String emptyValue) {
+        return StringUtils.isBlank(str)?emptyValue:str;
+    }
     /**
      * 用"0"填补string
      *
