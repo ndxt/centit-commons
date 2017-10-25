@@ -82,12 +82,13 @@ public abstract class OfficeToPdf {
             }
             //关闭
             Dispatch.call(excel, "Close", new Variant(false));
-            actcom.invoke("Quit", new Variant[0]);
+
         } catch (Exception es) {
             successed =false;
             logger.error(es.getMessage(), es);
         }finally {
             //释放jcom线程
+            actcom.invoke("Quit", new Variant[0]);
             ComThread.Release();
         }
 
@@ -151,12 +152,12 @@ public abstract class OfficeToPdf {
 
             Dispatch.call(excel, "Close",new Variant(false));
 
-            ax.invoke("Quit",new Variant[]{});
             return true;
         }catch(Exception es){
             logger.error(es.getMessage(),es);
             return false;
         }finally {
+            ax.invoke("Quit",new Variant[]{});
             ComThread.Release();
         }
     }
@@ -165,8 +166,8 @@ public abstract class OfficeToPdf {
         String inputFile = inPptFile.replace('/','\\');
         String pdfFile   = outPdfFile.replace('/','\\');
         ComThread.InitSTA();
+        ActiveXComponent app = new ActiveXComponent("PowerPoint.Application");
         try {
-            ActiveXComponent app = new ActiveXComponent("PowerPoint.Application");
 
             Dispatch ppts = app.getProperty("Presentations").toDispatch();
             Dispatch ppt = Dispatch
@@ -180,12 +181,13 @@ public abstract class OfficeToPdf {
 
             Dispatch.call(ppt, "SaveAs", pdfFile, Integer.valueOf(32));
             Dispatch.call(ppt, "Close");
-            app.invoke("Quit");
+
             //System.out.println("ppt转换为PDF完成！");
             return true;
         } catch (Exception e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
         }finally {
+            app.invoke("Quit");
             ComThread.Release();
         }
         return false;
@@ -196,8 +198,8 @@ public abstract class OfficeToPdf {
         String pdfFile   = outPdfFile.replace('/','\\');
         ComThread.InitSTA();
         //long start = System.currentTimeMillis();
+        ActiveXComponent app = new ActiveXComponent("Word.Application");
         try {
-            ActiveXComponent app = new ActiveXComponent("Word.Application");
             // 设置word不可见
             app.setProperty("Visible", new Variant(false));
             // 打开word文件
@@ -214,12 +216,13 @@ public abstract class OfficeToPdf {
             Dispatch.invoke(doc, "SaveAs", Dispatch.Method, new Object[] {
                     pdfFile, new Variant(17) }, new int[1]);
             Dispatch.call(doc,"Close",false);
-            app.invoke("Quit", new Variant[] {});
+
         } catch (Exception e) {
             //e.printStackTrace();
             logger.error(e.getMessage(),e);//e.printStackTrace();
             //System.out.println("========Error:文档转换失败：" + e.getMessage());
         } finally {
+            app.invoke("Quit", new Variant[] {});
             ComThread.Release();
         }
         //如果没有这句话,winword.exe进程将不会关闭
