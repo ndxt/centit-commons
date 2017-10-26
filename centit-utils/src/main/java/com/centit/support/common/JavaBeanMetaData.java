@@ -22,7 +22,7 @@ public class JavaBeanMetaData {
         this.fileds = new HashMap<>(30);
     }
 
-    public static JavaBeanMetaData creatBeanMetaDataFromType(Class<?> javaType){
+    public static JavaBeanMetaData createBeanMetaDataFromType(Class<?> javaType){
         JavaBeanMetaData metaData = new JavaBeanMetaData(javaType);
         Field[] objFields = javaType.getDeclaredFields();
         for(Field field :objFields){
@@ -72,65 +72,23 @@ public class JavaBeanMetaData {
         return metaData;
     }
 
-    public Object creatBeanObject() throws IllegalAccessException, InstantiationException {
+    public Object createBeanObject() throws IllegalAccessException, InstantiationException {
         return javaType.newInstance();
+    }
+
+    public Object createBeanObjectFromMap(Map<String,Object> properties) throws IllegalAccessException, InstantiationException {
+        Object object = javaType.newInstance();
+        for(Map.Entry<String, Object> pro : properties.entrySet() ){
+            setObjectFieldValue(object, pro.getKey(), pro.getValue());
+        }
+        return object;
     }
 
     public void setObjectFieldValue(Object object, String fieldName, Object newValue){
         JavaBeanField field = this.getFiled(fieldName);
         if(field==null)
             return ;
-
-        switch (field.getFieldJavaType()) {
-            case "int":
-            case "Integer":
-                field.setObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToInteger(newValue));
-                break;
-            case "long":
-            case "Long":
-                field.setObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToLong(newValue));
-                break;
-            case "float":
-            case "Float":
-            case "double":
-            case "Double":
-                field.setObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToDouble(newValue));
-                break;
-
-            case "byte[]":
-                field.setObjectFieldValue(object,
-                        StringBaseOpt.objectToString(newValue).getBytes());
-                break;
-            case "BigDecimal":
-                field.setObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToBigDecimal(newValue));
-                break;
-            case "BigInteger":
-                field.setObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToBigInteger(newValue));
-                break;
-            case "String":
-                field.setObjectFieldValue(object,
-                            StringBaseOpt.objectToString(newValue));
-                break;
-            case "Date":
-            case "Timestamp":
-                field.setObjectFieldValue(object,
-                        DatetimeOpt.castObjectToDate(newValue));
-                break;
-            case "boolean":
-            case "Boolean":
-                field.setObjectFieldValue(object,
-                        StringRegularOpt.isTrue(
-                                StringBaseOpt.objectToString(newValue)));
-                break;
-            default:
-                field.setObjectFieldValue(object, newValue);
-                break;
-        }
+        field.setObjectFieldValue(object,newValue);
     }
 
     public Class<?> getJavaType() {
