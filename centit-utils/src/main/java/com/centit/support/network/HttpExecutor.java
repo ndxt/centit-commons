@@ -50,6 +50,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -1081,13 +1083,14 @@ public abstract class HttpExecutor {
         return null;
     }
 
-    public interface doOperateInputStream{
-        boolean doOperate(InputStream inputStream) throws IOException;
+    public interface DoOperateInputStream<T>{
+        T doOperate(InputStream inputStream) throws IOException;
     }
 
-    public static boolean fetchInputStreamByUrl(CloseableHttpClient httpClient,
+
+    public static <T> T fetchInputStreamByUrl(CloseableHttpClient httpClient,
                                        HttpContext context, String uri, String queryParam,
-                                       doOperateInputStream operate)throws IOException {
+                                       DoOperateInputStream<T> operate)throws IOException {
 
         HttpGet httpGet = new HttpGet(appendParamToUrl(uri,queryParam));
 
@@ -1111,15 +1114,15 @@ public abstract class HttpExecutor {
         }
     }
 
-    public static boolean fetchInputStreamByUrl(CloseableHttpClient httpClient, String uri ,
-                                                doOperateInputStream operate)throws IOException {
+    public static <T> T fetchInputStreamByUrl(CloseableHttpClient httpClient, String uri ,
+                                                DoOperateInputStream<T> operate)throws IOException {
 
         return fetchInputStreamByUrl( httpClient, null,
                 uri, null,operate);
     }
 
-    public static boolean fetchInputStreamByUrl(String uri ,
-                                                doOperateInputStream operate)throws IOException {
+    public static <T> T fetchInputStreamByUrl(String uri ,
+                                                DoOperateInputStream<T> operate)throws IOException {
         try(CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
 
             return fetchInputStreamByUrl(httpClient, null,
