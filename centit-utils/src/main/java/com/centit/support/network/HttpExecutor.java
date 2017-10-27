@@ -1081,21 +1081,17 @@ public abstract class HttpExecutor {
         return null;
     }
 
+    public interface doOperateInputStream{
+        boolean doOperate(InputStream inputStream) throws IOException;
+    }
 
-    public static boolean fileDownload(CloseableHttpClient httpclient,
-            HttpContext context,
-             String uri, String queryParam,String filePath)
-            throws IOException {
+    public static boolean fetchInputStreamByUrl(CloseableHttpClient httpClient,
+                                       HttpContext context, String uri, String queryParam,
+                                       doOperateInputStream operate)throws IOException {
 
         HttpGet httpGet = new HttpGet(appendParamToUrl(uri,queryParam));
 
-        /*if (httpProxy != null) {
-            RequestConfig config = RequestConfig.custom().setProxy(httpProxy)
-                    .build();
-            httpGet.setConfig(config);
-        }*/
-
-        try (CloseableHttpResponse response = httpclient.execute(httpGet,context)) {
+        try (CloseableHttpResponse response = httpClient.execute(httpGet,context)) {
 
             Header[] contentTypeHeader = response.getHeaders("Content-Type");
             if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
@@ -1106,13 +1102,40 @@ public abstract class HttpExecutor {
                         .handleResponse(response);
                 throw new RuntimeException(responseContent);
             }
-            InputStream inputStream = InputStreamResponseHandler.INSTANCE
-                    .handleResponse(response);
-
-            // 视频文件不支持下载
-            //fileName = extraFileName(response);
-            return FileSystemOpt.createFile(inputStream,filePath);
+            try(InputStream inputStream = InputStreamResponseHandler.INSTANCE
+                    .handleResponse(response)) {
+                // 视频文件不支持下载
+                //fileName = extraFileName(response);
+                return operate.doOperate(inputStream);
+            }
         }
+    }
+
+    public static boolean fetchInputStreamByUrl(CloseableHttpClient httpClient, String uri ,
+                                                doOperateInputStream operate)throws IOException {
+
+        return fetchInputStreamByUrl( httpClient, null,
+                uri, null,operate);
+    }
+
+    public static boolean fetchInputStreamByUrl(String uri ,
+                                                doOperateInputStream operate)throws IOException {
+        try(CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
+
+            return fetchInputStreamByUrl(httpClient, null,
+                    uri, null, operate);
+        }
+    }
+
+    public static boolean fileDownload(CloseableHttpClient httpClient,
+            HttpContext context,
+             String uri, String queryParam,String filePath)
+            throws IOException {
+
+       return fetchInputStreamByUrl( httpClient, context,
+                uri, queryParam,
+                    (inputStream)-> FileSystemOpt.createFile(inputStream, filePath));
+
     }
 
     public static boolean fileDownload(CloseableHttpClient httpclient,
