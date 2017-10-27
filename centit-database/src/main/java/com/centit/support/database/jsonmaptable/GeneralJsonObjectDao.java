@@ -151,7 +151,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             fieldNames[i] = col.getPropertyName();
             i++;
         }
-        return new ImmutablePair<String,String[]>(sBuilder.toString(),fieldNames);
+        return new ImmutablePair<>(sBuilder.toString(),fieldNames);
     }
 
     public boolean isPkColumn(String propertyName){
@@ -194,9 +194,9 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         for(String plCol : properties){
             TableField col = ti.findFieldByName(plCol);
             if( col != null ) {
-                if (i > 0)
+                if (i > 0) {
                     sBuilder.append(" and ");
-
+                }
                 if (StringUtils.isNotBlank(alias))
                     sBuilder.append(alias).append('.');
                 sBuilder.append(col.getColumnName()).append(" = :").append(col.getPropertyName());
