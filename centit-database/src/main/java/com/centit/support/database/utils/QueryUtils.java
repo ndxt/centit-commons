@@ -1223,8 +1223,10 @@ public abstract class QueryUtils {
             return StringBaseOpt.objectToString(paramValue)+"%";
         if(SQL_PRETREAT_ENDWITH.equalsIgnoreCase(pretreatment))
             return "%"+StringBaseOpt.objectToString(paramValue);
-        if( SQL_PRETREAT_DATE.equalsIgnoreCase(pretreatment)
-                || SQL_PRETREAT_DATETIME.equalsIgnoreCase(pretreatment))
+        if( SQL_PRETREAT_DATE.equalsIgnoreCase(pretreatment))
+            return DatetimeOpt.truncateToDay(
+                    DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(paramValue)));
+        if( SQL_PRETREAT_DATETIME.equalsIgnoreCase(pretreatment))
             return DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(paramValue));
         if(SQL_PRETREAT_DATESTR.equalsIgnoreCase(pretreatment))
             return DatetimeOpt.convertDateToString(
