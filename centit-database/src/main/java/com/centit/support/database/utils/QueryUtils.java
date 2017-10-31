@@ -38,12 +38,18 @@ public abstract class QueryUtils {
      * 用于like语句，只在参数前面添加一个 %
      */
     public static final String SQL_PRETREAT_ENDWITH = "ENDWITH";
+
+
     /**
-     * 转化为日期类型
+     * 转化为日期类型,
      */
     public static final String SQL_PRETREAT_DATE = "DATE";
     /**
-     * 转化为带日期的类型
+     * 转化为日期类型，并且计算第二天的日期，没有时间（时间为00:00:00） 用于区间查询的结束时间
+     */
+    public static final String SQL_PRETREAT_NEXTDAY = "NEXTDAY";
+    /**
+     * 转化为带时间的，日期的类型
      */
     public static final String SQL_PRETREAT_DATETIME = "DATETIME";
     /**
@@ -1223,10 +1229,13 @@ public abstract class QueryUtils {
             return StringBaseOpt.objectToString(paramValue)+"%";
         if(SQL_PRETREAT_ENDWITH.equalsIgnoreCase(pretreatment))
             return "%"+StringBaseOpt.objectToString(paramValue);
+        if(SQL_PRETREAT_NEXTDAY.equalsIgnoreCase(pretreatment))
+            return DatetimeOpt.truncateToDay(DatetimeOpt.addDays(
+                    DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(paramValue)),1));
         if( SQL_PRETREAT_DATE.equalsIgnoreCase(pretreatment))
             return DatetimeOpt.truncateToDay(
                     DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(paramValue)));
-        if( SQL_PRETREAT_DATETIME.equalsIgnoreCase(pretreatment))
+        if(SQL_PRETREAT_DATETIME.equalsIgnoreCase(pretreatment))
             return DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(paramValue));
         if(SQL_PRETREAT_DATESTR.equalsIgnoreCase(pretreatment))
             return DatetimeOpt.convertDateToString(
@@ -1253,7 +1262,6 @@ public abstract class QueryUtils {
             return StringBaseOpt.objectToString(paramValue);
         if(SQL_PRETREAT_SPLITFORIN.equalsIgnoreCase(pretreatment))
             return String.valueOf(paramValue).split(",");*/
-
         return paramValue;
     }
 
