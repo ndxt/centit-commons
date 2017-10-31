@@ -1230,19 +1230,19 @@ public abstract class QueryUtils {
         if(SQL_PRETREAT_ENDWITH.equalsIgnoreCase(pretreatment))
             return "%"+StringBaseOpt.objectToString(paramValue);
         if(SQL_PRETREAT_NEXTDAY.equalsIgnoreCase(pretreatment))
-            return DatetimeOpt.truncateToDay(DatetimeOpt.addDays(
-                    DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(paramValue)),1));
+            return DatetimeOpt.addDays(DatetimeOpt.truncateToDay(
+                    DatetimeOpt.castObjectToDate(paramValue)),1);
         if( SQL_PRETREAT_DATE.equalsIgnoreCase(pretreatment))
             return DatetimeOpt.truncateToDay(
-                    DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(paramValue)));
+                    DatetimeOpt.castObjectToDate(paramValue));
         if(SQL_PRETREAT_DATETIME.equalsIgnoreCase(pretreatment))
-            return DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(paramValue));
+            return DatetimeOpt.castObjectToDate(paramValue);
         if(SQL_PRETREAT_DATESTR.equalsIgnoreCase(pretreatment))
             return DatetimeOpt.convertDateToString(
-                    DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(paramValue)));
+                    DatetimeOpt.castObjectToDate(paramValue));
         if(SQL_PRETREAT_DATETIMESTR.equalsIgnoreCase(pretreatment))
             return DatetimeOpt.convertDatetimeToString(
-                    DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(paramValue)));
+                    DatetimeOpt.castObjectToDate(paramValue));
         if(SQL_PRETREAT_DIGIT.equalsIgnoreCase(pretreatment))
             return StringRegularOpt.trimDigits(StringBaseOpt.objectToString(paramValue));
         if(SQL_PRETREAT_UPPERCASE.equalsIgnoreCase(pretreatment))
