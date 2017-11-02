@@ -625,8 +625,10 @@ public abstract class QueryUtils {
                 return buildSqlServerLimitQuerySQL(sql,offset, maxsize);
             case MySql:
                 return buildMySqlLimitQuerySQL(sql,offset, maxsize,asParameter);
-            case Access:
             case H2:
+                return buildMySqlLimitQuerySQL(sql,offset, maxsize,asParameter);
+
+            case Access:
             default:
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,
                         "不支持的数据库类型："+dbType.toString());
