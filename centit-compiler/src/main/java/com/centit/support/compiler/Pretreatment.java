@@ -1,8 +1,6 @@
 package com.centit.support.compiler;
 
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.algorithm.*;
 
 import java.util.Collection;
 
@@ -113,5 +111,53 @@ public abstract class Pretreatment {
             sWord = varMorp.getAWord();
         }
         return sDesFormula.toString();
+    }
+
+    /** mapTemplateString
+     * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
+     *
+     * @param template 模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
+     * @param object 传入的对象，可以是一个Map 、JSON 或者Pojo
+     * @param nullValue 找不到变量时的值
+     * @return 新的表达式
+     */
+    public static String mapTemplateString(String template,Object object, String nullValue){
+        Lexer varTemplate = new Lexer();
+        varTemplate.setFormula(template);
+        StringBuilder mapString = new StringBuilder();
+        int nlen = template.length();
+        int bp = 0;
+        while(true) {
+            if(!varTemplate.seekTo('{'))
+                break;
+            int ep = varTemplate.getCurrPos();
+            if(ep-1>bp){
+                mapString.append(template.substring(bp,ep-1));
+            }
+            varTemplate.seekToRightBrace();
+            bp = varTemplate.getCurrPos();
+            if(bp-1>ep) {
+                String valueName = template.substring(ep, bp - 1);
+                mapString.append(GeneralAlgorithm.nvl(
+                            StringBaseOpt.objectToString(
+                            ReflectionOpt.attainExpressionValue(object,valueName)),nullValue));
+            }
+        }
+        if(bp<nlen)
+            mapString.append(template.substring(bp));
+        return mapString.toString();
+    }
+
+
+    /** mapTemplateString
+     * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
+     *
+     * @param template 模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
+     * @param object 传入的对象，可以是一个Map 、JSON 或者Pojo
+     *
+     * @return 新的表达式
+     */
+    public static String mapTemplateString(String template,Object object) {
+        return mapTemplateString(template, object, null);
     }
 }

@@ -61,7 +61,14 @@ public class FormulaTest {
     public  static void  main(String[] args)   {
         //testFormula2();//
         // testFormula2();
-        testLexer();
+        //testLexer();
+        Map<String,Object> map = new HashMap<>(5);
+        Map<String,Object> usreInfo = new HashMap<>(5);
+        usreInfo.put("userCode","admin");
+        usreInfo.put("userName","管理员");
+        map.put("userInfo",usreInfo);
+        String str = Pretreatment.mapTemplateString("你的{unitCode} 用户号是 { userInfo.userCode } 你的姓名是{userName}，分", map, "{没有赋值}");
+        System.out.println(str );
         System.out.println("123123.4545" + (String)null );
 
     }

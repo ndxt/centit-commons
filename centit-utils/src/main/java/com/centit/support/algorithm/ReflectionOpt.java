@@ -346,7 +346,7 @@ public abstract class ReflectionOpt  {
      * @return
      */
     public static Object attainExpressionValue(Object sourceObj , String expression){
-        if(sourceObj==null || expression==null || "".equals(expression))
+        if(sourceObj==null || StringUtils.isBlank(expression))
             return null;
         if(".".equals(expression))
             return sourceObj;
