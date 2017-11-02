@@ -50,6 +50,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -1081,21 +1083,18 @@ public abstract class HttpExecutor {
         return null;
     }
 
+    public interface DoOperateInputStream<T>{
+        T doOperate(InputStream inputStream) throws IOException;
+    }
 
-    public static boolean fileDownload(CloseableHttpClient httpclient,
-            HttpContext context,
-             String uri, String queryParam,String filePath)
-            throws IOException {
+
+    public static <T> T fetchInputStreamByUrl(CloseableHttpClient httpClient,
+                                       HttpContext context, String uri, String queryParam,
+                                       DoOperateInputStream<T> operate)throws IOException {
 
         HttpGet httpGet = new HttpGet(appendParamToUrl(uri,queryParam));
 
-        /*if (httpProxy != null) {
-            RequestConfig config = RequestConfig.custom().setProxy(httpProxy)
-                    .build();
-            httpGet.setConfig(config);
-        }*/
-
-        try (CloseableHttpResponse response = httpclient.execute(httpGet,context)) {
+        try (CloseableHttpResponse response = httpClient.execute(httpGet,context)) {
 
             Header[] contentTypeHeader = response.getHeaders("Content-Type");
             if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
@@ -1106,13 +1105,40 @@ public abstract class HttpExecutor {
                         .handleResponse(response);
                 throw new RuntimeException(responseContent);
             }
-            InputStream inputStream = InputStreamResponseHandler.INSTANCE
-                    .handleResponse(response);
-
-            // 视频文件不支持下载
-            //fileName = extraFileName(response);
-            return FileSystemOpt.createFile(inputStream,filePath);
+            try(InputStream inputStream = InputStreamResponseHandler.INSTANCE
+                    .handleResponse(response)) {
+                // 视频文件不支持下载
+                //fileName = extraFileName(response);
+                return operate.doOperate(inputStream);
+            }
         }
+    }
+
+    public static <T> T fetchInputStreamByUrl(CloseableHttpClient httpClient, String uri ,
+                                                DoOperateInputStream<T> operate)throws IOException {
+
+        return fetchInputStreamByUrl( httpClient, null,
+                uri, null,operate);
+    }
+
+    public static <T> T fetchInputStreamByUrl(String uri ,
+                                                DoOperateInputStream<T> operate)throws IOException {
+        try(CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
+
+            return fetchInputStreamByUrl(httpClient, null,
+                    uri, null, operate);
+        }
+    }
+
+    public static boolean fileDownload(CloseableHttpClient httpClient,
+            HttpContext context,
+             String uri, String queryParam,String filePath)
+            throws IOException {
+
+       return fetchInputStreamByUrl( httpClient, context,
+                uri, queryParam,
+                    (inputStream)-> FileSystemOpt.createFile(inputStream, filePath));
+
     }
 
     public static boolean fileDownload(CloseableHttpClient httpclient,

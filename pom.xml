@@ -19,7 +19,8 @@
         <pinyin4j.version>2.5.1</pinyin4j.version>
         <junit.version>4.12</junit.version>
         <commons-dbcp2.version>2.1.1</commons-dbcp2.version>
-        <persistence-api.version>1.0.2</persistence-api.version>
+
+        <persistence-api.version>2.2</persistence-api.version>
         <apache.poi.version>3.16</apache.poi.version>
         <itextpdf.version>5.5.11</itextpdf.version>
         <jacob.version>1.18</jacob.version>
@@ -147,7 +148,7 @@
                 </executions>
             </plugin>-->
 
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
@@ -161,7 +162,7 @@
                     </execution>
                 </executions>
             </plugin>
-
+-->
             <!--<plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>

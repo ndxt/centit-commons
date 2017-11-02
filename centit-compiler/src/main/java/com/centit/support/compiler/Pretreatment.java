@@ -26,17 +26,17 @@ public abstract class Pretreatment {
                     if(i>0)
                         sb.append(',');
                     if(objs[i]!=null){
-                        if(ReflectionOpt.isNumberType(objs[i].getClass()))
-                            sb.append( objs[i].toString());
-                        else if(objs[i] instanceof java.util.Date)
+                        if(ReflectionOpt.isNumberType(objs[i].getClass())) {
+                            sb.append(objs[i].toString());
+                        }else if(objs[i] instanceof java.util.Date) {
                             sb.append(StringRegularOpt.quotedString(
                                     DatetimeOpt.convertDatetimeToString((java.util.Date) objs[i])));
-                        else if(objs[i] instanceof java.sql.Date)
+                        } /*else if(objs[i] instanceof java.sql.Date) {
                             sb.append(StringRegularOpt.quotedString(DatetimeOpt.convertDatetimeToString(
-                                    DatetimeOpt.convertUtilDate(
-                                            (java.sql.Date) objs[i]))));
-                        else
+                                    (java.sql.Date) objs[i])));
+                        }*/ else {
                             sb.append(StringRegularOpt.quotedString(objs[i].toString()));
+                        }
                     }
                 }
                 return sb.toString();
@@ -57,11 +57,10 @@ public abstract class Pretreatment {
                         sb.append(
                                 StringRegularOpt.quotedString(
                                         DatetimeOpt.convertDatetimeToString((java.util.Date) ov)));
-                    else if(ov instanceof java.sql.Date)
+                    /*else if(ov instanceof java.sql.Date)
                         sb.append(
                                 StringRegularOpt.quotedString(DatetimeOpt.convertDatetimeToString(
-                                        DatetimeOpt.convertUtilDate(
-                                                (java.sql.Date) ov))));
+                                                (java.sql.Date) ov)));*/
                     else
                         sb.append(StringRegularOpt.quotedString(ov.toString()));
                     vc++;
@@ -73,11 +72,11 @@ public abstract class Pretreatment {
         }else if(objValue instanceof java.util.Date){
             return StringRegularOpt.quotedString(
                     DatetimeOpt.convertDatetimeToString((java.util.Date) objValue));
-        }else if(objValue instanceof java.sql.Date){
+        }/*else if(objValue instanceof java.sql.Date){
             return StringRegularOpt.quotedString( DatetimeOpt.convertDatetimeToString(
-                    DatetimeOpt.convertUtilDate(
+                    DatetimeOpt.convertToUtilDate(
                             (java.sql.Date) objValue)));
-        }else
+        }*/else
             return StringRegularOpt.quotedString(objValue.toString());
     }
 

@@ -127,7 +127,7 @@ public abstract class DatetimeOpt {
      * @param date 时间
      * @return 时间
      */
-    public static java.util.Date convertUtilDate(java.sql.Date date){
+    public static java.util.Date convertToUtilDate(java.sql.Date date){
         return date;
     }
     /**
@@ -135,11 +135,13 @@ public abstract class DatetimeOpt {
      * @param date 时间
      * @return 时间
      */
-    public static java.sql.Date convertSqlDate(java.util.Date date){
+    public static java.sql.Date convertToSqlDate(java.util.Date date){
         if(date==null)
             return null;
-        else
-            return new java.sql.Date(date.getTime());
+        if(date instanceof java.sql.Date)
+            return (java.sql.Date) date;
+
+        return new java.sql.Date(date.getTime());
     }
 
     /**
@@ -147,11 +149,12 @@ public abstract class DatetimeOpt {
      * @param date 时间
      * @return 时间
      */
-    public static java.sql.Timestamp convertSqlTimestamp(java.util.Date date){
+    public static java.sql.Timestamp convertToSqlTimestamp(java.util.Date date){
         if(date==null)
             return null;
-        else
-            return new java.sql.Timestamp(date.getTime());
+        if(date instanceof java.sql.Timestamp)
+            return (java.sql.Timestamp) date;
+        return new java.sql.Timestamp(date.getTime());
     }
 
     /*

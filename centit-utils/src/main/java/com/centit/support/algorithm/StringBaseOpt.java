@@ -359,7 +359,6 @@ public abstract class StringBaseOpt {
     }
 
     /*private static char convertFirstLetter(byte[] bytes) {
-
        char result = '-';
        int secPosvalue = 0;
        int i;
@@ -377,14 +376,14 @@ public abstract class StringBaseOpt {
        return result;
     }*/
 
-    /*
+    /**
     * 获取一个汉字的拼音首字母。 GB码两个字节分别减去160，转换成10进制码组合就可以得到区位码
     * 例如汉字“你”的GB码是0xC4/0xE3，分别减去0xA0（160）就是0x24/0x43
     * 0x24转成10进制就是36，0x43是67，那么它的区位码就是3667，在对照表中读音为‘n’
-    */
+     * @param oriStr 输入字符串
+     * @return 输出的首字母
+     */
     public static String getFirstLetter(String oriStr) {
-
-
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < oriStr.length(); i++) {
             String[] pinyin = PinyinHelper.toHanyuPinyinStringArray(oriStr.charAt(i));
@@ -393,7 +392,6 @@ public abstract class StringBaseOpt {
             else
                 sb.append(oriStr.charAt(i));
         }
-
         return sb.toString();
     }
 
@@ -477,7 +475,7 @@ public abstract class StringBaseOpt {
                             sb.append(DatetimeOpt.convertDatetimeToString((java.util.Date) objs[i]));
                         /*else if(objs[i] instanceof java.sql.Date)
                             sb.append(DatetimeOpt.convertDatetimeToString(
-                                    DatetimeOpt.convertUtilDate(
+                                    DatetimeOpt.convertToUtilDate(
                                             (java.sql.Date) objs[i])));
                         */else
                             sb.append(objs[i].toString());
@@ -499,7 +497,7 @@ public abstract class StringBaseOpt {
                         sb.append(DatetimeOpt.convertDatetimeToString((java.util.Date) ov));
                     /*else if(ov instanceof java.sql.Date)
                         sb.append(DatetimeOpt.convertDatetimeToString(
-                                DatetimeOpt.convertUtilDate(
+                                DatetimeOpt.convertToUtilDate(
                                         (java.sql.Date) ov)));*/
                     else
                         sb.append(ov.toString());
@@ -511,7 +509,7 @@ public abstract class StringBaseOpt {
             return DatetimeOpt.convertDatetimeToString((java.util.Date) objValue);
         }/*else if(objValue instanceof java.sql.Date){
             return DatetimeOpt.convertDatetimeToString(
-                    DatetimeOpt.convertUtilDate(
+                    DatetimeOpt.convertToUtilDate(
                     (java.sql.Date) objValue));
         }*/else
             return objValue.toString();
