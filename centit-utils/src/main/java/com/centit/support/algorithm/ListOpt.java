@@ -33,8 +33,7 @@ import com.centit.support.common.TreeNode;
  6. clone* 复制集合。
  7. storedAsTree、treeToJSONArray 对属性结构的存储或者序列化。
  * @author codefan
- * @version $Rev$ <br>
- *          $Id$
+ * @version  2.2.5
  */
 @SuppressWarnings("unused")
 public abstract class ListOpt {
@@ -435,10 +434,10 @@ public abstract class ListOpt {
     public static <T> Triple<List<T>, List<Pair<T,T>>, List<T>> 
         compareTwoList(List<T> oldList, List<T> newList,Comparator<T> compare){
         if(oldList==null ||oldList.size()==0)
-            return new ImmutableTriple<List<T>, List<Pair<T,T>>, List<T>> (
+            return new ImmutableTriple<> (
                     newList,null,null);
         if(newList==null ||newList.size()==0)
-            return new ImmutableTriple<List<T>, List<Pair<T,T>>, List<T>> (
+            return new ImmutableTriple<> (
                     null,null,oldList);
         List<T> souList = cloneList(oldList);
         List<T> desList = cloneList(newList);
@@ -447,16 +446,16 @@ public abstract class ListOpt {
         //---------------------------------------
         int i=0; int sl = souList.size();
         int j=0; int dl = desList.size();
-        List<T> insertList = new ArrayList<T>();
-        List<T> delList = new ArrayList<T>();
-        List<Pair<T,T>> updateList = new ArrayList<Pair<T,T>>();
+        List<T> insertList = new ArrayList<>();
+        List<T> delList = new ArrayList<>();
+        List<Pair<T,T>> updateList = new ArrayList<>();
         while(i<sl&&j<dl){
             int n = compare.compare(souList.get(i), desList.get(j));
             if(n<0){
                 delList.add(souList.get(i));
                 i++;
             }else if(n==0){
-                updateList.add( new ImmutablePair<T,T>(souList.get(i),desList.get(j)));
+                updateList.add( new ImmutablePair<>(souList.get(i),desList.get(j)));
                 i++;
                 j++;
             }else /*if(n>0)*/{
@@ -475,12 +474,31 @@ public abstract class ListOpt {
             j++;
         }
 
-        return new ImmutableTriple<List<T>, List<Pair<T,T>>, List<T>> (
-                insertList,updateList,delList);
+        return new ImmutableTriple<>(insertList,updateList,delList);
     }
-    
-    /*
+
+    /**
+     *将list(Collection 所以 set也可以) 转换为数组， list.toArray(T[]) 感觉不太好用，要new一个接受的数组对象
+     * @param listObj Collection 对象 可以是list 也可以是 set
+     * @param <T> 类型，
+     * @param classType T的类型，
+     * @return T[] 数组
+     */
+    public static <T> T[] listToArray(Collection<T> listObj, Class<T> classType){
+        if(listObj==null || listObj.size()==0)
+            return null;
+        @SuppressWarnings("unchecked")
+        T[] ta =(T[]) Array.newInstance(classType, listObj.size());
+        return listObj.toArray(ta);
+    }
+
+    /**
      * 将list(Collection 所以 set也可以) 转换为数组， list.toArray(T[]) 感觉不太好用，要new一个接受的数组对象
+     * @param listObj Collection 对象 可以是list 也可以是 set
+     * @param <T> 类型
+     * @return T[] 数组
+     * 注意，如果这个 T 是一个 接口，并且 Collection 中的内容是这个接口的不同实现，这个方法将抛异常,
+     *      这时候需要调用   <T> T[] listToArray(Collection<T> listObj, Class<T> classType)其中 classType 传入接口类
      */
     public static <T> T[] listToArray(Collection<T> listObj){
         if(listObj==null || listObj.size()==0)
@@ -497,9 +515,8 @@ public abstract class ListOpt {
     public static <T> List<T> arrayToList(T[] arrayObj ){
         if(arrayObj==null || arrayObj.length==0)
             return null;
-        List<T> listObj = new ArrayList<T>(arrayObj.length);
-        for(T obj:arrayObj)
-            listObj.add(obj);
+        List<T> listObj = new ArrayList<>(arrayObj.length);
+        Collections.addAll(listObj, arrayObj);
         return listObj;
     }
     
