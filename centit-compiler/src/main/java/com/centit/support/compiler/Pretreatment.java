@@ -1,6 +1,7 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 
@@ -122,6 +123,9 @@ public abstract class Pretreatment {
      * @return 新的表达式
      */
     public static String mapTemplateString(String template,Object object, String nullValue){
+        if(StringUtils.isBlank(template)){
+            return nullValue;
+        }
         Lexer varTemplate = new Lexer();
         varTemplate.setFormula(template);
         StringBuilder mapString = new StringBuilder();

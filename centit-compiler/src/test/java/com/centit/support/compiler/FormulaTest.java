@@ -69,6 +69,12 @@ public class FormulaTest {
         map.put("userInfo",usreInfo);
         String str = Pretreatment.mapTemplateString("你的{unitCode} 用户号是 { userInfo.userCode } 你的姓名是{userName}，分", map, "{没有赋值}");
         System.out.println(str );
+        str = Pretreatment.mapTemplateString("", map, "{没有赋值}");
+        System.out.println(str );
+        str = Pretreatment.mapTemplateString(null, map, "{没有赋值}");
+        System.out.println(str );
+        str = Pretreatment.mapTemplateString("{}{}{][[}}[][]{}{}", map, "{没有赋值}");
+        System.out.println(str );
         System.out.println("123123.4545" + (String)null );
 
     }
