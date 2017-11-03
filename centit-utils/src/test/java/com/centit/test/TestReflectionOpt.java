@@ -1,16 +1,26 @@
 package com.centit.test;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.alibaba.fastjson.JSON;
+import com.centit.support.algorithm.Lunar;
 import com.centit.support.algorithm.ReflectionOpt;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+
 public class TestReflectionOpt {
-     public static void main(String arg[]){
+    public static void main(String arg[]) {
+         Method [] methods = Lunar.class.getDeclaredMethods();
+         for(Method md : methods){
+             System.out.println(md.getName());
+             Parameter[] params = md.getParameters();
+             if(params!=null){
+                 for(Parameter p : params){
+                     System.out.println("   "+p.getName());
+                 }
+             }
+             System.out.println();
+         }
+    }
+    public static void getTypeMatch(){
          int [] objArray = new int [10];
          if(int[].class.isAssignableFrom(objArray.getClass())){
 
@@ -24,5 +34,5 @@ public class TestReflectionOpt {
              System.out.println(md.getName());
 
          }
-     }
+    }
 }

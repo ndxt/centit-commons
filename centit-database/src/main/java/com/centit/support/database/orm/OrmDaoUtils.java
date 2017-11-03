@@ -152,7 +152,7 @@ public abstract class OrmDaoUtils {
     private final static <T> T queryParamsSql(Connection conn, QueryAndParams sqlAndParams ,
                                               int startPos, int maxSize, FetchDataWork<T> fetchDataWork)
             throws PersistenceException {
-        sqlAndParams.setSql( QueryUtils.buildLimitQuerySQL(
+        sqlAndParams.setQuery(QueryUtils.buildLimitQuerySQL(
                 sqlAndParams.getQuery(),  startPos , maxSize , false , DBType.mapDBType(conn)
             ));
         return queryParamsSql(conn,  sqlAndParams , fetchDataWork);
