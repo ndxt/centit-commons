@@ -1,5 +1,7 @@
 package com.centit.support.database.utils;
 
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.xml.IgnoreDTDEntityResolver;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -172,7 +174,8 @@ public final class DataSourceDescription implements  Serializable{
             }else
                 doc= builder.read(this.getClass().getResourceAsStream(sConfFile));
             Element root  = doc.getRootElement();//获取根元素
-            bean = (Element) root.selectSingleNode("bean[@id=\""+sDbBeanName+"\"]");
+            bean = (Element) root.selectSingleNode("bean[@id="+
+                    StringRegularOpt.quotedString(sDbBeanName)+"]");
             if(bean != null){ //
                 Element property;
 

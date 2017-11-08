@@ -192,10 +192,8 @@ public abstract class StringBaseOpt {
     /**
      * copyProperties(),删除备份条件的后缀,如"value_CODE"过滤成"value"
      *
-     * @param str
-     *            源串
-     * @param quote
-     *            待过滤串
+     * @param str 源串
+     * @param quote 待过滤串
      * @return  删除备份条件的后缀,如"value_CODE"过滤成"value"
      */
     public static String deleteStringByQuote(String str, String quote) {

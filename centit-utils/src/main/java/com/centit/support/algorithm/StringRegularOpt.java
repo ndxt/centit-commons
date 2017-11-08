@@ -12,7 +12,7 @@ public abstract class StringRegularOpt {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static String  trimString(String szWord)
+    public static String trimString(String szWord)
     {
         if(szWord==null)
             return "";
@@ -29,6 +29,9 @@ public abstract class StringRegularOpt {
         return strWord;
     }
 
+    public static String trimStringQuoted(String szWord){
+        return trimString(szWord);
+    }
 
     public static String  quotedString(String szWord)
     {
@@ -85,9 +88,10 @@ public abstract class StringRegularOpt {
 
     /**
      * 判断字符串是否为空(null || ""),是：true,否：false
-     * 和StringUtils中的isBlank等价
+     * 和StringUtils中的isBlank等价 建议使用 StringUtils.isBlank
      * @param str str
      * @return boolean 字符串是否为空
+     * @see org.apache.commons.lang3.StringUtils
      */
     public static boolean isNvl(String str) {
         return (str == null) || "".equals(str.trim());
