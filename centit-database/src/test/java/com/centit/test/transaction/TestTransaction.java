@@ -1,14 +1,17 @@
 package com.centit.test.transaction;
 
 import com.alibaba.fastjson.JSONObject;
+import com.centit.support.database.orm.OrmDaoUtils;
 import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.DbcpConnectPools;
+import com.centit.support.database.utils.TransactionHandler;
 
 import java.sql.SQLException;
 
 public class TestTransaction {
     public  static void  main(String[] args)   {
-         testJDBCMetadata();
+        runInTransaction();
     }
  
     public  static void testJDBCMetadata(){
@@ -33,4 +36,22 @@ public class TestTransaction {
         }
         System.out.println("done!");
     }
+
+    public  static void runInTransaction()  {
+        DataSourceDescription dbc = new DataSourceDescription();
+        dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
+        dbc.setUsername("fdemo2");
+        dbc.setPassword("fdemo2");
+        Object userInfo = new Object();
+        try {
+            Integer ret = TransactionHandler.executeInTransaction(dbc, (conn) -> {
+                DatabaseAccess.doExecuteSql(conn, "delete * from table");
+                return OrmDaoUtils.saveNewObject(conn, userInfo);
+            });
+            System.out.println(ret);
+        }catch (SQLException e){
+            System.out.println(e.getLocalizedMessage());
+        }
+    }
+
 }
