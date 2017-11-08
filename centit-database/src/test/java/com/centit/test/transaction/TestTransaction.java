@@ -42,10 +42,18 @@ public class TestTransaction {
         dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
         dbc.setUsername("fdemo2");
         dbc.setPassword("fdemo2");
+        /**
+         * 假设这个对象是你要保存的; 如果调用 OrmDaoUtils.saveNewObject 成功，这个对象上必须有jpa注解
+         * 有jpa注解就不用自己写sql语句了，否则自己写insert语句也是可以的
+         */
         Object userInfo = new Object();
         try {
             Integer ret = TransactionHandler.executeInTransaction(dbc, (conn) -> {
-                DatabaseAccess.doExecuteSql(conn, "delete * from table");
+                /**
+                 * 这两个操作是在一个事物中的
+                 */
+                DatabaseAccess.doExecuteSql(conn, "delete from table where a=? and b=?",
+                        new Object[]{"a",5});
                 return OrmDaoUtils.saveNewObject(conn, userInfo);
             });
             System.out.println(ret);
