@@ -16,7 +16,7 @@ public abstract class DbcpConnectPools {
     protected static final Logger logger = LoggerFactory.getLogger(DbcpConnectPools.class);
     private static final
         Map<DataSourceDescription,BasicDataSource> dbcpDataSourcePools
-         = new HashMap<DataSourceDescription,BasicDataSource >();
+         = new HashMap<>();
 
     private static synchronized BasicDataSource addDataSource(DataSourceDescription dsDesc){
 
@@ -59,7 +59,7 @@ public abstract class DbcpConnectPools {
         BasicDataSource bds = dbcpDataSourcePools.get(dsDesc);
         if(bds==null)
             return null;
-        Map<String, Integer> map = new HashMap<String, Integer>(2);  
+        Map<String, Integer> map = new HashMap<>(2);
         map.put("active_number", bds.getNumActive());  
         map.put("idle_number", bds.getNumIdle());  
         return map;  

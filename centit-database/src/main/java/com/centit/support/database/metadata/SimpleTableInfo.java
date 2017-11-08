@@ -338,7 +338,7 @@ public class SimpleTableInfo implements TableInfo{
 
     public List<SimpleTableField> getColumns() {
         if(columns==null)
-            columns = new ArrayList<SimpleTableField>(20);
+            columns = new ArrayList<>(20);
         return columns;
     }
 
