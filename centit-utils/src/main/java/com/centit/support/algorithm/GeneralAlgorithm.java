@@ -45,4 +45,21 @@ public abstract  class GeneralAlgorithm {
                 StringBaseOpt.objectToString(operand2));
     }
 
+    /**  int compare(final T c1, final T c2)
+     * 等价于 ObjectUtils.compare
+     * @param l1 参数1
+     * @param l2 参数2
+     * @return 返回比较值 0 相等 1 大于 -1 小于
+     * @see org.apache.commons.lang3.ObjectUtils compare
+     */
+    public static <T extends Comparable<? super T>> int compareTwoComparableObject(T l1 , T l2){
+        return (l1 == null && l2 == null) ? 0:(
+                l1 == null ? -1 :(
+                        l2 == null ? 1 :(
+                                l1.compareTo(l2)
+                        )
+                )
+        );
+    }
+
 }
