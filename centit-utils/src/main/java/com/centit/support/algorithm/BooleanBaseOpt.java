@@ -86,6 +86,7 @@ public abstract class BooleanBaseOpt {
                         (ch4 == 'e' || ch4 == 'E')) {
                     return false;
                 }
+                break;
             }
             default:
                 break;
