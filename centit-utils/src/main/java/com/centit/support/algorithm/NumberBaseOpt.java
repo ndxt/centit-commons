@@ -347,7 +347,7 @@ public abstract class NumberBaseOpt {
     }
 
 
-    public int compareTwoLong(Long l1 , Long l2){
+    public static int compareTwoLong(Long l1 , Long l2){
         return (l1 == null && l2 == null) ? 0:(
                 l1 == null?-1:(
                         l2 == null ? 1 :(
@@ -357,7 +357,7 @@ public abstract class NumberBaseOpt {
                 );
     }
 
-    public int compareTwoInteger(Integer i1 , Integer i2){
+    public static int compareTwoInteger(Integer i1 , Integer i2){
         return (i1 == null && i2 == null) ? 0:(
                 i1 == null?-1:(
                         i2 == null ? 1 :(
@@ -367,7 +367,7 @@ public abstract class NumberBaseOpt {
         );
     }
 
-    public int compareTwoDouble(Double d1 , Double d2){
+    public static int compareTwoDouble(Double d1 , Double d2){
         return (d1 == null && d2 == null) ? 0:(
                 d1 == null?-1:(
                         d2 == null ? 1 :(
@@ -377,7 +377,7 @@ public abstract class NumberBaseOpt {
         );
     }
 
-    public int compareTwoBigInteger(BigInteger bi1 , BigInteger bi2){
+    public static int compareTwoBigInteger(BigInteger bi1 , BigInteger bi2){
         return (bi1 == null && bi2 == null) ? 0:(
                 bi1 == null?-1:(
                         bi2 == null ? 1 : bi1.compareTo(bi2)
@@ -385,7 +385,7 @@ public abstract class NumberBaseOpt {
         );
     }
 
-    public int compareTwoBigDecimal(BigDecimal d1 , BigDecimal d2){
+    public static int compareTwoBigDecimal(BigDecimal d1 , BigDecimal d2){
         return (d1 == null && d2 == null) ? 0:(
                 d1 == null?-1:(
                         d2 == null ? 1 : d1.compareTo(d2)
