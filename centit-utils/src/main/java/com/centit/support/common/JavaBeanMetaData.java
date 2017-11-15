@@ -10,7 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * java 的内省机制实现了 javaBean 的信息获取，后面希望通过这套jdk标准的方法重写这部分内容。
  * Created by codefan on 17-9-22.
+ * @see java.beans.BeanInfo
+ * @see java.beans.Introspector
  */
 public class JavaBeanMetaData {
     private Class<?> javaType;

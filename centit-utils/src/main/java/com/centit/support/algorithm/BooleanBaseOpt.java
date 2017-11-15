@@ -7,11 +7,14 @@ public abstract class BooleanBaseOpt {
     }
 
 
-    static public boolean isBoolean(Object obj){
+
+    static public Boolean castObjectToBoolean(Object obj){
         if(obj==null)
-            return false;
+            return null;
         if(obj instanceof Boolean)
-            return true;
+            return (Boolean)obj;
+        if (obj instanceof Number)
+            return ((Number) obj).intValue() != 0;
 
         final String str = StringBaseOpt.objectToString(obj);
 
@@ -19,21 +22,25 @@ public abstract class BooleanBaseOpt {
             case 1: {
                 final char ch0 = str.charAt(0);
                 if (ch0 == 'y' || ch0 == 'Y' ||
-                        ch0 == 't' || ch0 == 'T' || ch0 == '1' ||
-                    ch0 == 'n' || ch0 == 'N' ||
-                        ch0 == 'f' || ch0 == 'F' || ch0 == '0') {
+                        ch0 == 't' || ch0 == 'T' /*|| ch0 == '1'*/ ) {
                     return true;
+                }
+                if (ch0 == 'n' || ch0 == 'N' ||
+                        ch0 == 'f' || ch0 == 'F' /*|| ch0 == '0'*/) {
+                    return false;
                 }
                 break;
             }
             case 2: {
                 final char ch0 = str.charAt(0);
                 final char ch1 = str.charAt(1);
-                if ( ((ch0 == 'o' || ch0 == 'O') &&
-                        (ch1 == 'n' || ch1 == 'N') ) ||
-                     ((ch0 == 'n' || ch0 == 'N') &&
-                        (ch1 == 'o' || ch1 == 'O')) ) {
-                    return true;
+                if ((ch0 == 'o' || ch0 == 'O') &&
+                        (ch1 == 'n' || ch1 == 'N') ) {
+                    return true; // om /off
+                }
+                if ((ch0 == 'n' || ch0 == 'N') &&
+                        (ch1 == 'o' || ch1 == 'O')) {
+                    return false; // no / yes
                 }
                 break;
             }
@@ -41,14 +48,15 @@ public abstract class BooleanBaseOpt {
                 final char ch0 = str.charAt(0);
                 final char ch1 = str.charAt(1);
                 final char ch2 = str.charAt(2);
-                if ( ((ch0 == 'y' || ch0 == 'Y') &&
+                if ((ch0 == 'y' || ch0 == 'Y') &&
                         (ch1 == 'e' || ch1 == 'E') &&
-                        (ch2 == 's' || ch2 == 'S') ) ||
-
-                     ((ch0 == 'o' || ch0 == 'O') &&
-                        (ch1 == 'f' || ch1 == 'F') &&
-                        (ch2 == 'f' || ch2 == 'F') ) ){
+                        (ch2 == 's' || ch2 == 'S') ) {
                     return true;
+                }
+                if((ch0 == 'o' || ch0 == 'O') &&
+                        (ch1 == 'f' || ch1 == 'F') &&
+                        (ch2 == 'f' || ch2 == 'F') ){
+                    return false;
                 }
                 break;
             }
@@ -76,27 +84,21 @@ public abstract class BooleanBaseOpt {
                         (ch2 == 'l' || ch2 == 'L') &&
                         (ch3 == 's' || ch3 == 'S') &&
                         (ch4 == 'e' || ch4 == 'E')) {
-                    return true;
+                    return false;
                 }
+                break;
             }
             default:
                 break;
         }
-
-        return false;//ringRegularOpt.isNumber(str);
-    }
-
-    public static Boolean castObjectToBoolean(Object obj){
-        if (obj == null)
-            return null;
-        if (obj instanceof Boolean)
-            return (Boolean) obj;
-        if (obj instanceof Number)
-            return ((Number) obj).intValue() != 0;
-        return StringRegularOpt.isTrue(StringBaseOpt.objectToString(obj));
+        return null;//ringRegularOpt.isNumber(str);
     }
 
     public static Boolean castObjectToBoolean(Object obj, Boolean defaultValue){
         return GeneralAlgorithm.nvl(castObjectToBoolean(obj),defaultValue);
+    }
+
+    static public boolean isBoolean(Object obj){
+        return BooleanBaseOpt.castObjectToBoolean(obj)!= null;
     }
 }
