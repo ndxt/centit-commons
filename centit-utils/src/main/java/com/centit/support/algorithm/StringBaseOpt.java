@@ -258,20 +258,28 @@ public abstract class StringBaseOpt {
      * @return 用"0"填补string
      */
     public static String fillZeroForString(String str, int size) {
-        if (isNvl(str) ) {
-            str =  "0";
-        }
-        if(size==0)
-            return str;
-
-        int sl = str.length();
-
-        for (; sl< size ;sl++) {
-            str = "0"+str;
-        }
-        return str;
+        return StringUtils.leftPad(str,size,'0');
     }
 
+    /**
+     * 在中间添加 字符
+     * @param str 字符串
+     * @param size pad后长度
+     * @param prefix 前缀
+     * @param padChar 添加的字符
+     * @return 返回值
+     */
+    public static String midPad(String str, int size, String prefix ,char padChar) {
+        return  prefix==null?
+                StringUtils.leftPad(str,size,padChar) :
+                prefix + StringUtils.leftPad(str,size-prefix.length(),padChar);
+    }
+
+    public static String midPad(String str, int size, String prefix ,String padChar) {
+        return  prefix==null?
+                StringUtils.leftPad(str,size,padChar) :
+                prefix + StringUtils.leftPad(str,size-prefix.length(),padChar);
+    }
     /**
      * 用"0"填补string
      *
@@ -292,7 +300,9 @@ public abstract class StringBaseOpt {
      * @param currNo 流水号
      * @param params 用户自定义参数
      * @return 文号、档案号、规则生成算法，
+     * 参见类 com.centit.support.compiler.Pretreatment 的 mapTemplateString 方法
      */
+    @Deprecated
     public static String clacDocumentNo(String templet,long currNo,Map<String,String> params){
         if( StringRegularOpt.isNvl( templet) )
             return String.valueOf(currNo);
@@ -356,23 +366,7 @@ public abstract class StringBaseOpt {
         return sRes;
     }
 
-    /*private static char convertFirstLetter(byte[] bytes) {
-       char result = '-';
-       int secPosvalue = 0;
-       int i;
-       for (i = 0; i < bytes.length; i++) {
-        bytes[i] -= GB_SP_DIFF;
-       }
-       secPosvalue = bytes[0] * 100 + bytes[1];
-       for (i = 0; i < 23; i++) {
-        if (secPosvalue >= secPosvalueList[i]
-          && secPosvalue < secPosvalueList[i + 1]) {
-         result = firstLetter[i];
-         break;
-        }
-       }
-       return result;
-    }*/
+
 
     /**
     * 获取一个汉字的拼音首字母。 GB码两个字节分别减去160，转换成10进制码组合就可以得到区位码
