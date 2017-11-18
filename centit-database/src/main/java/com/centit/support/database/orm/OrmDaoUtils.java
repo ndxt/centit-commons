@@ -133,8 +133,8 @@ public abstract class OrmDaoUtils {
     private final static <T> T queryParamsSql(Connection conn, QueryAndParams sqlAndParams ,
                                              FetchDataWork<T> fetchDataWork)
             throws PersistenceException {
-         logger.debug( sqlAndParams.getQuery() +" :" + JSON.toJSONString(sqlAndParams.getParams()) );
-         try(PreparedStatement stmt = conn.prepareStatement(sqlAndParams.getQuery())){
+        QueryLogUtils.printSql(logger, sqlAndParams.getQuery(), sqlAndParams.getParams() );
+        try(PreparedStatement stmt = conn.prepareStatement(sqlAndParams.getQuery())){
             DatabaseAccess.setQueryStmtParameters(stmt,sqlAndParams.getParams());
             try(ResultSet rs = stmt.executeQuery()) {
                 return fetchDataWork.execute(rs);

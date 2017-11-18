@@ -101,7 +101,7 @@ public abstract class DatabaseAccess {
      */
     public static boolean doExecuteSql(Connection conn, String sSql) throws SQLException {
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
-            logger.debug(sSql);
+            QueryLogUtils.printSql(logger,sSql);
             return stmt.execute();
         }catch (SQLException e) {
             throw new DatabaseAccessException(sSql,e);
@@ -139,7 +139,7 @@ public abstract class DatabaseAccess {
      * 直接运行行带参数的 SQL,update delete insert
      */
     public static int doExecuteSql(Connection conn, String sSql, Object[] values) throws SQLException {
-        logger.debug( sSql +" :" + JSON.toJSONString(values) );
+        QueryLogUtils.printSql(logger,sSql ,values );
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
             setQueryStmtParameters(stmt,values);
             return stmt.executeUpdate();
@@ -282,7 +282,7 @@ public abstract class DatabaseAccess {
      */
     public static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames)
             throws SQLException, IOException {
-        logger.debug( sSql +" :" + JSON.toJSONString(values) );
+        QueryLogUtils.printSql(logger, sSql, values);
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
             setQueryStmtParameters(stmt,values);
 
@@ -308,7 +308,7 @@ public abstract class DatabaseAccess {
 
     public static JSONObject getObjectAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames)
             throws SQLException, IOException {
-        logger.debug( sSql +" :" + JSON.toJSONString(values) );
+        QueryLogUtils.printSql( logger, sSql ,values );
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
             setQueryStmtParameters(stmt,values);
 
@@ -516,7 +516,7 @@ public abstract class DatabaseAccess {
      */
     public static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object[] values)
             throws SQLException, IOException {
-        logger.debug( sSql +" :" + JSON.toJSONString(values) );
+        QueryLogUtils.printSql(logger, sSql, values);
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
             setQueryStmtParameters(stmt,values);
             // stmt.setMaxRows(max);
@@ -535,7 +535,7 @@ public abstract class DatabaseAccess {
      */
     public static List<Object[]> findObjectsBySql(Connection conn, String sSql, List<Object> values)
             throws SQLException, IOException {
-        logger.debug( sSql +" :" + JSON.toJSONString(values) );
+        QueryLogUtils.printSql(logger, sSql, values);
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
             setQueryStmtParameters(stmt,values);
             try(ResultSet rs = stmt.executeQuery()) {
@@ -552,7 +552,7 @@ public abstract class DatabaseAccess {
      */
     public static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object value)
             throws SQLException, IOException {
-        logger.debug( sSql +" :" + JSON.toJSONString(value) );
+        QueryLogUtils.printSql(logger, sSql, value );
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
             setQueryStmtParameters(stmt,new Object[]{value});
 
@@ -572,7 +572,7 @@ public abstract class DatabaseAccess {
      *
      */
     public static List<Object[]> findObjectsBySql(Connection conn, String sSql) throws SQLException, IOException {
-        logger.debug(sSql);
+        QueryLogUtils.printSql(logger, sSql);
         try(PreparedStatement stmt = conn.prepareStatement(sSql);
             ResultSet rs = stmt.executeQuery()){
             return fetchResultSetToObjectsList(rs);

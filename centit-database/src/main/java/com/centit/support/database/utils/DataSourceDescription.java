@@ -47,7 +47,7 @@ public final class DataSourceDescription implements  Serializable{
     public DataSourceDescription(){
         this.maxTotal  = 10;
         this.maxIdle  = 5;
-        this.setMinIdle(1);
+        this.minIdle = 1;
         this.initialSize = 3;
         this.maxWaitMillis = 10000;
     }
