@@ -1188,7 +1188,7 @@ public abstract class QueryUtils {
             if(alias==null)
                 return null;
 
-            return "".equals(alias)? columnDesc.substring(n+1):alias+'.'+  columnDesc.substring(n+1);
+            return StringUtils.isBlank(alias)? columnDesc.substring(n+1):alias+'.'+  columnDesc.substring(n+1);
         }
 
         @Override
