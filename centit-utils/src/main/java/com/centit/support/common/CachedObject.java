@@ -1,4 +1,4 @@
-package com.centit.support.database.utils;
+package com.centit.support.common;
 
 import com.centit.support.algorithm.DatetimeOpt;
 
