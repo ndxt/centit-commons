@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -228,6 +230,35 @@ public abstract class JpaMetadata {
                         mapInfo.addReference(reference);
                     }
                 }
+            }
+        }
+        // 整理 引用字段
+        if( mapInfo.getReferences() != null && mapInfo.getReferences().size()>0) {
+            Set<SimpleTableReference> errorRef = new HashSet<>(mapInfo.getReferences().size());
+            for (SimpleTableReference reference : mapInfo.getReferences()) {
+                TableMapInfo refTalbeInfo = fetchTableMapInfo(reference.getTargetEntityType());
+                if (refTalbeInfo == null) {
+                    errorRef.add(reference);
+                    continue;
+                }
+                Set<String> keySet = new HashSet<>(reference.getReferenceColumns().keySet());
+                for (String keyName : keySet) {
+                    SimpleTableField field = mapInfo.findFieldByName(keyName);
+                    SimpleTableField refField = refTalbeInfo.findFieldByName(reference.getReferenceColumns().get(keyName));
+                    if (field == null || refField == null) {
+                        errorRef.add(reference);
+                        break;
+                    }
+                    if (!keyName.equals(field.getPropertyName())) {
+                        reference.getReferenceColumns().remove(keyName);
+                    }
+                    reference.getReferenceColumns().put(field.getPropertyName(), refField.getPropertyName());
+
+                }
+            }
+
+            if(errorRef.size()>0) {
+                mapInfo.getReferences().removeAll(errorRef);
             }
         }
         return mapInfo;

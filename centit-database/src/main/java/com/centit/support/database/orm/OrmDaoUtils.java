@@ -677,14 +677,20 @@ public abstract class OrmDaoUtils {
                 ListOpt.compareTwoList(dbObjects, newObjects,
                         new OrmObjectComparator<>( mapInfo) );
         int resN = 0;
-        for(T obj:comRes.getLeft()){
-            resN += saveNewObject(connection,  obj);
+        if(comRes.getLeft() != null) {
+            for (T obj : comRes.getLeft()) {
+                resN += saveNewObject(connection, obj);
+            }
         }
-        for(T obj:comRes.getRight()){
-            resN += deleteObject(connection, obj);
+        if(comRes.getRight() != null) {
+            for (T obj : comRes.getRight()) {
+                resN += deleteObject(connection, obj);
+            }
         }
-        for(Pair<T,T> pobj:comRes.getMiddle()){
-            resN += updateObject(connection, pobj.getRight());
+        if(comRes.getMiddle() != null) {
+            for (Pair<T, T> pobj : comRes.getMiddle()) {
+                resN += updateObject(connection, pobj.getRight());
+            }
         }
         return resN;
     }
@@ -767,7 +773,6 @@ public abstract class OrmDaoUtils {
             replaceObjectsAsTabulation( connection, (List<Object>) refs,
                     (List<Object>) newObj );
         }
-
         return 1;
     }
 
@@ -836,14 +841,20 @@ public abstract class OrmDaoUtils {
                 ListOpt.compareTwoList(dbObjects, newObjects,
                         new OrmObjectComparator<>(mapInfo) );
         int resN = 0;
-        for(T obj:comRes.getLeft()){
-            resN += saveNewObjectCascade(connection,  obj);
+        if(comRes.getLeft() != null) {
+            for (T obj : comRes.getLeft()) {
+                resN += saveNewObjectCascade(connection, obj);
+            }
         }
-        for(T obj:comRes.getRight()){
-            resN += deleteObjectCascade(connection, obj);
+        if(comRes.getRight() != null) {
+            for (T obj : comRes.getRight()) {
+                resN += deleteObjectCascade(connection, obj);
+            }
         }
-        for(Pair<T,T> pobj:comRes.getMiddle()){
-            resN += updateObjectCascade(connection, pobj.getRight());
+        if(comRes.getMiddle() != null) {
+            for (Pair<T, T> pobj : comRes.getMiddle()) {
+                resN += updateObjectCascade(connection, pobj.getRight());
+            }
         }
         return resN;
     }

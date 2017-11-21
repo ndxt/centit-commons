@@ -510,14 +510,20 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             ListOpt.compareTwoList(dbObjects, newObjects, new JSONObjectComparator(tableInfo));
 
         int resN = 0;
-        for(Object obj:comRes.getLeft()){
-            resN += saveNewObject((JSONObject)obj);
+        if(comRes.getLeft() != null) {
+            for (Object obj : comRes.getLeft()) {
+                resN += saveNewObject((JSONObject) obj);
+            }
         }
-        for(Object obj:comRes.getRight()){
-            resN += deleteObjectById((JSONObject)obj);
+        if(comRes.getRight() != null) {
+            for (Object obj : comRes.getRight()) {
+                resN += deleteObjectById((JSONObject) obj);
+            }
         }
-        for(Pair<Object,Object> pobj:comRes.getMiddle()){
-            resN += updateObject((JSONObject)pobj.getRight());
+        if(comRes.getMiddle() != null) {
+            for (Pair<Object, Object> pobj : comRes.getMiddle()) {
+                resN += updateObject((JSONObject) pobj.getRight());
+            }
         }
         return resN;
     }

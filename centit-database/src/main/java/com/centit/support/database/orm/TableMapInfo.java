@@ -55,6 +55,7 @@ public class TableMapInfo extends SimpleTableInfo {
             if(col.getPropertyName().equals(name))
                 return col;
         }
+
         if(lazyColumns!=null) {
             for ( SimpleTableField col : lazyColumns){
                 if (col.getPropertyName().equals(name))
@@ -66,6 +67,7 @@ public class TableMapInfo extends SimpleTableInfo {
             if(col.getColumnName().equalsIgnoreCase(name))
                 return col;
         }
+
         if(lazyColumns!=null) {
             for ( SimpleTableField col : lazyColumns){
                 if(col.getColumnName().equalsIgnoreCase(name))
