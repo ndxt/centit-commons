@@ -661,7 +661,16 @@ public abstract class OrmDaoUtils {
 
     public static <T> int replaceObjectsAsTabulation(Connection connection, List<T> dbObjects,List<T> newObjects)
             throws PersistenceException {
-        Class<T> objType =(Class<T>) newObjects.iterator().next().getClass();
+        if(newObjects == null || newObjects.size()==0){
+            if(dbObjects==null || dbObjects.size()==0){
+                return 0;
+            }
+            for(T obj: dbObjects){
+                deleteObject(connection, obj);
+            }
+            return dbObjects.size();
+        }
+        Class<T> objType =(Class<T>) newObjects.get(0).getClass();
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(objType);
         Triple<List<T>, List<Pair<T,T>>, List<T>>
                 comRes=
@@ -809,7 +818,18 @@ public abstract class OrmDaoUtils {
 
     private static <T> int replaceObjectsAsTabulationCascade(Connection connection, List<T> dbObjects,List<T> newObjects)
             throws PersistenceException {
-        Class<T> objType =(Class<T>) newObjects.iterator().next().getClass();
+
+        if(newObjects == null || newObjects.size()==0){
+            if(dbObjects==null || dbObjects.size()==0){
+                return 0;
+            }
+            for(T obj: dbObjects){
+                deleteObjectCascade(connection, obj);
+            }
+            return dbObjects.size();
+        }
+
+        Class<T> objType =(Class<T>) newObjects.get(0).getClass();
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(objType);
         Triple<List<T>, List<Pair<T,T>>, List<T>>
                 comRes=

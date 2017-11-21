@@ -506,8 +506,8 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             throws SQLException {
         //insert<T> update(old,new)<T,T> delete<T>
         Triple<List<Object>, List<Pair<Object,Object>>, List<Object>>
-         comRes=
-             ListOpt.compareTwoList(dbObjects, newObjects, new JSONObjectComparator(tableInfo));
+        comRes=
+            ListOpt.compareTwoList(dbObjects, newObjects, new JSONObjectComparator(tableInfo));
 
         int resN = 0;
         for(Object obj:comRes.getLeft()){
