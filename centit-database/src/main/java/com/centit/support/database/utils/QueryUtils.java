@@ -990,6 +990,10 @@ public abstract class QueryUtils {
                     lex.seekToRightBracket();
                     prewordIsOpt = false;
                 } else {
+                    // 如果有 * 则不能解析 字段名
+                    if("*".equals(aWord)){
+                        return null;
+                    }
                     if (Lexer.isLabel(aWord)) {
                         if (!prewordIsOpt) {
                             filedName = aWord;
@@ -1008,13 +1012,17 @@ public abstract class QueryUtils {
             nFiledNo ++;
 
             if(filedName==null) {
-                filedName = "column" + String.valueOf(nFiledNo);
+                filedName = "";
             }else {
                 /*if(filedName.endsWith("*"))
                     return null;*/
                 int n = filedName.lastIndexOf('.');
                 if (n > 0) {
                     filedName = filedName.substring(n + 1);
+                    // 如果有 * 则不能解析 字段名
+                    if("*".equals(filedName)){
+                        return null;
+                    }
                 }
             }
 

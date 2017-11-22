@@ -1,12 +1,12 @@
 package com.centit.support.database.utils;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -211,7 +211,11 @@ public abstract class DatabaseAccess {
         int asFn = 0;
         if (fieldnames != null) {
             asFn = fieldnames.length;
-            System.arraycopy(fieldnames,0,fieldNames,0,asFn);
+            for (int i = 0; i < asFn; i++) {
+                fieldNames[i] = StringUtils.isBlank(fieldnames[i])?
+                                mapColumnNameToField(rs.getMetaData().getColumnLabel(i + 1)):
+                                fieldnames[i];
+            }
         }
 
         for (int i = asFn; i < cc; i++) {
@@ -226,6 +230,10 @@ public abstract class DatabaseAccess {
     }
 
     public static String mapColumnNameToField(String colName){
+        if(StringUtils.isBlank(colName)){
+            return colName;
+        }
+
         if(colName.indexOf('_')>=0){
             int nl = colName.length();
             char [] ch = colName.toCharArray();
@@ -746,8 +754,6 @@ public abstract class DatabaseAccess {
         return NumberBaseOpt.castObjectToLong(scalarObj);
     }
 
-
-
     private static String makePageQuerySql(Connection conn, String sSql,  int pageNo,
                                            int pageSize ){
         int offset = (pageNo > 1 && pageSize > 0)?(pageNo - 1) * pageSize:0;
@@ -792,7 +798,7 @@ public abstract class DatabaseAccess {
      */
     public static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object[] values, int pageNo,
                                                         int pageSize) throws SQLException, IOException {
-        String query = makePageQuerySql(conn,  sSql,   pageNo, pageSize );
+        String query = makePageQuerySql(conn, sSql, pageNo, pageSize );
         if(query.equals(sSql)){
             try(PreparedStatement stmt = conn.prepareStatement(sSql)){
                 setQueryStmtParameters(stmt,values);
@@ -811,10 +817,10 @@ public abstract class DatabaseAccess {
                     //return datas;
                 }
             }catch (SQLException e) {
-                throw new DatabaseAccessException(sSql,e);
+                throw new DatabaseAccessException(sSql, e);
             }
         }else
-            return findObjectsBySql(conn,query,values);
+            return findObjectsBySql(conn, query, values);
     }
 
 
@@ -839,7 +845,7 @@ public abstract class DatabaseAccess {
     public static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames,
             int pageNo, int pageSize) throws SQLException, IOException {
 
-        String query = makePageQuerySql(conn,  sSql,   pageNo, pageSize );
+        String query = makePageQuerySql(conn, sSql, pageNo, pageSize );
 
         if(query.equals(sSql)) {
             try (PreparedStatement stmt = conn.prepareStatement(sSql)){
@@ -869,8 +875,14 @@ public abstract class DatabaseAccess {
             } catch (SQLException e) {
                 throw new DatabaseAccessException(sSql, e);
             }
-        }else
-            return findObjectsAsJSON(conn,query,values,fieldnames);
+        }else {
+            String[] fns = fieldnames;
+            if (ArrayUtils.isEmpty(fns)) {
+                List<String> fields = QueryUtils.getSqlFiledNames(sSql);
+                fns = mapColumnsNameToFields(fields);
+            }
+            return findObjectsAsJSON(conn, query, values, fns);
+        }
     }
 
     /**
