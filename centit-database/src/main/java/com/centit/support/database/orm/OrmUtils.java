@@ -5,13 +5,10 @@ import com.centit.support.common.KeyValuePair;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
-import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.utils.DatabaseAccess;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;

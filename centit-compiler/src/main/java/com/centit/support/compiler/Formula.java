@@ -471,7 +471,7 @@ public class Formula {
      * @param varMap 这个参数可以为null 如果为null表达式中的标识符和变量都会被替换为""这个空字符串
      * @return 计算结果
      */
-    public static String calculate(String szExpress,Map<String,Object> varMap)
+    public static String calculate(String szExpress,Object varMap)
     {
         return calculate(szExpress,new ObjectTranslate(varMap));
     }
