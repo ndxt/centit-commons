@@ -6,10 +6,10 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void testFormula() {
-        String formula = " T == 'T' ";
+        String formula = " today() ";
 
-        Formula f = new Formula();
-        String s = f.calculate(formula, new HashMap<>());
+
+        Object s =  new VariableFormula().calculate(formula);
         System.out.println(s);
         //assertEquals("nihao,地球 !",s);
     }
@@ -59,6 +59,7 @@ public class FormulaTest {
     }
 
     public  static void  main(String[] args)   {
+        testFormula();/*
         //testFormula2();//
         // testFormula2();
         //testLexer();
@@ -76,6 +77,6 @@ public class FormulaTest {
         str = Pretreatment.mapTemplateString("{}{}{][[}}[][]{}{}", map, "{没有赋值}");
         System.out.println(str );
         System.out.println("123123.4545" + (String)null );
-
+*/
     }
 }

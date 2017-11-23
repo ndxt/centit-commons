@@ -17,6 +17,10 @@ public class Formula {
         //m_preTreat.setVariableTranslate(new SimpleTranslate("1"));
     }
 
+    public void setFormula(String formula) {
+        lex.setFormula(formula);
+    }
+
     public static int getFuncNo(String  sFuncName)
     {
         return EmbedFunc.getFuncNo(sFuncName);
@@ -398,37 +402,7 @@ public class Formula {
         str = EmbedFunc.runFunc(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
         return str;
     }
-    //不一致的问题 需要修改
-    /**
-     * 计算表达式，使用 setVariableTranslate 中设置的变量转换器
-     * @param szExpress 表达式
-     * @return 计算结果
-     */
-    public String calculate(String szExpress)
-    {
-        lex.setFormula(szExpress);
-        String sRes = calcFormula();
-        if(sRes == null || sRes.length()==0) return "";
-        return StringRegularOpt.trimString(sRes);
-    }
-
-    /**
-     * @param szExpress 表达式
-     * @param varMap 这个参数可以为null 如果为null表达式中的标识符和变量都会被替换为""这个空字符串
-     * @return 计算结果
-     */
-    public String calculate(String szExpress,Map<String,Object> varMap)
-    {
-        return calculate(szExpress,new ObjectTranslate(varMap));
-    }
-
-    public String calculate(String szExpress,VariableTranslate varTrans)
-    {
-        return calculate(Pretreatment.runPretreatment(szExpress,varTrans));
-    }
-
-    // return the error point
-    /**
+     /**
      *
      * @param szExpress 表达式
      * @return 返回出错的位置，0 表示表达式格式检查通过
@@ -476,4 +450,35 @@ public class Formula {
         else
             return lex.getCurrPos()+1;
     }
+
+    //不一致的问题 需要修改
+    /**
+     * 计算表达式，使用 setVariableTranslate 中设置的变量转换器
+     * @param szExpress 表达式
+     * @return 计算结果
+     */
+    public static String calculate(String szExpress)
+    {
+        Formula formula = new Formula();
+        formula.setFormula(szExpress);
+        String sRes = formula.calcFormula();
+        if(sRes == null || sRes.length()==0) return "";
+        return StringRegularOpt.trimString(sRes);
+    }
+
+    /**
+     * @param szExpress 表达式
+     * @param varMap 这个参数可以为null 如果为null表达式中的标识符和变量都会被替换为""这个空字符串
+     * @return 计算结果
+     */
+    public static String calculate(String szExpress,Map<String,Object> varMap)
+    {
+        return calculate(szExpress,new ObjectTranslate(varMap));
+    }
+
+    public static String calculate(String szExpress,VariableTranslate varTrans)
+    {
+        return calculate(Pretreatment.runPretreatment(szExpress,varTrans));
+    }
+
 }

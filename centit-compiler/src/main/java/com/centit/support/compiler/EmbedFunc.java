@@ -13,7 +13,7 @@ public abstract class EmbedFunc {
         throw new IllegalAccessError("Utility class");
     }
     private static double MIN_DOUBLE = 0.00000001;
-    public static final int functionsSum = 46;
+    public static final int functionsSum = 48;
     protected static final FunctionInfo functionsList[]={
         new FunctionInfo("ave",-1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
@@ -59,6 +59,9 @@ public abstract class EmbedFunc {
         new FunctionInfo("frac",1,ConstDefine.FUNC_FRAC,ConstDefine.TYPE_NUM), // 求小数部分 frac (12.34)=0.34 frac (-12.34)=-0.34
 
         new FunctionInfo("today",-1,ConstDefine.FUNC_TODAY,ConstDefine.TYPE_STR),//当前日期
+        new FunctionInfo("currentDay",-1,ConstDefine.FUNC_TODAY,ConstDefine.TYPE_STR),//当前日期
+        new FunctionInfo("currentTime",-1,ConstDefine.FUNC_CURRENT_TIME,ConstDefine.TYPE_STR),//当前时间
+
         new FunctionInfo("day",-1,ConstDefine.FUNC_DAY,ConstDefine.TYPE_STR),//日期函数
         new FunctionInfo("month",-1,ConstDefine.FUNC_MONTH,ConstDefine.TYPE_STR),//日期函数
         new FunctionInfo("year",-1,ConstDefine.FUNC_YEAR,ConstDefine.TYPE_STR),//日期函数
@@ -494,7 +497,9 @@ public abstract class EmbedFunc {
             {
                 return DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate());
             }
-
+            case ConstDefine.FUNC_CURRENT_TIME:{ // 包括时间
+                return DatetimeOpt.convertDatetimeToString(DatetimeOpt.currentUtilDate());
+            }
             case ConstDefine.FUNC_DAY://
             {
                 Date dt = null;
@@ -1044,12 +1049,17 @@ public abstract class EmbedFunc {
                 return DatetimeOpt.currentUtilDate();
             }
 
+            case ConstDefine.FUNC_CURRENT_TIME:{ // 包括时间
+                return DatetimeOpt.currentSqlTimeStamp();
+            }
+
             case ConstDefine.FUNC_DAY://
             {
-                Date dt = (nOpSum > 0)?DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
+                Date dt = (nOpSum > 0)? DatetimeOpt.castObjectToDate(slOperand.get(0))
+                         :DatetimeOpt.currentUtilDate();
                 if(dt==null)
                     dt = DatetimeOpt.currentUtilDate();
-                return dt;
+                return DatetimeOpt.getDay(dt);
             }
             case ConstDefine.FUNC_MONTH://
             {

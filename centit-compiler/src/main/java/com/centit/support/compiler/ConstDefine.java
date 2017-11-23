@@ -49,6 +49,7 @@ public abstract class ConstDefine {
     public static final int   FUNC_MONTH_SPAN    = 130;
     public static final int   FUNC_YEAR_SPAN    = 131;
     public static final int   FUNC_TODAY        = 132;
+    public static final int   FUNC_CURRENT_TIME        = 149;
     public static final int   FUNC_ADD_DAYS        = 137;
     public static final int   FUNC_ADD_MONTHS    = 138;
     public static final int   FUNC_ADD_YEARS    = 139;

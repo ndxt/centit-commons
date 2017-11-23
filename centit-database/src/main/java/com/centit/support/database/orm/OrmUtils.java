@@ -2,6 +2,7 @@ package com.centit.support.database.orm;
 
 import com.centit.support.algorithm.*;
 import com.centit.support.common.KeyValuePair;
+import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.TableField;
@@ -133,18 +134,11 @@ public abstract class OrmUtils {
                             break;
                         case CONSTANT:
                             setObjectFieldValue(object, filed, valueGenerator.value());
-
                             break;
-                        case FUNCTIION: {
-                            switch (valueGenerator.value()){
-                                case "now":
-                                case "currentTime":
-                                case "sysdate":
-                                    setObjectFieldValue(object, filed, DatetimeOpt.currentUtilDate());
-                                    break;
-                            }
+                        case FUNCTIION:
+                            setObjectFieldValue(object, filed,
+                                    VariableFormula.calculate(valueGenerator.value()));
                             break;
-                        }
                     }
                 }
             }

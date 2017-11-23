@@ -26,27 +26,6 @@ public class VariableFormula {
         lex.setFormula(formula);
     }
 
-    public Object calculate(String szExpress)
-    {
-        setFormula(szExpress);
-        return calcFormula();
-    }
-
-    public Object calculate(String szExpress,Map<String,Object> varMap)
-    {
-        setFormula(szExpress);
-        setTrans(new ObjectTranslate(varMap));
-        return calcFormula();
-    }
-
-    public Object calculate(String szExpress,VariableTranslate varTrans)
-    {
-        setFormula(szExpress);
-        setTrans(varTrans);
-        return calcFormula();
-    }
-
-
     private Object calcItem()
     {
         String str = lex.getAWord();
@@ -426,4 +405,26 @@ public class VariableFormula {
         return  EmbedFunc.runFuncWithRaw(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
     }
 
+    public static Object calculate(String szExpress)
+    {
+        VariableFormula formula = new VariableFormula();
+        formula.setFormula(szExpress);
+        return formula.calcFormula();
+    }
+
+    public static Object calculate(String szExpress,Map<String,Object> varMap)
+    {
+        VariableFormula formula = new VariableFormula();
+        formula.setFormula(szExpress);
+        formula.setTrans(new ObjectTranslate(varMap));
+        return formula.calcFormula();
+    }
+
+    public static Object calculate(String szExpress,VariableTranslate varTrans)
+    {
+        VariableFormula formula = new VariableFormula();
+        formula.setFormula(szExpress);
+        formula.setTrans(varTrans);
+        return formula.calcFormula();
+    }
 }
