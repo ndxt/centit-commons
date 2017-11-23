@@ -412,13 +412,6 @@ public class VariableFormula {
         return formula.calcFormula();
     }
 
-    public static Object calculate(String szExpress,Map<String,Object> varMap)
-    {
-        VariableFormula formula = new VariableFormula();
-        formula.setFormula(szExpress);
-        formula.setTrans(new ObjectTranslate(varMap));
-        return formula.calcFormula();
-    }
 
     public static Object calculate(String szExpress,VariableTranslate varTrans)
     {
@@ -426,5 +419,10 @@ public class VariableFormula {
         formula.setFormula(szExpress);
         formula.setTrans(varTrans);
         return formula.calcFormula();
+    }
+
+    public static Object calculate(String szExpress,Object varMap)
+    {
+        return calculate(szExpress,new ObjectTranslate(varMap));
     }
 }

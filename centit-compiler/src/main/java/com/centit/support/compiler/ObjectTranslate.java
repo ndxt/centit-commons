@@ -27,10 +27,8 @@ public class ObjectTranslate implements VariableTranslate {
       */
     @Override
     public Object getVarValue(String varName) {
-        
         if(varObj==null)
             return null;
-
         return ReflectionOpt.attainExpressionValue
                 /*ReflectionOpt.forceGetProperty*/(varObj, varName);
     }    

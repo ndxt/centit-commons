@@ -1,5 +1,7 @@
 package com.centit.support.compiler;
 
+import com.centit.support.algorithm.StringBaseOpt;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +18,6 @@ public class FormulaTest {
 
     public static void testFormula2() {
 
-        VariableFormula f = new VariableFormula();
         Map<String,Object> varMap = new HashMap<String,Object>();
         Map<String,Object> varA = new HashMap<String,Object>();
         varA.put("aa", new Integer[]{100,200,300});
@@ -31,10 +32,10 @@ public class FormulaTest {
         //System.out.println(f.checkFormula("a.aa[1]+a.aa[2]"));
         //String s = f.calculate("${a.aa[0]}+ ${a.aa[2]}",varMap);
         //System.out.println(s);
-        String formula = " depart != '你好' ";
+        String formula = "getpy(depart ) + a.aa ";
         System.out.println(formula);
-        Object s = f.calculate(formula, varMap);
-        System.out.println(s);
+        Object s = VariableFormula.calculate(formula, varMap);
+        System.out.println(StringBaseOpt.castObjectToString(s));
         System.out.println("Done!");
     }
 
@@ -59,8 +60,9 @@ public class FormulaTest {
     }
 
     public  static void  main(String[] args)   {
-        testFormula();/*
-        //testFormula2();//
+        //testFormula();
+        testFormula2();//
+        /*
         // testFormula2();
         //testLexer();
         Map<String,Object> map = new HashMap<>(5);

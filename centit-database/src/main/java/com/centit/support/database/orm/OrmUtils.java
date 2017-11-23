@@ -137,7 +137,7 @@ public abstract class OrmUtils {
                             break;
                         case FUNCTIION:
                             setObjectFieldValue(object, filed,
-                                    VariableFormula.calculate(valueGenerator.value()));
+                                    VariableFormula.calculate(valueGenerator.value(),object));
                             break;
                     }
                 }
