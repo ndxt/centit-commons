@@ -479,9 +479,9 @@ public abstract class ListOpt {
 
     /**
      *将list(Collection 所以 set也可以) 转换为数组， list.toArray(T[]) 感觉不太好用，要new一个接受的数组对象
+     * @param <T> 类型
      * @param listObj Collection 对象 可以是list 也可以是 set
-     * @param <T> 类型，
-     * @param classType T的类型，
+     * @param classType T 的类型
      * @return T[] 数组
      */
     public static <T> T[] listToArray(Collection<T> listObj, Class<T> classType){
@@ -496,9 +496,9 @@ public abstract class ListOpt {
      * 将list(Collection 所以 set也可以) 转换为数组， list.toArray(T[]) 感觉不太好用，要new一个接受的数组对象
      * @param listObj Collection 对象 可以是list 也可以是 set
      * @param <T> 类型
-     * @return T[] 数组
+     * @return 数组
      * 注意，如果这个 T 是一个 接口，并且 Collection 中的内容是这个接口的不同实现，这个方法将抛异常,
-     *      这时候需要调用   <T> T[] listToArray(Collection<T> listObj, Class<T> classType)其中 classType 传入接口类
+     *      这时候需要调用   &lt;T&gt; T[] listToArray(Collection&lt;T&gt; listObj, Class&lt;T&gt; classType)其中 classType 传入接口类
      */
     public static <T> T[] listToArray(Collection<T> listObj){
         if(listObj==null || listObj.size()==0)

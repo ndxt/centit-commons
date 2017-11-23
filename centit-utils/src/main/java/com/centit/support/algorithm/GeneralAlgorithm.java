@@ -47,6 +47,7 @@ public abstract  class GeneralAlgorithm {
 
     /**  int compare(final T c1, final T c2)
      * 等价于 ObjectUtils.compare
+     * @param <T> 比较对对象类型
      * @param l1 参数1
      * @param l2 参数2
      * @return 返回比较值 0 相等 1 大于 -1 小于

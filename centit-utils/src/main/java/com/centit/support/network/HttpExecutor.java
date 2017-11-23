@@ -211,19 +211,12 @@ public abstract class HttpExecutor {
         return httpExecute( httpclient,null,
                  httpRequest, null);
     } 
-    
-    public static String appendParamToUrl(String uri,String queryParam){
-        if (queryParam == null || "".equals(queryParam))
-            return uri;
-        return (uri.endsWith("?") || uri.endsWith("&")) ? uri + queryParam :
-            (uri.indexOf('?') == -1 ?  uri+'?'+queryParam :  uri+'&'+queryParam );
-    }
-    
+
     public static String simpleGet(CloseableHttpClient httpclient,
             HttpContext context,String uri, String queryParam)
             throws IOException {
 
-        HttpGet httpGet = new HttpGet(appendParamToUrl(uri,queryParam));
+        HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamToUrl(uri,queryParam));
 
         return httpExecute(httpclient,context,httpGet);
     }
@@ -239,27 +232,7 @@ public abstract class HttpExecutor {
     public static String simpleGet(CloseableHttpClient httpclient,
             HttpContext context,String uri, Map<String,Object> queryParam)
             throws IOException {
-
-        StringBuilder urlBuilder = new StringBuilder(uri);
-        if(queryParam!=null){
-            if(!uri.endsWith("?") && !uri.endsWith("&")){
-                if(uri.indexOf('?') == -1 )
-                    urlBuilder.append('?');
-                else
-                    urlBuilder.append('&');
-            }
-            int n=0;
-            for(Map.Entry<String,Object> ent : queryParam.entrySet() ){
-                if(n>0)
-                    urlBuilder.append('&');
-                n++;
-                urlBuilder.append(ent.getKey()).append('=').append(
-                        StringEscapeUtils.escapeHtml4(
-                                StringBaseOpt.objectToString(ent.getValue()))
-                        );
-            }
-        }
-        HttpGet httpGet = new HttpGet(urlBuilder.toString());
+        HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamsToUrl(uri, queryParam));
         return httpExecute(httpclient,context,httpGet);
     }
 
@@ -267,7 +240,6 @@ public abstract class HttpExecutor {
     public static String simpleGet(CloseableHttpClient httpclient,
             HttpContext context,String uri)
             throws IOException {
-
         return simpleGet( httpclient,context,
                    uri,  (String)null);
     }
@@ -293,7 +265,7 @@ public abstract class HttpExecutor {
             HttpContext context, String uri, String queryParam)
             throws IOException {
 
-        HttpDelete httpDelete = new HttpDelete(appendParamToUrl(uri,queryParam));
+        HttpDelete httpDelete = new HttpDelete(UrlOptUtils.appendParamToUrl(uri,queryParam));
 
         return httpExecute(httpclient,context,httpDelete);
     }
@@ -981,7 +953,7 @@ public abstract class HttpExecutor {
                 EntityUtils.toString(new UrlEncodedFormEntity(params,Consts.UTF_8));
         }
         return inputStreamUpload(httpclient,context,
-                appendParamToUrl(uri,paramsUrl), inputStream);
+                UrlOptUtils.appendParamToUrl(uri,paramsUrl), inputStream);
     }
 
     public static String inputStreamUpload(CloseableHttpClient httpclient,
@@ -1038,7 +1010,7 @@ public abstract class HttpExecutor {
                 EntityUtils.toString(new UrlEncodedFormEntity(params,Consts.UTF_8));
         }
         return fileUpload(httpclient,context,
-                appendParamToUrl(uri,paramsUrl), file);
+                UrlOptUtils.appendParamToUrl(uri,paramsUrl), file);
     }
 
     public static String fileUpload(CloseableHttpClient httpclient,
@@ -1092,7 +1064,7 @@ public abstract class HttpExecutor {
                                        HttpContext context, String uri, String queryParam,
                                        DoOperateInputStream<T> operate)throws IOException {
 
-        HttpGet httpGet = new HttpGet(appendParamToUrl(uri,queryParam));
+        HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamToUrl(uri,queryParam));
 
         try (CloseableHttpResponse response = httpClient.execute(httpGet,context)) {
 

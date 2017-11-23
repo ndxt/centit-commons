@@ -1,5 +1,7 @@
 package com.centit.support.network;
 
+import com.centit.support.algorithm.StringBaseOpt;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +114,10 @@ public abstract class UrlOptUtils {
         return o.toString();
     }
 
-    /*
-     * 获取域名
+    /**
+     * 根据URL 获取域名
+     * @param curl url
+     * @return 返回域名
      */
     public static String getUrlDomain(String curl){
         try{
@@ -122,5 +126,42 @@ public abstract class UrlOptUtils {
             logger.error(e.getMessage(),e);//e.printStackTrace();
             return null;
         }
+    }
+
+    public static String appendParamsToUrl(String uri, Map<String,Object> queryParam){
+        StringBuilder urlBuilder = new StringBuilder(uri);
+        if(queryParam!=null){
+            if(!uri.endsWith("?") && !uri.endsWith("&")){
+                if(uri.indexOf('?') == -1 )
+                    urlBuilder.append('?');
+                else
+                    urlBuilder.append('&');
+            }
+            int n=0;
+            for(Map.Entry<String,Object> ent : queryParam.entrySet() ){
+                if(n>0)
+                    urlBuilder.append('&');
+                n++;
+                urlBuilder.append(ent.getKey()).append('=').append(
+                        StringEscapeUtils.escapeHtml4(
+                                StringBaseOpt.objectToString(ent.getValue()))
+                );
+            }
+        }
+        return urlBuilder.toString();
+    }
+
+    public static String appendParamToUrl(String uri, String queryParam){
+        if (queryParam == null || "".equals(queryParam))
+            return uri;
+        return (uri.endsWith("?") || uri.endsWith("&")) ? uri + queryParam :
+                (uri.indexOf('?') == -1 ?  uri+'?'+queryParam :  uri+'&'+queryParam );
+    }
+
+    public static String appendParamToUrl(String uri, String paramName, Object paramValue){
+        return (uri.endsWith("?") || uri.endsWith("&")) ?
+                uri + paramName +"="+ StringBaseOpt.objectToString(paramValue):
+                uri + (uri.indexOf('?') == -1 ? '?':'&')
+                        + paramName +"="+ StringBaseOpt.objectToString(paramValue);
     }
 }
