@@ -515,4 +515,27 @@ public abstract class StringBaseOpt {
         return GeneralAlgorithm.nvl(castObjectToString(obj),defaultValue);
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T stringToScalarData(String sdata, Class<T> clazz) {
+        if(StringUtils.isBlank(sdata))
+            return null;
+        if(clazz == java.lang.Integer.class || clazz == int.class){
+            return (T)java.lang.Integer.valueOf(sdata);
+        }else if(clazz == java.lang.Long.class || clazz == long.class){
+            return (T)java.lang.Long.valueOf(sdata);
+        }else if(clazz == java.lang.Double.class || clazz == double.class ){
+            return (T)java.lang.Double.valueOf(sdata);
+        }else if(clazz == java.lang.Boolean.class || clazz == boolean.class ){
+            return (T)java.lang.Boolean.valueOf(sdata);
+        }else if(clazz == java.lang.Float.class || clazz == float.class ){
+            return (T)java.lang.Float.valueOf(sdata);
+        }else if(clazz == java.lang.String.class){
+            return (T)sdata;
+        }else if(clazz == java.util.Date.class){
+            return (T)DatetimeOpt.smartPraseDate(sdata);
+        }else if(clazz == java.util.UUID.class){
+            return (T)java.util.UUID.fromString(sdata);
+        }else
+            return null;
+    }
 }
