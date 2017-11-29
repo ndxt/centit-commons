@@ -109,7 +109,7 @@ public abstract class OrmDaoUtils {
         try {
             TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
-            object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
+            object = OrmUtils.prepareObjectForMerge(object,mapInfo,sqlDialect );
             return sqlDialect.mergeObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
         }catch (NoSuchFieldException | IOException | SQLException e){
             throw  new PersistenceException(e);
@@ -985,8 +985,18 @@ public abstract class OrmDaoUtils {
         }
     }
 
+    private static <T> T prepareObjectForMerge(Connection connection, T object) throws PersistenceException {
+        try {
+            TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+            return OrmUtils.prepareObjectForMerge(object, mapInfo, sqlDialect);
+        } catch (IOException | SQLException| NoSuchFieldException e) {
+            throw new PersistenceException(e);
+        }
+    }
     public static <T> int mergeObjectCascadeShallow(Connection connection, T object)
             throws PersistenceException {
+        object = prepareObjectForMerge(connection,  object);
         int  checkExists = checkObjectExists(connection, object);
         if(checkExists == 0){
             return saveNewObjectCascadeShallow(connection, object);
@@ -998,6 +1008,8 @@ public abstract class OrmDaoUtils {
     }
 
     public static <T> int mergeObjectCascade(Connection connection, T object) throws PersistenceException {
+
+        object = prepareObjectForMerge(connection,  object);
         int  checkExists = checkObjectExists(connection,object);
         if(checkExists == 0){
             return saveNewObjectCascade(connection,object);

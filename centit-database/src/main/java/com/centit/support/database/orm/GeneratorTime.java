@@ -5,6 +5,6 @@ package com.centit.support.database.orm;
  */
 public enum GeneratorTime {
     NEW, // 在新建的时候生成
-    UPDATE, //再修改式生成
+    UPDATE, //在修改式生成
     ALWAYS //任何时候都生成
 }

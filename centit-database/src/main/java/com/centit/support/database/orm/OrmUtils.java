@@ -3,9 +3,11 @@ package com.centit.support.database.orm;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.KeyValuePair;
 import com.centit.support.compiler.VariableFormula;
+import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.PersistenceException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -151,6 +153,16 @@ public abstract class OrmUtils {
     public static <T> T prepareObjectForUpdate(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
             throws SQLException, NoSuchFieldException, IOException {
         return prepareObjectForExecuteSql(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
+    }
+
+    public static <T> T prepareObjectForMerge(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
+            throws SQLException, NoSuchFieldException, IOException {
+        Map<String,Object> objectMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
+        if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,objectMap)){
+            return prepareObjectForExecuteSql(object, mapInfo, sqlDialect, GeneratorTime.NEW);
+        }else {
+            return prepareObjectForExecuteSql(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
+        }
     }
 
     public static Map<String, Object> fetchObjectField(Object object)
