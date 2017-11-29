@@ -712,7 +712,8 @@ public abstract class OrmDaoUtils {
         return replaceObjectsAsTabulation(connection, dbObjects,newObjects);
     }
 
-    private static <T> int saveNewObjectReferenceCascade(Connection connection, T object,SimpleTableReference ref ,TableMapInfo mapInfo )
+    private static <T> int saveNewObjectReferenceCascade(Connection connection, T object,
+                                                         SimpleTableReference ref ,TableMapInfo mapInfo )
             throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
@@ -728,8 +729,18 @@ public abstract class OrmDaoUtils {
         if( refMapInfo == null )
             return 0;
         if (ref.getReferenceType().equals(refType)){ // OneToOne
+            for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
+                Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
+                refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(newObj,obj);
+            }
             saveNewObjectCascade(connection, newObj);
         }else if(newObj instanceof Collection){
+            for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
+                Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
+                for(Object subObj : (Collection<Object>)newObj) {
+                    refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(subObj, obj);
+                }
+            }
             for(Object subObj : (Collection<Object>)newObj){
                 saveNewObjectCascade(connection, subObj);
             }
@@ -761,17 +772,27 @@ public abstract class OrmDaoUtils {
         List<?> refs = listObjectsByProperties(connection,  properties, refType);
 
         if (ref.getReferenceType().equals(refType)){ // OneToOne
+            for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
+                Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
+                refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(newObj,obj);
+            }
             if(refs!=null && refs.size()>0){
                 updateObject(connection, newObj);
             }else{
                 saveNewObject(connection, newObj);
             }
-        }else if(Set.class.isAssignableFrom(ref.getReferenceType())){
-                replaceObjectsAsTabulation(connection,  (List<Object>) refs,
-                        new ArrayList<>((Set<?>) newObj));
-        }else if(List.class.isAssignableFrom(ref.getReferenceType())){
-            replaceObjectsAsTabulation( connection, (List<Object>) refs,
-                    (List<Object>) newObj );
+        }else {
+            List<Object> newListObj = Set.class.isAssignableFrom(ref.getReferenceType())?
+                  new ArrayList<>((Set<?>) newObj):(List<Object>) newObj;
+
+            for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
+                Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
+                for(Object subObj : newListObj) {
+                    refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(subObj, obj);
+                }
+            }
+            replaceObjectsAsTabulation(connection, (List<Object>) refs, newListObj);
+
         }
         return 1;
     }

@@ -54,7 +54,7 @@ public class SimpleTableReference implements TableReference{
 
     public List<SimpleTableField> getFkColumns() {
         if(fkColumns==null)
-            fkColumns = new ArrayList<SimpleTableField>();
+            fkColumns = new ArrayList<>();
         return fkColumns;
     }
 
