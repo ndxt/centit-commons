@@ -13,7 +13,7 @@ public abstract class EmbedFunc {
         throw new IllegalAccessError("Utility class");
     }
     private static double MIN_DOUBLE = 0.00000001;
-    public static final int functionsSum = 48;
+    public static final int functionsSum = 50;
     protected static final FunctionInfo functionsList[]={
         new FunctionInfo("ave",-1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
@@ -52,6 +52,9 @@ public abstract class EmbedFunc {
         new FunctionInfo("upcase",1,ConstDefine.FUNC_UPCASE,ConstDefine.TYPE_STR), // 字符串大写
         new FunctionInfo("lowcase",1,ConstDefine.FUNC_LOWCASE,ConstDefine.TYPE_STR), // 字符串小写
         new FunctionInfo("substr",2,ConstDefine.FUNC_SUBSTR,ConstDefine.TYPE_STR), // 求字符串子串 substr ("123456",2,3)="345"
+        new FunctionInfo("lpad",1,ConstDefine.FUNC_LPAD,ConstDefine.TYPE_STR), // 字符串小写
+        new FunctionInfo("rpad",1,ConstDefine.FUNC_RPAD,ConstDefine.TYPE_STR), // 求字符串子串 substr ("123456",2,3)="345"
+
         new FunctionInfo("find",2,ConstDefine.FUNC_FIND,ConstDefine.TYPE_NUM),  //求子串位置 find ("123456","34")=2  find ("123456","35")=-1
         new FunctionInfo("frequence",2,ConstDefine.FUNC_FREQUENCE,ConstDefine.TYPE_NUM), // 求子串个数 find ("12345236","23")=2
         new FunctionInfo("int",1,ConstDefine.FUNC_INT,ConstDefine.TYPE_NUM), // 求整数部分 int (12.34)=12 int -12.34)=-12
@@ -296,6 +299,43 @@ public abstract class EmbedFunc {
                 str  = '"' +tempstr + '"';
                 return str;
                          }
+            case ConstDefine.FUNC_LPAD: {
+                if (nOpSum < 2)
+                    return slOperand.get(0);
+                int nLength;
+                if( StringRegularOpt.isNumber(slOperand.get(1) )) {
+                    nLength = Integer.valueOf(StringRegularOpt.trimString(slOperand.get(1)));
+                }else{
+                    return slOperand.get(0);
+                }
+                if (nOpSum > 2){
+                    String padChar = StringRegularOpt.trimString(slOperand.get(2));
+                    return '"' + StringUtils.leftPad(
+                            StringRegularOpt.trimString(slOperand.get(0)), nLength, padChar )+ '"';
+                }else{
+                    return '"' + StringUtils.leftPad(
+                            StringRegularOpt.trimString(slOperand.get(0)), nLength)+ '"';
+                }
+            }
+
+            case ConstDefine.FUNC_RPAD: {
+                if (nOpSum < 2)
+                    return slOperand.get(0);
+                int nLength;
+                if( StringRegularOpt.isNumber(slOperand.get(1) )) {
+                    nLength = Integer.valueOf(StringRegularOpt.trimString(slOperand.get(1)));
+                }else{
+                    return slOperand.get(0);
+                }
+                if (nOpSum > 2){
+                    String padChar = StringRegularOpt.trimString(slOperand.get(2));
+                    return '"' + StringUtils.rightPad(
+                            StringRegularOpt.trimString(slOperand.get(0)), nLength, padChar )+ '"';
+                }else{
+                    return '"' + StringUtils.rightPad(
+                            StringRegularOpt.trimString(slOperand.get(0)), nLength)+ '"';
+                }
+            }
 
             case ConstDefine.FUNC_FIND:{ //index
                     if (nOpSum < 2) return "-1";
@@ -875,6 +915,33 @@ public abstract class EmbedFunc {
                     nLength = 1;
 
                 return tempStr.substring(nStart,nStart + nLength);
+            }
+            case ConstDefine.FUNC_LPAD: {
+                if (nOpSum < 2)
+                    return slOperand.get(0);
+                int nLength = NumberBaseOpt.castObjectToInteger(slOperand.get(1),0);
+                 if (nOpSum > 2){
+                    String padChar = StringBaseOpt.castObjectToString(slOperand.get(2));
+                    return StringUtils.leftPad(
+                            StringBaseOpt.castObjectToString(slOperand.get(0)), nLength, padChar );
+                }else{
+                    return StringUtils.leftPad(
+                            StringBaseOpt.castObjectToString(slOperand.get(0)), nLength );
+                }
+            }
+
+            case ConstDefine.FUNC_RPAD: {
+                if (nOpSum < 2)
+                    return slOperand.get(0);
+                int nLength = NumberBaseOpt.castObjectToInteger(slOperand.get(1),0);
+                if (nOpSum > 2){
+                    String padChar = StringBaseOpt.castObjectToString(slOperand.get(2));
+                    return StringUtils.rightPad(
+                            StringBaseOpt.castObjectToString(slOperand.get(0)), nLength, padChar );
+                }else{
+                    return StringUtils.rightPad(
+                            StringBaseOpt.castObjectToString(slOperand.get(0)), nLength );
+                }
             }
 
             case ConstDefine.FUNC_FIND:{ //index

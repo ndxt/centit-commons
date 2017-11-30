@@ -66,6 +66,8 @@ public abstract class ConstDefine {
     public static final int   FUNC_ISEMPTY    = 146;
     public static final int   FUNC_NOTEMPTY    = 147;
     public static final int   FUNC_GET_AT    = 148;
+    public static final int   FUNC_LPAD    = 150;
+    public static final int   FUNC_RPAD    = 151;
 
     public static final int   OP_BASE        = 30;    // +
     public static final int   OP_ADD         = 30;    // +
