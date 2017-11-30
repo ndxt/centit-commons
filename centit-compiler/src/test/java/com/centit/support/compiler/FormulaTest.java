@@ -32,7 +32,7 @@ public class FormulaTest {
         //System.out.println(f.checkFormula("a.aa[1]+a.aa[2]"));
         //String s = f.calculate("${a.aa[0]}+ ${a.aa[2]}",varMap);
         //System.out.println(s);
-        String formula = "getpy(depart ) + a.aa ";
+        String formula = "getpy(depart ) + rpad(lpad(ideaCode,9,'abcd'),20,'def') + a.aa ";
         System.out.println(formula);
         Object s = VariableFormula.calculate(formula, varMap);
         System.out.println(StringBaseOpt.castObjectToString(s));
