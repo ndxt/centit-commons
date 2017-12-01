@@ -132,10 +132,16 @@ public class JavaBeanField {
                         StringBaseOpt.objectToString(newValue));
                 break;
             case "Date":
-            case "Timestamp":
                 this.innerSetObjectFieldValue(object,
                         DatetimeOpt.castObjectToDate(newValue));
                 break;
+            case "sqlDate":
+                this.innerSetObjectFieldValue(object,
+                        DatetimeOpt.castObjectToSqlDate(newValue));
+                break;
+            case "sqlTimestamp":
+                this.innerSetObjectFieldValue(object,
+                        DatetimeOpt.castObjectToSqlTimestamp(newValue));
             case "boolean":
             case "Boolean":
                 this.innerSetObjectFieldValue(object,

@@ -94,23 +94,23 @@ public abstract class ReflectionOpt  {
             try {
                 md = obj.getClass().getMethod("is" + StringUtils.capitalize(fieldName));
             }catch (Exception e ){
-                logger.error(noGet.getMessage() + e.getMessage(), e);
+                logger.error(noGet.getMessage() + e.getMessage());
             }
         }catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            logger.error(e.getMessage());
         }
 
         if(md==null){
             try{
                 return forceGetProperty(obj, fieldName);
             }catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error(e.getMessage());
             }
         }else{
             try{
                 return md.invoke(obj);
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error(e.getMessage());
             }
         }
         return null;
@@ -127,7 +127,7 @@ public abstract class ReflectionOpt  {
             } catch (NoSuchMethodException noSet) {
                 logger.error(noSet.getMessage(), noSet);
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error(e.getMessage());
             }
         }
         if(!hasSetValue){
@@ -135,7 +135,7 @@ public abstract class ReflectionOpt  {
                 forceSetProperty(object, fieldName, newValue);
                 hasSetValue = true;
             }catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error(e.getMessage());
             }
         }
         return hasSetValue;
@@ -306,7 +306,7 @@ public abstract class ReflectionOpt  {
             else
                 return null;
         } catch (NoSuchMethodException e) {
-            logger.error(e.getMessage(), e);
+            logger.error(e.getMessage());
             return null;
         }
     }
@@ -322,7 +322,7 @@ public abstract class ReflectionOpt  {
             else
                 return md;
         } catch (NoSuchMethodException e) {
-            logger.error(e.getMessage(), e);
+            logger.error(e.getMessage());
             return null;
         }
     }
@@ -334,7 +334,7 @@ public abstract class ReflectionOpt  {
         try {
             return classType.getMethod("set" + StringUtils.capitalize(fieldName), propertyType);
         } catch (NoSuchMethodException e) {
-            logger.error(e.getMessage(), e);
+            logger.error(e.getMessage());
             return null;
         }
     }
@@ -717,12 +717,14 @@ public abstract class ReflectionOpt  {
         String typeName = type.getTypeName();
         if(typeName.indexOf('.')<1) {
             return typeName;
-        } else if(typeName.startsWith("java.lang.") || typeName.startsWith("java.sql.")
+        } else if(typeName.startsWith("java.lang.")
                 || "java.util.Date".equals(typeName)
                 || "java.util.UUID".equals(typeName)
                 || "java.math.BigDecimal".equals(typeName)
                 || "java.math.BigInteger".equals(typeName)) {
             return FileType.getFileExtName(typeName);
+        } else if(typeName.startsWith("java.sql.")) {
+            return "sql" + FileType.getFileExtName(typeName);
         } else {
             return typeName;
         }

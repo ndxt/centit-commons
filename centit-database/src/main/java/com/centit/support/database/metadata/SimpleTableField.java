@@ -1,8 +1,8 @@
 package com.centit.support.database.metadata;
 
+import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.database.utils.DBType;
-import com.centit.support.file.FileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +58,8 @@ public class SimpleTableField implements TableField {
         if( ("Long".equals(javaType) || "Double".equals(javaType))
                 && maxLength <= 0 )
             maxLength = 8;
-        if( ("Date".equals(javaType) || "Timestamp".equals(javaType))
+        if( ("Date".equals(javaType) || "Timestamp".equals(javaType)
+            || "sqlDate".equals(javaType) || "sqlTimestamp".equals(javaType))
                 && maxLength <= 0 )
             maxLength = 7;
     }
@@ -109,8 +110,9 @@ public class SimpleTableField implements TableField {
                 return "VARCHAR2";
             return "VARCHAR";
         case "Date":
+        case "sqlDate":
             return "DATE";
-        case "Timestamp":
+        case "sqlTimestamp":
             return "TIMESTAMP";
         case "byte[]":
             return "BLOB";
@@ -122,6 +124,10 @@ public class SimpleTableField implements TableField {
     public String getHibernateType(){
         if(javaType !=null && ( javaType.equals("Date")|| javaType.equals("Timestamp")))
             return "java.util."+javaType;
+        if("sqlDate".equals(javaType))
+            return "java.sql.Date";
+        if("sqlTimestamp".equals(javaType))
+            return "java.sql.Timestamp";
         return "java.lang."+javaType;
     }
 
@@ -162,17 +168,7 @@ public class SimpleTableField implements TableField {
     }
 
     public void setJavaType(Class<?> type) {
-        String typeName = type.getTypeName();
-        if(typeName.indexOf('.')<1) {
-            javaType = typeName;
-        } else if(typeName.startsWith("java.lang.") || typeName.startsWith("java.sql.")
-                || "java.util.Date".equals(typeName)
-                || "java.util.UUID".equals(typeName)
-                || "java.math.BigDecimal".equals(typeName)
-                || "java.math.BigInteger".equals(typeName)) {
-            javaType = FileType.getFileExtName(typeName);
-        } else
-            javaType = type.getTypeName();
+        javaType = ReflectionOpt.getJavaTypeName(type);
     }
 
     /**

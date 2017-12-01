@@ -81,9 +81,16 @@ public abstract class OrmUtils {
                 }
                 break;
             case "Date":
-            case "Timestamp":
                 field.setObjectFieldValue(object,
                         DatetimeOpt.castObjectToDate(newValue));
+                break;
+            case "sqlDate":
+                field.setObjectFieldValue(object,
+                        DatetimeOpt.castObjectToSqlDate(newValue));
+                break;
+            case "sqlTimestamp":
+                field.setObjectFieldValue(object,
+                        DatetimeOpt.castObjectToSqlTimestamp(newValue));
                 break;
             case "boolean":
             case "Boolean":

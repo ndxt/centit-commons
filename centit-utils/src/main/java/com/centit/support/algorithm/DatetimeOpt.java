@@ -144,6 +144,19 @@ public abstract class DatetimeOpt {
         return new java.sql.Date(date.getTime());
     }
 
+    public static java.sql.Date castObjectToSqlDate(Object date){
+        if(date==null)
+            return null;
+        if(date instanceof java.sql.Date)
+            return (java.sql.Date) date;
+        if(date instanceof java.util.Date)
+            return new java.sql.Date(((java.util.Date)date).getTime());
+        java.util.Date dt = DatetimeOpt.castObjectToDate(date);
+        if(dt==null)
+            return null;
+        return new java.sql.Date(dt.getTime());
+    }
+
     /**
      *  日期类型转换 从 java.util.Date 转换为 java.sql.Timestamp
      * @param date 时间
@@ -157,6 +170,18 @@ public abstract class DatetimeOpt {
         return new java.sql.Timestamp(date.getTime());
     }
 
+    public static java.sql.Timestamp castObjectToSqlTimestamp(Object date){
+        if(date==null)
+            return null;
+        if(date instanceof java.sql.Timestamp)
+            return (java.sql.Timestamp) date;
+        if(date instanceof java.util.Date)
+            return new java.sql.Timestamp(((java.util.Date) date).getTime());
+        java.util.Date dt = DatetimeOpt.castObjectToDate(date);
+        if(dt==null)
+            return null;
+        return new java.sql.Timestamp(dt.getTime());
+    }
     /*
      * 取系统当前日期和时间 ，返回 类型 java.sql.Date
      */

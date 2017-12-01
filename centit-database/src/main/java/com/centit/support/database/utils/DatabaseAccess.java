@@ -53,6 +53,8 @@ public abstract class DatabaseAccess {
             for (int i = 0; i < n; i++) {
                 if (paramObjs[i] == null)
                     stmt.setNull(i + 2, Types.NULL);
+                else if (paramObjs[i] instanceof java.sql.Date)
+                    stmt.setObject(i + 2, paramObjs[i]);
                 else if (paramObjs[i] instanceof java.util.Date)
                     stmt.setObject(i + 2, DatetimeOpt.convertToSqlTimestamp((java.util.Date) paramObjs[i]));
                 else
@@ -115,6 +117,8 @@ public abstract class DatabaseAccess {
             for (int i = 0; i < paramObjs.length; i++) {
                 if (paramObjs[i] == null)
                     stmt.setNull(i + 1, Types.NULL);
+                else if (paramObjs[i] instanceof java.sql.Date)
+                    stmt.setObject(i + 1, paramObjs[i]);
                 else if (paramObjs[i] instanceof java.util.Date)
                     stmt.setObject(i + 1, DatetimeOpt.convertToSqlTimestamp((java.util.Date) paramObjs[i]));
                 else
@@ -128,6 +132,8 @@ public abstract class DatabaseAccess {
             for (int i = 0; i < paramObjs.size(); i++) {
                 if (paramObjs.get(i) == null)
                     stmt.setNull(i + 1, Types.NULL);
+                else if (paramObjs.get(i) instanceof java.sql.Date)
+                    stmt.setObject(i + 1, paramObjs.get(i));
                 else if (paramObjs.get(i) instanceof java.util.Date)
                     stmt.setObject(i + 1, DatetimeOpt.convertToSqlTimestamp((java.util.Date) paramObjs.get(i)));
                 else
