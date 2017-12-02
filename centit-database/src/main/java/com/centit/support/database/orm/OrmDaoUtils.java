@@ -34,6 +34,14 @@ public abstract class OrmDaoUtils {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(OrmDaoUtils.class);
+
+    /**
+     * MySql使用存储过程来模拟序列的
+     * 获取 Sequence 的值
+     * @param connection 数据库连接
+     * @param sequenceName 序列名称
+     * @return 序列值
+     */
     public static Long getSequenceNextValue(Connection connection, final String sequenceName) {
         try {
             return GeneralJsonObjectDao.createJsonObjectDao(connection)
@@ -74,7 +82,15 @@ public abstract class OrmDaoUtils {
         }
     }
 
-
+    /**
+     * 只更改对象object的部分属性 fields
+     * @param connection 数据库连接
+     * @param fields 需要修改的属性
+     * @param object 修改的对象，主键必须有值
+     * @param <T> 对象类型
+     * @return 更改的记录数
+     * @throws PersistenceException 运行时异常
+     */
     public static <T> int updateObject(Connection connection, Collection<String> fields,  T object)
             throws PersistenceException  {
         try {
@@ -88,8 +104,19 @@ public abstract class OrmDaoUtils {
         }
     }
 
+    /**
+     * 批量修改 对象
+     * @param connection 数据库连接
+     * @param fields 需要修改的属性，对应的值从 object 对象中找
+     * @param object   对应 fields 中的属性必须有值，如果没有值 将被设置为null
+     * @param propertiesFilter 过滤条件对
+     * @param <T> 类型
+     * @return 更改的条数
+     * @throws PersistenceException 运行时异常
+     */
     public static <T> int batchUpdateObject(
-            Connection connection, Collection<String> fields,   T object, Map<String, Object> properties)
+            Connection connection, Collection<String> fields,   T object,
+                Map<String, Object> propertiesFilter)
             throws PersistenceException  {
         try {
             TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
@@ -99,8 +126,35 @@ public abstract class OrmDaoUtils {
             return sqlDialect.updateObjectsByProperties(
                     fields,
                     OrmUtils.fetchObjectDatabaseField(object,mapInfo),
-                    properties);
+                    propertiesFilter);
         }catch (NoSuchFieldException | IOException | SQLException e){
+            throw  new PersistenceException(e);
+        }
+    }
+
+    /**
+     * 批量修改 对象
+     * @param connection 数据库连接
+     * @param type 对象类型
+     * @param propertiesValue 值对
+     * @param propertiesFilter 过滤条件对
+     * @return 更改的条数
+     * @throws PersistenceException 运行时异常
+     */
+    public static int batchUpdateObject(
+            Connection connection, Class<?> type,
+            Map<String, Object> propertiesValue,
+            Map<String, Object> propertiesFilter)
+            throws PersistenceException  {
+        try {
+            TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+
+            return sqlDialect.updateObjectsByProperties(
+                    propertiesValue.keySet(),
+                    propertiesValue,
+                    propertiesFilter);
+        }catch (SQLException e){
             throw  new PersistenceException(e);
         }
     }
