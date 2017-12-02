@@ -1,12 +1,12 @@
 package com.centit.support.database.orm;
 
-import com.alibaba.fastjson.JSON;
 import com.centit.support.algorithm.ListOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
+import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableReference;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.*;
@@ -446,10 +446,14 @@ public abstract class OrmDaoUtils {
                 (rs) -> OrmUtils.fetchFieldsFormResultSet(rs,object,mapInfo));
     }
 
-    private static <T> T fetchObjectReference(Connection connection, T object,SimpleTableReference ref ,TableMapInfo mapInfo , boolean casecade)
+    private static <T> T fetchObjectReference(Connection connection, T object,SimpleTableReference ref,
+                                              TableMapInfo mapInfo, boolean casecade)
             throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
+            return object;
+        SimpleTableField field = mapInfo.findFieldByName(ref.getReferenceName());
+        if(field==null)
             return object;
 
         Class<?> refType = ref.getTargetEntityType();
@@ -469,16 +473,13 @@ public abstract class OrmDaoUtils {
                     fetchObjectReferencesCascade(connection, refObject,refType);
                 }
             }
-            if (ref.getReferenceType().equals(refType) /*||
-                    ref.getReferenceType().isAssignableFrom(refType) */){
-                ReflectionOpt.setFieldValue(object, ref.getReferenceName(),
-                        refs.get(0), ref.getReferenceType());
+            if (//ref.getReferenceType().equals(refType) || oneToOne
+                    ref.getReferenceType().isAssignableFrom(refType) ){
+                field.setObjectFieldValue(object, refs.get(0));
             }else if(Set.class.isAssignableFrom(ref.getReferenceType())){
-                ReflectionOpt.setFieldValue(object, ref.getReferenceName(),
-                        new HashSet<>(refs), ref.getReferenceType());
+                field.setObjectFieldValue(object, new HashSet<>(refs));
             }else if(List.class.isAssignableFrom(ref.getReferenceType())){
-                ReflectionOpt.setFieldValue(object, ref.getReferenceName(),
-                        refs, ref.getReferenceType());
+                field.setObjectFieldValue(object, refs);
             }
         }
         return object;
@@ -537,7 +538,7 @@ public abstract class OrmDaoUtils {
         }
     }
 
-    private static <T> int deleteObjectReference(Connection connection, T object,SimpleTableReference ref)
+    public static <T> int deleteObjectReference(Connection connection, T object,SimpleTableReference ref)
             throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
@@ -728,7 +729,8 @@ public abstract class OrmDaoUtils {
         TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
         if( refMapInfo == null )
             return 0;
-        if (ref.getReferenceType().equals(refType)){ // OneToOne
+        if (//ref.getReferenceType().equals(refType) || oneToOne
+                ref.getReferenceType().isAssignableFrom(refType) ){
             for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
                 Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
                 refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(newObj,obj);
@@ -771,7 +773,8 @@ public abstract class OrmDaoUtils {
 
         List<?> refs = listObjectsByProperties(connection,  properties, refType);
 
-        if (ref.getReferenceType().equals(refType)){ // OneToOne
+        if (//ref.getReferenceType().equals(refType) || oneToOne
+                ref.getReferenceType().isAssignableFrom(refType) ){
             for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
                 Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
                 refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(newObj,obj);
@@ -900,7 +903,8 @@ public abstract class OrmDaoUtils {
         List<?> refs = listObjectsByProperties(connection,  properties, refType);
         if(newObj==null){
             if(refs!=null && refs.size()>0) {
-                if (ref.getReferenceType().equals(refType)) { // OneToOne
+                if (//ref.getReferenceType().equals(refType) || oneToOne
+                        ref.getReferenceType().isAssignableFrom(refType) ){
                     n += deleteObjectCascade(connection, refs.get(0));
                 } else {
                     for (Object subObj : refs) {
@@ -911,7 +915,8 @@ public abstract class OrmDaoUtils {
             return n;
         }
 
-        if (ref.getReferenceType().equals(refType)){ // OneToOne
+        if (//ref.getReferenceType().equals(refType) || oneToOne
+                ref.getReferenceType().isAssignableFrom(refType) ){
             if(refs!=null && refs.size()>0){
                 updateObjectCascade(connection, newObj);
             }else{
@@ -1008,7 +1013,6 @@ public abstract class OrmDaoUtils {
     }
 
     public static <T> int mergeObjectCascade(Connection connection, T object) throws PersistenceException {
-
         object = prepareObjectForMerge(connection,  object);
         int  checkExists = checkObjectExists(connection,object);
         if(checkExists == 0){
