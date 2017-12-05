@@ -506,9 +506,6 @@ public abstract class OrmDaoUtils {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
             return object;
-        SimpleTableField field = mapInfo.findFieldByName(ref.getReferenceName());
-        if(field==null)
-            return object;
 
         Class<?> refType = ref.getTargetEntityType();
         TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
@@ -529,11 +526,11 @@ public abstract class OrmDaoUtils {
             }
             if (//ref.getReferenceType().equals(refType) || oneToOne
                     ref.getReferenceType().isAssignableFrom(refType) ){
-                field.setObjectFieldValue(object, refs.get(0));
+                ref.setObjectFieldValue(object, refs.get(0));
             }else if(Set.class.isAssignableFrom(ref.getReferenceType())){
-                field.setObjectFieldValue(object, new HashSet<>(refs));
+                ref.setObjectFieldValue(object, new HashSet<>(refs));
             }else if(List.class.isAssignableFrom(ref.getReferenceType())){
-                field.setObjectFieldValue(object, refs);
+                ref.setObjectFieldValue(object, refs);
             }
         }
         return object;
@@ -774,7 +771,8 @@ public abstract class OrmDaoUtils {
         if(ref==null || ref.getReferenceColumns().size()<1)
             return 0;
 
-        Object newObj = ReflectionOpt.getFieldValue( object, ref.getReferenceName());
+        Object newObj = ref.getObjectFieldValue(object);
+        //ReflectionOpt.getFieldValue( object, ref.getReferenceName());
         if(newObj==null){
             return 0;
         }
@@ -810,7 +808,8 @@ public abstract class OrmDaoUtils {
         if(ref==null || ref.getReferenceColumns().size()<1)
             return 0;
 
-        Object newObj = ReflectionOpt.getFieldValue( object, ref.getReferenceName());
+        Object newObj = ref.getObjectFieldValue(object);
+        //ReflectionOpt.getFieldValue( object, ref.getReferenceName());
         if(newObj==null){
             return deleteObjectReference(connection, object,ref);
         }
@@ -943,7 +942,8 @@ public abstract class OrmDaoUtils {
         if(ref==null || ref.getReferenceColumns().size()<1)
             return 0;
 
-        Object newObj = ReflectionOpt.getFieldValue( object, ref.getReferenceName());
+        Object newObj = ref.getObjectFieldValue(object);
+        // ReflectionOpt.getFieldValue( object, ref.getReferenceName());
         Class<?> refType = ref.getTargetEntityType();
         TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
         if( refMapInfo == null )

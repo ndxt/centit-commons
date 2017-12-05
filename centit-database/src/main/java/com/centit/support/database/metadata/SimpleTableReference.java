@@ -1,7 +1,10 @@
 package com.centit.support.database.metadata;
 
+import com.centit.support.common.JavaBeanField;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +22,7 @@ public class SimpleTableReference implements TableReference{
 
     private Map<String, String> referenceColumns;
     private int nObjectId; //only used by sqlserver
+    private JavaBeanField beanField;
 
     public int getObjectId() {
         return nObjectId;
@@ -117,5 +121,30 @@ public class SimpleTableReference implements TableReference{
 
     public void setTargetEntityType(Class<?> targetEntityType) {
         this.targetEntityType = targetEntityType;
+    }
+    public void setObjectField(Field objectField) {
+        if(beanField==null)
+            beanField = new JavaBeanField();
+        beanField.setObjectField(objectField);
+    }
+
+    public void setObjectSetFieldValueFunc(Method objectSetFieldValueFunc) {
+        if(beanField==null)
+            beanField = new JavaBeanField();
+        beanField.setSetFieldValueFunc(objectSetFieldValueFunc);
+    }
+
+    public void setObjectGetFieldValueFunc(Method objectGetFieldValueFunc) {
+        if(beanField==null)
+            beanField = new JavaBeanField();
+        beanField.setGetFieldValueFunc(objectGetFieldValueFunc);
+    }
+
+    public void setObjectFieldValue(Object obj, Object fieldValue) {
+        beanField.setObjectFieldValue(obj,fieldValue);
+    }
+
+    public Object getObjectFieldValue(Object obj) {
+        return beanField.getObjectFieldValue(obj);
     }
 }

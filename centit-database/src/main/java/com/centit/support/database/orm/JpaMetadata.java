@@ -214,12 +214,13 @@ public abstract class JpaMetadata {
 
                 if(reference.getTargetEntityType() !=null
                         &&  ! reference.getTargetEntityType().equals(void.class) ) {
+                    boolean haveJoinColumns = false;
                     if (field.isAnnotationPresent(JoinColumn.class)) {
                         JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
                         reference.setReferenceName(field.getName());
                         reference.setReferenceType(field.getType());
                         reference.addReferenceColumn(joinColumn.name(), joinColumn.referencedColumnName());
-                        mapInfo.addReference(reference);
+                        haveJoinColumns = true;
                     } else if (field.isAnnotationPresent(JoinColumns.class)) {
                         JoinColumns joinColumns = field.getAnnotation(JoinColumns.class);
                         reference.setReferenceName(field.getName());
@@ -227,6 +228,12 @@ public abstract class JpaMetadata {
                         for (JoinColumn joinColumn : joinColumns.value()) {
                             reference.addReferenceColumn(joinColumn.name(), joinColumn.referencedColumnName());
                         }
+                        haveJoinColumns = true;
+                    }
+                    if(haveJoinColumns) {
+                        reference.setObjectField(field);
+                        reference.setObjectGetFieldValueFunc(ReflectionOpt.getGetterMethod(objType, field.getType(), field.getName()));
+                        reference.setObjectSetFieldValueFunc(ReflectionOpt.getSetterMethod(objType, field.getType(), field.getName()));
                         mapInfo.addReference(reference);
                     }
                 }
