@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class DbcpConnectPools {
     private DbcpConnectPools() {
@@ -16,7 +17,7 @@ public abstract class DbcpConnectPools {
     protected static final Logger logger = LoggerFactory.getLogger(DbcpConnectPools.class);
     private static final
         Map<DataSourceDescription,BasicDataSource> dbcpDataSourcePools
-         = new HashMap<>();
+         = new ConcurrentHashMap<>();
 
     private static synchronized BasicDataSource addDataSource(DataSourceDescription dsDesc){
 
