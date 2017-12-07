@@ -1,6 +1,5 @@
 package com.centit.support.database.utils;
 
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.xml.IgnoreDTDEntityResolver;
 import org.dom4j.Document;
