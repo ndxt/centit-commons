@@ -2,6 +2,7 @@ package com.centit.test;
 
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.KeyValuePair;
+import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -16,6 +17,7 @@ public class TestQueryUtils {
 
     public static void testGetTemplateParams() {
 
+
         String queryStatement = "select  eb.estimateDatOld"+
 
           " [ :(like,uppercase) xmqc ,,,:(like,uppercase)newparames,:(like,uppercase) xmqc3| and eb.PRONAME like:xmqc] ";
@@ -26,7 +28,29 @@ public class TestQueryUtils {
     }
 
     public static void main(String[] args) {
-        testSpiltFieldPiece();
+        byte [] bytes = "hello world!".getBytes();
+        System.out.println(bytes.toString());
+        System.out.println(new String(bytes));
+        System.out.println(java.sql.Date.class.getSimpleName());
+        System.out.println(bytes.getClass().getSimpleName());
+        System.out.println(bytes.getClass().getTypeName());
+        System.out.println(bytes instanceof byte[]);
+        Object b = bytes;
+        System.out.println(b.getClass().getSimpleName());
+        System.out.println(b.getClass().getTypeName());
+        System.out.println(b instanceof byte[]);
+        System.out.println(b instanceof Object[]);
+/*
+        System.out.println(GeneratorTime.UPDATE.matchTime(GeneratorTime.READ));
+        System.out.println(GeneratorTime.READ.matchTime(GeneratorTime.NEW));
+        System.out.println(GeneratorTime.UPDATE.matchTime(GeneratorTime.NEW));
+        System.out.println(GeneratorTime.NEW_UPDATE.matchTime(GeneratorTime.UPDATE));
+        System.out.println(GeneratorTime.NEW_UPDATE.matchTime(GeneratorTime.NEW));
+        System.out.println(GeneratorTime.NEW_UPDATE.matchTime(GeneratorTime.READ));
+        System.out.println(GeneratorTime.ALWAYS.matchTime(GeneratorTime.READ));
+        System.out.println(GeneratorTime.ALWAYS.matchTime(GeneratorTime.NEW));*/
+
+        //testSpiltFieldPiece();
 
         /*System.out.println(QueryUtils.trimSqlOrderByField(" , 1 2 nulls last, 2 desc ,"));
         System.out.println(QueryUtils.trimSqlOrderByField("%27+%2B+%27+%2B+%27createDate"));

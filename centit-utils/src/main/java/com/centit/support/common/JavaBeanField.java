@@ -116,8 +116,12 @@ public class JavaBeanField {
                 break;
 
             case "byte[]":
-                this.innerSetObjectFieldValue(object,
-                        StringBaseOpt.objectToString(newValue).getBytes());
+                if(object instanceof byte[]){
+                    this.innerSetObjectFieldValue(object,newValue);
+                }else {
+                    this.innerSetObjectFieldValue(object,
+                            StringBaseOpt.objectToString(newValue).getBytes());
+                }
                 break;
             case "BigDecimal":
                 this.innerSetObjectFieldValue(object,

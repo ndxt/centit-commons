@@ -7,7 +7,6 @@ import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.utils.DatabaseAccess;
-import com.centit.support.database.utils.PersistenceException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -30,94 +29,28 @@ public abstract class OrmUtils {
     public static void setObjectFieldValue(Object object, SimpleTableField field,
                                            Object newValue)
             throws NoSuchFieldException, IOException {
-        switch (field.getJavaType()) {
-            case "int":
-            case "Integer":
-                field.setObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToInteger(newValue));
-                break;
-            case "long":
-            case "Long":
-                field.setObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToLong(newValue));
-                break;
-            case "float":
-            case "Float":
-            case "double":
-            case "Double":
-                field.setObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToDouble(newValue));
-                break;
-
-            case "byte[]"://BLOB字段
-                if (newValue instanceof Blob) {
-                    field.setObjectFieldValue(object,
-                            DatabaseAccess.fetchBlobBytes((Blob) newValue));
-                }else{
-                    field.setObjectFieldValue(object,
-                            StringBaseOpt.objectToString(newValue).getBytes());
-                }
-                break;
-
-
-            case "BigDecimal":
-                field.setObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToBigDecimal(newValue));
-                break;
-            case "BigInteger":
-                field.setObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToBigInteger(newValue));
-                break;
-            case "String":
-                if (newValue instanceof Clob) {
-                    field.setObjectFieldValue(object,
-                            DatabaseAccess.fetchClobString((Clob) newValue));
-                } /*else if (newValue instanceof Blob) {
-                    ReflectionOpt.setFieldValue(object,propertyName,
-                            DatabaseAccess.fetchBlobAsBase64((Blob) newValue),String.class);
-                } */else {
-                    field.setObjectFieldValue(object,
-                            StringBaseOpt.objectToString(newValue));
-                }
-                break;
-            case "Date":
-                field.setObjectFieldValue(object,
-                        DatetimeOpt.castObjectToDate(newValue));
-                break;
-            case "sqlDate":
-                field.setObjectFieldValue(object,
-                        DatetimeOpt.castObjectToSqlDate(newValue));
-                break;
-            case "sqlTimestamp":
-                field.setObjectFieldValue(object,
-                        DatetimeOpt.castObjectToSqlTimestamp(newValue));
-                break;
-            case "boolean":
-            case "Boolean":
-                field.setObjectFieldValue(object,
-                        StringRegularOpt.isTrue(
-                                StringBaseOpt.objectToString(newValue)));
-                break;
-            case "Clob":
-            case "Blob":
+        if (newValue instanceof Clob) {
+            if(field.getJavaType() == "Clob"){
                 field.setObjectFieldValue(object,
                         /*(Clob)*/ newValue );
-                break;
-            default:
-                if (newValue instanceof Clob) {
-                    field.setObjectFieldValue(object,
-                            DatabaseAccess.fetchClobString((Clob) newValue));
-                }else if (newValue instanceof Blob) {
-                    field.setObjectFieldValue(object,
-                            DatabaseAccess.fetchBlobBytes((Blob) newValue));
-                } else {
-                    field.setObjectFieldValue(object, newValue);
-                }
-                break;
+            }else {
+                field.setObjectFieldValue(object,
+                        DatabaseAccess.fetchClobString((Clob) newValue));
+            }
+        }else if (newValue instanceof Blob) {
+            if(field.getJavaType() == "Blob"){
+                field.setObjectFieldValue(object,
+                        /*(Blob)*/ newValue );
+            }else {
+                field.setObjectFieldValue(object,
+                        DatabaseAccess.fetchBlobBytes((Blob) newValue));
+            }
+        } else {
+            field.setObjectFieldValue(object, newValue);
         }
     }
 
-    private static <T> T prepareObjectForExecuteSql(T object, TableMapInfo mapInfo,
+    private static <T> T makeObjectValueByGenerator(T object, TableMapInfo mapInfo,
                                                     JsonObjectDao sqlDialect, GeneratorTime generatorTime)
             throws SQLException, NoSuchFieldException, IOException {
         List<KeyValuePair<String, ValueGenerator>>  valueGenerators = mapInfo.getValueGenerators();
@@ -125,8 +58,7 @@ public abstract class OrmUtils {
             return object;
         for(KeyValuePair<String, ValueGenerator> ent :  valueGenerators) {
             ValueGenerator valueGenerator =  ent.getValue();
-            if ( generatorTime == valueGenerator.occasion()
-                       || valueGenerator.occasion() == GeneratorTime.ALWAYS ){
+            if ( valueGenerator.occasion().matchTime(generatorTime)){
                 SimpleTableField filed = mapInfo.findFieldByName(ent.getKey());
                 Object fieldValue = ReflectionOpt.forceGetProperty(object, filed.getPropertyName());
                 if( fieldValue == null || valueGenerator.condition() == GeneratorCondition.ALWAYS ){
@@ -135,13 +67,16 @@ public abstract class OrmUtils {
                             filed.setObjectFieldValue(object, UuidOpt.getUuidAsString32());
                             break;
                         case SEQUENCE:
-                            setObjectFieldValue(object, filed, sqlDialect.getSequenceNextValue(
-                                    valueGenerator.value()));
+                            //GeneratorTime.READ 读取数据时不能用 SEQUENCE 生成值
+                            if(sqlDialect!=null) {
+                                setObjectFieldValue(object, filed,
+                                        sqlDialect.getSequenceNextValue(valueGenerator.value()));
+                            }
                             break;
                         case CONSTANT:
                             setObjectFieldValue(object, filed, valueGenerator.value());
                             break;
-                        case FUNCTIION:
+                        case FUNCTION:
                             setObjectFieldValue(object, filed,
                                     VariableFormula.calculate(valueGenerator.value(),object));
                             break;
@@ -154,21 +89,21 @@ public abstract class OrmUtils {
 
     public static <T> T prepareObjectForInsert(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
             throws SQLException, NoSuchFieldException, IOException {
-        return prepareObjectForExecuteSql(object, mapInfo, sqlDialect,GeneratorTime.NEW);
+        return makeObjectValueByGenerator(object, mapInfo, sqlDialect,GeneratorTime.NEW);
     }
 
     public static <T> T prepareObjectForUpdate(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
             throws SQLException, NoSuchFieldException, IOException {
-        return prepareObjectForExecuteSql(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
+        return makeObjectValueByGenerator(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
     }
 
     public static <T> T prepareObjectForMerge(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
             throws SQLException, NoSuchFieldException, IOException {
         Map<String,Object> objectMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
         if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,objectMap)){
-            return prepareObjectForExecuteSql(object, mapInfo, sqlDialect, GeneratorTime.NEW);
+            return makeObjectValueByGenerator(object, mapInfo, sqlDialect, GeneratorTime.NEW);
         }else {
-            return prepareObjectForExecuteSql(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
+            return makeObjectValueByGenerator(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
         }
     }
 
@@ -224,8 +159,8 @@ public abstract class OrmUtils {
                 setObjectFieldValue(object, filed, rs.getObject(i));
             }
         }
-        return object;
-
+        return makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ);
+        //return object;
     }
 
     public static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz)
@@ -270,7 +205,7 @@ public abstract class OrmUtils {
                     setObjectFieldValue(object, fields[i], rs.getObject(i));
                 }
             }
-            listObj.add(object);
+            listObj.add(makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ));
         }
         return listObj;
     }

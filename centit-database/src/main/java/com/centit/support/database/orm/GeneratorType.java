@@ -4,13 +4,25 @@ package com.centit.support.database.orm;
  * Created by codefan on 17-8-29.
  */
 public enum GeneratorType {
-    AUTO, // 数据库自动增长
-
-    SEQUENCE, //数据库序列
-
-    UUID, //uuid 32bit
-
-    CONSTANT, //常量
-
-    FUNCTIION // 函数，比如 当前日期
+    /**
+     *  这个其实什么都不做，就是依赖数据库自动增长
+     */
+    AUTO,
+    /**
+     * 数据库序列, 序列名称保存在value中
+     */
+    SEQUENCE,
+    /**
+     * uuid 32bit
+     */
+    UUID,
+    /**
+     * 常量 , 保存在value中
+     */
+    CONSTANT,
+    /**
+     *  函数，比如 当前日期
+     *  这个调用compiler中的表达式运行，可以将同一个对象中的其他字段作为参数
+     */
+    FUNCTION
 }

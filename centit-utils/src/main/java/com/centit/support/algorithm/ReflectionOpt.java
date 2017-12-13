@@ -719,6 +719,8 @@ public abstract class ReflectionOpt  {
             return typeName;
         } else if(typeName.startsWith("java.lang.")
                 || "java.util.Date".equals(typeName)
+                || "java.sql.Clob".equals(typeName)
+                || "java.sql.Blob".equals(typeName)
                 || "java.util.UUID".equals(typeName)
                 || "java.math.BigDecimal".equals(typeName)
                 || "java.math.BigInteger".equals(typeName)) {

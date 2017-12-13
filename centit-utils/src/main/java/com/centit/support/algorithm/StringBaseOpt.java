@@ -455,6 +455,9 @@ public abstract class StringBaseOpt {
         if(objValue instanceof String){
             return (String)objValue;
         }
+        if(objValue instanceof byte[]){
+            return new String((byte[])objValue);
+        }
         if(objValue instanceof Object[]){
             Object [] objs=(Object[]) objValue;
             StringBuilder sb = new StringBuilder();
