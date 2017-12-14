@@ -118,6 +118,8 @@ public abstract class StringBaseOpt {
      * 连接字符串 null 自动忽略 不会拼接一个 'null'
      * @param objs 字符串数组
      * @return 返回 链接号的字符串
+     * @see org.apache.commons.lang3.StringUtils join 方法
+     * 尽量用 StringUtils 的方法
      */
     public static String concat(Object ...objs) {
         StringBuilder sb = new StringBuilder();
@@ -133,17 +135,19 @@ public abstract class StringBaseOpt {
     /**
      * 连接字符串 null 自动忽略 不会拼接一个 'null'
      * @param objs 字符串数组
-     * @param str 连接 分隔符
+     * @param separator 连接 分隔符
      * @return 返回 链接号的字符串
+     * @see org.apache.commons.lang3.StringUtils join 方法
+     * 尽量用 StringUtils 的方法
      */
-    public static String concat(Object objs[], String str) {
+    public static String concat(Object objs[], String separator) {
         StringBuilder sb = new StringBuilder();
         int objInd=0;
         if (objs !=null &&  objs.length > 0) {
             for (int i = 0; i < objs.length; i++) {
                 if(objs[i]!=null) {
                     if (objInd > 0)
-                        sb.append(str);
+                        sb.append(separator);
                     objInd++;
                     sb.append(StringBaseOpt.objectToString(objs[i]));
                 }
@@ -155,17 +159,19 @@ public abstract class StringBaseOpt {
     /**
      * 连接字符串 null 自动忽略 不会拼接一个 'null'
      * @param objs 字符串数组
-     * @param str 连接 分隔符
+     * @param separator 连接 分隔符
      * @return 返回 链接号的字符串
+     * @see org.apache.commons.lang3.StringUtils join 方法
+     * 尽量用 StringUtils 的方法
      */
-    public static String concat(Collection<Object> objs, String str) {
+    public static String concat(Collection<Object> objs, String separator) {
         StringBuilder sb = new StringBuilder();
         if (objs !=null && objs.size() > 0) {
             int i=0;
             for (Object obj : objs) {
                 if(obj !=null) {
                     if (i > 0)
-                        sb.append(str);
+                        sb.append(separator);
                     i++;
                     sb.append(StringBaseOpt.objectToString(obj));
                 }
