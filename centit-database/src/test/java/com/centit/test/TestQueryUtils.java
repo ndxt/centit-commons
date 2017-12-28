@@ -2,6 +2,7 @@ package com.centit.test;
 
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.KeyValuePair;
+import com.centit.support.compiler.Lexer;
 import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
@@ -28,18 +29,20 @@ public class TestQueryUtils {
     }
 
     public static void main(String[] args) {
-        byte [] bytes = "hello world!".getBytes();
-        System.out.println(bytes.toString());
-        System.out.println(new String(bytes));
-        System.out.println(java.sql.Date.class.getSimpleName());
-        System.out.println(bytes.getClass().getSimpleName());
-        System.out.println(bytes.getClass().getTypeName());
-        System.out.println(bytes instanceof byte[]);
-        Object b = bytes;
-        System.out.println(b.getClass().getSimpleName());
-        System.out.println(b.getClass().getTypeName());
-        System.out.println(b instanceof byte[]);
-        System.out.println(b instanceof Object[]);
+
+        //分析表别名， 格式为 TableNameOrClass:alias,TableNameOrClass:alias,.....
+        String tablesDesc =  "TableNameOrClass:alias,  TableNameOrClass alias, addasf ";
+        String [] tables = tablesDesc.split(",");
+        for(String tableDesc:tables){
+            Lexer tableLexer = new Lexer(tableDesc);
+            String tableName = tableLexer.getAWord();
+            String aliasName = tableLexer.getAWord();
+            if(":".equals(aliasName)){
+                aliasName = tableLexer.getAWord();
+            }
+            System.out.println(tableName +"-" + aliasName );
+        }
+
 /*
         System.out.println(GeneratorTime.UPDATE.matchTime(GeneratorTime.READ));
         System.out.println(GeneratorTime.READ.matchTime(GeneratorTime.NEW));

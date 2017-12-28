@@ -1,9 +1,6 @@
 package com.centit.support.database.utils;
 
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.common.KeyValuePair;
 import com.centit.support.compiler.*;
 import org.apache.commons.lang3.StringUtils;
@@ -1626,9 +1623,8 @@ public abstract class QueryUtils {
             int prePos = varMorp.getCurrPos();
             String condition =  queryPiece.substring(curPos,prePos-1);
 
-            Formula frml =new Formula();
-            String sret = frml.calculate(condition, translater);
-            if(!StringRegularOpt.isTrue(sret))
+            Object sret = VariableFormula.calculate(condition, translater);
+            if(!BooleanBaseOpt.castObjectToBoolean(sret))
                 return null;
 
             String paramsString = null;
@@ -1749,14 +1745,22 @@ public abstract class QueryUtils {
                 //分析表别名， 格式为 TableNameOrClass:alias,TableNameOrClass:alias,.....
                 String tablesDesc =  queryStatement.substring(curPos,prePos-1).trim();
                 String [] tables = tablesDesc.split(",");
-                Map<String, String> tableMap = new HashMap<String, String>();
+                Map<String, String> tableMap = new HashMap<>();
                 for(String tableDesc:tables){
+                    Lexer tableLexer = new Lexer(tableDesc);
+                    String tableName = tableLexer.getAWord();
+                    String aliasName = tableLexer.getAWord();
+                    if(":".equals(aliasName)){
+                        aliasName = tableLexer.getAWord();
+                    }
+                    tableMap.put(tableName, aliasName);
+                    /*
                     int n= tableDesc.indexOf(':');
                     if(n<1){
                         tableMap.put(tableDesc, "");
                     }else{
                         tableMap.put(tableDesc.substring(0,n), tableDesc.substring(n+1));
-                    }
+                    }*/
                 }
                 translater.setTableAlias(tableMap);
                 QueryAndNamedParams hqlPiece =
