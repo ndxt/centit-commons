@@ -1,7 +1,6 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.*;
-import org.apache.commons.lang3.ObjectUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -58,7 +57,12 @@ public class VariableFormula {
         if(trans!=null && Lexer.isLabel(str)){
             return trans.getLabelValue(str);
         }
-        return StringRegularOpt.trimString(str);
+
+        String res = StringRegularOpt.trimString(str);
+        if(StringRegularOpt.isNumber(res)){
+            return NumberBaseOpt.castObjectToNumber(res);
+        }
+        return res;
     }
 
     private Object calcOperate(Object operand, Object operand2, int optID)
@@ -84,128 +88,35 @@ public class VariableFormula {
             }
 
             case ConstDefine.OP_ADD: {
-                if (NumberBaseOpt.isNumber(operand)
-                        && NumberBaseOpt.isNumber(operand2)) {
-                    return NumberBaseOpt.castObjectToDouble(operand,0.0) +
-                            NumberBaseOpt.castObjectToDouble(operand2,0.0);
-                }
-                return StringBaseOpt.concat(operand, operand2);
-
+                 return GeneralAlgorithm.addTwoObject( operand, operand2);
             }
             case ConstDefine.OP_MUL: {
                 if (NumberBaseOpt.isNumber(operand)
                         && NumberBaseOpt.isNumber(operand2)) {
-                    return NumberBaseOpt.castObjectToDouble(operand,0.0) *
-                            NumberBaseOpt.castObjectToDouble(operand2,0.0);
+                    return GeneralAlgorithm.multiplyTwoObject(operand, operand2);
                 }
                 return StringBaseOpt.concat(operand, operand2);
 
             }
             case ConstDefine.OP_EQ: {
-
-                if (operand == null && operand2 == null) {
-                    return true;
-                }
-
-                if (operand == null || operand2 == null) {
-                    return false;
-                }
-
-                return operand.equals(operand2);
+                return GeneralAlgorithm.compareTwoObject(operand, operand2) == 0 ;
             }
-
             case ConstDefine.OP_BG: {
-                if (operand == null) {
-                    return false;
-                }
-
-                if (operand2 == null) {
-                    return true;
-                }
-
-                if (NumberBaseOpt.isNumber(operand)
-                        && NumberBaseOpt.isNumber(operand2)) {
-                    return NumberBaseOpt.castObjectToDouble(operand) >
-                            NumberBaseOpt.castObjectToDouble(operand2);
-                }
-
-                return ObjectUtils.compare(
-                        StringBaseOpt.objectToString(operand),
-                        StringBaseOpt.objectToString(operand2)) > 0;
-
+                return GeneralAlgorithm.compareTwoObject(operand, operand2) > 0 ;
             }
 
             case ConstDefine.OP_LT: {
-                if (operand2 == null) {
-                    return false;
-                }
-                if (operand == null) {
-                    return true;
-                }
-
-                if (NumberBaseOpt.isNumber(operand)
-                        && NumberBaseOpt.isNumber(operand2)) {
-                    return NumberBaseOpt.castObjectToDouble(operand) <
-                            NumberBaseOpt.castObjectToDouble(operand2);
-                }
-
-                return ObjectUtils.compare(
-                        StringBaseOpt.objectToString(operand),
-                        StringBaseOpt.objectToString(operand2)) < 0;
-
+                return GeneralAlgorithm.compareTwoObject(operand, operand2) < 0 ;
             }
             case ConstDefine.OP_EL:{
-                if (operand2 == null && operand == null ) {
-                    return true;
-                }
-                if (operand2 == null) {
-                    return false;
-                }
-                if (operand == null) {
-                    return true;
-                }
-
-                if (NumberBaseOpt.isNumber(operand)
-                        && NumberBaseOpt.isNumber(operand2)) {
-                    return NumberBaseOpt.castObjectToDouble(operand) <=
-                            NumberBaseOpt.castObjectToDouble(operand2);
-                }
-
-                return ObjectUtils.compare(
-                        StringBaseOpt.objectToString(operand),
-                        StringBaseOpt.objectToString(operand2)) <= 0;
-
+                return GeneralAlgorithm.compareTwoObject(operand, operand2) <= 0 ;
             }
             case ConstDefine.OP_EB:{
-                if (operand2 == null && operand == null ) {
-                    return true;
-                }
-                if (operand == null) {
-                    return false;
-                }
-                if (operand2 == null) {
-                    return true;
-                }
-
-                if (NumberBaseOpt.isNumber(operand)
-                        && NumberBaseOpt.isNumber(operand2)) {
-                    return NumberBaseOpt.castObjectToDouble(operand) >=
-                            NumberBaseOpt.castObjectToDouble(operand2);
-                }
-
-                return ObjectUtils.compare(
-                        StringBaseOpt.objectToString(operand),
-                        StringBaseOpt.objectToString(operand2)) >= 0;
+                return GeneralAlgorithm.compareTwoObject(operand, operand2) >= 0 ;
 
             }
             case ConstDefine.OP_NE: {
-                if (operand == null && operand2 == null) {
-                    return false;
-                }
-                if (operand == null || operand2 == null) {
-                    return true;
-                }
-                return ! operand.equals(operand2);
+                return GeneralAlgorithm.compareTwoObject(operand, operand2) != 0 ;
             }
             case ConstDefine.OP_LMOV:
 
@@ -244,17 +155,14 @@ public class VariableFormula {
                         StringBaseOpt.objectToString(operand2));
 
             case ConstDefine.OP_SUB:
-                return NumberBaseOpt.castObjectToDouble(operand,0.0) -
-                        NumberBaseOpt.castObjectToDouble(operand2,0.0);
+                return GeneralAlgorithm.subtractTwoObject(operand,operand2);
 
             case ConstDefine.OP_DIV:
             {
-                Double dbop = NumberBaseOpt.castObjectToDouble(operand);
-                Double dbop2 = NumberBaseOpt.castObjectToDouble(operand2);
-                if(dbop==null || dbop2==null ||
-                        BigDecimal.valueOf(dbop2).compareTo(BigDecimal.ZERO)==0)
+                BigDecimal dbop2 = NumberBaseOpt.castObjectToBigDecimal(operand2);
+                if(dbop2==null || dbop2.compareTo(BigDecimal.ZERO)==0)
                     return null;
-                return dbop/dbop2;
+                return GeneralAlgorithm.divideTwoObject(operand,operand2);
             }
 
             case ConstDefine.OP_POWER: {

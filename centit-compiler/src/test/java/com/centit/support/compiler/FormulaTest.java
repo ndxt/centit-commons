@@ -8,18 +8,18 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void testFormula() {
-        String formula = " today() ";
 
-
-        Object s =  new VariableFormula().calculate(formula);
+        Object s =  VariableFormula.calculate("5+6");
+        System.out.println(s);
+        s =  VariableFormula.calculate("5.0 + 6 + 'hello'");
         System.out.println(s);
         //assertEquals("nihao,地球 !",s);
     }
 
     public static void testFormula2() {
 
-        Map<String,Object> varMap = new HashMap<String,Object>();
-        Map<String,Object> varA = new HashMap<String,Object>();
+        Map<String,Object> varMap = new HashMap<>();
+        Map<String,Object> varA = new HashMap<>();
         varA.put("aa", new Integer[]{100,200,300});
         varA.put("ab", 200);
         Map<String,Object> varB = new HashMap<>();
@@ -60,8 +60,8 @@ public class FormulaTest {
     }
 
     public  static void  main(String[] args)   {
-        //testFormula();
-        testFormula2();//
+        testFormula();
+        //testFormula2();//
         /*
         // testFormula2();
         //testLexer();

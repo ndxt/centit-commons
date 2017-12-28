@@ -346,4 +346,17 @@ public abstract class NumberBaseOpt {
         return GeneralAlgorithm.nvl(castObjectToBigDecimal(obj),defaultValue);
     }
 
+    public static Number castObjectToNumber(Object obj){
+        if (obj == null)
+            return null;
+        if (obj instanceof Number)
+            return (Number) obj;
+
+        String strNum = StringRegularOpt.trimNumber(StringBaseOpt.castObjectToString(obj));
+        if(strNum.indexOf('.')<0){
+            return castObjectToLong(strNum);
+        }else{
+            return castObjectToBigDecimal(strNum);
+        }
+    }
 }

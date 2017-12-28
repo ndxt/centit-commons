@@ -2,6 +2,10 @@ package com.centit.support.algorithm;
 
 import org.apache.commons.lang3.ObjectUtils;
 
+import java.math.RoundingMode;
+import java.util.Collection;
+import java.util.Iterator;
+
 /**
  * Created by codefan on 17-9-7.
  * @author codefan
@@ -63,4 +67,321 @@ public abstract  class GeneralAlgorithm {
         );
     }
 
+    private static int getJavaTypeOrder(Object a){
+        switch (ReflectionOpt.getJavaTypeName(a.getClass())) {
+            case "int":
+            case "Integer":
+                return 1;
+            case "long":
+            case "Long":
+                return 2;
+            case "float":
+            case "Float":
+                return 3;
+            case "double":
+            case "Double":
+                return 4;
+            case "BigInteger":
+                return 5;
+            case "BigDecimal":
+                return 6;
+            case "String":
+                return 10;
+            default:
+                return 100;
+        }
+    }
+
+    /**
+     * 将两个对象加+起来，可能是数字相加，也可能是字符串连接
+     * @param a object1
+     * @param b object2
+     * @return 相加结果
+     */
+    public static Object addTwoObject(Object a,Object b){
+        if(a==null)
+            return b;
+        if(b==null)
+            return a;
+
+        if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
+            int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
+            switch (retType){
+                case 1:
+                    return NumberBaseOpt.castObjectToInteger(a) +
+                            NumberBaseOpt.castObjectToInteger(b);
+                case 2:
+                    return NumberBaseOpt.castObjectToLong(a) +
+                            NumberBaseOpt.castObjectToLong(b);
+                case 3:
+                    return NumberBaseOpt.castObjectToFloat(a) +
+                            NumberBaseOpt.castObjectToFloat(b);
+                case 5:
+                    return NumberBaseOpt.castObjectToBigInteger(a).add(
+                            NumberBaseOpt.castObjectToBigInteger(b));
+                case 6:
+                    return NumberBaseOpt.castObjectToBigDecimal(a).add(
+                            NumberBaseOpt.castObjectToBigDecimal(b));
+                case 4:
+                default:
+                    return NumberBaseOpt.castObjectToDouble(a) +
+                            NumberBaseOpt.castObjectToDouble(b);
+            }
+
+        }
+        return StringBaseOpt.concat(
+                StringBaseOpt.castObjectToString(a),
+                StringBaseOpt.castObjectToString(b));
+    }
+
+    public static Object subtractTwoObject(Object a,Object b){
+
+        if(b==null)
+            return a;
+        if(a==null)
+            a = new Integer(0);
+
+        if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
+            int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
+            switch (retType){
+                case 1:
+                    return NumberBaseOpt.castObjectToInteger(a) -
+                            NumberBaseOpt.castObjectToInteger(b);
+                case 2:
+                    return NumberBaseOpt.castObjectToLong(a) -
+                            NumberBaseOpt.castObjectToLong(b);
+                case 3:
+                    return NumberBaseOpt.castObjectToFloat(a) -
+                            NumberBaseOpt.castObjectToFloat(b);
+                case 5:
+                    return NumberBaseOpt.castObjectToBigInteger(a).subtract(
+                            NumberBaseOpt.castObjectToBigInteger(b));
+                case 6:
+                    return NumberBaseOpt.castObjectToBigDecimal(a).subtract(
+                            NumberBaseOpt.castObjectToBigDecimal(b));
+                case 4:
+                default:
+                    return NumberBaseOpt.castObjectToDouble(a) -
+                            NumberBaseOpt.castObjectToDouble(b);
+            }
+
+        }
+        return a;
+    }
+
+    public static Object multiplyTwoObject(Object a,Object b){
+        if(a==null)
+            return b;
+        if(b==null)
+            return a;
+
+        if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
+            int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
+            switch (retType){
+                case 1:
+                    return NumberBaseOpt.castObjectToInteger(a) *
+                            NumberBaseOpt.castObjectToInteger(b);
+                case 2:
+                    return NumberBaseOpt.castObjectToLong(a) *
+                            NumberBaseOpt.castObjectToLong(b);
+                case 3:
+                    return NumberBaseOpt.castObjectToFloat(a) *
+                            NumberBaseOpt.castObjectToFloat(b);
+                case 5:
+                    return NumberBaseOpt.castObjectToBigInteger(a).multiply(
+                            NumberBaseOpt.castObjectToBigInteger(b));
+                case 6:
+                    return NumberBaseOpt.castObjectToBigDecimal(a).multiply(
+                            NumberBaseOpt.castObjectToBigDecimal(b));
+                case 4:
+                default:
+                    return NumberBaseOpt.castObjectToDouble(a) *
+                            NumberBaseOpt.castObjectToDouble(b);
+            }
+
+        }
+        return StringBaseOpt.concat(
+                StringBaseOpt.castObjectToString(a),
+                StringBaseOpt.castObjectToString(b));
+    }
+
+    public static Object divideTwoObject(Object a, Object b){
+        if(a==null || b==null)
+            return null;
+
+        if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
+            int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
+            switch (retType){
+                case 1:
+                    return NumberBaseOpt.castObjectToInteger(a) /
+                            NumberBaseOpt.castObjectToInteger(b);
+                case 2:
+                    return NumberBaseOpt.castObjectToLong(a) /
+                            NumberBaseOpt.castObjectToLong(b);
+                case 3:
+                    return NumberBaseOpt.castObjectToFloat(a) /
+                            NumberBaseOpt.castObjectToFloat(b);
+                case 5:
+                    return NumberBaseOpt.castObjectToBigInteger(a).divide(
+                            NumberBaseOpt.castObjectToBigInteger(b));
+                case 6:
+                    return NumberBaseOpt.castObjectToBigDecimal(a).divide(
+                            NumberBaseOpt.castObjectToBigDecimal(b), RoundingMode.HALF_EVEN);
+                case 4:
+                default:
+                    return NumberBaseOpt.castObjectToDouble(a) /
+                            NumberBaseOpt.castObjectToDouble(b);
+            }
+
+        }
+        return a;
+    }
+
+    public static Object maxObject(Collection<Object> ar){
+        if(ar.size()<1)
+            return null;
+        Iterator<Object> ari = ar.iterator();
+        Object maxObject = ar.iterator().next();
+        if(ar.size()==1)
+            return maxObject;
+
+        int retType = getJavaTypeOrder(maxObject);
+        while(ari.hasNext()){
+            Object anOther = ari.next();
+            retType = Math.max(retType, getJavaTypeOrder(anOther));
+            switch (retType){
+                case 1:
+                    maxObject = Math.max(NumberBaseOpt.castObjectToInteger(maxObject) ,
+                            NumberBaseOpt.castObjectToInteger(anOther));
+                    break;
+                case 2:
+                    maxObject = Math.max(NumberBaseOpt.castObjectToLong(maxObject) ,
+                            NumberBaseOpt.castObjectToLong(anOther));
+                    break;
+                case 3:
+                    maxObject = Math.max(NumberBaseOpt.castObjectToFloat(maxObject) ,
+                            NumberBaseOpt.castObjectToFloat(anOther));
+                    break;
+                case 5:
+                    maxObject = NumberBaseOpt.castObjectToBigInteger(maxObject).max(
+                            NumberBaseOpt.castObjectToBigInteger(anOther));
+                    break;
+
+                case 6:
+                    maxObject = NumberBaseOpt.castObjectToBigDecimal(maxObject).max(
+                            NumberBaseOpt.castObjectToBigDecimal(anOther));
+                    break;
+                case 4:
+                    maxObject = Math.max(NumberBaseOpt.castObjectToDouble(maxObject) ,
+                            NumberBaseOpt.castObjectToDouble(anOther));
+                    break;
+                case 10:
+                default:
+                    String str1 = StringBaseOpt.castObjectToString(maxObject);
+                    String str2 = StringBaseOpt.castObjectToString(anOther);
+                    maxObject = str1.compareTo(str2) > 0 ? str1 : str2;
+                    break;
+            }
+        }
+        return maxObject;
+    }
+
+    public static Object minObject(Collection<Object> ar){
+        if(ar.size()<1)
+            return null;
+        Iterator<Object> ari = ar.iterator();
+        Object minObject = ar.iterator().next();
+        if(ar.size()==1)
+            return minObject;
+
+        int retType = getJavaTypeOrder(minObject);
+        while(ari.hasNext()){
+            Object anOther = ari.next();
+            retType = Math.max(retType, getJavaTypeOrder(anOther));
+            switch (retType){
+                case 1:
+                    minObject = Math.min(NumberBaseOpt.castObjectToInteger(minObject) ,
+                            NumberBaseOpt.castObjectToInteger(anOther));
+                    break;
+                case 2:
+                    minObject = Math.min(NumberBaseOpt.castObjectToLong(minObject) ,
+                            NumberBaseOpt.castObjectToLong(anOther));
+                    break;
+                case 3:
+                    minObject = Math.min(NumberBaseOpt.castObjectToFloat(minObject) ,
+                            NumberBaseOpt.castObjectToFloat(anOther));
+                    break;
+                case 5:
+                    minObject = NumberBaseOpt.castObjectToBigInteger(minObject).min(
+                            NumberBaseOpt.castObjectToBigInteger(anOther));
+                    break;
+
+                case 6:
+                    minObject = NumberBaseOpt.castObjectToBigDecimal(minObject).min(
+                            NumberBaseOpt.castObjectToBigDecimal(anOther));
+                    break;
+                case 4:
+                    minObject = Math.min(NumberBaseOpt.castObjectToDouble(minObject) ,
+                            NumberBaseOpt.castObjectToDouble(anOther));
+                    break;
+                case 10:
+                default:
+                    String str1 = StringBaseOpt.castObjectToString(minObject);
+                    String str2 = StringBaseOpt.castObjectToString(anOther);
+                    minObject = str1.compareTo(str2) < 0 ? str1 : str2;
+                    break;
+            }
+        }
+        return minObject;
+    }
+
+
+    public static Object sumObjects(Collection<Object> ar){
+        if(ar.size()<1)
+            return null;
+        Iterator<Object> ari = ar.iterator();
+        Object sumObj = ar.iterator().next();
+        if(ar.size()==1)
+            return sumObj;
+
+        int retType = getJavaTypeOrder(sumObj);
+        while(ari.hasNext()){
+            Object anOther = ari.next();
+            retType = Math.max(retType, getJavaTypeOrder(anOther));
+            switch (retType){
+                case 1:
+                    sumObj = NumberBaseOpt.castObjectToInteger(sumObj) +
+                            NumberBaseOpt.castObjectToInteger(anOther);
+                    break;
+                case 2:
+                    sumObj = NumberBaseOpt.castObjectToLong(sumObj) +
+                            NumberBaseOpt.castObjectToLong(anOther);
+                    break;
+                case 3:
+                    sumObj = NumberBaseOpt.castObjectToFloat(sumObj) +
+                            NumberBaseOpt.castObjectToFloat(anOther) ;
+                    break;
+                case 5:
+                    sumObj = NumberBaseOpt.castObjectToBigInteger(sumObj).add(
+                            NumberBaseOpt.castObjectToBigInteger(anOther));
+                    break;
+
+                case 6:
+                    sumObj = NumberBaseOpt.castObjectToBigDecimal(sumObj).add(
+                            NumberBaseOpt.castObjectToBigDecimal(anOther));
+                    break;
+                case 4:
+                    sumObj = NumberBaseOpt.castObjectToDouble(sumObj) +
+                            NumberBaseOpt.castObjectToDouble(anOther);
+                    break;
+                case 10:
+                default:
+                    sumObj =  StringBaseOpt.concat(
+                            StringBaseOpt.castObjectToString(sumObj),
+                            StringBaseOpt.castObjectToString(anOther));
+                    break;
+            }
+        }
+        return sumObj;
+    }
 }

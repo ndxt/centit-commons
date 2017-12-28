@@ -1,13 +1,13 @@
 package com.centit.support.compiler;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+@Deprecated
 public class Formula {
 
     private Lexer lex;
@@ -399,7 +399,7 @@ public class Formula {
         if( EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
             //&& prmNo != m_sFunctionList[nFuncNo].nPrmSum) return null;
             && prmNo < EmbedFunc.functionsList[nFuncNo].nPrmSum) return null;
-        str = EmbedFunc.runFunc(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
+        str = EmbedFunc.runFuncBaseString(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
         return str;
     }
      /**

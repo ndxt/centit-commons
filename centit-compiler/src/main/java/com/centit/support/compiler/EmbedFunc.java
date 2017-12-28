@@ -90,8 +90,8 @@ public abstract class EmbedFunc {
         return -1;
     }
 
-
-    public static final String runFunc(List<String> slOperand,int funcID)
+    @Deprecated
+    public static final String runFuncBaseString(List<String> slOperand, int funcID)
     {
         int nOpSum = ( slOperand == null )? 0: slOperand.size();
 
@@ -709,7 +709,7 @@ public abstract class EmbedFunc {
                     dbtemp += NumberBaseOpt.castObjectToDouble(slOperand.get(i),0.0);
                 }
                 if (nOpSum > 0)
-                    return dbtemp /nOpSum;//"%f",
+                    return dbtemp / nOpSum;//"%f",
                 else
                     return null;
             case ConstDefine.FUNC_GET_AT: {//148
@@ -763,66 +763,14 @@ public abstract class EmbedFunc {
             }
             case ConstDefine.FUNC_MAX:{// 103
                 if (nOpSum <1) return null;
-                List<Object> trimOperand = new ArrayList<>(slOperand.size());
-                boolean hasNotNumber=false;
-                for(Object obj : slOperand) {
-                    if(obj != null){
-                        trimOperand.add(obj);
-                        if(! NumberBaseOpt.isNumber(obj))
-                            hasNotNumber = true;
-                    }
-                }
-                if(hasNotNumber) {
-                    Double tempDouble = NumberBaseOpt.castObjectToDouble(trimOperand.get(0));
-                    for (int i = 1; i < trimOperand.size(); i++) {
-                        Double temp = NumberBaseOpt.castObjectToDouble(trimOperand.get(i));
-                        if (tempDouble.compareTo(temp) < 0) {
-                            tempDouble = temp;
-                        }
-                    }
-                    return tempDouble;
-                }else{
-                    String tempString = StringBaseOpt.objectToString(trimOperand.get(0));
-                    for (int i = 1; i < trimOperand.size(); i++) {
-                        String temp = StringBaseOpt.objectToString(trimOperand.get(i));
-                        if (tempString.compareTo(temp) < 0) {
-                            tempString = temp;
-                        }
-                    }
-                    return tempString;
-                }
+                return GeneralAlgorithm.maxObject(slOperand);
             }
+
             case ConstDefine.FUNC_MIN:{// 104
                 if (nOpSum <1) return null;
-                List<Object> trimOperand = new ArrayList<>(slOperand.size());
-                boolean hasNotNumber=false;
-                for(Object obj : slOperand) {
-                    if(obj != null){
-                        trimOperand.add(obj);
-                        if(! NumberBaseOpt.isNumber(obj))
-                            hasNotNumber = true;
-                    }
-                }
-                if(hasNotNumber) {
-                    Double tempDouble = NumberBaseOpt.castObjectToDouble(trimOperand.get(0));
-                    for (int i = 1; i < trimOperand.size(); i++) {
-                        Double temp = NumberBaseOpt.castObjectToDouble(trimOperand.get(i));
-                        if (tempDouble.compareTo(temp) > 0) {
-                            tempDouble = temp;
-                        }
-                    }
-                    return tempDouble;
-                }else{
-                    String tempString = StringBaseOpt.objectToString(trimOperand.get(0));
-                    for (int i = 1; i < trimOperand.size(); i++) {
-                        String temp = StringBaseOpt.objectToString(trimOperand.get(i));
-                        if (tempString.compareTo(temp) > 0) {
-                            tempString = temp;
-                        }
-                    }
-                    return tempString;
-                }
+                return GeneralAlgorithm.minObject(slOperand);
             }
+
             case ConstDefine.FUNC_COUNT:// 112
                 return String.valueOf(nOpSum);
 
@@ -859,14 +807,11 @@ public abstract class EmbedFunc {
                 return nc;
             }
             case ConstDefine.FUNC_SUM:// 105
-                for(int i=0; i<nOpSum; i++){
-                    dbtemp += NumberBaseOpt.castObjectToDouble(slOperand.get(i),0.0);
-                }
-                return dbtemp;
+                if (nOpSum <1) return null;
+                return GeneralAlgorithm.sumObjects(slOperand);
 
             case ConstDefine.FUNC_STDDEV:// 133
             {
-
                 if(nOpSum<2)
                     return  0;
                 int numberSum = 0;
@@ -893,7 +838,7 @@ public abstract class EmbedFunc {
                     return null;
                 StringBuilder sb= new StringBuilder();
                 for(int i=0; i<nOpSum; i++) {
-                    sb.append(StringBaseOpt.objectToString(slOperand.get(i)));
+                    sb.append(StringBaseOpt.castObjectToString(slOperand.get(i),""));
                 }
                 return sb.toString();
             }

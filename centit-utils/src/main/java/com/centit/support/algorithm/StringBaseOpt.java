@@ -521,7 +521,7 @@ public abstract class StringBaseOpt {
     }
 
     public static String castObjectToString(Object obj,String defaultValue){
-        return GeneralAlgorithm.nvl(castObjectToString(obj),defaultValue);
+        return GeneralAlgorithm.nvl(objectToString(obj),defaultValue);
     }
 
     @SuppressWarnings("unchecked")
