@@ -9,9 +9,13 @@ public class FormulaTest {
 
     public static void testFormula() {
 
-        Object s =  VariableFormula.calculate("5+6");
+        Object s =  VariableFormula.calculate("5 / 6");
         System.out.println(s);
-        s =  VariableFormula.calculate("5.0 + 6 + 'hello'");
+        s =  VariableFormula.calculate("17 / 6.0");
+        System.out.println(s);
+        s =  VariableFormula.calculate("5 / 0");
+        System.out.println(s);
+        s =  VariableFormula.calculate("5 / 0.0");
         System.out.println(s);
         //assertEquals("nihao,地球 !",s);
     }

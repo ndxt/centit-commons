@@ -225,8 +225,9 @@ public abstract  class GeneralAlgorithm {
                     return NumberBaseOpt.castObjectToBigInteger(a).divide(
                             NumberBaseOpt.castObjectToBigInteger(b));
                 case 6:
+                    //默认采用8位有效数字
                     return NumberBaseOpt.castObjectToBigDecimal(a).divide(
-                            NumberBaseOpt.castObjectToBigDecimal(b), RoundingMode.HALF_EVEN);
+                            NumberBaseOpt.castObjectToBigDecimal(b),8, RoundingMode.HALF_EVEN);
                 case 4:
                 default:
                     return NumberBaseOpt.castObjectToDouble(a) /
