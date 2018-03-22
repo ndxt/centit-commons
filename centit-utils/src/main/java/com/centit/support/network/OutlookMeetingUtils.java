@@ -13,6 +13,7 @@ import net.fortuna.ical4j.model.parameter.Cn;
 import net.fortuna.ical4j.model.parameter.Role;
 import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.model.property.Version;
+import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.util.UidGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -288,7 +289,7 @@ public abstract class OutlookMeetingUtils {
     public static String createMeeting(Date startTime, Date endTime, String title, String organizerName,
             String organizerEmail, String location, String description, List<Pair<String, String>> participators)
             throws MessagingException, IOException {
-        UidGenerator ug = new UidGenerator("uidGen");
+        UidGenerator ug = new RandomUidGenerator();// new UidGenerator("uidGen");
         Uid uid = ug.generateUid();
         String content = makeICalMeetingText(uid, startTime, endTime, title, organizerName, organizerEmail,
                 location, description, participators);
