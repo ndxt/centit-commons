@@ -74,6 +74,7 @@
         <module>centit-compiler</module>
         <module>centit-database</module>
         <module>centit-office</module>
+        <module>centit-database-datasource</module>
     </modules>
 
     <!-- mvn deploy -DpomFile=pom.xml -->
