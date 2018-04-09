@@ -9,13 +9,19 @@ public class FormulaTest {
 
     public static void testFormula() {
 
-        Object s =  VariableFormula.calculate("5 / 6");
+        Object s =  VariableFormula.calculate("5.12 % 3.03");
         System.out.println(s);
-        s =  VariableFormula.calculate("17 / 6.0");
+        s =  VariableFormula.calculate("5.12 mod 3.03");
         System.out.println(s);
-        s =  VariableFormula.calculate("5 / 0");
+        s =  VariableFormula.calculate("5 dbmod 3");
         System.out.println(s);
-        s =  VariableFormula.calculate("5 / 0.0");
+        s =  VariableFormula.calculate("5.12 dbmod 3.03");
+        System.out.println(s);
+        s =  Formula.calculate("5.12 % 3.03");
+        System.out.println(s);
+        s =  Formula.calculate("5 dbmod 3");
+        System.out.println(s);
+        s =  Formula.calculate("5.12 dbmod 3.03");
         System.out.println(s);
         //assertEquals("nihao,地球 !",s);
     }

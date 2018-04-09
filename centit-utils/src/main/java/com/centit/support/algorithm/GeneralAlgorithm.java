@@ -238,6 +238,36 @@ public abstract  class GeneralAlgorithm {
         return a;
     }
 
+    public static Object modTwoObject(Object a, Object b){
+        if(a==null || b==null)
+            return null;
+
+        if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
+            int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
+            switch (retType){
+                case 1:
+                    return NumberBaseOpt.castObjectToInteger(a) %
+                            NumberBaseOpt.castObjectToInteger(b);
+                case 2:
+                    return NumberBaseOpt.castObjectToLong(a) %
+                            NumberBaseOpt.castObjectToLong(b);
+                case 3:
+                    return NumberBaseOpt.castObjectToFloat(a) %
+                            NumberBaseOpt.castObjectToFloat(b);
+                case 5:
+                    return NumberBaseOpt.castObjectToBigInteger(a).mod(
+                            NumberBaseOpt.castObjectToBigInteger(b));
+                case 4:
+                case 6:
+                default:
+                    return NumberBaseOpt.castObjectToDouble(a) %
+                            NumberBaseOpt.castObjectToDouble(b);
+            }
+
+        }
+        return a;
+    }
+
     public static Object maxObject(Collection<Object> ar){
         if(ar.size()<1)
             return null;

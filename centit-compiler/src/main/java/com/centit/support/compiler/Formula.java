@@ -1,5 +1,6 @@
 package com.centit.support.compiler;
 
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 
@@ -42,6 +43,7 @@ public class Formula {
             case '-': return(ConstDefine.OP_SUB);//{ m_iPreIsn = ConstDefine.OP_SUB ; return ConstDefine.OP_SUB;}
             case '*': return(ConstDefine.OP_MUL);//m_iPreIsn = ConstDefine.OP_MUL; return ConstDefine.OP_MUL;
             case '/': return(ConstDefine.OP_DIV);//m_iPreIsn = ConstDefine.OP_DIV; return ConstDefine.OP_DIV;
+            case '%': return(ConstDefine.OP_MOD);
             case '^': return(ConstDefine.OP_POWER);//m_iPreIsn = ConstDefine.OP_POWER; return ConstDefine.OP_POWER;
             case '>':
                 if(sp2 == '=') {
@@ -89,6 +91,10 @@ public class Formula {
             return(ConstDefine.OP_IN);
         if(sOptName.equalsIgnoreCase("DIV"))
             return(ConstDefine.OP_DIV);
+        if(sOptName.equalsIgnoreCase("MOD"))
+            return(ConstDefine.OP_MOD);
+        if(sOptName.equalsIgnoreCase("DBMOD"))
+            return(ConstDefine.OP_DBMOD);
         return -1;
     }
 
@@ -221,6 +227,25 @@ public class Formula {
                 return "0";
             return String.format("%f",dbop/dbop2);
         }
+
+        case ConstDefine.OP_DBMOD:
+        {
+            if(BigDecimal.valueOf(dbop2).compareTo(BigDecimal.ZERO)==0)
+                return "0";
+            return String.format("%f",dbop % dbop2);
+        }
+
+        case ConstDefine.OP_MOD:
+        {
+            Long long2 = NumberBaseOpt.castObjectToLong(dbop2);
+            if(long2==null || long2==0)
+                return "0";
+
+            Long long1 = NumberBaseOpt.castObjectToLong(dbop);
+
+            return String.format("%d",(long1 % long2));
+        }
+
         case ConstDefine.OP_EQ:
         {
             if(BigDecimal.valueOf(dbop).compareTo(BigDecimal.valueOf(dbop2))==0)

@@ -165,6 +165,23 @@ public class VariableFormula {
                 return GeneralAlgorithm.divideTwoObject(operand,operand2);
             }
 
+            case ConstDefine.OP_MOD:
+            {
+                Long dbop2 = NumberBaseOpt.castObjectToLong(operand2);
+                if(dbop2==null || dbop2 == 0)
+                    return null;
+                Long dbop = NumberBaseOpt.castObjectToLong(operand);
+                return dbop % dbop2;
+            }
+
+            case ConstDefine.OP_DBMOD:
+            {
+                BigDecimal dbop2 = NumberBaseOpt.castObjectToBigDecimal(operand2);
+                if(dbop2==null || dbop2.compareTo(BigDecimal.ZERO)==0)
+                    return null;
+                return GeneralAlgorithm.modTwoObject(operand,operand2);
+            }
+
             case ConstDefine.OP_POWER: {
                 Double dbop = NumberBaseOpt.castObjectToDouble(operand);
                 Double dbop2 = NumberBaseOpt.castObjectToDouble(operand2);
