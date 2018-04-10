@@ -40,8 +40,9 @@ public abstract  class GeneralAlgorithm {
 
         if (NumberBaseOpt.isNumber(operand)
                 && NumberBaseOpt.isNumber(operand2)) {
-            return NumberBaseOpt.castObjectToDouble(operand).
-                    compareTo( NumberBaseOpt.castObjectToDouble(operand2));
+            return ObjectUtils.compare(
+                    NumberBaseOpt.castObjectToDouble(operand),
+                    NumberBaseOpt.castObjectToDouble(operand2));
         }
 
         return ObjectUtils.compare(
