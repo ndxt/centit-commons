@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -514,6 +516,34 @@ public abstract class StringBaseOpt {
                     (java.sql.Date) objValue));
         }*/else
             return objValue.toString();
+    }
+
+    /**
+     * 将对象转换为 string list
+     * @param object 对象
+     * @return stringList
+     */
+    public static List<String> objectToStringList(Object object){
+        if(object==null){
+            return null;
+        }else if (object instanceof Collection) {
+            List<String> stringList = new ArrayList<>( ((Collection<?>) object).size()+1 );
+            for(Object po :(Collection<?>) object){
+                stringList.add(StringBaseOpt.castObjectToString(po));
+            }
+            return stringList;
+        } else if (object instanceof Object[]) {
+            List<String> stringList = new ArrayList<>( ((Object[]) object).length+1 );
+            for(Object po :(Object[])  object){
+                stringList.add(StringBaseOpt.castObjectToString(po));
+            }
+            return stringList;
+        }//else{
+
+        List<String> stringList = new ArrayList<>( 1 );
+        stringList.add(StringBaseOpt.castObjectToString(object));
+        return stringList;
+        //}
     }
 
     public static String castObjectToString(Object obj){

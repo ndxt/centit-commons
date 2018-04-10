@@ -358,6 +358,18 @@ public abstract class JSONOpt {
 
            return objectToJSONObject(obj,methodOnly,fieldOnly,includePrivateField).toJSONString();
     }
+
+    public static Map<String,Object> objectToMap(Object object){
+        if(object instanceof Map){
+            return (Map<String,Object>) object;
+        }
+        if(ReflectionOpt.isScalarType(object.getClass())){
+            return createHashMap("scalar",object);
+        }
+
+        return (JSONObject) JSON.toJSON(object);
+    }
+
     /**
      * 将一个对象转换为JSON, 如果是 数值 或者 实现collect接口 则转换为 JSONArray否则转换为JSONObject
      * @param obj 将一个对象转换为JSON
