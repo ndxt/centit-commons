@@ -156,7 +156,7 @@ public abstract class NumberBaseOpt {
     static public Long parseLong(String sNum, Long errorValue){
         Long lValue;
         try{
-            lValue = Long.parseLong(sNum);
+            lValue = Long.parseLong(StringRegularOpt.trimString(sNum));
         }catch(NumberFormatException e){
             lValue = errorValue;
         }
@@ -174,7 +174,7 @@ public abstract class NumberBaseOpt {
     static public Integer parseInteger(String sNum, Integer errorValue){
         Integer lValue;
         try{
-            lValue = Integer.parseInt(sNum);
+            lValue = Integer.parseInt(StringRegularOpt.trimString(sNum));
         }catch(NumberFormatException e){
             lValue = errorValue;
         }
@@ -196,7 +196,7 @@ public abstract class NumberBaseOpt {
     public static Double parseDouble(String sNum, Double errorValue){
         Double lValue;
         try{
-            lValue = Double.parseDouble(sNum);
+            lValue = Double.parseDouble(StringRegularOpt.trimString(sNum));
         }catch(NumberFormatException e){
             lValue = errorValue;
         }
@@ -209,7 +209,7 @@ public abstract class NumberBaseOpt {
     public static Float parseFloat(String sNum, Float errorValue){
         Float lValue;
         try{
-            lValue = Float.parseFloat(sNum);
+            lValue = Float.parseFloat(StringRegularOpt.trimString(sNum));
         }catch(NumberFormatException e){
             lValue = errorValue;
         }
