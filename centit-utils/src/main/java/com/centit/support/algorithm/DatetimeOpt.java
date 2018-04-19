@@ -94,6 +94,16 @@ public abstract class DatetimeOpt {
         return cal.getTime();
     }
 
+    public static java.util.Date createUtilDate(int year, int month, int date,
+                                                int hourOfDay, int minute,int second,int milliSecond)
+    {
+        Calendar cal = new GregorianCalendar();
+        cal.set( year,  month-1,  date,
+                hourOfDay,  minute, second);
+        cal.set(Calendar.MILLISECOND, milliSecond);
+        return cal.getTime();
+    }
+
     /**
      * 根据 年、月、日、时、分  创建一个日期 类型为 java.util.Date
      * @param year 年
@@ -383,11 +393,16 @@ public abstract class DatetimeOpt {
     }
 
     public static int getSecond(java.util.Date date) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        return cal.get(Calendar.SECOND);
+    }
 
-            Calendar cal = new GregorianCalendar();
-            cal.setTime(date);
-            return cal.get(Calendar.SECOND);
-        }
+    public static int getMilliSecond(java.util.Date date) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        return cal.get(Calendar.MILLISECOND);
+    }
 
     public static int getMinute(java.util.Date date) {
 
