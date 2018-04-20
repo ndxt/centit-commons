@@ -1,6 +1,5 @@
 package com.centit.support.algorithm;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 @SuppressWarnings("unused")
@@ -22,12 +21,9 @@ public abstract class ByteBaseOpt {
     }
 
     public static int writeInt32(byte [] buf, int data, int offset){
-        //Integer.highestOneBit()
         for(int i=0;i<4;i++){
             buf[offset+3-i] = (byte)(data & 0xff);
-            //System.out.println(buf[offset+3-i]);
             data = data>>8;
-            //System.out.println(data);
         }
         return offset + 4;
     }
@@ -37,7 +33,6 @@ public abstract class ByteBaseOpt {
     }
 
     public static int writeInt16(byte [] buf, short data, int offset){
-        //Integer.reverseBytes()
         for(int i=0;i<2;i++){
             buf[offset+1-i] = Integer.valueOf(data & 0xff).byteValue();
             data = (short) (data >> 8);
@@ -111,7 +106,7 @@ public abstract class ByteBaseOpt {
         long longData = 0;
         for(int i=0;i<8;i++){
             longData = longData << 8;
-            longData = longData + (buf[offset+i] & 0x0FF);
+            longData = longData + (buf[offset+i] & 0xFF);
         }
         return longData;
     }
@@ -124,9 +119,7 @@ public abstract class ByteBaseOpt {
         int intData = 0;
         for(int i=0;i<4;i++){
             intData = intData << 8;
-            //System.out.println(buf[offset+i]);
-            intData = intData + (buf[offset+i] & 0x0FF);
-            //System.out.println(intData);
+            intData = intData + (buf[offset+i] & 0xFF);
         }
         return intData;
     }
@@ -140,7 +133,7 @@ public abstract class ByteBaseOpt {
         short intData = 0;
         for(int i=0;i<2;i++){
             intData = (short) (intData << 8);
-            intData = (short) (intData + (buf[offset+i] & 0x0FF));
+            intData = (short) (intData + (buf[offset+i] & 0xFF));
         }
         return intData;
     }
