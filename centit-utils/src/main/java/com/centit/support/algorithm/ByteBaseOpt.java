@@ -67,6 +67,30 @@ public abstract class ByteBaseOpt {
         }
         return offset + data.length;
     }
+    public static int writeStringApendSpace(byte [] buf, String data, int len, int offset){
+        int i=0;
+        int dataLen = data.length()<len?data.length():len;
+        for(;i<dataLen;i++){
+            buf[offset+i] = (byte) data.charAt(i);
+        }
+        for(;i<len;i++){
+            buf[offset+i] = 32;
+        }
+        return offset + data.length();
+    }
+
+    public static int writeStringApendSpace(byte [] buf, char[] data, int len, int offset){
+        int i=0;
+        int dataLen = data.length<len?data.length:len;
+        for(;i<dataLen;i++){
+            buf[offset+i] = (byte) data[i];
+        }
+        for(;i<len;i++){
+            buf[offset+i] = 32;
+        }
+        return offset + data.length;
+    }
+
 
     public static int writeDateAsInt32(byte [] buf, Date data, int offset){
         int intDate =
