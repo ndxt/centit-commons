@@ -30,7 +30,7 @@ public class TestSocket {
         //MsgType = 1
         ByteBaseOpt.writeInt32(buf,1,0);
         //length = 100
-        ByteBaseOpt.writeInt32(buf,100,4);
+        ByteBaseOpt.writeInt32(buf,92,4);
         //SenderCompID = user1 长度 20
         ByteBaseOpt.writeStringApendSpace(buf,"user1",20,8);
         //TargetCompID 留空 长度也是 20
@@ -55,7 +55,8 @@ public class TestSocket {
             socket.getInputStream().read(readbuf,0,8);
             int datLen = ByteBaseOpt.readInt(readbuf,4);
             socket.getInputStream().read(readbuf,8,datLen<2000?datLen:2000);
-            System.out.println(buf);
+            System.out.println(readbuf);
+            socket.close();
 
         }catch (Exception e){
             e.printStackTrace();
