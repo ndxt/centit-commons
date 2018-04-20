@@ -81,7 +81,19 @@ public abstract class ByteBaseOpt {
         return writeInt32(buf, intDate, offset);
     }
 
-    public static int writeDateAsInt64(byte [] buf, Date data, int offset){
+    public static int writeDatetimeAsInt64(byte [] buf, Date data, int offset){
+        long longDate =
+                DatetimeOpt.getYear(data)  * 10000000000L +
+                DatetimeOpt.getMonth(data) * 100000000L +
+                DatetimeOpt.getDay(data)   * 1000000L +
+                DatetimeOpt.getHour(data)  * 10000L +
+                DatetimeOpt.getMinute(data)* 100L +
+                DatetimeOpt.getSecond(data);
+        return writeInt64(buf, longDate, offset);
+
+    }
+
+    public static int writeTimestampAsInt64(byte [] buf, Date data, int offset){
         long longDate =
                 DatetimeOpt.getYear(data)  * 10000000000000L +
                 DatetimeOpt.getMonth(data) * 100000000000L +
@@ -91,12 +103,9 @@ public abstract class ByteBaseOpt {
                 DatetimeOpt.getSecond(data)* 1000L +
                 DatetimeOpt.getMilliSecond(data);
         return writeInt64(buf, longDate, offset);
-
     }
 
-    public static int writeTimestampAsInt64(byte [] buf, Timestamp data, int offset){
-        return writeDateAsInt64(buf, data, offset);
-    }
+
     /*-----------------read------------------------------------------------------------*/
     public static long readInt64(byte [] buf, int offset){
         long longData = 0;
@@ -163,7 +172,7 @@ public abstract class ByteBaseOpt {
         return DatetimeOpt.createUtilDate(intDate / 10000, intDate / 100 % 100, intDate % 100);
     }
 
-    public static Date readDateAsInt64(byte [] buf, int offset){
+    public static Date readDatetimeAsInt64(byte [] buf, int offset){
         long longDate = readInt64(buf, offset);
         return DatetimeOpt.createUtilDate(
                 (int)(longDate / 10000000000L),
