@@ -1,11 +1,10 @@
 package com.centit.support.compiler;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
-import com.centit.support.algorithm.StringBaseOpt;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Lexer {
 

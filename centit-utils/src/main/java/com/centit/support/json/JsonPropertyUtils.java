@@ -1,11 +1,10 @@
 package com.centit.support.json;
 
-import java.util.Map;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import com.alibaba.fastjson.serializer.PropertyPreFilter;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.

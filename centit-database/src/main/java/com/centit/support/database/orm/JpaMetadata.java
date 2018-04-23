@@ -1,7 +1,6 @@
 package com.centit.support.database.orm;
 
 import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableReference;
 import org.apache.commons.lang3.StringUtils;

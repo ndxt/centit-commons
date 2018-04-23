@@ -1,9 +1,9 @@
 package com.centit.support.database.ddl;
 
-import java.sql.Connection;
-
-import com.centit.support.database.utils.QueryUtils;
 import com.centit.support.database.metadata.TableField;
+import com.centit.support.database.utils.QueryUtils;
+
+import java.sql.Connection;
 
 public class DB2DDLOperations extends GeneralDDLOperations{
 

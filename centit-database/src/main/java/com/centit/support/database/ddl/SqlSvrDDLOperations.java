@@ -1,8 +1,8 @@
 package com.centit.support.database.ddl;
 
-import java.sql.Connection;
-
 import com.centit.support.database.metadata.TableField;
+
+import java.sql.Connection;
 
 public class SqlSvrDDLOperations extends GeneralDDLOperations {
 

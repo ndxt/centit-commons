@@ -1,13 +1,12 @@
 package com.centit.test;
 
+import com.centit.support.image.ImageOpt;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-
-import com.centit.support.image.ImageOpt;
 
 public class TestImage {
      public static void main(String arg[]){

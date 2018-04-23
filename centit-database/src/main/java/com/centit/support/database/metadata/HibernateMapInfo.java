@@ -1,21 +1,20 @@
 package com.centit.support.database.metadata;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.xml.IgnoreDTDEntityResolver;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.xml.IgnoreDTDEntityResolver;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 这个变量的属性没有和TableInfo一致起来，设计的时候有欠缺

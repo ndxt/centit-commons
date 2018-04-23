@@ -1,9 +1,9 @@
 package com.centit.test;
 
+import com.centit.support.algorithm.ListOpt;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.centit.support.algorithm.ListOpt;
 
 public class TestSortAsTree {
 

@@ -1,19 +1,17 @@
 package com.centit.test;
 
+import com.centit.support.network.OutlookMeetingUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-
-import com.centit.support.network.OutlookMeetingUtils;
 
 public class TestOutlookNeeting {
      /**

@@ -1,8 +1,8 @@
 package com.centit.support.network;
 
-import java.util.Collection;
-
 import org.apache.commons.lang3.StringEscapeUtils;
+
+import java.util.Collection;
 
 @SuppressWarnings("unused")
 public abstract class HtmlFormUtils {

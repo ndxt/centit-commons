@@ -1,14 +1,14 @@
 package com.centit.test;
 
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.file.FileType;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.file.FileType;
 
 
 public class TextSvgToJpg {

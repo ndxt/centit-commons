@@ -1,8 +1,8 @@
 package com.centit.test;
 
-import java.io.IOException;
-
 import com.centit.support.file.FileIOOpt;
+
+import java.io.IOException;
 
 public class TestReadStringFromFile {
     public static void main(String[] args) {

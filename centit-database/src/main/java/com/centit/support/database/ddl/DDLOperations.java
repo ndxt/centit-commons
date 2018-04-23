@@ -1,10 +1,10 @@
 package com.centit.support.database.ddl;
 
-import java.sql.SQLException;
-import java.util.List;
-
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
+
+import java.sql.SQLException;
+import java.util.List;
 
 public interface DDLOperations {
     /**

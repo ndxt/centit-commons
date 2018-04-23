@@ -1,11 +1,11 @@
 package com.centit.support.xml;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 public class IgnoreDTDEntityResolver implements EntityResolver {
 

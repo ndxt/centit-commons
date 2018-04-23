@@ -28,6 +28,14 @@ public abstract class ByteBaseOpt {
         return offset + 4;
     }
 
+    public static int writeUInt32(byte [] buf, long data, int offset){
+        for(int i=0;i<4;i++){
+            buf[offset+3-i] = (byte)(data & 0xff);
+            data = data>>8;
+        }
+        return offset + 4;
+    }
+
     public static int writeInt(byte [] buf, int data, int offset){
         return writeInt32(buf, data, offset);
     }
@@ -35,6 +43,14 @@ public abstract class ByteBaseOpt {
     public static int writeInt16(byte [] buf, short data, int offset){
         for(int i=0;i<2;i++){
             buf[offset+1-i] = Integer.valueOf(data & 0xff).byteValue();
+            data = (short) (data >> 8);
+        }
+        return offset + 2;
+    }
+
+    public static int writeUInt16(byte [] buf, int data, int offset){
+        for(int i=0;i<2;i++){
+            buf[offset+1-i] = (byte)(data & 0xff);
             data = (short) (data >> 8);
         }
         return offset + 2;
@@ -148,6 +164,15 @@ public abstract class ByteBaseOpt {
         return intData;
     }
 
+    public static long readUInt32(byte [] buf, int offset){
+        long intData = 0;
+        for(int i=0;i<4;i++){
+            intData = intData << 8;
+            intData = intData + (buf[offset+i] & 0xFF);
+        }
+        return intData;
+    }
+
     public static int readInt(byte [] buf, int offset){
         return readInt32(buf, offset);
     }
@@ -158,6 +183,16 @@ public abstract class ByteBaseOpt {
         for(int i=0;i<2;i++){
             intData = (short) (intData << 8);
             intData = (short) (intData + (buf[offset+i] & 0xFF));
+        }
+        return intData;
+    }
+
+    public static int readUInt16(byte [] buf,  int offset){
+        //Integer.reverseBytes()
+        int intData = 0;
+        for(int i=0;i<2;i++){
+            intData = (intData << 8);
+            intData = (intData + (buf[offset+i] & 0xFF));
         }
         return intData;
     }

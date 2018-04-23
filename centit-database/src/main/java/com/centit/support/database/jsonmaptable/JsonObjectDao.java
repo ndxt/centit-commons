@@ -1,14 +1,14 @@
 package com.centit.support.database.jsonmaptable;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.centit.support.database.metadata.TableInfo;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.centit.support.database.metadata.TableInfo;
 
 public interface JsonObjectDao {
 

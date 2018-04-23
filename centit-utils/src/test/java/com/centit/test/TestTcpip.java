@@ -1,14 +1,13 @@
 package com.centit.test;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.alibaba.fastjson.JSON;
+import com.centit.support.network.HttpExecutor;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import com.alibaba.fastjson.JSON;
-import com.centit.support.network.HttpExecutor;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class TestTcpip {

@@ -1,9 +1,9 @@
 package com.centit.support.database.ddl;
 
-import java.sql.Connection;
-
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
+
+import java.sql.Connection;
 
 public class MySqlDDLOperations extends GeneralDDLOperations {
 

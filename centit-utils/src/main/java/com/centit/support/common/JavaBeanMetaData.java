@@ -1,6 +1,6 @@
 package com.centit.support.common;
 
-import com.centit.support.algorithm.*;
+import com.centit.support.algorithm.ReflectionOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;

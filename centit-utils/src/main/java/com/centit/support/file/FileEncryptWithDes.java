@@ -1,17 +1,11 @@
 package com.centit.support.file;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.GeneralSecurityException;
+import com.centit.support.security.DESSecurityUtils;
 
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
-
-import com.centit.support.security.DESSecurityUtils;
+import java.io.*;
+import java.security.GeneralSecurityException;
 @SuppressWarnings("unused")
 public abstract class FileEncryptWithDes {
     private FileEncryptWithDes() {

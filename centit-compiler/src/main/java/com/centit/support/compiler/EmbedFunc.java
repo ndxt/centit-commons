@@ -1,12 +1,12 @@
 package com.centit.support.compiler;
 
+import com.centit.support.algorithm.*;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
-import com.centit.support.algorithm.*;
-import org.apache.commons.lang3.StringUtils;
 
 public abstract class EmbedFunc {
     private EmbedFunc() {

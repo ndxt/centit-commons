@@ -1,12 +1,12 @@
 package com.centit.support.database.ddl;
 
+import com.centit.support.database.metadata.SimpleTableField;
+import com.centit.support.database.metadata.TableField;
+import com.centit.support.database.utils.QueryUtils;
+
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.centit.support.database.utils.QueryUtils;
-import com.centit.support.database.metadata.SimpleTableField;
-import com.centit.support.database.metadata.TableField;
 
 public class OracleDDLOperations extends GeneralDDLOperations {
 

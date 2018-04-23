@@ -1,6 +1,7 @@
 package com.centit.support.database.orm;
 
-import com.centit.support.algorithm.*;
+import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.KeyValuePair;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;

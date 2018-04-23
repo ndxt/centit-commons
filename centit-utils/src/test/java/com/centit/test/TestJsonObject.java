@@ -1,10 +1,10 @@
 package com.centit.test;
 
-import java.util.Map;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.json.JSONOpt;
+
+import java.util.Map;
 
 public class TestJsonObject {
 
