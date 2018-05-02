@@ -3,6 +3,7 @@ package com.centit.support.database.utils;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.KeyValuePair;
 import com.centit.support.compiler.*;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -108,6 +109,10 @@ public abstract class QueryUtils {
      */
     public static final String SQL_PRETREAT_INPLACE = "INPLACE";
 
+    /**
+     * 过滤参数中的html标签
+     */
+    public static final String SQL_PRETREAT_ESCAPE_HTML = "ESCAPEHTML";
     /**
      * 把字符串string包装成'string',并将字符传中的数里的"'"替换为“''”
      * @param value value
@@ -1263,8 +1268,11 @@ public abstract class QueryUtils {
             return NumberBaseOpt.castObjectToLong(paramValue);
         if(SQL_PRETREAT_FLOAT.equalsIgnoreCase(pretreatment))
             return NumberBaseOpt.castObjectToDouble(paramValue);
+        if(SQL_PRETREAT_ESCAPE_HTML.equalsIgnoreCase(pretreatment))
+            return StringEscapeUtils.escapeHtml4(StringBaseOpt.objectToString(paramValue));
         if(SQL_PRETREAT_QUOTASTR.equalsIgnoreCase(pretreatment))
-            return  buildStringForQuery(StringBaseOpt.objectToString(paramValue));
+            return buildStringForQuery(StringBaseOpt.objectToString(paramValue));
+
         /*if(SQL_PRETREAT_STRING.equalsIgnoreCase(pretreatment))
             return StringBaseOpt.objectToString(paramValue);
         if(SQL_PRETREAT_SPLITFORIN.equalsIgnoreCase(pretreatment))
