@@ -3,29 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <centit.commons.version>2.2-SNAPSHOT</centit.commons.version>
-        <jdk.version>1.8</jdk.version>
-
-        <ical4j.version>2.2.0</ical4j.version>
-        <dom4j.version>2.0.0</dom4j.version>
-        <commons-lang3.version>3.5</commons-lang3.version>
-
-        <slf4j.version>1.7.25</slf4j.version>
-        <fastjson.version>1.2.46</fastjson.version>
-        <httpcomponents.version>4.5.5</httpcomponents.version>
-        <commons-email.version>1.4</commons-email.version>
-        <commons-net.version>3.6</commons-net.version>
-        <pinyin4j.version>2.5.1</pinyin4j.version>
-        <junit.version>4.12</junit.version>
-        <commons-dbcp2.version>2.1.1</commons-dbcp2.version>
-
-        <persistence-api.version>2.2</persistence-api.version>
-        <apache.poi.version>3.16</apache.poi.version>
-        <itextpdf.version>5.5.11</itextpdf.version>
-        <jacob.version>1.18</jacob.version>
-    </properties>
+    <parent>
+        <artifactId>centit-framework-dependencies</artifactId>
+        <groupId>com.centit.framework</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.support</groupId>
@@ -76,33 +58,6 @@
         <module>centit-office</module>
         <module>centit-database-datasource</module>
     </modules>
-
-    <!-- mvn deploy -DpomFile=pom.xml -->
-
-    <distributionManagement>
-       <repository>
-           <id>ossrh</id>
-           <name>sonatype-releases</name>
-           <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-       </repository>
-       <!--<snapshotRepository>
-           <id>ossrh</id>
-           <name>sonatype-snapshots</name>
-           <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-       </snapshotRepository>
-    </distributionManagement>
-    <distributionManagement>-->
-        <!--<repository>
-            <id>centit-releases</id>
-            <name>centit-release</name>
-            <url>http://nexus.centit.com:8081/nexus/content/repositories/centit-releases/</url>
-        </repository>-->
-        <snapshotRepository>
-            <id>centit-snapshots</id>
-            <name>centit-snapshots</name>
-            <url>http://nexus.centit.com:8081/nexus/content/repositories/centit-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <build>
         <plugins>

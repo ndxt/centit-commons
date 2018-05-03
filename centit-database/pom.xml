@@ -18,13 +18,12 @@
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-compiler</artifactId>
-            <version>${centit.commons.version}</version>
+            <version>${version}</version>
         </dependency>
 
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>javax.persistence-api</artifactId>
-            <version>${persistence-api.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>

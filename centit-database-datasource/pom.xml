@@ -19,13 +19,12 @@
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-database</artifactId>
-            <version>${centit.commons.version}</version>
+            <version>${version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-dbcp2</artifactId>
-            <version>${commons-dbcp2.version}</version>
         </dependency>
 
         <!-- test -->
@@ -38,7 +37,6 @@
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.4</version>
             <scope>test</scope>
         </dependency>
 
