@@ -107,6 +107,9 @@ public abstract class ByteBaseOpt {
         return offset + data.length;
     }
 
+    public static int writeDate(byte [] buf, Date data, int offset){
+        return writeLong(buf, data.getTime(), offset);
+    }
 
     public static int writeDateAsInt32(byte [] buf, Date data, int offset){
         int intDate =
@@ -217,6 +220,11 @@ public abstract class ByteBaseOpt {
             str[i] = (char)buf[offset+i];
         }
         return String.valueOf(str);
+    }
+
+    public static Date readDate(byte [] buf, Date data, int offset){
+        long dateTime = readLong(buf, offset);
+        return new Date(dateTime);
     }
 
     public static Date readDateAsInt32(byte [] buf, int offset){
