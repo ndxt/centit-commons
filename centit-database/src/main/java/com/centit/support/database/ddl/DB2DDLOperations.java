@@ -2,6 +2,7 @@ package com.centit.support.database.ddl;
 
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.utils.QueryUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 
@@ -25,11 +26,22 @@ public class DB2DDLOperations extends GeneralDDLOperations{
     public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column){
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
-        sbsql.append(" alter column ");
-        sbsql.append(column.getColumnName());
-        sbsql.append(" set data type ");
-        sbsql.append(column.getColumnType());
-        appendColumnTypeSQL(column, sbsql);
+
+        if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
+                || oldColumn.getMaxLength() != column.getMaxLength()
+                || oldColumn.getPrecision() != column.getPrecision() ){
+            sbsql.append(" alter column ");
+            sbsql.append(column.getColumnName());
+            sbsql.append(" set data type ");
+            appendColumnTypeSQL(column, sbsql);
+        }
+
+        if( oldColumn.isMandatory() != column.isMandatory()){
+            sbsql.append(" alter column ");
+            sbsql.append(column.getColumnName());
+            sbsql.append(column.isMandatory() ? " set not null" : " drop not null");
+        }
+
         return sbsql.toString();
     }
 }
