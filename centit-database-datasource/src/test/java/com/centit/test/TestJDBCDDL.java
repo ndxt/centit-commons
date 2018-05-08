@@ -85,7 +85,7 @@ public class TestJDBCDDL {
             ddl.dropColumn("ddltemp", "f1");
             tablfilef2.setPrecision(10);
             tablfilef2.setScale(2);
-            ddl.modifyColumn("ddltemp", tablfilef2);
+            ddl.modifyColumn("ddltemp",tablfilef2, tablfilef2);
 
             tablfilef2.setColumnType("varchar");
             tablfilef2.setMaxLength(200);
@@ -167,7 +167,7 @@ public class TestJDBCDDL {
             conn.commit();
             tablfilef2.setPrecision(10);
             tablfilef2.setScale(2);
-            ddl.modifyColumn("ddltemp", tablfilef2);
+            ddl.modifyColumn("ddltemp",tablfilef2, tablfilef2);
             conn.commit();
             tablfilef2.setColumnType("varchar");
             tablfilef2.setMaxLength(200);
@@ -231,7 +231,7 @@ public class TestJDBCDDL {
             conn.commit();
             tablfilef2.setPrecision(10);
             tablfilef2.setScale(2);
-            ddl.modifyColumn("ddltemp", tablfilef2);
+            ddl.modifyColumn("ddltemp",tablfilef2, tablfilef2);
             conn.commit();
             tablfilef2.setColumnType("varchar");
             tablfilef2.setMaxLength(200);
