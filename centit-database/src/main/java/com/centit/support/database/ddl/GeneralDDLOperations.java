@@ -94,20 +94,23 @@ public abstract class GeneralDDLOperations implements DDLOperations {
      * @return Pair
      */
     public static final Pair<Integer, String> checkTableWellDefined(final TableInfo tableInfo) {
-        if(! checkLabelName(tableInfo.getTableName()))
-            return new ImmutablePair<Integer, String>(-1,"表名"+tableInfo.getTableName()+"格式不正确！");
-
+        if(! checkLabelName(tableInfo.getTableName())) {
+            return new ImmutablePair<>(-1, "表名" + tableInfo.getTableName() + "格式不正确！");
+        }
         for(TableField field : tableInfo.getColumns()){
-            if(! checkLabelName(field.getColumnName()))
-                return new ImmutablePair<Integer, String>(-2,"字段名"+field.getColumnName()+"格式不正确！");
-            if(StringUtils.isBlank(field.getColumnType()))
-                return new ImmutablePair<Integer, String>(-3,"字段"+field.getColumnName()+"没有指定类型！");
+            if(! checkLabelName(field.getColumnName())) {
+                return new ImmutablePair<>(-2, "字段名" + field.getColumnName() + "格式不正确！");
+            }
+            if(StringUtils.isBlank(field.getColumnType())) {
+                return new ImmutablePair<>(-3, "字段" + field.getColumnName() + "没有指定类型！");
+            }
         }
 
-        if( tableInfo.getPkColumns()==null || tableInfo.getPkColumns().size()==0)
-            return new ImmutablePair<Integer, String>(-4,"没有定义主键！");;
+        if( tableInfo.getPkColumns()==null || tableInfo.getPkColumns().size()==0) {
+            return new ImmutablePair<>(-4, "没有定义主键！");
+        }
 
-        return new ImmutablePair<Integer, String>(0,"ok！");
+        return new ImmutablePair<>(0,"ok！");
     }
 
     /**
@@ -152,8 +155,9 @@ public abstract class GeneralDDLOperations implements DDLOperations {
         sbCreate.append("(");
         int i=0;
         for(String pkfield : tableInfo.getPkColumns()){
-            if(i>0)
+            if(i>0) {
                 sbCreate.append(", ");
+            }
             sbCreate.append(pkfield);
             i++;
         }
@@ -163,8 +167,9 @@ public abstract class GeneralDDLOperations implements DDLOperations {
     protected void appendColumnsSQL(final TableInfo tableInfo, StringBuilder sbCreate) {
         for(TableField field : tableInfo.getColumns()){
             appendColumnSQL(field,sbCreate);
-            if(StringUtils.isNotBlank(field.getDefaultValue()))
+            if(StringUtils.isNotBlank(field.getDefaultValue())) {
                 sbCreate.append(" default ").append(field.getDefaultValue());
+            }
             sbCreate.append(",");
         }
     }
@@ -174,21 +179,25 @@ public abstract class GeneralDDLOperations implements DDLOperations {
             .append(" ").append(field.getColumnType());
         //StringUtils.equalsIgnoreCase(str1, str2)
         if("varchar".equalsIgnoreCase(field.getColumnType())|| "varchar2".equalsIgnoreCase(field.getColumnType())){
-            if(field.getMaxLength()>0)
+            if(field.getMaxLength()>0) {
                 sbCreate.append("(").append(field.getMaxLength()).append(")");
-            else
+            } else {
                 sbCreate.append("(64)");
+            }
         }else if("number".equalsIgnoreCase(field.getColumnType())|| "decimal".equalsIgnoreCase(field.getColumnType())){
-            if(field.getPrecision()>0)
+            if(field.getPrecision()>0) {
                 sbCreate.append("(").append(field.getPrecision());
-            else
+            } else {
                 sbCreate.append("(").append(24);
-            if(field.getScale()>0)
+            }
+            if(field.getScale()>0){
                 sbCreate.append(",").append(field.getScale());
+            }
             sbCreate.append(")");
         }
-        if(field.isMandatory())
+        if(field.isMandatory()) {
             sbCreate.append(" not null");
+        }
     }
 
     @Override

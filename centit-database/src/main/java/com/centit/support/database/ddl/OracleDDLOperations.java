@@ -34,7 +34,7 @@ public class OracleDDLOperations extends GeneralDDLOperations {
 
     @Override
     public List<String> makeReconfigurationColumnSqls(final String tableCode, final String columnCode, final TableField column){
-        List<String> sqls = new ArrayList<String>();
+        List<String> sqls = new ArrayList<>();
         SimpleTableField tempColumn = new SimpleTableField();
         tempColumn.setColumnName(columnCode+"_1");
         sqls.add(makeRenameColumnSql(tableCode, columnCode, tempColumn));
