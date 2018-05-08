@@ -220,24 +220,6 @@ public abstract class GeneralDDLOperations implements DDLOperations {
     }
 
     @Override
-    public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column){
-        StringBuilder sbsql = new StringBuilder("alter table ");
-        sbsql.append(tableCode);
-        sbsql.append(" modify ").append(column.getColumnType());
-        if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
-                || oldColumn.getMaxLength() != column.getMaxLength()
-                || oldColumn.getPrecision() != column.getPrecision() ){
-            appendColumnTypeSQL(column, sbsql);
-        }
-
-        if( oldColumn.isMandatory() != column.isMandatory()){
-            sbsql.append(column.isMandatory()?" not null": " null");
-        }
-
-        return sbsql.toString();
-    }
-
-    @Override
     public String makeDropColumnSql(final String tableCode, final String columnCode){
         return  "alter table " + tableCode +" drop COLUMN " + columnCode;
 

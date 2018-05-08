@@ -63,8 +63,6 @@ public interface DDLOperations {
      * @return sql语句列表
      */
     List<String> makeReconfigurationColumnSqls(final String tableCode, final String columnCode, final TableField column);
-
-
     /**
      * 创建sequence
      * @param sequenceName sequenceName
