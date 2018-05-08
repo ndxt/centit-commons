@@ -22,21 +22,14 @@ public class DB2DDLOperations extends GeneralDDLOperations{
     }
 
     @Override
-    public String makeModifyColumnSql(final String tableCode, final TableField column){
+    public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column){
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
         sbsql.append(" alter column ");
         sbsql.append(column.getColumnName());
         sbsql.append(" set data type ");
         sbsql.append(column.getColumnType());
-        if (column.getMaxLength() > 0)
-            sbsql.append("(").append(column.getMaxLength()).append(")");
-        else if (column.getPrecision() > 0) {
-            sbsql.append("(").append(column.getPrecision());
-            if (column.getScale() > 0)
-                sbsql.append(",").append(column.getScale());
-            sbsql.append(")");
-        }
+        appendColumnTypeSQL(column, sbsql);
         return sbsql.toString();
     }
 }

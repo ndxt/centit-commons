@@ -1,6 +1,7 @@
 package com.centit.support.database.ddl;
 
 import com.centit.support.database.metadata.TableField;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 
@@ -24,12 +25,19 @@ public class SqlSvrDDLOperations extends GeneralDDLOperations {
     }
 
     @Override
-    public String makeModifyColumnSql(final String tableCode, final TableField column){
+    public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column){
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
-        sbsql.append(" ALTER COLUMN ");
-        appendColumnSQL(column,sbsql);
+        sbsql.append(" ALTER COLUMN ").append(column.getColumnType());
+        if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
+                || oldColumn.getMaxLength() != column.getMaxLength()
+                || oldColumn.getPrecision() != column.getPrecision() ){
+            appendColumnTypeSQL(column, sbsql);
+        }
+
+        if( oldColumn.isMandatory() != column.isMandatory()){
+            sbsql.append(column.isMandatory()?" not null": " null");
+        }
         return sbsql.toString();
     }
-
 }

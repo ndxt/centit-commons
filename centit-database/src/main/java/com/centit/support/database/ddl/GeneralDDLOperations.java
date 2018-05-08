@@ -174,27 +174,32 @@ public abstract class GeneralDDLOperations implements DDLOperations {
         }
     }
 
-    protected void appendColumnSQL(final TableField field,StringBuilder sbCreate) {
-        sbCreate.append(field.getColumnName())
-            .append(" ").append(field.getColumnType());
+    protected void appendColumnTypeSQL(final TableField field,StringBuilder sbCreate) {
+        sbCreate.append(field.getColumnType());
         //StringUtils.equalsIgnoreCase(str1, str2)
-        if("varchar".equalsIgnoreCase(field.getColumnType())|| "varchar2".equalsIgnoreCase(field.getColumnType())){
-            if(field.getMaxLength()>0) {
+        if ("varchar".equalsIgnoreCase(field.getColumnType()) || "varchar2".equalsIgnoreCase(field.getColumnType())) {
+            if (field.getMaxLength() > 0) {
                 sbCreate.append("(").append(field.getMaxLength()).append(")");
             } else {
                 sbCreate.append("(64)");
             }
-        }else if("number".equalsIgnoreCase(field.getColumnType())|| "decimal".equalsIgnoreCase(field.getColumnType())){
-            if(field.getPrecision()>0) {
+        } else if ("number".equalsIgnoreCase(field.getColumnType()) || "decimal".equalsIgnoreCase(field.getColumnType())) {
+            if (field.getPrecision() > 0) {
                 sbCreate.append("(").append(field.getPrecision());
             } else {
                 sbCreate.append("(").append(24);
             }
-            if(field.getScale()>0){
+            if (field.getScale() > 0) {
                 sbCreate.append(",").append(field.getScale());
             }
             sbCreate.append(")");
         }
+    }
+
+    protected void appendColumnSQL(final TableField field,StringBuilder sbCreate) {
+        sbCreate.append(field.getColumnName())
+                .append(" ");
+        appendColumnTypeSQL(field, sbCreate);
         if(field.isMandatory()) {
             sbCreate.append(" not null");
         }
@@ -215,11 +220,20 @@ public abstract class GeneralDDLOperations implements DDLOperations {
     }
 
     @Override
-    public String makeModifyColumnSql(final String tableCode, final TableField column){
+    public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column){
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
-        sbsql.append(" modify ");
-        appendColumnSQL(column,sbsql);
+        sbsql.append(" modify ").append(column.getColumnType());
+        if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
+                || oldColumn.getMaxLength() != column.getMaxLength()
+                || oldColumn.getPrecision() != column.getPrecision() ){
+            appendColumnTypeSQL(column, sbsql);
+        }
+
+        if( oldColumn.isMandatory() != column.isMandatory()){
+            sbsql.append(column.isMandatory()?" not null": " null");
+        }
+
         return sbsql.toString();
     }
 
@@ -273,8 +287,8 @@ public abstract class GeneralDDLOperations implements DDLOperations {
     }
 
     @Override
-    public void modifyColumn(String tableCode, TableField column) throws SQLException {
-        DatabaseAccess.doExecuteSql(conn, makeModifyColumnSql(tableCode,column));
+    public void modifyColumn(String tableCode, TableField oldColumn, TableField column) throws SQLException {
+        DatabaseAccess.doExecuteSql(conn, makeModifyColumnSql(tableCode,oldColumn, column));
     }
 
     @Override

@@ -35,10 +35,11 @@ public interface DDLOperations {
     /**
      * 修改列定义 ，比如 修改 varchar 的长度
      * @param tableCode 表代码
+     * @param oldColumn 老的字段
      * @param column 字段
      * @return sql语句
      */
-    String makeModifyColumnSql(final String tableCode, final TableField column);
+    String makeModifyColumnSql(final String tableCode,final TableField oldColumn, final TableField column);
     /**
      * 删除列
      * @param tableCode 表代码
@@ -92,10 +93,11 @@ public interface DDLOperations {
     /**
      * 修改列定义 ，比如 修改 varchar 的长度
      * @param tableCode 表代码
+     * @param oldColumn 老的字段
      * @param column 字段
      * @throws SQLException SQLException
      */
-    void modifyColumn(String tableCode, TableField column) throws SQLException;
+    void modifyColumn(String tableCode, TableField oldColumn, TableField column) throws SQLException;
     /**
      * 删除列
      * @param tableCode 表代码
