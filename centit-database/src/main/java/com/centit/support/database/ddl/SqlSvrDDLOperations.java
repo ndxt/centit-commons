@@ -28,7 +28,7 @@ public class SqlSvrDDLOperations extends GeneralDDLOperations {
     public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column){
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
-        sbsql.append(" ALTER COLUMN ").append(column.getColumnType());
+        sbsql.append(" ALTER COLUMN ").append(column.getColumnName());
         if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
                 || oldColumn.getMaxLength() != column.getMaxLength()
                 || oldColumn.getPrecision() != column.getPrecision() ){
