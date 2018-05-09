@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-database</artifactId>
-            <version>${project.version}</version>
+            <version>${version}</version>
         </dependency>
 
         <dependency>
@@ -32,6 +32,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
+            <version>${junit.version}</version>
         </dependency>
         <dependency>
             <groupId>com.oracle</groupId>

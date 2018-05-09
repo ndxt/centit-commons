@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.centit.support</groupId>
             <artifactId>centit-compiler</artifactId>
-            <version>${project.version}</version>
+            <version>${version}</version>
         </dependency>
 
         <dependency>
