@@ -103,7 +103,7 @@ public abstract class Pretreatment {
                             .append(" ");
                 }else
                     sDesFormula.append( "$"+sWord+" ");
-            }else if(Lexer.isLabel(sWord) && !Formula.isKeyWord(sWord) && EmbedFunc.getFuncNo(sWord) == -1 ){
+            }else if(Lexer.isLabel(sWord) && !VariableFormula.isKeyWord(sWord) && EmbedFunc.getFuncNo(sWord) == -1 ){
                 sDesFormula.append( objectToFormulaString(varTrans.getLabelValue(sWord)))
                         .append(" ");
             }else

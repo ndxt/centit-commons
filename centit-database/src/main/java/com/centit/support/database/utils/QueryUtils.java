@@ -775,7 +775,7 @@ public abstract class QueryUtils {
                         aWord = labelSelected.getStringUntil("}");
                         paramList.add(aWord);
                     }
-                }else if(Lexer.isLabel(aWord) && !Formula.isKeyWord(aWord)
+                }else if(Lexer.isLabel(aWord) && !VariableFormula.isKeyWord(aWord)
                         && EmbedFunc.getFuncNo(aWord) == -1){
                     paramList.add(aWord);
                 }
@@ -890,7 +890,7 @@ public abstract class QueryUtils {
                             }
                             prewordIsOpt = false;
                         } else {
-                            prewordIsOpt = Formula.getOptID(aWord) > 0;
+                            prewordIsOpt = VariableFormula.getOptID(aWord) > 0;
                             if (prewordIsOpt) {
                                 filedName = null;
                             }
@@ -1002,7 +1002,7 @@ public abstract class QueryUtils {
                         }
                         prewordIsOpt = false;
                     } else {
-                        prewordIsOpt = Formula.getOptID(aWord) > 0;
+                        prewordIsOpt = VariableFormula.getOptID(aWord) > 0;
                         if (prewordIsOpt) {
                             filedName = null;
                         }

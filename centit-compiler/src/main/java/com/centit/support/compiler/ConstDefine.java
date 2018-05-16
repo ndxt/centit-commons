@@ -8,6 +8,7 @@ public abstract class ConstDefine {
 
     public static final int   TYPE_NUM = 1;
     public static final int   TYPE_STR = 2;
+    public static final int   TYPE_DATE = 3;
     public static final int   TYPE_ANY = 0;
 
     public static final int   FUNC_AVE        = 100;
@@ -68,6 +69,10 @@ public abstract class ConstDefine {
     public static final int   FUNC_GET_AT    = 148;
     public static final int   FUNC_LPAD    = 150;
     public static final int   FUNC_RPAD    = 151;
+
+    public static final int   FUNC_TO_DATE    = 152;
+    public static final int   FUNC_TO_STRING    = 153;
+    public static final int   FUNC_TO_NUMBER    = 154;
 
     public static final int   OP_BASE        = 30;    // +
     public static final int   OP_ADD         = 30;    // +

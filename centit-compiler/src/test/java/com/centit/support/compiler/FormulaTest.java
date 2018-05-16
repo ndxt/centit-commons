@@ -9,21 +9,16 @@ public class FormulaTest {
 
     public static void testFormula() {
 
-        Object s =  VariableFormula.calculate("5.12 % 3.03");
+        Object s =  VariableFormula.calculate("toNumber(5.12 dbmod 3.03)");
         System.out.println(s);
         s =  VariableFormula.calculate("5.12 mod 3.03");
         System.out.println(s);
-        s =  VariableFormula.calculate("5 dbmod 3");
-        System.out.println(s);
         s =  VariableFormula.calculate("5.12 dbmod 3.03");
         System.out.println(s);
-        s =  Formula.calculate("5.12 % 3.03");
+        s =  VariableFormula.calculate("toString(25+60)");
         System.out.println(s);
-        s =  Formula.calculate("5 dbmod 3");
+        s =  VariableFormula.calculate("toDate('2012-12-12')");
         System.out.println(s);
-        s =  Formula.calculate("5.12 dbmod 3.03");
-        System.out.println(s);
-        //assertEquals("nihao,地球 !",s);
     }
 
     public static void testFormula2() {
