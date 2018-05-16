@@ -29,7 +29,7 @@ public class MySqlDDLOperations extends GeneralDDLOperations {
     public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column){
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
-        sbsql.append(" MODIFY COLUMN  ").append(column.getColumnName());
+        sbsql.append(" MODIFY COLUMN  ").append(column.getColumnName()).append(" ");
         if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
                 || oldColumn.getMaxLength() != column.getMaxLength()
                 || oldColumn.getPrecision() != column.getPrecision() ){
