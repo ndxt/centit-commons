@@ -2,6 +2,7 @@ package com.centit.support.algorithm;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Date;
 
 /**
  *
@@ -225,20 +226,22 @@ public abstract class NumberBaseOpt {
      * 将一个Object转换为 long
      */
     public static Long castObjectToLong(Object obj){
-        if (obj == null)
+        if (obj == null) {
             return null;
-        if (obj instanceof Long)
+        }
+        if (obj instanceof Long) {
             return (Long) obj;
-        /*if (obj instanceof Double)
-            return ((Double) obj).longValue();
-        if (obj instanceof Integer)
-            return ((Integer) obj).longValue();
-        if (obj instanceof Float)
-            return ((Float) obj).longValue();*/
-        if (obj instanceof String)
-            return parseLong((String)obj,null);
-        if (obj instanceof Number)
+        }
+        if (obj instanceof Number) {
             return ((Number) obj).longValue();
+        }
+        if (obj instanceof Date) {
+            return ((Date) obj).getTime();
+        }
+        if (obj instanceof String) {
+            return parseLong((String) obj, null);
+        }
+
         return parseLong(StringBaseOpt.objectToString(obj),null);
     }
 
@@ -251,16 +254,16 @@ public abstract class NumberBaseOpt {
             return null;
         if (obj instanceof Integer)
             return (Integer) obj;
-        /*if (obj instanceof Long)
-            return ((Long) obj).intValue();
-        if (obj instanceof Double)
-            return ((Double) obj).intValue();
-        if (obj instanceof Float)
-            return ((Float) obj).intValue();*/
+        if (obj instanceof Number) {
+            return ((Number) obj).intValue();
+        }
+        if (obj instanceof Date) {
+            return Long.valueOf(((Date) obj).getTime()).intValue();
+        }
+
         if (obj instanceof String)
             return parseInteger((String)obj,null);
-        if (obj instanceof Number)
-            return ((Number) obj).intValue();
+
         return parseInteger(StringBaseOpt.objectToString(obj),null);
     }
 
@@ -276,12 +279,7 @@ public abstract class NumberBaseOpt {
             return null;
         if (obj instanceof Float)
             return (Float) obj;
-        /*if (obj instanceof Integer)
-            return ((Integer) obj).floatValue();
-        if (obj instanceof Long)
-            return ((Long) obj).floatValue();
-        if (obj instanceof Double)
-            return ((Double) obj).floatValue();*/
+
         if (obj instanceof String)
             return parseFloat((String)obj,null);
         if (obj instanceof Number)
@@ -349,8 +347,12 @@ public abstract class NumberBaseOpt {
     public static Number castObjectToNumber(Object obj){
         if (obj == null)
             return null;
-        if (obj instanceof Number)
+        if (obj instanceof Number) {
             return (Number) obj;
+        }
+        if (obj instanceof Date) {
+            return ((Date) obj).getTime();
+        }
 
         String strNum = StringRegularOpt.trimNumber(StringBaseOpt.castObjectToString(obj));
         if(strNum.indexOf('.')<0){
