@@ -397,33 +397,16 @@ public abstract class StringBaseOpt {
 
     public static String readFileToBuffer( String sFileName)
     {
-        /* 一行一行的读出
-        StringBuffer buffer = new StringBuffer();
-        String line; // 用来保存每行读取的内容
-        BufferedReader reader;
-        try {
-            reader = new BufferedReader(new FileReader(sFileName));
-
-            line = reader.readLine(); // 读取第一行
-            while (line != null) { // 如果 line 为空说明读完了
-                buffer.append(line); // 将读到的内容添加到 buffer 中
-                buffer.append("\r\n"); // 添加换行符
-                line = reader.readLine(); // 读取下一行
-            }
-            return buffer.toString();
-        } catch (FileNotFoundException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
-        } catch (IOException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
-        }
-        */
-
         //一次性全部读出
         try(FileInputStream in= new FileInputStream(sFileName)) {
-            byte[] readBytes = new byte[in.available()];
-            int l = in.read(readBytes);
-            if(l>0)
-                return new String(readBytes);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+            byte[] readBytes = out.toByteArray();
+            return new String(readBytes);
         } catch (IOException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
         }

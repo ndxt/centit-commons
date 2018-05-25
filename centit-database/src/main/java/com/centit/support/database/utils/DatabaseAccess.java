@@ -436,7 +436,6 @@ public abstract class DatabaseAccess {
             if(is==null){
                 return null;
             }
-
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             byte[] buffer = new byte[4096];
             int len;
@@ -452,17 +451,11 @@ public abstract class DatabaseAccess {
     }
 
     public static String fetchBlobAsBase64(Blob blob) throws IOException {
-        try (InputStream is = blob.getBinaryStream()){
-            byte[] readBytes = new byte[is.available()];
-            int nl = is.read(readBytes);
-            if(nl>0)
-                return new String(Base64.encodeBase64(readBytes));
+        byte[] readBytes = DatabaseAccess.fetchBlobBytes(blob);
+        if(readBytes == null){
             return null;
-
-        } catch (SQLException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
-            throw new IOException("write clob error", e);
         }
+        return new String(Base64.encodeBase64(readBytes));
     }
 
     public static Object fetchLobField(Object fieldData, boolean blobAsBase64String) {
@@ -613,8 +606,6 @@ public abstract class DatabaseAccess {
         return findObjectsBySql(conn, qap.getQuery(), qap.getParams());
     }
 
-
-
     /*
      * *执行一个标量查询
      */
@@ -638,7 +629,6 @@ public abstract class DatabaseAccess {
         return null;
     }
 
-
     /*
      * * 执行一个标量查询
      */
@@ -660,7 +650,6 @@ public abstract class DatabaseAccess {
             return objList.get(0);
         return null;
     }
-
 
     /* 下面是分页查询相关的语句 */
     /*----------------------------------------------------------------------------- */
@@ -687,7 +676,6 @@ public abstract class DatabaseAccess {
             throws SQLException, IOException {
 
         List<Object[]> objList = DatabaseAccess.findObjectsByNamedSql(conn,sSql, values);
-
         return DatabaseAccess.fetchScalarObject(objList);
     }
     /*
@@ -695,12 +683,9 @@ public abstract class DatabaseAccess {
      */
     public static Object getScalarObjectQuery(Connection conn, String sSql, Object[] values)
             throws SQLException, IOException {
-
         List<Object[]> objList = DatabaseAccess.findObjectsBySql(conn,sSql, values);
-
         return DatabaseAccess.fetchScalarObject(objList);
     }
-
 
     /*
      * * 执行一个标量查询
@@ -736,9 +721,7 @@ public abstract class DatabaseAccess {
      */
     public static Long queryTotalRows(Connection conn, String sSql, Object[] values)
             throws SQLException, IOException {
-
         Object scalarObj = DatabaseAccess.getScalarObjectQuery(conn, QueryUtils.buildGetCountSQL(sSql), values);
-
         return NumberBaseOpt.castObjectToLong(scalarObj);
     }
 
@@ -757,9 +740,7 @@ public abstract class DatabaseAccess {
      */
     public static Long queryTotalRows(Connection conn, String sSql, Map<String,Object> values)
             throws SQLException, IOException {
-
         Object scalarObj = DatabaseAccess.getScalarObjectQuery(conn, QueryUtils.buildGetCountSQL(sSql), values);
-
         return NumberBaseOpt.castObjectToLong(scalarObj);
     }
 
@@ -832,8 +813,6 @@ public abstract class DatabaseAccess {
             return findObjectsBySql(conn, query, values);
     }
 
-
-
     /**
      *
      * @param conn
@@ -853,33 +832,23 @@ public abstract class DatabaseAccess {
      */
     public static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames,
             int pageNo, int pageSize) throws SQLException, IOException {
-
         String query = makePageQuerySql(conn, sSql, pageNo, pageSize );
-
         if(query.equals(sSql)) {
             try (PreparedStatement stmt = conn.prepareStatement(sSql)){
                 setQueryStmtParameters(stmt, values);
-
                 if (pageNo > 0 && pageSize > 0)
                     stmt.setMaxRows(pageNo * pageSize);
-
                 try(ResultSet rs = stmt.executeQuery()) {
-
                     if (rs == null)
                         return new JSONArray();
-
                     if (pageNo > 1 && pageSize > 0)
                         rs.absolute((pageNo - 1) * pageSize);
-
                     String[] fns = fieldnames;
                     if (ArrayUtils.isEmpty(fns)) {
                         List<String> fields = QueryUtils.getSqlFiledNames(sSql);
                         fns = mapColumnsNameToFields(fields);
                     }
                     return fetchResultSetToJSONArray(rs, fns);
-                    //rs.close();
-                    //stmt.close();
-                    //return ja;
                 }
             } catch (SQLException e) {
                 throw new DatabaseAccessException(sSql, e);
@@ -934,13 +903,9 @@ public abstract class DatabaseAccess {
             Connection conn, String sSql, Map<String, Object> values,
             int pageNo, int pageSize)
             throws SQLException, IOException {
-
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
-
         return findObjectsBySql(conn, qap.getQuery(), qap.getParams(),pageNo,pageSize);
     }
-
-
 
     /**
      * 执行一个带命名参数的查询并返回JSONArray
@@ -962,10 +927,7 @@ public abstract class DatabaseAccess {
     public static JSONArray findObjectsByNamedSqlAsJSON(
             Connection conn, String sSql, Map<String, Object> values,
             String[] fieldnames,int pageNo, int pageSize)throws SQLException, IOException {
-
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
-
         return findObjectsAsJSON(conn, qap.getQuery(), qap.getParams(), fieldnames,pageNo,pageSize);
     }
-
 }
