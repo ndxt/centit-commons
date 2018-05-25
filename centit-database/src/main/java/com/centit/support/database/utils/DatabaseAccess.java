@@ -10,10 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringWriter;
+import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -421,7 +418,7 @@ public abstract class DatabaseAccess {
     public static String fetchClobString(Clob clob) throws IOException {
         try (Reader reader = clob.getCharacterStream()){
             StringWriter writer = new StringWriter();
-            char[] buf = new char[1024];
+            char[] buf = new char[4096];
             int len;
             while ((len = reader.read(buf)) != -1) {
                 writer.write(buf, 0, len);
@@ -436,11 +433,17 @@ public abstract class DatabaseAccess {
 
     public static byte[] fetchBlobBytes(Blob blob) throws IOException {
         try (InputStream is = blob.getBinaryStream()){
-            byte[] readBytes = new byte[is.available()];
-            int nl = is.read(readBytes);
-            if(nl>0)
-                return readBytes;
-            return null;
+            if(is==null){
+                return null;
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            int len;
+            while ((len = is.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+            return out.toByteArray();
             // out.writeString(new String(Base64.encodeBase64(readBytes)));
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
