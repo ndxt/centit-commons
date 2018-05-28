@@ -96,6 +96,11 @@ public class JavaBeanField {
     }
 
     public void setObjectFieldValue(Object object,  Object newValue){
+        if(newValue==null){
+            this.innerSetObjectFieldValue(object, null);
+            return;
+        }
+
         switch (this.getFieldJavaType()) {
             case "int":
             case "Integer":
