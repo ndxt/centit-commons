@@ -8,6 +8,45 @@ public abstract class ByteBaseOpt {
         throw new IllegalAccessError("Utility class");
     }
 
+    public static byte[] castObjectToBytes(Object obj){
+        if(obj instanceof byte[]){
+            return (byte[]) obj;
+        }
+
+        if (obj instanceof Long) {
+            byte [] buf = new byte[8];
+            writeInt64(buf, (Long) obj ,0);
+            return buf;
+        }
+
+        if (obj instanceof Integer) {
+            byte [] buf = new byte[4];
+            writeInt32(buf, (Integer) obj ,0);
+            return buf;
+        }
+
+        if (obj instanceof Date) {
+            byte [] buf = new byte[8];
+            writeInt64(buf, ((Date) obj).getTime() ,0);
+            return buf;
+        }
+
+        if (obj instanceof Float) {
+            byte [] buf = new byte[4];
+            writeFloat(buf, (Float) obj ,0);
+            return buf;
+        }
+
+        if (obj instanceof Double) {
+            byte [] buf = new byte[8];
+            writeDouble(buf, (Double) obj ,0);
+            return buf;
+        }
+
+        return StringBaseOpt.objectToString(obj).getBytes();
+    }
+
+
     public static int writeInt64(byte [] buf, long data, int offset){
         for(int i=0;i<8;i++){
             buf[offset+7-i] = (byte)(data & 0xff);
