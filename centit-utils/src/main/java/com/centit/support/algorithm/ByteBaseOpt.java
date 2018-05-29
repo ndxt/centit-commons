@@ -109,6 +109,15 @@ public abstract class ByteBaseOpt {
         return writeInt64(buf,longDate,offset);
     }
 
+    public static int writeStringAsBytes(byte [] buf, String data, int offset){
+        byte[] strBytes = data.getBytes();
+        System.arraycopy(strBytes,0, buf, offset, strBytes.length);
+        /*for(int i=0;i<strBytes.length;i++){
+            buf[offset+i] = strBytes[i];
+        }*/
+        return offset + data.length();
+    }
+
     public static int writeString(byte [] buf, String data, int offset){
         for(int i=0;i<data.length();i++){
             buf[offset+i] = (byte) data.charAt(i);
@@ -122,6 +131,7 @@ public abstract class ByteBaseOpt {
         }
         return offset + data.length;
     }
+
     public static int writeStringApendSpace(byte [] buf, String data, int len, int offset){
         int i=0;
         int dataLen = data.length()<len?data.length():len;
