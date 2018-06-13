@@ -271,7 +271,7 @@ public abstract class ByteBaseOpt {
         return String.valueOf(str);
     }
 
-    public static Date readDate(byte [] buf, Date data, int offset){
+    public static Date readDate(byte [] buf, int offset){
         long dateTime = readLong(buf, offset);
         return new Date(dateTime);
     }
