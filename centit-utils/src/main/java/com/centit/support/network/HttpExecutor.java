@@ -171,8 +171,12 @@ public abstract class HttpExecutor {
     
     public static String httpExecute(CloseableHttpClient httpclient,
             HttpContext context,
-            HttpRequestBase httpRequest,HttpHost httpProxy)
+            HttpRequestBase httpRequest, Map<String,String> httpHeader, HttpHost httpProxy)
             throws IOException {
+        if(httpHeader!=null ){
+            for(Map.Entry<String,String> entHeader: httpHeader.entrySet())
+            httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
+        }
 
         if (httpProxy != null) {
             RequestConfig config = RequestConfig.custom().setProxy(httpProxy)
@@ -188,25 +192,56 @@ public abstract class HttpExecutor {
     }
 
     public static String httpExecute(CloseableHttpClient httpclient,
+                                     HttpContext context,
+                                     HttpRequestBase httpRequest, Map<String,String> httpHeader)
+            throws IOException {
+        return httpExecute( httpclient,context,
+                httpRequest, httpHeader, null);
+    }
+
+    public static String httpExecute(CloseableHttpClient httpclient,
+                                     HttpRequestBase httpRequest, Map<String,String> httpHeader ,
+                                     HttpHost httpProxy)
+            throws IOException {
+        return httpExecute( httpclient,null,
+                httpRequest, httpHeader, httpProxy);
+    }
+
+    public static String httpExecute(CloseableHttpClient httpclient,
+                                     HttpRequestBase httpRequest, Map<String,String> httpHeader)
+            throws IOException {
+        return httpExecute( httpclient,null,
+                httpRequest, httpHeader, null);
+    }
+
+    public static String httpExecute(CloseableHttpClient httpclient,
+                                     HttpContext context,
+                                     HttpRequestBase httpRequest, HttpHost httpProxy)
+            throws IOException {
+        return httpExecute( httpclient, context,
+                httpRequest, null, httpProxy);
+    }
+
+    public static String httpExecute(CloseableHttpClient httpclient,
             HttpContext context,
             HttpRequestBase httpRequest)
             throws IOException {
         return httpExecute( httpclient,context,
-                 httpRequest, null);
+                 httpRequest, null, null);
     } 
     
     public static String httpExecute(CloseableHttpClient httpclient,
             HttpRequestBase httpRequest,HttpHost httpProxy)
             throws IOException {
         return httpExecute( httpclient,null,
-                 httpRequest, httpProxy);
+                 httpRequest, null, httpProxy);
     } 
     
     public static String httpExecute(CloseableHttpClient httpclient,
             HttpRequestBase httpRequest)
             throws IOException {
         return httpExecute( httpclient,null,
-                 httpRequest, null);
+                 httpRequest, null, null);
     } 
 
     public static String simpleGet(CloseableHttpClient httpclient,
@@ -244,7 +279,6 @@ public abstract class HttpExecutor {
     public static String simpleGet(CloseableHttpClient httpclient,
             String uri)
             throws IOException {
-
         return  simpleGet( httpclient,null,
                    uri,  (String)null);
     }
