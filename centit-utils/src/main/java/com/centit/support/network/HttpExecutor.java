@@ -10,6 +10,7 @@ import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.EntityBuilder;
@@ -31,7 +32,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,148 +168,80 @@ public abstract class HttpExecutor {
             throws NoSuchAlgorithmException, KeyManagementException{
         return createHttpClient(null,true,true);
     }
-    
-    public static String httpExecute(CloseableHttpClient httpclient,
-            HttpContext context,
-            HttpRequestBase httpRequest, Map<String,String> httpHeader, HttpHost httpProxy)
+
+    public static <T> T httpExecute (HttpExecutorContext executorContext,
+                                     HttpRequestBase httpRequest, ResponseHandler<T> responseHandler)
             throws IOException {
-        if(httpHeader!=null ){
-            for(Map.Entry<String,String> entHeader: httpHeader.entrySet())
-            httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
+        if(executorContext.getHttpHeaders() != null ){
+            for(Map.Entry<String,String> entHeader: executorContext.getHttpHeaders().entrySet())
+                httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
         }
 
-        if (httpProxy != null) {
-            RequestConfig config = RequestConfig.custom().setProxy(httpProxy)
+        if (executorContext.getHttpProxy() != null) {
+            RequestConfig config = RequestConfig.custom().setProxy(executorContext.getHttpProxy())
                     .build();
             httpRequest.setConfig(config);
         }
 
-        try (CloseableHttpResponse response = httpclient.execute(httpRequest,context)) {
-            String responseContent = Utf8ResponseHandler.INSTANCE
-                    .handleResponse(response);
-            return responseContent;
+        CloseableHttpClient httpClient = null;
+        boolean createSelfClient = executorContext.getHttpclient() == null;
+        if(createSelfClient){
+            httpClient = executorContext.getHttpProxy() == null?
+                    HttpExecutor.createHttpClient():
+                    HttpExecutor.createHttpClient(executorContext.getHttpProxy() );
+        }else{
+            httpClient = executorContext.getHttpclient();
+        }
+
+        try (CloseableHttpResponse response = httpClient.execute(httpRequest,executorContext.getHttpContext())) {
+            return responseHandler.handleResponse(response);
+        }finally {
+            if(createSelfClient){
+                httpClient.close();
+            }
         }
     }
 
-    public static String httpExecute(CloseableHttpClient httpclient,
-                                     HttpContext context,
-                                     HttpRequestBase httpRequest, Map<String,String> httpHeader)
-            throws IOException {
-        return httpExecute( httpclient,context,
-                httpRequest, httpHeader, null);
-    }
-
-    public static String httpExecute(CloseableHttpClient httpclient,
-                                     HttpRequestBase httpRequest, Map<String,String> httpHeader ,
-                                     HttpHost httpProxy)
-            throws IOException {
-        return httpExecute( httpclient,null,
-                httpRequest, httpHeader, httpProxy);
-    }
-
-    public static String httpExecute(CloseableHttpClient httpclient,
-                                     HttpRequestBase httpRequest, Map<String,String> httpHeader)
-            throws IOException {
-        return httpExecute( httpclient,null,
-                httpRequest, httpHeader, null);
-    }
-
-    public static String httpExecute(CloseableHttpClient httpclient,
-                                     HttpContext context,
-                                     HttpRequestBase httpRequest, HttpHost httpProxy)
-            throws IOException {
-        return httpExecute( httpclient, context,
-                httpRequest, null, httpProxy);
-    }
-
-    public static String httpExecute(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String httpExecute(HttpExecutorContext executorContext,
             HttpRequestBase httpRequest)
             throws IOException {
-        return httpExecute( httpclient,context,
-                 httpRequest, null, null);
-    } 
-    
-    public static String httpExecute(CloseableHttpClient httpclient,
-            HttpRequestBase httpRequest,HttpHost httpProxy)
-            throws IOException {
-        return httpExecute( httpclient,null,
-                 httpRequest, null, httpProxy);
-    } 
-    
-    public static String httpExecute(CloseableHttpClient httpclient,
-            HttpRequestBase httpRequest)
-            throws IOException {
-        return httpExecute( httpclient,null,
-                 httpRequest, null, null);
-    } 
+        return httpExecute(executorContext, httpRequest, Utf8ResponseHandler.INSTANCE);
+    }
 
-    public static String simpleGet(CloseableHttpClient httpclient,
-            HttpContext context,String uri, String queryParam)
+
+    public static String simpleGet(HttpExecutorContext executorContext, String uri, String queryParam)
             throws IOException {
 
         HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamToUrl(uri,queryParam));
 
-        return httpExecute(httpclient,context,httpGet);
+        return httpExecute(executorContext,httpGet);
     }
 
-    public static String simpleGet(CloseableHttpClient httpclient,
-            String uri, String queryParam)
-            throws IOException {
 
-        return  simpleGet( httpclient,null,
-                   uri,  queryParam);
-    }
 
-    public static String simpleGet(CloseableHttpClient httpclient,
-            HttpContext context,String uri, Map<String,Object> queryParam)
+    public static String simpleGet(HttpExecutorContext executorContext, String uri, Map<String,Object> queryParam)
             throws IOException {
         HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamsToUrl(uri, queryParam));
-        return httpExecute(httpclient,context,httpGet);
+        return httpExecute(executorContext,httpGet);
     }
 
 
-    public static String simpleGet(CloseableHttpClient httpclient,
-            HttpContext context,String uri)
+    public static String simpleGet(HttpExecutorContext executorContext, String uri)
             throws IOException {
-        return simpleGet( httpclient,context,
+        return simpleGet( executorContext,
                    uri,  (String)null);
     }
 
-    public static String simpleGet(CloseableHttpClient httpclient,
-            String uri)
-            throws IOException {
-        return  simpleGet( httpclient,null,
-                   uri,  (String)null);
-    }
 
-    public static String simpleGet(CloseableHttpClient httpclient,
-            String uri, Map<String,Object> queryParam)
-            throws IOException {
-
-        return  simpleGet( httpclient,null,
-                   uri,  queryParam);
-    }
-
-
-    public static String simpleDelete(CloseableHttpClient httpclient,
-            HttpContext context, String uri, String queryParam)
+    public static String simpleDelete(HttpExecutorContext executorContext, String uri, String queryParam)
             throws IOException {
 
         HttpDelete httpDelete = new HttpDelete(UrlOptUtils.appendParamToUrl(uri,queryParam));
 
-        return httpExecute(httpclient,context,httpDelete);
+        return httpExecute(executorContext,httpDelete);
     }
 
-    public static String simpleDelete(CloseableHttpClient httpclient,
-             String uri, String queryParam)
-            throws IOException {
-        return simpleDelete(httpclient,null,
-                  uri,  queryParam);
-    }
-
-    public static String simplePut(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String simplePut(HttpExecutorContext executorContext,
              String uri, String putEntity)
             throws IOException {
 
@@ -322,19 +254,11 @@ public abstract class HttpExecutor {
             httpPut.setEntity(entity);
         }
 
-        return httpExecute(httpclient,context,httpPut);
-    }
-
-    public static String simplePut(CloseableHttpClient httpclient,
-             String uri, String putEntity)
-            throws IOException {
-        return simplePut( httpclient,null,
-                  uri,  putEntity);
+        return httpExecute(executorContext,httpPut);
     }
 
 
-    public static String rawPut(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String rawPut(HttpExecutorContext executorContext,
              String uri, byte[] bytes)
             throws IOException {
 
@@ -347,23 +271,15 @@ public abstract class HttpExecutor {
             httpPut.setEntity(entity);
         }
 
-        return httpExecute(httpclient,context,httpPut);
+        return httpExecute(executorContext,httpPut);
 
-    }
-
-    public static String rawPut(CloseableHttpClient httpclient,
-             String uri, byte[] bytes)
-            throws IOException {
-        return  rawPut( httpclient,null,
-                  uri, bytes);
     }
 
     /*
      * 在spring mvc 中的 request.getInputStream() 是不可以用的，因为spring 已经处理过这个流
      * 所以这个方法只能在自己写的servlet中使用
      */
-    public static String requestInputStreamPut(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String requestInputStreamPut(HttpExecutorContext executorContext,
              String uri, InputStream putIS)
             throws IOException {
 
@@ -375,14 +291,7 @@ public abstract class HttpExecutor {
             httpPut.setEntity(entity);
         }
 
-        return httpExecute(httpclient,context,httpPut);
-    }
-
-    public static String requestInputStreamPut(CloseableHttpClient httpclient,
-             String uri, InputStream putIS)
-            throws IOException {
-        return requestInputStreamPut(httpclient,null,
-                  uri,  putIS);
+        return httpExecute(executorContext,httpPut);
     }
 
     public static List<NameValuePair> makeRequectParams(Object obj, String prefixName){
@@ -528,8 +437,7 @@ public abstract class HttpExecutor {
         return makeRequectParams(obj,"");
     }
 
-    public static String formPut(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String formPut(HttpExecutorContext executorContext,
              String uri, Object formData)
             throws IOException {
         HttpPut httpPut = new HttpPut(uri);
@@ -547,18 +455,11 @@ public abstract class HttpExecutor {
             httpPut.setEntity(eb.build());
         }
 
-        return httpExecute(httpclient,context,httpPut);
+        return httpExecute(executorContext, httpPut);
     }
 
-    public static String formPut(CloseableHttpClient httpclient,
-             String uri, Object formData)
-            throws IOException {
-        return formPut(httpclient,null,
-                 uri, formData);
-    }
 
-    public static String multiFormPut(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String multiFormPut(HttpExecutorContext executorContext,
              String uri, Object[] formObjects,Map<String,Object> extFormObjects)
             throws IOException {
 
@@ -588,22 +489,20 @@ public abstract class HttpExecutor {
         eb.setParameters(params);
         httpPut.setEntity(eb.build());
 
-        return httpExecute(httpclient,context,httpPut);
+        return httpExecute(executorContext,httpPut);
     }
 
 
-    public static String multiFormPut(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String multiFormPut(HttpExecutorContext executorContext,
              String uri, Object formObject,Map<String,Object> extFormObjects)
             throws IOException {
 
-        return multiFormPut( httpclient,context,
+        return multiFormPut(executorContext,
                   uri, new Object[]{formObject},extFormObjects);
     }
 
 
-    public static String simplePost(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String simplePost(HttpExecutorContext executorContext,
              String uri, String postEntity, final boolean asPutMethod)
             throws IOException {
 
@@ -615,28 +514,22 @@ public abstract class HttpExecutor {
             httpPost.setEntity(entity);
         }
 
-        return httpExecute(httpclient,context,httpPost);
+        return httpExecute(executorContext,httpPost);
     }
 
-    public static String simplePost(CloseableHttpClient httpclient,
-             String uri, String postEntity, final boolean asPutMethod)
-            throws IOException {
-        return simplePost(httpclient, null,
-                 uri,  postEntity, asPutMethod);
-    }
 
-    public static String simplePost(CloseableHttpClient httpclient,
+
+    public static String simplePost(HttpExecutorContext executorContext,
              String uri, String postEntity)
             throws IOException {
-        return simplePost(httpclient,null, uri, postEntity, false);
+        return simplePost(executorContext, uri, postEntity, false);
     }
 
     /*
      * 在spring mvc 中的 request.getInputStream() 是不可以用的，因为spring 已经处理过这个流
      * 所以这个方法只能在自己写的servlet中使用
      */
-    public static String requestInputStreamPost(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String requestInputStreamPost(HttpExecutorContext executorContext,
              String uri, InputStream postIS)
             throws IOException {
         HttpPost httpPost = new HttpPost(uri);
@@ -648,18 +541,11 @@ public abstract class HttpExecutor {
             httpPost.setEntity(entity);
         }
 
-        return httpExecute(httpclient,context,httpPost);
+        return httpExecute(executorContext,httpPost);
     }
 
-    public static String requestInputStreamPost(CloseableHttpClient httpclient,
-             String uri, InputStream postIS)
-            throws IOException {
-        return  requestInputStreamPost(httpclient,null,
-                 uri,  postIS);
-    }
 
-    public static String rawPost(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String rawPost(HttpExecutorContext executorContext,
              String uri, byte[] bytes,final boolean asPutMethod)
             throws IOException {
 
@@ -672,23 +558,17 @@ public abstract class HttpExecutor {
             httpPost.setEntity(entity);
         }
 
-        return httpExecute(httpclient,context,httpPost);
+        return httpExecute(executorContext,httpPost);
     }
 
-    public static String rawPost(CloseableHttpClient httpclient,
-             String uri, byte[] bytes,final boolean asPutMethod)
-            throws IOException {
-        return rawPost( httpclient, null,  uri, bytes ,asPutMethod);
-    }
 
-    public static String rawPost(CloseableHttpClient httpclient,
+    public static String rawPost(HttpExecutorContext executorContext,
              String uri, byte[] bytes)
                     throws IOException {
-        return rawPost( httpclient, null,  uri, bytes ,false);
+        return rawPost(executorContext,  uri, bytes ,false);
     }
 
-    public static String jsonPost(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String jsonPost(HttpExecutorContext executorContext,
              String uri, String jsonString, final boolean asPutMethod)
             throws IOException {
 
@@ -699,70 +579,50 @@ public abstract class HttpExecutor {
             httpPost.setEntity(entity);
         }
 
-        return httpExecute(httpclient,context,httpPost);
+        return httpExecute(executorContext,httpPost);
     }
 
-    public static String jsonPost(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String jsonPost(HttpExecutorContext executorContext,
              String uri, JSON jsonEntity, final boolean asPutMethod)
             throws IOException {
 
-        return jsonPost( httpclient,
-                 context,
+        return jsonPost(executorContext,
                   uri, jsonEntity==null?null:jsonEntity.toJSONString() ,  asPutMethod);
     }
 
-    public static String jsonPost(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String jsonPost(HttpExecutorContext executorContext,
              String uri, Object obj, final boolean asPutMethod)
             throws IOException {
 
-        return jsonPost( httpclient,
-                 context,
+        return jsonPost( executorContext,
                   uri, obj==null?null:JSON.toJSONString(obj) ,  asPutMethod);
     }
 
-    public static String jsonPost(CloseableHttpClient httpclient,
-             String uri, String jsonString, final boolean asPutMethod)
-            throws IOException {
-        return jsonPost( httpclient,null, uri,  jsonString, asPutMethod);
-    }
 
-    public static String jsonPost(CloseableHttpClient httpclient,
+
+    public static String jsonPost(HttpExecutorContext executorContext,
              String uri, String jsonString)
             throws IOException {
-        return jsonPost( httpclient,null, uri,  jsonString, false);
+        return jsonPost( executorContext, uri,  jsonString, false);
     }
 
-    public static String jsonPost(CloseableHttpClient httpclient,
-             String uri, Object obj, final boolean asPutMethod)
-            throws IOException {
-        return jsonPost( httpclient,null, uri,  obj, asPutMethod);
-    }
 
-    public static String jsonPost(CloseableHttpClient httpclient,
+    public static String jsonPost(HttpExecutorContext executorContext,
              String uri, Object obj)
             throws IOException {
-        return jsonPost( httpclient,null, uri,  obj, false);
+        return jsonPost(executorContext, uri,  obj, false);
     }
 
 
-    public static String jsonPost(CloseableHttpClient httpclient,
-             String uri, JSON jsonEntity, final boolean asPutMethod)
-            throws IOException {
-        return jsonPost( httpclient,null, uri,  jsonEntity, asPutMethod);
-    }
-
-    public static String jsonPost(CloseableHttpClient httpclient,
+    public static String jsonPost(HttpExecutorContext executorContext,
              String uri, JSON jsonEntity)
             throws IOException {
-        return jsonPost( httpclient,null, uri,  jsonEntity, false);
+        return jsonPost( executorContext, uri,  jsonEntity, false);
     }
 
 
 
-    public static String jsonPut(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String jsonPut(HttpExecutorContext executorContext,
              String uri, String jsonString)
             throws IOException {
 
@@ -772,18 +632,11 @@ public abstract class HttpExecutor {
             StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
             httpPut.setEntity(entity);
         }
-        return httpExecute(httpclient,context,httpPut);
-    }
-
-    public static String jsonPut(CloseableHttpClient httpclient,
-             String uri, String jsonString)
-            throws IOException {
-        return jsonPut(httpclient,null, uri, jsonString);
+        return httpExecute(executorContext,httpPut);
     }
 
 
-    public static String xmlPost(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String xmlPost(HttpExecutorContext executorContext,
              String uri, String xmlEntity,final boolean asPutMethod)
             throws IOException {
 
@@ -795,23 +648,16 @@ public abstract class HttpExecutor {
             httpPost.setEntity(entity);
         }
 
-        return httpExecute(httpclient,context,httpPost);
+        return httpExecute(executorContext,httpPost);
     }
 
-    public static String xmlPost(CloseableHttpClient httpclient,
-             String uri, String xmlEntity,final boolean asPutMethod)
-            throws IOException {
-        return xmlPost( httpclient,null, uri,  xmlEntity,asPutMethod);
-    }
-
-    public static String xmlPost(CloseableHttpClient httpclient,
+    public static String xmlPost(HttpExecutorContext executorContext,
              String uri, String xmlEntity)
             throws IOException {
-        return xmlPost( httpclient,null, uri,  xmlEntity,false);
+        return xmlPost(executorContext, uri,  xmlEntity,false);
     }
 
-    public static String xmlPut(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String xmlPut(HttpExecutorContext executorContext,
              String uri, String xmlEntity)
             throws IOException {
 
@@ -821,13 +667,7 @@ public abstract class HttpExecutor {
             StringEntity entity = new StringEntity(xmlEntity, Consts.UTF_8);
             httpPut.setEntity(entity);
         }
-        return httpExecute(httpclient,context,httpPut);
-    }
-
-    public static String xmlPut(CloseableHttpClient httpclient,
-             String uri, String xmlEntity)
-            throws IOException {
-        return xmlPut(httpclient,null, uri, xmlEntity);
+        return httpExecute(executorContext,httpPut);
     }
 
     public static String urlAddMethodParameter(String url,String method){
@@ -842,8 +682,7 @@ public abstract class HttpExecutor {
         return sUrl;
     }
 
-    public static String formPost(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String formPost(HttpExecutorContext executorContext,
              String uri, Object formData, final boolean asPutMethod)
             throws IOException {
 
@@ -862,24 +701,17 @@ public abstract class HttpExecutor {
             httpPost.setEntity(eb.build());
         }
 
-        return httpExecute(httpclient,context,httpPost);
+        return httpExecute(executorContext,httpPost);
     }
 
-    public static String formPost(CloseableHttpClient httpclient,
-             String uri, Object formData, final boolean asPutMethod)
-            throws IOException {
 
-        return formPost(httpclient,null, uri, formData, asPutMethod);
-    }
-
-    public static String formPost(CloseableHttpClient httpclient,
+    public static String formPost(HttpExecutorContext executorContext,
              String uri, Object formData)
             throws IOException {
-        return formPost(httpclient,null, uri, formData, false);
+        return formPost(executorContext, uri, formData, false);
     }
 
-    public static String multiFormPost(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String multiFormPost(HttpExecutorContext executorContext,
              String uri, Object[] formObjects,Map<String,Object> extFormObjects, final boolean asPutMethod)
             throws IOException {
 
@@ -908,48 +740,34 @@ public abstract class HttpExecutor {
         eb.setParameters(params);
         httpPost.setEntity(eb.build());
 
-        return httpExecute(httpclient,context,httpPost);
+        return httpExecute(executorContext,httpPost);
     }
 
-    public static String multiFormPost(CloseableHttpClient httpclient,
-             String uri, Object[] formObjects,Map<String,Object> extFormObjects, final boolean asPutMethod)
-            throws IOException {
 
-        return multiFormPost( httpclient, null,
-                  uri, (Object[]) formObjects, extFormObjects,asPutMethod);
-    }
-
-    public static String multiFormPost(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String multiFormPost(HttpExecutorContext executorContext,
              String uri, Object formObject,Map<String,Object> extFormObjects, final boolean asPutMethod)
             throws IOException {
-        return multiFormPost( httpclient, context,
+        return multiFormPost(executorContext,
                   uri, new Object[]{formObject},extFormObjects,asPutMethod);
     }
 
-    public static String multiFormPost(CloseableHttpClient httpclient,
-             String uri, Object formObject,Map<String,Object> extFormObjects, final boolean asPutMethod)
-            throws IOException {
-        return multiFormPost( httpclient, null,
-                  uri, new Object[]{formObject},extFormObjects,asPutMethod);
-    }
 
-    public static String multiFormPost(CloseableHttpClient httpclient,
+
+    public static String multiFormPost(HttpExecutorContext executorContext,
              String uri, Object[] formObjects,Map<String,Object> extFormObjects)
             throws IOException {
-        return multiFormPost( httpclient, null,
+        return multiFormPost(executorContext,
                   uri, formObjects,extFormObjects,false);
     }
 
-    public static String multiFormPost(CloseableHttpClient httpclient,
+    public static String multiFormPost(HttpExecutorContext executorContext,
              String uri, Object formObject,Map<String,Object> extFormObjects)
             throws IOException {
-        return multiFormPost( httpclient,null,
+        return multiFormPost( executorContext,
                   uri, new Object[]{formObject},extFormObjects,false);
     }
 
-    public static String inputStreamUpload(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String inputStreamUpload(HttpExecutorContext executorContext,
              String uri, InputStream inputStream)
             throws IOException {
 
@@ -962,18 +780,11 @@ public abstract class HttpExecutor {
         InputStreamEntity entity = new InputStreamEntity(inputStream);
         httpPost.setEntity(entity);
 
-        return httpExecute(httpclient,context,httpPost);
+        return httpExecute(executorContext,httpPost);
     }
 
-    public static String inputStreamUpload(CloseableHttpClient httpclient,
-             String uri,  InputStream inputStream)
-            throws IOException {
-        return inputStreamUpload( httpclient,null,
-                  uri,  inputStream);
-    }
 
-    public static String inputStreamUpload(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String inputStreamUpload(HttpExecutorContext executorContext,
              String uri, Map<String, Object> formObjects, InputStream inputStream)
             throws IOException {
 
@@ -983,19 +794,12 @@ public abstract class HttpExecutor {
             paramsUrl =
                 EntityUtils.toString(new UrlEncodedFormEntity(params,Consts.UTF_8));
         }
-        return inputStreamUpload(httpclient,context,
+        return inputStreamUpload(executorContext,
                 UrlOptUtils.appendParamToUrl(uri,paramsUrl), inputStream);
     }
 
-    public static String inputStreamUpload(CloseableHttpClient httpclient,
-             String uri, Map<String, Object> formObjects,InputStream inputStream)
-            throws IOException {
-        return inputStreamUpload(httpclient,null,
-                  uri,formObjects, inputStream);
-    }
 
-    public static String formPostWithFileUpload(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String formPostWithFileUpload(HttpExecutorContext executorContext,
              String uri, Map<String, Object> formObjects, Map<String, File> files)
             throws IOException {
 
@@ -1018,19 +822,27 @@ public abstract class HttpExecutor {
             }
         }
         httpPost.setEntity(builder.build());
-        return httpExecute(httpclient,context,httpPost);
+        return httpExecute(executorContext,httpPost);
     }
 
-    public static String formPostWithFileUpload(CloseableHttpClient httpclient,
-             String uri, Map<String, Object> formObjects, Map<String, File> files)
+
+    public static String fileUpload(HttpExecutorContext executorContext,
+                                    String uri, File file)
             throws IOException {
-        return formPostWithFileUpload(httpclient, null,
-                 uri,  formObjects,  files);
+
+        HttpPost httpPost = new HttpPost(uri);
+        httpPost.setHeader("Content-Type",applicationOctetStream);
+
+        /*httpPost.setHeader("Content-Type",
+                //ContentType.MULTIPART_FORM_DATA.toString());
+                "multipart/form-data; boundary=" + BOUNDARY);
+        //httpPost.addHeader("boundary", BOUNDARY);*/
+        InputStreamEntity entity = new InputStreamEntity(new FileInputStream(file));
+        httpPost.setEntity(entity);
+        return httpExecute(executorContext,httpPost);
     }
 
-
-    public static String fileUpload(CloseableHttpClient httpclient,
-            HttpContext context,
+    public static String fileUpload(HttpExecutorContext executorContext,
              String uri, Map<String, Object> formObjects, File file)
             throws IOException {
 
@@ -1040,42 +852,11 @@ public abstract class HttpExecutor {
             paramsUrl =
                 EntityUtils.toString(new UrlEncodedFormEntity(params,Consts.UTF_8));
         }
-        return fileUpload(httpclient,context,
+        return fileUpload(executorContext,
                 UrlOptUtils.appendParamToUrl(uri,paramsUrl), file);
     }
 
-    public static String fileUpload(CloseableHttpClient httpclient,
-             String uri, Map<String, Object> formObjects, File file)
-            throws IOException {
-        return fileUpload(httpclient,null,
-                  uri,formObjects, file);
-    }
-
-    public static String fileUpload(CloseableHttpClient httpclient,
-            HttpContext context,
-             String uri, File file)
-            throws IOException {
-
-        HttpPost httpPost = new HttpPost(uri);
-        httpPost.setHeader("Content-Type",applicationOctetStream);
-
-        /*httpPost.setHeader("Content-Type",
-                //ContentType.MULTIPART_FORM_DATA.toString());
-                "multipart/form-data; boundary=" + BOUNDARY);  
-        //httpPost.addHeader("boundary", BOUNDARY);*/
-        InputStreamEntity entity = new InputStreamEntity(new FileInputStream(file));
-        httpPost.setEntity(entity);
-        return httpExecute(httpclient,context,httpPost);
-    }
-
-    public static String fileUpload(CloseableHttpClient httpclient,
-             String uri, File file)
-            throws IOException {
-        return fileUpload( httpclient,null,
-                  uri,  file);
-    }
-
-    protected static String extraFileName(CloseableHttpResponse response) {
+     protected static String extraFileName(CloseableHttpResponse response) {
         Header[] contentDispositionHeader = response
                 .getHeaders("Content-disposition");
 
@@ -1091,13 +872,22 @@ public abstract class HttpExecutor {
     }
 
 
-    public static <T> T fetchInputStreamByUrl(CloseableHttpClient httpClient,
-                                       HttpContext context, String uri, String queryParam,
+    public static <T> T fetchInputStreamByUrl(HttpExecutorContext executorContext, String uri, String queryParam,
                                        DoOperateInputStream<T> operate)throws IOException {
 
         HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamToUrl(uri,queryParam));
 
-        try (CloseableHttpResponse response = httpClient.execute(httpGet,context)) {
+        CloseableHttpClient httpClient = null;
+        boolean createSelfClient = executorContext.getHttpclient() == null;
+        if(createSelfClient){
+            httpClient = executorContext.getHttpProxy() == null?
+                    HttpExecutor.createHttpClient():
+                    HttpExecutor.createHttpClient(executorContext.getHttpProxy() );
+        }else{
+            httpClient = executorContext.getHttpclient();
+        }
+
+        try (CloseableHttpResponse response = httpClient.execute(httpGet,executorContext.getHttpContext())) {
 
             Header[] contentTypeHeader = response.getHeaders("Content-Type");
             if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
@@ -1114,13 +904,17 @@ public abstract class HttpExecutor {
                 //fileName = extraFileName(response);
                 return operate.doOperate(inputStream);
             }
+        }finally {
+            if(createSelfClient){
+                httpClient.close();
+            }
         }
     }
 
-    public static <T> T fetchInputStreamByUrl(CloseableHttpClient httpClient, String uri ,
+    public static <T> T fetchInputStreamByUrl(HttpExecutorContext executorContext, String uri ,
                                                 DoOperateInputStream<T> operate)throws IOException {
 
-        return fetchInputStreamByUrl( httpClient, null,
+        return fetchInputStreamByUrl( executorContext,
                 uri, null,operate);
     }
 
@@ -1128,26 +922,39 @@ public abstract class HttpExecutor {
                                                 DoOperateInputStream<T> operate)throws IOException {
         try(CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
 
-            return fetchInputStreamByUrl(httpClient, null,
+            return fetchInputStreamByUrl(HttpExecutorContext.create(httpClient),
                     uri, null, operate);
         }
     }
 
-    public static boolean fileDownload(CloseableHttpClient httpClient,
-            HttpContext context,
+    public static boolean fileDownload(HttpExecutorContext executorContext,
              String uri, String queryParam,String filePath)
             throws IOException {
 
-       return fetchInputStreamByUrl( httpClient, context,
+       return fetchInputStreamByUrl(executorContext,
                 uri, queryParam,
                     (inputStream)-> FileSystemOpt.createFile(inputStream, filePath));
 
     }
 
-    public static boolean fileDownload(CloseableHttpClient httpclient,
-             String uri, String queryParam,String filePath)
+    public static boolean fileDownload(HttpExecutorContext executorContext,
+             String uri ,String filePath)
             throws IOException {
-        return fileDownload( httpclient,null,
-                  uri,  queryParam, filePath);
+        return fileDownload(executorContext,
+                uri, null, filePath);
+    }
+
+    public static boolean fileDownload(String uri, String queryParam,String filePath)
+            throws IOException {
+
+        return fileDownload(HttpExecutorContext.create(),
+                uri, queryParam, filePath);
+
+    }
+
+    public static boolean fileDownload(String uri ,String filePath)
+            throws IOException {
+        return fileDownload(HttpExecutorContext.create(),
+                uri, null, filePath);
     }
 }

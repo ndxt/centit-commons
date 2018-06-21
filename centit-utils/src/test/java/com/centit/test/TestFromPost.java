@@ -1,6 +1,7 @@
 package com.centit.test;
 
 import com.centit.support.network.HttpExecutor;
+import com.centit.support.network.HttpExecutorContext;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -26,7 +27,7 @@ public class TestFromPost {
         params.put("optId","LOCAL_FILE");
         String jsonStr;
         try {
-            jsonStr = HttpExecutor.formPostWithFileUpload(httpClient,
+            jsonStr = HttpExecutor.formPostWithFileUpload(HttpExecutorContext.create(),
                     "http://codefanpc:8180/product-file/service/upload/file",
                     params,
                     files);
@@ -39,85 +40,71 @@ public class TestFromPost {
     }
     
     public static void testSession(){
-
-
         try {
-
-
             CloseableHttpClient httpClient = HttpClients.createDefault();
-
        
-           String s = HttpExecutor.simpleGet(httpClient, null, 
+            String s = HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),
                     "http://codefanbook:8180/TestSession/TestSession",(String)null);
-            
             System.out.println(s);
             
-            s = HttpExecutor.simpleGet(httpClient, null, 
+            s = HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),
                     "http://codefanbook:8180/TestSession/TestSession",(String)null);
-            
-            System.out.println(s);            
-            
-            s = HttpExecutor.simpleGet(httpClient, null, 
+            System.out.println(s);
+
+            s = HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),
                     "http://codefanbook:8180/TestSession/TestSession",(String)null);
-            
             System.out.println(s);
             
         } catch (Exception e) {
             //e.printStackTrace();
         }
-        
     }
 
+    public static void testLogin(){
+        //CloseableHttpClient client2 = HttpClients.createDefault();
+        HttpClientContext context = HttpClientContext.create();
 
-    
-public static void testLogin(){
+        CloseableHttpClient httpClient = HttpExecutor.createKeepSessionHttpClient();
 
-    
-    //CloseableHttpClient client2 = HttpClients.createDefault();
-    HttpClientContext context = HttpClientContext.create();
-   
-    CloseableHttpClient httpClient = HttpExecutor.createHttpClient();
+        HttpExecutorContext executorContext = HttpExecutorContext.create(httpClient).context(context);
+        try {
 
-    try {
+            Map<String,String> params = new HashMap<>();
+            params.put("j_username", "admin");
+            params.put("j_password", "000000");
+            params.put("remember", "true");
 
-        Map<String,String> params = new HashMap<String,String>();
-        params.put("j_username", "admin");
-        params.put("j_password", "000000");
-        params.put("remember", "true");            
-        
-        String s = HttpExecutor.formPost(httpClient,context,  
-                "http://codefanbook:8180/framework-sys-module/j_spring_security_check?ajax=true", 
-                params,true);
-        System.out.println(s);
-        
-                
-        //ResponseJSON rj = ResponseJSON.valueOfJson(s);
-        //String jsessionid = rj.getDataAsScalarObject(String.class);            
-        //context.setAttribute("JSESSIONID", jsessionid);
-       
-        s = HttpExecutor.simpleGet(httpClient,context,  
-                "http://codefanbook:8180/framework-sys-module/service/sys/currentuser",(String)null);
-        
-        System.out.println(s);
-        
-        s = HttpExecutor.simpleGet(httpClient,context,  
-                "http://codefanbook:8180/framework-sys-module/service/sys/currentuser",(String)null);
-        
-        System.out.println(s);
-        
-       /* params.put("j_password", "111111");
-        s = HttpExecutor.formPost(client2, null, 
-                "http://codefanbook:8180/framework-sys-module/j_spring_security_check?ajax=true", 
-                params,true);
-        System.out.println(s);
-        
-        s = HttpExecutor.simpleGet(client2, null, 
-                "http://codefanbook:8180/framework-sys-module/service/sys/currentuser",null);
-        System.out.println(s);*/
-    } catch (Exception e) {
-        //e.printStackTrace();
+            String s = HttpExecutor.formPost(executorContext,
+                    "http://codefanbook:8180/framework-sys-module/j_spring_security_check?ajax=true",
+                    params,true);
+            System.out.println(s);
+
+
+            //ResponseJSON rj = ResponseJSON.valueOfJson(s);
+            //String jsessionid = rj.getDataAsScalarObject(String.class);
+            //context.setAttribute("JSESSIONID", jsessionid);
+
+            s = HttpExecutor.simpleGet(executorContext,
+                    "http://codefanbook:8180/framework-sys-module/service/sys/currentuser",(String)null);
+
+            System.out.println(s);
+
+            s = HttpExecutor.simpleGet(executorContext,
+                    "http://codefanbook:8180/framework-sys-module/service/sys/currentuser",(String)null);
+
+            System.out.println(s);
+
+           /* params.put("j_password", "111111");
+            s = HttpExecutor.formPost(client2, null,
+                    "http://codefanbook:8180/framework-sys-module/j_spring_security_check?ajax=true",
+                    params,true);
+            System.out.println(s);
+
+            s = HttpExecutor.simpleGet(client2, null,
+                    "http://codefanbook:8180/framework-sys-module/service/sys/currentuser",null);
+            System.out.println(s);*/
+        } catch (Exception e) {
+            //e.printStackTrace();
+        }
     }
-    
-}
-
 }

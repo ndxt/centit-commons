@@ -2,6 +2,7 @@ package com.centit.test;
 
 import com.alibaba.fastjson.JSON;
 import com.centit.support.network.HttpExecutor;
+import com.centit.support.network.HttpExecutorContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -13,7 +14,6 @@ import java.util.Map;
 public class TestTcpip {
      public static void main(String arg[]){
 
-         CloseableHttpClient httpclient = HttpClients.createDefault();
          Map<String ,Object> formData = new HashMap<String ,Object>();
          formData.put("catalogCode","TestData");
          formData.put("catalogStyle","U");
@@ -28,7 +28,7 @@ public class TestTcpip {
          try {
              JSON json = (JSON)JSON.toJSON(formData);
              String uri = "http://192.168.133.11:8180/centit/service/sys/testText";
-             String sRet = HttpExecutor.simplePost(httpclient, null, uri,
+             String sRet = HttpExecutor.simplePost(HttpExecutorContext.create(), uri,
                      json.toJSONString(),false );
              System.out.println(sRet);
         } catch (IOException e) {
@@ -38,7 +38,6 @@ public class TestTcpip {
      }
 
      public static void testPsts(){
-         CloseableHttpClient httpclient = HttpClients.createDefault();
 
          String uri = "http://192.168.133.11:8180/centit/service/sys/datacatalog/TestData";
 
@@ -53,7 +52,7 @@ public class TestTcpip {
          formData.put("optId","MGH");
 
          try {
-             String sRet = HttpExecutor.formPost(httpclient, null, uri,
+             String sRet = HttpExecutor.formPost(HttpExecutorContext.create(), uri,
                     formData,true );
              System.out.println(sRet);
         } catch (IOException e) {
