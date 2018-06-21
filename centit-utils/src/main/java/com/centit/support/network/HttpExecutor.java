@@ -172,17 +172,20 @@ public abstract class HttpExecutor {
     public static <T> T httpExecute (HttpExecutorContext executorContext,
                                      HttpRequestBase httpRequest, ResponseHandler<T> responseHandler)
             throws IOException {
-        if(executorContext.getHttpHeaders() != null ){
-            for(Map.Entry<String,String> entHeader: executorContext.getHttpHeaders().entrySet())
+
+        /*if(executorContext==null){
+            executorContext = HttpExecutorContext.create();
+        }else {*/
+        if (executorContext.getHttpHeaders() != null) {
+            for (Map.Entry<String, String> entHeader : executorContext.getHttpHeaders().entrySet())
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
         }
-
         if (executorContext.getHttpProxy() != null) {
             RequestConfig config = RequestConfig.custom().setProxy(executorContext.getHttpProxy())
                     .build();
             httpRequest.setConfig(config);
         }
-
+        //}
         CloseableHttpClient httpClient = null;
         boolean createSelfClient = executorContext.getHttpclient() == null;
         if(createSelfClient){

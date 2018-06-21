@@ -25,6 +25,10 @@ public class HttpExecutorContext {
         return new HttpExecutorContext();
     }
 
+    public static HttpExecutorContext empty(){
+        return new HttpExecutorContext();
+    }
+
     public static HttpExecutorContext create(CloseableHttpClient httpclient){
         HttpExecutorContext executorContext = new HttpExecutorContext();
         executorContext.httpclient = httpclient;
