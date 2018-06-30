@@ -12,24 +12,19 @@ import java.util.Map;
 public class TestDateTimeOpt {
     public  static void  main(String[] args) throws Exception  {
 
-        /*try {
-            System.out.println(Hex.encodeHex("000000".getBytes("utf8")));
-            System.out.println(Hex.encodeHex("{u0000000}".getBytes("utf8")));
-            System.out.println(Hex.encodeHex("000000{u0000000}".getBytes("utf8")));
-        } catch (UnsupportedEncodingException e) {
-            //e.printStackTrace();
-        }*/
-        //System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "yyyyMMddHHmmssSSS"));
-        System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.smartPraseDate("2017-9  3")));
-        System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.smartPraseDate("201793")));
-        //testTPTime() ;
-        //testDateTime();
-/*        System.out.println(FileSystemOpt.extractFileName(""));
-        System.out.println(FileSystemOpt.extractFileName("D:\\Projects\\RunData\\dde\\temp\\export-01\\export-010002.zip"));
-        System.out.println(FileSystemOpt.extractFileName("D:/Projects/RunData/dde/temp/export-01/export-010002.zip"));
-        System.out.println(FileSystemOpt.extractFileName("D:\\Projects\\RunData\\dde\\temp\\export-01\\export-010002"));
-        System.out.println(FileSystemOpt.extractFileName("export-010002.zip"));
-*/    }
+        System.out.println(DatetimeOpt.addDays(DatetimeOpt.currentUtilDate(),-1));
+
+        System.out.println(DatetimeOpt.calcSpanDays(
+                DatetimeOpt.smartPraseDate("2018-6-1"), DatetimeOpt.smartPraseDate("2018-6-2")));
+        System.out.println(DatetimeOpt.calcSpanDays(
+                DatetimeOpt.createUtilDate(2018,6,1),DatetimeOpt.createUtilDate(2018,6,2)));
+
+
+        //return addDays(truncateToMonth( addMonths(date,1) ),-1);
+        System.out.println(DatetimeOpt.convertDateToString(
+                DatetimeOpt.seekEndOfYear( DatetimeOpt.createUtilDate(2018,7,1))));
+
+    }
 
     //T代表后面跟着时间，Z代表UTC统一时间
 

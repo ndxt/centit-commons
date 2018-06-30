@@ -75,6 +75,16 @@ public abstract class DatetimeOpt {
         return sCurDate;
     }
 
+    public static java.util.Date createUtilDate(int year, int month, int date,
+                                                int hourOfDay, int minute,int second,int milliSecond)
+    {
+        Calendar cal = new GregorianCalendar();
+        cal.set( year,  month-1,  date,
+                hourOfDay,  minute, second);
+        cal.set(Calendar.MILLISECOND, milliSecond);
+        return cal.getTime();
+    }
+
     /**
      * 根据 年、月、日、时、分、秒  创建一个日期 类型为 java.util.Date
      * @param year 年
@@ -88,21 +98,11 @@ public abstract class DatetimeOpt {
     public static java.util.Date createUtilDate(int year, int month, int date,
             int hourOfDay, int minute,int second)
     {
-        Calendar cal = new GregorianCalendar();
-        cal.set( year,  month-1,  date,
-                 hourOfDay,  minute, second);
-        return cal.getTime();
+        return createUtilDate( year,  month,  date,
+                hourOfDay,  minute, second, 0);
     }
 
-    public static java.util.Date createUtilDate(int year, int month, int date,
-                                                int hourOfDay, int minute,int second,int milliSecond)
-    {
-        Calendar cal = new GregorianCalendar();
-        cal.set( year,  month-1,  date,
-                hourOfDay,  minute, second);
-        cal.set(Calendar.MILLISECOND, milliSecond);
-        return cal.getTime();
-    }
+
 
     /**
      * 根据 年、月、日、时、分  创建一个日期 类型为 java.util.Date
@@ -117,7 +117,7 @@ public abstract class DatetimeOpt {
             int hourOfDay, int minute)
     {
         return createUtilDate(year,  month,  date,
-                 hourOfDay,  minute,0);
+                 hourOfDay,  minute,0,0);
     }
 
     /**
@@ -129,7 +129,7 @@ public abstract class DatetimeOpt {
      */
     public static java.util.Date createUtilDate(int year, int month, int date)
     {
-        return createUtilDate(year,  month,  date, 0, 0,0);
+        return createUtilDate(year,  month,  date, 0, 0,0, 0);
     }
 
     /**
@@ -442,7 +442,6 @@ public abstract class DatetimeOpt {
 
 
     public static int getDayOfYear(java.util.Date date) {
-
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
         return cal.get(Calendar.DAY_OF_YEAR);
@@ -463,31 +462,56 @@ public abstract class DatetimeOpt {
     public static java.util.Date truncateToDay(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
-        return createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,cal.get(Calendar.DAY_OF_MONTH));
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+        //createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,cal.get(Calendar.DAY_OF_MONTH));
     }
 
     public static java.util.Date truncateToMonth(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
-        return createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,1);
+        cal.set(Calendar.DATE, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+        //return createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,1);
     }
 
     public static java.util.Date truncateToYear(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
-        return createUtilDate(cal.get(Calendar.YEAR),1,1);
+        cal.set(Calendar.MONTH, 0);
+        cal.set(Calendar.DATE, 1);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+        //return createUtilDate(cal.get(Calendar.YEAR),1,1);
     }
 
     //跳转到年的最后一天
     public static java.util.Date seekEndOfYear(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
-        return createUtilDate(cal.get(Calendar.YEAR),12,31);
+        cal.set(Calendar.MONTH, 11);
+        cal.set(Calendar.DATE, 31);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+        //return createUtilDate(cal.get(Calendar.YEAR),12,31);
     }
 
     //跳转到月的最后一天
     public static java.util.Date seekEndOfMonth(java.util.Date date){
-        return addDays(truncateToMonth(addMonths(date,1)),-1);
+        return addDays(truncateToMonth( addMonths(date,1) ),-1);
     }
 
     public static java.util.Date addSeconds(java.util.Date date, int nSeconds) {
@@ -539,6 +563,8 @@ public abstract class DatetimeOpt {
      * @return 计算这个周期中的天数, 包括 beginTime，endTime
      */
     public static int calcSpanDays(java.util.Date beginDate, java.util.Date endDate) {
+        //System.out.println(beginDate.getTime());
+        //System.out.println(endDate.getTime());
         java.util.Date bD = (beginDate.getTime() > endDate.getTime()) ? truncateToDay(endDate) : truncateToDay(beginDate);
         java.util.Date eD = (beginDate.getTime() > endDate.getTime()) ? beginDate : endDate;
         return (int) ((eD.getTime() - bD.getTime()) / 1000 / 60 / 60 / 24 + 1 );
