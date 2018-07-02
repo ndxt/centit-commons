@@ -2,15 +2,11 @@ package com.centit.support.database.jsonmaptable;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.support.algorithm.ListOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DBType;
 import com.centit.support.database.utils.DatabaseAccess;
-import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -222,7 +218,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         Pair<String,String[]> q = buildGetObjectSqlByPk(tableInfo);
         JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(
                  conn, q.getLeft(),
-                 QueryUtils.createSqlParamsMap( tableInfo.getPkColumns().get(0),keyValue),
+                 CollectionsOpt.createHashMap( tableInfo.getPkColumns().get(0),keyValue),
                  q.getRight());
         if(ja.size()<1)
             return null;
@@ -411,7 +407,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         String sql =  "delete from " + tableInfo.getTableName()+
                 " where " +  buildFilterSqlByPk(tableInfo,null);
         return DatabaseAccess.doExecuteNamedSql(conn, sql,
-                 QueryUtils.createSqlParamsMap( tableInfo.getPkColumns().get(0),keyValue) );
+                 CollectionsOpt.createHashMap( tableInfo.getPkColumns().get(0),keyValue) );
     }
 
     @Override
@@ -454,7 +450,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     @Override
     public int deleteObjectsAsTabulation(final String propertyName,final Object propertyValue) throws SQLException {
         return deleteObjectsByProperties(
-                QueryUtils.createSqlParamsMap(propertyName,propertyValue));
+                CollectionsOpt.createHashMap(propertyName,propertyValue));
     }
 
     @Override
@@ -533,7 +529,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             final String propertyName,final Object propertyValue)
             throws SQLException, IOException {
         JSONArray dbObjects = listObjectsByProperties(
-                QueryUtils.createSqlParamsMap(propertyName,propertyValue));
+                CollectionsOpt.createHashMap(propertyName,propertyValue));
         return replaceObjectsAsTabulation(newObjects,dbObjects);
     }
 

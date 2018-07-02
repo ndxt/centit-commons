@@ -1150,15 +1150,11 @@ public abstract class QueryUtils {
      * 创建sql语句参数键值对
      * @param objs 奇数变量为参数名，类型为string，偶数变量为参数值，类型为任意对象（object）
      * @return  Map String Object
+     * @see com.centit.support.algorithm.CollectionsOpt 方法 createHashMap
      */
+    @Deprecated
     public static Map<String,Object> createSqlParamsMap(Object... objs){
-        if(objs==null || objs.length<2)
-            return null;
-        Map<String,Object> paramsMap = new HashMap<>();
-        for(int i=0;i<objs.length / 2;i++){
-            paramsMap.put(String.valueOf(objs[i*2]), objs[i*2+1]);
-        }
-        return paramsMap;
+        return CollectionsOpt.createHashMap(objs);
     }
     
     public interface IFilterTranslater extends VariableTranslate {

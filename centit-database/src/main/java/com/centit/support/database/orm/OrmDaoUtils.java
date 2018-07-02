@@ -1,9 +1,6 @@
 package com.centit.support.database.orm;
 
-import com.centit.support.algorithm.ListOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableReference;
@@ -255,7 +252,7 @@ public abstract class OrmDaoUtils {
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,
                         "表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return getObjectBySql(connection,q.getKey(),
-                    QueryUtils.createSqlParamsMap(mapInfo.getPkColumns().get(0),id), type);
+                    CollectionsOpt.createHashMap(mapInfo.getPkColumns().get(0),id), type);
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
             if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idObj)){
@@ -280,7 +277,7 @@ public abstract class OrmDaoUtils {
             if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return getObjectBySql(connection, sql,
-                    QueryUtils.createSqlParamsMap(mapInfo.getPkColumns().get(0),id), type);
+                    CollectionsOpt.createHashMap(mapInfo.getPkColumns().get(0),id), type);
 
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
@@ -337,7 +334,7 @@ public abstract class OrmDaoUtils {
             if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return deleteObjectById(connection,
-                    QueryUtils.createSqlParamsMap( mapInfo.getPkColumns().get(0),id),
+                    CollectionsOpt.createHashMap( mapInfo.getPkColumns().get(0),id),
                     mapInfo);
 
         }else{
@@ -750,7 +747,7 @@ public abstract class OrmDaoUtils {
                            final String propertyName, final Object propertyValue )
             throws PersistenceException {
         return replaceObjectsAsTabulation(connection, newObjects,
-                JSONOpt.createHashMap(propertyName,propertyValue));
+                CollectionsOpt.createHashMap(propertyName,propertyValue));
     }
 
     public static <T> int replaceObjectsAsTabulation(Connection connection, List<T> newObjects,

@@ -3,6 +3,7 @@ package com.centit.support.json;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -364,7 +365,7 @@ public abstract class JSONOpt {
             return (Map<String,Object>) object;
         }
         if(ReflectionOpt.isScalarType(object.getClass())){
-            return createHashMap("scalar",object);
+            return CollectionsOpt.createHashMap("scalar",object);
         }
 
         return (JSONObject) JSON.toJSON(object);
@@ -577,19 +578,14 @@ public abstract class JSONOpt {
     public static JSONArray arrayToJSONArray(Object objArray,boolean methodOnly, boolean fieldOnly){
         return arrayToJSONArray( objArray, methodOnly,  fieldOnly, false);
     }
-    /*
+    /**
      * 参数必须是 string object string object ....
-     * @param objs
-     * @return
+     * @param objs 参数必须是 string object string object ....
+     * @return Map &lt; String,Object &gt;
      */
+    @Deprecated
     public static Map<String,Object> createHashMap(Object... objs){
-        if(objs==null || objs.length<2)
-            return null;
-        Map<String,Object> paramsMap = new HashMap<>(objs.length);
-        for(int i=0;i<objs.length / 2;i++){
-            paramsMap.put(String.valueOf(objs[i*2]), objs[i*2+1]);
-        }
-        return paramsMap;
+        return CollectionsOpt.createHashMap(objs);
     }
 
     /*

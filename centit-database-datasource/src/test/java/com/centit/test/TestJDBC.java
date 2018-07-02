@@ -1,10 +1,10 @@
 package com.centit.test;
 
 import com.alibaba.fastjson.JSONArray;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.DbcpConnectPools;
-import com.centit.support.database.utils.QueryUtils;
 
 import java.sql.Connection;
 
@@ -51,10 +51,10 @@ public class TestJDBC {
         String sql = "select loginName,userName from f_userinfo " +
                 "where usercode in (:userCodes)";
         /*QueryAndParams qp = QueryAndParams.createFromQueryAndNamedParams(sql,
-             QueryUtils.createSqlParamsMap("userCodes",new Object[]{"U0000041","U0001013"}));*/
+             CollectionsOpt.createHashMap("userCodes",new Object[]{"U0000041","U0001013"}));*/
         try {
              Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
-             JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, sql,  QueryUtils.createSqlParamsMap("userCodes",new Object[]{"U0000041","U0001013"}));
+             JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, sql,  CollectionsOpt.createHashMap("userCodes",new Object[]{"U0000041","U0001013"}));
              conn.close();
              System.out.println(ja.toJSONString());
         } catch (Exception e) {

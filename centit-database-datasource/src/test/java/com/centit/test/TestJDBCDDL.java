@@ -1,20 +1,16 @@
 package com.centit.test;
 
-import java.sql.Connection;
-import java.util.List;
-
 import com.alibaba.fastjson.JSONArray;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.database.ddl.*;
+import com.centit.support.database.metadata.SimpleTableField;
+import com.centit.support.database.metadata.SimpleTableInfo;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.DbcpConnectPools;
-import com.centit.support.database.utils.QueryUtils;
-import com.centit.support.database.ddl.DB2DDLOperations;
-import com.centit.support.database.ddl.DDLOperations;
-import com.centit.support.database.ddl.GeneralDDLOperations;
-import com.centit.support.database.ddl.MySqlDDLOperations;
-import com.centit.support.database.ddl.OracleDDLOperations;
-import com.centit.support.database.metadata.SimpleTableField;
-import com.centit.support.database.metadata.SimpleTableInfo;
+
+import java.sql.Connection;
+import java.util.List;
 
 public class TestJDBCDDL {
 
@@ -109,10 +105,10 @@ public class TestJDBCDDL {
       String sql = "select loginName,userName from f_userinfo " +
                 "where usercode in (:userCodes)";
       /*QueryAndParams qp = QueryAndParams.createFromQueryAndNamedParams(sql,
-             QueryUtils.createSqlParamsMap("userCodes",new Object[]{"U0000041","U0001013"}));*/
+             CollectionsOpt.createHashMap("userCodes",new Object[]{"U0000041","U0001013"}));*/
       try {
           Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
-            JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, sql,  QueryUtils.createSqlParamsMap("userCodes",new Object[]{"U0000041","U0001013"}));
+            JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, sql,  CollectionsOpt.createHashMap("userCodes",new Object[]{"U0000041","U0001013"}));
             conn.close();
             System.out.println(ja.toJSONString());
         } catch (Exception e) {
