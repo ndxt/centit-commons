@@ -7,9 +7,11 @@ import java.util.function.Supplier;
 
 public class CachedObject<T> {
 
+    public static final long NOT_REFRESH_PERIOD = 43200L;
     private T target;
     private boolean evicted;
     private Date refreshTime;
+    //分钟
     private long freshPeriod;
     private Supplier<T> refresher;
 
@@ -18,7 +20,7 @@ public class CachedObject<T> {
         this.evicted = true;
         this.refresher = refresher;
         //默认时间一个月
-        this.freshPeriod = 43200L;
+        this.freshPeriod = NOT_REFRESH_PERIOD;
     }
 
     /**
@@ -33,6 +35,9 @@ public class CachedObject<T> {
         this.freshPeriod = freshPeriod;
     }
 
+    /**
+     * @param freshPeriod 刷新周期 单位分钟
+     */
     public void setFreshPeriod(int freshPeriod) {
         this.freshPeriod = freshPeriod;
     }

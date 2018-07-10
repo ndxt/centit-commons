@@ -25,7 +25,7 @@ public class CachedMap<K,T> {
      * @param initialCapacity The implementation performs internal
      * sizing to accommodate this many elements.
      */
-    public CachedMap(Function<K, T> refresher, long freshPeriod , int initialCapacity){
+    public CachedMap(Function<K, T> refresher, long freshPeriod, int initialCapacity){
         this.targetMap = new ConcurrentHashMap<>(initialCapacity);
         this.refresher = refresher;
         this.freshPeriod = freshPeriod;
@@ -33,21 +33,13 @@ public class CachedMap<K,T> {
 
     /**
      * 构造函数
+     * @param freshPeriod 保鲜时间，单位为分钟；也是重新刷新时间
+     *                    它的意思不是每隔一段时间就刷新，而是在获取数据是检查是否超时，如果超时则刷新
      * @param refresher 重新获取代码的接口
      */
-    public CachedMap(Function<K, T> refresher){
-        this(refresher, 43200L,16);
+    public CachedMap(Function<K, T> refresher, long freshPeriod){
+        this(refresher, freshPeriod,16);
     }
-    /**
-     * 构造函数
-     * @param refresher 重新获取代码的接口
-     * @param initialCapacity The implementation performs internal
-     * sizing to accommodate this many elements.
-     */
-    public CachedMap(Function<K, T> refresher, int initialCapacity){
-        this(refresher, 43200L,initialCapacity);
-    }
-
 
     public void setFreshPeriod(int freshPeriod) {
         this.freshPeriod = freshPeriod;
@@ -69,7 +61,7 @@ public class CachedMap<K,T> {
         T target = refresher.apply(key);
         if(target != null) {
             targetMap.put(key,
-                    new CachedIdentifiedObject(refresher, target, freshPeriod));
+                    new CachedIdentifiedObject<>(refresher, target, freshPeriod));
         }
         return target;
     }
