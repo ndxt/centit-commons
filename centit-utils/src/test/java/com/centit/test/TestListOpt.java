@@ -1,6 +1,6 @@
 package com.centit.test;
 
-import com.centit.support.algorithm.ListOpt;
+import com.centit.support.algorithm.CollectionsOpt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public class TestListOpt {
             strs.add(new DemoClass("name"+i));
         }
 
-        DemoInterface [] strarray = ListOpt.listToArray(strs);
+        DemoInterface [] strarray = CollectionsOpt.listToArray(strs);
 
         for(int i=0;i<10;i++){
             System.out.println(strarray[i].getName());

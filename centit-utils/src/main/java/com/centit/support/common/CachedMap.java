@@ -45,14 +45,19 @@ public class CachedMap<K,T> {
         this.freshPeriod = freshPeriod;
     }
 
-    public synchronized void evictObject(K key){
+    public void evictObject(K key){
         CachedIdentifiedObject<K,T> identifiedObject =  targetMap.get(key);
         if(identifiedObject!=null){
             identifiedObject.evictObject();
         }
     }
 
-    public synchronized T getCachedObject(K key){
+    public void evictAll(){
+        targetMap.clear();
+    }
+
+
+    public T getCachedObject(K key){
         CachedIdentifiedObject<K,T> identifiedObject =  targetMap.get(key);
         if(identifiedObject != null){
             return identifiedObject.getCachedObject(key);

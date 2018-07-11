@@ -1,6 +1,6 @@
 package com.centit.test;
 
-import com.centit.support.algorithm.ListOpt;
+import com.centit.support.algorithm.CollectionsOpt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,8 +54,8 @@ public class TestSortAsTree {
         nodeList.add(2);
         nodeList.add(1);
 
-        System.out.println( ListOpt.srotAsTreeAndToJSON(nodeList,
-                new ListOpt.ParentChild<Integer>() {
+        System.out.println( CollectionsOpt.srotAsTreeAndToJSON(nodeList,
+                new CollectionsOpt.ParentChild<Integer>() {
                     public boolean parentAndChild(Integer p, Integer c) {
                         return p ==( c / 10);
                     }
