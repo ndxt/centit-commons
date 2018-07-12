@@ -1,6 +1,8 @@
 package com.centit.support.common;
 
 import com.centit.support.algorithm.DatetimeOpt;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.Date;
 import java.util.function.Function;
@@ -12,6 +14,7 @@ import java.util.function.Function;
  */
 public class CachedIdentifiedObject<K,T> {
 
+    private static Log logger = LogFactory.getLog(CachedIdentifiedObject.class);
     private T target;
     private boolean evicted;
     private Date refreshTime;
@@ -55,7 +58,15 @@ public class CachedIdentifiedObject<K,T> {
     public synchronized T getCachedObject(K key){
         if(this.target == null || this.evicted ||
                 System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000 ){
-            target = refresher.apply(key);
+
+            T tempTarget = null;
+            try{
+                tempTarget = refresher.apply(key);
+            }catch (RuntimeException re){
+                logger.error(re.getLocalizedMessage());
+            }
+
+            target = tempTarget;// refresher.apply(key);
             refreshTime = DatetimeOpt.currentUtilDate();
             this.evicted = false;
         }

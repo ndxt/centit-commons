@@ -1,5 +1,8 @@
 package com.centit.support.common;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -11,6 +14,7 @@ import java.util.function.Function;
  * @param <T> target 缓存对象的类型
  */
 public class CachedMap<K,T> {
+    private static Log logger = LogFactory.getLog(CachedMap.class);
 
     private ConcurrentMap<K, CachedIdentifiedObject<K,T>> targetMap;
     private Date refreshTime;
@@ -55,20 +59,22 @@ public class CachedMap<K,T> {
     public void evictAll(){
         targetMap.clear();
     }
-
-
     public T getCachedObject(K key){
         CachedIdentifiedObject<K,T> identifiedObject =  targetMap.get(key);
         if(identifiedObject != null){
             return identifiedObject.getCachedObject(key);
         }
 
-        T target = refresher.apply(key);
+        T target = null;
+        try{
+            target = refresher.apply(key);
+        }catch (RuntimeException re){
+            logger.error(re.getLocalizedMessage());
+        }
         if(target != null) {
             targetMap.put(key,
                     new CachedIdentifiedObject<>(refresher, target, freshPeriod));
         }
         return target;
     }
-
 }
