@@ -1,10 +1,9 @@
 package com.centit.support.algorithm;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.Comparator;
 
 public class Mathematics {
 
@@ -24,8 +23,11 @@ public class Mathematics {
         }
         listSouce.sort(comparable);
         int len = listSouce.size();
+        //标记排序位置的栈
         List<Integer> comPos = new ArrayList<>(len);
+        //标记已经排好序的元素
         List<Boolean> usedItem = new ArrayList<>(len);
+        //记录排序结果
         List<T> comRes = new ArrayList<>(len);
 
         for(int i=0;i<len;i++){
