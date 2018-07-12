@@ -11,12 +11,12 @@ public class CachedObject<T> {
 
     private static Log logger = LogFactory.getLog(CachedObject.class);
 
-    public static final long NOT_REFRESH_PERIOD = 43200L;
+    public static final int NOT_REFRESH_PERIOD = 43200;
     private T target;
     private boolean evicted;
     private Date refreshTime;
     //分钟
-    private long freshPeriod;
+    private int freshPeriod;
     private Supplier<T> refresher;
 
     public  CachedObject(Supplier<T> refresher){
@@ -32,7 +32,7 @@ public class CachedObject<T> {
      * @param refresher 重新获取代码的接口
      * @param freshPeriod 保鲜时间，单位为分钟
      */
-    public  CachedObject(Supplier<T> refresher, long freshPeriod){
+    public  CachedObject(Supplier<T> refresher, int freshPeriod){
         this.target = null;
         this.evicted = true;
         this.refresher = refresher;
@@ -50,22 +50,38 @@ public class CachedObject<T> {
         evicted = true;
     }
 
-    public synchronized T getCachedObject(){
+    private synchronized void refreshData(){
+        T tempTarget = null;
+        try{
+            tempTarget = refresher.get();
+        }catch (RuntimeException re){
+            logger.error(re.getLocalizedMessage());
+        }
+        // 如果获取失败 继续用以前的缓存
+        if(tempTarget != null) {
+            this.target = tempTarget;
+            this.refreshTime = DatetimeOpt.currentUtilDate();
+            this.evicted = false;
+        }
+    }
+
+    public T getCachedObject(){
         if(this.target == null || this.evicted ||
                 System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000 ){
-            T tempTarget = null;
-            try{
-                tempTarget = refresher.get();
-            }catch (RuntimeException re){
-                logger.error(re.getLocalizedMessage());
-            }
-            // 如果获取失败 继续用以前的缓存
-            if(tempTarget != null) {
-                target = tempTarget;
-                refreshTime = DatetimeOpt.currentUtilDate();
-                this.evicted = false;
-            }
+            refreshData();
         }
         return target;
+    }
+
+    public void setRefresher(Supplier<T> refresher) {
+        this.refresher = refresher;
+    }
+
+    public synchronized void setFreshtDate(T freshData){
+        //T oldTarget =  this.target;
+        this.target = freshData;
+        this.refreshTime = DatetimeOpt.currentUtilDate();
+        this.evicted = false;
+        //return oldTarget;
     }
 }
