@@ -73,6 +73,15 @@ public class CachedObject<T> {
         return target;
     }
 
+    public T getFreshObject(){
+        refreshData();
+        return target;
+    }
+
+    public T getRawTarget(){
+        return target;
+    }
+
     public void setRefresher(Supplier<T> refresher) {
         this.refresher = refresher;
     }

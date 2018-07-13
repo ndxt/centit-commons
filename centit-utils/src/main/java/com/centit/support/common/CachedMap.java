@@ -5,6 +5,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -23,7 +25,7 @@ public class CachedMap<K,T> {
         private boolean evicted;
         private Date refreshTime;
 
-        public CachedIdentifiedObject(T target){
+        CachedIdentifiedObject(T target){
             //assert target!=null :"输入的 target 值不能为null ";
             //this.key = key;
             this.target = target;
@@ -32,17 +34,17 @@ public class CachedMap<K,T> {
         }
         /**
          */
-        public CachedIdentifiedObject(){
+        CachedIdentifiedObject(){
             //this.key = null;
             this.target = null;
             this.evicted = true;
         }
 
-        public synchronized void evictObject(){
+        synchronized void evictObject(){
             evicted = true;
         }
 
-        private synchronized void refreshData(K key){
+        synchronized void refreshData(K key){
             T tempTarget = null;
             try{
                 tempTarget = refresher.apply(key);
@@ -57,7 +59,7 @@ public class CachedMap<K,T> {
             }
         }
 
-        public T getCachedObject(K key){
+        T getCachedObject(K key){
             if(this.target == null || this.evicted ||
                     System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000 ){
                 refreshData(key);
@@ -65,7 +67,16 @@ public class CachedMap<K,T> {
             return target;
         }
 
-        public synchronized void setFreshtDate(T freshData){
+        T getFreshObject(K key){
+            refreshData(key);
+            return target;
+        }
+
+        public T getRawTarget(){
+            return target;
+        }
+
+        synchronized void setFreshtDate(T freshData){
             this.target = freshData;
             this.refreshTime = DatetimeOpt.currentUtilDate();
             this.evicted = false;
@@ -115,7 +126,6 @@ public class CachedMap<K,T> {
         targetMap.clear();
     }
 
-
     public T getCachedObject(K key){
         CachedIdentifiedObject  identifiedObject =  targetMap.get(key);
         if(identifiedObject != null){
@@ -128,6 +138,31 @@ public class CachedMap<K,T> {
             targetMap.put(key,identifiedObject);
         }
         return target;
+    }
+
+    public T getFreshObject(K key){
+        CachedIdentifiedObject  identifiedObject =  targetMap.get(key);
+        if(identifiedObject != null){
+            return identifiedObject.getFreshObject(key);
+        }
+
+        identifiedObject = new CachedIdentifiedObject();
+        T target = identifiedObject.getCachedObject(key);
+        if(target != null) {
+            targetMap.put(key,identifiedObject);
+        }
+        return target;
+    }
+
+    public Map<K,T> getRawTarget(){
+        if(targetMap == null){
+            return null;
+        }
+        Map<K,T> rawTargetMap = new HashMap<>( targetMap.size() +1);
+        for(Map.Entry<K,CachedIdentifiedObject> ent : targetMap.entrySet()){
+            rawTargetMap.put(ent.getKey(),ent.getValue().getRawTarget());
+        }
+        return rawTargetMap;
     }
 
     public void setRefresher(Function<K, T> refresher) {
