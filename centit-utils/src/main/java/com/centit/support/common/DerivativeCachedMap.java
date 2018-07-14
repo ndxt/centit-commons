@@ -16,30 +16,38 @@ import java.util.function.Function;
  * @param <K> id 键值类型
  * @param <T> target 缓存对象的类型
  */
-public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
-    private static Log logger = LogFactory.getLog(CachedMap.class);
+public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>   {
+    private static Log logger = LogFactory.getLog(DerivativeCachedMap.class);
+
+    private ConcurrentMap<K, CachedIdentifiedObject> targetMap;
+    private long freshPeriod;
+    private Function<D, T> refresher;
+    private CachedMap<K, D>  parentCachedMap;
 
     class CachedIdentifiedObject extends AbstractCachedObject<T> {
 
         private Date refreshTime;
         private T target;
-
-        CachedIdentifiedObject(T target){
-            this.target = target;
-            this.evicted = false;
-            this.refreshTime =  DatetimeOpt.currentUtilDate();
-        }
+        private AbstractCachedObject<D> parentCache;
         /**
          */
         CachedIdentifiedObject(){
             this.target = null;
             this.evicted = true;
+            parentCache = null;
         }
 
         synchronized void refreshData(K key){
+            if(parentCache==null){
+                parentCache = parentCachedMap.getCachedObject(key);
+                parentCache.addDeriveCache(this);
+            }
+            if(parentCache==null){
+                return;
+            }
             T tempTarget = null;
             try{
-                tempTarget = refresher.apply(key);
+                tempTarget = refresher.apply(parentCachedMap.getCachedValue(key));
             }catch (RuntimeException re){
                 logger.error(re.getLocalizedMessage());
             }
@@ -68,61 +76,30 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
         public T getRawTarget() {
             return target;
         }
-
-        synchronized void setFreshtDate(T freshData){
-            this.target = freshData;
-            this.refreshTime = DatetimeOpt.currentUtilDate();
-            this.evicted = false;
-        }
-    }
-
-    private ConcurrentMap<K, CachedIdentifiedObject> targetMap;
-    private long freshPeriod;
-    private Function<K, T> refresher;
-
-
-
-    public CachedMap(){
-        this.targetMap = new ConcurrentHashMap<>(16);
-        this.refresher = null;
-        this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
     }
 
     /**
      * 构造函数
      * @param refresher 重新获取代码的接口
-     * @param freshPeriod 保鲜时间，单位为分钟；也是重新刷新时间
+     * @param parentCache 保鲜时间，单位为分钟；也是重新刷新时间
      *                    它的意思不是每隔一段时间就刷新，而是在获取数据是检查是否超时，如果超时则刷新
      * @param initialCapacity The implementation performs internal
      * sizing to accommodate this many elements.
      */
-    public CachedMap(Function<K, T> refresher, long freshPeriod, int initialCapacity){
+    public DerivativeCachedMap(Function<D, T> refresher, CachedMap<K, D> parentCache , int initialCapacity){
         this.targetMap = new ConcurrentHashMap<>(initialCapacity);
         this.refresher = refresher;
-        this.freshPeriod = freshPeriod;
-    }
-
-    public CachedMap(Function<K, T> refresher,  AbstractCachedObject<?> parentCache , int initialCapacity){
-        this.targetMap = new ConcurrentHashMap<>(initialCapacity);
-        this.refresher = refresher;
+        this.parentCachedMap = parentCache;
         parentCache.addDeriveCache(this);
         this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
     }
-    /**
-     * 构造函数
-     * @param freshPeriod 保鲜时间，单位为分钟；也是重新刷新时间
-     *                    它的意思不是每隔一段时间就刷新，而是在获取数据是检查是否超时，如果超时则刷新
-     * @param refresher 重新获取代码的接口
-     */
-    public CachedMap(Function<K, T> refresher, long freshPeriod){
-        this(refresher, freshPeriod,16);
+
+    public DerivativeCachedMap(Function<D, T> refresher, CachedMap<K, D> parentCache ){
+        this(refresher, parentCache, 16);
     }
 
-    public CachedMap(Function<K, T> refresher,  AbstractCachedObject<?> parentCache ){
-        this(refresher, parentCache,16);
-    }
 
-    public void setRefresher(Function<K, T> refresher) {
+    public void setRefresher(Function<D, T> refresher) {
         this.refresher = refresher;
     }
 
@@ -137,24 +114,12 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
         }
     }
 
-    public void evictCache(){
+    @Override
+    public void evictCahce(){
         targetMap.clear();
         super.evictCahce();
     }
 
-    public AbstractCachedObject<T> getCachedObject(K key){
-        CachedIdentifiedObject  identifiedObject =  targetMap.get(key);
-        if(identifiedObject == null){
-            identifiedObject = new CachedIdentifiedObject();
-            T target = identifiedObject.getFreshTarget(key);
-            if(target != null) {
-                targetMap.put(key,identifiedObject);
-            }else{
-                identifiedObject = null;
-            }
-        }
-        return identifiedObject;
-    }
 
     public T getCachedValue(K key){
         CachedIdentifiedObject  identifiedObject =  targetMap.get(key);
@@ -170,19 +135,7 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
         return target;
     }
 
-    public T getFreshValue(K key){
-        CachedIdentifiedObject  identifiedObject =  targetMap.get(key);
-        if(identifiedObject != null){
-            return identifiedObject.getFreshTarget(key);
-        }
 
-        identifiedObject = new CachedIdentifiedObject();
-        T target = identifiedObject.getFreshTarget(key);
-        if(target != null) {
-            targetMap.put(key,identifiedObject);
-        }
-        return target;
-    }
 
     public Map<K,T> getRawTarget(){
         if(targetMap == null){
@@ -195,13 +148,5 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
         return rawTargetMap;
     }
 
-    public synchronized void setFreshtDate(K key, T freshData){
-        CachedIdentifiedObject identifiedObject =  targetMap.get(key);
-        if(identifiedObject != null){
-            identifiedObject.setFreshtDate(freshData);
-        }else{
-            targetMap.put(key,
-                    new CachedIdentifiedObject(freshData));
-        }
-    }
+
 }

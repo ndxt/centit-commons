@@ -7,24 +7,23 @@ import org.apache.commons.logging.LogFactory;
 import java.util.Date;
 import java.util.function.Supplier;
 
-public class CachedObject<T> {
+public class CachedObject<T> extends AbstractCachedObject<T>  {
 
     private static Log logger = LogFactory.getLog(CachedObject.class);
 
-    public static final int NOT_REFRESH_PERIOD = 43200;
-    private T target;
-    private boolean evicted;
-    private Date refreshTime;
-    //分钟
-    private int freshPeriod;
     private Supplier<T> refresher;
+    private Date refreshTime;
+    private int freshPeriod;
+    private T target;
+
+    public  CachedObject(){
+    }
 
     public  CachedObject(Supplier<T> refresher){
         this.target = null;
         this.evicted = true;
         this.refresher = refresher;
-        //默认时间一个月
-        this.freshPeriod = NOT_REFRESH_PERIOD;
+        this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
     }
 
     /**
@@ -39,15 +38,20 @@ public class CachedObject<T> {
         this.freshPeriod = freshPeriod;
     }
 
+
+    public  CachedObject(Supplier<T> refresher, AbstractCachedObject<?> parentCache ){
+        this.target = null;
+        this.evicted = true;
+        this.refresher = refresher;
+        parentCache.addDeriveCache(this);
+        this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
+    }
+
     /**
      * @param freshPeriod 刷新周期 单位分钟
      */
     public void setFreshPeriod(int freshPeriod) {
         this.freshPeriod = freshPeriod;
-    }
-
-    public synchronized void evictObject(){
-        evicted = true;
     }
 
     private synchronized void refreshData(){
@@ -65,7 +69,7 @@ public class CachedObject<T> {
         }
     }
 
-    public T getCachedObject(){
+    public T getCachedTarget(){
         if(this.target == null || this.evicted ||
                 System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000 ){
             refreshData();
@@ -73,7 +77,7 @@ public class CachedObject<T> {
         return target;
     }
 
-    public T getFreshObject(){
+    public T getFreshTarget(){
         refreshData();
         return target;
     }
@@ -87,10 +91,9 @@ public class CachedObject<T> {
     }
 
     public synchronized void setFreshtDate(T freshData){
-        //T oldTarget =  this.target;
         this.target = freshData;
         this.refreshTime = DatetimeOpt.currentUtilDate();
         this.evicted = false;
-        //return oldTarget;
     }
+
 }
