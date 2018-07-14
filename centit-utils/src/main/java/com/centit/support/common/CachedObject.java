@@ -47,6 +47,17 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
         this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
     }
 
+    public  CachedObject(Supplier<T> refresher, AbstractCachedObject<?> [] parentCaches ){
+        this.target = null;
+        this.evicted = true;
+        this.refresher = refresher;
+        for(AbstractCachedObject<?> parentCache: parentCaches) {
+            parentCache.addDeriveCache(this);
+        }
+        this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
+    }
+
+
     /**
      * @param freshPeriod 刷新周期 单位分钟
      */
