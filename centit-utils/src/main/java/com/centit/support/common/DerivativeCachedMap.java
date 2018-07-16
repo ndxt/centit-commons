@@ -40,7 +40,9 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
         synchronized void refreshData(K key){
             if(parentCache==null){
                 parentCache = parentCachedMap.getCachedObject(key);
-                parentCache.addDeriveCache(this);
+                if(parentCache!=null) {
+                    parentCache.addDeriveCache(this);
+                }
             }
             if(parentCache==null){
                 return;
