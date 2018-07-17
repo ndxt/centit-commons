@@ -42,11 +42,11 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
                 parentCache = parentCachedMap.getCachedObject(key);
                 if(parentCache!=null) {
                     parentCache.addDeriveCache(this);
+                }else{
+                    return;
                 }
             }
-            if(parentCache==null){
-                return;
-            }
+
             T tempTarget = null;
             try{
                 tempTarget = refresher.apply(parentCachedMap.getCachedValue(key));
