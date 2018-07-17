@@ -722,7 +722,7 @@ public abstract class OrmDaoUtils {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(objType);
         Triple<List<T>, List<Pair<T,T>>, List<T>>
                 comRes=
-                ListOpt.compareTwoList(dbObjects, newObjects,
+                CollectionsOpt.compareTwoList(dbObjects, newObjects,
                         new OrmObjectComparator<>( mapInfo) );
         int resN = 0;
         if(comRes.getLeft() != null) {
@@ -911,7 +911,7 @@ public abstract class OrmDaoUtils {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(objType);
         Triple<List<T>, List<Pair<T,T>>, List<T>>
                 comRes=
-                ListOpt.compareTwoList(dbObjects, newObjects,
+                CollectionsOpt.compareTwoList(dbObjects, newObjects,
                         new OrmObjectComparator<>(mapInfo) );
         int resN = 0;
         if(comRes.getLeft() != null) {
