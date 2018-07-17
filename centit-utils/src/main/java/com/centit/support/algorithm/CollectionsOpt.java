@@ -265,7 +265,7 @@ public abstract class CollectionsOpt {
      * 将TreeList转换为JSONArray
      * @param <T> 泛型类型
      * @param treeList  必须是已经通过 sortAsTree 排序好的list 
-     * @param c  比较算法，需要实现接口 ListOpt.ParentChild T
+     * @param c  比较算法，需要实现接口 CollectionsOpt.ParentChild T
      * @param childrenPropertyName 为孩子的 属性名
      * @return JSONArray
      */
@@ -315,7 +315,7 @@ public abstract class CollectionsOpt {
      * 将列表转换为tree结构的json
      * @param <T> 泛型类型
      * @param treeList 待排序的List
-     * @param c  比较算法，需要实现接口 ListOpt.ParentChild T
+     * @param c  比较算法，需要实现接口 CollectionsOpt.ParentChild T
      * @param childrenPropertyName 为孩子的 属性名
      * @return JSONArray
      */
@@ -379,7 +379,7 @@ public abstract class CollectionsOpt {
      * 和 srotAsTreeAndToJSON 用不同的算法实现，这个需要额外的空间，用递归实现。
      * @param <T> 泛型类型
      * @param treeList 待排序的List
-     * @param c  比较算法，需要实现接口 ListOpt.ParentChild T
+     * @param c  比较算法，需要实现接口 CollectionsOpt.ParentChild T
      * @param childrenPropertyName 为孩子的 属性名
      * @return JSONArray
      */

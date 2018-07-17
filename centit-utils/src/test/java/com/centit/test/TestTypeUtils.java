@@ -15,7 +15,7 @@ public class TestTypeUtils {
         ls.add("world");
         ls.add("ok!");
 
-        String [] as = ListOpt.listToArray(ls);
+        String [] as = CollectionsOpt.listToArray(ls);
         for(String s:as)
             System.out.println(s);*/
 
