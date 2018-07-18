@@ -47,19 +47,16 @@ public class TestSortAsTree {
         nodeList.add(222);
         nodeList.add(221);
         nodeList.add(22);
-        nodeList.add(1111);
-        nodeList.add(111);
+        nodeList.add(123);
+        nodeList.add(121);
         nodeList.add(11);
+        nodeList.add(12);
         nodeList.add(21);
         nodeList.add(2);
         nodeList.add(1);
 
-        System.out.println( CollectionsOpt.srotAsTreeAndToJSON(nodeList,
-                new CollectionsOpt.ParentChild<Integer>() {
-                    public boolean parentAndChild(Integer p, Integer c) {
-                        return p ==( c / 10);
-                    }
-                }, "c"));
+        CollectionsOpt.sortAsTree(nodeList,(p,c)-> p == c / 10);
+        System.out.println(nodeList);
     }
 
 }
