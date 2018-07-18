@@ -334,10 +334,10 @@ public abstract class NumberBaseOpt {
             return (BigDecimal) obj;
         if (obj instanceof BigInteger)
             return new BigDecimal((BigInteger)obj);
-        if (obj instanceof Double){
+        /*if (obj instanceof Double){
             return new BigDecimal((Double)obj);
-        }
-        return new BigDecimal(StringBaseOpt.objectToString(obj));
+        }*/
+        return new BigDecimal(obj.toString());
     }
 
     public static BigDecimal castObjectToBigDecimal(Object obj, BigDecimal defaultValue){
