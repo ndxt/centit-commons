@@ -53,7 +53,7 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
 
         T getCachedTarget(K key){
             if(this.target == null || this.evicted ||
-                    System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000 ){
+                    System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000L){
                 refreshData(key);
             }
             return target;
@@ -79,8 +79,6 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
     private ConcurrentMap<K, CachedIdentifiedObject> targetMap;
     private long freshPeriod;
     private Function<K, T> refresher;
-
-
 
     public CachedMap(){
         this.targetMap = new ConcurrentHashMap<>(16);

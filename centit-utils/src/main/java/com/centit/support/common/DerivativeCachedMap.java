@@ -63,7 +63,7 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
 
         T getCachedTarget(K key){
             if(this.target == null || this.evicted ||
-                    System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000 ){
+                    System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000L){
                 refreshData(key);
             }
             return target;

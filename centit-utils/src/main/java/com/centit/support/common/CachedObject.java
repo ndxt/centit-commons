@@ -13,7 +13,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
 
     private Supplier<T> refresher;
     private Date refreshTime;
-    private int freshPeriod;
+    private long freshPeriod;
     private T target;
 
     public  CachedObject(){
@@ -82,7 +82,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
 
     public T getCachedTarget(){
         if(this.target == null || this.evicted ||
-                System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000 ){
+                System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000L){
             refreshData();
         }
         return target;
