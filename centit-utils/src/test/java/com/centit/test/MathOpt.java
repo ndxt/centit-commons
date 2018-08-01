@@ -40,11 +40,16 @@ public class MathOpt {
             if(StringUtils.equalsIgnoreCase("exit",s)){
                 break;
             }
+            int nSelect = -1;
             String[] nums = s.split(" ");
             List<Integer> alist = new ArrayList<>(4);
             for(int i=0; i<nums.length; i++){
                 if(StringRegularOpt.isNumber(nums[i])){
-                    alist.add(NumberBaseOpt.castObjectToInteger(nums[i]));
+                    if( nSelect == -1 ){
+                        nSelect = NumberBaseOpt.castObjectToInteger(nums[i]);
+                    }else {
+                        alist.add(NumberBaseOpt.castObjectToInteger(nums[i]));
+                    }
                 }
             }
 
@@ -53,7 +58,7 @@ public class MathOpt {
             }
 
             Mathematics.combination(
-                    alist, Integer::compare, MathOpt::sortFormulaOpt
+                    alist,nSelect, Integer::compare, MathOpt::sortFormulaOpt
             );
         }
     }
