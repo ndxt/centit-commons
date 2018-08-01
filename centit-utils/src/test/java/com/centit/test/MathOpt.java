@@ -57,7 +57,7 @@ public class MathOpt {
                 continue;
             }
 
-            Mathematics.combination(
+            Mathematics.permutationAndCombination(
                     alist,nSelect, Integer::compare, MathOpt::sortFormulaOpt
             );
         }

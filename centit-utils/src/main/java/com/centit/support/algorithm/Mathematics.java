@@ -142,4 +142,19 @@ public class Mathematics {
             }
         }
     }
+
+    /**
+     * 非递归的排列与组合
+     * @param listSouce 待选择的集合
+     * @param selected 选择组合的数量
+     * @param comparable 比较函数，用于去重
+     * @param consumer 消费者函数，处理输出结果
+     * @param <T> 泛型参数
+     */
+    public static <T> void permutationAndCombination(List<T> listSouce , int selected,
+                                       Comparator<? super T> comparable,
+                                       Consumer<List<T>> consumer) {
+        combination(listSouce , selected, comparable,
+                ( oneCom ) -> permutation(oneCom, comparable,  consumer));
+    }
 }
