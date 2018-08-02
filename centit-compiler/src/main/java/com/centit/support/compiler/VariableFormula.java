@@ -10,8 +10,7 @@ public class VariableFormula {
 
     private Lexer lex;
     private VariableTranslate trans;
-    public VariableFormula()
-    {
+    public VariableFormula() {
         lex = new Lexer();
         //m_preTreat.setVariableTranslate(new SimpleTranslate("1"));
     }
@@ -24,8 +23,7 @@ public class VariableFormula {
         lex.setFormula(formula);
     }
 
-    public static int getOptID(String sOptName)
-    {
+    public static int getOptID(String sOptName) {
         int sl = sOptName.length();
         if(sl == 0) return -1;
         char sp = sOptName.charAt(0), sp2= '\0';
@@ -95,8 +93,7 @@ public class VariableFormula {
         return -1;
     }
 
-    public static final boolean isKeyWord(String sWord)
-    {
+    public static final boolean isKeyWord(String sWord) {
         if (sWord == null || sWord.length()==0)
             return false;
         char firstChar = sWord.charAt(0);
@@ -106,8 +103,7 @@ public class VariableFormula {
         return getOptID(sWord)>0;
     }
 
-    private Object calcItem()
-    {
+    private Object calcItem() {
         String str = lex.getAWord();
         if( str == null || str.length()==0) return null;
         if(str.charAt(0) == ')' || str.charAt(0) == ',' ){
@@ -147,8 +143,7 @@ public class VariableFormula {
         return res;
     }
 
-    private Object calcOperate(Object operand, Object operand2, int optID)
-    {
+    private Object calcOperate(Object operand, Object operand2, int optID) {
         switch(optID) {
             case ConstDefine.OP_LOGICOR: {
                 return BooleanBaseOpt.castObjectToBoolean(operand, false) ||
@@ -278,8 +273,7 @@ public class VariableFormula {
         return null;
     }
 
-    public Object calcFormula()
-    {
+    public Object calcFormula() {
         List<Object> slOperand = new ArrayList<>();
         OptStack  optStack = new OptStack();
 
@@ -344,8 +338,7 @@ public class VariableFormula {
         return  slOperand.get(0);
     }
 
-    private Object calcFunc(int nFuncNo, String funcName)
-    {
+    private Object calcFunc(int nFuncNo, String funcName) {
         String str = lex.getAWord();
         if( str==null || str.length()==0 || !str.equals("(") ) {
             if(str!=null && str.length()>0)
@@ -411,24 +404,21 @@ public class VariableFormula {
         return  EmbedFunc.runFuncWithRaw(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
     }
 
-    public static Object calculate(String szExpress)
-    {
+    public static Object calculate(String szExpress) {
         VariableFormula formula = new VariableFormula();
         formula.setFormula(szExpress);
         return formula.calcFormula();
     }
 
 
-    public static Object calculate(String szExpress,VariableTranslate varTrans)
-    {
+    public static Object calculate(String szExpress,VariableTranslate varTrans) {
         VariableFormula formula = new VariableFormula();
         formula.setFormula(szExpress);
         formula.setTrans(varTrans);
         return formula.calcFormula();
     }
 
-    public static Object calculate(String szExpress,Object varMap)
-    {
+    public static Object calculate(String szExpress,Object varMap) {
         return calculate(szExpress,new ObjectTranslate(varMap));
     }
 
@@ -437,8 +427,7 @@ public class VariableFormula {
      * @param szExpress 表达式
      * @return 返回出错的位置，0 表示表达式格式检查通过
      */
-    public int checkFormula(String szExpress)
-    {
+    public int checkFormula(String szExpress) {
         /*if(hasPreTreat)
             szExpress=preTreat.runPretreatment(szExpress);*/
         int nNextType = 1;
@@ -480,5 +469,4 @@ public class VariableFormula {
         else
             return lex.getCurrPos()+1;
     }
-
 }

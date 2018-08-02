@@ -13,8 +13,11 @@ public class Lexer {
     private boolean isBack;
     private String formulaSen;
     private boolean canAcceptOpt;
-    private int startPos ;    
-    
+    private int startPos ;
+
+    /**
+     * 这个LANG_TYPE_DEFAULT是没有注释的，所有字符串都需要自行分析
+     */
     public static final int  LANG_TYPE_DEFAULT=0;
     /**
      * java c++ 的注释方式 用 // 单行注释，/* 多行注释
@@ -27,38 +30,32 @@ public class Lexer {
     
     private int languageType;
     
-    public Lexer()
-    {
+    public Lexer() {
         languageType = LANG_TYPE_JAVA;
         setFormula(null);
     }
     
-    public Lexer(String sFormula)
-    {
+    public Lexer(String sFormula) {
         languageType = LANG_TYPE_JAVA;
         setFormula(sFormula);
     }
 
-    public Lexer(int langType)
-    {
+    public Lexer(int langType) {
         this.languageType = langType;
         setFormula(null);
     }
     
-    public Lexer(String sFormula,int langType)
-    {
+    public Lexer(String sFormula,int langType) {
         this.languageType = langType;
         setFormula(sFormula);
     }
     
-    public void setPreword(String preWord)
-    {
+    public void setPreword(String preWord) {
         curWord = preWord; 
         isBack = true;
     }
     
-    public void setFormula(String sFormula)
-    {
+    public void setFormula(String sFormula) {
         formulaSen = sFormula;
         isBack  = false;
         curWord = "";
@@ -74,13 +71,11 @@ public class Lexer {
         this.canAcceptOpt = canAcceptOpt;
     }
     
-    public int getCurrPos()
-    {
+    public int getCurrPos() {
         return startPos;
     }
     
-    static public boolean isLabel(String sWord)
-    {   
+    static public boolean isLabel(String sWord) {
         if(sWord.length() < 1)
             return false;
         char c = sWord.charAt(0); 
@@ -212,8 +207,7 @@ public class Lexer {
         return str;    
     }    
     
-    public String getARegularWord()
-    {
+    public String getARegularWord() {
         String s = getARawWord();
         int sl = formulaSen.length();
         if("\"".equals(s)){
@@ -252,8 +246,7 @@ public class Lexer {
      *                 sql       -- /*
      * @return 单词
      */
-    public String getAWord( )
-    {
+    public String getAWord() {
         if (isBack) {
             isBack = false;
             return curWord;
@@ -266,7 +259,7 @@ public class Lexer {
             else if((this.languageType == LANG_TYPE_JAVA && "//".equals(curWord)) ||
                     (this.languageType == LANG_TYPE_SQL && "--".equals(curWord)) )
                 this.seekToLineEnd();
-            else if("/*".equals(curWord))
+            else if(this.languageType != LANG_TYPE_DEFAULT && "/*".equals(curWord))
                 this.seekToAnnotateEnd();
             else
                 break;            
@@ -274,20 +267,18 @@ public class Lexer {
         return curWord;
     }
     
-    public String getAWord(boolean bAcceptOpt )
-    {
+    public String getAWord(boolean bAcceptOpt) {
         canAcceptOpt = bAcceptOpt;
         return getAWord( );
     }
     
     
-    public String getARawWord(boolean bAcceptOpt )
-    {
+    public String getARawWord(boolean bAcceptOpt) {
         canAcceptOpt = bAcceptOpt;
         return getARawWord( );
     }
     
-    public void seekToLineEnd(){
+    public void seekToLineEnd() {
         int sl = formulaSen.length();
         while( (startPos < sl ) && (formulaSen.charAt(startPos) != 10 ))
             startPos ++;
@@ -297,7 +288,7 @@ public class Lexer {
      * 将解释位置滑动到注释结束位置 '*'+'/'
      *
      */
-    public void seekToAnnotateEnd(){
+    public void seekToAnnotateEnd() {
         int sl = formulaSen.length();
         while( (startPos < sl-1 ) && (formulaSen.charAt(startPos) != '*' || formulaSen.charAt(startPos+1) != '/' ))
             startPos ++;
@@ -311,8 +302,7 @@ public class Lexer {
      * 移动到下一个），自动跳过之间的（）括号对
      * @return 是否成功
      */
-    public boolean seekToRightBracket()
-    {
+    public boolean seekToRightBracket() {
         int nBracket = 1;
         while(true){
             String sWord = getAWord(false);
@@ -351,8 +341,7 @@ public class Lexer {
      * 移动到下一个}，自动跳过之间的{}括号对
      * @return 是否成功
      */
-    public boolean seekToRightBrace()
-    {
+    public boolean seekToRightBrace() {
         int nBracket = 1;
         while(true){
             String sWord = getAWord(false);
@@ -368,8 +357,7 @@ public class Lexer {
     }
     
     
-    public void skipAOperand()
-    {
+    public void skipAOperand() {
         int nBracket = 0;
         String sWord;
         while(true){
@@ -395,8 +383,7 @@ public class Lexer {
         }
     }
     
-    public String getStringUntil(String szBreak)
-    {
+    public String getStringUntil(String szBreak) {
         int bp = startPos;
         int ep = startPos;
         while(true){
@@ -410,16 +397,14 @@ public class Lexer {
     }
     
     
-    public void resetToBegin()
-    {
+    public void resetToBegin() {
         isBack  = false;
         curWord = "";
         startPos = 0;
         canAcceptOpt = false;
     }    
     
-    public boolean setPosition(int newPos)
-    {
+    public boolean setPosition(int newPos) {
         if(formulaSen==null|| formulaSen.length()<=newPos)
             return false;
         isBack  = false;
@@ -429,7 +414,7 @@ public class Lexer {
         return true;
     }    
     
-    public boolean seekTo(char cSplit){
+    public boolean seekTo(char cSplit) {
         int sl = formulaSen.length();
         while((startPos < sl ) && (formulaSen.charAt(startPos) != cSplit))
             startPos ++;
@@ -450,7 +435,7 @@ public class Lexer {
         }
     }
     
-    public String getBuffer(int bp, int ep){
+    public String getBuffer(int bp, int ep) {
         if(ep-bp < 1)
             return null;             
         return formulaSen.substring(bp, ep );
@@ -462,8 +447,7 @@ public class Lexer {
      * @param skipAnnotate skipAnnotate
      * @return 发现点
      */
-    public int findWord(String aword,final boolean caseSensitives,final boolean skipAnnotate)
-    {
+    public int findWord(String aword,final boolean caseSensitives,final boolean skipAnnotate) {
         String cWord=skipAnnotate?this.getAWord():this.getARegularWord();
         while(!StringBaseOpt.isNvl(cWord)){
             if(cWord.equals(aword) || (!caseSensitives && cWord.equalsIgnoreCase(aword)) )
