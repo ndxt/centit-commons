@@ -45,6 +45,20 @@ public class FormulaTest {
     }
 
 
+    public static void testFormula3() {
+
+        Map<String,Object> varMap = new HashMap<>();
+
+        varMap.put("a", 10);
+        varMap.put("b", 4);
+        String formula = "(a*a-b)/b";
+        Object s = VariableFormula.calculate(formula, varMap);
+        System.out.println(StringBaseOpt.castObjectToString(s));
+        System.out.println("Done!");
+    }
+
+
+
     public static void testLexer() {
         Lexer l = new Lexer("hello jane , jan say!");
         System.out.println(l.findWord("jan",true,true));
@@ -65,8 +79,8 @@ public class FormulaTest {
     }
 
     public  static void  main(String[] args)   {
-        testFormula();
-        //testFormula2();//
+        //testFormula();
+        testFormula3();//
         /*
         // testFormula2();
         //testLexer();
