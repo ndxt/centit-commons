@@ -15,6 +15,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ValueGenerator {
     /**
      * 数值生成方式
+     *   Auto 数据库自动增长、 SEQUENCE 序列 value中保存序列名称 、
+     *   UUID 、 CONSTANT 常量 value中保存常量、
+     *   FUNCTION 公式 value中保存公式，是一个四则运算表达式，可以通过变量引用这个对象的其他属性
      * @return GeneratorType
      */
     GeneratorType strategy() default GeneratorType.AUTO;
