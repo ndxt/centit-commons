@@ -29,7 +29,8 @@ public class TestQueryUtils {
     }
 
     public static void main(String[] args) {
-
+        testTranslateQuery2();
+        System.out.println("Done!");
         //分析表别名， 格式为 TableNameOrClass:alias,TableNameOrClass:alias,.....
         String tablesDesc =  "TableNameOrClass:alias,  TableNameOrClass alias, addasf ";
         String [] tables = tablesDesc.split(",");
@@ -190,23 +191,21 @@ public class TestQueryUtils {
 
     public static void testTranslateQuery2() {
 
-
         Map<String,Object> paramsMap = new HashMap<String,Object>();
+        paramsMap.put("punitCode", "null");
+        paramsMap.put("createDate", "2010-12-01");
+        paramsMap.put("mathName", "江苏 先腾");
+        paramsMap.put("array", "1,2,3,4,5");
+        paramsMap.put("sort", "uu.unitType asc");
 
         String queryStatement =
-                "select unitCode,parentUnit,unitType,isValid,unitTag"
+                "select uu.unitCode,uu.unitName,uu.unitType,uu.isValid,uu.unitTag"
                         +"  from projectTable uu  "
-                        +"[(isnotempty(punitCode) and punitCode <> 'null')(punitCode)|  start with uu.unitCode =:punitCode connect by prior uu.UNITCODE = uu.parentUnit]"
-                        + " where 1=1 [:(SPLITFORIN,LONG,CREEPFORIN)array| and t in (:array)]"
-                        +"[:(inplace)sort,:(inplace)order| order by :sort  :order ]"
-                        +"[(isnotempty(sort) and isempty(order))(:(inplace)sort)| order by :sort ]"
-                        +"[(isempty(sort)) | order by createDate desc]";
+                        +" where 1=1 [:(SPLITFORIN,LONG,CREEPFORIN)array| and uu.unitType in (:array)]"
+                        + "[:(date)createDate | and uu.createDate >= :createDate ]"
+                        + "[:(like)mathName | and uu.unitName like :mathName ]"
+                        +"[:(inplace)sort | order by :sort  ]";
 
-
-        paramsMap.put("punitCode", "null");
-        paramsMap.put("array", "1,2,3,4,5");
-        paramsMap.put("sort", "uu.unitType");
-        paramsMap.put("order", "asc");
         printQueryAndNamedParams(QueryUtils.translateQuery(
                  queryStatement, null,
                   paramsMap, true));

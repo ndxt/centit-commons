@@ -25,11 +25,11 @@ public abstract class QueryUtils {
      */
     public static final String SQL_PRETREAT_NO_PARAM = "NP";
     /**
-     * 转化为模式匹配字符串
+     * 转化为模式匹配字符串，字符串中间的空格、tab都会被%替换
      */
     public static final String SQL_PRETREAT_LIKE = "LIKE";
     /**
-     * 用于like语句，只在参数后面添加一个 %
+     * 用于like语句，只在参数后面添加一个 %，MySql建议只用这个，其他的匹配方式在MySql中效率都比较低
      */
     public static final String SQL_PRETREAT_STARTWITH = "STARTWITH";
     /**
@@ -96,16 +96,17 @@ public abstract class QueryUtils {
      */
     public static final String SQL_PRETREAT_STRING = "STRING";
     /**
-     * 将字符串 用,分割返回 String[]
+     * 将字符串 用,分割返回 String[];对于支持数组变量的spring jdbcTemplate
+     * 或者hibernate中的hql用这个处理就可以了，先腾实现的jpa也支持数组参数
      */
     public static final String SQL_PRETREAT_SPLITFORIN = "SPLITFORIN";
-    /**
+    /** 对于不支持数组参数的执行引擎，需要将参数按照数值的格式进行扩展
      * 修改语句中的 命名参数，使其能够接受 多个参数以便用于in语句，比如： in(:a)
      * 传入a为一个数组，会根据a的实际长度变为 in(:a0,:a1,a2,......)
      */
     public static final String SQL_PRETREAT_CREEPFORIN = "CREEPFORIN";
     /**
-     * 将参数值 拼接到 sql对应的参数位置，同时要避免sql注入
+     * 将参数值 拼接到 sql对应的参数位置，同时要避免sql注入；一般用与Order by中
      */
     public static final String SQL_PRETREAT_INPLACE = "INPLACE";
 
@@ -1399,7 +1400,13 @@ public abstract class QueryUtils {
         return new ImmutableTriple<String,String,String>
             (paramName,paramAlias,paramPretreatment);
     }
-    
+
+    /**
+     * 通过参数数组 编译in语句
+     * @param paramAlias 参数别名
+     * @param realParam 参数实际值
+     * @return sql语句和参数列表
+     */
     public static QueryAndNamedParams buildInStatement(String paramAlias,Object realParam){
         StringBuilder hqlPiece= new StringBuilder();
         QueryAndNamedParams hqlAndParams = new QueryAndNamedParams();
