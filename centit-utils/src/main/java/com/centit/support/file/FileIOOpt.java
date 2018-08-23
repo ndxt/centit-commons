@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.*;
 
 @SuppressWarnings("unused")
 public abstract class FileIOOpt {
@@ -64,6 +65,34 @@ public abstract class FileIOOpt {
             }
             return writer.toString();
         }
+    }
+
+    /**
+     * @param is 输入流
+     * @param length 最大读取长度
+     * @return 读取的字节
+     * @throws IOException 异常
+     */
+    public static byte[] readBytesFromInputStream(InputStream is,int length) throws IOException{
+        byte[] buf = new byte[length];
+        int readed =0;
+        while(readed<length){
+            int nStep = length-readed > 1024 * 64 ? 1024 * 64 : length-readed;
+            int len = is.read(buf,readed,nStep);
+            if(len<0){
+                break;
+            }
+            readed += len;
+        }
+        if(readed<1){
+            return null;
+        }
+        if(readed<length){
+            byte[] buffer = new byte[readed];
+            System.arraycopy(buf,0,buffer,0, readed);
+            return buffer;
+        }
+        return buf;
     }
 
     public static String readStringFromInputStream(InputStream is,String charsetName) throws IOException{
