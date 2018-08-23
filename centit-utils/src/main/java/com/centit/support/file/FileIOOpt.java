@@ -73,7 +73,7 @@ public abstract class FileIOOpt {
      * @return 读取的字节
      * @throws IOException 异常
      */
-    public static byte[] readBytesFromInputStream(InputStream is,int length) throws IOException{
+    public static byte[] readBytesFromInputStream(InputStream is, int length) throws IOException{
         byte[] buf = new byte[length];
         int readed =0;
         while(readed<length){
@@ -93,6 +93,16 @@ public abstract class FileIOOpt {
             return buffer;
         }
         return buf;
+    }
+
+    public static byte[] readBytesFromFile(File file, int length) throws IOException{
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return FileIOOpt.readBytesFromInputStream(fis, length);
+        }
+    }
+
+    public static byte[] readBytesFromFile(String filePath, int length) throws IOException{
+        return FileIOOpt.readBytesFromFile(new File(filePath), length);
     }
 
     public static String readStringFromInputStream(InputStream is,String charsetName) throws IOException{
