@@ -6,13 +6,13 @@
     <parent>
         <artifactId>centit-framework-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>1.1.1806</version>
+        <version>1.1.1808</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.support</groupId>
     <artifactId>centit-commons</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>2.2.1808</version>
     <name>com.centit.support:centit-commons</name>
     <packaging>pom</packaging>
     <description>java 常用工具类,作为 apache-commons的补充</description>
