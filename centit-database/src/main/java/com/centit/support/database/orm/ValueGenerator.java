@@ -36,7 +36,7 @@ public @interface ValueGenerator {
 
     /**
      * 具体生成参数 对应 GeneratorType 不同有不用的意思
-     * @return
+     * @return 具体生成参数
      */
     String value() default "";
 }

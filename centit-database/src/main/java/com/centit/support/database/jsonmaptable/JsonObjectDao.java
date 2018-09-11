@@ -288,4 +288,5 @@ public interface JsonObjectDao {
 
     int doExecuteNamedSql(final String sSql, final Map<String, Object> values)
             throws SQLException;
+
 }

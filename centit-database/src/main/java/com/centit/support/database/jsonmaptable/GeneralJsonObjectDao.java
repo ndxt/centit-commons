@@ -150,9 +150,9 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return new ImmutablePair<>(sBuilder.toString(),fieldNames);
     }
 
-    public boolean isPkColumn(String propertyName){
-        TableField field = tableInfo.findFieldByName(propertyName);
-        return tableInfo.getPkColumns().contains(field.getColumnName());
+    public static boolean isPkColumn(TableInfo ti, String propertyName){
+        TableField field = ti.findFieldByName(propertyName);
+        return ti.getPkColumns().contains(field.getColumnName());
     }
 
     public static boolean checkHasAllPkColumns(TableInfo tableInfo, Map<String, Object> properties){
@@ -287,9 +287,9 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return NumberBaseOpt.castObjectToLong(object);
     }
 
-    private String buildInsertSql(final Collection<String> fields){
+    public static String buildInsertSql(TableInfo ti, final Collection<String> fields){
         StringBuilder sbInsert = new StringBuilder("insert into ");
-        sbInsert.append(tableInfo.getTableName()).append(" ( ");
+        sbInsert.append(ti.getTableName()).append(" ( ");
         StringBuilder sbValues = new StringBuilder(" ) values ( ");
         int i=0;
         for(String f : fields){
@@ -297,7 +297,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 sbInsert.append(", ");
                 sbValues.append(", ");
             }
-            TableField col = tableInfo.findFieldByName(f);
+            TableField col = ti.findFieldByName(f);
             sbInsert.append(col.getColumnName());
             sbValues.append(":").append(f);
             i++;
@@ -310,22 +310,22 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         /*if(! checkHasAllPkColumns(object)){
             throw new SQLException("缺少主键");
         }*/
-        String sql = buildInsertSql(object.keySet());
+        String sql = buildInsertSql(tableInfo, object.keySet());
         return DatabaseAccess.doExecuteNamedSql(conn, sql, object);
     }
 
-    private String buildUpdateSql(final Collection<String> fields,final boolean exceptPk){
+    public static String buildUpdateSql(TableInfo ti, final Collection<String> fields,final boolean exceptPk){
         StringBuilder sbUpdate = new StringBuilder("update ");
-        sbUpdate.append(tableInfo.getTableName()).append(" set ");
+        sbUpdate.append(ti.getTableName()).append(" set ");
         int i=0;
         for(String f : fields){
-            if(exceptPk && isPkColumn(f))
+            if(exceptPk && isPkColumn(ti, f))
                 continue;
 
             if(i>0){
                 sbUpdate.append(", ");
             }
-            TableField col = tableInfo.findFieldByName(f);
+            TableField col = ti.findFieldByName(f);
             sbUpdate.append(col.getColumnName());
             sbUpdate.append(" = :").append(f);
             i++;
@@ -344,7 +344,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         if(! checkHasAllPkColumns(object)){
             throw new SQLException("缺少主键对应的属性。");
         }
-        String sql =  buildUpdateSql( fields ,true) +
+        String sql =  buildUpdateSql(tableInfo, fields ,true) +
                 " where " +  buildFilterSqlByPk(tableInfo,null);
         return DatabaseAccess.doExecuteNamedSql(conn, sql, object);
     }
@@ -384,7 +384,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public int updateObjectsByProperties(final Collection<String> fields,
             final Map<String, Object> fieldValues,final Map<String, Object> properties)
             throws SQLException {
-        String sql =  buildUpdateSql(fields,true) +
+        String sql =  buildUpdateSql(tableInfo, fields,true) +
                 " where " +  buildFilterSql(tableInfo,null,properties.keySet());
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.putAll(fieldValues);
