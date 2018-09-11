@@ -79,6 +79,7 @@ public class FormulaTest {
     }
 
     public static void testDate() {
+        System.out.println( VariableFormula.calculate("today()"));
         System.out.println( VariableFormula.calculate("currentDate()"));
         System.out.println( VariableFormula.calculate("currentDatetime()"));
         System.out.println( VariableFormula.calculate("currentTimestamp()"));

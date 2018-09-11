@@ -61,9 +61,9 @@ public abstract class EmbedFunc {
         new FunctionInfo("integer",1,ConstDefine.FUNC_INT,ConstDefine.TYPE_NUM), // 求整数部分 integer (12.34)=12 int (-12.34)=-12
         new FunctionInfo("frac",1,ConstDefine.FUNC_FRAC,ConstDefine.TYPE_NUM), // 求小数部分 frac (12.34)=0.34 frac (-12.34)=-0.34
 
-        new FunctionInfo("today",-1,ConstDefine.FUNC_TODAY,ConstDefine.TYPE_DATE),//当前日期
-        new FunctionInfo("currentDate",-1,ConstDefine.FUNC_TODAY,ConstDefine.TYPE_DATE),//当前日期
-        new FunctionInfo("currentDatetime",-1,ConstDefine.FUNC_CURRENT_TIME,ConstDefine.TYPE_DATE),//当前时间
+        new FunctionInfo("today",-1,ConstDefine.FUNC_CURRENT_DATETIME,ConstDefine.TYPE_DATE),//当前日期
+        new FunctionInfo("currentDate",-1,ConstDefine.FUNC_CURRENT_DATE,ConstDefine.TYPE_DATE),//当前日期
+        new FunctionInfo("currentDatetime",-1,ConstDefine.FUNC_CURRENT_DATETIME,ConstDefine.TYPE_DATE),//当前时间
         new FunctionInfo("currentTimestamp",-1,ConstDefine.FUNC_CURRENT_TIMESTAMP,ConstDefine.TYPE_DATE),//当前时间
         new FunctionInfo("day",-1,ConstDefine.FUNC_DAY,ConstDefine.TYPE_STR),//日期函数
         new FunctionInfo("month",-1,ConstDefine.FUNC_MONTH,ConstDefine.TYPE_STR),//日期函数
@@ -469,11 +469,11 @@ public abstract class EmbedFunc {
                     return slOperand.get(nOpSum-1);
                 return null;
             }
-            case ConstDefine.FUNC_TODAY:{//
+            case ConstDefine.FUNC_CURRENT_DATE:{//
                 return DatetimeOpt.truncateToDay(DatetimeOpt.currentUtilDate());
             }
 
-            case ConstDefine.FUNC_CURRENT_TIME:{ // 包括时间
+            case ConstDefine.FUNC_CURRENT_DATETIME:{ // 包括时间
                 return DatetimeOpt.currentUtilDate();
             }
 
