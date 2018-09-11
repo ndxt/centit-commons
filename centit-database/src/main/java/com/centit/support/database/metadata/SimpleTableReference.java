@@ -79,6 +79,8 @@ public class SimpleTableReference implements TableReference{
     }
 
     public String getClassName() {
+        if(tableName==null)
+            return null;
         String sClassName = SimpleTableField.mapPropName(tableName);
         return sClassName.substring(0,1).toUpperCase() +
                 sClassName.substring(1);

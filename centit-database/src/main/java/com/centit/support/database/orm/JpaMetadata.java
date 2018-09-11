@@ -211,22 +211,19 @@ public abstract class JpaMetadata {
                     OneToMany oneToMany = field.getAnnotation(OneToMany.class);
                     Class targetClass = oneToMany.targetEntity();
                     if(/*targetClass ==null || */targetClass.equals(void.class) ) {
-                        Type t = ((ParameterizedType) field.getType()
-                                .getGenericSuperclass()).getActualTypeArguments()[0];
+                        Type t = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
                         if(t instanceof Class){
                             targetClass = (Class<?>)t;
                         }
                     }
                     reference.setTargetEntityType(targetClass);
-
                 }else if (field.isAnnotationPresent(ManyToMany.class)) {
                     ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
                     Class targetClass = manyToMany.targetEntity();
                     if(/*targetClass ==null ||*/ targetClass.equals(void.class) ) {
-                        Type t = ((ParameterizedType) field.getType()
-                                .getGenericSuperclass()).getActualTypeArguments()[0];
+                        Type t = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
                         if(t instanceof Class){
-                            targetClass = (Class<?>)t;
+                            targetClass = (Class<?>) t;
                         }
                     }
                     reference.setTargetEntityType(targetClass);
