@@ -19,7 +19,9 @@ public class SimpleTableReference implements TableReference{
     private Class<?> referenceType;
     private Class<?> targetEntityType;
     private List<SimpleTableField> fkColumns;
-
+    /**
+     * key： 父表属性 value：子表属性
+     */
     private Map<String, String> referenceColumns;
     private int nObjectId; //only used by sqlserver
     private JavaBeanField beanField;
@@ -102,6 +104,10 @@ public class SimpleTableReference implements TableReference{
         this.referenceColumns = referenceColumns;
     }
 
+    /**
+     * @param column 父表字段
+     * @param referencedColumn 子表字段
+     */
     public void addReferenceColumn(String column, String referencedColumn) {
         getReferenceColumns().put(column,
                 StringUtils.isBlank(referencedColumn)?column:referencedColumn);

@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -129,6 +131,8 @@ public abstract class JpaMetadata {
         return column;
     }
 
+
+
     public static TableMapInfo obtainMapInfoFromClass(Class<?> objType){
 
         if(!objType.isAnnotationPresent( Table.class ))
@@ -194,21 +198,38 @@ public abstract class JpaMetadata {
                 if (field.isAnnotationPresent(OneToOne.class)) {
                     OneToOne oneToOne = field.getAnnotation(OneToOne.class);
                     Class targetClass = oneToOne.targetEntity();
-                    if(targetClass ==null || targetClass.equals(void.class) )
+                    if(/*targetClass ==null || */targetClass.equals(void.class) )
                         targetClass = field.getType();
                     reference.setTargetEntityType(targetClass);
                 }else if (field.isAnnotationPresent(ManyToOne.class)) {
                     ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
                     Class targetClass = manyToOne.targetEntity();
-                    if(targetClass ==null || targetClass.equals(void.class) )
+                    if(/*targetClass ==null || */targetClass.equals(void.class) )
                         targetClass = field.getType();
                     reference.setTargetEntityType(targetClass);
                 }else if (field.isAnnotationPresent(OneToMany.class)) {
                     OneToMany oneToMany = field.getAnnotation(OneToMany.class);
-                    reference.setTargetEntityType(oneToMany.targetEntity());
+                    Class targetClass = oneToMany.targetEntity();
+                    if(/*targetClass ==null || */targetClass.equals(void.class) ) {
+                        Type t = ((ParameterizedType) field.getType()
+                                .getGenericSuperclass()).getActualTypeArguments()[0];
+                        if(t instanceof Class){
+                            targetClass = (Class<?>)t;
+                        }
+                    }
+                    reference.setTargetEntityType(targetClass);
+
                 }else if (field.isAnnotationPresent(ManyToMany.class)) {
                     ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
-                    reference.setTargetEntityType(manyToMany.targetEntity());
+                    Class targetClass = manyToMany.targetEntity();
+                    if(/*targetClass ==null ||*/ targetClass.equals(void.class) ) {
+                        Type t = ((ParameterizedType) field.getType()
+                                .getGenericSuperclass()).getActualTypeArguments()[0];
+                        if(t instanceof Class){
+                            targetClass = (Class<?>)t;
+                        }
+                    }
+                    reference.setTargetEntityType(targetClass);
                 }
 
                 if(reference.getTargetEntityType() !=null
@@ -229,6 +250,7 @@ public abstract class JpaMetadata {
                         }
                         haveJoinColumns = true;
                     }
+
                     if(haveJoinColumns) {
                         reference.setObjectField(field);
                         reference.setObjectGetFieldValueFunc(ReflectionOpt.getGetterMethod(objType, field.getType(), field.getName()));
