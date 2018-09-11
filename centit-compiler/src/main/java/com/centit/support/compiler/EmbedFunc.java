@@ -13,7 +13,7 @@ public abstract class EmbedFunc {
         throw new IllegalAccessError("Utility class");
     }
     private static double MIN_DOUBLE = 0.00000001;
-    public static final int functionsSum = 53;
+    public static final int functionsSum = 54;
     protected static final FunctionInfo functionsList[]={
         new FunctionInfo("ave",-1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
@@ -21,12 +21,12 @@ public abstract class EmbedFunc {
                                         //          byte (4321.789,-2)=8
                                         //          byte ("4321.789",2)=3
         new FunctionInfo("capital",1,ConstDefine.FUNC_CAPITAL,ConstDefine.TYPE_STR),  // capital (123.45)="一百二十三点四五"
-        new FunctionInfo("if",3,ConstDefine.FUNC_IF,ConstDefine.TYPE_STR),      // if (1,2,3)= 2  if (0,"2","3")= "3"
-        new FunctionInfo("case",2,ConstDefine.FUNC_CASE,ConstDefine.TYPE_STR),      // case(1,2,3)= null  case(1,2,3,1,"5")= "5"  case(0,1,"2","3")= "3"
+        new FunctionInfo("if",3,ConstDefine.FUNC_IF,ConstDefine.TYPE_ANY),      // if (1,2,3)= 2  if (0,"2","3")= "3"
+        new FunctionInfo("case",2,ConstDefine.FUNC_CASE,ConstDefine.TYPE_ANY),      // case(1,2,3)= null  case(1,2,3,1,"5")= "5"  case(0,1,"2","3")= "3"
         new FunctionInfo("match",2,ConstDefine.FUNC_MATCH,ConstDefine.TYPE_NUM), //匹配*?为通配符 match ("abcd","a??d")=1
                                             //             match ("abcd","a*d")=1
-        new FunctionInfo("max",-1,ConstDefine.FUNC_MAX,ConstDefine.TYPE_NUM),   // 求最大值 max (1,2,3,5,4) = 5
-        new FunctionInfo("min",-1,ConstDefine.FUNC_MIN,ConstDefine.TYPE_NUM),    // 求最小值 min (1,2,3,5,4) = 1
+        new FunctionInfo("max",-1,ConstDefine.FUNC_MAX,ConstDefine.TYPE_ANY),   // 求最大值 max (1,2,3,5,4) = 5
+        new FunctionInfo("min",-1,ConstDefine.FUNC_MIN,ConstDefine.TYPE_ANY),    // 求最小值 min (1,2,3,5,4) = 1
 
         new FunctionInfo("count",-1,ConstDefine.FUNC_COUNT,ConstDefine.TYPE_NUM),    // 计数 count(1,"2",3,"5",1,1,4) = 7
         new FunctionInfo("countnotnull",-1,ConstDefine.FUNC_COUNTNOTNULL,ConstDefine.TYPE_NUM),    // 计数 非空参数 countnotnull(1,,"2",,,,1,1,4) = 5
@@ -61,10 +61,10 @@ public abstract class EmbedFunc {
         new FunctionInfo("integer",1,ConstDefine.FUNC_INT,ConstDefine.TYPE_NUM), // 求整数部分 integer (12.34)=12 int (-12.34)=-12
         new FunctionInfo("frac",1,ConstDefine.FUNC_FRAC,ConstDefine.TYPE_NUM), // 求小数部分 frac (12.34)=0.34 frac (-12.34)=-0.34
 
-        new FunctionInfo("today",-1,ConstDefine.FUNC_TODAY,ConstDefine.TYPE_STR),//当前日期
-        new FunctionInfo("currentDay",-1,ConstDefine.FUNC_TODAY,ConstDefine.TYPE_STR),//当前日期
-        new FunctionInfo("currentTime",-1,ConstDefine.FUNC_CURRENT_TIME,ConstDefine.TYPE_STR),//当前时间
-
+        new FunctionInfo("today",-1,ConstDefine.FUNC_TODAY,ConstDefine.TYPE_DATE),//当前日期
+        new FunctionInfo("currentDate",-1,ConstDefine.FUNC_TODAY,ConstDefine.TYPE_DATE),//当前日期
+        new FunctionInfo("currentDatetime",-1,ConstDefine.FUNC_CURRENT_TIME,ConstDefine.TYPE_DATE),//当前时间
+        new FunctionInfo("currentTimestamp",-1,ConstDefine.FUNC_CURRENT_TIMESTAMP,ConstDefine.TYPE_DATE),//当前时间
         new FunctionInfo("day",-1,ConstDefine.FUNC_DAY,ConstDefine.TYPE_STR),//日期函数
         new FunctionInfo("month",-1,ConstDefine.FUNC_MONTH,ConstDefine.TYPE_STR),//日期函数
         new FunctionInfo("year",-1,ConstDefine.FUNC_YEAR,ConstDefine.TYPE_STR),//日期函数
@@ -73,17 +73,16 @@ public abstract class EmbedFunc {
         //new FunctionInfo("monthspan",-1,ConstDefine.FUNC_MONTH_SPAN,ConstDefine.TYPE_NUM),//日期函数   求两日期之间的月数
         //new FunctionInfo("yearspan",-1,ConstDefine.FUNC_YEAR_SPAN,ConstDefine.TYPE_NUM),//日期函数   求两日期之间的年数
 
-        new FunctionInfo("adddays",2,ConstDefine.FUNC_ADD_DAYS,ConstDefine.TYPE_STR),//日期函数  加天数
-        new FunctionInfo("addmonths",2,ConstDefine.FUNC_ADD_MONTHS,ConstDefine.TYPE_STR),//日期函数  加月数
-        new FunctionInfo("addyears",2,ConstDefine.FUNC_ADD_YEARS,ConstDefine.TYPE_STR),//日期函数   加年数
-        new FunctionInfo("truncday",-1,ConstDefine.FUNC_TRUNC_DAY,ConstDefine.TYPE_STR),//日期函数   截断日期  第二个参数  Y ，M , D 分别返回一年、月的第一天 ，或者一日的零点
-        new FunctionInfo("firstofmonth",-1,ConstDefine.FUNC_FIRST_OF_MONTH,ConstDefine.TYPE_STR),//日期函数   求这个月的第一天
+        new FunctionInfo("adddays",2,ConstDefine.FUNC_ADD_DAYS,ConstDefine.TYPE_ANY),//日期函数  加天数
+        new FunctionInfo("addmonths",2,ConstDefine.FUNC_ADD_MONTHS,ConstDefine.TYPE_ANY),//日期函数  加月数
+        new FunctionInfo("addyears",2,ConstDefine.FUNC_ADD_YEARS,ConstDefine.TYPE_ANY),//日期函数   加年数
+        new FunctionInfo("truncday",-1,ConstDefine.FUNC_TRUNC_DAY,ConstDefine.TYPE_ANY),//日期函数   截断日期  第二个参数  Y ，M , D 分别返回一年、月的第一天 ，或者一日的零点
+        new FunctionInfo("firstofmonth",-1,ConstDefine.FUNC_FIRST_OF_MONTH,ConstDefine.TYPE_ANY),//日期函数   求这个月的第一天
 
         new FunctionInfo("toDate",1,ConstDefine.FUNC_TO_DATE,ConstDefine.TYPE_DATE),// 转换为日期
         new FunctionInfo("toString",1,ConstDefine.FUNC_TO_STRING,ConstDefine.TYPE_STR),//转换为String
         new FunctionInfo("toNumber",1,ConstDefine.FUNC_TO_NUMBER,ConstDefine.TYPE_NUM),//转换为数字
-
-            //new FunctionInfo("getsysstr",1,ConstDefine.FUNC_GET_STR,ConstDefine.TYPE_STR),//取系统字符串
+        //new FunctionInfo("getsysstr",1,ConstDefine.FUNC_GET_STR,ConstDefine.TYPE_STR),//取系统字符串
         new FunctionInfo("getpy",1,ConstDefine.FUNC_GET_PY,ConstDefine.TYPE_STR)//取汉字拼音
     };
 
@@ -470,39 +469,38 @@ public abstract class EmbedFunc {
                     return slOperand.get(nOpSum-1);
                 return null;
             }
-            case ConstDefine.FUNC_TODAY://
-            {
-                return DatetimeOpt.currentUtilDate();
+            case ConstDefine.FUNC_TODAY:{//
+                return DatetimeOpt.truncateToDay(DatetimeOpt.currentUtilDate());
             }
 
             case ConstDefine.FUNC_CURRENT_TIME:{ // 包括时间
+                return DatetimeOpt.currentUtilDate();
+            }
+
+            case ConstDefine.FUNC_CURRENT_TIMESTAMP:{ // 包括时间
                 return DatetimeOpt.currentSqlTimeStamp();
             }
 
-            case ConstDefine.FUNC_DAY://
-            {
+            case ConstDefine.FUNC_DAY:{//
                 Date dt = (nOpSum > 0)? DatetimeOpt.castObjectToDate(slOperand.get(0))
                          :DatetimeOpt.currentUtilDate();
                 if(dt==null)
                     dt = DatetimeOpt.currentUtilDate();
                 return DatetimeOpt.getDay(dt);
             }
-            case ConstDefine.FUNC_MONTH://
-            {
+            case ConstDefine.FUNC_MONTH:{//
                 Date dt = (nOpSum > 0)?DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
                 if(dt==null)
                     dt = DatetimeOpt.currentUtilDate();
                 return DatetimeOpt.getMonth(dt);
             }
-            case ConstDefine.FUNC_YEAR://
-            {
+            case ConstDefine.FUNC_YEAR:{//
                 Date dt = (nOpSum > 0)?DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
                 if(dt==null)
                     dt = DatetimeOpt.currentUtilDate();
                 return DatetimeOpt.getYear(dt);
             }
-            case ConstDefine.FUNC_DAY_SPAN://
-            {
+            case ConstDefine.FUNC_DAY_SPAN:{//
                 if (nOpSum < 2) return null;
                 Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
                 Date dt2 =DatetimeOpt.castObjectToDate(slOperand.get(1));
@@ -512,8 +510,7 @@ public abstract class EmbedFunc {
                 return DatetimeOpt.calcSpanDays(dt, dt2);
             }
 
-            case ConstDefine.FUNC_ADD_DAYS://
-            {
+            case ConstDefine.FUNC_ADD_DAYS:{//
                 if (nOpSum < 2) return null;
                 Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
                 if(dt==null )
@@ -525,8 +522,7 @@ public abstract class EmbedFunc {
 
                 return DatetimeOpt.addDays(dt, ti);
             }
-            case ConstDefine.FUNC_ADD_MONTHS://
-            {
+            case ConstDefine.FUNC_ADD_MONTHS:{//
                 if (nOpSum < 2) return null;
                 Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
                 if(dt==null )
@@ -539,8 +535,7 @@ public abstract class EmbedFunc {
                 return DatetimeOpt.addMonths(dt, ti);
             }
 
-            case ConstDefine.FUNC_ADD_YEARS://
-            {
+            case ConstDefine.FUNC_ADD_YEARS:{//
                 if (nOpSum < 2) return null;
                 Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
                 if(dt==null )

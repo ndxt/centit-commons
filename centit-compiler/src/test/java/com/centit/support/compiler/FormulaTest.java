@@ -78,9 +78,14 @@ public class FormulaTest {
         System.out.println(s);
     }
 
+    public static void testDate() {
+        System.out.println( VariableFormula.calculate("currentDate()"));
+        System.out.println( VariableFormula.calculate("currentDatetime()"));
+        System.out.println( VariableFormula.calculate("currentTimestamp()"));
+    }
     public  static void  main(String[] args)   {
         //testFormula();
-        testFormula3();//
+        testDate();//
         /*
         // testFormula2();
         //testLexer();
