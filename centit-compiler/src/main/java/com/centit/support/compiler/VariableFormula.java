@@ -130,8 +130,13 @@ public class VariableFormula {
 
         int funcNo = EmbedFunc.getFuncNo(str);
         if( funcNo != -1) {
-            return calcFunc(funcNo, str);
+            String nextWord = lex.getAWord();
+            if("(".equals(nextWord)) {
+                return calcFunc(funcNo, str);
+            }
+            lex.setPreword(nextWord);
         }
+
         if(trans!=null && Lexer.isLabel(str)){
             return trans.getLabelValue(str);
         }
@@ -339,14 +344,8 @@ public class VariableFormula {
     }
 
     private Object calcFunc(int nFuncNo, String funcName) {
-        String str = lex.getAWord();
-        if( str==null || str.length()==0 || !str.equals("(") ) {
-            if(str!=null && str.length()>0)
-                lex.setPreword(str);
-            return funcName;
-        }
+        String str;
         int prmNo = 0;
-
         // IF 语句单独处理
         if( EmbedFunc.functionsList[nFuncNo].nFuncID == ConstDefine.FUNC_IF){
             Object sCondition = calcFormula();
@@ -397,7 +396,9 @@ public class VariableFormula {
             }
         }
         //str = m_lex.getAWord();
-        if(/* str==null || str.length()==0 || */ !str.equals(")") ) return null;
+        if(/* str==null || str.length()==0 || */ !str.equals(")") ){
+            return null;
+        }
         if( EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
             //&& prmNo != m_sFunctionList[nFuncNo].nPrmSum) return null;
             && prmNo < EmbedFunc.functionsList[nFuncNo].nPrmSum) return null;

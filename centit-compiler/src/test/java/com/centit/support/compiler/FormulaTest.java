@@ -1,5 +1,6 @@
 package com.centit.support.compiler;
 
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 
 import java.util.HashMap;
@@ -79,10 +80,10 @@ public class FormulaTest {
     }
 
     public static void testDate() {
-        System.out.println( VariableFormula.calculate("today()"));
-        System.out.println( VariableFormula.calculate("currentDate()"));
-        System.out.println( VariableFormula.calculate("currentDatetime()"));
-        System.out.println( VariableFormula.calculate("currentTimestamp()"));
+        System.out.println(VariableFormula.calculate("today + ' ' + hello2"));
+        //System.out.println( VariableFormula.calculate("currentDate()"));
+        //System.out.println( VariableFormula.calculate("currentDatetime()"));
+        //System.out.println( VariableFormula.calculate("currentTimestamp()"));
     }
     public  static void  main(String[] args)   {
         //testFormula();
