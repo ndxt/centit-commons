@@ -29,7 +29,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
     /**
      *
      * @param refresher 重新获取代码的接口
-     * @param freshPeriod 保鲜时间，单位为分钟
+     * @param freshPeriod 保鲜时间，单位为秒
      */
     public  CachedObject(Supplier<T> refresher, int freshPeriod){
         this.target = null;
@@ -59,7 +59,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
 
 
     /**
-     * @param freshPeriod 刷新周期 单位分钟
+     * @param freshPeriod 刷新周期 单位秒
      */
     public void setFreshPeriod(int freshPeriod) {
         this.freshPeriod = freshPeriod;
@@ -82,7 +82,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
 
     public T getCachedTarget(){
         if(this.target == null || this.evicted ||
-                System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000L){
+                System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 1000L){
             refreshData();
         }
         return target;

@@ -1,8 +1,8 @@
 package com.centit.support.common;
 
 public interface ICachedObject<T> {
-    //单位分钟，表示一个月
-    long NOT_REFRESH_PERIOD = 43200L;
+    //单位秒，表示一个月
+    long NOT_REFRESH_PERIOD = 2592000L;
 
     void evictCahce();
 

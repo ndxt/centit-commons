@@ -53,7 +53,7 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
 
         T getCachedTarget(K key){
             if(this.target == null || this.evicted ||
-                    System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 60000L){
+                    System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 1000L){
                 refreshData(key);
             }
             return target;
@@ -89,7 +89,7 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
     /**
      * 构造函数
      * @param refresher 重新获取代码的接口
-     * @param freshPeriod 保鲜时间，单位为分钟；也是重新刷新时间
+     * @param freshPeriod 保鲜时间，单位为秒；也是重新刷新时间
      *                    它的意思不是每隔一段时间就刷新，而是在获取数据是检查是否超时，如果超时则刷新
      * @param initialCapacity The implementation performs internal
      * sizing to accommodate this many elements.
@@ -108,7 +108,7 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
     }
     /**
      * 构造函数
-     * @param freshPeriod 保鲜时间，单位为分钟；也是重新刷新时间
+     * @param freshPeriod 保鲜时间，单位为秒；也是重新刷新时间
      *                    它的意思不是每隔一段时间就刷新，而是在获取数据是检查是否超时，如果超时则刷新
      * @param refresher 重新获取代码的接口
      */
