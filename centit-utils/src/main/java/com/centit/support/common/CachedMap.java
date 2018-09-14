@@ -37,6 +37,9 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
         }
 
         synchronized void refreshData(K key){
+            //刷新派生缓存
+            evictDerivativeCahce();
+
             T tempTarget = null;
             try{
                 tempTarget = refresher.apply(key);
@@ -180,6 +183,14 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
             targetMap.put(key,identifiedObject);
         }
         return target;
+    }
+
+    public boolean isFreshData(K key){
+        CachedIdentifiedObject  identifiedObject =  targetMap.get(key);
+        if(identifiedObject != null){
+            return identifiedObject.evicted;
+        }
+        return false;
     }
 
     public void setFreshDataPair(K key, T freshData){

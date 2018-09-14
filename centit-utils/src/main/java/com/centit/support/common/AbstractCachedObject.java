@@ -11,16 +11,19 @@ public abstract class AbstractCachedObject<T> implements ICachedObject<T> {
     protected Set<ICachedObject<?>> deriveCaches;
 
     public AbstractCachedObject(){
-
     }
 
-    public synchronized void evictCahce(){
-        evicted = true;
-        if(deriveCaches!=null){
+    protected synchronized void evictDerivativeCahce(){
+        if(deriveCaches != null){
             for(ICachedObject eriveCache : deriveCaches){
                 eriveCache.evictCahce();
             }
         }
+    }
+
+    public synchronized void evictCahce(){
+        evicted = true;
+        evictDerivativeCahce();
     }
 
     public void addDeriveCache(ICachedObject<?> eriveCache){

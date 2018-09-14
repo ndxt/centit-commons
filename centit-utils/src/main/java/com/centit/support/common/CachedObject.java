@@ -66,6 +66,8 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
     }
 
     private synchronized void refreshData(){
+        //刷新派生缓存
+        evictDerivativeCahce();
         T tempTarget = null;
         try{
             tempTarget = refresher.get();

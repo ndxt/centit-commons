@@ -25,7 +25,6 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
     private CachedMap<K, D>  parentCachedMap;
 
     class CachedIdentifiedObject extends AbstractCachedObject<T> {
-
         private Date refreshTime;
         private T target;
         private AbstractCachedObject<D> parentCache;
@@ -62,8 +61,9 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
         }
 
         T getCachedTarget(K key){
-            if(this.target == null || this.evicted ||
-                    System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 1000L){
+            if(this.target == null || this.evicted
+                    //|| parentCachedMap.isFreshData(key)
+                    || System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 1000L){
                 refreshData(key);
             }
             return target;
@@ -122,7 +122,6 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
         super.evictCahce();
     }
 
-
     public T getCachedValue(K key){
         CachedIdentifiedObject  identifiedObject =  targetMap.get(key);
         if(identifiedObject != null){
@@ -137,8 +136,6 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
         return target;
     }
 
-
-
     public Map<K,T> getRawTarget(){
         if(targetMap == null){
             return null;
@@ -149,6 +146,4 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
         }
         return rawTargetMap;
     }
-
-
 }
