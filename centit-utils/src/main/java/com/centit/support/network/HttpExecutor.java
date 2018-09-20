@@ -596,9 +596,16 @@ public abstract class HttpExecutor {
     public static String jsonPost(HttpExecutorContext executorContext,
              String uri, Object obj, final boolean asPutMethod)
             throws IOException {
-
+        String jsonString = null;
+        if(obj != null){
+            if( obj instanceof String){
+                jsonString = (String) obj;
+            }else{
+                jsonString = JSON.toJSONString(obj);
+            }
+        }
         return jsonPost( executorContext,
-                  uri, obj==null?null:JSON.toJSONString(obj) ,  asPutMethod);
+                  uri, jsonString,  asPutMethod);
     }
 
 
@@ -622,7 +629,6 @@ public abstract class HttpExecutor {
             throws IOException {
         return jsonPost( executorContext, uri,  jsonEntity, false);
     }
-
 
 
     public static String jsonPut(HttpExecutorContext executorContext,
