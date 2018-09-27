@@ -1,6 +1,10 @@
 package com.centit.support.network;
 
+import com.centit.support.algorithm.ByteBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.security.Md5Encoder;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -9,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -163,5 +169,57 @@ public abstract class UrlOptUtils {
                 uri + paramName +"="+ StringBaseOpt.objectToString(paramValue):
                 uri + (uri.indexOf('?') == -1 ? '?':'&')
                         + paramName +"="+ StringBaseOpt.objectToString(paramValue);
+    }
+
+    /*
+     * 这个没有实际意义，不如直接用uuid
+     * 简化的url压缩算法，对url进行md5映射，得到16个byte的编码，然后base64编码得到22个字符
+     * 网络上的算法可以压缩到6～8个字符，效果比这个好，但是算法比较复杂
+     * @param uri 原始url
+     * @return 压缩后的rul
+     */
+    /*public static String shortCodeUrl(String uri){
+        MessageDigest MD5;
+        try {
+            MD5 = MessageDigest.getInstance("MD5");
+            MD5.update( uri.getBytes("utf8"), 0, uri.length());
+            //将 + 替换成 - / 替换成 _
+            //换成url非保留字符
+            byte [] md5Code = Base64.encodeBase64(MD5.digest());
+            for(int i=0;i<24;i++){
+                if(md5Code[i] == '+'){
+                    md5Code[i] = '-';
+                }else if(md5Code[i] == '/'){
+                    md5Code[i] = '_';
+                }
+            }
+            return new String(md5Code,0,22);
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException  e) {
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+            return null;
+        }
+    }*/
+
+    public static String shortenCodeUrl(String longUrl, int urlLength) {
+        if (urlLength < 0 ) {
+            urlLength = 8;// defalut length
+        }
+        StringBuilder sbBuilder = new StringBuilder(24);
+        String md5Hex = "";
+        int nLen = 0;
+        while (nLen < urlLength) {
+            md5Hex = Md5Encoder.encodeBase64(md5Hex + longUrl);
+            for(int i=0;i<md5Hex.length();i++){
+                char c = md5Hex.charAt(i);
+                if(c != '/' && c != '+'){
+                    sbBuilder.append(c);
+                    nLen ++;
+                }
+                if(nLen == urlLength){
+                    break;
+                }
+            }
+        }
+        return sbBuilder.toString();
     }
 }

@@ -1,5 +1,7 @@
 package com.centit.support.algorithm;
 
+import org.apache.commons.codec.binary.Base64;
+
 import java.util.UUID;
 @SuppressWarnings("unused")
 public abstract class UuidOpt {
@@ -16,17 +18,28 @@ public abstract class UuidOpt {
     public static String uuidToString32(UUID uuid){
         long leastSigBits =uuid.getLeastSignificantBits() ;
         long mostSigBits = uuid.getMostSignificantBits();
-        return Long.toHexString(mostSigBits)+ Long.toHexString(leastSigBits);
+        return digits(mostSigBits >> 32, 8)  +
+               digits(mostSigBits, 8) +
+               digits(leastSigBits >> 32, 8) +
+               digits(leastSigBits, 8);
+               //Long.toHexString(mostSigBits) + Long.toHexString(leastSigBits);
     }
     
     public static String uuidToString36(UUID uuid){
         long leastSigBits =uuid.getLeastSignificantBits() ;
         long mostSigBits = uuid.getMostSignificantBits();
-        return (digits(mostSigBits >> 32, 8) + "-" +
-                digits(mostSigBits >> 16, 4) + "-" +
-                digits(mostSigBits, 4) + "-" +
-                digits(leastSigBits >> 48, 4) + "-" +
-                digits(leastSigBits, 12));
+        return digits(mostSigBits >> 32, 8) + "-" +
+               digits(mostSigBits >> 16, 4) + "-" +
+               digits(mostSigBits, 4) + "-" +
+               digits(leastSigBits >> 48, 4) + "-" +
+               digits(leastSigBits, 12);
+    }
+
+    public static String uuidToBase64String(UUID uuid){
+        byte [] buf = new byte[16];
+        ByteBaseOpt.writeInt64(buf, uuid.getMostSignificantBits() ,0);
+        ByteBaseOpt.writeInt64(buf, uuid.getLeastSignificantBits() ,8);
+        return new String(Base64.encodeBase64(buf),0,22);
     }
     
     public static String getUuidAsString36(){
@@ -36,7 +49,15 @@ public abstract class UuidOpt {
     public static String getUuidAsString32(){
         return uuidToString32(UUID.randomUUID());
     }
-    
+
+    public static String getUuidAsBase64String(){
+        return uuidToBase64String(UUID.randomUUID());
+    }
+
+    public static String getUuidAsString22(){
+        return uuidToBase64String(UUID.randomUUID());
+    }
+
     public static String getUuidAsString(){
         return uuidToString32(UUID.randomUUID());
     }
