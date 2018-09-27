@@ -1,20 +1,14 @@
 package com.centit.support.network;
 
-import com.centit.support.algorithm.ByteBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.security.Md5Encoder;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +19,8 @@ public abstract class UrlOptUtils {
     }
 
     protected static final Logger logger = LoggerFactory.getLogger(UrlOptUtils.class);
-    private static final String ALLOWED_CHARS =
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()";
+    /*private static final String ALLOWED_CHARS =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()";*/
 
     public static final String getUrlParamter(String szUrl) {
         String sQuery;
@@ -83,43 +77,6 @@ public abstract class UrlOptUtils {
     }
 
 
-    public static String encodeURIComponent(String input) {
-        if (StringUtils.isEmpty(input)) {
-            return input;
-        }
-
-        int l = input.length();
-        StringBuilder o = new StringBuilder(l * 3);
-        try {
-            for (int i = 0; i < l; i++) {
-                String e = input.substring(i, i + 1);
-                if (ALLOWED_CHARS.indexOf(e) == -1) {
-                    byte[] b = e.getBytes("utf-8");
-                    o.append(getHex(b));
-                    continue;
-                }
-                o.append(e);
-            }
-            return o.toString();
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
-        }
-        return input;
-    }
-
-    private static String getHex(byte buf[]) {
-        StringBuilder o = new StringBuilder(buf.length * 3);
-        for (int i = 0; i < buf.length; i++) {
-            int n = (int) buf[i] & 0xff;
-            o.append("%");
-            if (n < 0x10) {
-                o.append("0");
-            }
-            o.append(Long.toString(n, 16).toUpperCase());
-        }
-        return o.toString();
-    }
-
     /**
      * 根据URL 获取域名
      * @param curl url
@@ -157,54 +114,39 @@ public abstract class UrlOptUtils {
         return urlBuilder.toString();
     }
 
-    public static String appendParamToUrl(String uri, String queryParam){
-        if (queryParam == null || "".equals(queryParam))
+    public static String appendParamToUrl(String uri, String queryUrl){
+        if (queryUrl == null || "".equals(queryUrl))
             return uri;
-        return (uri.endsWith("?") || uri.endsWith("&")) ? uri + queryParam :
-                (uri.indexOf('?') == -1 ?  uri+'?'+queryParam :  uri+'&'+queryParam );
+        return (uri.endsWith("?") || uri.endsWith("&")) ? uri + queryUrl :
+                (uri.indexOf('?') == -1 ?  uri+'?'+queryUrl :  uri+'&'+queryUrl );
     }
 
     public static String appendParamToUrl(String uri, String paramName, Object paramValue){
         return (uri.endsWith("?") || uri.endsWith("&")) ?
                 uri + paramName +"="+ StringBaseOpt.objectToString(paramValue):
                 uri + (uri.indexOf('?') == -1 ? '?':'&')
-                        + paramName +"="+ StringBaseOpt.objectToString(paramValue);
+                        + paramName +"="+ StringEscapeUtils.escapeHtml4(
+                                StringBaseOpt.objectToString(paramValue));
     }
 
-    /*
-     * 这个没有实际意义，不如直接用uuid
-     * 简化的url压缩算法，对url进行md5映射，得到16个byte的编码，然后base64编码得到22个字符
-     * 网络上的算法可以压缩到6～8个字符，效果比这个好，但是算法比较复杂
-     * @param uri 原始url
+    /**
+     * 简化的url压缩算法，算法如下：
+     * 1. 对Url进行md5编码
+     * 2. 对md5码进行base64编码，长度为22
+     * 3. 剔除base64码中的‘+’和‘/’， 取前面的一段，
+     * 4. 如果位数不够，用base64码加上url再进行一次md5，用这个补齐，
+     * 5. 循环4直到位数满足短码的长度需求
+     * 说明一般短码的长度在6～10之间，一次就可以了。解决冲突的方法也简单，可以取长一点，比如目标是8位，可以取16位，如果发现0～7冲突，就取1～8 以此类推。
+     * @param longUrl 原始url
+     * @param urlLength 输出url长度
      * @return 压缩后的rul
      */
-    /*public static String shortCodeUrl(String uri){
-        MessageDigest MD5;
-        try {
-            MD5 = MessageDigest.getInstance("MD5");
-            MD5.update( uri.getBytes("utf8"), 0, uri.length());
-            //将 + 替换成 - / 替换成 _
-            //换成url非保留字符
-            byte [] md5Code = Base64.encodeBase64(MD5.digest());
-            for(int i=0;i<24;i++){
-                if(md5Code[i] == '+'){
-                    md5Code[i] = '-';
-                }else if(md5Code[i] == '/'){
-                    md5Code[i] = '_';
-                }
-            }
-            return new String(md5Code,0,22);
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException  e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
-            return null;
-        }
-    }*/
 
     public static String shortenCodeUrl(String longUrl, int urlLength) {
-        if (urlLength < 0 ) {
+        if (urlLength < 4 ) {
             urlLength = 8;// defalut length
         }
-        StringBuilder sbBuilder = new StringBuilder(24);
+        StringBuilder sbBuilder = new StringBuilder(urlLength + 2);
         String md5Hex = "";
         int nLen = 0;
         while (nLen < urlLength) {
