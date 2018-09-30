@@ -6,13 +6,13 @@
     <parent>
         <artifactId>centit-framework-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>1.1.1808</version>
+        <version>1.1.1809</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.support</groupId>
     <artifactId>centit-commons</artifactId>
-    <version>2.2.SNAPSHOT</version>
+    <version>2.2-SNAPSHOT</version>
     <name>com.centit.support:centit-commons</name>
     <packaging>pom</packaging>
     <description>java 常用工具类,作为 apache-commons的补充</description>
@@ -104,7 +104,7 @@
                 </executions>
             </plugin>
             <!-- GPG自动签名的插件-->
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <version>1.6</version>
@@ -117,10 +117,10 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
             <!--sonatype release :
                mvn nexus-staging:release-->
-            <!--<plugin>
+            <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
                 <version>1.6.8</version>
@@ -130,7 +130,7 @@
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
 </project>
