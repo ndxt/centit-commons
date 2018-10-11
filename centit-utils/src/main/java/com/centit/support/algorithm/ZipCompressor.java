@@ -2,6 +2,7 @@ package com.centit.support.algorithm;
 
 
 import java.io.*;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.zip.*;
 
@@ -65,6 +66,40 @@ public abstract  class ZipCompressor {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 将多个文件 压缩到一个 zip 文件中
+     * @param zipFilePathName 输出zip文件的路径名
+     * @param srcPathNames 输入的文件路径列表
+     */
+    public static void compressFiles(String zipFilePathName, String[] srcPathNames) {
+        try {
+            File zipFile = new File(zipFilePathName);
+            FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
+
+            ZipOutputStream out = convertToZipOutputStream(fileOutputStream);
+            // new ZipOutputStream(cos);
+            String basedir = "";
+            for(String srcPathName : srcPathNames){
+                File file = new File(srcPathName);
+                if (file.exists()) {
+                    compress(file, out, basedir);
+                }
+            }
+            out.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 将多个文件 压缩到一个 zip 文件中
+     * @param zipFilePathName 输出zip文件的路径名
+     * @param srcPathNames 输入的文件路径列表
+     */
+    public static void compressFiles(String zipFilePathName, Collection<String> srcPathNames) {
+        compressFiles(zipFilePathName, srcPathNames.toArray(new String [srcPathNames.size()]));
     }
     
     public static void compressFileInDirectory(String zipFilePathName, String srcPathName) {
