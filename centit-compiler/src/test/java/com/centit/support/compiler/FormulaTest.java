@@ -87,8 +87,8 @@ public class FormulaTest {
     }
     public  static void  main(String[] args)   {
         //testFormula();
-        testDate();//
-        /*
+        //testDate();//
+
         // testFormula2();
         //testLexer();
         Map<String,Object> map = new HashMap<>(5);
@@ -96,7 +96,7 @@ public class FormulaTest {
         usreInfo.put("userCode","admin");
         usreInfo.put("userName","管理员");
         map.put("userInfo",usreInfo);
-        String str = Pretreatment.mapTemplateString("你的{unitCode} 用户号是 { userInfo.userCode } 你的姓名是{userName}，分", map, "{没有赋值}");
+        String str = Pretreatment.mapTemplateString("你的\\\\{\\{\\\\{\\{{unitCode} 用户号是 \\{\\ { userInfo.userCode } 你的姓名是\\{{userInfo.userName}，分", map, "[没有赋值]");
         System.out.println(str );
         str = Pretreatment.mapTemplateString("", map, "{没有赋值}");
         System.out.println(str );
@@ -105,6 +105,6 @@ public class FormulaTest {
         str = Pretreatment.mapTemplateString("{}{}{][[}}[][]{}{}", map, "{没有赋值}");
         System.out.println(str );
         System.out.println("123123.4545" + (String)null );
-*/
+
     }
 }
