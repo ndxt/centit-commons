@@ -153,15 +153,6 @@ public abstract class Pretreatment {
 
             int ep = varTemplate.getCurrPos();
             if(ep-1>bp){
-                // 检查转义符
-                if(template.charAt(ep-2) == '\\'){
-                    if(ep-2>bp){
-                        mapString.append(template.substring(bp,ep-2));
-                    }
-                    mapString.append('{');
-                    bp = varTemplate.getCurrPos();
-                    continue;
-                }
                 mapString.append(template.substring(bp, ep - 1));
             }
 
