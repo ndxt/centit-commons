@@ -180,6 +180,6 @@ public abstract class Pretreatment {
      * @return 新的表达式
      */
     public static String mapTemplateString(String template,Object object) {
-        return mapTemplateString(template, object, null);
+        return mapTemplateString(template, object, "");
     }
 }

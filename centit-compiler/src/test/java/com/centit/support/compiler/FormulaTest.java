@@ -102,7 +102,7 @@ public class FormulaTest {
         System.out.println(str );
         str = Pretreatment.mapTemplateString(null, map, "{没有赋值}");
         System.out.println(str );
-        str = Pretreatment.mapTemplateString("{}{}{][[}}[][]{}{}", map, "{没有赋值}");
+        str = Pretreatment.mapTemplateString("{}！{}2{][[}}[][]3{  }4{3}", map);
         System.out.println(str );
         System.out.println("123123.4545" + (String)null );
 
