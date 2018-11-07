@@ -40,6 +40,15 @@ public abstract class StringRegularOpt {
         return "\"" + StringUtils.replace(szWord.trim(), "\"", "'") + "\"";
     }
 
+    /**
+     * 判断 一个字符串是否为 双子节 字符，比如 中文、日语、韩文等等
+     * @param letter char
+     * @return true or false
+     */
+    public static boolean isDoubleByteChar(char letter){
+        return (letter / 0x80) != 0;
+    }
+
     public static boolean isDigit(String pszNum){
         return StringUtils.isNumeric(pszNum);
     }

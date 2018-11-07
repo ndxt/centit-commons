@@ -132,7 +132,23 @@ public abstract class Pretreatment {
         int nlen = template.length();
         int bp = 0;
         while(true) {
-            if(!varTemplate.seekTo('{'))
+            String aword = varTemplate.getAWord();
+            while(true){
+                // 检查转义符
+                if("\\".equals(aword)){
+                    int ep = varTemplate.getCurrPos();
+                    mapString.append(template.substring(bp, ep - 1));
+                    //获取 \\ 后面的一个字符
+                    mapString.append(template.charAt(ep));
+                    varTemplate.setPosition(ep+1);
+                    bp = varTemplate.getCurrPos();
+                    //aword = varTemplate.getAWord();
+                }else if("{".equals(aword) || aword==null || "".equals(aword)){
+                    break;
+                }
+                aword = varTemplate.getAWord();
+            }
+            if(!"{".equals(aword))
                 break;
 
             int ep = varTemplate.getCurrPos();

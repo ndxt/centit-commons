@@ -2,6 +2,7 @@ package com.centit.test;
 
 import com.centit.support.algorithm.ByteBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringRegularOpt;
 
 public class TestNumber {
 
@@ -15,8 +16,12 @@ public class TestNumber {
     }
 
     public static void main(String[] args) {
-        System.out.println(rmbDX("123.45"));
-        System.out.println(rmbDX("3456700000000089123.45"));
+        String cs ="chinese我是中文";
+        System.out.println(cs.length());
+        System.out.println(cs.substring(6,10));
+        System.out.println(StringRegularOpt.isDoubleByteChar(cs.charAt(7)));
+        //System.out.println(rmbDX("123.45"));
+        //System.out.println(rmbDX("3456700000000089123.45"));
     }
 
     public static void testByte() {

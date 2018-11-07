@@ -197,7 +197,7 @@ public class Lexer {
                 canAcceptOpt = true;
                 startPos ++;
                 break;
-            default: //"+-*/"
+            default: // \\ "
                 startPos ++;
                 break;
             }
