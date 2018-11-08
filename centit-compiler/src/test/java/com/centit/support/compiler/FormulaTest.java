@@ -96,7 +96,10 @@ public class FormulaTest {
         usreInfo.put("userCode","admin");
         usreInfo.put("userName","管理员");
         map.put("userInfo",usreInfo);
-        String str = Pretreatment.mapTemplateString("你的\\\\\\{\\{\\ {unitCode} 用户号是 \\ \"合\\{理}哦\" \\ { userInfo.userCode } 你的姓名是\\{{userInfo.userName}，分", map, "[没有赋值]");
+        String str = Pretreatment.mapTemplateString(
+                "转义符\\\\又一个转义符\\{ {无法找到的变量} " +
+                        "\"引号中的\\和{都不会被处理}\" 你的姓名是{userInfo.userName}",
+                map, "[没有赋值]");
         System.out.println(str );
         str = Pretreatment.mapTemplateString("", map, "{没有赋值}");
         System.out.println(str );
