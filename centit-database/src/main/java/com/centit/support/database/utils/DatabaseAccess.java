@@ -45,7 +45,9 @@ public abstract class DatabaseAccess {
             procDesc.append("?");
         }
         procDesc.append(")}");
-        try(CallableStatement stmt = conn.prepareCall(procDesc.toString())){
+        String sqlCen = procDesc.toString();
+        QueryLogUtils.printSql(logger,sqlCen);
+        try(CallableStatement stmt = conn.prepareCall(sqlCen)){
             stmt.registerOutParameter(1, sqlType);
             for (int i = 0; i < n; i++) {
                 if (paramObjs[i] == null)
@@ -60,7 +62,7 @@ public abstract class DatabaseAccess {
             stmt.execute();
             return stmt.getObject(1);
         }catch (SQLException e) {
-            throw new DatabaseAccessException(procDesc.toString(),e);
+            throw new DatabaseAccessException(sqlCen,e);
         }
     }
 
@@ -83,11 +85,13 @@ public abstract class DatabaseAccess {
             procDesc.append("?");
         }
         procDesc.append(")}");
-        try(CallableStatement stmt = conn.prepareCall(procDesc.toString())){
+        String sqlCen = procDesc.toString();
+        QueryLogUtils.printSql(logger, sqlCen);
+        try(CallableStatement stmt = conn.prepareCall(sqlCen)){
             DatabaseAccess.setQueryStmtParameters(stmt,paramObjs);
             return stmt.execute();
         }catch (SQLException e) {
-            throw new DatabaseAccessException(procDesc.toString(),e);
+            throw new DatabaseAccessException(sqlCen, e);
         }
     }
 
@@ -180,7 +184,6 @@ public abstract class DatabaseAccess {
 
     public static JSONObject fetchResultSetRowToJSONObject(ResultSet rs, String[] fieldnames)
             throws SQLException, IOException {
-
         if (rs.next()) {
             int cc = rs.getMetaData().getColumnCount();
             String[] fieldNames = new String[cc];
@@ -192,13 +195,10 @@ public abstract class DatabaseAccess {
                     fieldNames[i] = fieldnames[i];
                 }*/
             }
-
             for (int i = asFn; i < cc; i++) {
                 fieldNames[i] = mapColumnNameToField(
                     rs.getMetaData().getColumnLabel(i + 1));
             }
-
-
             return innerFetchResultSetRowToJSONObject(rs,cc,fieldNames);
         }
         return null;
@@ -206,10 +206,8 @@ public abstract class DatabaseAccess {
 
     public static JSONArray fetchResultSetToJSONArray(ResultSet rs, String[] fieldnames)
             throws SQLException, IOException {
-
         JSONArray ja = new JSONArray();
         int cc = rs.getMetaData().getColumnCount();
-
         String[] fieldNames = new String[cc];
         int asFn = 0;
         if (fieldnames != null) {
@@ -220,12 +218,10 @@ public abstract class DatabaseAccess {
                                 fieldnames[i];
             }
         }
-
         for (int i = asFn; i < cc; i++) {
             fieldNames[i] = mapColumnNameToField(
                     rs.getMetaData().getColumnLabel(i + 1));
         }
-
         while (rs.next()) {
             ja.add(innerFetchResultSetRowToJSONObject(rs,cc,fieldNames));
         }
@@ -236,7 +232,6 @@ public abstract class DatabaseAccess {
         if(StringUtils.isBlank(colName)){
             return colName;
         }
-
         if(colName.indexOf('_')>=0){
             int nl = colName.length();
             char [] ch = colName.toCharArray();
@@ -296,11 +291,9 @@ public abstract class DatabaseAccess {
         QueryLogUtils.printSql(logger, sSql, values);
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
             setQueryStmtParameters(stmt,values);
-
             try(ResultSet rs = stmt.executeQuery()) {
                 if (rs == null)
                     return new JSONArray();
-
                 String[] fns = fieldnames;
                 if (ArrayUtils.isEmpty(fns)) {
                     List<String> fields = QueryUtils.getSqlFiledNames(sSql);
@@ -316,17 +309,15 @@ public abstract class DatabaseAccess {
         }
     }
 
-
     public static JSONObject getObjectAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames)
             throws SQLException, IOException {
-        QueryLogUtils.printSql( logger, sSql ,values );
+        QueryLogUtils.printSql(logger, sSql ,values );
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
             setQueryStmtParameters(stmt,values);
-
             try(ResultSet rs = stmt.executeQuery()) {
-                if (rs == null)
+                if (rs == null) {
                     return null;
-
+                }
                 String[] fns = fieldnames;
                 if (ArrayUtils.isEmpty(fns)) {
                     List<String> fields = QueryUtils.getSqlFiledNames(sSql);
@@ -378,7 +369,6 @@ public abstract class DatabaseAccess {
         return findObjectsAsJSON(conn, sSql, new Object[] { value }, null);
     }
 
-
     public static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object value, String[] fieldnames)
             throws SQLException, IOException {
         return findObjectsAsJSON(conn, sSql, new Object[] { value }, fieldnames);
@@ -398,9 +388,7 @@ public abstract class DatabaseAccess {
      */
     public static JSONArray findObjectsByNamedSqlAsJSON(Connection conn, String sSql, Map<String, Object> values,
             String[] fieldnames) throws SQLException, IOException {
-
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
-
         return findObjectsAsJSON(conn, qap.getQuery(), qap.getParams(), fieldnames);
     }
 
@@ -409,9 +397,7 @@ public abstract class DatabaseAccess {
      */
     public static JSONArray findObjectsByNamedSqlAsJSON(Connection conn, String sSql, Map<String, Object> values)
             throws SQLException, IOException {
-
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
-
         return findObjectsAsJSON(conn, qap.getQuery(), qap.getParams(), null);
     }
 
@@ -496,7 +482,6 @@ public abstract class DatabaseAccess {
         return datas;
     }
 
-
     private static Object[] innerFetchResultSetRowToObjects(ResultSet rs,int col) throws SQLException, IOException {
         Object[] objs = new Object[col];
         for (int i = 1; i <= col; i++) {
@@ -510,7 +495,6 @@ public abstract class DatabaseAccess {
             }
         }
         return objs;
-
     }
 
     public static Object[] fetchResultSetRowToObjects(ResultSet rs) throws SQLException, IOException {
@@ -662,7 +646,6 @@ public abstract class DatabaseAccess {
         return firstRow[0];
     }
 
-
     /**
      * 执行一个标量查询
      * @param conn 数据库链接
@@ -674,7 +657,6 @@ public abstract class DatabaseAccess {
      */
     public static Object getScalarObjectQuery(Connection conn, String sSql, Map<String,Object> values)
             throws SQLException, IOException {
-
         List<Object[]> objList = DatabaseAccess.findObjectsByNamedSql(conn,sSql, values);
         return DatabaseAccess.fetchScalarObject(objList);
     }
@@ -768,7 +750,7 @@ public abstract class DatabaseAccess {
         return query;
     }
 
-    /* 下面是根据不同数据库生成不同的查询语句进行分页查询相关的语句 */
+    /** 下面是根据不同数据库生成不同的查询语句进行分页查询相关的语句 */
     /*----------------------------------------------------------------------------- */
 
     /**
@@ -792,7 +774,6 @@ public abstract class DatabaseAccess {
         if(query.equals(sSql)){
             try(PreparedStatement stmt = conn.prepareStatement(sSql)){
                 setQueryStmtParameters(stmt,values);
-
                 if (pageNo > 0 && pageSize > 0)
                     stmt.setMaxRows(pageNo * pageSize);
 
