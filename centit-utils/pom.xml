@@ -14,25 +14,6 @@
     <description>java 常用工具类,作为 apache-commons的补充</description>
 
     <dependencies>
-        <dependency>
-            <groupId>org.mnode.ical4j</groupId>
-            <artifactId>ical4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
         <!-- jSon -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -50,22 +31,42 @@
 
         <dependency>
             <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mnode.ical4j</groupId>
+            <artifactId>ical4j</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
             <artifactId>commons-email</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
+            <optional>true</optional>
         </dependency>
         <!-- 获取汉字首字母的类库  -->
-        <!-- <dependency>
-            <groupId>net.sourceforge.pinyin4j</groupId>
-            <artifactId>pinyin4j</artifactId>
-            <version>5.0</version>
-        </dependency> -->
         <dependency>
             <groupId>com.belerweb</groupId>
             <artifactId>pinyin4j</artifactId>
+            <optional>true</optional>
         </dependency>
         <!-- test -->
         <dependency>
