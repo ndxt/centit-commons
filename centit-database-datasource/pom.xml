@@ -32,11 +32,7 @@
             <artifactId>dom4j</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <optional>true</optional>
-        </dependency>
+
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>
