@@ -2,7 +2,7 @@ package com.centit.support.security;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.net.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 import sun.security.rsa.RSAPrivateCrtKeyImpl;
 import sun.security.rsa.RSAPublicKeyImpl;
 

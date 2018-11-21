@@ -1,4 +1,4 @@
-package com.centit.support.network;
+package com.centit.support;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;

@@ -6,11 +6,12 @@ import com.centit.support.algorithm.StringRegularOpt;
 public class TestStringBuilder {
 
     public static void main(String[] args) {
-        System.out.println(StringBaseOpt.midPad("12",6,"UX",'0'));
-        System.out.println(StringBaseOpt.midPad("adc",0,null,"X"));
-        System.out.println(StringBaseOpt.midPad("def",6,null,null));
-        System.out.println(StringRegularOpt.isMatch(
-                "江苏南京东南大学先腾信息产业有限苏州分公司", "%南___大%公司%") );
+        System.out.println(StringBaseOpt.getFirstLetter("codefan 完美的解决 汉字拼音 哈哈 中国南京 nanjing China"));
+        //System.out.println(StringBaseOpt.midPad("12",6,"UX",'0'));
+//        System.out.println(StringBaseOpt.midPad("adc",0,null,"X"));
+//        System.out.println(StringBaseOpt.midPad("def",6,null,null));
+//        System.out.println(StringRegularOpt.isMatch(
+//                "江苏南京东南大学先腾信息产业有限苏州分公司", "%南___大%公司%") );
     }
 
     public static void testString()

@@ -1,4 +1,4 @@
-package com.centit.support.network;
+package com.centit.support;
 
 /**
  * @author 范春峰

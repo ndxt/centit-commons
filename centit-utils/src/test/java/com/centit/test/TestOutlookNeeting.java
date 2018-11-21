@@ -1,6 +1,6 @@
 package com.centit.test;
 
-import com.centit.support.network.OutlookMeetingUtils;
+import com.centit.support.OutlookMeetingUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 

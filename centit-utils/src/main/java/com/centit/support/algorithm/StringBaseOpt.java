@@ -1,6 +1,5 @@
 package com.centit.support.algorithm;
 
-import net.sourceforge.pinyin4j.PinyinHelper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -312,7 +311,7 @@ public abstract class StringBaseOpt {
      */
     @Deprecated
     public static String clacDocumentNo(String templet,long currNo,Map<String,String> params){
-        if( StringRegularOpt.isNvl( templet) )
+        if(StringRegularOpt.isNvl( templet) )
             return String.valueOf(currNo);
 
         String sDocNo = templet;
@@ -374,8 +373,39 @@ public abstract class StringBaseOpt {
         return sRes;
     }
 
+    private final static int[] li_SecPosValue = { 1601, 1637, 1833, 2078, 2274,
+            2302, 2433, 2594, 2787, 3106, 3212, 3472, 3635, 3722, 3730, 3858,
+            4027, 4086, 4390, 4558, 4684, 4925, 5249, 5590 };
+    private final static String[] lc_FirstLetter = { "a", "b", "c", "d", "e",
+            "f", "g", "h", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",
+            "t", "w", "x", "y", "z" };
 
-
+    private static String getPinYin(String hanzi){
+        try {
+            String chinese = new String(hanzi.getBytes("GB2312"), "ISO8859-1");
+            if (chinese.length() > 1) {
+                int li_SectorCode = (int) chinese.charAt(0); // 汉字区码
+                int li_PositionCode = (int) chinese.charAt(1); // 汉字位码
+                li_SectorCode = li_SectorCode - 160;
+                li_PositionCode = li_PositionCode - 160;
+                int li_SecPosCode = li_SectorCode * 100 + li_PositionCode; // 汉字区位码
+                if (li_SecPosCode > 1600 && li_SecPosCode < 5590) {
+                    for (int i = 0; i < 23; i++) {
+                        if (li_SecPosCode >= li_SecPosValue[i]
+                                && li_SecPosCode < li_SecPosValue[i + 1]) {
+                            chinese = lc_FirstLetter[i];
+                            break;
+                        }
+                    }
+                }
+                return chinese;
+            }else{
+                return hanzi;
+            }
+        } catch (UnsupportedEncodingException e) {
+            return "";
+        }
+    }
     /**
     * 获取一个汉字的拼音首字母。 GB码两个字节分别减去160，转换成10进制码组合就可以得到区位码
     * 例如汉字“你”的GB码是0xC4/0xE3，分别减去0xA0（160）就是0x24/0x43
@@ -386,11 +416,8 @@ public abstract class StringBaseOpt {
     public static String getFirstLetter(String oriStr) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < oriStr.length(); i++) {
-            String[] pinyin = PinyinHelper.toHanyuPinyinStringArray(oriStr.charAt(i));
-            if(pinyin != null && pinyin.length > 0) 
-                sb.append(pinyin[0].charAt(0));
-            else
-                sb.append(oriStr.charAt(i));
+            String pinyin = getPinYin(String.valueOf(oriStr.charAt(i)));
+            sb.append(pinyin);
         }
         return sb.toString();
     }
