@@ -1,6 +1,7 @@
 package com.centit.support.database.orm;
 
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.compiler.Lexer;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableReference;
 import org.apache.commons.lang3.StringUtils;
@@ -130,8 +131,6 @@ public abstract class JpaMetadata {
 
         return column;
     }
-
-
 
     public static TableMapInfo obtainMapInfoFromClass(Class<?> objType){
 
@@ -289,4 +288,66 @@ public abstract class JpaMetadata {
         return mapInfo;
     }
 
+    /**
+     * 将sql语句中的属性名 替换为 数据库中表的字段名
+     * @param mapInfo 数据库表和对象的映射关系信息
+     * @param sql 带有属性名的sql语句
+     * @param alias 表的别名
+     * @return 转换后的 sql语句
+     */
+    public static String translateSqlPropertyToColumn(TableMapInfo mapInfo, String sql, String alias) {
+        StringBuilder sqlb = new StringBuilder();
+        Lexer lex = new Lexer(sql, Lexer.LANG_TYPE_SQL);
+        boolean needTranslate = true;
+        int prePos = 0;
+        int preWordPos = 0;
+        String aWord = lex.getAWord();
+        boolean addAlias = StringUtils.isNotBlank(alias);
+        //skeep to |
+        if ("[".equals(aWord)) {
+            aWord = lex.getAWord();
+            while (aWord != null && !"".equals(aWord) && !"|".equals(aWord)) {
+                if ("(".equals(aWord)) {
+                    lex.seekToRightBracket();
+                }
+                aWord = lex.getAWord();
+            }
+        }
+
+        while (aWord != null && !"".equals(aWord)) {
+            if ("select".equalsIgnoreCase(aWord) || "from".equalsIgnoreCase(aWord)
+                /* || "group".equalsIgnoreCase(aWord) || "order".equalsIgnoreCase(aWord)*/) {
+                needTranslate = false;
+            } else if ("where".equalsIgnoreCase(aWord)) {
+                needTranslate = true;
+            }
+
+            if (!needTranslate) {
+                preWordPos = lex.getCurrPos();
+                aWord = lex.getAWord();
+                continue;
+            }
+
+            if (":".equals(aWord)) {
+                lex.getAWord(); // 跳过参数
+                preWordPos = lex.getCurrPos();
+                aWord = lex.getAWord();
+            }
+
+            if (Lexer.isLabel(aWord)) {
+                SimpleTableField col = mapInfo.findFieldByName(aWord);
+                if (col != null) {
+                    if (preWordPos > prePos) {
+                        sqlb.append(sql.substring(prePos, preWordPos));
+                    }
+                    sqlb.append(addAlias ? (" " + alias + ".") : " ").append(col.getColumnName());
+                    prePos = lex.getCurrPos();
+                }
+            }
+            preWordPos = lex.getCurrPos();
+            aWord = lex.getAWord();
+        }
+        sqlb.append(sql.substring(prePos));
+        return sqlb.toString();
+    }
 }
