@@ -138,7 +138,8 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
         }
     }
 
-    public void evictCache(){
+    @Override
+    public void evictCahce(){
         targetMap.clear();
         super.evictCahce();
     }
