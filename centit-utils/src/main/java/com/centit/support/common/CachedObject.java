@@ -103,7 +103,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
         this.refresher = refresher;
     }
 
-    public synchronized void setFreshtDate(T freshData){
+    public void setFreshtDate(T freshData){
         this.target = freshData;
         this.refreshTime = DatetimeOpt.currentUtilDate();
         this.evicted = false;
