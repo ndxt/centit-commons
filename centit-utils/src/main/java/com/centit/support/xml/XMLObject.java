@@ -1,12 +1,13 @@
 package com.centit.support.xml;
 
 import com.centit.support.algorithm.*;
+import com.centit.support.common.JavaBeanField;
+import com.centit.support.common.JavaBeanMetaData;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -60,6 +61,7 @@ public abstract class XMLObject {
         if(object instanceof Map){
             Element element = DocumentHelper.createElement(elementName);
             element.addAttribute("type","Object");
+            element.addAttribute("class",object.getClass().getName());
             for(Map.Entry<Object,Object> jo : ((Map<Object,Object>)object).entrySet()){
                 if(jo.getValue()!=null)
                     element.add(createXMLElementFromObject(
@@ -71,6 +73,7 @@ public abstract class XMLObject {
         if(object instanceof Object[]){
             Element element = DocumentHelper.createElement(elementName);
             element.addAttribute("type","Array");
+            element.addAttribute("class",object.getClass().getName());
             for(Object obj: (Object[]) object){
                 if(obj!=null) {
                     element.add(createXMLElementFromObject("item", obj));
@@ -80,6 +83,7 @@ public abstract class XMLObject {
         }else if(object instanceof Collection){
             Element element = DocumentHelper.createElement(elementName);
             element.addAttribute("type","Array");
+            element.addAttribute("class",object.getClass().getName());
             for(Object obj: (Collection<?>) object){
                 if(obj!=null) {
                     element.add(createXMLElementFromObject("item", obj));
@@ -91,16 +95,18 @@ public abstract class XMLObject {
         if(ReflectionOpt.isScalarType(object.getClass())){
              return createXMLElement(elementName ,"String", object);
         }else{
-            Field[] fields = ReflectionOpt.getFields(object);
+            JavaBeanMetaData jbm = JavaBeanMetaData.createBeanMetaDataFromType(object.getClass());
+            Map<String, JavaBeanField> fields = jbm.getFileds();
             if(fields==null)
                 return createXMLElement(elementName ,"String", object);
 
             Element element = DocumentHelper.createElement(elementName);
             element.addAttribute("type","Object");
-            for(Field field: fields){
-                Object obj = ReflectionOpt.getFieldValue( object,   field);
+            element.addAttribute("class",object.getClass().getName());
+            for(Map.Entry<String, JavaBeanField> field: fields.entrySet()){
+                Object obj = field.getValue().getObjectFieldValue(object);
                 if(obj!=null)
-                    element.add(createXMLElementFromObject(field.getName(), obj));
+                    element.add(createXMLElementFromObject(field.getKey(), obj));
              
             }
             return element;
