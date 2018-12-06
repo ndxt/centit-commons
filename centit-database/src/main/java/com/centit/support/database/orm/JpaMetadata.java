@@ -256,6 +256,8 @@ public abstract class JpaMetadata {
                 }
             }
         }
+        //先 注册一下，避免 交叉引用时 死循环
+        ORM_JPA_METADATA_CLASSPATH.put(objType.getName(), mapInfo);
         // 整理 引用字段
         if( mapInfo.getReferences() != null && mapInfo.getReferences().size()>0) {
             Set<SimpleTableReference> errorRef = new HashSet<>(mapInfo.getReferences().size());
