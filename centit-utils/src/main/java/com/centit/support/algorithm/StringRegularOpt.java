@@ -589,54 +589,50 @@ public abstract class StringRegularOpt {
         return "^"+sTempl.replaceAll("%", "\\\\S*").replaceAll("_", "\\\\S")+"$";
     }
 
-    /*{
-            if(szValue==null || szTempl==null)
-                return false;
-            int nLV = szValue.length();
-            int nLT = szTempl.length();
-            if(nLV == 0){
-                for(int i=0;i<nLT;i++)
-                    if(szTempl.charAt(i)!='*')
-                        return  false;
-                return true;
-            }
-            int i =0,j=0;
-            while(i<nLV && j<nLT){
-                if( (szTempl.charAt(j) != '*' && szValue.charAt(i) == szTempl.charAt(j)) ||
-                    szTempl.charAt(j) == '?'){
-                    i++;j++;
-                }else if(szTempl.charAt(j) == '*'){
-                    if(szTempl.charAt(j+1) == '*'){
-                        if (szValue.charAt(i) == '*'){
-                            i++; j+=2;
-                        }else return false;
-                    } else {
-                        j++;
-                        while(j<nLT && (szTempl.charAt(j)=='?' )){
-                            j++;
-                            i++;
-                        }
-                        int nStart = j;
-                        if(nStart == nLT) return true;
-                        while(j<nLT && szTempl.charAt(j)!='?' && szTempl.charAt(j)!='*') j++;
-                        int nSubStr = j-nStart;
-
-                        for(int k=i;k<=nLV-nSubStr;k++){
-                            boolean bMatchSub = true;
-                            for(int l=nStart;l<j;l++)
-                                if(szValue.charAt(k+l-nStart) != szTempl.charAt(l)){
-                                    bMatchSub = false;
-                                    break;
-                                }
-                            if(bMatchSub && innerMatch(szValue+k+nSubStr ,szTempl+j)) return true;
-                        }
-                        return false;
-                    }
-                }else
-                    return false;
-            }
-            return (i==nLV && j==nLT);
+    /*
+    public boolean isMatch(String s, String p) {
+        if(s==null || p==null)
+            return false;
+        int nLV = s.length();
+        int nLT = p.length();
+        if(nLV == 0){
+            for(int i=0;i<nLT;i++)
+                if(p.charAt(i)!='*')
+                    return  false;
+            return true;
         }
+        int i =0,j=0;
+        while(i<nLV && j<nLT){
+            if((p.charAt(j) != '*' && s.charAt(i) == p.charAt(j)) ||
+                    p.charAt(j) == '?'){
+                i++;j++;
+            }else if(p.charAt(j) == '*'){
+                j++;
+                while(j<nLT && (p.charAt(j)=='?' || p.charAt(j)=='*')){
+                    if(p.charAt(j)=='?') {
+                        i++;
+                    }
+                    j++;
+                }
+                if(i>nLV){
+                    return false;
+                }
+                if(j == nLT) return true;
+                for(int k=i;k<nLV;k++){
+                    if( p.charAt(j) == s.charAt(k) ){
+                        if(isMatch(s.substring(k+1) ,
+                                p.substring(j+1))) return true;
+                    }
+                }
+                return false;
+            }else
+                return false;
+        }
+        while(j<nLT && p.charAt(j)=='*'){
+           j++;
+        }
+        return (i==nLV && j==nLT);
+    }
     */
     public static boolean  isMatch(String szValue , String szTempl)
     {// ?_  *% 是通配符
