@@ -589,51 +589,6 @@ public abstract class StringRegularOpt {
         return "^"+sTempl.replaceAll("%", "\\\\S*").replaceAll("_", "\\\\S")+"$";
     }
 
-    /*
-    public boolean isMatch(String s, String p) {
-        if(s==null || p==null)
-            return false;
-        int nLV = s.length();
-        int nLT = p.length();
-        if(nLV == 0){
-            for(int i=0;i<nLT;i++)
-                if(p.charAt(i)!='*')
-                    return  false;
-            return true;
-        }
-        int i =0,j=0;
-        while(i<nLV && j<nLT){
-            if((p.charAt(j) != '*' && s.charAt(i) == p.charAt(j)) ||
-                    p.charAt(j) == '?'){
-                i++;j++;
-            }else if(p.charAt(j) == '*'){
-                j++;
-                while(j<nLT && (p.charAt(j)=='?' || p.charAt(j)=='*')){
-                    if(p.charAt(j)=='?') {
-                        i++;
-                    }
-                    j++;
-                }
-                if(i>nLV){
-                    return false;
-                }
-                if(j == nLT) return true;
-                for(int k=i;k<nLV;k++){
-                    if( p.charAt(j) == s.charAt(k) ){
-                        if(isMatch(s.substring(k+1) ,
-                                p.substring(j+1))) return true;
-                    }
-                }
-                return false;
-            }else
-                return false;
-        }
-        while(j<nLT && p.charAt(j)=='*'){
-           j++;
-        }
-        return (i==nLV && j==nLT);
-    }
-    */
     public static boolean  isMatch(String szValue , String szTempl)
     {// ?_  *% 是通配符
         if( szValue == null || szTempl == null) return false;
