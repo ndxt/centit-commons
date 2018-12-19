@@ -7,7 +7,9 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -20,23 +22,38 @@ public class JdbcMetadata implements DatabaseMetadata {
         this.dbc = dbc;
     }
 
-    /**
-     * 没有获取外键
-     */
-    @Override
-    public SimpleTableInfo getTableMetadata(String tabName) {
-        SimpleTableInfo tab = new SimpleTableInfo(tabName);
+
+    public List<SimpleTableInfo> listAllTable() {
+        List<SimpleTableInfo> tables = new ArrayList<>(100);
         try {
-            tab.setSchema(dbc.getSchema().toUpperCase());
+
             DatabaseMetaData dbmd = dbc.getMetaData();
 
-            ResultSet rs = dbmd.getTables(null, dbc.getSchema(), tabName, null);
+            ResultSet rs = dbmd.getTables(null, dbc.getSchema(), null, null);
             if(rs.next()) {
+                SimpleTableInfo tab = new SimpleTableInfo();
+                tab.setSchema(dbc.getSchema().toUpperCase());
+                tab.setTableName(rs.getString("TABLE_NAME") );
                 tab.setTableLabelName(rs.getString("REMARKS"));
+                String tt = rs.getString("TABLE_TYPE");
+                if("view".equalsIgnoreCase(tt) || "table".equalsIgnoreCase(tt) ) {
+                    fetchTableDetail(tab, dbmd);
+                    tables.add(tab);
+                }
             }
             rs.close();
+        } catch (SQLException e) {
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+        }
+        return tables;
+    }
 
-            rs = dbmd.getTables(dbc.getCatalog(), dbc.getSchema(), tabName, null);
+
+    private void fetchTableDetail(SimpleTableInfo tab ,DatabaseMetaData dbmd  ) {
+        String tabName = tab.getTableName();
+        try {
+
+            ResultSet rs = dbmd.getTables(dbc.getCatalog(), dbc.getSchema(), tabName, null);
             while (rs.next()) {
                 SimpleTableField field = new SimpleTableField();
                 field.setColumnName(rs.getString("COLUMN_NAME"));
@@ -79,6 +96,29 @@ public class JdbcMetadata implements DatabaseMetadata {
             for(Map.Entry<String , SimpleTableReference> entry:refs.entrySet()){
                 tab.getReferences().add(entry.getValue());
             }
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+        }
+    }
+
+    /**
+     * 没有获取外键
+     */
+    @Override
+    public SimpleTableInfo getTableMetadata(String tabName) {
+        SimpleTableInfo tab = new SimpleTableInfo(tabName);
+        try {
+            tab.setSchema(dbc.getSchema().toUpperCase());
+            DatabaseMetaData dbmd = dbc.getMetaData();
+
+            ResultSet rs = dbmd.getTables(null, dbc.getSchema(), tabName, null);
+            if(rs.next()) {
+                tab.setTableLabelName(rs.getString("REMARKS"));
+            }
+            rs.close();
+
+            fetchTableDetail(tab, dbmd);
 
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
