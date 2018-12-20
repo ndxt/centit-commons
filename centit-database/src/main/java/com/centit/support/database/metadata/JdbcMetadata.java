@@ -57,10 +57,10 @@ public class JdbcMetadata implements DatabaseMetadata {
     private void fetchTableDetail(SimpleTableInfo tab ,DatabaseMetaData dbmd  ) {
         String tabName = tab.getTableName();
         try {
-            String dbSechema = this.getDBSchema();
+            String dbSchema = this.getDBSchema();
             String dbCatalog = this.getDBCatalog();
 
-            ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, tabName, null);
+            ResultSet rs = dbmd.getColumns(dbCatalog, dbSchema, tabName, null);
             while (rs.next()) {
                 SimpleTableField field = new SimpleTableField();
                 field.setColumnName(rs.getString("COLUMN_NAME"));
@@ -74,14 +74,14 @@ public class JdbcMetadata implements DatabaseMetadata {
                 tab.getColumns().add(field);
             }
             rs.close();
-            rs = dbmd.getPrimaryKeys(dbCatalog, dbSechema, tabName);
+            rs = dbmd.getPrimaryKeys(dbCatalog, dbSchema, tabName);
             while (rs.next()) {
                 tab.getPkColumns().add(rs.getString("COLUMN_NAME"));
                 tab.setPkName(rs.getString("PK_NAME"));
             }
             rs.close();
 
-            rs = dbmd.getExportedKeys(dbCatalog, dbSechema, tabName);
+            rs = dbmd.getExportedKeys(dbCatalog, dbSchema, tabName);
             Map<String , SimpleTableReference> refs = new HashMap<String , SimpleTableReference>();
             while (rs.next()) {
                 String fkTableName = rs.getString("FKTABLE_NAME");
