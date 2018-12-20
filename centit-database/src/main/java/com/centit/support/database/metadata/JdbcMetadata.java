@@ -141,7 +141,9 @@ public class JdbcMetadata implements DatabaseMetadata {
     public String getDBSchema() {
         try {
             return dbc.getSchema();
-        } catch (SQLException | AbstractMethodError e) {
+        }catch (AbstractMethodError error){
+            return null;
+        } catch (SQLException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
             return null;
         }
@@ -150,7 +152,9 @@ public class JdbcMetadata implements DatabaseMetadata {
     public String getDBCatalog() {
         try {
             return dbc.getCatalog();
-        } catch (SQLException | AbstractMethodError e) {
+        }catch (AbstractMethodError error){
+            return null;
+        } catch (SQLException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
             return null;
         }
