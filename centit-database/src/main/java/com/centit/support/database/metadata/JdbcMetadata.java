@@ -17,6 +17,7 @@ public class JdbcMetadata implements DatabaseMetadata {
     protected static final Logger logger = LoggerFactory.getLogger(JdbcMetadata.class);
     private Connection dbc;
 
+
     @Override
     public void setDBConfig(Connection dbc) {
         this.dbc = dbc;
@@ -26,13 +27,17 @@ public class JdbcMetadata implements DatabaseMetadata {
     public List<SimpleTableInfo> listAllTable() {
         List<SimpleTableInfo> tables = new ArrayList<>(100);
         try {
+            String dbSechema = this.getDBSchema();
+            String dbCatalog = this.getDBCatalog();
 
             DatabaseMetaData dbmd = dbc.getMetaData();
 
-            ResultSet rs = dbmd.getTables(null, dbc.getSchema(), null, null);
+            ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, null, null);
             if(rs.next()) {
                 SimpleTableInfo tab = new SimpleTableInfo();
-                tab.setSchema(dbc.getSchema().toUpperCase());
+                if(dbSechema!=null) {
+                    tab.setSchema(dbSechema.toUpperCase());
+                }
                 tab.setTableName(rs.getString("TABLE_NAME") );
                 tab.setTableLabelName(rs.getString("REMARKS"));
                 String tt = rs.getString("TABLE_TYPE");
@@ -52,8 +57,10 @@ public class JdbcMetadata implements DatabaseMetadata {
     private void fetchTableDetail(SimpleTableInfo tab ,DatabaseMetaData dbmd  ) {
         String tabName = tab.getTableName();
         try {
+            String dbSechema = this.getDBSchema();
+            String dbCatalog = this.getDBCatalog();
 
-            ResultSet rs = dbmd.getTables(dbc.getCatalog(), dbc.getSchema(), tabName, null);
+            ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, tabName, null);
             while (rs.next()) {
                 SimpleTableField field = new SimpleTableField();
                 field.setColumnName(rs.getString("COLUMN_NAME"));
@@ -67,14 +74,14 @@ public class JdbcMetadata implements DatabaseMetadata {
                 tab.getColumns().add(field);
             }
             rs.close();
-            rs = dbmd.getPrimaryKeys(dbc.getCatalog(),dbc.getSchema(), tabName);
+            rs = dbmd.getPrimaryKeys(dbCatalog, dbSechema, tabName);
             while (rs.next()) {
                 tab.getPkColumns().add(rs.getString("COLUMN_NAME"));
                 tab.setPkName(rs.getString("PK_NAME"));
             }
             rs.close();
 
-            rs = dbmd.getExportedKeys(dbc.getCatalog(),dbc.getSchema(), tabName);
+            rs = dbmd.getExportedKeys(dbCatalog, dbSechema, tabName);
             Map<String , SimpleTableReference> refs = new HashMap<String , SimpleTableReference>();
             while (rs.next()) {
                 String fkTableName = rs.getString("FKTABLE_NAME");
@@ -109,10 +116,14 @@ public class JdbcMetadata implements DatabaseMetadata {
     public SimpleTableInfo getTableMetadata(String tabName) {
         SimpleTableInfo tab = new SimpleTableInfo(tabName);
         try {
-            tab.setSchema(dbc.getSchema().toUpperCase());
+            String dbSechema = this.getDBSchema();
+            String dbCatalog = this.getDBCatalog();
+            if(dbSechema!=null) {
+                tab.setSchema(dbc.getSchema().toUpperCase());
+            }
             DatabaseMetaData dbmd = dbc.getMetaData();
 
-            ResultSet rs = dbmd.getTables(null, dbc.getSchema(), tabName, null);
+            ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, tabName, null);
             if(rs.next()) {
                 tab.setTableLabelName(rs.getString("REMARKS"));
             }
@@ -130,6 +141,15 @@ public class JdbcMetadata implements DatabaseMetadata {
     public String getDBSchema() {
         try {
             return dbc.getSchema();
+        } catch (SQLException e) {
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getDBCatalog() {
+        try {
+            return dbc.getCatalog();
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
             return null;
