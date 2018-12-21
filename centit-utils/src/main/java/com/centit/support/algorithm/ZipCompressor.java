@@ -23,11 +23,11 @@ public abstract  class ZipCompressor {
      * @return ZipOutputStream
      */
     public static ZipOutputStream convertToZipOutputStream(OutputStream os){
-         return new ZipOutputStream( 
+         return new ZipOutputStream(
                  new CheckedOutputStream(os,
                          new CRC32()));
     }
-    
+
     public static void compress(String zipFilePathName,  String fileName, String srcPathName) {
         File file = new File(srcPathName);
         if (!file.exists())
@@ -40,14 +40,14 @@ public abstract  class ZipCompressor {
             ZipOutputStream out = convertToZipOutputStream(fileOutputStream);
             // new ZipOutputStream(cos);
             String basedir = "";
-            
+
             compress(file, fileName, out, basedir);
             out.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    
+
     public static void compress(String zipFilePathName,  String srcPathName) {
         File file = new File(srcPathName);
         if (!file.exists())
@@ -60,7 +60,7 @@ public abstract  class ZipCompressor {
             ZipOutputStream out = convertToZipOutputStream(fileOutputStream);
             // new ZipOutputStream(cos);
             String basedir = "";
-            
+
             compress(file,  out, basedir);
             out.close();
         } catch (Exception e) {
@@ -101,7 +101,7 @@ public abstract  class ZipCompressor {
     public static void compressFiles(String zipFilePathName, Collection<String> srcPathNames) {
         compressFiles(zipFilePathName, srcPathNames.toArray(new String [srcPathNames.size()]));
     }
-    
+
     public static void compressFileInDirectory(String zipFilePathName, String srcPathName) {
         File file = new File(srcPathName);
         if (!file.exists())
@@ -113,12 +113,12 @@ public abstract  class ZipCompressor {
                     new CRC32());*/
             ZipOutputStream out = convertToZipOutputStream(fileOutputStream);
             // new ZipOutputStream(cos);
-           
-            File[] files = file.listFiles();   
-            for (int i = 0; i < files.length; i++) {   
-                /* 递归 */  
-                compress(files[i], out, "");   
-            }   
+
+            File[] files = file.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                /* 递归 */
+                compress(files[i], out, "");
+            }
             //compress(file, out, basedir);
             out.close();
         } catch (Exception e) {
@@ -133,7 +133,7 @@ public abstract  class ZipCompressor {
             compressDirectory(file, out, basedir);
         } else {
             //System.out.println("压缩：" + basedir + file.getName());
-            compressFile(file, fileName, out, basedir);   
+            compressFile(file, fileName, out, basedir);
         }
     }
 
@@ -144,44 +144,52 @@ public abstract  class ZipCompressor {
             compressDirectory(file, out, basedir);
         } else {
             //System.out.println("压缩：" + basedir + file.getName());
-            compressFile(file, file.getName(), out, basedir);   
+            compressFile(file, file.getName(), out, basedir);
         }
     }
-    
+
     /* 压缩一个目录 */
     public static void compressDirectory(File dir, ZipOutputStream out, String basedir) {
         if (!dir.exists())
             return;
 
-        File[] files = dir.listFiles();   
-        for (int i = 0; i < files.length; i++) {   
-            /* 递归 */  
-            compress(files[i], out, basedir + dir.getName() + "/");   
-        }   
-    }
-  
-    /* 压缩一个文件  fileName =  file.getName() */
-    
-    public static void compressFile(File file, String fileName, ZipOutputStream out, String basedir) {   
-        if (!file.exists()) {   
-            return;   
+        File[] files = dir.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            /* 递归 */
+            compress(files[i], out, basedir + dir.getName() + "/");
         }
-        try(BufferedInputStream bis = new BufferedInputStream(
-                    new FileInputStream(file))){
+    }
 
-            ZipEntry entry = new ZipEntry(basedir +fileName);   
-            out.putNextEntry(entry);   
+    public static void compressFile(InputStream fis, String fileName, ZipOutputStream out, String basedir) {
+
+        try(BufferedInputStream bis = new BufferedInputStream(fis)){
+
+            ZipEntry entry = new ZipEntry(basedir +fileName);
+            out.putNextEntry(entry);
             int count;
-            byte data[] = new byte[BUFFER];   
-            while ((count = bis.read(data, 0, BUFFER)) != -1) {   
-                out.write(data, 0, count);   
+            byte data[] = new byte[BUFFER];
+            while ((count = bis.read(data, 0, BUFFER)) != -1) {
+                out.write(data, 0, count);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);   
+            throw new RuntimeException(e);
         }
-    }   
+    }
 
-    public static void compressFile(File file,  ZipOutputStream out, String basedir) {   
+    /* 压缩一个文件  fileName =  file.getName() */
+
+    public static void compressFile(File file, String fileName, ZipOutputStream out, String basedir) {
+        if (!file.exists()) {
+            return;
+        }
+        try(FileInputStream fis = new FileInputStream(file)){
+            compressFile(fis,fileName, out, basedir);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void compressFile(File file,  ZipOutputStream out, String basedir) {
         compressFile( file, file.getName(), out,  basedir);
     }
     /**
@@ -241,8 +249,8 @@ public abstract  class ZipCompressor {
             }
             //zip.close();
         }catch (Exception e) {
-            throw new RuntimeException(e);   
-        }   
+            throw new RuntimeException(e);
+        }
         // System.out.println("******************解压完毕********************");
     }
 }
