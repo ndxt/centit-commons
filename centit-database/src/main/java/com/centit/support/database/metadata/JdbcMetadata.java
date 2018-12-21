@@ -33,7 +33,7 @@ public class JdbcMetadata implements DatabaseMetadata {
             DatabaseMetaData dbmd = dbc.getMetaData();
 
             ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, null, null);
-            if(rs.next()) {
+            while(rs.next()) {
                 SimpleTableInfo tab = new SimpleTableInfo();
                 if(dbSechema!=null) {
                     tab.setSchema(dbSechema.toUpperCase());
@@ -57,10 +57,10 @@ public class JdbcMetadata implements DatabaseMetadata {
     private void fetchTableDetail(SimpleTableInfo tab ,DatabaseMetaData dbmd  ) {
         String tabName = tab.getTableName();
         try {
-            String dbSechema = this.getDBSchema();
+            String dbSchema = this.getDBSchema();
             String dbCatalog = this.getDBCatalog();
 
-            ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, tabName, null);
+            ResultSet rs = dbmd.getColumns(dbCatalog, dbSchema, tabName, null);
             while (rs.next()) {
                 SimpleTableField field = new SimpleTableField();
                 field.setColumnName(rs.getString("COLUMN_NAME"));
@@ -74,14 +74,14 @@ public class JdbcMetadata implements DatabaseMetadata {
                 tab.getColumns().add(field);
             }
             rs.close();
-            rs = dbmd.getPrimaryKeys(dbCatalog, dbSechema, tabName);
+            rs = dbmd.getPrimaryKeys(dbCatalog, dbSchema, tabName);
             while (rs.next()) {
                 tab.getPkColumns().add(rs.getString("COLUMN_NAME"));
                 tab.setPkName(rs.getString("PK_NAME"));
             }
             rs.close();
 
-            rs = dbmd.getExportedKeys(dbCatalog, dbSechema, tabName);
+            rs = dbmd.getExportedKeys(dbCatalog, dbSchema, tabName);
             Map<String , SimpleTableReference> refs = new HashMap<String , SimpleTableReference>();
             while (rs.next()) {
                 String fkTableName = rs.getString("FKTABLE_NAME");
@@ -141,6 +141,8 @@ public class JdbcMetadata implements DatabaseMetadata {
     public String getDBSchema() {
         try {
             return dbc.getSchema();
+        }catch (AbstractMethodError error){
+            return null;
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
             return null;
@@ -150,6 +152,8 @@ public class JdbcMetadata implements DatabaseMetadata {
     public String getDBCatalog() {
         try {
             return dbc.getCatalog();
+        }catch (AbstractMethodError error){
+            return null;
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
             return null;
