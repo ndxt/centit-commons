@@ -125,7 +125,7 @@ public abstract class QueryUtils {
         return "'" + StringUtils.replace(value.trim(), "'", "''") + "'";
     }
 
-    
+
     public static String buildObjectsStringForQuery(Object [] objects) {
         if (objects == null || objects.length<1)
             return "()";
@@ -159,7 +159,7 @@ public abstract class QueryUtils {
         sb.append(")");
         return sb.toString();
     }
-    
+
     public static String buildObjectStringForQuery(Object fieldValue) {
         if(fieldValue instanceof java.util.Date){
             return QueryUtils.buildDatetimeStringForQuery((java.util.Date)fieldValue);
@@ -175,7 +175,7 @@ public abstract class QueryUtils {
             return QueryUtils.buildStringForQuery(fieldValue.toString());
         }
     }
-    
+
     public static String buildDateStringForQuery(Date value) {
         return "'" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd")
                 + "'";
@@ -184,7 +184,7 @@ public abstract class QueryUtils {
         return "'" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd")
                 + "'";
     }
-    
+
     public static String buildDatetimeStringForQuery(Date value) {
         return "'" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd HH:mm:ss")
                 + "'";
@@ -193,7 +193,7 @@ public abstract class QueryUtils {
         return "'" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd HH:mm:ss")
                 + "'";
     }
-    
+
     /**
      * 在HQL检索策略以外,模糊拼接key-value键值对,把string包装成to-char('value','yyyy-MM-dd')
      *
@@ -208,8 +208,8 @@ public abstract class QueryUtils {
         return "TO_DATE('" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd")
                 + "','yyyy-MM-dd')";
     }
-    
-    
+
+
     /**
      * 在HQL检索策略以外,模糊拼接key-value键值对,把string包装成to-char('value','yyyy-MM-dd
      * hh24:mi:ss')
@@ -311,7 +311,7 @@ public abstract class QueryUtils {
         }
         return "order".equalsIgnoreCase(aWord);
     }
-    
+
     /**
      * 去掉 order by 语句
      * @param sql sql
@@ -332,7 +332,7 @@ public abstract class QueryUtils {
         }
         return sql.substring(0, nPos);
     }
-    
+
     /**
      * 去掉 order by 语句
      * @param sql sql
@@ -341,7 +341,7 @@ public abstract class QueryUtils {
     public static String getGroupByField(String sql){
         Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
         String aWord = lex.getAWord();
-        
+
         while (aWord != null && !"".equals(aWord) && !"group".equalsIgnoreCase(aWord)) {
             if (aWord.equals("(")) {
                 lex.seekToRightBracket();
@@ -350,7 +350,7 @@ public abstract class QueryUtils {
             aWord = lex.getAWord();
             if (aWord == null || "".equals(aWord))
                 return null;
-            
+
         }
         if("group".equalsIgnoreCase(aWord)){
              while (aWord != null && !"".equals(aWord) && !"by".equalsIgnoreCase(aWord)){
@@ -361,7 +361,7 @@ public abstract class QueryUtils {
             return null;
         int nPos = lex.getCurrPos();
         int nEnd = nPos;
-        
+
         while (aWord != null && !"".equals(aWord) && !"order".equalsIgnoreCase(aWord)) {
             nEnd = lex.getCurrPos();
             aWord = lex.getAWord();
@@ -381,7 +381,7 @@ public abstract class QueryUtils {
      * @return sql
      */
     public static List<String> splitSqlByFields(String sql){
-        
+
         Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
         List<String> sqlPiece = new ArrayList<>(5);
         int sl = sql.length();
@@ -395,10 +395,10 @@ public abstract class QueryUtils {
             if (aWord == null || "".equals(aWord))
                 break;
         }
-        
+
         int nSelectPos = lex.getCurrPos();
         int nFieldBegin = nSelectPos;
-        
+
         if(nSelectPos>=sl){
             lex.setFormula(sql);
             nSelectPos=0;
@@ -413,14 +413,14 @@ public abstract class QueryUtils {
                     nFieldBegin = lex.getCurrPos();
             }
         }
-        
+
         while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)){
             if (aWord.equals("(")) {
                 lex.seekToRightBracket();
             }
             aWord = lex.getAWord();
             if (aWord == null || "".equals(aWord))
-                return sqlPiece;            
+                return sqlPiece;
         }
         int nFieldEnd = lex.getCurrPos();
 
@@ -446,7 +446,7 @@ public abstract class QueryUtils {
         if(StringUtils.isBlank(sqlPieces.get(0))) {
             sqlPieces.set(0, "select");
         }
-         
+
         String groupByField = QueryUtils.getGroupByField(sqlPieces.get(2));
         if(groupByField==null)
              return sqlPieces.get(0) + " count(*) as rowcount from " +
@@ -479,7 +479,7 @@ public abstract class QueryUtils {
     /**
      * sql 语句可以用 子查询和替换查询字段的方式获得总数，
      *     但是 有distinct的语句只能用子查询的方式。distinct的语句也可以用 group by的方式来转换，
-     * 
+     *
      * @param sql sql
      * @return sql
      */
@@ -496,19 +496,27 @@ public abstract class QueryUtils {
         return buildGetCountSQLByReplaceFields(hql);
     }
     /**
-     * 生成MySql分页查询语句
+     * 生成PostgreSql分页查询语句
      * @param sql sql
      * @param offset offset
      * @param maxsize maxsize
      * @param asParameter asParameter
      * @return String
      */
+    public static String buildPostgreSqlLimitQuerySQL(String sql,int offset,int maxsize,boolean asParameter) {
+        if(asParameter)
+            return sql + (offset>0 ? " limit ? offset ?" : " limit ?");
+        else
+            return sql + (offset>0 ? " limit "+String.valueOf(offset)+" offset "+String.valueOf(maxsize) :
+                                     " limit "+String.valueOf(maxsize));
+    }
+
     public static String buildMySqlLimitQuerySQL(String sql,int offset,int maxsize,boolean asParameter) {
         if(asParameter)
             return sql + (offset>0 ? " limit ?, ?" : " limit ?");
         else
             return sql + (offset>0 ? " limit "+String.valueOf(offset)+","+String.valueOf(maxsize) :
-                                     " limit "+String.valueOf(maxsize));
+                    " limit "+String.valueOf(maxsize));
     }
     /** org.hibernate.dialect
      * 生成Oracle分页查询语句, 不考虑for update语句
@@ -556,7 +564,7 @@ public abstract class QueryUtils {
 
         return pagingSelect.toString();
     }
-    
+
     /**
      * 生成DB2分页查询语句
      * @param sql sql
@@ -577,7 +585,7 @@ public abstract class QueryUtils {
                 + sql + " fetch first " + String.valueOf(offset+maxsize) + " rows only ) as inner2_ ) as inner1_ where rownumber_ > "
                 + offset + " order by rownumber_";
     }
-    
+
     /**
      * 生成SqlServer分页查询语句
      * @param sql sql
@@ -633,10 +641,10 @@ public abstract class QueryUtils {
             case SqlServer:
                 return buildSqlServerLimitQuerySQL(sql,offset, maxsize);
             case MySql:
-                return buildMySqlLimitQuerySQL(sql,offset, maxsize,asParameter);
             case H2:
                 return buildMySqlLimitQuerySQL(sql,offset, maxsize,asParameter);
-
+            case PostgreSql:
+                return  buildPostgreSqlLimitQuerySQL(sql,offset, maxsize,asParameter);
             case Access:
             default:
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,
@@ -648,7 +656,7 @@ public abstract class QueryUtils {
      * 返回sql语句中所有的 命令变量（:变量名）,最后一个String 为转换为？变量的sql语句
      *
      * @param sql sql
-     * @return 返回sql语句中所有的 命令变量（:变量名）,最后一个String 为转换为？变量的sql语句 
+     * @return 返回sql语句中所有的 命令变量（:变量名）,最后一个String 为转换为？变量的sql语句
      *             Key 为转化成？的sql语句，value为对应的命名变量名，如果一个变量出现多次在list中也会出现多次
      */
     public static KeyValuePair<String,List<String>> transNamedParamSqlToParamSql(String sql){
@@ -670,7 +678,7 @@ public abstract class QueryUtils {
                 params.add(aWord);
                 sqlb.append("?");
                 prePos = lex.getCurrPos();
-            } 
+            }
 
             aWord = lex.getAWord();
         }
@@ -678,7 +686,7 @@ public abstract class QueryUtils {
         //params.add(sqlb.toString());
         return new KeyValuePair<>(sqlb.toString(),params);
     }
-    
+
     /**
      * 获取sql语句中所有的 命名参数
      * @param sql sql
@@ -699,7 +707,7 @@ public abstract class QueryUtils {
         }
         return params;
     }
-    
+
     /**
      * 一、 p1.1:(like)ps return p1.1
      * 二、:(like)ps return ps
@@ -727,7 +735,7 @@ public abstract class QueryUtils {
         return paramAlias.substring(n+1).trim();
     }
     /**
-     * 参数 模板 p1.1:(like,,)ps 
+     * 参数 模板 p1.1:(like,,)ps
      * 条件模板： [(条件)(参数)| 语句]
      *           [参数| 语句]
      * @param paramString paramString
@@ -741,7 +749,7 @@ public abstract class QueryUtils {
         }
         return params;
     }
-    
+
     /**
      * 参数 模板 p1.1:(like)ps
      * 条件模板： [(条件)(参数)| 语句]
@@ -820,7 +828,7 @@ public abstract class QueryUtils {
      * @return 返回sql语句中所有的 命令变量（:变量名）
      */
     public static Set<String> getSqlTemplateParameters(String sql){
-       
+
         Set<String> params = new HashSet<String>();
         Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
 
@@ -831,7 +839,7 @@ public abstract class QueryUtils {
                 if (aWord == null || "".equals(aWord))
                     return params;
                 params.add(aWord);
-              
+
             }else if(aWord.equals("[")){
                 int beginPos = lex.getCurrPos();
 
@@ -974,7 +982,7 @@ public abstract class QueryUtils {
 
     /**
      * 返回sql语句中所有的 字段 名称
-     * 获得 查询语句中的所有 字段名称,比如   a, (b+c) as d, f fn from 语句 返回 [a,d,fn] 
+     * 获得 查询语句中的所有 字段名称,比如   a, (b+c) as d, f fn from 语句 返回 [a,d,fn]
      * @param sFieldSql sFieldSql
      * @return 字段名子列表
      */
@@ -1011,7 +1019,7 @@ public abstract class QueryUtils {
                 }
                 aWord = lex.getAWord();
             }
-            
+
             nFiledNo ++;
 
             if(filedName==null) {
@@ -1041,7 +1049,7 @@ public abstract class QueryUtils {
 
     /**
      * 返回sql语句中所有的 字段 名称
-     * 获得 查询语句中的所有 字段名称,比如 select a, (b+c) as d, f fn from ta 语句 返回 [a,d,fn] 
+     * 获得 查询语句中的所有 字段名称,比如 select a, (b+c) as d, f fn from ta 语句 返回 [a,d,fn]
      * @param sql sql
      * @return 字段名子列表 ，  如果 查询语句中有 * 将返回  null
      */
@@ -1051,11 +1059,11 @@ public abstract class QueryUtils {
             return null;
         return splitSqlFieldNames(sqlPieces.get(1));
      }
-    
-    
+
+
     /**
      *  返回SqlTemplate(sql语句模板)中所有的所有的 字段 名称
-     * 获得 查询语句中的所有 字段名称,比如 select a, (b+c) as d, f fn from ta 语句 返回 [a,d,fn] 
+     * 获得 查询语句中的所有 字段名称,比如 select a, (b+c) as d, f fn from ta 语句 返回 [a,d,fn]
      * @param sql sql
      * @return 字段名子列表
      */
@@ -1063,13 +1071,13 @@ public abstract class QueryUtils {
         List<String> sqlPieces = splitSqlByFields(sql);
         if (sqlPieces == null || sqlPieces.size() < 3)
             return null;
-       
+
         String sFieldSql = sqlPieces.get(1);
         Lexer varMorp = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
         StringBuilder sbSql = new StringBuilder();
         int prePos = 0;
         String aWord = varMorp.getAWord();
-        while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {            
+        while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
             if(aWord.equals("[")){
                 int curPos = varMorp.getCurrPos();
                 if(curPos-1>prePos)
@@ -1101,12 +1109,12 @@ public abstract class QueryUtils {
      * @param sqlOrderBy sqlOrderBy
      * @return String
      */
-    public static String trimSqlOrderByField(String sqlOrderBy){        
+    public static String trimSqlOrderByField(String sqlOrderBy){
         if (sqlOrderBy == null)
             return null;
-        
+
         StringBuilder sb= new StringBuilder();
-        
+
         Lexer lex = new Lexer(sqlOrderBy,Lexer.LANG_TYPE_SQL);
         boolean haveOrder = false;
         boolean bLastDouHao = false;
@@ -1126,7 +1134,7 @@ public abstract class QueryUtils {
                 if("asc".equalsIgnoreCase(aWord) || "desc".equalsIgnoreCase(aWord)){
                     sb.append(" ").append(aWord);
                     aWord = lex.getAWord();
-                }                
+                }
                 if("nulls".equalsIgnoreCase(aWord)){
                     aWord = lex.getAWord();
                     if("first".equalsIgnoreCase(aWord) || "last".equalsIgnoreCase(aWord)){
@@ -1146,7 +1154,7 @@ public abstract class QueryUtils {
 
         return sb.toString();
     }
-    
+
     /**
      * 创建sql语句参数键值对
      * @param objs 奇数变量为参数名，类型为string，偶数变量为参数值，类型为任意对象（object）
@@ -1157,13 +1165,13 @@ public abstract class QueryUtils {
     public static Map<String,Object> createSqlParamsMap(Object... objs){
         return CollectionsOpt.createHashMap(objs);
     }
-    
+
     public interface IFilterTranslater extends VariableTranslate {
         void setTableAlias(Map<String, String> tableAlias);
         String translateColumn(String columnDesc);
         KeyValuePair<String,Object> translateParam(String paramName);
     }
-    
+
     public static class SimpleFilterTranslater implements IFilterTranslater{
         private Map<String,Object> paramsMap;
         private Map<String,String> tableAlias;
@@ -1318,7 +1326,7 @@ public abstract class QueryUtils {
         //if(SQL_PRETREAT_CREEPFORIN.equalsIgnoreCase(pretreatment))
             //return String.valueOf(paramValue).split(",");
     }
-    
+
     /**
      * 对参数进行预处理
      * @param pretreatment, 可以有多个，用','分开
@@ -1343,7 +1351,7 @@ public abstract class QueryUtils {
         Lexer lex = new Lexer(paramString,Lexer.LANG_TYPE_SQL);
         int prePos = 0;
         String aWord = lex.getAWord();
-        while (aWord != null && !"".equals(aWord) ) {            
+        while (aWord != null && !"".equals(aWord) ) {
              if(aWord.equals("(")){
                  lex.seekToRightBracket();
              }else if(aWord.equals(",")){
@@ -1438,9 +1446,9 @@ public abstract class QueryUtils {
         hqlAndParams.setQuery(hqlPiece.toString());
         return hqlAndParams;
     }
-    
+
     /**
-     * 去掉 分号 ； 和  单行注释   / * 注释保留 * / 
+     * 去掉 分号 ； 和  单行注释   / * 注释保留 * /
      * @param fieldsSql paramString
      * @return String
      */
@@ -1469,7 +1477,7 @@ public abstract class QueryUtils {
              aWord = lex.getARegularWord();
         }
         return fieldsSql.substring(0,prePos);
-        
+
         /*char [] ch = fieldsSql.toCharArray();
 
         for(char c :ch){
@@ -1487,7 +1495,7 @@ public abstract class QueryUtils {
         }
         return sBuilder.toString();
 */    }
-    
+
     public static String replaceParamAsSqlString(String sql, String paramAlias,String paramSqlString){
         Lexer varMorp = new Lexer(sql,Lexer.LANG_TYPE_SQL);
 

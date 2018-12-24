@@ -743,6 +743,9 @@ public abstract class DatabaseAccess {
             case MySql:
                 query = QueryUtils.buildMySqlLimitQuerySQL(sSql, offset, pageSize, false);
                 break;
+            case PostgreSql:
+                query = QueryUtils.buildPostgreSqlLimitQuerySQL(sSql, offset, pageSize, false);
+                break;
             default:
                 query = sSql;
                 break;

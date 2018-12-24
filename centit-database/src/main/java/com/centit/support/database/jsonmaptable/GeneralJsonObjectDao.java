@@ -42,7 +42,8 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 return new MySqlJsonObjectDao(conn,tableInfo);
             case H2:
                 return new H2JsonObjectDao(conn,tableInfo);
-
+            case PostgreSql:
+                return new PostgreSqlJsonObjectDao(conn,tableInfo);
             case Access:
             default:
                 throw new  SQLException("不支持的数据库类型："+dbtype.toString());
@@ -63,7 +64,8 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 return new MySqlJsonObjectDao(conn);
             case H2:
                 return new H2JsonObjectDao(conn);
-
+            case PostgreSql:
+                return new PostgreSqlJsonObjectDao(conn);
             case Access:
             default:
                 throw new  SQLException("不支持的数据库类型："+dbtype.toString());

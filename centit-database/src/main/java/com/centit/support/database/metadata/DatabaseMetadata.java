@@ -22,6 +22,7 @@ public interface DatabaseMetadata {
                 return new DB2Metadata();
             case SqlServer:
                 return new SqlSvrMetadata();
+            case PostgreSql:
             case MySql:
             case Access:
             case H2:

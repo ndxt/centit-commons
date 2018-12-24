@@ -8,8 +8,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum DBType {
-    Unknown,SqlServer,Oracle,DB2,Access,MySql,H2;
+    Unknown,SqlServer,Oracle,DB2,Access,MySql,H2,PostgreSql;
     protected static final Logger logger = LoggerFactory.getLogger(DBType.class);
+
     public static DBType valueOf(int ordinal){
 
         switch(ordinal){
@@ -23,8 +24,10 @@ public enum DBType {
               return Access;
           case 5:
               return MySql;
-        case 6:
-            return H2;
+          case 6:
+              return H2;
+          case 7:
+              return PostgreSql;
           default:
               return Unknown;
       }
@@ -34,7 +37,7 @@ public enum DBType {
     public static DBType mapDBType(String connurl){
         if(connurl==null)
             return Unknown;
-        if("oracle".equalsIgnoreCase(connurl)  
+        if("oracle".equalsIgnoreCase(connurl)
             ||    connurl.startsWith("jdbc:oracle"))
             return Oracle;
         if("db2".equalsIgnoreCase(connurl)
@@ -52,7 +55,9 @@ public enum DBType {
         if("access".equalsIgnoreCase(connurl)
                 ||    connurl.startsWith("jdbc:odbc:driver"))
             return Access;
-        
+        if("postgresql".equalsIgnoreCase(connurl)
+                ||    connurl.startsWith("jdbc:postgresql"))
+            return MySql;
         return Unknown;
     }
 
@@ -64,7 +69,7 @@ public enum DBType {
             return Unknown;
         }
     }
-    
+
     public static DBType mapDialectToDBType(String dialectName){
         if(dialectName==null)
             return Unknown;
@@ -81,9 +86,11 @@ public enum DBType {
             return Access;
         if (dialectName.contains("H2"))
             return H2;
+        if (dialectName.contains("PostgreSQL"))
+            return PostgreSql;
         return Unknown;
     }
-    
+
     public static Set<DBType> allValues()
     {
         //DBType.values();
@@ -94,47 +101,52 @@ public enum DBType {
         dbtypes.add(MySql);
         dbtypes.add(Access);
         dbtypes.add(H2);
+        dbtypes.add(PostgreSql);
         return dbtypes;
     }
-    
+
     public static String getDbDriver(DBType dt)
     {
-      switch(dt){
-          case Oracle:
-              return "oracle.jdbc.driver.OracleDriver";
-          case DB2:
-              return "com.ibm.db2.jdbc.app.DB2Driver";
-          case SqlServer:
-              return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-          case Access:
-              return "sun.jdbc.odbc.JdbcOdbcDriver";
-          case MySql:
-              return "com.mysql.jdbc.Driver";
-        case H2:
-            return "org.h2.Driver";
-          default:
-              return "";
-      }
+        switch(dt){
+            case Oracle:
+                return "oracle.jdbc.driver.OracleDriver";
+            case DB2:
+                return "com.ibm.db2.jdbc.app.DB2Driver";
+            case SqlServer:
+                return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+            case Access:
+                return "sun.jdbc.odbc.JdbcOdbcDriver";
+            case MySql:
+                return "com.mysql.jdbc.Driver";
+            case H2:
+                return "org.h2.Driver";
+            case PostgreSql:
+                return "org.postgresql.Driver";
+            default:
+                return "";
+        }
     }
-    
+
     public static String getDBTypeName(DBType type){
         //return type.toString();
         switch(type){
-          case Oracle:
-              return "oracle";
-          case DB2:
-              return "db2";
-          case SqlServer:
-              return "sqlserver";
-          case Access:
-              return "access";
-          case MySql:
-              return "mysql";
-        case H2:
-            return "h2";
-        default:
-              return "unknown";
-      }
+            case Oracle:
+                return "oracle";
+            case DB2:
+                return "db2";
+            case SqlServer:
+                return "sqlserver";
+            case Access:
+                return "access";
+            case MySql:
+                return "mysql";
+            case H2:
+                return "h2";
+            case PostgreSql:
+                return "postgresql";
+            default:
+                return "unknown";
+        }
     }
 
     @Override
