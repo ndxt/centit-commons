@@ -476,6 +476,7 @@ public abstract class QueryUtils {
         return sqlPieces.get(0) + " count(*) as rowCount from (select "+
             sqlPieces.get(1) + sqlPieces.get(2) + ") a";
     }
+
     /**
      * sql 语句可以用 子查询和替换查询字段的方式获得总数，
      *     但是 有distinct的语句只能用子查询的方式。distinct的语句也可以用 group by的方式来转换，
@@ -483,10 +484,10 @@ public abstract class QueryUtils {
      * @param sql sql
      * @return sql
      */
-
     public static String buildGetCountSQL(String sql) {
         return buildGetCountSQLBySubSelect(sql);
     }
+
     /**
      * hql语句不能用子查询的方式，只能用buildGetCountSQLByReplaceFields
      * @param hql sql
@@ -507,7 +508,7 @@ public abstract class QueryUtils {
         if(asParameter)
             return sql + (offset>0 ? " limit ? offset ?" : " limit ?");
         else
-            return sql + (offset>0 ? " limit "+String.valueOf(offset)+" offset "+String.valueOf(maxsize) :
+            return sql + (offset>0 ? " limit "+String.valueOf(maxsize)+" offset "+String.valueOf(offset) :
                                      " limit "+String.valueOf(maxsize));
     }
 
