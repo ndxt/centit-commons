@@ -27,7 +27,7 @@ public class SimpleTableInfo implements TableInfo{
     private List<String> pkColumns=null;
     private String schema;
     private String orderBy;
-
+    private String tableType;
     private String tableName;// 其实是table 代码 code
     //private String sClassName;//表对应的类名 同时作为业务模块名
     private String tableLabelName;// 表的 描述，中文名称
@@ -392,5 +392,13 @@ public class SimpleTableInfo implements TableInfo{
 
     public void setReferences(List<SimpleTableReference> references) {
         this.references = references;
+    }
+
+    public String getTableType() {
+        return tableType;
+    }
+
+    public void setTableType(String tableType) {
+        this.tableType = tableType;
     }
 }

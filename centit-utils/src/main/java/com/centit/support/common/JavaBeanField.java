@@ -1,6 +1,7 @@
 package com.centit.support.common;
 
 import com.centit.support.algorithm.*;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +98,10 @@ public class JavaBeanField {
 
     public void setObjectFieldValue(Object object,  Object newValue){
         if(newValue==null){
+            if(StringUtils.equalsAny( this.getFieldJavaType(),
+                    "int","long","float","double")){
+                return;
+            }
             this.innerSetObjectFieldValue(object, null);
             return;
         }
@@ -113,8 +118,8 @@ public class JavaBeanField {
                         NumberBaseOpt.castObjectToLong(newValue));
                 break;
             case "float":
-            case "Float":
             case "double":
+            case "Float":
             case "Double":
                 this.innerSetObjectFieldValue(object,
                         NumberBaseOpt.castObjectToDouble(newValue));

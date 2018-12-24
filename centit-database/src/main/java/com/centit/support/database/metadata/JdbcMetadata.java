@@ -43,6 +43,7 @@ public class JdbcMetadata implements DatabaseMetadata {
                 String tt = rs.getString("TABLE_TYPE");
                 if("view".equalsIgnoreCase(tt) || "table".equalsIgnoreCase(tt) ) {
                     fetchTableDetail(tab, dbmd);
+                    tab.setTableType("view".equalsIgnoreCase(tt)?"V":"T");
                     tables.add(tab);
                 }
             }
