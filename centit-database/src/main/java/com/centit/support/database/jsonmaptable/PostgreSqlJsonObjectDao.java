@@ -53,11 +53,12 @@ public class PostgreSqlJsonObjectDao extends GeneralJsonObjectDao {
                  q.getRight());
     }
 
+    // nextval currval
     @Override
     public Long getSequenceNextValue(final String sequenceName) throws SQLException, IOException {
         Object object = DatabaseAccess.getScalarObjectQuery(
                  getConnect(),
-                 "SELECT next_val(" + sequenceName + ") from dual");
+                 "SELECT nextval('" + sequenceName + "')");
         return NumberBaseOpt.castObjectToLong(object);
     }
 
