@@ -57,7 +57,7 @@ public enum DBType {
             return Access;
         if("postgresql".equalsIgnoreCase(connurl)
                 ||    connurl.startsWith("jdbc:postgresql"))
-            return MySql;
+            return PostgreSql;
         return Unknown;
     }
 
