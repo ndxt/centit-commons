@@ -94,11 +94,11 @@ public abstract class HttpExecutor {
     public static final String plainTextHead = ContentType.create(
             "text/plain", Consts.UTF_8).toString();
     public static final String xmlTextHead = ContentType.create(
-            "text/xml", Consts.UTF_8).toString();  
-    
+            "text/xml", Consts.UTF_8).toString();
+
     public static final String applicationOctetStream = ContentType.create(
             "application/octet-stream", (Charset) null).toString();
-    
+
     private static TrustManager manager = new X509TrustManager(){
         @Override
         public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
@@ -112,8 +112,8 @@ public abstract class HttpExecutor {
             return null;
         }
     };
-    
-    public static CloseableHttpClient createHttpClient(HttpHost httpProxy,boolean keepSession,boolean useSSL) 
+
+    public static CloseableHttpClient createHttpClient(HttpHost httpProxy,boolean keepSession,boolean useSSL)
             throws NoSuchAlgorithmException, KeyManagementException{
         HttpClientBuilder clientBuilder = HttpClients.custom();
         if(useSSL){
@@ -136,16 +136,16 @@ public abstract class HttpExecutor {
         if(httpProxy!=null)
             clientBuilder.setProxy(httpProxy);
         return clientBuilder.build();
-    }    
-    
+    }
+
     public static CloseableHttpClient createHttpClient(){
         return HttpClients.createDefault();
     }
-    
+
     public static CloseableHttpClient createHttpClient(HttpHost httpProxy){
         return HttpClients.custom().setProxy(httpProxy).build();
     }
-    
+
     /*
      * 设置cookie的保存策略为CookieSpecs.NETSCAPE，这样可以保持session
      */
@@ -153,18 +153,18 @@ public abstract class HttpExecutor {
         RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).build();
         return HttpClients.custom().setDefaultRequestConfig(config).build();
     }
-    
+
     public static CloseableHttpClient createKeepSessionHttpClient(HttpHost httpProxy){
         RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).build();
         return HttpClients.custom().setDefaultRequestConfig(config).setProxy(httpProxy).build();
     }
-    
-    public static CloseableHttpClient createHttpsClient() 
+
+    public static CloseableHttpClient createHttpsClient()
             throws NoSuchAlgorithmException, KeyManagementException{
         return createHttpClient(null,false,true);
     }
-    
-    public static CloseableHttpClient createKeepSessionHttpsClient() 
+
+    public static CloseableHttpClient createKeepSessionHttpsClient()
             throws NoSuchAlgorithmException, KeyManagementException{
         return createHttpClient(null,true,true);
     }
@@ -313,8 +313,8 @@ public abstract class HttpExecutor {
             String sFN = (prefixName==null || "".equals(prefixName))?"":prefixName+".";
             @SuppressWarnings("unchecked")
             Map<String ,Object> objMap = (Map<String ,Object>) obj;
-            /*objMap.entrySet().forEach( f -> {if(f.getValue()!=null){
-                List<NameValuePair> subNP = makeRequectParams(f.getValue(), sFN + f.getKey());
+            /*objMap.entrySet().forEach( f -> {if(f.getRight()!=null){
+                List<NameValuePair> subNP = makeRequectParams(f.getRight(), sFN + f.getLeft());
                 params.addAll(subNP);
             }} );*/
             for(Map.Entry<String ,Object> f : objMap.entrySet()){
@@ -784,7 +784,7 @@ public abstract class HttpExecutor {
         httpPost.setHeader("Content-Type",applicationOctetStream);
         /*httpPost.setHeader("Content-Type",
                 //ContentType.MULTIPART_FORM_DATA.toString());
-                "multipart/form-data; boundary=" + BOUNDARY);  
+                "multipart/form-data; boundary=" + BOUNDARY);
         //httpPost.addHeader("boundary", BOUNDARY);*/
         InputStreamEntity entity = new InputStreamEntity(inputStream);
         httpPost.setEntity(entity);

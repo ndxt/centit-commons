@@ -1,7 +1,7 @@
 package com.centit.support.database.utils;
 
 import com.centit.support.algorithm.*;
-import com.centit.support.common.KeyValuePair;
+import com.centit.support.common.LeftRightPair;
 import com.centit.support.compiler.*;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -660,7 +660,7 @@ public abstract class QueryUtils {
      * @return 返回sql语句中所有的 命令变量（:变量名）,最后一个String 为转换为？变量的sql语句
      *             Key 为转化成？的sql语句，value为对应的命名变量名，如果一个变量出现多次在list中也会出现多次
      */
-    public static KeyValuePair<String,List<String>> transNamedParamSqlToParamSql(String sql){
+    public static LeftRightPair<String,List<String>> transNamedParamSqlToParamSql(String sql){
         StringBuilder sqlb = new StringBuilder();
         List<String> params = new ArrayList<>();
         Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
@@ -685,7 +685,7 @@ public abstract class QueryUtils {
         }
         sqlb.append(sql.substring(prePos));
         //params.add(sqlb.toString());
-        return new KeyValuePair<>(sqlb.toString(),params);
+        return new LeftRightPair<>(sqlb.toString(),params);
     }
 
     /**
@@ -1170,7 +1170,7 @@ public abstract class QueryUtils {
     public interface IFilterTranslater extends VariableTranslate {
         void setTableAlias(Map<String, String> tableAlias);
         String translateColumn(String columnDesc);
-        KeyValuePair<String,Object> translateParam(String paramName);
+        LeftRightPair<String,Object> translateParam(String paramName);
     }
 
     public static class SimpleFilterTranslater implements IFilterTranslater{
@@ -1208,7 +1208,7 @@ public abstract class QueryUtils {
         }
 
         @Override
-        public KeyValuePair<String,Object> translateParam(String paramName){
+        public LeftRightPair<String,Object> translateParam(String paramName){
 
             if(paramsMap==null)
                 return null;
@@ -1219,7 +1219,7 @@ public abstract class QueryUtils {
                 if(StringUtils.isBlank((String)obj))
                     return null;
             }
-            return new KeyValuePair<>(paramName, obj);
+            return new LeftRightPair<>(paramName, obj);
         }
 
         @Override
@@ -1566,12 +1566,12 @@ public abstract class QueryUtils {
                     String paramName = StringUtils.isBlank(paramMeta.left) ? paramMeta.middle : paramMeta.left;
                     String paramAlias = StringUtils.isBlank(paramMeta.middle) ? paramMeta.left : paramMeta.middle;
 
-                    KeyValuePair<String, Object> paramPair = translater.translateParam(paramName);
+                    LeftRightPair<String, Object> paramPair = translater.translateParam(paramName);
                     if (paramPair == null)
                         return null;
 
-                    if (paramPair.getValue() != null) {
-                        Object realParam = pretreatParameter(paramMeta.right, paramPair.getValue());
+                    if (paramPair.getRight() != null) {
+                        Object realParam = pretreatParameter(paramMeta.right, paramPair.getRight());
                         if (hasPretreatment(paramMeta.right, SQL_PRETREAT_CREEPFORIN)) {
                             QueryAndNamedParams inSt = buildInStatement(paramAlias, realParam);
                             hqlPiece.append(inSt.getQuery());
@@ -1584,7 +1584,7 @@ public abstract class QueryUtils {
                         }
 
                     } else {
-                        hqlPiece.append(paramPair.getKey());
+                        hqlPiece.append(paramPair.getLeft());
                     }
                 }
             }
@@ -1676,9 +1676,9 @@ public abstract class QueryUtils {
                         //{paramName,paramAlias,paramPretreatment};
                         String paramName=StringUtils.isBlank(paramMeta.left)?paramMeta.middle:paramMeta.left;
                         String paramAlias=StringUtils.isBlank(paramMeta.middle)?paramMeta.left:paramMeta.middle;
-                        KeyValuePair<String,Object> paramPair = translater.translateParam(paramName);
-                        if(paramPair!=null && paramPair.getValue()!=null){
-                            Object realParam = pretreatParameter(paramMeta.right, paramPair.getValue());
+                        LeftRightPair<String,Object> paramPair = translater.translateParam(paramName);
+                        if(paramPair!=null && paramPair.getRight()!=null){
+                            Object realParam = pretreatParameter(paramMeta.right, paramPair.getRight());
                             if( hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
                                 QueryAndNamedParams inSt = buildInStatement(paramAlias,realParam);
                                 hqlAndParams.addAllParams(inSt.getParams());
@@ -1721,11 +1721,11 @@ public abstract class QueryUtils {
                     String paramName=StringUtils.isBlank(paramMeta.left)?paramMeta.middle:paramMeta.left;
                     String paramAlias=addParams?paramMeta.middle:paramMeta.left;
 
-                    KeyValuePair<String,Object> paramPair = translater.translateParam(paramName);
-                    if(paramPair==null || paramPair.getValue()==null)
+                    LeftRightPair<String,Object> paramPair = translater.translateParam(paramName);
+                    if(paramPair==null || paramPair.getRight()==null)
                         return null;
                     if(addParams){
-                        Object realParam = pretreatParameter(paramMeta.right, paramPair.getValue());
+                        Object realParam = pretreatParameter(paramMeta.right, paramPair.getRight());
                         if( hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
                             QueryAndNamedParams inSt = buildInStatement(paramAlias,realParam);
                             hqlAndParams.addAllParams(inSt.getParams());

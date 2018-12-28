@@ -1,9 +1,8 @@
 package com.centit.test;
 
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.common.KeyValuePair;
+import com.centit.support.common.LeftRightPair;
 import com.centit.support.compiler.Lexer;
-import com.centit.support.database.orm.GeneratorTime;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -110,14 +109,14 @@ public class TestQueryUtils {
         }
     }
 
-    public static void printDictionaryMap(Map<String,KeyValuePair<String,String>> m) {
+    public static void printDictionaryMap(Map<String, LeftRightPair<String,String>> m) {
 
-        for(Map.Entry<String, KeyValuePair<String,String>>ent : m.entrySet()){
+        for(Map.Entry<String, LeftRightPair<String,String>>ent : m.entrySet()){
             System.out.print(ent.getKey());
             System.out.print("----");
-            System.out.print(String.valueOf(ent.getValue().getKey()));
+            System.out.print(String.valueOf(ent.getValue().getLeft()));
             System.out.print("----");
-            System.out.println(String.valueOf(ent.getValue().getValue()));
+            System.out.println(String.valueOf(ent.getValue().getRight()));
         }
     }
 
@@ -127,7 +126,7 @@ public class TestQueryUtils {
                 "from [(${p1.1}>2  && p2>2)| table1 t1,] table2 t2,table3 t3 "+
                 "where 1=1 [(${p1.1}>2  && p2>2)(p1.1:ps)| and t1.a=:ps][(isNotEmpty(${p1.1})&&isNotEmpty(p2)&&isNotEmpty(p3))(p2,p3:px)"
                 + "| and (t2.b> :p2 or t3.c >:px)] order by 1,2";
-        System.out.println(QueryUtils.transNamedParamSqlToParamSql(queryStatement).getKey());
+        System.out.println(QueryUtils.transNamedParamSqlToParamSql(queryStatement).getLeft());
     }
 
     public static void testTranslateQuery() {

@@ -16,7 +16,7 @@ public class PdmTableInfo{
         //System.out.println(DBType.valueOf("Oracle"));
         /*List<Pair<String, String>> tables = listTablesInPdm("D:/temp/im.pdm");
         for(Pair<String, String> t : tables )
-            System.out.println("table "+ t.getKey() +" name "+ t.getValue());
+            System.out.println("table "+ t.getLeft() +" name "+ t.getRight());
         System.out.println("Done!");*/
     }
     public static List<Pair<String, String>> listTablesInPdm(String pdmFilePath) {

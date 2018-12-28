@@ -1,6 +1,6 @@
 package com.centit.support.database.orm;
 
-import com.centit.support.common.KeyValuePair;
+import com.centit.support.common.LeftRightPair;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableInfo;
 import com.centit.support.database.metadata.TableField;
@@ -14,17 +14,17 @@ import java.util.List;
  */
 public class TableMapInfo extends SimpleTableInfo {
 
-    public List<KeyValuePair<String, ValueGenerator>> getValueGenerators() {
+    public List<LeftRightPair<String, ValueGenerator>> getValueGenerators() {
         return valueGenerators;
     }
 
-    private List<KeyValuePair<String,ValueGenerator>> valueGenerators;
+    private List<LeftRightPair<String,ValueGenerator>> valueGenerators;
 
     public TableMapInfo addValueGenerator(String fieldName, ValueGenerator generator ){
         if(valueGenerators ==null)
             valueGenerators = new ArrayList<>(5);
         /*boolean add = */
-        valueGenerators.add(new KeyValuePair<>(fieldName, generator));
+        valueGenerators.add(new LeftRightPair<>(fieldName, generator));
         return this;
     }
 

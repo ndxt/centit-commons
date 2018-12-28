@@ -13,10 +13,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 /**
- * 
+ *
  * 对JSON对象进行操作，目前只能对一维数组进行操作，
  * 但这不意味只能有一维数据，你可以给一维数组中的变量设置为任意值，包括数值，只是不能再次操作这个数值中的值
- * 
+ *
  * @author codefan
  * @version $Rev$ <br>
  *          $Id$
@@ -67,7 +67,7 @@ public abstract class JSONOpt {
         JSONObject lastKeyJson=objJson;
         while(nLast<depth){
             JSONKey key = praseJosnKey( skeys[nLast]);
-  
+
             if(!lastKeyJson.containsKey(key.skey))
                 break;
             Object obj = lastKeyJson.get(key.skey);
@@ -103,19 +103,19 @@ public abstract class JSONOpt {
      * @return 获取一个json对象的属性
      */
     public static JSONObject findJsonObject(JSONObject objJson,String [] skeys){
-        int depth = skeys.length; 
+        int depth = skeys.length;
         if(depth<1)
-            return null;  
+            return null;
         JSONPath path = findJsonObject(objJson,depth,skeys);
         if(path.pathPos != depth )
             return null;
         return path.objJson;
     }
-    
+
     /**
-     * 获取一个json对象的属性，path是json属性 可以有多层，用'.' 分隔 ，比如 a.b 
+     * 获取一个json对象的属性，path是json属性 可以有多层，用'.' 分隔 ，比如 a.b
      * @param objJson objJson
-     * @param path json属性 可以有多层，用'.' 分隔 ，比如 a.b 
+     * @param path json属性 可以有多层，用'.' 分隔 ，比如 a.b
      * @return 获取一个json对象的属性
      */
     public static JSONObject findJsonObject(JSONObject objJson,String path){
@@ -124,7 +124,7 @@ public abstract class JSONOpt {
             return null;*/
         return findJsonObject(objJson,skeys);
     }
-    
+
     private static JSONObject createJsonObject(String [] skeys , int beginPos ,Object value){
         int depth = skeys.length;
         if(depth==0)
@@ -158,16 +158,16 @@ public abstract class JSONOpt {
             leafKey = tempKey;
             depth--;
         }
-        return leafKey; 
+        return leafKey;
     }
-    
-  
+
+
     /*
      * 给设置json对象属性值
      * @param objJson
      * @param path 用'.'隔开的 属性路径 比如 a.b
      * @param value
-     */    
+     */
     @SuppressWarnings("unchecked")
     public static void setAttribute(JSONObject objJson,String path,Object value)
     {
@@ -187,7 +187,7 @@ public abstract class JSONOpt {
             /* Map（JSONObject） 也必须作为一个变量设置，不能作为添加属性的方式。
             if( jpath.pathPos == depth-1 && jsonValue instanceof Map){
                 for(Map.Entry<Object,Object> ent : ((Map<Object,Object>)value).entrySet() ){
-                    jpath.objJson.element(ent.getKey().toString(), ent.getValue());
+                    jpath.objJson.element(ent.getLeft().toString(), ent.getRight());
                 }
             }else */
                 jpath.objJson.put(key.skey, jsonValue);
@@ -321,7 +321,7 @@ public abstract class JSONOpt {
                 }
             }
         }
-*/        
+*/
     }
     /**
      * 给设置json对象属性 添加多个新值
@@ -334,15 +334,15 @@ public abstract class JSONOpt {
         for(Object obj : values)
             appendData(objJson,path,obj);
     }
-    
+
     public static String objectToJSONString(Object obj ){
            return objectToJSONString(obj,false,false);
     }
-    
+
     public static String objectToJSONString(Object obj,boolean methodOnly, boolean fieldOnly ){
         return objectToJSONString(obj,methodOnly,fieldOnly,false);
     }
-    
+
     public static String objectToJSONString(Object obj,boolean methodOnly, boolean fieldOnly, boolean includePrivateField ){
         if(obj == null)
             return null;
@@ -379,11 +379,11 @@ public abstract class JSONOpt {
     public static JSON objectToJSON(Object obj ){
            return objectToJSON(obj,false,false);
     }
-    
+
     /*  将一个对象转换为JSON, 如果是 数值 或者 实现collect接口 则转换为 JSONArray否则转换为JSONObject
      * methodOnly 和 fieldOnly 不能同时为 true
      * @param obj
-     * @param methodOnly 
+     * @param methodOnly
      * @param fieldOnly
      * @param includePrivateField 包括私有属性，methodOnly 为true是这个参数无效
      * @return
@@ -398,18 +398,18 @@ public abstract class JSONOpt {
         else
             return objectToJSONObject(obj,methodOnly,fieldOnly,includePrivateField);
     }
-    
+
     /*  将一个对象转换为JSON, 如果是 数值 或者 实现collect接口 则转换为 JSONArray否则转换为JSONObject
      * methodOnly 和 fieldOnly 不能同时为 true
      * @param obj
-     * @param methodOnly 
+     * @param methodOnly
      * @param fieldOnly
      * @return
      */
     public static JSON objectToJSON(Object obj,boolean methodOnly, boolean fieldOnly ){
         return objectToJSON(obj,methodOnly,fieldOnly,false);
     }
-    
+
     /*
      * 将一个对象转换为JSON对象，method方法优先
      * @param obj
@@ -418,7 +418,7 @@ public abstract class JSONOpt {
     public static JSONObject objectToJSONObject(Object obj){
         return objectToJSONObject(obj,false,false,false);
     }
-    
+
     /*
      * 将一个对象转换为 JSON 值， 如果是简单类型则转换为一个 String
      * @param value
@@ -435,11 +435,11 @@ public abstract class JSONOpt {
             return objectToJSON(value,methodOnly, fieldOnly);
         }
     }
-    
+
     /* 将一个对象转换为JSON对象
      * methodOnly 和 fieldOnly 不能同时为 true
      * @param obj
-     * @param methodOnly 
+     * @param methodOnly
      * @param fieldOnly
      * @param includePrivateField 包括私有属性，methodOnly 为true是这个参数无效
      * @return
@@ -504,7 +504,7 @@ public abstract class JSONOpt {
         }
         return jObj;
     }
-    
+
     public static JSONObject objectToJSONObject(Object obj,boolean methodOnly, boolean fieldOnly){
         return  objectToJSONObject( obj, methodOnly,  fieldOnly,false);
     }
@@ -516,8 +516,8 @@ public abstract class JSONOpt {
     public static JSONArray arrayToJSONArray(Object obj){
         return arrayToJSONArray(obj,false,false,false);
     }
-    
-    /**  将一个对象转换为JSON对象 
+
+    /**  将一个对象转换为JSON对象
      * methodOnly 和 fieldOnly 不能同时为 true
      * @param objArray objArray
      * @param methodOnly  methodOnly

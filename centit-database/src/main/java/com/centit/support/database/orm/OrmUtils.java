@@ -2,7 +2,7 @@ package com.centit.support.database.orm;
 
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.UuidOpt;
-import com.centit.support.common.KeyValuePair;
+import com.centit.support.common.LeftRightPair;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
@@ -54,13 +54,13 @@ public abstract class OrmUtils {
     private static <T> T makeObjectValueByGenerator(T object, TableMapInfo mapInfo,
                                                     JsonObjectDao sqlDialect, GeneratorTime generatorTime)
             throws SQLException, NoSuchFieldException, IOException {
-        List<KeyValuePair<String, ValueGenerator>>  valueGenerators = mapInfo.getValueGenerators();
+        List<LeftRightPair<String, ValueGenerator>>  valueGenerators = mapInfo.getValueGenerators();
         if(valueGenerators == null || valueGenerators.size()<1 )
             return object;
-        for(KeyValuePair<String, ValueGenerator> ent :  valueGenerators) {
-            ValueGenerator valueGenerator =  ent.getValue();
+        for(LeftRightPair<String, ValueGenerator> ent :  valueGenerators) {
+            ValueGenerator valueGenerator =  ent.getRight();
             if ( valueGenerator.occasion().matchTime(generatorTime)){
-                SimpleTableField filed = mapInfo.findFieldByName(ent.getKey());
+                SimpleTableField filed = mapInfo.findFieldByName(ent.getLeft());
                 Object fieldValue = ReflectionOpt.forceGetProperty(object, filed.getPropertyName());
                 if( fieldValue == null || valueGenerator.condition() == GeneratorCondition.ALWAYS ){
                     switch (valueGenerator.strategy()){

@@ -25,7 +25,7 @@ public class QueryAndNamedParams {
         this.queryStmt = shql;
         this.params = null;
     }
-    
+
     public QueryAndNamedParams(String shql, Map<String, Object> values) {
         this.queryStmt = shql;
         this.params = values;
@@ -40,7 +40,7 @@ public class QueryAndNamedParams {
     public void setSql(String hql) {
         this.queryStmt = hql;
     }
-    
+
     public String getQuery() {
         return queryStmt;
     }
@@ -62,18 +62,18 @@ public class QueryAndNamedParams {
             params = new HashMap<> ();
         return params;
     }
-    
+
     public Object getParam(String paramName){
         if( params==null)
             return null;
-       
+
         return params.get(paramName);
     }
 
     public void setParams(Map<String, Object> params) {
         this.params = params;
     }
-    
+
     /**
      * 这个方法返回this所以可以  addParam(k1，v1).addAllParams(Map K，V）.
      * addParam(k2,v2)便捷的添加多个参数
@@ -87,7 +87,7 @@ public class QueryAndNamedParams {
         params.put(paramName, paramValue);
         return this;
     }
-    
+
     public QueryAndNamedParams addAllParams(Map<String, Object> oParams) {
         if(oParams==null)
             return this;
@@ -95,7 +95,7 @@ public class QueryAndNamedParams {
             params = new HashMap<> ();
         params.putAll(oParams);
         /*for(Map.Entry<String, Object> param : oParams.entrySet())
-            params.put(param.getKey(), param.getValue());*/
+            params.put(param.getLeft(), param.getRight());*/
         return this;
     }
 }

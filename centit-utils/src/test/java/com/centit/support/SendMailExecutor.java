@@ -48,7 +48,7 @@ public abstract class SendMailExecutor {
                 mailUser,
                 mailPassword);
         try {
-            //multMail.setFrom(CodeRepositoryUtil.getValue("SysMail", "admin_email"));
+            //multMail.setFrom(CodeRepositoryUtil.getRight("SysMail", "admin_email"));
             multMail.setFrom(mailFrom);
             multMail.addTo(mailTo);
             multMail.setSubject(msgSubject);
@@ -75,7 +75,7 @@ public abstract class SendMailExecutor {
     public static boolean sendEmail(String [] mailTo, String mailFrom,
             String msgSubject, String msgContent,List<File> annexs) {
 
-        MultiPartEmail multMail = new MultiPartEmail();        
+        MultiPartEmail multMail = new MultiPartEmail();
         // SMTP
         multMail.setHostName(mailHost);
         multMail.setSmtpPort(smtpPort);
@@ -84,18 +84,18 @@ public abstract class SendMailExecutor {
                 mailUser,
                 mailPassword);
         try {
-            //multMail.setFrom(CodeRepositoryUtil.getValue("SysMail", "admin_email"));
+            //multMail.setFrom(CodeRepositoryUtil.getRight("SysMail", "admin_email"));
             multMail.setFrom(mailFrom);
             multMail.addTo(mailTo);
             multMail.setSubject(msgSubject);
             multMail.setMsg(msgContent);
-            
+
             for(File attachment: annexs){
                 multMail.attach(attachment);
             }
 
             multMail.send();
-            
+
             return true;
         } catch (EmailException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
