@@ -1209,10 +1209,9 @@ public abstract class QueryUtils {
 
         @Override
         public LeftRightPair<String,Object> translateParam(String paramName){
-
             if(paramsMap==null)
                 return null;
-            Object obj = paramsMap.get(paramName);
+            Object obj = ReflectionOpt.attainExpressionValue(paramsMap, paramName);
             if(obj==null)
                 return null;
             if(obj instanceof String){
@@ -1348,7 +1347,7 @@ public abstract class QueryUtils {
     }
 
     public static List<String> splitParamString(String paramString){
-        List<String> params = new ArrayList<String>();
+        List<String> params = new ArrayList<>();
         Lexer lex = new Lexer(paramString,Lexer.LANG_TYPE_SQL);
         int prePos = 0;
         String aWord = lex.getAWord();
@@ -1372,7 +1371,7 @@ public abstract class QueryUtils {
      * @param paramString paramString
      * @return 返回为Triple "表达式","参数名称","预处理,预处理2,......"
      */
-    private static ImmutableTriple<String,String,String> parseParameter(String paramString){
+    public static ImmutableTriple<String,String,String> parseParameter(String paramString){
         /*if(StringUtils.isBlank(paramString))
             return null;*/
         String paramName;
@@ -1406,8 +1405,7 @@ public abstract class QueryUtils {
             }else
                 paramName = paramString;
         }
-        return new ImmutableTriple<String,String,String>
-            (paramName,paramAlias,paramPretreatment);
+        return new ImmutableTriple<>(paramName,paramAlias,paramPretreatment);
     }
 
     /**

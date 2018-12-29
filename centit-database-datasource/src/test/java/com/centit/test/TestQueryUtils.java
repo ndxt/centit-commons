@@ -19,19 +19,18 @@ public class TestQueryUtils {
 
 
         String queryStatement = "select  eb.estimateDatOld"+
-
-          " [ :(like,uppercase) xmqc ,,,:(like,uppercase)newparames,:(like,uppercase) xmqc3| and eb.PRONAME like:xmqc] ";
+          " [ :(like,uppercase) xmqc,:(like,uppercase)newparames, user.Info.username : (like,uppercase) xmqc3 | and eb.PRONAME like:xmqc] ";
         for(String s : QueryUtils.getSqlTemplateParameters(queryStatement)){
             System.out.println(s);
         }
-        System.out.println("done!");
+        System.out.println("\ndone!");
     }
 
     public static void main(String[] args) {
         testTranslateQuery2();
-        System.out.println("Done!");
+        System.out.println("\nDone!");
         //分析表别名， 格式为 TableNameOrClass:alias,TableNameOrClass:alias,.....
-        String tablesDesc =  "TableNameOrClass:alias,  TableNameOrClass alias, addasf ";
+        /*String tablesDesc =  "TableNameOrClass:alias,  TableNameOrClass alias, addasf ";
         String [] tables = tablesDesc.split(",");
         for(String tableDesc:tables){
             Lexer tableLexer = new Lexer(tableDesc);
@@ -41,7 +40,7 @@ public class TestQueryUtils {
                 aliasName = tableLexer.getAWord();
             }
             System.out.println(tableName +"-" + aliasName );
-        }
+        }*/
 
 /*
         System.out.println(GeneratorTime.UPDATE.matchTime(GeneratorTime.READ));
@@ -190,19 +189,22 @@ public class TestQueryUtils {
 
     public static void testTranslateQuery2() {
 
-        Map<String,Object> paramsMap = new HashMap<String,Object>();
+        Map<String,Object> paramsMap = new HashMap<>();
         paramsMap.put("punitCode", "null");
         paramsMap.put("createDate", "2010-12-01");
-        paramsMap.put("mathName", "江苏 先腾");
         paramsMap.put("array", "1,2,3,4,5");
         paramsMap.put("sort", "uu.unitType asc");
-
+        Map<String,Object> userInfo = new HashMap<>();
+        userInfo.put("username", "先腾 用户");
+        userInfo.put("userCode", "xt code");
+        paramsMap.put("userInfo", userInfo);
         String queryStatement =
                 "select uu.unitCode,uu.unitName,uu.unitType,uu.isValid,uu.unitTag"
                         +"  from projectTable uu  "
-                        +" where 1=1 [:(SPLITFORIN,LONG,CREEPFORIN)array| and uu.unitType in (:array)]"
-                        + "[:(date)createDate | and uu.createDate >= :createDate ]"
-                        + "[:(like)mathName | and uu.unitName like :mathName ]"
+                        +" where 1=1 "
+                        //+ "[:(SPLITFORIN,LONG,CREEPFORIN)array| and uu.unitType in (:array)]"
+                        //+ "[:(date)createDate | and uu.createDate >= :createDate ]"
+                        + "[ * D(U+1, U3)||D(U--) :(like)mathName | and uu.unitName like :mathName ]"
                         +"[:(inplace)sort | order by :sort  ]";
 
         printQueryAndNamedParams(QueryUtils.translateQuery(
