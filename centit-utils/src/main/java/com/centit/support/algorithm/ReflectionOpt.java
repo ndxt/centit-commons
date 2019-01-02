@@ -466,6 +466,21 @@ public abstract class ReflectionOpt  {
         }
         return null;
     }
+
+    /**
+     * 将getter方法映射为对应属性
+     * @param method Getter方法
+     * @return 对应属性名
+     */
+    public static String mapGetter2Field(Method method){
+        String methodName = method.getName();
+        if(methodName.startsWith("get")){
+            return StringUtils.uncapitalize(methodName.substring(3));
+        }else if(methodName.startsWith("is")){
+            return StringUtils.uncapitalize(methodName.substring(2));
+        }
+        return methodName;
+    }
     /*
      * 获取所有getMethod方法
      */
