@@ -53,9 +53,8 @@ public abstract class StringRegularOpt {
         return StringUtils.isNumeric(pszNum);
     }
 
-    public static boolean isNumber(String pszNum)
-    {
-        String szNum = trimString(pszNum);
+    public static boolean isNumber(String szNum){
+        //String szNum = trimString(pszNum);
         int sl = szNum.length();
         if (sl<1) return false;
         int sp=0;
@@ -73,9 +72,7 @@ public abstract class StringRegularOpt {
             }
             return false;
         }
-
         //if ((sp==sl) && (sl>1) && (szNum.charAt(sp-1)!='.') && (szNum.charAt(0)=='0')) return false;;
-
         while(sp<sl){
             if(szNum.charAt(sp)>='0' &&  szNum.charAt(sp)<= '9'){
                 sp++;
@@ -414,7 +411,7 @@ public abstract class StringRegularOpt {
         return b;
     }
 
-    public static boolean isTime(String szTime ,Calendar   t_time)
+    public static boolean isTime(String szTime ,Calendar t_time)
     {
         if(szTime==null)
             return false;
@@ -424,7 +421,6 @@ public abstract class StringRegularOpt {
         int s=0;
         String c="";
         int h,min,sec;
-
         while(sp<sl && (szTime.charAt(sp)<'0' || szTime.charAt(sp)> '9')) sp++;
         s=0; c="";
         while(sp<sl ){
@@ -499,26 +495,18 @@ public abstract class StringRegularOpt {
                             sB.append(' ');
                         else if(nPart>3 && nPart<6)
                             sB.append(':');
-
                         nPart ++;
-
                         if(sTmp2.length() == 1){
                             sB.append('0');
                         }
-
                         if(sTmp2.length()>0)
                             sB.append(sTmp2);
-
                         sTmp2 ="";
-
-
                     }
                     bDot = false;
                 }
-
                 if(nPart>=6)
                     break;
-
                 sTmp2 = sTmp2 + szDateStr.charAt(j);
                 if( (hasYearPart || nPart>3) && (sTmp2.length()==2 || sTmp2.charAt(0)>'5' ) ){
                     bDot = true;
@@ -529,9 +517,7 @@ public abstract class StringRegularOpt {
             }else{ //if(! sTmp2.equals(""))
                 bDot = true;
             }
-
         }
-
         if(!"".equals(sTmp2)){
             if(nPart>0 && nPart<3)
                 sB.append('-');
@@ -539,16 +525,12 @@ public abstract class StringRegularOpt {
                 sB.append(' ');
             else if(nPart>3 && nPart<6)
                 sB.append(':');
-
             if(sTmp2.length() == 1){
                 sB.append('0');
             }
-
             if(sTmp2.length()>0)
                 sB.append(sTmp2);
-
         }
-
         return sB.toString();
     }
 
@@ -564,8 +546,6 @@ public abstract class StringRegularOpt {
         }
         return sTmp2.toString();
     }
-
-
 
     public static String trimNumber(String szNumber)
     {
@@ -626,11 +606,11 @@ public abstract class StringRegularOpt {
      */
     public static boolean isChineseEscapeSymbol(char c) {
         Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
-        if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS 
+        if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
                 || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
-                || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A 
+                || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
                 || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
-                //|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION 
+                //|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
                 //|| ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
                 //|| ub == Character.UnicodeBlock.GENERAL_PUNCTUATION
                 ) {
@@ -653,7 +633,7 @@ public abstract class StringRegularOpt {
         }
         return -1;
     }
-    
+
     /**
      * 获得首个中文位置 ，标点符号不算
      * @param strName strName

@@ -542,6 +542,13 @@ public abstract class DatetimeOpt {
         return cal.getTime();
     }
 
+    public static java.util.Date addDays(java.util.Date date, float nDays) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis( date.getTime() +
+                Double.valueOf(nDays * 86400000.0).longValue());
+        return cal.getTime();
+    }
+
     public static java.util.Date addMonths(java.util.Date date, int nMonths) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
@@ -567,20 +574,27 @@ public abstract class DatetimeOpt {
         //System.out.println(endDate.getTime());
         java.util.Date bD = (beginDate.getTime() > endDate.getTime()) ? truncateToDay(endDate) : truncateToDay(beginDate);
         java.util.Date eD = (beginDate.getTime() > endDate.getTime()) ? beginDate : endDate;
-        return (int) ((eD.getTime() - bD.getTime()) / 1000 / 60 / 60 / 24 + 1 );
+        return (int) ((eD.getTime() - bD.getTime()) / 86400000 + 1 );
     }
-   
+
+    public static float calcDateSpan(java.util.Date beginDate, java.util.Date endDate) {
+        //System.out.println(beginDate.getTime());
+        //System.out.println(endDate.getTime());
+        java.util.Date bD = (beginDate.getTime() > endDate.getTime()) ? truncateToDay(endDate) : truncateToDay(beginDate);
+        java.util.Date eD = (beginDate.getTime() > endDate.getTime()) ? beginDate : endDate;
+        return Double.valueOf((eD.getTime() - bD.getTime()) / 86400000.0).floatValue();
+    }
     /*
      * 计算周的第一天始日期
      */
     public static java.util.Date calcWeek1stDay(int nYear, int nWeekNo){
          Calendar cal = Calendar.getInstance();
-         cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);      
+         cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
          cal.set(Calendar.YEAR, nYear);
          cal.set(Calendar.WEEK_OF_YEAR, nWeekNo);
          return cal.getTime();
     }
-    
+
     /*
      * 计算周的最后一天日期
      */
@@ -591,7 +605,7 @@ public abstract class DatetimeOpt {
         cal.set(Calendar.WEEK_OF_YEAR, nWeekNo);
         return cal.getTime();
     }
-    
+
     /**
         * 计算这个周期中的周六和周日的天数，周末的天数
         * @param beginDate beginTime
@@ -606,7 +620,7 @@ public abstract class DatetimeOpt {
            int days = weekEnds * 2 - (nWeekDay==0?0:1) + (nWeekDay2>0?1:0) ;
            return days;
        }
-    
+
     /**
      * 计算这个周期中 工作日的天数,不包括 周六和周日，但是因为不知道其他的假期，所以只是去掉周末
      * @param beginDate beginTime

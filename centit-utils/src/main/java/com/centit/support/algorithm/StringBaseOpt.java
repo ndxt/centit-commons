@@ -15,11 +15,11 @@ import java.util.zip.GZIPOutputStream;
 
 /**
  * String Utility Class This is used to encode passwords programmatically
- * 
+ *
  * <p>
  * <a href="StringUtil.java.html"><i>View Source</i></a>
  * </p>
- * 
+ *
  * @author <a href="mailto:matt@raibledesigns.com">Matt Raible</a>
  * @author 杨淮生
  */
@@ -63,7 +63,7 @@ public abstract class StringBaseOpt {
         //sun.misc.BASE64Decoder dec = new sun.misc.BASE64Decoder();
         return new String(Base64.decodeBase64(str.getBytes()));
     }
-   
+
     /**
        * 字符串的压缩
        *
@@ -310,7 +310,7 @@ public abstract class StringBaseOpt {
      * 参见类 com.centit.support.compiler.Pretreatment 的 mapTemplateString 方法
      */
     @Deprecated
-    public static String clacDocumentNo(String templet,long currNo,Map<String,String> params){
+    public static String clacDocumentNo(String templet, long currNo, Map<String,String> params){
         if(StringRegularOpt.isNvl( templet) )
             return String.valueOf(currNo);
 
@@ -323,8 +323,8 @@ public abstract class StringBaseOpt {
              if(secondBegin>firstEnd )
                  nunber = Integer.parseInt(sDocNo.substring(firstEnd,
                          secondBegin));
-             
-             sDocNo = sDocNo.substring(0,  firstBegin) + 
+
+             sDocNo = sDocNo.substring(0,  firstBegin) +
                      fillZeroForString (String.valueOf(currNo), nunber)
                      + sDocNo.substring(secondBegin+1);
         }
@@ -340,7 +340,7 @@ public abstract class StringBaseOpt {
                 String.valueOf(DatetimeOpt.getYear( DatetimeOpt.currentUtilDate())));
         sDocNo = sDocNo.replaceAll("\\$Y2\\$",
                 String.valueOf(DatetimeOpt.getYear( DatetimeOpt.currentUtilDate())).substring(2,4));
-        
+
         return sDocNo;
     }
 

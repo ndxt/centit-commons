@@ -4,6 +4,7 @@ import com.centit.support.algorithm.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class VariableFormula {
@@ -141,11 +142,10 @@ public class VariableFormula {
             return trans.getLabelValue(str);
         }
 
-        String res = StringRegularOpt.trimString(str);
-        if(StringRegularOpt.isNumber(res)){
-            return NumberBaseOpt.castObjectToNumber(res);
+        if(StringRegularOpt.isNumber(str)){
+            return NumberBaseOpt.castObjectToNumber(str);
         }
-        return res;
+        return StringRegularOpt.trimString(str);
     }
 
     private Object calcOperate(Object operand, Object operand2, int optID) {
@@ -170,7 +170,13 @@ public class VariableFormula {
             }
 
             case ConstDefine.OP_ADD: {
-                 return GeneralAlgorithm.addTwoObject( operand, operand2);
+                if(operand instanceof Date && NumberBaseOpt.isNumber(operand2)){
+                    float num = NumberBaseOpt.castObjectToFloat(operand2, 0.f);
+                    return DatetimeOpt.addDays((Date)operand, num);
+                } else if(operand instanceof String){
+                    return operand + StringBaseOpt.castObjectToString(operand2);
+                }
+                return GeneralAlgorithm.addTwoObject( operand, operand2);
             }
             case ConstDefine.OP_MUL: {
                 if (NumberBaseOpt.isNumber(operand)
@@ -217,10 +223,8 @@ public class VariableFormula {
                 }
                 return null;
             case ConstDefine.OP_RMOV:
-
                 if( NumberBaseOpt.isNumber(operand2) ){
                     int nP2 = NumberBaseOpt.castObjectToInteger(operand2);
-
                     if( NumberBaseOpt.isNumber(operand) ) {
                         int nP = NumberBaseOpt.castObjectToInteger(operand);
                         return nP >> nP2;
@@ -235,8 +239,15 @@ public class VariableFormula {
             case ConstDefine.OP_LIKE:
                 return StringRegularOpt.isMatch(StringBaseOpt.objectToString(operand),
                         StringBaseOpt.objectToString(operand2));
-
             case ConstDefine.OP_SUB:
+                if(operand instanceof Date) {
+                    if (operand2 instanceof Date) {
+                        return DatetimeOpt.calcDateSpan((Date)operand, (Date)operand2);
+                    } else if (NumberBaseOpt.isNumber(operand2)) {
+                        float num = NumberBaseOpt.castObjectToFloat(operand2, 0.f);
+                        return DatetimeOpt.addDays((Date) operand, 0 - num);
+                    }
+                }
                 return GeneralAlgorithm.subtractTwoObject(operand,operand2);
 
             case ConstDefine.OP_DIV:

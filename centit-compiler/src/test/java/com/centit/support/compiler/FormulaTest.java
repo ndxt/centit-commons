@@ -1,6 +1,5 @@
 package com.centit.support.compiler;
 
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 
 import java.util.HashMap;
@@ -8,17 +7,20 @@ import java.util.Map;
 
 public class FormulaTest {
 
-    public static void testFormula() {
+    public  static void  main(String[] args)   {
+        testFormula();
+    }
 
-        Object s =  VariableFormula.calculate("toNumber(5.12 dbmod 3.03)");
+    public static void testFormula() {
+        Object s = VariableFormula.calculate("today() - 1");
         System.out.println(s);
-        s =  VariableFormula.calculate("5.12 mod 3.03");
+        s =  VariableFormula.calculate("toDate('2012-12-12') + 1");
         System.out.println(s);
-        s =  VariableFormula.calculate("5.12 dbmod 3.03");
+        s = VariableFormula.calculate("round(today() - toDate('2018-12-12'))");
         System.out.println(s);
-        s =  VariableFormula.calculate("toString(25+60)");
+        s =  VariableFormula.calculate("'123' + 3.03");
         System.out.println(s);
-        s =  VariableFormula.calculate("toDate('2012-12-12')");
+        s =  VariableFormula.calculate("toString(25)+60");
         System.out.println(s);
     }
 
@@ -85,7 +87,7 @@ public class FormulaTest {
         //System.out.println( VariableFormula.calculate("currentDatetime()"));
         //System.out.println( VariableFormula.calculate("currentTimestamp()"));
     }
-    public  static void  main(String[] args)   {
+    public  static void  testStringTemplate()   {
         //testFormula();
         //testDate();//
 
