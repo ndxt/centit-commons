@@ -6,7 +6,35 @@ public abstract class BooleanBaseOpt {
         throw new IllegalAccessError("Utility class");
     }
 
+    static Boolean check4CharStrIsTrue(String str){
+        final char ch0 = str.charAt(0);
+        final char ch1 = str.charAt(1);
+        final char ch2 = str.charAt(2);
+        final char ch3 = str.charAt(3);
+        if ((ch0 == 't' || ch0 == 'T') &&
+                (ch1 == 'r' || ch1 == 'R') &&
+                (ch2 == 'u' || ch2 == 'U') &&
+                (ch3 == 'e' || ch3 == 'E') ) {
+            return true;
+        }
+        return false;
+    }
 
+    static Boolean check5CharStrIsFlase(String str){
+        final char ch0 = str.charAt(0);
+        final char ch1 = str.charAt(1);
+        final char ch2 = str.charAt(2);
+        final char ch3 = str.charAt(3);
+        final char ch4 = str.charAt(4);
+        if ((ch0 == 'f' || ch0 == 'F') &&
+                (ch1 == 'a' || ch1 == 'A') &&
+                (ch2 == 'l' || ch2 == 'L') &&
+                (ch3 == 's' || ch3 == 'S') &&
+                (ch4 == 'e' || ch4 == 'E')) {
+            return true;
+        }
+        return false;
+    }
 
     static public Boolean castObjectToBoolean(Object obj){
         if(obj==null)
@@ -61,29 +89,13 @@ public abstract class BooleanBaseOpt {
                 break;
             }
             case 4: {
-                final char ch0 = str.charAt(0);
-                final char ch1 = str.charAt(1);
-                final char ch2 = str.charAt(2);
-                final char ch3 = str.charAt(3);
-                if ((ch0 == 't' || ch0 == 'T') &&
-                    (ch1 == 'r' || ch1 == 'R') &&
-                    (ch2 == 'u' || ch2 == 'U') &&
-                    (ch3 == 'e' || ch3 == 'E') ) {
+                if(check4CharStrIsTrue(str)){
                     return true;
                 }
                 break;
             }
             case 5: {
-                final char ch0 = str.charAt(0);
-                final char ch1 = str.charAt(1);
-                final char ch2 = str.charAt(2);
-                final char ch3 = str.charAt(3);
-                final char ch4 = str.charAt(4);
-                if ((ch0 == 'f' || ch0 == 'F') &&
-                        (ch1 == 'a' || ch1 == 'A') &&
-                        (ch2 == 'l' || ch2 == 'L') &&
-                        (ch3 == 's' || ch3 == 'S') &&
-                        (ch4 == 'e' || ch4 == 'E')) {
+                if(check5CharStrIsFlase(str)){
                     return false;
                 }
                 break;
