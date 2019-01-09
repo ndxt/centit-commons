@@ -118,7 +118,22 @@ public abstract class EmbedFunc {
         }
         return new LeftRightPair<>(nCount, ret);
     }
-
+    private static LeftRightPair<Date, Object> fetchDateOpt(int nOpSum ,List<Object> slOperand) {
+        Date dt = null;
+        Object ti = null;
+        if (nOpSum == 1) {
+            dt = DatetimeOpt.currentUtilDate();
+            if (NumberBaseOpt.isNumber(slOperand.get(0))) {
+                ti = slOperand.get(0);
+            }
+        } else if (nOpSum > 1) {
+            dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
+            if (NumberBaseOpt.isNumber(slOperand.get(1))) {
+                ti = slOperand.get(1);
+            }
+        }
+        return new LeftRightPair<>(dt, ti);
+    }
     public static Object runFuncWithObject(List<Object> slOperand,int funcID)
     {
         int nOpSum = ( slOperand == null )? 0: slOperand.size();
@@ -551,80 +566,48 @@ public abstract class EmbedFunc {
                 return DatetimeOpt.calcDateSpan(dt, dt2);
             }
             case ConstDefine.FUNC_ADD_DATE:{//
-                if (nOpSum < 1) return null;
-                Date dt = DatetimeOpt.currentUtilDate();
-                Float tf;
-                if(nOpSum==1){
-                    if (!NumberBaseOpt.isNumber(slOperand.get(0))){
-                        return null;
-                    }
-                    tf = NumberBaseOpt.castObjectToFloat(slOperand.get(0));
-                }else {
-                    dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
-                    if (!NumberBaseOpt.isNumber(slOperand.get(1))){
-                        return null;
-                    }
-                    tf = NumberBaseOpt.castObjectToFloat(slOperand.get(1));
-                }
-                if(dt == null || tf == null)
+                LeftRightPair<Date, Object> dateOpt = fetchDateOpt(nOpSum, slOperand);
+                if(dateOpt.getLeft() == null || dateOpt.getRight() == null)
                     return null;
-                return DatetimeOpt.addDays(dt, tf);
+                return DatetimeOpt.addDays(dateOpt.getLeft(),
+                        NumberBaseOpt.castObjectToFloat(dateOpt.getRight()));
             }
             case ConstDefine.FUNC_ADD_DAYS:{//
-                if (nOpSum < 2) return null;
-                Date dt = DatetimeOpt.currentUtilDate();
-                Integer ti;
-                if(nOpSum==1){
-                    if (!NumberBaseOpt.isNumber(slOperand.get(0))){
-                        return null;
-                    }
-                    ti = NumberBaseOpt.castObjectToInteger(slOperand.get(0));
-                }else {
-                    dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
-                    if (!NumberBaseOpt.isNumber(slOperand.get(1))){
-                        return null;
-                    }
-                    ti = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
-                }
-                if(dt == null || ti == null)
+                LeftRightPair<Date, Object> dateOpt = fetchDateOpt(nOpSum, slOperand);
+                if(dateOpt.getLeft() == null || dateOpt.getRight() == null)
                     return null;
-                return DatetimeOpt.addDays(dt, ti);
+                return DatetimeOpt.addDays(dateOpt.getLeft(),
+                        NumberBaseOpt.castObjectToInteger(dateOpt.getRight()));
             }
             case ConstDefine.FUNC_ADD_MONTHS:{//
-                if (nOpSum < 2) return null;
-                Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
-                if(dt==null )
+                LeftRightPair<Date, Object> dateOpt = fetchDateOpt(nOpSum, slOperand);
+                if(dateOpt.getLeft() == null || dateOpt.getRight() == null)
                     return null;
-                if (!NumberBaseOpt.isNumber(slOperand.get(1)))
-                    return DatetimeOpt.convertDateToString(dt);
-
-                int ti = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
-
-                return DatetimeOpt.addMonths(dt, ti);
+                return DatetimeOpt.addMonths(dateOpt.getLeft(),
+                        NumberBaseOpt.castObjectToInteger(dateOpt.getRight()));
             }
-
             case ConstDefine.FUNC_ADD_YEARS:{//
-                if (nOpSum < 2) return null;
-                Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
-                if(dt==null )
+                LeftRightPair<Date, Object> dateOpt = fetchDateOpt(nOpSum, slOperand);
+                if(dateOpt.getLeft() == null || dateOpt.getRight() == null)
                     return null;
-                if (!NumberBaseOpt.isNumber(slOperand.get(1)))
-                    return DatetimeOpt.convertDateToString(dt);
-
-                int ti = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
-
-                return DatetimeOpt.addYears(dt, ti);
+                return DatetimeOpt.addYears(dateOpt.getLeft(),
+                        NumberBaseOpt.castObjectToInteger(dateOpt.getRight()));
             }
 
             case ConstDefine.FUNC_TRUNC_DATE:{//
-                Date dt = (nOpSum > 0)?DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
-                if(dt==null)
+                Date dt = null;
+                Object ti = null;
+                if (nOpSum == 1) {
                     dt = DatetimeOpt.currentUtilDate();
-
-                if (nOpSum < 2)
-                    return DatetimeOpt.truncateToDay(dt);
-
-                String tempStr = StringBaseOpt.objectToString(slOperand.get(1));
+                    ti = slOperand.get(0);
+                } else if (nOpSum > 1) {
+                    dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
+                    if(dt==null) {
+                        dt = DatetimeOpt.currentUtilDate();
+                    }
+                    ti = slOperand.get(1);
+                }
+                String tempStr = StringBaseOpt.objectToString(ti);
                 if("M".equalsIgnoreCase(tempStr))
                     return DatetimeOpt.truncateToMonth(dt);
                 else if("Y".equalsIgnoreCase(tempStr))
