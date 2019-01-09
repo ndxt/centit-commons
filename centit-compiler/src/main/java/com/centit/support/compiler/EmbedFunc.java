@@ -14,7 +14,7 @@ public abstract class EmbedFunc {
         throw new IllegalAccessError("Utility class");
     }
     private static double MIN_DOUBLE = 0.00000001;
-    public static final int functionsSum = 55;
+    public static final int functionsSum = 57;
     protected static final FunctionInfo functionsList[]={
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte",2, ConstDefine.FUNC_BYTE,ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,2)=2
@@ -70,9 +70,11 @@ public abstract class EmbedFunc {
         new FunctionInfo("year",-1,ConstDefine.FUNC_YEAR,ConstDefine.TYPE_STR),//日期函数
 
         new FunctionInfo("dayspan",-1,ConstDefine.FUNC_DAY_SPAN,ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
+        new FunctionInfo("datespan",-1,ConstDefine.FUNC_DATE_SPAN,ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
         //new FunctionInfo("monthspan",-1,ConstDefine.FUNC_MONTH_SPAN,ConstDefine.TYPE_NUM),//日期函数   求两日期之间的月数
         //new FunctionInfo("yearspan",-1,ConstDefine.FUNC_YEAR_SPAN,ConstDefine.TYPE_NUM),//日期函数   求两日期之间的年数
 
+        new FunctionInfo("adddate",2,ConstDefine.FUNC_ADD_DATE,ConstDefine.TYPE_ANY),//日期函数  加天数
         new FunctionInfo("adddays",2,ConstDefine.FUNC_ADD_DAYS,ConstDefine.TYPE_ANY),//日期函数  加天数
         new FunctionInfo("addmonths",2,ConstDefine.FUNC_ADD_MONTHS,ConstDefine.TYPE_ANY),//日期函数  加月数
         new FunctionInfo("addyears",2,ConstDefine.FUNC_ADD_YEARS,ConstDefine.TYPE_ANY),//日期函数   加年数
@@ -95,55 +97,62 @@ public abstract class EmbedFunc {
         return -1;
     }
 
-    public static Object runFuncWithRaw(List<Object> rawOperand,int funcID)
-    {
-        List<Object> slOperand = new ArrayList<>(rawOperand.size() + 1);
-        for(Object objValue : rawOperand){
-            if(objValue instanceof Object[]){
-                Object [] objs=(Object[]) objValue;
-                for(int i=0;i<objs.length;i++) {
-                    slOperand.add(objs[i]);
-                }
-            }else if(objValue instanceof Collection){
-                Collection<?> valueList = (Collection<?> )objValue;
-                slOperand.addAll(valueList);
-            }else{
-                slOperand.add(objValue);
-            }
-        }
-        return runFuncWithObject(slOperand, funcID);
-    }
-
     private static LeftRightPair<Integer, List<Object>> flatOperands(List<Object> slOperand){
         int nCount=0;
         List<Object> ret = new ArrayList<>();
-        for(Object obj : slOperand){
-            if(obj instanceof Collection){
-                ret.addAll((Collection)obj);
-                nCount += ((Collection)obj).size();
-            } else {
-                ret.add(obj);
-                nCount ++;
+        if(slOperand!=null && slOperand.size()>0) {
+            for (Object obj : slOperand) {
+                if(obj instanceof Object[]){
+                    Object [] objs=(Object[]) obj;
+                    for(int i=0;i<objs.length;i++) {
+                        ret.add(objs[i]);
+                        nCount++;
+                    }
+                }else if (obj instanceof Collection) {
+                    ret.addAll((Collection) obj);
+                    nCount += ((Collection) obj).size();
+                } else {
+                    ret.add(obj);
+                    nCount++;
+                }
             }
         }
         return new LeftRightPair<>(nCount, ret);
     }
-    private static Object runFuncWithObject(List<Object> slOperand,int funcID)
+
+    public static Object runFuncWithObject(List<Object> slOperand,int funcID)
     {
         int nOpSum = ( slOperand == null )? 0: slOperand.size();
         double dbtemp = 0.0;
         switch(funcID){
             case ConstDefine.FUNC_AVE :// 100
-                for(int i=0; i<nOpSum; i++){
-                    dbtemp += NumberBaseOpt.castObjectToDouble(
-                            slOperand.get(i),0.0);
+            {
+                LeftRightPair<Integer, List<Object>> opt = flatOperands (slOperand);
+                nOpSum = 0;
+                for (int i = 0; i < opt.getLeft(); i++) {
+                    Double db = NumberBaseOpt.castObjectToDouble(
+                            opt.getRight().get(i));
+                    if( db != null) {
+                        dbtemp += db;
+                        nOpSum ++;
+                    }
                 }
                 if (nOpSum > 0)
                     return dbtemp / nOpSum;//"%f",
                 else
                     return null;
-            case ConstDefine.FUNC_SINGLETON:
-
+            }
+            case ConstDefine.FUNC_SINGLETON:{
+                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
+                List<Object> retObjs = new ArrayList<>();
+                for(Object obj : opt.getRight()){
+                    if(obj == null || retObjs.contains(obj)){
+                        continue;
+                    }
+                    retObjs.add(obj);
+                }
+                return retObjs;
+            }
             case ConstDefine.FUNC_GET_AT: {//148
                 if (nOpSum < 2)
                     return null;
@@ -194,25 +203,25 @@ public abstract class EmbedFunc {
                         StringBaseOpt.objectToString(slOperand.get(0)),nT);
             }
             case ConstDefine.FUNC_MAX:{// 103
-                if (nOpSum <1) return null;
-                return GeneralAlgorithm.maxObject(slOperand);
+                LeftRightPair<Integer, List<Object>> opt = flatOperands (slOperand);
+                return GeneralAlgorithm.maxObject(opt.getRight());
             }
 
             case ConstDefine.FUNC_MIN:{// 104
-                if (nOpSum <1) return null;
-                return GeneralAlgorithm.minObject(slOperand);
+                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
+                return GeneralAlgorithm.minObject(opt.getRight());
             }
 
-            case ConstDefine.FUNC_COUNT:// 112
-                return String.valueOf(nOpSum);
-
+            case ConstDefine.FUNC_COUNT: {// 112
+                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
+                return opt.getLeft();
+            }
             case ConstDefine.FUNC_COUNTNOTNULL:// 145
             {
-                if(nOpSum==0)
-                    return 0;
+                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
                 int nc=0;
-                for(Object obj:slOperand){
-                    if(obj !=null){
+                for(Object obj: opt.getRight()){
+                    if(obj != null){
                         String s = StringBaseOpt.objectToString(obj);
                         if(StringUtils.isNotBlank(s) &&
                             !"''".equals(s)  && !"\"\"".equals(s))
@@ -223,10 +232,9 @@ public abstract class EmbedFunc {
             }
             case ConstDefine.FUNC_COUNTNULL:// 144
             {
-                if(nOpSum==0)
-                    return 0;
+                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
                 int nc=0;
-                for(Object obj:slOperand){
+                for(Object obj: opt.getRight()){
                     if(obj ==null) {
                         nc ++;
                     }else{
@@ -238,26 +246,30 @@ public abstract class EmbedFunc {
                 }
                 return nc;
             }
-            case ConstDefine.FUNC_SUM:// 105
-                if (nOpSum <1) return null;
-                return GeneralAlgorithm.sumObjects(slOperand);
-
+            case ConstDefine.FUNC_SUM: {// 105
+                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
+                return GeneralAlgorithm.sumObjects(opt.getRight());
+            }
             case ConstDefine.FUNC_STDDEV:// 133
             {
-                if(nOpSum<2)
+                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
+                if(opt.getLeft()<2)
                     return  0;
                 int numberSum = 0;
-                for(int i=0; i<nOpSum; i++) {
-                    if(NumberBaseOpt.isNumber(slOperand.get(i) )) {
+                for(int i=0; i<opt.getLeft(); i++) {
+                    if(NumberBaseOpt.isNumber(opt.getRight().get(i) )) {
                         numberSum ++;
-                        dbtemp += NumberBaseOpt.castObjectToDouble(slOperand.get(i), 0.0);
+                        dbtemp += NumberBaseOpt.castObjectToDouble(opt.getRight().get(i), 0.0);
                     }
+                }
+                if(numberSum<2){
+                    return 0;
                 }
                 double dbAvg = dbtemp/numberSum;
                 dbtemp = 0.0;
-                for(int i=0; i<nOpSum; i++)
-                    if(NumberBaseOpt.isNumber(slOperand.get(i) )) {
-                        double dtp = NumberBaseOpt.castObjectToDouble(slOperand.get(i), 0.0)
+                for(int i=0; i<opt.getLeft(); i++)
+                    if(NumberBaseOpt.isNumber(opt.getRight().get(i) )) {
+                        double dtp = NumberBaseOpt.castObjectToDouble(opt.getRight().get(i), 0.0)
                                 - dbAvg;
                         dbtemp += dtp*dtp;
                     }
@@ -527,22 +539,56 @@ public abstract class EmbedFunc {
                 if (nOpSum < 2) return null;
                 Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
                 Date dt2 =DatetimeOpt.castObjectToDate(slOperand.get(1));
-
                 if(dt==null || dt2==null)
                     return null;
                 return DatetimeOpt.calcSpanDays(dt, dt2);
             }
-
-            case ConstDefine.FUNC_ADD_DAYS:{//
+            case ConstDefine.FUNC_DATE_SPAN:{//
                 if (nOpSum < 2) return null;
                 Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
-                if(dt==null )
+                Date dt2 =DatetimeOpt.castObjectToDate(slOperand.get(1));
+                if(dt==null || dt2==null)
                     return null;
-                if (!NumberBaseOpt.isNumber(slOperand.get(1)))
-                    return DatetimeOpt.convertDateToString(dt);
-
-                int ti = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
-
+                return DatetimeOpt.calcDateSpan(dt, dt2);
+            }
+            case ConstDefine.FUNC_ADD_DATE:{//
+                if (nOpSum < 1) return null;
+                Date dt = DatetimeOpt.currentUtilDate();
+                Float tf;
+                if(nOpSum==1){
+                    if (!NumberBaseOpt.isNumber(slOperand.get(0))){
+                        return null;
+                    }
+                    tf = NumberBaseOpt.castObjectToFloat(slOperand.get(0));
+                }else {
+                    dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
+                    if (!NumberBaseOpt.isNumber(slOperand.get(1))){
+                        return null;
+                    }
+                    tf = NumberBaseOpt.castObjectToFloat(slOperand.get(1));
+                }
+                if(dt == null || tf == null)
+                    return null;
+                return DatetimeOpt.addDays(dt, tf);
+            }
+            case ConstDefine.FUNC_ADD_DAYS:{//
+                if (nOpSum < 2) return null;
+                Date dt = DatetimeOpt.currentUtilDate();
+                Integer ti;
+                if(nOpSum==1){
+                    if (!NumberBaseOpt.isNumber(slOperand.get(0))){
+                        return null;
+                    }
+                    ti = NumberBaseOpt.castObjectToInteger(slOperand.get(0));
+                }else {
+                    dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
+                    if (!NumberBaseOpt.isNumber(slOperand.get(1))){
+                        return null;
+                    }
+                    ti = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
+                }
+                if(dt == null || ti == null)
+                    return null;
                 return DatetimeOpt.addDays(dt, ti);
             }
             case ConstDefine.FUNC_ADD_MONTHS:{//

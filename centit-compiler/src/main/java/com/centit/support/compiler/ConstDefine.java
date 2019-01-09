@@ -75,6 +75,8 @@ public abstract class ConstDefine {
     public static final int   FUNC_TO_STRING    = 153;
     public static final int   FUNC_TO_NUMBER    = 154;
     public static final int   FUNC_SINGLETON    = 156;
+    public static final int   FUNC_DATE_SPAN    = 157;
+    public static final int   FUNC_ADD_DATE   = 158;
 
     public static final int   OP_BASE        = 30;    // +
     public static final int   OP_ADD         = 30;    // +

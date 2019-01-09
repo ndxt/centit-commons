@@ -101,10 +101,18 @@ public abstract  class GeneralAlgorithm {
      * @return 相加结果
      */
     public static Object addTwoObject(Object a,Object b){
-        if(a==null)
+        if(a==null) {
+            if(b==null || b instanceof java.lang.Number){
+                return null;
+            }
             return b;
-        if(b==null)
+        }
+        if(b==null){
+            if(a instanceof java.lang.Number){
+                return null;
+            }
             return a;
+        }
 
         if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
@@ -150,10 +158,16 @@ public abstract  class GeneralAlgorithm {
     }
 
     public static Object subtractTwoObject(Object a,Object b){
-        if(b==null)
+        if(a==null) {
+            return null;
+        }
+        if(b==null){
+            if(a instanceof java.lang.Number){
+                return null;
+            }
             return a;
-        if(a==null)
-            a = 0;
+        }
+
         if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
             switch (retType){
@@ -295,7 +309,6 @@ public abstract  class GeneralAlgorithm {
     public static Object modTwoObject(Object a, Object b){
         if(a==null || b==null)
             return null;
-
         if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
             switch (retType){
@@ -317,7 +330,6 @@ public abstract  class GeneralAlgorithm {
                     return NumberBaseOpt.castObjectToDouble(a) %
                             NumberBaseOpt.castObjectToDouble(b);
             }
-
         }
         return a;
     }
@@ -428,7 +440,6 @@ public abstract  class GeneralAlgorithm {
         Object sumObj = ar.iterator().next();
         if(ar.size()==1)
             return sumObj;
-
         int retType = getJavaTypeOrder(sumObj);
         while(ari.hasNext()){
             Object anOther = ari.next();
@@ -450,7 +461,6 @@ public abstract  class GeneralAlgorithm {
                     sumObj = NumberBaseOpt.castObjectToBigInteger(sumObj).add(
                             NumberBaseOpt.castObjectToBigInteger(anOther));
                     break;
-
                 case 6:
                     sumObj = NumberBaseOpt.castObjectToBigDecimal(sumObj).add(
                             NumberBaseOpt.castObjectToBigDecimal(anOther));

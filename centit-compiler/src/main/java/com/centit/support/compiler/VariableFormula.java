@@ -399,7 +399,7 @@ public class VariableFormula {
         if(EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
             //&& prmNo != m_sFunctionList[nFuncNo].nPrmSum) return null;
             && prmNo < EmbedFunc.functionsList[nFuncNo].nPrmSum) return null;
-        return  EmbedFunc.runFuncWithRaw(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
+        return  EmbedFunc.runFuncWithObject(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
     }
 
     public static Object calculate(String szExpress) {
@@ -407,7 +407,6 @@ public class VariableFormula {
         formula.setFormula(szExpress);
         return formula.calcFormula();
     }
-
 
     public static Object calculate(String szExpress,VariableTranslate varTrans) {
         VariableFormula formula = new VariableFormula();
@@ -419,7 +418,6 @@ public class VariableFormula {
     public static Object calculate(String szExpress,Object varMap) {
         return calculate(szExpress,new ObjectTranslate(varMap));
     }
-
     /**
      *
      * @param szExpress 表达式
