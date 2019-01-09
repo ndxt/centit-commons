@@ -35,8 +35,7 @@ public class JavaBeanMetaData {
         List<Method> setters = ReflectionOpt.getAllSetterMethod(javaType);
         if(setters!=null){
             for(Method md : setters) {
-                String fieldName = StringUtils.uncapitalize(
-                        md.getName().substring(3));
+                String fieldName = ReflectionOpt.mapGetter2Field(md);
                 JavaBeanField javaField = metaData.getFiled(fieldName);
                 if(javaField == null){
                     javaField = new JavaBeanField();
