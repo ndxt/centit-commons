@@ -18,7 +18,7 @@ public class FormulaTest {
         System.out.println(s);
         s = VariableFormula.calculate("round(today() - toDate('2018-12-12'))");
         System.out.println(s);
-        s =  VariableFormula.calculate("'123' + 3.03");
+        s =  VariableFormula.calculate("2 in ( 3.03,[1,2,'123'])");
         System.out.println(s);
         s =  VariableFormula.calculate("25+toString(60)");
         System.out.println(s);

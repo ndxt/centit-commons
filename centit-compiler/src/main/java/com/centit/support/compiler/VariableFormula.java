@@ -4,6 +4,7 @@ import com.centit.support.algorithm.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -299,12 +300,28 @@ public class VariableFormula {
                 str = lex.getAWord();
                 if( str==null || str.length()==0 || !str.equals("(") ) return null;
 
-
-                while(true)
-                {
+                while(true){
                     item = calcFormula();
-                    if( GeneralAlgorithm.compareTwoObject(operand,item) == 0 ){
-                        bInRes = true;
+                    // 需要展开 数组
+                    if(item instanceof Object[]){
+                        Object [] objs=(Object[]) item;
+                        for(int i=0;i<objs.length;i++) {
+                            if(GeneralAlgorithm.compareTwoObject(operand,objs[i]) == 0 ){
+                                bInRes = true;
+                                break;
+                            }
+                        }
+                    }else if (item instanceof Collection) {
+                        for(Object obj : (Collection)item) {
+                            if(GeneralAlgorithm.compareTwoObject(operand,obj) == 0 ){
+                                bInRes = true;
+                                break;
+                            }
+                        }
+                    } else {
+                        if(GeneralAlgorithm.compareTwoObject(operand,item) == 0 ){
+                            bInRes = true;
+                        }
                     }
                     str = lex.getAWord();
                     if( str==null || str.length()==0 ||(  !str.equals(",")  && !str.equals(")") ) ) return null;
@@ -313,9 +330,7 @@ public class VariableFormula {
                         break;
                     }
                 }
-
                 lex.seekToRightBracket();
-
                 slOperand.add(0,bInRes);
                 str = lex.getAWord();
                 optID = VariableFormula.getOptID(str);

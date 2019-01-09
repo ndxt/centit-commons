@@ -90,8 +90,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("getpy",1,ConstDefine.FUNC_GET_PY,ConstDefine.TYPE_STR)//取汉字拼音
     };
 
-    public static final int getFuncNo(String sFuncName)
-    {
+    public static final int getFuncNo(String sFuncName){
         for(int i=0; i<functionsSum; i++)
             if( sFuncName.equalsIgnoreCase(functionsList[i].sName)) return i;
         return -1;
