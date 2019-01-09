@@ -1,6 +1,7 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.*;
+import com.centit.support.common.LeftRightPair;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -13,9 +14,8 @@ public abstract class EmbedFunc {
         throw new IllegalAccessError("Utility class");
     }
     private static double MIN_DOUBLE = 0.00000001;
-    public static final int functionsSum = 54;
+    public static final int functionsSum = 55;
     protected static final FunctionInfo functionsList[]={
-        new FunctionInfo("ave",-1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte",2, ConstDefine.FUNC_BYTE,ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,2)=2
                                         //          byte (4321.789,-2)=8
@@ -27,10 +27,12 @@ public abstract class EmbedFunc {
                                             //             match ("abcd","a*d")=1
         new FunctionInfo("max",-1,ConstDefine.FUNC_MAX,ConstDefine.TYPE_ANY),   // 求最大值 max (1,2,3,5,4) = 5
         new FunctionInfo("min",-1,ConstDefine.FUNC_MIN,ConstDefine.TYPE_ANY),    // 求最小值 min (1,2,3,5,4) = 1
-
+        new FunctionInfo("ave",-1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
         new FunctionInfo("count",-1,ConstDefine.FUNC_COUNT,ConstDefine.TYPE_NUM),    // 计数 count(1,"2",3,"5",1,1,4) = 7
         new FunctionInfo("countnotnull",-1,ConstDefine.FUNC_COUNTNOTNULL,ConstDefine.TYPE_NUM),    // 计数 非空参数 countnotnull(1,,"2",,,,1,1,4) = 5
         new FunctionInfo("countnull",-1,ConstDefine.FUNC_COUNTNULL,ConstDefine.TYPE_NUM),    // 计数孔参数  countnull(1,,"2",,,,1,1,4) = 4
+        new FunctionInfo("sum",-1,ConstDefine.FUNC_SUM, ConstDefine.TYPE_NUM),    // 求和 sum (1,2,3,4,5) = 15
+        new FunctionInfo("stddev",-1,ConstDefine.FUNC_STDDEV,ConstDefine.TYPE_NUM),    // 求标准偏差
 
         new FunctionInfo("round",1,ConstDefine.FUNC_ROUND,ConstDefine.TYPE_NUM),    // 四舍五入
         new FunctionInfo("concat",-1,ConstDefine.FUNC_STRCAT,ConstDefine.TYPE_STR),    // 连接字符串 concat ("12","34","56")="123456"
@@ -38,8 +40,6 @@ public abstract class EmbedFunc {
         new FunctionInfo("isempty",1,ConstDefine.FUNC_ISEMPTY,ConstDefine.TYPE_NUM),    // 判断参数是否为空 isempty("")=1
         new FunctionInfo("isnotempty",1,ConstDefine.FUNC_NOTEMPTY,ConstDefine.TYPE_NUM),    // 判断参数是否为空 notempty("")=0
 
-        new FunctionInfo("sum",-1,ConstDefine.FUNC_SUM,ConstDefine.TYPE_NUM),    // 求和 sum (1,2,3,4,5) = 15
-        new FunctionInfo("stddev",-1,ConstDefine.FUNC_STDDEV,ConstDefine.TYPE_NUM),    // 求标准偏差
 
         new FunctionInfo("log",1,ConstDefine.FUNC_LOG,ConstDefine.TYPE_NUM),    // 求以10为底的对数
         new FunctionInfo("ln",1,ConstDefine.FUNC_LN,ConstDefine.TYPE_NUM),        // 求自然对数
@@ -82,6 +82,8 @@ public abstract class EmbedFunc {
         new FunctionInfo("toDate",1,ConstDefine.FUNC_TO_DATE,ConstDefine.TYPE_DATE),// 转换为日期
         new FunctionInfo("toString",1,ConstDefine.FUNC_TO_STRING,ConstDefine.TYPE_STR),//转换为String
         new FunctionInfo("toNumber",1,ConstDefine.FUNC_TO_NUMBER,ConstDefine.TYPE_NUM),//转换为数字
+        new FunctionInfo("singleton",-1,ConstDefine.FUNC_SINGLETON,ConstDefine.TYPE_ANY),//返回集合，去重
+
         //new FunctionInfo("getsysstr",1,ConstDefine.FUNC_GET_STR,ConstDefine.TYPE_STR),//取系统字符串
         new FunctionInfo("getpy",1,ConstDefine.FUNC_GET_PY,ConstDefine.TYPE_STR)//取汉字拼音
     };
@@ -112,6 +114,20 @@ public abstract class EmbedFunc {
         return runFuncWithObject(slOperand, funcID);
     }
 
+    private static LeftRightPair<Integer, List<Object>> flatOperands(List<Object> slOperand){
+        int nCount=0;
+        List<Object> ret = new ArrayList<>();
+        for(Object obj : slOperand){
+            if(obj instanceof Collection){
+                ret.addAll((Collection)obj);
+                nCount += ((Collection)obj).size();
+            } else {
+                ret.add(obj);
+                nCount ++;
+            }
+        }
+        return new LeftRightPair<>(nCount, ret);
+    }
     private static Object runFuncWithObject(List<Object> slOperand,int funcID)
     {
         int nOpSum = ( slOperand == null )? 0: slOperand.size();
@@ -119,12 +135,15 @@ public abstract class EmbedFunc {
         switch(funcID){
             case ConstDefine.FUNC_AVE :// 100
                 for(int i=0; i<nOpSum; i++){
-                    dbtemp += NumberBaseOpt.castObjectToDouble(slOperand.get(i),0.0);
+                    dbtemp += NumberBaseOpt.castObjectToDouble(
+                            slOperand.get(i),0.0);
                 }
                 if (nOpSum > 0)
                     return dbtemp / nOpSum;//"%f",
                 else
                     return null;
+            case ConstDefine.FUNC_SINGLETON:
+
             case ConstDefine.FUNC_GET_AT: {//148
                 if (nOpSum < 2)
                     return null;
@@ -308,7 +327,11 @@ public abstract class EmbedFunc {
                 int nStart = 0;
                 if(nOpSum>2 && NumberBaseOpt.isNumber(slOperand.get(2)))
                     nStart =  NumberBaseOpt.castObjectToInteger(slOperand.get(2));
-                String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
+                Object obj = slOperand.get(0);
+                if(obj instanceof Collection){
+                    return ((Collection)obj).contains(slOperand.get(1));
+                }
+                String tempStr = StringBaseOpt.objectToString(obj);
                 return tempStr.indexOf(
                         StringBaseOpt.objectToString(slOperand.get(1)) ,nStart);
             }

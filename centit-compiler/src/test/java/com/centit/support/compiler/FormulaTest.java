@@ -12,16 +12,16 @@ public class FormulaTest {
     }
 
     public static void testFormula() {
-        Object s = VariableFormula.calculate("today() - 1");
+        Object s = VariableFormula.calculate("[1,2,2,3] - 1");
         System.out.println(s);
-        s =  VariableFormula.calculate("toDate('2012-12-12') + 1");
+/*        s =  VariableFormula.calculate("toDate('2012-12-12') + 1");
         System.out.println(s);
         s = VariableFormula.calculate("round(today() - toDate('2018-12-12'))");
         System.out.println(s);
         s =  VariableFormula.calculate("'123' + 3.03");
         System.out.println(s);
         s =  VariableFormula.calculate("toString(25)+60");
-        System.out.println(s);
+        System.out.println(s);*/
     }
 
     public static void testFormula2() {

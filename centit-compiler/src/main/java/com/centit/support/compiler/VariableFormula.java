@@ -116,10 +116,10 @@ public class VariableFormula {
             str = lex.getAWord();
             if( str == null || str.length()==0 || str.charAt(0) != ')') return null;
             return resStr;
-        }else if( (str.charAt(0) == '!') || str.equalsIgnoreCase("NOT") ) {
+        } else if( (str.charAt(0) == '!') || str.equalsIgnoreCase("NOT") ) {
             Object obj = calcItem();
             return ! BooleanBaseOpt.castObjectToBoolean(obj,false);
-        }else if(str.charAt(0) == '$'){
+        } else if(str.charAt(0) == '$'){
             str = lex.getAWord();
             if(str.equals("{")){
                 str = lex.getStringUntil("}");
@@ -127,8 +127,19 @@ public class VariableFormula {
             }else {
                 return null;
             }
+        } else if(str.charAt(0) == '['){
+            List<Object> slOperand = new ArrayList<>();
+            while(true){
+                Object item = calcFormula();
+                slOperand.add(item);
+                str = lex.getAWord();
+                if( str==null || str.length()==0 || ( !str.equals(",") && !str.equals("]"))  )
+                    return null;
+                if( str.equals("]") ){
+                    return slOperand;
+                }
+            }
         }
-
         int funcNo = EmbedFunc.getFuncNo(str);
         if( funcNo != -1) {
             String nextWord = lex.getAWord();
@@ -170,21 +181,10 @@ public class VariableFormula {
             }
 
             case ConstDefine.OP_ADD: {
-                if(operand instanceof Date && NumberBaseOpt.isNumber(operand2)){
-                    float num = NumberBaseOpt.castObjectToFloat(operand2, 0.f);
-                    return DatetimeOpt.addDays((Date)operand, num);
-                } else if(operand instanceof String){
-                    return operand + StringBaseOpt.castObjectToString(operand2);
-                }
                 return GeneralAlgorithm.addTwoObject( operand, operand2);
             }
             case ConstDefine.OP_MUL: {
-                if (NumberBaseOpt.isNumber(operand)
-                        && NumberBaseOpt.isNumber(operand2)) {
-                    return GeneralAlgorithm.multiplyTwoObject(operand, operand2);
-                }
-                return StringBaseOpt.concat(operand, operand2);
-
+                return GeneralAlgorithm.multiplyTwoObject(operand, operand2);
             }
             case ConstDefine.OP_EQ: {
                 return GeneralAlgorithm.compareTwoObject(operand, operand2) == 0 ;
@@ -240,24 +240,11 @@ public class VariableFormula {
                 return StringRegularOpt.isMatch(StringBaseOpt.objectToString(operand),
                         StringBaseOpt.objectToString(operand2));
             case ConstDefine.OP_SUB:
-                if(operand instanceof Date) {
-                    if (operand2 instanceof Date) {
-                        return DatetimeOpt.calcDateSpan((Date)operand, (Date)operand2);
-                    } else if (NumberBaseOpt.isNumber(operand2)) {
-                        float num = NumberBaseOpt.castObjectToFloat(operand2, 0.f);
-                        return DatetimeOpt.addDays((Date) operand, 0 - num);
-                    }
-                }
                 return GeneralAlgorithm.subtractTwoObject(operand,operand2);
-
             case ConstDefine.OP_DIV:
             {
-                BigDecimal dbop2 = NumberBaseOpt.castObjectToBigDecimal(operand2);
-                if(dbop2==null || dbop2.compareTo(BigDecimal.ZERO)==0)
-                    return null;
                 return GeneralAlgorithm.divideTwoObject(operand,operand2);
             }
-
             case ConstDefine.OP_MOD:
             {
                 Long dbop2 = NumberBaseOpt.castObjectToLong(operand2);
@@ -266,7 +253,6 @@ public class VariableFormula {
                 Long dbop = NumberBaseOpt.castObjectToLong(operand);
                 return dbop % dbop2;
             }
-
             case ConstDefine.OP_DBMOD:
             {
                 BigDecimal dbop2 = NumberBaseOpt.castObjectToBigDecimal(operand2);
@@ -410,7 +396,7 @@ public class VariableFormula {
         if(/* str==null || str.length()==0 || */ !str.equals(")") ){
             return null;
         }
-        if( EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
+        if(EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
             //&& prmNo != m_sFunctionList[nFuncNo].nPrmSum) return null;
             && prmNo < EmbedFunc.functionsList[nFuncNo].nPrmSum) return null;
         return  EmbedFunc.runFuncWithRaw(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);

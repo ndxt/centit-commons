@@ -1,10 +1,11 @@
 package com.centit.support.algorithm;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * Created by codefan on 17-9-7.
@@ -128,7 +129,20 @@ public abstract  class GeneralAlgorithm {
                     return NumberBaseOpt.castObjectToDouble(a) +
                             NumberBaseOpt.castObjectToDouble(b);
             }
-
+        } else if(a instanceof Date && NumberBaseOpt.isNumber(b)){
+            float num = NumberBaseOpt.castObjectToFloat(b, 0.f);
+            return DatetimeOpt.addDays((Date)a, num);
+        } else if(a instanceof Collection){
+            List<Object> objs = new ArrayList<>();
+            if (b instanceof Collection){
+                objs.addAll((Collection<Object>) a);
+                objs.addAll((Collection<Object>) b);
+            } else {
+                for(Object obj : (Collection<Object>) a){
+                    objs.add(addTwoObject(obj, b));
+                }
+            }
+            return objs;
         }
         return StringBaseOpt.concat(
                 StringBaseOpt.castObjectToString(a),
@@ -136,12 +150,10 @@ public abstract  class GeneralAlgorithm {
     }
 
     public static Object subtractTwoObject(Object a,Object b){
-
         if(b==null)
             return a;
         if(a==null)
-            a = new Integer(0);
-
+            a = 0;
         if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
             switch (retType){
@@ -165,16 +177,31 @@ public abstract  class GeneralAlgorithm {
                     return NumberBaseOpt.castObjectToDouble(a) -
                             NumberBaseOpt.castObjectToDouble(b);
             }
-
+        } else if(a instanceof Date) {
+            if (b instanceof Date) {
+                return DatetimeOpt.calcDateSpan((Date)a, (Date)b);
+            } else if (NumberBaseOpt.isNumber(b)) {
+                float num = NumberBaseOpt.castObjectToFloat(b, 0.f);
+                return DatetimeOpt.addDays((Date) a, 0 - num);
+            }
+        } else if(a instanceof Collection){
+            List<Object> objs = new ArrayList<>();
+            if (b instanceof Collection){
+                objs.addAll((Collection<Object>) a);
+                objs.removeAll((Collection<Object>) b);
+            } else {
+                for(Object obj : (Collection<Object>) a){
+                    objs.add(subtractTwoObject(obj, b));
+                }
+            }
+            return objs;
         }
         return a;
     }
 
     public static Object multiplyTwoObject(Object a,Object b){
-        if(a==null)
-            return b;
-        if(b==null)
-            return a;
+        if(a == null|| b == null)
+            return null;
 
         if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
@@ -199,7 +226,25 @@ public abstract  class GeneralAlgorithm {
                     return NumberBaseOpt.castObjectToDouble(a) *
                             NumberBaseOpt.castObjectToDouble(b);
             }
-
+        } else if(a instanceof Collection){
+            List<Object> objs = new ArrayList<>();
+            if (b instanceof Collection){
+                List<Object> aobjs = new ArrayList<>();
+                aobjs.addAll((Collection<Object>) a);
+                for(Object obj : (Collection<Object>) b){
+                    if (aobjs.contains(obj)){
+                        objs.add(obj);
+                    }
+                }
+            } else {
+                for(Object obj : (Collection<Object>) a){
+                    objs.add(multiplyTwoObject(obj, b));
+                }
+            }
+            return objs;
+        } else if(b instanceof java.lang.Number){
+            int bi = NumberBaseOpt.castObjectToInteger(b);
+            return StringUtils.repeat(StringBaseOpt.castObjectToString(a), bi);
         }
         return StringBaseOpt.concat(
                 StringBaseOpt.castObjectToString(a),
@@ -211,6 +256,9 @@ public abstract  class GeneralAlgorithm {
             return null;
 
         if( a instanceof java.lang.Number &&  b instanceof java.lang.Number) {
+            BigDecimal dbop2 = NumberBaseOpt.castObjectToBigDecimal(b);
+            if(dbop2==null || dbop2.compareTo(BigDecimal.ZERO)==0)
+                return null;
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
             switch (retType){
                 case 1:
@@ -234,7 +282,12 @@ public abstract  class GeneralAlgorithm {
                     return NumberBaseOpt.castObjectToDouble(a) /
                             NumberBaseOpt.castObjectToDouble(b);
             }
-
+        } else if(a instanceof Collection){
+            List<Object> objs = new ArrayList<>();
+            for(Object obj : (Collection<Object>) a){
+                objs.add(divideTwoObject(obj, b));
+            }
+            return objs;
         }
         return a;
     }
