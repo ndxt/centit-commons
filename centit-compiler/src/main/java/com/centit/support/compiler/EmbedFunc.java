@@ -8,13 +8,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
     private EmbedFunc() {
         throw new IllegalAccessError("Utility class");
     }
     private static double MIN_DOUBLE = 0.00000001;
-    public static final int functionsSum = 57;
+    public static final int functionsSum = 59;
     protected static final FunctionInfo functionsList[]={
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte",2, ConstDefine.FUNC_BYTE,ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,2)=2
@@ -25,6 +27,8 @@ public abstract class EmbedFunc {
         new FunctionInfo("case",2,ConstDefine.FUNC_CASE,ConstDefine.TYPE_ANY),      // case(1,2,3)= null  case(1,2,3,1,"5")= "5"  case(0,1,"2","3")= "3"
         new FunctionInfo("match",2,ConstDefine.FUNC_MATCH,ConstDefine.TYPE_NUM), //匹配*?为通配符 match ("abcd","a??d")=1
                                             //             match ("abcd","a*d")=1
+        new FunctionInfo("regexmatch",2,ConstDefine.FUNC_REG_MATCH,ConstDefine.TYPE_NUM), //正则表达式 regexMatch
+        new FunctionInfo("regexmatchvalue",2,ConstDefine.FUNC_REG_MATCH_VALUES,ConstDefine.TYPE_ANY), //正则表达式匹配部分
         new FunctionInfo("max",-1,ConstDefine.FUNC_MAX,ConstDefine.TYPE_ANY),   // 求最大值 max (1,2,3,5,4) = 5
         new FunctionInfo("min",-1,ConstDefine.FUNC_MIN,ConstDefine.TYPE_ANY),    // 求最小值 min (1,2,3,5,4) = 1
         new FunctionInfo("ave",-1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
@@ -203,7 +207,24 @@ public abstract class EmbedFunc {
                 return StringRegularOpt.isMatch(
                         StringBaseOpt.objectToString(slOperand.get(0)),
                         StringBaseOpt.objectToString(slOperand.get(1)));
-
+            case ConstDefine.FUNC_REG_MATCH:
+                if(nOpSum<2)
+                    return false;
+                return Pattern.matches(
+                        StringBaseOpt.objectToString(slOperand.get(0)),
+                        StringBaseOpt.objectToString(slOperand.get(1)));
+            case ConstDefine.FUNC_REG_MATCH_VALUES: {
+                if (nOpSum < 2)
+                    return false;
+                String sValues = StringBaseOpt.objectToString(slOperand.get(1));
+                Pattern p = Pattern.compile(StringBaseOpt.objectToString(slOperand.get(0)));
+                Matcher m = p.matcher(sValues); // 获取 matcher 对象
+                List<String> matchValues = new ArrayList<>();
+                while(m.find()) {
+                    matchValues.add(sValues.substring(m.start(), m.end()));
+                }
+                return matchValues;
+            }
             case ConstDefine.FUNC_CAPITAL:// 102
             {
                 if (nOpSum <1) return null;

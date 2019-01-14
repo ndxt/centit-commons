@@ -550,11 +550,12 @@ public abstract class StringRegularOpt {
     }
 
     public static String sqlMatchToRegex(String sTempl){
-        return "^"+sTempl.replaceAll("%", "\\\\S*").replaceAll("_", "\\\\S")+"$";
+        return "^"+sTempl.replaceAll("%", "\\\\S*")
+                .replaceAll("_", "\\\\S")+"$";
     }
 
-    public static boolean  isMatch(String szValue , String szTempl)
-    {// ?_  *% 是通配符
+    // ?_  *% 是通配符
+    public static boolean  isMatch(String szValue , String szTempl) {
         if( szValue == null || szTempl == null) return false;
         if( szValue.equals(szTempl)) return true;
         int nLV = szValue.length();
@@ -563,9 +564,9 @@ public abstract class StringRegularOpt {
 
         szValue = trimString(szValue);
         szTempl = trimString(szTempl);
-
         //return Pattern.matches(sqlMatchToRegex(szTempl), szValue);//
-        return Pattern.compile(sqlMatchToRegex(szTempl)).matcher(szValue).find();
+        //Pattern.compile(sqlMatchToRegex(szTempl)).matcher(szValue).find()
+        return Pattern.matches(sqlMatchToRegex(szTempl),szValue);
     }
 
     /**

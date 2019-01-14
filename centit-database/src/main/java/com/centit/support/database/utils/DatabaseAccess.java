@@ -146,12 +146,12 @@ public abstract class DatabaseAccess {
      * 直接运行行带参数的 SQL,update delete insert
      */
     public static int doExecuteSql(Connection conn, String sSql, Object[] values) throws SQLException {
-        QueryLogUtils.printSql(logger,sSql ,values );
+        QueryLogUtils.printSql(logger,sSql, values );
         try(PreparedStatement stmt = conn.prepareStatement(sSql)){
-            setQueryStmtParameters(stmt,values);
+            setQueryStmtParameters(stmt, values);
             return stmt.executeUpdate();
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sSql,e);
+            throw new DatabaseAccessException(sSql, e);
         }
     }
 

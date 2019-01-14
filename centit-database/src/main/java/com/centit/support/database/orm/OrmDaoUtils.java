@@ -111,7 +111,7 @@ public abstract class OrmDaoUtils {
      * @throws PersistenceException 运行时异常
      */
     public static <T> int batchUpdateObject(
-            Connection connection, Collection<String> fields,   T object,
+            Connection connection, Collection<String> fields, T object,
                 Map<String, Object> propertiesFilter)
             throws PersistenceException  {
         try {

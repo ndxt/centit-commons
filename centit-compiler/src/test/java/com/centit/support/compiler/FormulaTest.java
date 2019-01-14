@@ -14,6 +14,8 @@ public class FormulaTest {
     public static void testFormula() {
         Object s = VariableFormula.calculate("SINGLETON( [1,2,2,4,5,,3] ,5, 6, 7 , -1)");
         System.out.println(s);
+        s = VariableFormula.calculate("[1,2,2,4,5,,3] - 1");
+        System.out.println(s);
         s =  VariableFormula.calculate("toDate('2012-12-12') + 1");
         System.out.println(s);
         s = VariableFormula.calculate("round(today() - toDate('2018-12-12'))");
@@ -75,10 +77,10 @@ public class FormulaTest {
 
         Map<String,Object> varB = new HashMap<>();
         varB.put("usercode", 300);
-        varB.put("unitcode", 500);
+        varMap.put("unit打法  code", 500);
         varMap.put("user", varB);
         Object s = f.calculate(
-                "today +':'+  today() + ' usercode' + usercode + $ { otherValue } + ':' +user.usercode }",
+                "today +':'+  today() + ' usercode' + usercode + ${unit打法  code} + ':' +user.usercode }",
                 varMap);
         System.out.println(s);
     }

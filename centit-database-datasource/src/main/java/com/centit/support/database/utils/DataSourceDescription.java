@@ -20,7 +20,7 @@ import java.sql.SQLException;
  * @author codefan
  *
  */
-public final class DataSourceDescription implements  Serializable{
+public final class DataSourceDescription implements Serializable{
     protected static final Logger logger = LoggerFactory.getLogger(DataSourceDescription.class);
     private static final long serialVersionUID = 1L;
     private String connUrl ;
@@ -149,7 +149,7 @@ public final class DataSourceDescription implements  Serializable{
         int result = 17;
         result = 37 * result +
              (this.connUrl == null ? 0 :this.connUrl.hashCode());
-  
+
         result = 37 * result +
              (this.username == null ? 0 :this.username.hashCode());
 

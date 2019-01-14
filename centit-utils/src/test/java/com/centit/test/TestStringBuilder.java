@@ -3,9 +3,29 @@ package com.centit.test;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class TestStringBuilder {
 
     public static void main(String[] args) {
+
+        final String REGEX = "\\bcat\\b";
+        final String INPUT =
+                "hello  cat pat cat cat cattie cat";
+
+
+        Pattern p = Pattern.compile(REGEX);
+        Matcher m = p.matcher(INPUT); // 获取 matcher 对象
+        int count = 0;
+
+        while(m.find()) {
+            count++;
+            System.out.println("Match number "+count);
+            System.out.println(INPUT.substring(m.start(), m.end()));
+        }
+
+
         System.out.println(StringBaseOpt.getFirstLetter("codefan 完美的解决 汉字拼音 哈哈 中国南京 nanjing China"));
         //System.out.println(StringBaseOpt.midPad("12",6,"UX",'0'));
 //        System.out.println(StringBaseOpt.midPad("adc",0,null,"X"));
