@@ -9,7 +9,7 @@ import java.util.List;
 public class Lexer {
 
     private String curWord;
-    
+
     private boolean isBack;
     private String formulaSen;
     private boolean canAcceptOpt;
@@ -27,14 +27,14 @@ public class Lexer {
      * SQL 的注释方式 用 -- 单行注释，/* 多行注释
      */
     public static final int LANG_TYPE_SQL=2;
-    
+
     private int languageType;
-    
+
     public Lexer() {
         languageType = LANG_TYPE_JAVA;
         setFormula(null);
     }
-    
+
     public Lexer(String sFormula) {
         languageType = LANG_TYPE_JAVA;
         setFormula(sFormula);
@@ -44,17 +44,17 @@ public class Lexer {
         this.languageType = langType;
         setFormula(null);
     }
-    
+
     public Lexer(String sFormula,int langType) {
         this.languageType = langType;
         setFormula(sFormula);
     }
-    
+
     public void setPreword(String preWord) {
-        curWord = preWord; 
+        curWord = preWord;
         isBack = true;
     }
-    
+
     public void setFormula(String sFormula) {
         formulaSen = sFormula;
         isBack  = false;
@@ -62,7 +62,7 @@ public class Lexer {
         startPos = 0;
         canAcceptOpt = false;
     }
-    
+
     public boolean isCanAcceptOpt() {
         return canAcceptOpt;
     }
@@ -70,31 +70,31 @@ public class Lexer {
     public void setCanAcceptOpt(boolean canAcceptOpt) {
         this.canAcceptOpt = canAcceptOpt;
     }
-    
+
     public int getCurrPos() {
         return startPos;
     }
-    
+
     static public boolean isLabel(String sWord) {
         if(sWord.length() < 1)
             return false;
-        char c = sWord.charAt(0); 
+        char c = sWord.charAt(0);
         return ( c == '_' ||
                 ( c >= 'a' && c <= 'z') ||
                 ( c >= 'A' && c <= 'Z')
              );
     }
-    
+
     public String getARawWord(){
         int sl = formulaSen.length();
 
         while((startPos < sl ) && (formulaSen.charAt(startPos) == ' ' || formulaSen.charAt(startPos) == 9 || formulaSen.charAt(startPos) == 10|| formulaSen.charAt(startPos) == 13)) startPos++;
         if(startPos >= sl) return "";
-            
+
 
         int bp = startPos;
         // 数字
-        if( (formulaSen.charAt(startPos)>='0' && formulaSen.charAt(startPos)<='9') || 
+        if( (formulaSen.charAt(startPos)>='0' && formulaSen.charAt(startPos)<='9') ||
             //m_Formula.charAt(m_iStart)== '.' ||
             ( ! canAcceptOpt && (formulaSen.charAt(startPos)== '-' || formulaSen.charAt(startPos)== '+' ) ) ){
             startPos++;
@@ -102,7 +102,7 @@ public class Lexer {
             while ( startPos < sl  && (
                     ( formulaSen.charAt(startPos)>='0' && formulaSen.charAt(startPos)<='9') ||
                      formulaSen.charAt(startPos)=='.'  ))
-            { 
+            {
                 if( formulaSen.charAt(startPos)=='.' ){
                     nPoints ++;
                     if (nPoints>1)
@@ -110,8 +110,8 @@ public class Lexer {
                 }
                 startPos ++;
             }
-            canAcceptOpt = true;            
-        // 标识符    
+            canAcceptOpt = true;
+        // 标识符
         } else if (( formulaSen.charAt(startPos)>='a' && formulaSen.charAt(startPos)<='z') ||
             ( formulaSen.charAt(startPos)>='A' && formulaSen.charAt(startPos)<='Z') ||
             formulaSen.charAt(startPos)=='_' ||
@@ -122,7 +122,7 @@ public class Lexer {
                     ( formulaSen.charAt(startPos)>='a' && formulaSen.charAt(startPos)<='z') ||
                     ( formulaSen.charAt(startPos)>='A' && formulaSen.charAt(startPos)<='Z') ||
                       formulaSen.charAt(startPos)=='_' || formulaSen.charAt(startPos)=='.' ||
-                      formulaSen.charAt(startPos)=='@' ) ) 
+                      formulaSen.charAt(startPos)=='@' ) )
                 startPos ++;
             canAcceptOpt = true;
         }else {
@@ -130,43 +130,43 @@ public class Lexer {
             switch(formulaSen.charAt(startPos)){
             case '+':
                 ++startPos;
-                if((startPos<sl) && ((formulaSen.charAt(startPos) == '=') || 
+                if((startPos<sl) && ((formulaSen.charAt(startPos) == '=') ||
                                      (formulaSen.charAt(startPos) == '+')  ) ) startPos ++;
                 break;
             case '-':
                 ++startPos;
-                if((startPos<sl) && ((formulaSen.charAt(startPos) == '=') || 
+                if((startPos<sl) && ((formulaSen.charAt(startPos) == '=') ||
                                      (formulaSen.charAt(startPos) == '-')  ) ) startPos ++;
                 break;
             case '*':
                 ++startPos;
-                if((startPos<sl) && ((formulaSen.charAt(startPos) == '*') || 
+                if((startPos<sl) && ((formulaSen.charAt(startPos) == '*') ||
                                      (formulaSen.charAt(startPos) == '=') ||
                                      (formulaSen.charAt(startPos) == '/')   ) ) startPos ++;
-                break;    
+                break;
             case '/':
                 ++startPos;
-                if((startPos<sl) && ((formulaSen.charAt(startPos) == '=') || 
+                if((startPos<sl) && ((formulaSen.charAt(startPos) == '=') ||
                                      (formulaSen.charAt(startPos) == '/') ||
                                      (formulaSen.charAt(startPos) == '*')   ) ) startPos ++;
-                break;    
-                
+                break;
+
             case '<':
                 ++startPos;
-                if((startPos<sl) && ((formulaSen.charAt(startPos) == '=') || 
+                if((startPos<sl) && ((formulaSen.charAt(startPos) == '=') ||
                                      (formulaSen.charAt(startPos) == '>') ||
                                      (formulaSen.charAt(startPos) == '<')   ) ) startPos ++;
-                break;    
+                break;
             case '>':
                 ++startPos;
-                if((startPos<sl) && ((formulaSen.charAt(startPos) == '=') || 
+                if((startPos<sl) && ((formulaSen.charAt(startPos) == '=') ||
                                      (formulaSen.charAt(startPos) == '>')  ) ) startPos ++;
                 break;
             case ':':
                 ++startPos;
                 if((startPos<sl) && (formulaSen.charAt(startPos) == '=')) startPos ++;
                 break;
-                
+
             case '=':
             case '!':
                 ++startPos;
@@ -187,11 +187,11 @@ public class Lexer {
                 break;
             case '.':
                 ++startPos;
-                while ( startPos < sl  && 
+                while ( startPos < sl  &&
                         ( formulaSen.charAt(startPos)>='0' && formulaSen.charAt(startPos)<='9') )
-                { 
+                {
                     startPos ++;
-                }                
+                }
                 break;
             case ')':
                 canAcceptOpt = true;
@@ -202,11 +202,10 @@ public class Lexer {
                 break;
             }
         }
-        
-        String str = formulaSen.substring(bp, startPos );
-        return str;    
-    }    
-    
+
+        return formulaSen.substring(bp, startPos );
+    }
+
     public String getARegularWord() {
         String s = getARawWord();
         int sl = formulaSen.length();
@@ -219,7 +218,7 @@ public class Lexer {
                 startPos++;
             }
             if(startPos >= sl)//没有找到配对的\"
-                return null;            
+                return null;
             startPos ++;
             canAcceptOpt = true;
             s = formulaSen.substring(bp, startPos );
@@ -232,14 +231,14 @@ public class Lexer {
                 startPos++;
             }
             if(startPos >= sl)//没有找到配对的\'
-                return null;            
+                return null;
             startPos ++;
             canAcceptOpt = true;
             s = formulaSen.substring(bp, startPos );
         }
         return s;
     }
-    
+
     /**
      * 过滤掉 注释
      * 系统支持两种注释， c++(java)  // /*
@@ -251,7 +250,7 @@ public class Lexer {
             isBack = false;
             return curWord;
         }
-        
+
         while(true){
             curWord =  getARegularWord();
             if(curWord==null || "".equals(curWord))
@@ -262,28 +261,28 @@ public class Lexer {
             else if(this.languageType != LANG_TYPE_DEFAULT && "/*".equals(curWord))
                 this.seekToAnnotateEnd();
             else
-                break;            
+                break;
         }
         return curWord;
     }
-    
+
     public String getAWord(boolean bAcceptOpt) {
         canAcceptOpt = bAcceptOpt;
         return getAWord( );
     }
-    
-    
+
+
     public String getARawWord(boolean bAcceptOpt) {
         canAcceptOpt = bAcceptOpt;
         return getARawWord( );
     }
-    
+
     public void seekToLineEnd() {
         int sl = formulaSen.length();
         while( (startPos < sl ) && (formulaSen.charAt(startPos) != 10 ))
             startPos ++;
     }
-    
+
     /**
      * 将解释位置滑动到注释结束位置 '*'+'/'
      *
@@ -294,10 +293,10 @@ public class Lexer {
             startPos ++;
         if(startPos < sl-1 && formulaSen.charAt(startPos) == '*' && formulaSen.charAt(startPos+1) == '/')
             startPos += 2;
-        else 
+        else
             startPos = sl;
     }
-    
+
     /**
      * 移动到下一个），自动跳过之间的（）括号对
      * @return 是否成功
@@ -315,8 +314,8 @@ public class Lexer {
             if (nBracket==0)
                 return true;
         }
-    }    
-    
+    }
+
     /**
      * 移动到下一个]，自动跳过之间的[]括号对
      * @return 是否成功
@@ -336,7 +335,7 @@ public class Lexer {
                 return true;
         }
     }
-    
+
     /**
      * 移动到下一个}，自动跳过之间的{}括号对
      * @return 是否成功
@@ -355,8 +354,8 @@ public class Lexer {
                 return true;
         }
     }
-    
-    
+
+
     public void skipAOperand() {
         int nBracket = 0;
         String sWord;
@@ -373,7 +372,7 @@ public class Lexer {
                     return;
                 }
             }
-    
+
             if(sWord.equals(",")){
                 if(nBracket==0) {
                     setPreword(",");
@@ -382,7 +381,7 @@ public class Lexer {
             }
         }
     }
-    
+
     public String getStringUntil(String szBreak) {
         int bp = startPos;
         int ep = startPos;
@@ -393,17 +392,17 @@ public class Lexer {
                 break;
         }
         String str = formulaSen.substring(bp, ep );
-        return str;    
+        return str;
     }
-    
-    
+
+
     public void resetToBegin() {
         isBack  = false;
         curWord = "";
         startPos = 0;
         canAcceptOpt = false;
-    }    
-    
+    }
+
     public boolean setPosition(int newPos) {
         if(formulaSen==null|| formulaSen.length()<=newPos)
             return false;
@@ -412,8 +411,8 @@ public class Lexer {
         startPos = newPos;
         canAcceptOpt = false;
         return true;
-    }    
-    
+    }
+
     public boolean seekTo(char cSplit) {
         int sl = formulaSen.length();
         while((startPos < sl ) && (formulaSen.charAt(startPos) != cSplit))
@@ -424,24 +423,24 @@ public class Lexer {
         }
         return false;
     }
-    
+
     public boolean seekTo(String aword,final boolean skipAnnotate){
         while(true){
             curWord = skipAnnotate?this.getAWord():this.getARegularWord();
             if(curWord==null || "".equals(curWord))
                 return false;
             if(curWord.equals(aword))
-                return true;            
+                return true;
         }
     }
-    
+
     public String getBuffer(int bp, int ep) {
         if(ep-bp < 1)
-            return null;             
+            return null;
         return formulaSen.substring(bp, ep );
     }
     /**
-     * 
+     *
      * @param aword aword
      * @param caseSensitives  caseSensitives
      * @param skipAnnotate skipAnnotate
@@ -453,7 +452,7 @@ public class Lexer {
             if(cWord.equals(aword) || (!caseSensitives && cWord.equalsIgnoreCase(aword)) )
                 return this.getCurrPos() - cWord.length();
             cWord=skipAnnotate?this.getAWord():this.getARegularWord();
-        }    
+        }
         return -1;
     }
 
@@ -497,7 +496,7 @@ public class Lexer {
                 prePos = varMorp.getCurrPos();
             }
             curPos = varMorp.getCurrPos();
-            aWord = varMorp.getARawWord();            
+            aWord = varMorp.getARawWord();
         }
         curPos = varMorp.getCurrPos();
         res.add(sourceString.substring(prePos,curPos));
