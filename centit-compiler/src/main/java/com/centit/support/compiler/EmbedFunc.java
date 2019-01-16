@@ -94,9 +94,11 @@ public abstract class EmbedFunc {
         new FunctionInfo("getpy",1,ConstDefine.FUNC_GET_PY,ConstDefine.TYPE_STR)//取汉字拼音
     };
 
-    public static final int getFuncNo(String sFuncName){
-        for(int i=0; i<functionsSum; i++)
-            if( sFuncName.equalsIgnoreCase(functionsList[i].sName)) return i;
+    public static int getFuncNo(String sFuncName){
+        for(int i=0; i<functionsSum; i++) {
+            if (sFuncName.equalsIgnoreCase(functionsList[i].sName))
+                return i;
+        }
         return -1;
     }
 
@@ -107,8 +109,8 @@ public abstract class EmbedFunc {
             for (Object obj : slOperand) {
                 if(obj instanceof Object[]){
                     Object [] objs=(Object[]) obj;
-                    for(int i=0;i<objs.length;i++) {
-                        ret.add(objs[i]);
+                    for (Object obj1 : objs) {
+                        ret.add(obj1);
                         nCount++;
                     }
                 }else if (obj instanceof Collection) {
@@ -138,6 +140,7 @@ public abstract class EmbedFunc {
         }
         return new LeftRightPair<>(dt, ti);
     }
+
     public static Object runFuncWithObject(List<Object> slOperand,int funcID)
     {
         int nOpSum = ( slOperand == null )? 0: slOperand.size();
@@ -322,7 +325,9 @@ public abstract class EmbedFunc {
                 return sb.toString();
             }
             case ConstDefine.FUNC_SUBSTR:{
-                if(nOpSum<2 )
+                if (nOpSum < 1)
+                    return null;
+                if (nOpSum<2 )
                     return slOperand.get(0);
                 if(slOperand.get(0)==null)
                     return null;
@@ -341,6 +346,8 @@ public abstract class EmbedFunc {
                 return tempStr.substring(nStart,nStart + nLength);
             }
             case ConstDefine.FUNC_LPAD: {
+                if (nOpSum < 1)
+                    return null;
                 if (nOpSum < 2)
                     return slOperand.get(0);
                 int nLength = NumberBaseOpt.castObjectToInteger(slOperand.get(1),0);
@@ -355,6 +362,8 @@ public abstract class EmbedFunc {
             }
 
             case ConstDefine.FUNC_RPAD: {
+                if (nOpSum < 1)
+                    return null;
                 if (nOpSum < 2)
                     return slOperand.get(0);
                 int nLength = NumberBaseOpt.castObjectToInteger(slOperand.get(1),0);
