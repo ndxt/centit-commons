@@ -1,9 +1,11 @@
 package com.centit.support.common;
 
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.function.Supplier;
 
@@ -76,7 +78,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
         }
         // 如果获取失败 继续用以前的缓存
         if(tempTarget != null) {
-            this.target = tempTarget;
+            this.target = CollectionsOpt.unmodifiableObject(tempTarget);
             this.refreshTime = DatetimeOpt.currentUtilDate();
             this.evicted = false;
         }
@@ -104,7 +106,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
     }
 
     public void setFreshtDate(T freshData){
-        this.target = freshData;
+        this.target = CollectionsOpt.unmodifiableObject(freshData);
         this.refreshTime = DatetimeOpt.currentUtilDate();
         this.evicted = false;
     }

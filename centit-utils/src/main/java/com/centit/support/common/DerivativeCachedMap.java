@@ -1,5 +1,6 @@
 package com.centit.support.common;
 
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,7 +55,7 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
             }
             // 如果获取失败 继续用以前的缓存
             if(tempTarget != null) {
-                this.target = tempTarget;
+                this.target = CollectionsOpt.unmodifiableObject(tempTarget);
                 this.refreshTime = DatetimeOpt.currentUtilDate();
                 this.evicted = false;
             }

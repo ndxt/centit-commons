@@ -15,7 +15,7 @@ import java.util.*;
 
 
 /**
- * 
+ *
  * 一些通用的算法，这些算法都和具体的业务数据结构解耦
  *1. sortAsTree* 将list按照树形结构进行排序，这个方式是这个类最重要的一个方法，也是这个类存在的一个原因。
  2. compareTwoList 比较两个list，将他们相同的、删除的、新增的分别找出来，
@@ -166,7 +166,7 @@ public abstract class CollectionsOpt {
         }
         return indexes;
     }
-    
+
     /**
      * 移除List中的所有null对象
      * @param <T> 泛型类型
@@ -183,7 +183,7 @@ public abstract class CollectionsOpt {
         }
         return retList;
     }
-    
+
     /**
      * 移除List中的所有null对象
      * @param <T> 泛型类型
@@ -215,7 +215,7 @@ public abstract class CollectionsOpt {
         }
         return ta;
     }
-        
+
     /**
      * 移除String List中的所有 Blank 对象
      * @param list 输入字符串列表
@@ -231,7 +231,7 @@ public abstract class CollectionsOpt {
         }
         return retList;
     }
-    
+
     /**
      * 移除List中的所有null对象
      * @param list 输入字符串数组
@@ -260,11 +260,11 @@ public abstract class CollectionsOpt {
         }
         return ta;
     }
-    
+
     /**
      * 将TreeList转换为JSONArray
      * @param <T> 泛型类型
-     * @param treeList  必须是已经通过 sortAsTree 排序好的list 
+     * @param treeList  必须是已经通过 sortAsTree 排序好的list
      * @param c  比较算法，需要实现接口 CollectionsOpt.ParentChild T
      * @param childrenPropertyName 为孩子的 属性名
      * @return JSONArray
@@ -310,7 +310,7 @@ public abstract class CollectionsOpt {
         }
         return jsonTree;
     }
-    
+
     /**
      * 将列表转换为tree结构的json
      * @param <T> 泛型类型
@@ -324,7 +324,7 @@ public abstract class CollectionsOpt {
          sortAsTree(treeList,c);
          return treeToJSONArray(treeList,c,childrenPropertyName);
     }
-    
+
     /**
      * 将数组结构按照树形展示的形式进行排序，将所有孩子元素放到父元素的下面
      * 深度优先的排序
@@ -373,7 +373,7 @@ public abstract class CollectionsOpt {
         }
         return ja;
     }
-    
+
     /**
      * 将列表转换为tree结构的json
      * 和 srotAsTreeAndToJSON 用不同的算法实现，这个需要额外的空间，用递归实现。
@@ -389,7 +389,7 @@ public abstract class CollectionsOpt {
         List<TreeNode<T>> sortTree = storedAsTree(treeList,c);
         return treeToJSONArray(sortTree,childrenPropertyName);
     }
-    
+
     /*
      * 克隆 一个 list
      */
@@ -400,7 +400,7 @@ public abstract class CollectionsOpt {
         deslist.addAll(souList);
         return deslist;
     }
-    
+
     /*
      * 克隆 一个 array
      */
@@ -426,7 +426,7 @@ public abstract class CollectionsOpt {
      * @return 返回三个list， 第一个是 需要新增的，第二个是 新旧对 他们拥有相同的排序值（主键），第三为新值中没有的，即需要删除的
      *             insert T update(old,new) T,T  delete T
      */
-    public static <T> Triple<List<T>, List<Pair<T,T>>, List<T>> 
+    public static <T> Triple<List<T>, List<Pair<T,T>>, List<T>>
         compareTwoList(List<T> oldList, List<T> newList,Comparator<T> compare){
         if(oldList==null ||oldList.size()==0)
             return new ImmutableTriple<> (
@@ -506,7 +506,7 @@ public abstract class CollectionsOpt {
             ta[i] = listObj.get(i);
         return ta;*/
     }
-    
+
     public static <T> List<T> arrayToList(T[] arrayObj ){
         if(arrayObj==null || arrayObj.length==0)
             return null;
@@ -556,5 +556,25 @@ public abstract class CollectionsOpt {
         HashSet<T>  paramsSet = new  HashSet<>(objs.length*2+1);
         Collections.addAll(paramsSet, objs);
         return paramsSet;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T unmodifiableObject(T obj){
+        if(obj == null){
+            return null;
+        }
+        if(obj instanceof List){
+            return (T) Collections.unmodifiableList( (List) obj);
+        }
+        if(obj instanceof Map){
+            return (T) Collections.unmodifiableMap( (Map) obj);
+        }
+        if(obj instanceof Set){
+            return (T) Collections.unmodifiableSet( (Set) obj);
+        }
+        if(obj instanceof Collection){
+            return (T) Collections.unmodifiableCollection( (Collection) obj);
+        }
+        return obj;
     }
 }
