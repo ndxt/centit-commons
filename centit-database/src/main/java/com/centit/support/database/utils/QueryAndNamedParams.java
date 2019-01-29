@@ -2,6 +2,7 @@ package com.centit.support.database.utils;
 
 import java.util.HashMap;
 import java.util.Map;
+
 /**
  * 这个类比较简单主要目的是将查询语句和其对应的参数变量放在一起便于参数传输。其中查询语句中的变量为命名变量，形式为：变量名。
  * @author codefan

@@ -42,7 +42,7 @@ public class QueryAndParams {
     public Object[] getParams() {
         return params;
     }
-    
+
     public Object getParam(int index){
         if( params==null)
             return null;
@@ -55,23 +55,23 @@ public class QueryAndParams {
         this.queryStmt = null;
         this.params = null;
     }
-    
+
     public QueryAndParams(String shql) {
         this.queryStmt = shql;
         this.params = null;
     }
-    
+
     public QueryAndParams(String shql,final Object[] values) {
         this.queryStmt = shql;
         this.params = values;
     }
-    
+
     public static QueryAndParams creepArrayParamForInQuery(String sql, Object[] sqlParams){
- 
+
         StringBuilder sqlb = new StringBuilder();
         List<Object> params = new ArrayList<>();
-        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);       
-        
+        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+
         int prePos = 0;
         int paramInd = -1;
         String aWord = lex.getAWord();
@@ -106,27 +106,27 @@ public class QueryAndParams {
                         sqlb.append("?");
                         params.add(po);
                         n++;
-                    }                   
+                    }
                 }else{
                     params.add(obj);
                     sqlb.append("?");
                 }
                 prePos = lex.getCurrPos();
-            } 
+            }
 
             aWord = lex.getAWord();
         }
-        sqlb.append(sql.substring(prePos));        
-        
+        sqlb.append(sql.substring(prePos));
+
         return new QueryAndParams(sqlb.toString(),params.toArray());
     }
-    
+
     public static QueryAndParams createFromQueryAndNamedParams(String sql, Map<String,Object> namedParams){
- 
+
         StringBuilder sqlb = new StringBuilder();
         List<Object> params = new ArrayList<Object>(namedParams.size()+5);
-        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);       
-        
+        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+
         int prePos = 0;
         String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord)) {
@@ -160,29 +160,28 @@ public class QueryAndParams {
                         sqlb.append("?");
                         params.add(po);
                         n++;
-                    }                   
+                    }
                 }else{
                     params.add(obj);
                     sqlb.append("?");
                 }
                 prePos = lex.getCurrPos();
-            } 
+            }
 
             aWord = lex.getAWord();
         }
-        sqlb.append(sql.substring(prePos));        
-        
+        sqlb.append(sql.substring(prePos));
+
         return new QueryAndParams(sqlb.toString(),params.toArray());
     }
-    
+
     public static QueryAndParams creepArrayParamForInQuery(QueryAndParams queryParam){
         return creepArrayParamForInQuery(
                 queryParam.getQuery(),queryParam.getParams());
     }
-    
+
     public static QueryAndParams createFromQueryAndNamedParams(QueryAndNamedParams namedParamQuery){
         return createFromQueryAndNamedParams(
                 namedParamQuery.getQuery(),namedParamQuery.getParams());
     }
-
 }
