@@ -142,6 +142,24 @@ public abstract class DatabaseAccess {
             }
         }
     }
+
+    public static void setQueryStmtParameters(PreparedStatement stmt,List<String> paramsName,
+                                              Map<String, Object> paramObjs) throws SQLException{
+        //query.getParameterMetadata().isOrdinalParametersZeroBased()?0:1;
+        if (paramObjs != null) {
+            for (int i = 0; i < paramsName.size(); i++) {
+                Object pobj = paramObjs.get(paramsName.get(i));
+                if (pobj == null)
+                    stmt.setNull(i + 1, Types.NULL);
+                else if (pobj instanceof java.sql.Date)
+                    stmt.setObject(i + 1, pobj);
+                else if (pobj instanceof java.util.Date)
+                    stmt.setObject(i + 1, DatetimeOpt.convertToSqlTimestamp((java.util.Date) pobj));
+                else
+                    stmt.setObject(i + 1, pobj);
+            }
+        }
+    }
     /*
      * 直接运行行带参数的 SQL,update delete insert
      */
