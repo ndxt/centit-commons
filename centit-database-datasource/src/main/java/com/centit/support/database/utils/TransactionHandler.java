@@ -21,6 +21,15 @@ public abstract class TransactionHandler {
     public static <T> T executeInTransaction(DataSourceDescription dataSourceDesc, TransactionWork<T> realWork)
         throws SQLException {
         Connection conn = DbcpConnectPools.getDbcpConnect(dataSourceDesc);
+        try {
+            return executeInTransaction(conn, realWork);
+        } finally {
+            DbcpConnectPools.closeConnect(conn);
+        }
+    }
+
+    public static <T> T executeInTransaction(Connection conn, TransactionWork<T> realWork)
+            throws SQLException {
         try{
             T relRet = realWork.execute(conn);
             conn.commit();
@@ -29,8 +38,6 @@ public abstract class TransactionHandler {
             logger.error("error code :" + e.getSQLState() + e.getLocalizedMessage(),e);
             conn.rollback();
             throw e;
-        } finally {
-            DbcpConnectPools.closeConnect(conn);
         }
     }
 }
