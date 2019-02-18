@@ -6,10 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -554,6 +551,51 @@ public abstract class StringBaseOpt {
         stringList.add(StringBaseOpt.castObjectToString(object));
         return stringList;
         //}
+    }
+
+    /**
+     * 将对象转换为 string list
+     * @param object 对象
+     * @return stringList
+     */
+    public static Set<String> objectToStringSet(Object object){
+        if(object==null){
+            return null;
+        }else if (object instanceof Collection) {
+            Set<String> stringSet = new HashSet<>( ((Collection<?>) object).size()+1 );
+            for(Object po :(Collection<?>) object){
+                stringSet.add(StringBaseOpt.castObjectToString(po));
+            }
+            return stringSet;
+        } else if (object instanceof Object[]) {
+            Set<String> stringSet = new HashSet<>( ((Object[]) object).length+1 );
+            for(Object po :(Object[])  object){
+                stringSet.add(StringBaseOpt.castObjectToString(po));
+            }
+            return stringSet;
+        }//else{
+
+        Set<String> stringSet = new HashSet<>( 1 );
+        stringSet.add(StringBaseOpt.castObjectToString(object));
+        return stringSet;
+    }
+
+    public static Map<String,Set<String>> objectToMapStrSet(Object object){
+        Map<String,Object> objMap = CollectionsOpt.objectToMap(object);
+        Map<String,Set<String>> strMap = new HashMap<>(objMap.size()+1);
+        for(Map.Entry<String, Object> ent : objMap.entrySet()){
+            strMap.put(ent.getKey(), objectToStringSet(ent.getValue()));
+        }
+        return strMap;
+    }
+
+    public static Map<String,List<String>> objectToMapStrArray(Object object){
+        Map<String,Object> objMap = CollectionsOpt.objectToMap(object);
+        Map<String,List<String>> strMap = new HashMap<>(objMap.size()+1);
+        for(Map.Entry<String, Object> ent : objMap.entrySet()){
+            strMap.put(ent.getKey(), objectToStringList(ent.getValue()));
+        }
+        return strMap;
     }
 
     public static String castObjectToString(Object obj){

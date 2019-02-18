@@ -577,4 +577,16 @@ public abstract class CollectionsOpt {
         }
         return obj;
     }
+
+    public static Map<String,Object> objectToMap(Object object){
+        if(object instanceof Map){
+            return (Map<String,Object>) object;
+        }
+        if(ReflectionOpt.isScalarType(object.getClass())){
+            return CollectionsOpt.createHashMap("scalar",object);
+        }
+
+        return (JSONObject) JSON.toJSON(object);
+    }
+
 }

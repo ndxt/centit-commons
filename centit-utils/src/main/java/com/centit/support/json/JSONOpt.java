@@ -33,14 +33,13 @@ public abstract class JSONOpt {
         String path;
         boolean found;
         int pathPos;
-    };
+    }
     static class JSONKey{
         String skey;
         int ind;
-    };
+    }
 
-
-    /*     * 目前只支持一维数值
+    /* 目前只支持一维数值
      * @return
      */
     private static JSONKey praseJosnKey(String skey){
@@ -360,15 +359,14 @@ public abstract class JSONOpt {
            return objectToJSONObject(obj,methodOnly,fieldOnly,includePrivateField).toJSONString();
     }
 
+    /**
+     * @see  com.centit.support.algorithm.CollectionsOpt  objectToMap
+     * @param object 对象
+     * @return map
+     */
+    @Deprecated
     public static Map<String,Object> objectToMap(Object object){
-        if(object instanceof Map){
-            return (Map<String,Object>) object;
-        }
-        if(ReflectionOpt.isScalarType(object.getClass())){
-            return CollectionsOpt.createHashMap("scalar",object);
-        }
-
-        return (JSONObject) JSON.toJSON(object);
+        return CollectionsOpt.objectToMap(object);
     }
 
     /**
@@ -578,7 +576,9 @@ public abstract class JSONOpt {
     public static JSONArray arrayToJSONArray(Object objArray,boolean methodOnly, boolean fieldOnly){
         return arrayToJSONArray( objArray, methodOnly,  fieldOnly, false);
     }
+
     /**
+     * @see  com.centit.support.algorithm.CollectionsOpt  createHashMap
      * 参数必须是 string object string object ....
      * @param objs 参数必须是 string object string object ....
      * @return Map &lt; String,Object &gt;
