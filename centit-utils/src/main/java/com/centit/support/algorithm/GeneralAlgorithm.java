@@ -1,5 +1,7 @@
 package com.centit.support.algorithm;
 
+import com.alibaba.fastjson.parser.ParserConfig;
+import com.alibaba.fastjson.util.TypeUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -478,5 +480,9 @@ public abstract  class GeneralAlgorithm {
             }
         }
         return sumObj;
+    }
+
+    public static Object castObjectToType(Object obj, Class<?> type){
+        return TypeUtils.cast(obj, type, ParserConfig.getGlobalInstance());
     }
 }

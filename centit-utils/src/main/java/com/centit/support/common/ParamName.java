@@ -8,6 +8,16 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER})
+
 public @interface ParamName {
+    /**
+     * @return 参数名称
+     */
     String value();
+
+    /**
+     * 是否可以为空
+     * @return true可以为空 false 不能为空
+     */
+    boolean nullable() default true;
 }

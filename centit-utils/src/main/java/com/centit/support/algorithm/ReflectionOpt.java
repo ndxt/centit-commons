@@ -1,5 +1,7 @@
 package com.centit.support.algorithm;
 
+import com.centit.support.common.LeftRightPair;
+import com.centit.support.common.ParamName;
 import com.centit.support.file.FileType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -339,6 +341,47 @@ public abstract class ReflectionOpt  {
         }
     }
 
+    public static LeftRightPair<Method, Object[]> getMatchBestMethod(Class<?> classType, String methodName, Map<String, Object> params){
+        Method[] mths =  classType.getMethods();
+        List<Method> getMths = new ArrayList<>();
+        int matchParam = -1;
+        LeftRightPair<Method, Object[]> mp = new LeftRightPair<>();
+        for (Method mth : mths) {
+            if (mth.getName().equals(methodName)){
+                Parameter[] parameters = mth.getParameters();
+                int nps = parameters.length;
+                boolean bmatch = true;
+                Object[] prams = null;
+                if(nps>0) {
+                    prams = new Object[nps];
+                    for (int i = 0; i < nps; i++) {
+                        String paramName = parameters[i].getName();
+                        if (parameters[i].isAnnotationPresent(ParamName.class)) {
+                            ParamName param = parameters[i].getAnnotation(ParamName.class);
+                            paramName = param.value();
+                        }
+                        prams[i] = params.get(paramName);
+                        if (prams[i] == null) {
+                            bmatch = false;
+                        } else {
+                            // 类型转换
+                            prams[i] = GeneralAlgorithm.castObjectToType(prams[i], parameters[i].getType());
+                            if (prams[i] == null) {
+                                bmatch = false;
+                            }
+                        }
+                    }
+                }
+
+                if(bmatch && nps>matchParam){
+                    matchParam = nps;
+                    mp.setLeft(mth);
+                    mp.setRight(prams);
+                }
+            }
+        }
+        return mp;
+    }
     /*
      * 获得 对象的 属性
      * @param sourceObj
@@ -487,7 +530,7 @@ public abstract class ReflectionOpt  {
     public static List<Method> getAllGetterMethod(Class<?> type) {
         try {
             Method[] mths =  type.getMethods();
-            List<Method> getMths = new ArrayList<Method>();
+            List<Method> getMths = new ArrayList<>();
             for (Method mth : mths)
                 if( ( mth.getName().startsWith("get") ||  mth.getName().startsWith("is") )
                         && ! mth.getName().equals("getClass")
