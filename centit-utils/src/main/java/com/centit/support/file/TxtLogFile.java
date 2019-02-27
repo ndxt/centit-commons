@@ -9,14 +9,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * 
+ *
  * 这个类是用来对纯文本的文件追加文本内容
  * 可以用来写操作日志
- * 
+ *
  * 他有两组函数，一组静态函数打开、写入、关闭 一次完成
  *                 一组是类成员函数，可以打开，重复写入，关闭，
  * 两组成员函数用于不同的场合
- * 
+ *
  * @author codefan
  */
 @SuppressWarnings("unused")
@@ -24,7 +24,7 @@ public class TxtLogFile {
     protected static final Logger logger = LoggerFactory.getLogger(TxtLogFile.class);
     public static void writeLog(String sLogFileName,String slog, boolean bNewLine,boolean bShowTime){
         try(BufferedWriter bw = new BufferedWriter(
-                 new FileWriter(sLogFileName))){
+                 new FileWriter(sLogFileName, true))){
             if(bShowTime)
                 bw.write(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
             if(bNewLine){
@@ -40,7 +40,7 @@ public class TxtLogFile {
 
     public static void writeLogEx(String sLogFileName,String slog, boolean bNewLine,boolean bShowTime){
         try(BufferedWriter bw = new BufferedWriter(
-                 new FileWriter(sLogFileName))){
+                 new FileWriter(sLogFileName, true))){
             if(bShowTime){
                 bw.write(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
                 //System.out.print(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
@@ -61,7 +61,7 @@ public class TxtLogFile {
 
     public static void writeLog(String sLogFileName,String slog){
         try(BufferedWriter bw = new BufferedWriter(
-                     new FileWriter(sLogFileName))){
+                     new FileWriter(sLogFileName, true))){
             bw.write(slog);
             //bw.close();
         } catch (IOException e) {
@@ -76,7 +76,7 @@ public class TxtLogFile {
         closeLogFile();
         boolean bOpened = false;
         try {
-            fileWriter = new FileWriter(sLogFileName);
+            fileWriter = new FileWriter(sLogFileName, true);
             logWriter = new BufferedWriter(fileWriter);
             bOpened = true;
         } catch (IOException e) {
