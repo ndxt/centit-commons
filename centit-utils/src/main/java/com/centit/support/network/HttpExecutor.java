@@ -240,23 +240,25 @@ public abstract class HttpExecutor {
             throws IOException {
 
         HttpDelete httpDelete = new HttpDelete(UrlOptUtils.appendParamToUrl(uri,queryParam));
+        return httpExecute(executorContext,httpDelete);
+    }
 
+    public static String simpleDelete(HttpExecutorContext executorContext, String uri, Map<String,Object> queryParam)
+        throws IOException {
+        HttpDelete httpDelete = new HttpDelete(UrlOptUtils.appendParamsToUrl(uri,queryParam));
         return httpExecute(executorContext,httpDelete);
     }
 
     public static String simplePut(HttpExecutorContext executorContext,
              String uri, String putEntity)
             throws IOException {
-
         HttpPut httpPut = new HttpPut(uri);
 
         httpPut.setHeader("Content-Type",plainTextHead);
-
         if (putEntity != null) {
             StringEntity entity = new StringEntity(putEntity, Consts.UTF_8);
             httpPut.setEntity(entity);
         }
-
         return httpExecute(executorContext,httpPut);
     }
 

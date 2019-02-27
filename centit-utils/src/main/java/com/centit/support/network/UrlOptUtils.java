@@ -92,24 +92,25 @@ public abstract class UrlOptUtils {
     }
 
     public static String appendParamsToUrl(String uri, Map<String,Object> queryParam){
+        if(queryParam == null) {
+          return uri;
+        }
         StringBuilder urlBuilder = new StringBuilder(uri);
-        if(queryParam!=null){
-            if(!uri.endsWith("?") && !uri.endsWith("&")){
-                if(uri.indexOf('?') == -1 )
-                    urlBuilder.append('?');
-                else
-                    urlBuilder.append('&');
-            }
-            int n=0;
-            for(Map.Entry<String,Object> ent : queryParam.entrySet() ){
-                if(n>0)
-                    urlBuilder.append('&');
-                n++;
-                urlBuilder.append(ent.getKey()).append('=').append(
-                        StringEscapeUtils.escapeHtml4(
-                                StringBaseOpt.objectToString(ent.getValue()))
-                );
-            }
+        if(!uri.endsWith("?") && !uri.endsWith("&")){
+            if(uri.indexOf('?') == -1 )
+                urlBuilder.append('?');
+            else
+                urlBuilder.append('&');
+        }
+        int n=0;
+        for(Map.Entry<String,Object> ent : queryParam.entrySet() ){
+            if(n>0)
+                urlBuilder.append('&');
+            n++;
+            urlBuilder.append(ent.getKey()).append('=').append(
+                    StringEscapeUtils.escapeHtml4(
+                            StringBaseOpt.objectToString(ent.getValue()))
+            );
         }
         return urlBuilder.toString();
     }
@@ -121,13 +122,13 @@ public abstract class UrlOptUtils {
                 (uri.indexOf('?') == -1 ?  uri+'?'+queryUrl :  uri+'&'+queryUrl );
     }
 
-    public static String appendParamToUrl(String uri, String paramName, Object paramValue){
-        return (uri.endsWith("?") || uri.endsWith("&")) ?
-                uri + paramName +"="+ StringBaseOpt.objectToString(paramValue):
-                uri + (uri.indexOf('?') == -1 ? '?':'&')
-                        + paramName +"="+ StringEscapeUtils.escapeHtml4(
-                                StringBaseOpt.objectToString(paramValue));
-    }
+        public static String appendParamToUrl(String uri, String paramName, Object paramValue){
+            return (uri.endsWith("?") || uri.endsWith("&")) ?
+                    uri + paramName +"="+ StringBaseOpt.objectToString(paramValue):
+                    uri + (uri.indexOf('?') == -1 ? '?':'&')
+                            + paramName +"="+ StringEscapeUtils.escapeHtml4(
+                                    StringBaseOpt.objectToString(paramValue));
+        }
 
     /**
      * 简化的url压缩算法，算法如下：
