@@ -1,5 +1,6 @@
 package com.centit.support.database.metadata;
 
+import com.centit.support.database.utils.FieldType;
 import com.centit.support.file.FileSystemOpt;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -206,7 +207,7 @@ public class SimpleTableInfo implements TableInfo{
 
     private void setAppPropertiesValue(Properties prop,String key,String value )
     {
-        String sKey = /*sModuleName +'.'+ */ SimpleTableField.mapPropName(tableName) +'.'+key;
+        String sKey = /*sModuleName +'.'+ */ FieldType.mapPropName(tableName) +'.'+key;
         if(! prop.containsKey(sKey))
             prop.setProperty(sKey,  value);
     }
@@ -226,7 +227,7 @@ public class SimpleTableInfo implements TableInfo{
             setAppPropertiesValue(prop,"edit.title","编辑"+tableLabelName);
             setAppPropertiesValue(prop,"view.title","查看"+tableLabelName);
             for(SimpleTableField col : columns )
-                setAppPropertiesValue(prop,SimpleTableField.mapPropName(col.getColumnName()),col.getFieldLabelName());
+                setAppPropertiesValue(prop,FieldType.mapPropName(col.getColumnName()),col.getFieldLabelName());
 
             try(FileOutputStream outputFile = new FileOutputStream(filename+"_zh_CN.properties")){
                 prop.store(outputFile, "create by centit B/S framework!");
@@ -245,11 +246,11 @@ public class SimpleTableInfo implements TableInfo{
                 }
             }
 
-            setAppPropertiesValue(prop,"list.title",SimpleTableField.mapPropName(tableName)+" list");
-            setAppPropertiesValue(prop,"edit.title","new or edit "+SimpleTableField.mapPropName(tableName)+" piece");
-            setAppPropertiesValue(prop,"view.title","view "+SimpleTableField.mapPropName(tableName)+" piece");
+            setAppPropertiesValue(prop,"list.title",FieldType.mapPropName(tableName)+" list");
+            setAppPropertiesValue(prop,"edit.title","new or edit "+FieldType.mapPropName(tableName)+" piece");
+            setAppPropertiesValue(prop,"view.title","view "+FieldType.mapPropName(tableName)+" piece");
             for(SimpleTableField col : columns )
-                setAppPropertiesValue(prop,SimpleTableField.mapPropName(col.getColumnName()),col.getPropertyName());
+                setAppPropertiesValue(prop,FieldType.mapPropName(col.getColumnName()),col.getPropertyName());
 
             try(FileOutputStream outputFile = new FileOutputStream(filename+".properties")){
                 prop.store(outputFile, "create by centit B/S framework!");
@@ -315,7 +316,7 @@ public class SimpleTableInfo implements TableInfo{
             for(Iterator<SimpleTableReference> it = references.iterator();it.hasNext();){
                 SimpleTableReference ref = it.next();
                 Element setElt = classElt.addElement("set");
-                setElt.addAttribute("name", SimpleTableField.mapPropName(ref.getTableName())+'s');
+                setElt.addAttribute("name", FieldType.mapPropName(ref.getTableName())+'s');
                 setElt.addAttribute("cascade", "all-delete-orphan");//"all-delete-orphan")//save-update,delete;
                 setElt.addAttribute("inverse", "true");
                 Element keyElt = setElt.addElement("key");
@@ -360,7 +361,7 @@ public class SimpleTableInfo implements TableInfo{
     }
 
     public String getClassName() {
-        String sClassName = SimpleTableField.mapPropName(tableName);
+        String sClassName = FieldType.mapPropName(tableName);
         return sClassName.substring(0,1).toUpperCase() +
                 sClassName.substring(1);
     }

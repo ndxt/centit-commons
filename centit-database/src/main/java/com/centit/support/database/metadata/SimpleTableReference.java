@@ -1,6 +1,7 @@
 package com.centit.support.database.metadata;
 
 import com.centit.support.common.JavaBeanField;
+import com.centit.support.database.utils.FieldType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -81,7 +82,7 @@ public class SimpleTableReference implements TableReference{
     public String getClassName() {
         if(tableName==null)
             return null;
-        String sClassName = SimpleTableField.mapPropName(tableName);
+        String sClassName = FieldType.mapPropName(tableName);
         return sClassName.substring(0,1).toUpperCase() +
                 sClassName.substring(1);
     }

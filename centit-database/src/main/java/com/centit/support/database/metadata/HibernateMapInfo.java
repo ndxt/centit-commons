@@ -1,6 +1,7 @@
 package com.centit.support.database.metadata;
 
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.database.utils.FieldType;
 import com.centit.support.xml.IgnoreDTDEntityResolver;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
@@ -197,7 +198,7 @@ public class HibernateMapInfo {
             if(idNode != null){// 单个主键属性
                 SimpleTableField tf = loadField(idNode);
                 hasComplexId = false;
-                idType = SimpleTableField.trimType(tf.getJavaType());
+                idType = FieldType.trimType(tf.getJavaType());
                 idName = tf.getPropertyName();
                 keyProperties.add(tf);
             }else{//复合主键值
@@ -205,7 +206,7 @@ public class HibernateMapInfo {
                 hasComplexId = true;
                 idType = idNode.attributeValue("class");
                 idName = idNode.attributeValue("name");
-                idType = SimpleTableField.trimType(idType);
+                idType = FieldType.trimType(idType);
 
                 List<Element> keyNodes = (List<Element>) idNode.elements("key-property");
                 for(Element key : keyNodes){

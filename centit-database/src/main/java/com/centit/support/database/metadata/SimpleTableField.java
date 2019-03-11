@@ -2,7 +2,7 @@ package com.centit.support.database.metadata;
 
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.common.JavaBeanField;
-import com.centit.support.database.utils.DBType;
+import com.centit.support.database.utils.FieldType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,36 +25,10 @@ public class SimpleTableField implements TableField {
     private int  scale;//精度 Only used when sType= Long Number Float
     private JavaBeanField beanField;
 
-
-    public static String mapPropName(String dbObjectName){
-        String sTempName = dbObjectName.toLowerCase();
-        String sTemp2Name = dbObjectName.toUpperCase();
-        int nl = dbObjectName.length();
-        if(nl<3)
-            return sTempName;
-        int i=0;
-        String sPropName="";
-        while(i<nl){
-            if(sTempName.charAt(i) != '_' ){
-                sPropName = sPropName + sTempName.charAt(i);
-                i++;
-            }else{
-                i++;
-                if(i==2)
-                    sPropName = "";
-                else if(i<nl){
-                    sPropName = sPropName + sTemp2Name.charAt(i);
-                    i++;
-                }
-            }
-        }
-        return sPropName;
-    }
-
     public void mapToMetadata(){
         //这个和下面的 mapToDatabaseType 不对称
-        propertyName = mapPropName(columnName);
-        javaType = mapToJavaType(columnType,scale);
+        propertyName = FieldType.mapPropName(columnName);
+        javaType = FieldType.mapToJavaType(columnType,scale);
         if( ("Long".equals(javaType) || "Double".equals(javaType))
                 && maxLength <= 0 )
             maxLength = 8;
@@ -62,63 +36,6 @@ public class SimpleTableField implements TableField {
             || "sqlDate".equals(javaType) || "sqlTimestamp".equals(javaType))
                 && maxLength <= 0 )
             maxLength = 7;
-    }
-
-    public static String mapToJavaType(String columnType,int scale)
-    {
-        if("NUMBER".equalsIgnoreCase(columnType) ||
-           "INTEGER".equalsIgnoreCase(columnType)||
-           "DECIMAL".equalsIgnoreCase(columnType) ){
-            if( scale > 0 )
-                return "Double";
-            else
-                return "Long";
-        }else if("FLOAT".equalsIgnoreCase(columnType)){
-            return "Double";
-        }else if("CHAR".equalsIgnoreCase(columnType) ||
-               "VARCHAR".equalsIgnoreCase(columnType)||
-               "VARCHAR2".equalsIgnoreCase(columnType)||
-               "STRING".equalsIgnoreCase(columnType) ){
-            return "String";
-        }else if("DATE".equalsIgnoreCase(columnType) ||
-                   "TIME".equalsIgnoreCase(columnType)||
-                   "DATETIME".equalsIgnoreCase(columnType) ){
-            return "Date";
-        }else if("TIMESTAMP".equalsIgnoreCase(columnType) ){
-            return "Timestamp";
-        }else if("CLOB".equalsIgnoreCase(columnType) /*||
-                   "LOB".equalsIgnoreCase(columnType)||
-                   "BLOB".equalsIgnoreCase(columnType)*/ ){
-            return "String";
-        }else if("BLOB".equalsIgnoreCase(columnType) ) {
-            return "byte[]";
-        }else
-            return columnType;
-    }
-
-    public static String mapToDatabaseType(String javaType,DBType dbt)
-    {
-        switch (javaType) {
-        case "Double":
-        case "Float":
-        case "Long":
-            if(dbt==DBType.Oracle)
-                return "NUMBER";
-            return "DECIMAL";
-        case "String":
-            if(dbt==DBType.Oracle)
-                return "VARCHAR2";
-            return "VARCHAR";
-        case "Date":
-        case "sqlDate":
-            return "DATE";
-        case "sqlTimestamp":
-            return "TIMESTAMP";
-        case "byte[]":
-            return "BLOB";
-        default:
-            return javaType;
-        }
     }
 
     public String getHibernateType(){
@@ -156,15 +73,10 @@ public class SimpleTableField implements TableField {
         return javaType;
     }
 
-    public static String trimType(String st ){
-        int p = st.lastIndexOf('.');
-        if(p>0)
-            return  st.substring(p+1);
-        return st;
-    }
+
 
     public void setJavaType(String st) {
-        javaType = trimType(st);
+        javaType = FieldType.trimType(st);
     }
 
     public void setJavaType(Class<?> type) {
