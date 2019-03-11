@@ -20,7 +20,6 @@ public abstract class DbcpConnectPools {
          = new ConcurrentHashMap<>();
 
     private static synchronized BasicDataSource addDataSource(DataSourceDescription dsDesc){
-
         //BasicDataSourceFactory.createDataSource(properties)
         BasicDataSource ds = new BasicDataSource();
         ds.setDriverClassName(dsDesc.getDriver());
@@ -39,35 +38,37 @@ public abstract class DbcpConnectPools {
 
     public static synchronized BasicDataSource getDataSource(DataSourceDescription dsDesc){
         BasicDataSource ds = dbcpDataSourcePools.get(dsDesc);
-        if(ds==null)
+        if(ds==null) {
             ds = addDataSource(dsDesc);
+        }
         return ds;
     }
 
     public static synchronized Connection getDbcpConnect(DataSourceDescription dsDesc) throws SQLException{
         BasicDataSource ds = dbcpDataSourcePools.get(dsDesc);
-        if(ds==null)
+        if(ds==null) {
             ds = addDataSource(dsDesc);
+        }
         Connection conn = null;
         conn = ds.getConnection();
-        conn.setAutoCommit(false);  
+        conn.setAutoCommit(false);
         ///*dsDesc.getUsername(),dsDesc.getDbType(),*/
         return conn;
     }
 
     /* 获得数据源连接状态 */
-    public static Map<String, Integer> getDataSourceStats(DataSourceDescription dsDesc){  
+    public static Map<String, Integer> getDataSourceStats(DataSourceDescription dsDesc){
         BasicDataSource bds = dbcpDataSourcePools.get(dsDesc);
         if(bds==null)
             return null;
         Map<String, Integer> map = new HashMap<>(2);
-        map.put("active_number", bds.getNumActive());  
-        map.put("idle_number", bds.getNumIdle());  
-        return map;  
-    }  
-  
-    /** 关闭数据源 */  
-    public static synchronized void shutdownDataSource(){  
+        map.put("active_number", bds.getNumActive());
+        map.put("idle_number", bds.getNumIdle());
+        return map;
+    }
+
+    /** 关闭数据源 */
+    public static synchronized void shutdownDataSource(){
         for(Map.Entry<DataSourceDescription,BasicDataSource> dbs : dbcpDataSourcePools.entrySet()){
             try {
                 dbs.getValue().close();
@@ -75,8 +76,8 @@ public abstract class DbcpConnectPools {
                 logger.error(e.getMessage(),e);//e.printStackTrace();
             }
         }
-    }  
-    
+    }
+
     public static synchronized boolean testDataSource(DataSourceDescription dsDesc){
         BasicDataSource ds = new BasicDataSource();
         ds.setDriverClassName(dsDesc.getDriver());
@@ -110,7 +111,7 @@ public abstract class DbcpConnectPools {
         }
         return connOk;
     }
-    
+
     public static void closeConnect(Connection conn){
         if(conn!=null){
             try {

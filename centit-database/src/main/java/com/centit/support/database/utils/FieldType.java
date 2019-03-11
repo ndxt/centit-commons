@@ -7,6 +7,10 @@ public abstract class FieldType {
     static final String STRING = "string";
     static final String INTEGER= "integer";
     static final String FLOAT= "float";
+    /**
+     * 要考虑 定点数，用于存储金钱
+     */
+    static final String MONEY= "money";
     static final String DOUBLE= "double";
     static final String LONG= "long";
     static final String BOOLEAN= "boolean";
@@ -63,23 +67,31 @@ public abstract class FieldType {
      */
     public static String mapToOracleColumnType(String ft){
         switch(ft){
-        case STRING:
-            return "varchar2";
-          case INTEGER:
-              return "number";
-          case FLOAT:
-              return "number";
-          case BOOLEAN:
-              return "varchar2(1)";
-          case DATE:
-          case DATETIME:
-              return "Date";
-          case TEXT:
-              return "clob";//长文本
-          case FILE:
-              return "varchar2(64)";//默认记录文件的ID号
-          default:
-              return ft;
+            case STRING:
+                return "varchar2";
+            case INTEGER:
+            case LONG:
+                return "number";
+            case FLOAT:
+            case DOUBLE:
+                return "number";
+            case MONEY:
+                return "number(30,4)";
+            case BOOLEAN:
+                return "varchar2(1)";
+            case DATE:
+            case DATETIME:
+                return "Date";
+            case TIMESTAMP:
+                return "TimeStamp";
+            case TEXT:
+                return "clob";//长文本
+            case BYTE_ARRAY:
+                return "blob";//大字段
+            case FILE:
+                return "varchar2(64)";//默认记录文件的ID号
+            default:
+                return ft;
       }
     }
 
@@ -90,23 +102,31 @@ public abstract class FieldType {
      */
     public static String mapToSqlServerColumnType(String ft){
         switch(ft){
-        case STRING:
-            return "varchar";
-          case INTEGER:
-              return "decimal";
-          case FLOAT:
-              return "decimal";
-          case BOOLEAN:
-              return "varchar(1)";
-          case DATE:
-          case DATETIME:
-              return "datetime";
-          case TEXT:
-              return "text";//长文本
-          case FILE:
-              return "varchar(64)";//默认记录文件的ID号
-          default:
-              return ft;
+            case STRING:
+                return "varchar";
+            case INTEGER:
+            case LONG:
+                return "decimal";
+            case DOUBLE:
+            case FLOAT:
+                return "decimal";
+            case MONEY:
+                return "decimal(30,4)";
+            case BOOLEAN:
+                return "varchar(1)";
+            case DATE:
+            case DATETIME:
+                return "datetime";
+            case TIMESTAMP:
+                return "TimeStamp";
+            case TEXT:
+                return "text";//长文本
+            case BYTE_ARRAY:
+                return "VarBinary(MAX)";
+            case FILE:
+                return "varchar(64)";//默认记录文件的ID号
+            default:
+                return ft;
       }
     }
 
@@ -119,21 +139,29 @@ public abstract class FieldType {
         switch(ft){
         case STRING:
             return "varchar";
-          case INTEGER:
-              return "INTEGER";
-          case FLOAT:
-              return "DECIMAL";
-          case BOOLEAN:
-              return "varchar(1)";
-          case DATE:
-          case DATETIME:
-              return "Date";
-          case TEXT:
-              return "clob(52428800)";//长文本
-          case FILE:
-              return "varchar(64)";//默认记录文件的ID号
-          default:
-              return ft;
+            case INTEGER:
+            case LONG:
+                 return "INTEGER";
+            case DOUBLE:
+            case FLOAT:
+                return "DECIMAL";
+            case MONEY:
+                return "DECIMAL(30,4)";
+            case BOOLEAN:
+                return "varchar(1)";
+            case DATE:
+            case DATETIME:
+                return "Date";
+            case TIMESTAMP:
+                return "TimeStamp";
+            case TEXT:
+                return "clob(52428800)";//长文本
+            case BYTE_ARRAY:
+                return "BLOB";
+            case FILE:
+                return "varchar(64)";//默认记录文件的ID号
+            default:
+                return ft;
       }
     }
 
@@ -144,26 +172,45 @@ public abstract class FieldType {
      */
     public static String mapToMySqlColumnType(String ft){
         switch(ft){
-        case STRING:
-            return "varchar";
-          case INTEGER:
-              return "INT";
-          case FLOAT:
-              return "DECIMAL";
-          case BOOLEAN:
-              return "varchar(1)";
-          case DATE:
-              return "Date";
-          case DATETIME:
-              return "DATETIME";
-          case TEXT:
-              return "clob";//长文本
-          case FILE:
-              return "varchar(64)";//默认记录文件的ID号
-          default:
-              return ft;
-      }
+            case STRING:
+                return "varchar";
+            case INTEGER:
+                return "INT";
+            case LONG:
+                  return "BIG INT";
+            case MONEY:
+                return "DECIMAL(30,4)";
+            case FLOAT:
+                return "FLOAT";
+            case DOUBLE:
+                return "DOUBLE";
+            case BOOLEAN:
+                return "varchar(1)";
+            case DATE:
+                return "Date";
+            case DATETIME:
+                return "DATETIME";
+            case TIMESTAMP:
+                return "TimeStamp";
+            case TEXT:
+                return "clob";//长文本
+            case FILE:
+                return "varchar(64)";//默认记录文件的ID号
+            case BYTE_ARRAY:
+                return "VARBINARY";
+            default:
+                return ft;
+        }
     }
+
+    public static String mapToH2ColumnType(String ft){
+        return mapToMySqlColumnType(ft);
+    }
+
+    public static String mapToPostgreSqlColumnType(String ft){
+        return mapToMySqlColumnType(ft);
+    }
+
     /**
      *
      * @param dt 数据库类别
@@ -173,18 +220,23 @@ public abstract class FieldType {
     public static String mapToDatabaseType(String ft, DBType dt ){
         if(dt==null)
             return ft;
-        switch(dt){
-        case SqlServer:
-            return mapToSqlServerColumnType(ft);
-          case Oracle:
-              return mapToOracleColumnType(ft);
-          case DB2:
-              return mapToDB2ColumnType(ft);
-          case MySql:
-              return mapToMySqlColumnType(ft);
-          default:
-              return mapToOracleColumnType(ft);
+        switch(dt) {
+            case SqlServer:
+                return mapToSqlServerColumnType(ft);
+            case Oracle:
+                return mapToOracleColumnType(ft);
+            case DB2:
+                return mapToDB2ColumnType(ft);
+            case MySql:
+                return mapToMySqlColumnType(ft);
+            case H2:
+                return mapToH2ColumnType(ft);
+            case PostgreSql:
+                return mapToPostgreSqlColumnType(ft);
+            default:
+                return mapToOracleColumnType(ft);
         }
+
     }
 
     public static Map<String,String> getAllTypeMap(){
@@ -195,52 +247,24 @@ public abstract class FieldType {
         fts.put("boolean","boolean");
         fts.put("date","date");
         fts.put("datetime","datetime");
+        fts.put("timestamp","timestamp");
         fts.put("text","text");
+        fts.put("blob","blob");
+        fts.put("money","money");
         fts.put("file","file");
         return fts;
     }
 
-    public static String mapToFieldType(String columnType,int scale)
+    public static String mapToJavaType(String columnType, int scale)
     {
         if("NUMBER".equalsIgnoreCase(columnType) ||
             "INTEGER".equalsIgnoreCase(columnType)||
             "DECIMAL".equalsIgnoreCase(columnType) ){
-            if( scale > 0 )
-                return FieldType.FLOAT;
-            else
-                return FieldType.INTEGER;
-        }else if("FLOAT".equalsIgnoreCase(columnType)){
-            return FieldType.FLOAT;
-        }else if("CHAR".equalsIgnoreCase(columnType) ||
-            "VARCHAR".equalsIgnoreCase(columnType)||
-            "VARCHAR2".equalsIgnoreCase(columnType)||
-            "STRING".equalsIgnoreCase(columnType) ){
-            return FieldType.STRING;
-        }else if("DATE".equalsIgnoreCase(columnType) ||
-            "TIME".equalsIgnoreCase(columnType) ){
-            return FieldType.DATE;
-        }else if("TIMESTAMP".equalsIgnoreCase(columnType)||
-            "DATETIME".equalsIgnoreCase(columnType) ){
-            return FieldType.DATETIME;
-        }else if("CLOB".equalsIgnoreCase(columnType) /*||
-                   "LOB".equalsIgnoreCase(sDBType)||
-                   "BLOB".equalsIgnoreCase(sDBType)*/ ){
-            return FieldType.TEXT;
-        }else if("BOOLEAN".equalsIgnoreCase(columnType) ){
-            return FieldType.BOOLEAN;
-        }else
-            return columnType;
-    }
-
-    public static String mapToJavaType(String columnType,int scale)
-    {
-        if("NUMBER".equalsIgnoreCase(columnType) ||
-            "INTEGER".equalsIgnoreCase(columnType)||
-            "DECIMAL".equalsIgnoreCase(columnType) ){
-            if( scale > 0 )
+            if( scale > 0 ) {
                 return FieldType.DOUBLE;
-            else
+            } else {
                 return FieldType.LONG;
+            }
         }else if("FLOAT".equalsIgnoreCase(columnType)){
             return FieldType.FLOAT;
         }else if("CHAR".equalsIgnoreCase(columnType) ||
@@ -262,7 +286,10 @@ public abstract class FieldType {
             return FieldType.BYTE_ARRAY;
         }else if("BOOLEAN".equalsIgnoreCase(columnType) ){
             return FieldType.BOOLEAN;
-        }else
+        }else if("MONEY".equalsIgnoreCase(columnType) ){
+            return "BigDecimal";//FieldType.MONEY;
+        }else {
             return columnType;
+        }
     }
 }
