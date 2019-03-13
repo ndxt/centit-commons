@@ -108,12 +108,11 @@ public abstract class OrmUtils {
         }
     }
 
-    public static Map<String, Object> fetchObjectField(Object object)
-             {
+    public static Map<String, Object> fetchObjectField(Object object) {
         if(object instanceof Map) {
             return (Map<String, Object>) object;
         }
-
+        // 这个地方为什么 不用 JsonObject.toJSONObject
         Field[] objFields = object.getClass().getDeclaredFields();
         Map<String, Object> fields = new HashMap<>(objFields.length*2);
         for(Field field :objFields){
