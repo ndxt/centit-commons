@@ -37,7 +37,6 @@ public abstract class QueryUtils {
      */
     public static final String SQL_PRETREAT_ENDWITH = "ENDWITH";
 
-
     /**
      * 转化为日期类型,
      */
@@ -45,7 +44,13 @@ public abstract class QueryUtils {
     /**
      * 转化为日期类型，并且计算第二天的日期，没有时间（时间为00:00:00） 用于区间查询的结束时间
      */
-    public static final String SQL_PRETREAT_NEXTDAY = "NEXTDAY";
+    public static final String SQL_PRETREAT_NEXT_DAY = "NEXTDAY";
+    public static final String SQL_PRETREAT_NEXT_MONTH = "NEXTMONTH";
+    public static final String SQL_PRETREAT_NEXT_YEAR = "NEXTYEAR";
+    public static final String SQL_PRETREAT_PREV_DAY = "PREVDAY";
+    public static final String SQL_PRETREAT_PREV_MONTH = "PREVMONTH";
+    public static final String SQL_PRETREAT_PREV_YEAR = "PREVYEAR";
+
     /**
      * 转化为带时间的，日期的类型
      */
@@ -1240,49 +1245,68 @@ public abstract class QueryUtils {
     public static Object scalarPretreatParameter(String pretreatment,Object paramValue){
         if(paramValue==null)
             return null;
-        if(SQL_PRETREAT_LIKE.equalsIgnoreCase(pretreatment))
-            return getMatchString(StringBaseOpt.objectToString(paramValue));
-        if(SQL_PRETREAT_STARTWITH.equalsIgnoreCase(pretreatment))
-            return StringBaseOpt.objectToString(paramValue)+"%";
-        if(SQL_PRETREAT_ENDWITH.equalsIgnoreCase(pretreatment))
-            return "%"+StringBaseOpt.objectToString(paramValue);
-        if(SQL_PRETREAT_NEXTDAY.equalsIgnoreCase(pretreatment))
-            return DatetimeOpt.addDays(DatetimeOpt.truncateToDay(
-                    DatetimeOpt.castObjectToDate(paramValue)),1);
-        if( SQL_PRETREAT_DATE.equalsIgnoreCase(pretreatment))
-            return DatetimeOpt.truncateToDay(
-                    DatetimeOpt.castObjectToDate(paramValue));
-        if(SQL_PRETREAT_DATETIME.equalsIgnoreCase(pretreatment))
-            return DatetimeOpt.castObjectToDate(paramValue);
-        if(SQL_PRETREAT_DATESTR.equalsIgnoreCase(pretreatment))
-            return DatetimeOpt.convertDateToString(
-                    DatetimeOpt.castObjectToDate(paramValue));
-        if(SQL_PRETREAT_DATETIMESTR.equalsIgnoreCase(pretreatment))
-            return DatetimeOpt.convertDatetimeToString(
-                    DatetimeOpt.castObjectToDate(paramValue));
-        if(SQL_PRETREAT_DIGIT.equalsIgnoreCase(pretreatment))
-            return StringRegularOpt.trimDigits(StringBaseOpt.objectToString(paramValue));
-        if(SQL_PRETREAT_UPPERCASE.equalsIgnoreCase(pretreatment))
-            return StringUtils.upperCase(StringBaseOpt.objectToString(paramValue));
-        if(SQL_PRETREAT_LOWERCASE.equalsIgnoreCase(pretreatment))
-            return StringUtils.lowerCase(StringBaseOpt.objectToString(paramValue));
-        if(SQL_PRETREAT_NUMBER.equalsIgnoreCase(pretreatment))
-            return StringRegularOpt.trimNumber(StringBaseOpt.objectToString(paramValue));
-        if(SQL_PRETREAT_INTEGER.equalsIgnoreCase(pretreatment)
-                || SQL_PRETREAT_LONG.equalsIgnoreCase(pretreatment))
-            return NumberBaseOpt.castObjectToLong(paramValue);
-        if(SQL_PRETREAT_FLOAT.equalsIgnoreCase(pretreatment))
-            return NumberBaseOpt.castObjectToDouble(paramValue);
-        if(SQL_PRETREAT_ESCAPE_HTML.equalsIgnoreCase(pretreatment))
-            return StringEscapeUtils.escapeHtml4(StringBaseOpt.objectToString(paramValue));
-        if(SQL_PRETREAT_QUOTASTR.equalsIgnoreCase(pretreatment))
-            return buildStringForQuery(StringBaseOpt.objectToString(paramValue));
+        switch (pretreatment.toUpperCase()) {
+            case SQL_PRETREAT_LIKE:
+                return getMatchString(StringBaseOpt.objectToString(paramValue));
+            case SQL_PRETREAT_STARTWITH:
+                return StringBaseOpt.objectToString(paramValue) + "%";
+            case SQL_PRETREAT_ENDWITH:
+                return "%" + StringBaseOpt.objectToString(paramValue);
+            case SQL_PRETREAT_NEXT_DAY:
+                return DatetimeOpt.addDays(DatetimeOpt.truncateToDay(
+                    DatetimeOpt.castObjectToDate(paramValue)), 1);
+            case SQL_PRETREAT_NEXT_MONTH:
+                return DatetimeOpt.addMonths(DatetimeOpt.truncateToDay(
+                    DatetimeOpt.castObjectToDate(paramValue)), 1);
+            case SQL_PRETREAT_NEXT_YEAR:
+                return DatetimeOpt.addYears(DatetimeOpt.truncateToDay(
+                    DatetimeOpt.castObjectToDate(paramValue)), 1);
+            case SQL_PRETREAT_PREV_DAY:
+                return DatetimeOpt.addDays(DatetimeOpt.truncateToDay(
+                    DatetimeOpt.castObjectToDate(paramValue)), -1);
+            case SQL_PRETREAT_PREV_MONTH:
+                return DatetimeOpt.addMonths(DatetimeOpt.truncateToDay(
+                    DatetimeOpt.castObjectToDate(paramValue)), -1);
+            case SQL_PRETREAT_PREV_YEAR:
+                return DatetimeOpt.addYears(DatetimeOpt.truncateToDay(
+                    DatetimeOpt.castObjectToDate(paramValue)), -1);
 
-        /*if(SQL_PRETREAT_STRING.equalsIgnoreCase(pretreatment))
-            return StringBaseOpt.objectToString(paramValue);
-        if(SQL_PRETREAT_SPLITFORIN.equalsIgnoreCase(pretreatment))
+            case SQL_PRETREAT_DATE:
+                return DatetimeOpt.truncateToDay(
+                    DatetimeOpt.castObjectToDate(paramValue));
+            case SQL_PRETREAT_DATETIME:
+                return DatetimeOpt.castObjectToDate(paramValue);
+            case SQL_PRETREAT_DATESTR:
+                return DatetimeOpt.convertDateToString(
+                    DatetimeOpt.castObjectToDate(paramValue));
+            case SQL_PRETREAT_DATETIMESTR:
+                return DatetimeOpt.convertDatetimeToString(
+                    DatetimeOpt.castObjectToDate(paramValue));
+            case SQL_PRETREAT_DIGIT:
+                return StringRegularOpt.trimDigits(StringBaseOpt.objectToString(paramValue));
+            case SQL_PRETREAT_UPPERCASE:
+                return StringUtils.upperCase(StringBaseOpt.objectToString(paramValue));
+            case SQL_PRETREAT_LOWERCASE:
+                return StringUtils.lowerCase(StringBaseOpt.objectToString(paramValue));
+            case SQL_PRETREAT_NUMBER:
+                return StringRegularOpt.trimNumber(StringBaseOpt.objectToString(paramValue));
+            case SQL_PRETREAT_INTEGER:
+            case SQL_PRETREAT_LONG:
+                return NumberBaseOpt.castObjectToLong(paramValue);
+            case SQL_PRETREAT_FLOAT:
+                return NumberBaseOpt.castObjectToDouble(paramValue);
+            case SQL_PRETREAT_ESCAPE_HTML:
+                return StringEscapeUtils.escapeHtml4(StringBaseOpt.objectToString(paramValue));
+            case SQL_PRETREAT_QUOTASTR:
+                return buildStringForQuery(StringBaseOpt.objectToString(paramValue));
+
+            case SQL_PRETREAT_STRING:
+                return StringBaseOpt.objectToString(paramValue);
+        /*case SQL_PRETREAT_SPLITFORIN:
             return String.valueOf(paramValue).split(",");*/
-        return paramValue;
+            default:
+                return paramValue;
+        }
     }
 
     public static Object onePretreatParameter(String pretreatment,Object paramValue){
