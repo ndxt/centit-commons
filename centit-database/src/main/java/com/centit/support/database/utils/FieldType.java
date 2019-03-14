@@ -4,22 +4,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class FieldType {
-    static final String STRING = "string";
-    static final String INTEGER= "integer";
-    static final String FLOAT= "float";
+    public static final String STRING = "string";
+    public static final String INTEGER= "integer";
+    public static final String FLOAT= "float";
     /**
      * 要考虑 定点数，用于存储金钱
      */
-    static final String MONEY= "money";
-    static final String DOUBLE= "double";
-    static final String LONG= "long";
-    static final String BOOLEAN= "boolean";
-    static final String DATE= "date";
-    static final String DATETIME= "datetime";
-    static final String TIMESTAMP= "timestamp";
-    static final String TEXT= "text";
-    static final String FILE = "file";
-    static final String BYTE_ARRAY = "byte[]";
+    public static final String MONEY= "money";
+    public static final String DOUBLE= "double";
+    public static final String LONG= "long";
+    public static final String BOOLEAN= "boolean";
+    public static final String DATE= "date";
+    public static final String DATETIME= "datetime";
+    public static final String TIMESTAMP= "timestamp";
+    public static final String TEXT= "text";
+    public static final String FILE = "file";
+    public static final String BYTE_ARRAY = "byte[]";
 
     /**
      * @param st java类 名称

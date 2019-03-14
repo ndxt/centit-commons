@@ -101,7 +101,7 @@ public abstract class JSONOpt {
      * @param skeys json属性数组，a.b 这样的属性对应的数组为{'a','b'}
      * @return 获取一个json对象的属性
      */
-    public static JSONObject findJsonObject(JSONObject objJson,String [] skeys){
+    private static JSONObject findJsonObject(JSONObject objJson,String [] skeys){
         int depth = skeys.length;
         if(depth<1)
             return null;
@@ -168,8 +168,7 @@ public abstract class JSONOpt {
      * @param value
      */
     @SuppressWarnings("unchecked")
-    public static void setAttribute(JSONObject objJson,String path,Object value)
-    {
+    public static void setAttribute(JSONObject objJson,String path,Object value){
         String [] skeys = path.split("\\x2E");
 /*        if(skeys==null)
             return;*/
@@ -237,7 +236,7 @@ public abstract class JSONOpt {
      * @param value value
     *
     */
-    public static void appendData(JSONObject objJson,String path,Object value)
+    public static void appendData(JSONObject objJson, String path, Object value)
     {
         String [] skeys = path.split("\\x2E");
 /*        if(skeys==null)
@@ -284,43 +283,9 @@ public abstract class JSONOpt {
      */
     public static void batchAppendData(JSONObject objJson,String path,Object [] values)
     {
-        for(Object obj : values)
-            appendData(objJson,path,obj);
-
-/*        String [] skeys = path.split("\\x2E");
-        if(skeys==null)
-            return;
-        int depth = skeys.length;
-        if(depth==0)
-            return;
-        JSONPath jpath = findJsonObject(objJson,depth-1,skeys);
-        Object jsonValue = values;
-        if(jpath.pathPos < depth-1 ){
-            jsonValue = createJsonObject(skeys ,  jpath.pathPos + 1 , values);
-            JSONKey key = praseJosnKey( skeys[jpath.pathPos]);
-            if(key.ind<0){
-                jpath.objJson.element(key.skey, jsonValue);
-            }else{
-                JSONArray jarray = new JSONArray();
-                jarray.set(key.ind, jsonValue);
-                jpath.objJson.element(key.skey, jarray);
-            }
-        }else{
-            JSONKey key = praseJosnKey( skeys[depth-1]);
-            if(jpath.objJson.has(key.skey)){
-                 for(Object obj : values)
-                     jpath.objJson.accumulate(key.skey, obj);
-            }else{
-                if(key.ind<0){
-                    jpath.objJson.element(key.skey, values);
-                }else{
-                    JSONArray jarray = new JSONArray();
-                    jarray.set(key.ind, values);
-                    jpath.objJson.element(key.skey, jarray);
-                }
-            }
+        for(Object obj : values) {
+            appendData(objJson, path, obj);
         }
-*/
     }
     /**
      * 给设置json对象属性 添加多个新值
@@ -356,7 +321,7 @@ public abstract class JSONOpt {
         if( ReflectionOpt.isArray(obj ))
             return arrayToJSONArray(obj,methodOnly,fieldOnly,includePrivateField).toJSONString();
 
-           return objectToJSONObject(obj,methodOnly,fieldOnly,includePrivateField).toJSONString();
+        return objectToJSONObject(obj,methodOnly,fieldOnly,includePrivateField).toJSONString();
     }
 
     /**
@@ -625,4 +590,5 @@ public abstract class JSONOpt {
         json.putAll(json2);
         return json;
     }
+
 }
