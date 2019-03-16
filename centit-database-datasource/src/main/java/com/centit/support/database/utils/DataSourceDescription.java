@@ -35,14 +35,6 @@ public final class DataSourceDescription implements Serializable{
     private int    initialSize ;
     private String databaseCode;
 
-    public String getDatabaseCode() {
-        return databaseCode;
-    }
-
-    public void setDatabaseCode(String databaseCode) {
-        this.databaseCode = databaseCode;
-    }
-
     public DataSourceDescription(){
         this.maxTotal  = 10;
         this.maxIdle  = 5;
@@ -139,8 +131,9 @@ public final class DataSourceDescription implements Serializable{
             DataSourceDescription dbc =(DataSourceDescription) dbco;
             return connUrl !=null && connUrl.equals(dbc.getConnUrl())
                 && username != null && username.equals(dbc.getUsername());
-        }else
+        }else {
             return false;
+        }
     }
 
 
@@ -227,4 +220,13 @@ public final class DataSourceDescription implements Serializable{
     public boolean testConntect(){
         return DataSourceDescription.testConntect(this);
     }
+
+    public String getDatabaseCode() {
+        return databaseCode;
+    }
+
+    public void setDatabaseCode(String databaseCode) {
+        this.databaseCode = databaseCode;
+    }
+
 }
