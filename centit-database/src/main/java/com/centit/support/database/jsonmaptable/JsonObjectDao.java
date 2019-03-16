@@ -21,14 +21,13 @@ public interface JsonObjectDao {
      * @throws IOException IOException
      */
     JSONObject getObjectById(final Object keyValue) throws SQLException, IOException;
-    /**
+/*
      * 联合主键表
      * @param keyValues keyValues
      * @return JSONObject
      * @throws SQLException SQLException
      * @throws IOException IOException
-     */
-    JSONObject getObjectById(final Map<String,Object> keyValues) throws SQLException, IOException;
+    JSONObject getObjectById(final Map<String,Object> keyValues) throws SQLException, IOException;*/
 
     /**
      * 根据属性查询对象
@@ -148,13 +147,13 @@ public interface JsonObjectDao {
      */
     int deleteObjectById(final Object keyValue) throws SQLException;
 
-    /**
+    /*
      * 删除，联合主键
      * @param keyValue keyValue
      * @return Long
      * @throws SQLException SQLException
+     int deleteObjectById(final Map<String,Object> keyValue) throws SQLException;
      */
-    int deleteObjectById(final Map<String,Object> keyValue) throws SQLException;
     /**
      * 根据属性 批量删除
      * @param properties properties
@@ -170,7 +169,7 @@ public interface JsonObjectDao {
      * @return int
      * @throws SQLException SQLException
      */
-    int insertObjectsAsTabulation(final JSONArray objects) throws SQLException;
+    int insertObjectsAsTabulation(final List<Map<String,Object>> objects) throws SQLException;
 
     /**
      * 批量删除
@@ -178,7 +177,7 @@ public interface JsonObjectDao {
      * @return int
      * @throws SQLException SQLException
      */
-    int deleteObjects(final JSONArray objects) throws SQLException;
+    int deleteObjects(final List<Object> objects) throws SQLException;
 
     /**
      * 根据外键批量删除，单外键
@@ -205,7 +204,7 @@ public interface JsonObjectDao {
      * @return int
      * @throws SQLException SQLException
      */
-    int replaceObjectsAsTabulation(final JSONArray newObjects,final JSONArray dbObjects) throws SQLException;
+    int replaceObjectsAsTabulation(final List<Map<String,Object>> newObjects,final List<Map<String,Object>> dbObjects) throws SQLException;
     /**
      * 用新的列表覆盖数据库中的内容，通过单外键查询列表
      * @param newObjects JSONArray
@@ -215,7 +214,7 @@ public interface JsonObjectDao {
      * @throws SQLException SQLException
      * @throws IOException IOException
      */
-    int replaceObjectsAsTabulation(final JSONArray newObjects,
+    int replaceObjectsAsTabulation(final List<Map<String,Object>> newObjects,
             final String propertyName,
             final Object propertyValue) throws SQLException, IOException;
     /**
@@ -226,7 +225,7 @@ public interface JsonObjectDao {
      * @throws SQLException SQLException
      * @throws IOException IOException
      */
-    int replaceObjectsAsTabulation(final JSONArray newObjects,
+    int replaceObjectsAsTabulation(final List<Map<String,Object>> newObjects,
             final Map<String, Object> properties) throws SQLException, IOException;
 
     ///////////////////////////////////////////////////////////////////////////////////////

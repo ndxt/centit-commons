@@ -2,7 +2,10 @@ package com.centit.support.database.jsonmaptable;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.support.algorithm.*;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DBType;
@@ -212,31 +215,28 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 q.getRight());
     }
 
-    @Override
-    public JSONObject getObjectById(final Object keyValue) throws SQLException, IOException {
-        if(tableInfo.getPkColumns()==null || tableInfo.getPkColumns().size()!=1)
-            throw new SQLException("表"+tableInfo.getTableName()+"不是单主键表，这个方法不适用。");
-
-        Pair<String,String[]> q = buildGetObjectSqlByPk(tableInfo);
-        JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(
-                 conn, q.getLeft(),
-                 CollectionsOpt.createHashMap( tableInfo.getPkColumns().get(0),keyValue),
-                 q.getRight());
-        if(ja.size()<1)
-            return null;
-        return (JSONObject) ja.get(0);
+    private Map<String, Object> makePkFieldMap(final Object keyValue) throws SQLException {
+        if(keyValue instanceof Map) {
+            Map<String, Object> keyValues = (Map) keyValue;
+            if (!checkHasAllPkColumns(keyValues)) {
+                throw new SQLException("缺少主键对应的属性。");
+            }
+            return keyValues;
+        }else {
+            if (tableInfo.getPkColumns() == null || tableInfo.getPkColumns().size() != 1)
+                throw new SQLException("表" + tableInfo.getTableName() + "不是单主键表，这个方法不适用。");
+            return CollectionsOpt.createHashMap(tableInfo.getPkColumns().get(0), keyValue);
+        }
     }
 
     @Override
-    public JSONObject getObjectById(final Map<String, Object> keyValues) throws SQLException, IOException {
-        if(! checkHasAllPkColumns(keyValues)){
-            throw new SQLException("缺少主键对应的属性。");
-        }
+    public JSONObject getObjectById(final Object keyValue) throws SQLException, IOException {
+        Map<String, Object> keyValues = makePkFieldMap(keyValue);
         Pair<String,String[]> q = buildGetObjectSqlByPk(tableInfo);
         JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(
-                 conn, q.getLeft(),
-                 keyValues,
-                 q.getRight());
+            conn, q.getLeft(),
+            keyValues,
+            q.getRight());
         if(ja.size()<1)
             return null;
         return (JSONObject) ja.get(0);
@@ -401,25 +401,13 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 
         return updateObjectsByProperties(fieldValues.keySet(),fieldValues, properties);
     }
+
     @Override
     public int deleteObjectById(final Object keyValue) throws SQLException {
-        if(tableInfo.getPkColumns()==null || tableInfo.getPkColumns().size()!=1)
-            throw new SQLException("表"+tableInfo.getTableName()+"不是单主键表，这个方法不适用。");
-
-        String sql =  "delete from " + tableInfo.getTableName()+
-                " where " +  buildFilterSqlByPk(tableInfo,null);
-        return DatabaseAccess.doExecuteNamedSql(conn, sql,
-                 CollectionsOpt.createHashMap( tableInfo.getPkColumns().get(0),keyValue) );
-    }
-
-    @Override
-    public int deleteObjectById(final Map<String, Object> keyValues) throws SQLException {
-        if(! checkHasAllPkColumns(keyValues)){
-            throw new SQLException("缺少主键对应的属性。");
-        }
-        String sql =  "delete from " + tableInfo.getTableName()+
-                " where " +  buildFilterSqlByPk(tableInfo,null);
-        return DatabaseAccess.doExecuteNamedSql(conn, sql, keyValues );
+        Map<String, Object> keyValues = makePkFieldMap(keyValue);
+        String sql = "delete from " + tableInfo.getTableName() +
+            " where " + buildFilterSqlByPk(tableInfo, null);
+        return DatabaseAccess.doExecuteNamedSql(conn, sql, keyValues);
     }
 
     @Override
@@ -432,19 +420,19 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     }
 
     @Override
-    public int insertObjectsAsTabulation(final JSONArray objects) throws SQLException {
+    public int insertObjectsAsTabulation(final List<Map<String,Object>> objects) throws SQLException {
         int resN = 0;
-        for(Object object : objects){
-            resN += saveNewObject((JSONObject)object);
+        for(Map<String,Object> object : objects){
+            resN += saveNewObject(object);
         }
         return resN;
     }
 
     @Override
-    public int deleteObjects(final JSONArray objects) throws SQLException {
+    public int deleteObjects(final List<Object> objects) throws SQLException {
         int resN = 0;
         for(Object object : objects){
-            resN += deleteObjectById((JSONObject)object);
+            resN += deleteObjectById(object);
         }
         return resN;
     }
@@ -460,17 +448,17 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return deleteObjectsByProperties(properties);
     }
 
-    public class JSONObjectComparator implements Comparator<Object>{
+    public class JSONObjectComparator implements Comparator<Map<String,Object>>{
         private TableInfo tableInfo;
         public JSONObjectComparator(TableInfo tableInfo){
             this.tableInfo = tableInfo;
         }
         @Override
-        public int compare(Object o1, Object o2) {
+        public int compare(Map<String,Object> o1, Map<String,Object> o2) {
             for(String pkc : tableInfo.getPkColumns() ){
                 TableField field = tableInfo.findFieldByColumn(pkc);
-                Object f1 = ((JSONObject) o1).get(field.getPropertyName());
-                Object f2 = ((JSONObject) o2).get(field.getPropertyName());
+                Object f1 = o1.get(field.getPropertyName());
+                Object f2 = o2.get(field.getPropertyName());
                 if(f1==null){
                     if(f2!=null)
                         return -1;
@@ -500,10 +488,10 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     }
 
     @Override
-    public int replaceObjectsAsTabulation(final JSONArray newObjects,final JSONArray dbObjects)
+    public int replaceObjectsAsTabulation(final List<Map<String,Object>> newObjects,final List<Map<String,Object>> dbObjects)
             throws SQLException {
         //insert<T> update(old,new)<T,T> delete<T>
-        Triple<List<Object>, List<Pair<Object,Object>>, List<Object>>
+        Triple<List<Map<String,Object>>, List<Pair<Map<String,Object>,Map<String,Object>>>, List<Map<String,Object>>>
         comRes=
             CollectionsOpt.compareTwoList(dbObjects, newObjects, new JSONObjectComparator(tableInfo));
 
@@ -519,28 +507,28 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             }
         }
         if(comRes.getMiddle() != null) {
-            for (Pair<Object, Object> pobj : comRes.getMiddle()) {
-                resN += updateObject((JSONObject) pobj.getRight());
+            for (Pair<Map<String,Object>, Map<String,Object>> pobj : comRes.getMiddle()) {
+                resN += updateObject(pobj.getRight());
             }
         }
         return resN;
     }
 
     @Override
-    public int replaceObjectsAsTabulation(final JSONArray newObjects,
+    public int replaceObjectsAsTabulation(final List<Map<String,Object>> newObjects,
             final String propertyName,final Object propertyValue)
             throws SQLException, IOException {
         JSONArray dbObjects = listObjectsByProperties(
                 CollectionsOpt.createHashMap(propertyName,propertyValue));
-        return replaceObjectsAsTabulation(newObjects,dbObjects);
+        return replaceObjectsAsTabulation(newObjects, (List)dbObjects);
     }
 
     @Override
-    public int replaceObjectsAsTabulation(final JSONArray newObjects,
+    public int replaceObjectsAsTabulation(final List<Map<String,Object>> newObjects,
             final Map<String, Object> properties)
             throws SQLException, IOException  {
         JSONArray dbObjects = listObjectsByProperties(properties);
-        return replaceObjectsAsTabulation(newObjects,dbObjects);
+        return replaceObjectsAsTabulation(newObjects, (List)dbObjects);
     }
 
     /** 用表来模拟sequence

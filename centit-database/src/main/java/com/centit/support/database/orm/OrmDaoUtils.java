@@ -42,7 +42,7 @@ public abstract class OrmDaoUtils {
         try {
             return GeneralJsonObjectDao.createJsonObjectDao(connection)
                     .getSequenceNextValue(sequenceName);
-        } catch (SQLException| IOException e) {
+        } catch (SQLException | IOException e) {
             throw  new PersistenceException(e);
         }
     }
@@ -301,7 +301,7 @@ public abstract class OrmDaoUtils {
             throws PersistenceException {
 
         T object = getObjectById(connection, id, type);
-        fetchObjectReferencesCascade(connection, object,type);
+        fetchObjectReferencesCascade(connection, object, type);
         return object;
     }
 
