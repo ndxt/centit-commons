@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 
 /**
  *
@@ -22,16 +23,23 @@ import java.io.IOException;
 @SuppressWarnings("unused")
 public class TxtLogFile {
     protected static final Logger logger = LoggerFactory.getLogger(TxtLogFile.class);
+
+    private final static void innerWriteLog(Writer bw, String slog, boolean bNewLine, boolean bShowTime) throws IOException{
+        if(bShowTime){
+            bw.write(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(),
+                DatetimeOpt.getDateTimePattern()));
+            bw.write(" -- ");
+         }
+        bw.write(slog);
+        if(bNewLine){
+            bw.write("\r\n");
+        }
+    }
+
     public static void writeLog(String sLogFileName,String slog, boolean bNewLine,boolean bShowTime){
         try(BufferedWriter bw = new BufferedWriter(
                  new FileWriter(sLogFileName, true))){
-            if(bShowTime)
-                bw.write(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
-            if(bNewLine){
-                bw.write(slog+"\r\n");
-            }else{
-                bw.write(slog);
-            }
+            innerWriteLog(bw,slog,bNewLine,bShowTime);
             bw.flush();
         } catch (IOException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
@@ -41,18 +49,8 @@ public class TxtLogFile {
     public static void writeLogEx(String sLogFileName,String slog, boolean bNewLine,boolean bShowTime){
         try(BufferedWriter bw = new BufferedWriter(
                  new FileWriter(sLogFileName, true))){
-            if(bShowTime){
-                bw.write(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
-                //System.out.print(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
-            }
-            if(bNewLine){
-                bw.write(slog+"\r\n");
-                //System.out.println(slog);
-            }else{
-                bw.write(slog);
-                //System.out.print(slog);
-            }
-            //bw.close();
+            innerWriteLog(bw,slog,bNewLine,bShowTime);
+            System.out.println(DatetimeOpt.currentDatetime() + " - "+ slog);
         } catch (IOException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
         }
@@ -102,13 +100,7 @@ public class TxtLogFile {
 
     public void writeLog(String slog, boolean bNewLine,boolean bShowTime){
         try {
-            if(bShowTime)
-                logWriter.write(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
-            if(bNewLine){
-                logWriter.write(slog+"\r\n");
-            }else{
-                logWriter.write(slog);
-            }
+            innerWriteLog(logWriter,slog,bNewLine,bShowTime);
         } catch (IOException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
         }
@@ -116,17 +108,8 @@ public class TxtLogFile {
 
     public void writeLogEx(String slog, boolean bNewLine,boolean bShowTime){
         try {
-            if(bShowTime){
-                logWriter.write(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
-                System.out.print(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), DatetimeOpt.getDateTimePattern()));
-            }
-            if(bNewLine){
-                logWriter.write(slog+"\r\n");
-                //System.out.println(slog);
-            }else{
-                logWriter.write(slog);
-                //System.out.print(slog);
-            }
+            innerWriteLog(logWriter,slog,bNewLine,bShowTime);
+            System.out.println(DatetimeOpt.currentDatetime() + " - "+ slog);
         } catch (IOException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
         }
