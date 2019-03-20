@@ -108,23 +108,27 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     /**
      * 返回 sql 语句 和 属性名数组
      * @param ti TableInfo
+     * @param fields String 值返回对应的字段
      * @param alias String
      * @return Pair String String []
      */
-    public static String buildFieldSql(TableInfo ti, String alias){
+    public static String buildFieldSqlWithFieldName(TableInfo ti, Collection<String> fields, String alias){
         StringBuilder sBuilder= new StringBuilder();
-        List<? extends TableField> columns = ti.getColumns();
         boolean addAlias = StringUtils.isNotBlank(alias);
+        String aliasName = alias+".";
         int i=0;
-        for(TableField col : columns){
-            if(i>0)
-                sBuilder.append(", ");
-            else
-                sBuilder.append(" ");
-            if(addAlias)
-                sBuilder.append(alias).append('.');
-            sBuilder.append(col.getColumnName());
-            i++;
+        for(String colName : fields){
+            TableField col =ti.findFieldByName(colName);
+            if(col!=null) {
+                if (i > 0)
+                    sBuilder.append(", ");
+                else
+                    sBuilder.append(" ");
+                if (addAlias)
+                    sBuilder.append(aliasName);
+                sBuilder.append(col.getColumnName());
+                i++;
+            }
         }
         return sBuilder.toString();
     }
