@@ -165,17 +165,15 @@ public class TableMapInfo extends SimpleTableInfo {
 
     public void appendOrderBy(SimpleTableField column, String orderBy) {
         String orderBySql ;
-        if( StringUtils.isBlank(orderBy)){
+        if( StringUtils.isBlank(orderBy) || "ASC".equalsIgnoreCase(orderBy) ){
             orderBySql = column.getColumnName();
+        }else if("DESC".equalsIgnoreCase(orderBy)){
+            // StringUtils.equalsAnyIgnoreCase(orderByTrim, "DESC", "ASC" )){
+            orderBySql = column.getColumnName() + " DESC";
         }else{
-            String orderByTrim = orderBy;
-            if("DESC".equalsIgnoreCase(orderByTrim)){
-                // StringUtils.equalsAnyIgnoreCase(orderByTrim, "DESC", "ASC" )){
-                orderBySql = column.getColumnName() + " DESC";
-            }else{
-                orderBySql = orderByTrim;
-            }
+            orderBySql = orderBy;
         }
+
         if( StringUtils.isBlank(this.getOrderBy()) ){
             super.setOrderBy( orderBySql);
         }else{
