@@ -105,6 +105,31 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return this.tableInfo;
     }
 
+
+    /**
+     * 返回 sql 语句 和 属性名数组
+     * @param ti TableInfo
+     * @param alias String
+     * @return Pair String String []
+     */
+    public static String buildFieldSql(TableInfo ti, String alias){
+        StringBuilder sBuilder= new StringBuilder();
+        List<? extends TableField> columns = ti.getColumns();
+        boolean addAlias = StringUtils.isNotBlank(alias);
+        int i=0;
+        for(TableField col : columns){
+            if(i>0)
+                sBuilder.append(", ");
+            else
+                sBuilder.append(" ");
+            if(addAlias)
+                sBuilder.append(alias).append('.');
+            sBuilder.append(col.getColumnName());
+            i++;
+        }
+        return sBuilder.toString();
+    }
+
     /**
      * 返回 sql 语句 和 属性名数组
      * @param ti TableInfo
@@ -112,7 +137,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
      * @param alias String
      * @return Pair String String []
      */
-    public static String buildFieldSqlWithFieldName(TableInfo ti, Collection<String> fields, String alias){
+    public static String buildPartFieldSql(TableInfo ti, Collection<String> fields, String alias){
         StringBuilder sBuilder= new StringBuilder();
         boolean addAlias = StringUtils.isNotBlank(alias);
         String aliasName = alias+".";
