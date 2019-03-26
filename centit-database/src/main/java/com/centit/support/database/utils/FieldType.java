@@ -1,5 +1,6 @@
 package com.centit.support.database.utils;
 
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -255,8 +256,7 @@ public abstract class FieldType {
         return fts;
     }
 
-    public static String mapToJavaType(String columnType, int scale)
-    {
+    public static String mapToJavaType(String columnType, int scale){
         if("NUMBER".equalsIgnoreCase(columnType) ||
             "INTEGER".equalsIgnoreCase(columnType)||
             "DECIMAL".equalsIgnoreCase(columnType) ){
@@ -290,6 +290,53 @@ public abstract class FieldType {
             return "BigDecimal";//FieldType.MONEY;
         }else {
             return columnType;
+        }
+    }
+
+    /**
+     * map java.sql.Type to javaType
+     * @param dbType java.sql.Type
+     * @return java type
+     * @see Types
+     */
+    public static String mapToJavaType(int dbType){
+        switch(dbType) {
+            case -6:
+            case -5:
+            case 5:
+            case 4:
+            case 2:
+                return FieldType.INTEGER;
+            case 6:
+            case 7:
+                return FieldType.FLOAT;
+            case 8:
+                return FieldType.DOUBLE;
+            case 3:
+                return FieldType.LONG;
+            case -1:
+            case 1:
+            case 12:
+                return FieldType.STRING;
+            case 91:
+                return FieldType.DATE;
+            case 92:
+                return FieldType.DATETIME;
+            case 93:
+            case 2013:
+            case 2014:
+                return FieldType.TIMESTAMP;
+            case -2:
+            case -3:
+            case -4:
+            case 2004:
+                return FieldType.BYTE_ARRAY;
+            case 2005:
+                return FieldType.TEXT;
+            case 16:
+                return FieldType.BOOLEAN;
+            default:
+                return FieldType.STRING;
         }
     }
 }
