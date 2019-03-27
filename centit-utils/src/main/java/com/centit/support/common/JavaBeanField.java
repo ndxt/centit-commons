@@ -154,8 +154,7 @@ public class JavaBeanField {
             case "boolean":
             case "Boolean":
                 this.innerSetObjectFieldValue(object,
-                        StringRegularOpt.isTrue(
-                                StringBaseOpt.objectToString(newValue)));
+                        BooleanBaseOpt.castObjectToBoolean(newValue));
                 break;
             default:
                 this.innerSetObjectFieldValue(object, newValue);
