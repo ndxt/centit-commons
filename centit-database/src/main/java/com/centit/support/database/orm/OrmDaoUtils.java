@@ -542,7 +542,7 @@ public abstract class OrmDaoUtils {
         return fetchObjectReference(connection, object,ref ,mapInfo , true);
     }
 
-    private static <T> T fetchObjectReferencesCascade(Connection connection, T object, Class<?> objType ){
+    public static <T> T fetchObjectReferencesCascade(Connection connection, T object, Class<?> objType ){
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         if(mapInfo.hasReferences()) {
             for (SimpleTableReference ref : mapInfo.getReferences()) {
@@ -551,7 +551,6 @@ public abstract class OrmDaoUtils {
         }
         return object;
     }
-
 
     public static <T> T fetchObjectReference(Connection connection, T object, String reference  )
             throws PersistenceException {
