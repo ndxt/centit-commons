@@ -3,7 +3,7 @@ package com.centit.support.algorithm;
 @SuppressWarnings("unused")
 public abstract class BooleanBaseOpt {
     public static final String ONE_CHAR_TRUE = "T";
-    public static final String ONE_CHAR_FALSE = "T";
+    public static final String ONE_CHAR_FALSE = "F";
     public static final String STRING_TRUE = "true";
     public static final String STRING_FALSE = "false";
 
