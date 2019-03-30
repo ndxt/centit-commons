@@ -33,33 +33,49 @@ public abstract class FieldType {
         return st;
     }
 
+    public static String mapToHumpName(String dbObjectName, boolean firstUpCase){
+        String sTempName = dbObjectName.toLowerCase();
+        int nl = dbObjectName.length();
+        int i=0;
+
+        StringBuilder sClassName = new StringBuilder();
+        boolean upCase = firstUpCase;
+        while(i<nl){
+            if(sTempName.charAt(i) == '_' ){
+               if(sClassName.length()==1){
+                    sClassName.delete(0,1);
+                    upCase = firstUpCase;
+                }else {
+                    upCase = true;
+                }
+            }else{
+                if(upCase) {
+                    sClassName.append((char)(sTempName.charAt(i)-32));
+                    upCase = false;
+                }else {
+                    sClassName.append(sTempName.charAt(i));
+                }
+            }
+            i++;
+        }
+        return sClassName.toString();
+    }
+
+    /**
+     * @param dbObjectName 数据库中的名称（代码）
+     * @return 大驼峰 名称
+     */
+    public static String mapClassName(String dbObjectName){
+        return mapToHumpName(dbObjectName, true);
+    }
+
+
     /**
      * @param dbObjectName 数据库中的名称（代码）
      * @return 小驼峰 名称
      */
     public static String mapPropName(String dbObjectName){
-        String sTempName = dbObjectName.toLowerCase();
-        String sTemp2Name = dbObjectName.toUpperCase();
-        int nl = dbObjectName.length();
-        if(nl<3)
-            return sTempName;
-        int i=0;
-        String sPropName="";
-        while(i<nl){
-            if(sTempName.charAt(i) != '_' ){
-                sPropName = sPropName + sTempName.charAt(i);
-                i++;
-            }else{
-                i++;
-                if(i==2)
-                    sPropName = "";
-                else if(i<nl){
-                    sPropName = sPropName + sTemp2Name.charAt(i);
-                    i++;
-                }
-            }
-        }
-        return sPropName;
+        return mapToHumpName(dbObjectName, false);
     }
     /**
      * 转换到Oracle的字段
