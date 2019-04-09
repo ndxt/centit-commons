@@ -12,7 +12,14 @@ import java.util.Map;
 public class TestDateTimeOpt {
     public  static void  main(String[] args) throws Exception  {
 
-        System.out.println(DatetimeOpt.addDays(DatetimeOpt.currentUtilDate(),-1));
+        System.out.println(DatetimeOpt.seekEndOfWeek(DatetimeOpt.currentUtilDate()));
+        System.out.println(DatetimeOpt.seekEndOfWeek(DatetimeOpt.createUtilDate(2019,4,7)));
+        System.out.println(DatetimeOpt.seekEndOfWeek(DatetimeOpt.createUtilDate(2019,4,8)));
+        System.out.println(DatetimeOpt.seekEndOfWeek(DatetimeOpt.createUtilDate(2019,4,12)));
+        System.out.println(DatetimeOpt.seekEndOfWeek(DatetimeOpt.createUtilDate(2019,4,13)));
+        System.out.println(DatetimeOpt.seekEndOfWeek(DatetimeOpt.createUtilDate(2019,4,14)));
+        System.out.println(DatetimeOpt.seekEndOfMonth(DatetimeOpt.currentUtilDate()));
+        System.out.println(DatetimeOpt.seekEndOfYear(DatetimeOpt.currentUtilDate()));
 
         System.out.println(DatetimeOpt.calcSpanDays(
                 DatetimeOpt.smartPraseDate("2018-6-1"), DatetimeOpt.smartPraseDate("2018-6-2")));

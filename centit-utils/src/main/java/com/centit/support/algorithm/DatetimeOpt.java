@@ -459,13 +459,18 @@ public abstract class DatetimeOpt {
         return cal.get(Calendar.YEAR);
     }
 
-    public static java.util.Date truncateToDay(java.util.Date date){
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
+    private static void resetToZeroPoint(Calendar cal ){
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
+    }
+
+    public static java.util.Date truncateToDay(java.util.Date date){
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        int weekDay = cal.get(Calendar.DAY_OF_WEEK);
+        resetToZeroPoint(cal);
         return cal.getTime();
         //createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,cal.get(Calendar.DAY_OF_MONTH));
     }
@@ -473,11 +478,9 @@ public abstract class DatetimeOpt {
     public static java.util.Date truncateToMonth(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
+
         cal.set(Calendar.DATE, 1);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        resetToZeroPoint(cal);
         return cal.getTime();
         //return createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,1);
     }
@@ -487,10 +490,7 @@ public abstract class DatetimeOpt {
         cal.setTime(date);
         cal.set(Calendar.MONTH, 0);
         cal.set(Calendar.DATE, 1);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        resetToZeroPoint(cal);
         return cal.getTime();
         //return createUtilDate(cal.get(Calendar.YEAR),1,1);
     }
@@ -501,10 +501,26 @@ public abstract class DatetimeOpt {
         cal.setTime(date);
         cal.set(Calendar.MONTH, 11);
         cal.set(Calendar.DATE, 31);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+        resetToZeroPoint(cal);
+        return cal.getTime();
+        //return createUtilDate(cal.get(Calendar.YEAR),12,31);
+    }
+
+    /**
+     * 获取一周最后一天（周日凌晨一点）
+     * @param date 输入时间
+     * @return 周六凌晨一点
+     */
+    public static java.util.Date seekEndOfWeek(java.util.Date date){
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+
+        resetToZeroPoint(cal);
+        int weekDay = cal.get(Calendar.DAY_OF_WEEK);
+        if(weekDay>1) {
+            cal.setTimeInMillis(cal.getTimeInMillis() +
+                Double.valueOf((8 - weekDay) * 86400000.0).longValue());
+        }
         return cal.getTime();
         //return createUtilDate(cal.get(Calendar.YEAR),12,31);
     }
@@ -564,7 +580,6 @@ public abstract class DatetimeOpt {
     }
 
     /**
-     *
      * @param beginDate beginTime
      * @param endDate endTime
      * @return 计算这个周期中的天数, 包括 beginTime，endTime
@@ -577,6 +592,11 @@ public abstract class DatetimeOpt {
         return (int) ((eD.getTime() - bD.getTime()) / 86400000 + 1 );
     }
 
+    /**
+     * @param beginDate beginTime
+     * @param endDate endTime
+     * @return 计算这个周期中的天数, 不足一天用小数表示
+     */
     public static float calcDateSpan(java.util.Date beginDate, java.util.Date endDate) {
         //System.out.println(beginDate.getTime());
         //System.out.println(endDate.getTime());
