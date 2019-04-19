@@ -59,7 +59,7 @@ public abstract class CaptchaImageUtil {
     }
 
     public static boolean checkcodeMatch(String session_checkcode, String request_checkcode){
-       if(request_checkcode==null || session_checkcode==null 
+       if(request_checkcode==null || session_checkcode==null
                || "".equals(request_checkcode))
            return false;
        return session_checkcode.equalsIgnoreCase(
@@ -75,7 +75,7 @@ public abstract class CaptchaImageUtil {
 
     }*/
 
-    public static BufferedImage generateCaptchaImage(String captchaKey) {
+    public static BufferedImage generateCaptchaImage(String captchaKey, Font font) {
         // 设置图片的长宽
         int width = 10+13*captchaKey.length();
         int height = 22;
@@ -88,7 +88,7 @@ public abstract class CaptchaImageUtil {
         g.setColor(getRandColor(180, 250));
         g.fillRect(0, 0, width, height);
         // 设置字体
-        g.setFont(new Font("Times New Roman", Font.PLAIN, 21));
+        g.setFont(font);
         g.setColor(new Color(0, 0, 0));
         Random rand = new Random();
         for (int i = 0; i < captchaKey.length(); i++) {
@@ -97,6 +97,14 @@ public abstract class CaptchaImageUtil {
         // 图象生效
         g.dispose();
         return image;
+    }
+
+    public static BufferedImage generateCaptchaImage(String captchaKey, String fontName) {
+        return generateCaptchaImage(captchaKey, new Font(fontName, Font.PLAIN, 21));
+    }
+
+    public static BufferedImage generateCaptchaImage(String captchaKey) {
+        return generateCaptchaImage(captchaKey, new Font("Times New Roman", Font.PLAIN, 21));
     }
 
     public static Color getRandColor(int fc, int bc) {
