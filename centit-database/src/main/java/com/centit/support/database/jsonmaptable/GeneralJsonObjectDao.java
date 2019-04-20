@@ -33,6 +33,21 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 
     }
 
+    public static Map<String, Object> mapObjectProperties(TableInfo tableInfo, Map<String, Object> properties){
+        for(TableField field : tableInfo.getColumns()){
+            if( properties.containsKey(field.getColumnName()) &&
+                ! properties.containsKey(field.getPropertyName())){
+                properties.put(field.getPropertyName(),
+                    properties.get(field.getColumnName()));
+            }
+        }
+        return properties;
+    }
+
+    public Map<String, Object> mapObjectProperties(Map<String, Object> properties){
+        return GeneralJsonObjectDao.mapObjectProperties(this.tableInfo, properties);
+    }
+
     public static GeneralJsonObjectDao createJsonObjectDao(final Connection conn,final TableInfo tableInfo )
             throws SQLException {
         DBType dbtype = DBType.mapDBType(conn.getMetaData().getURL());
