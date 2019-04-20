@@ -1,5 +1,6 @@
 package com.centit.support.database.jsonmaptable;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -10,6 +11,7 @@ import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DBType;
 import com.centit.support.database.utils.DatabaseAccess;
+import com.sun.tools.javac.util.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -206,7 +208,11 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public static String buildFilterSqlByPk(TableInfo ti,String alias){
         StringBuilder sBuilder= new StringBuilder();
         int i=0;
-        for(String plCol : ti.getPkColumns()){
+        List<String> pkColumns = ti.getPkColumns();
+        if(pkColumns == null || pkColumns.size()==0){
+            throw new RuntimeException("表或者视图 " + ti.getTableName() +" 缺少对应主键。" );
+        }
+        for(String plCol : pkColumns){
             if(i>0)
                 sBuilder.append(" and ");
             TableField col = ti.findFieldByColumn(plCol);
@@ -238,9 +244,8 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 
     public static Pair<String,String[]> buildGetObjectSqlByPk(TableInfo ti){
         Pair<String,String[]> q = buildFieldSqlWithFieldName(ti,null);
-        String filter = buildFilterSqlByPk(ti,null);
         return new ImmutablePair<>(
-                "select " + q.getLeft() +" from " +ti.getTableName() + " where " + filter,
+                "select " + q.getLeft() +" from " +ti.getTableName() + " where " + buildFilterSqlByPk(ti,null),
                 q.getRight());
     }
 
@@ -248,7 +253,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         if(keyValue instanceof Map) {
             Map<String, Object> keyValues = (Map) keyValue;
             if (!checkHasAllPkColumns(keyValues)) {
-                throw new SQLException("缺少主键对应的属性。");
+                throw new SQLException("缺少主键对应的属性, 表：" + tableInfo.getTableName() +" ,参数：" + JSON.toJSONString(keyValue)  );
             }
             return keyValues;
         }else {
