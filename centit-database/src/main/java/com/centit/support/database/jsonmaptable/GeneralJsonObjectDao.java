@@ -135,10 +135,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         boolean addAlias = StringUtils.isNotBlank(alias);
         int i=0;
         for(TableField col : columns){
-            if(i>0)
-                sBuilder.append(", ");
-            else
-                sBuilder.append(" ");
+            sBuilder.append(i > 0 ? ", " : " ");
             if(addAlias)
                 sBuilder.append(alias).append('.');
             sBuilder.append(col.getColumnName());
@@ -161,11 +158,8 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         int i=0;
         for(String colName : fields){
             TableField col =ti.findFieldByName(colName);
-            if(col!=null) {
-                if (i > 0)
-                    sBuilder.append(", ");
-                else
-                    sBuilder.append(" ");
+            if(col != null) {
+                sBuilder.append(i > 0 ? ", " : " ");
                 if (addAlias)
                     sBuilder.append(aliasName);
                 sBuilder.append(col.getColumnName());
@@ -344,14 +338,16 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         StringBuilder sbValues = new StringBuilder(" ) values ( ");
         int i=0;
         for(String f : fields){
-            if(i>0){
-                sbInsert.append(", ");
-                sbValues.append(", ");
-            }
             TableField col = ti.findFieldByName(f);
-            sbInsert.append(col.getColumnName());
-            sbValues.append(":").append(f);
-            i++;
+            if(col != null) {
+                if (i > 0) {
+                    sbInsert.append(", ");
+                    sbValues.append(", ");
+                }
+                sbInsert.append(col.getColumnName());
+                sbValues.append(":").append(f);
+                i++;
+            }
         }
         return sbInsert.append(sbValues).append(")").toString();
     }
@@ -372,14 +368,15 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         for(String f : fields){
             if(exceptPk && isPkColumn(ti, f))
                 continue;
-
-            if(i>0){
-                sbUpdate.append(", ");
-            }
             TableField col = ti.findFieldByName(f);
-            sbUpdate.append(col.getColumnName());
-            sbUpdate.append(" = :").append(f);
-            i++;
+            if(col != null) {
+                if (i > 0) {
+                    sbUpdate.append(", ");
+                }
+                sbUpdate.append(col.getColumnName());
+                sbUpdate.append(" = :").append(f);
+                i++;
+            }
         }
         return sbUpdate.toString();
     }
