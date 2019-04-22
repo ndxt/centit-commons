@@ -168,7 +168,6 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         }
         return sBuilder.toString();
     }
-
     /**
      * 返回 sql 语句 和 属性名数组
      * @param ti TableInfo
@@ -194,6 +193,34 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         }
         return new ImmutablePair<>(sBuilder.toString(),fieldNames);
     }
+
+    /**
+     * 返回 sql 语句 和 属性名数组
+     * @param ti TableInfo
+     * @param fields String 值返回对应的字段
+     * @param alias String
+     * @return Pair String String []
+     */
+    public static Pair<String,String[]> buildPartFieldSqlWithFieldName(TableInfo ti, Collection<String> fields, String alias){
+        StringBuilder sBuilder= new StringBuilder();
+        boolean addAlias = StringUtils.isNotBlank(alias);
+        String aliasName = alias+".";
+        String [] fieldNames = new String[fields.size()];
+        int i=0;
+        for(String colName : fields){
+            TableField col =ti.findFieldByName(colName);
+            if(col != null) {
+                sBuilder.append(i > 0 ? ", " : " ");
+                if (addAlias)
+                    sBuilder.append(aliasName);
+                sBuilder.append(col.getColumnName());
+                fieldNames[i] = col.getPropertyName();
+                i++;
+            }
+        }
+        return new ImmutablePair<>(sBuilder.toString(),fieldNames);
+    }
+
 
     public static boolean isPkColumn(TableInfo ti, String propertyName){
         TableField field = ti.findFieldByName(propertyName);
