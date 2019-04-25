@@ -271,7 +271,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 }
                 if (StringUtils.isNotBlank(alias))
                     sBuilder.append(alias).append('.');
-                sBuilder.append(col.getColumnName()).append(" = :").append(col.getPropertyName());
+                sBuilder.append(col.getColumnName()).append(" = :").append(plCol/*col.getPropertyName()*/);
                 i++;
             }
         }
