@@ -67,6 +67,9 @@ public abstract class OrmUtils {
                         case UUID:
                             filed.setObjectFieldValue(object, UuidOpt.getUuidAsString32());
                             break;
+                        case UUID22:
+                            filed.setObjectFieldValue(object, UuidOpt.getUuidAsString22());
+                            break;
                         case SEQUENCE:
                             //GeneratorTime.READ 读取数据时不能用 SEQUENCE 生成值
                             if(sqlDialect!=null) {

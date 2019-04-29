@@ -17,6 +17,10 @@ public enum GeneratorType {
      */
     UUID,
     /**
+     * uuid 22bit base64 编码
+     */
+    UUID22,
+    /**
      * 常量 , 保存在value中
      */
     CONSTANT,
