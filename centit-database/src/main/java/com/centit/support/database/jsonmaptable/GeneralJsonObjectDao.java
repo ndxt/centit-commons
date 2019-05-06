@@ -285,7 +285,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 q.getRight());
     }
 
-    private Map<String, Object> makePkFieldMap(final Object keyValue) throws SQLException {
+    public Map<String, Object> makePkFieldMap(final Object keyValue) throws SQLException {
         if(keyValue instanceof Map) {
             Map<String, Object> keyValues = (Map) keyValue;
             if (!checkHasAllPkColumns(keyValues)) {
