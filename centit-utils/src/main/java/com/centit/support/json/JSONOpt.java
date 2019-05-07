@@ -124,7 +124,7 @@ public abstract class JSONOpt {
         return findJsonObject(objJson,skeys);
     }
 
-    private static JSONObject createJsonObject(String [] skeys , int beginPos ,Object value){
+    private static JSONObject innerCreateJsonObject(String [] skeys , int beginPos , Object value){
         int depth = skeys.length;
         if(depth==0)
             return null;
@@ -178,7 +178,7 @@ public abstract class JSONOpt {
         JSONPath jpath = findJsonObject(objJson,depth-1,skeys);
         Object jsonValue = value;
         if(jpath.pathPos < depth-1 )
-            jsonValue = createJsonObject(skeys ,  jpath.pathPos + 1 , value);
+            jsonValue = innerCreateJsonObject(skeys ,  jpath.pathPos + 1 , value);
 
         JSONKey key = praseJosnKey( skeys[jpath.pathPos]);
         if(key.ind<0){
@@ -247,7 +247,7 @@ public abstract class JSONOpt {
         JSONPath jpath = findJsonObject(objJson,depth-1,skeys);
         Object jsonValue = value;
         if(jpath.pathPos < depth-1 ){
-            jsonValue = createJsonObject(skeys ,  jpath.pathPos + 1 , value);
+            jsonValue = innerCreateJsonObject(skeys ,  jpath.pathPos + 1 , value);
             JSONKey key = praseJosnKey( skeys[jpath.pathPos]);
             if(key.ind<0){
                 jpath.objJson.put(key.skey, jsonValue);

@@ -1,7 +1,5 @@
 package com.centit.support.file;
 
-import com.centit.support.security.DESSecurityUtils;
-
 import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import java.io.*;

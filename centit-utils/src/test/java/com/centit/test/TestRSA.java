@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.security.AESSecurityUtils;
-import com.centit.support.security.DESSecurityUtils;
 import com.centit.support.security.RSASecurityUtils;
 
 import java.security.KeyPair;
