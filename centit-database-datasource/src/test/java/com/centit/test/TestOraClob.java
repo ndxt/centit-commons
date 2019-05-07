@@ -9,7 +9,7 @@ import com.centit.support.database.utils.DbcpConnectPools;
 
 public class TestOraClob {
 
-  public  static void  main(String[] args)   { 
+  public  static void  main(String[] args)   {
       testFetchClob();
   }
   public  static void testFetchClob(){
@@ -37,7 +37,7 @@ public class TestOraClob {
     }
 
    }
-  
+
   public  static void testCentitLob(){
       DataSourceDescription dbc = new DataSourceDescription();
 
@@ -49,30 +49,28 @@ public class TestOraClob {
           Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
         PreparedStatement pStmt= conn.prepareStatement(
         "select NO, internal_no,item_id,STUFF , length(stuff),CENTIT_LOB.ClobToBlob(stuff) as bstuff " +
-        "from inf_apply where  no='JS000000HD0000000481' ")){
-        ResultSet rs = pStmt.executeQuery();
-        if (rs.next()) {
-            Clob stuff = rs.getClob("STUFF");
-            Blob bstuff = rs.getBlob("bstuff");
-            String internal_no = rs.getString("internal_no");
-            String item_id = rs.getString("item_id");
-            try(PreparedStatement pStmt2= conn.prepareStatement(
-                    "begin DataTranslate.InsertAnnex(?,?,?); end;")){
+        "from inf_apply where  no='JS000000HD0000000481' ");
+          ResultSet rs = pStmt.executeQuery()){
+            if (rs.next()) {
+                Clob stuff = rs.getClob("STUFF");
+                Blob bstuff = rs.getBlob("bstuff");
+                String internal_no = rs.getString("internal_no");
+                String item_id = rs.getString("item_id");
+                try(PreparedStatement pStmt2= conn.prepareStatement(
+                        "begin DataTranslate.InsertAnnex(?,?,?); end;")){
 
-                pStmt2.setClob(1, stuff);
-                pStmt2.setString(2, internal_no);
-                pStmt2.setString(3, item_id);
+                    pStmt2.setClob(1, stuff);
+                    pStmt2.setString(2, internal_no);
+                    pStmt2.setString(3, item_id);
 
-                pStmt2.execute();
+                    pStmt2.execute();
+                }
+                System.out.println("Clob len :" + stuff.length());//12560267
+                System.out.println("Blob len :" + bstuff.length());
             }
-            System.out.println("Clob len :" + stuff.length());//12560267
-            System.out.println("Blob len :" + bstuff.length());
+        } catch (Exception e) {
+            //e.printStackTrace();
         }
-
-    } catch (Exception e) {
-        //e.printStackTrace();
-    }
-
    }
 
 }

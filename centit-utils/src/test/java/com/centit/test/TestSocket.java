@@ -44,8 +44,7 @@ public class TestSocket {
         ByteBaseOpt.writeStringApendSpace(buf,"1.02",32,68);
         // 总长度刚好100 + 4位校验码
         ByteBaseOpt.writeInt32(buf,generateCheckSum(buf,100),100);
-        try  {
-            Socket socket = new Socket("192.168.128.83", 5016);
+        try (Socket socket = new Socket("192.168.128.83", 5016)) {
             //socket.setKeepAlive(true);
             //socket.setTcpNoDelay(true);
             socket.getOutputStream().write(buf, 0, 104);
@@ -57,7 +56,6 @@ public class TestSocket {
             socket.getInputStream().read(readbuf,8,datLen<2000?datLen:2000);
             System.out.println(readbuf);
             socket.close();
-
         }catch (Exception e){
             e.printStackTrace();
         }
