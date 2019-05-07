@@ -40,30 +40,6 @@ public class TestRSA {
         System.out.println("解密后为:"+sec);
     }
 
-
-    public static void testDes(){
-        String str="恭喜发财!恭喜发财!恭喜发财!恭喜发财";
-        String key = "0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
-        System.out.println("密码为:"+key);
-        System.out.println("---------------加密方法DES- 中文--------------------");
-        System.out.println("原文为:("+str.length()+")"+str);
-
-
-        String sec = DESSecurityUtils.encryptAndBase64(str, key);
-        System.out.println("加密后密文为：("+sec.length()+")"+ sec);
-        sec = DESSecurityUtils.decryptBase64String(sec, key);
-        System.out.println("解密后为:"+sec);
-
-        str="codefan@sina.com+www.centit.com";
-        System.out.println("---------------加密方法DES-- 英文和数字-------------------");
-        System.out.println("原文为:("+str.length()+")"+str);
-
-        sec = DESSecurityUtils.encryptAndBase64(str, key);
-        System.out.println("加密后密文为：("+sec.length()+")"+ sec);
-        sec = DESSecurityUtils.decryptBase64String(sec, key);
-        System.out.println("解密后为:"+sec);
-    }
-
     public static void testCreateKey() throws Exception {
         KeyPair keyPair = RSASecurityUtils.generateKeyPair(1024);
         FileIOOpt.writeStringToFile(RSASecurityUtils.keyPairToJson(keyPair),
