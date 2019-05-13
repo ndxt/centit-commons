@@ -57,22 +57,30 @@ public abstract class Md5Encoder {
      * @param data 需要编码的 数据
      * @return 将md5 编码进行base64编码，去掉最后的两个==
      */
-    public static String encodeBase64(byte[] data){
+    public static String encodeBase64(byte[] data, boolean urlSafe){
         byte [] md5Code = rawEncode(data);
         if(md5Code != null){
-            return new String(Base64.encodeBase64(md5Code),0,22);
+            return new String(
+                urlSafe? Base64.encodeBase64URLSafe(md5Code): Base64.encodeBase64(md5Code),0,22);
         } else {
             return null;
         }
     }
 
-    public static String encodeBase64(String data){
+    public static String encodeBase64(byte[] data){
+        return encodeBase64(data, false);
+    }
+
+    public static String encodeBase64(String data, boolean urlSafe){
         try {
-            return encodeBase64(data.getBytes("utf8"));
+            return encodeBase64(data.getBytes("utf8"), urlSafe);
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
             return null;
         }
+    }
+    public static String encodeBase64(String data){
+        return encodeBase64(data, false);
     }
     /**
      * encoding password for spring security

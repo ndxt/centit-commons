@@ -151,16 +151,13 @@ public abstract class UrlOptUtils {
         String md5Hex = "";
         int nLen = 0;
         while (nLen < urlLength) {
-            md5Hex = Md5Encoder.encodeBase64(md5Hex + longUrl);
-            for(int i=0;i<md5Hex.length();i++){
-                char c = md5Hex.charAt(i);
-                if(c != '/' && c != '+'){
-                    sbBuilder.append(c);
-                    nLen ++;
-                }
-                if(nLen == urlLength){
-                    break;
-                }
+            md5Hex = Md5Encoder.encodeBase64(md5Hex + longUrl, true);
+            int md5Len = md5Hex.length();
+            int copylen = md5Len < urlLength - nLen ? md5Len : urlLength - nLen;
+            sbBuilder.append(md5Hex.substring(0,copylen));
+            nLen += copylen;
+            if(nLen == urlLength){
+                break;
             }
         }
         return sbBuilder.toString();
