@@ -224,7 +224,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 
     public static boolean isPkColumn(TableInfo ti, String propertyName){
         TableField field = ti.findFieldByName(propertyName);
-        return ti.getPkColumns().contains(field.getColumnName());
+        return field !=null ? ti.getPkColumns().contains(field.getColumnName()) : false;
     }
 
     public static boolean checkHasAllPkColumns(TableInfo tableInfo, Map<String, Object> properties){
