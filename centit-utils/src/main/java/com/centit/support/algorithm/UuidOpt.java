@@ -14,7 +14,7 @@ public abstract class UuidOpt {
         long hi = 1L << (digits * 4);
         return Long.toHexString(hi | (val & (hi - 1))).substring(1);
     }
-    
+
     public static String uuidToString32(UUID uuid){
         long leastSigBits =uuid.getLeastSignificantBits() ;
         long mostSigBits = uuid.getMostSignificantBits();
@@ -24,7 +24,7 @@ public abstract class UuidOpt {
                digits(leastSigBits, 8);
                //Long.toHexString(mostSigBits) + Long.toHexString(leastSigBits);
     }
-    
+
     public static String uuidToString36(UUID uuid){
         long leastSigBits =uuid.getLeastSignificantBits() ;
         long mostSigBits = uuid.getMostSignificantBits();
@@ -39,13 +39,13 @@ public abstract class UuidOpt {
         byte [] buf = new byte[16];
         ByteBaseOpt.writeInt64(buf, uuid.getMostSignificantBits() ,0);
         ByteBaseOpt.writeInt64(buf, uuid.getLeastSignificantBits() ,8);
-        return new String(Base64.encodeBase64(buf),0,22);
+        return new String(Base64.encodeBase64URLSafe(buf),0,22);
     }
-    
+
     public static String getUuidAsString36(){
         return uuidToString36(UUID.randomUUID());
     }
-    
+
     public static String getUuidAsString32(){
         return uuidToString32(UUID.randomUUID());
     }
