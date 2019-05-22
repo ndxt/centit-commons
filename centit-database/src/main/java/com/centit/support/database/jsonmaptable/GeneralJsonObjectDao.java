@@ -264,24 +264,30 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         StringBuilder sBuilder= new StringBuilder();
         int i=0;
         for(String plCol : properties){
-            int opt = 0;// 0:eq 1:gt 2:ge 3:lt 4:le
+            int opt = 0;// 0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in
             TableField col = ti.findFieldByName(plCol);
             if(col == null && plCol.length()>3){
                 col = ti.findFieldByName(plCol.substring(0,plCol.length()-3));
-                String lowPlCol = plCol.toLowerCase();
-                if(lowPlCol.endsWith("_gt")){
-                    opt = 1;
-                } else if(lowPlCol.endsWith("_ge")){
-                    opt = 2;
-                } else if(lowPlCol.endsWith("_lt")){
-                    opt = 3;
-                } else if(lowPlCol.endsWith("_le")){
-                    opt = 4;
-                } /*else if(lowPlCol.endsWith("_eq")){
-                    opt = 0;
-                } else{
-                    col == null;
-                }*/
+                if(col!=null) {
+                    String lowPlCol = plCol.toLowerCase();
+                    if (lowPlCol.endsWith("_gt")) {
+                        opt = 1;
+                    } else if (lowPlCol.endsWith("_ge")) {
+                        opt = 2;
+                    } else if (lowPlCol.endsWith("_lt")) {
+                        opt = 3;
+                    } else if (lowPlCol.endsWith("_le")) {
+                        opt = 4;
+                    } else if (lowPlCol.endsWith("_lk")) {
+                        opt = 5;
+                    } else if (lowPlCol.endsWith("_in")) {
+                        opt = 6;
+                    } /*else if(lowPlCol.endsWith("_eq")){
+                    opt = 0;} */
+                    else if (lowPlCol.charAt(lowPlCol.length() - 3) != '_') {
+                        col = null;
+                    }
+                }
             }
 
             if( col != null ) {
@@ -293,23 +299,28 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 sBuilder.append(col.getColumnName());
                 switch (opt) {
                     case 1:
-                        sBuilder.append(" > :");
+                        sBuilder.append(" > :").append(plCol);
                         break;
                     case 2:
-                        sBuilder.append(" >= :");
+                        sBuilder.append(" >= :").append(plCol);
                         break;
                     case 3:
-                        sBuilder.append(" < :");
+                        sBuilder.append(" < :").append(plCol);
                         break;
                     case 4:
-                        sBuilder.append(" <= :");
+                        sBuilder.append(" <= :").append(plCol);
+                        break;
+                    case 5:
+                        sBuilder.append(" like :").append(plCol);
+                        break;
+                    case 6:
+                        sBuilder.append(" in (:").append(plCol).append(")");
                         break;
                     default:
-                        sBuilder.append(" = :");
+                        sBuilder.append(" = :").append(plCol);
                         break;
 
                 }
-                sBuilder.append(plCol);
                 i++;
             }
         }
