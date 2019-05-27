@@ -1,5 +1,6 @@
 package com.centit.support.database.metadata;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 public class JdbcMetadata implements DatabaseMetadata {
     protected static final Logger logger = LoggerFactory.getLogger(JdbcMetadata.class);
     private Connection dbc;
-
+    private String dbSchema;
 
     @Override
     public void setDBConfig(Connection dbc) {
@@ -140,6 +141,9 @@ public class JdbcMetadata implements DatabaseMetadata {
 
     @Override
     public String getDBSchema() {
+        if(StringUtils.isNotBlank(this.dbSchema)){
+            return this.dbSchema;
+        }
         try {
             return dbc.getSchema();
         }catch (AbstractMethodError error){
@@ -163,6 +167,6 @@ public class JdbcMetadata implements DatabaseMetadata {
 
     @Override
     public void setDBSchema(String schema) {
-
+        this.dbSchema = schema;
     }
 }
