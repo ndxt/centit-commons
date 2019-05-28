@@ -1200,16 +1200,15 @@ public abstract class QueryUtils {
                 return null;
             int n = columnDesc.indexOf('.');
             if(n<0){
-                return tableAlias.get(columnDesc);
+                return null;
             }
 
             String poClassName = columnDesc.substring(0,n);
-            String alias = tableAlias.get(poClassName);
-
-            if(alias==null)
-                return null;
-
-            return StringUtils.isBlank(alias)? columnDesc.substring(n+1):alias+'.'+  columnDesc.substring(n+1);
+            if(tableAlias.containsKey(poClassName)) {
+                String alias = tableAlias.get(poClassName);
+                return StringUtils.isBlank(alias) ? columnDesc.substring(n + 1) : alias + '.' + columnDesc.substring(n + 1);
+            }
+            return null;
         }
 
         @Override
