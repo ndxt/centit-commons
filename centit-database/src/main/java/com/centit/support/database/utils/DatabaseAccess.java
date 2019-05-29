@@ -160,6 +160,7 @@ public abstract class DatabaseAccess {
             }
         }
     }
+
     /*
      * 直接运行行带参数的 SQL,update delete insert
      */
@@ -246,8 +247,10 @@ public abstract class DatabaseAccess {
         return ja;
     }
 
+    @Deprecated
     public static String mapColumnNameToField(String colName){
-        if(StringUtils.isBlank(colName)){
+        return FieldType.mapToHumpName(colName, false);
+        /*if(StringUtils.isBlank(colName)){
             return colName;
         }
         if(colName.indexOf('_')>=0){
@@ -278,7 +281,7 @@ public abstract class DatabaseAccess {
             return colName.toLowerCase();
         }else {
             return colName;
-        }
+        }*/
     }
 
     public static String[] mapColumnsNameToFields(List<String> colNames){
@@ -286,9 +289,10 @@ public abstract class DatabaseAccess {
             return null;
         String[] fns = new String[colNames.size()];
         for(int i=0;i<colNames.size();i++)
-            fns[i] = mapColumnNameToField(colNames.get(i));
+            fns[i] = FieldType.mapToHumpName(colNames.get(i), false);
         return fns;
     }
+
     /**
      *
      * @param conn
