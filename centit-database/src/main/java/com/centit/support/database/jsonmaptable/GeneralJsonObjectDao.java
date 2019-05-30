@@ -11,7 +11,6 @@ import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DBType;
 import com.centit.support.database.utils.DatabaseAccess;
-import com.sun.tools.javac.util.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -91,7 +90,6 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 throw new  SQLException("不支持的数据库类型："+dbtype.toString());
         }
     }
-
 
     public GeneralJsonObjectDao(final TableInfo tableInfo) {
         this.tableInfo = tableInfo;
@@ -264,7 +262,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         StringBuilder sBuilder= new StringBuilder();
         int i=0;
         for(String plCol : properties){
-            int opt = 0;// 0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in
+            int opt = 0;// 0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne
             TableField col = ti.findFieldByName(plCol);
             if(col == null && plCol.length()>3){
                 col = ti.findFieldByName(plCol.substring(0,plCol.length()-3));
@@ -282,6 +280,8 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                         opt = 5;
                     } else if (lowPlCol.endsWith("_in")) {
                         opt = 6;
+                    } else if (lowPlCol.endsWith("_ne")) {
+                        opt = 7;
                     } /*else if(lowPlCol.endsWith("_eq")){
                     opt = 0;} */
                     else if (lowPlCol.charAt(lowPlCol.length() - 3) != '_') {
@@ -316,10 +316,12 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                     case 6:
                         sBuilder.append(" in (:").append(plCol).append(")");
                         break;
+                    case 7:
+                        sBuilder.append(" <> :").append(plCol);
+                        break;
                     default:
                         sBuilder.append(" = :").append(plCol);
                         break;
-
                 }
                 i++;
             }
