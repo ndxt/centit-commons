@@ -239,6 +239,27 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return GeneralJsonObjectDao.checkHasAllPkColumns(tableInfo,properties) ;
     }
 
+    public static String fetchSelfOrderSql(TableInfo ti, Map<String, Object> filterMap) {
+        String selfOrderBy = StringBaseOpt.objectToString(filterMap.get("ORDER_BY"));
+        if (StringUtils.isNotBlank(selfOrderBy)) {
+            return selfOrderBy;
+        }
+
+        String sortField = StringBaseOpt.objectToString(filterMap.get("sort"));
+        if (StringUtils.isNotBlank(sortField)) {
+            TableField field = ti.findFieldByName(sortField);
+            if (field != null) {
+                selfOrderBy = field.getColumnName();
+                String sOrder = StringBaseOpt.objectToString(filterMap.get("order"));
+                if (/*"asc".equalsIgnoreCase(sOrder) ||*/ "desc".equalsIgnoreCase(sOrder)) {
+                    selfOrderBy = sortField + " desc";
+                }
+                return selfOrderBy;
+            }
+        }
+        return ti.getOrderBy();
+    }
+
     public static String buildFilterSqlByPk(TableInfo ti,String alias){
         StringBuilder sBuilder= new StringBuilder();
         int i=0;
@@ -367,7 +388,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public JSONObject getObjectByProperties(final Map<String, Object> properties) throws SQLException, IOException {
 
         Pair<String,String[]> q = buildFieldSqlWithFieldName(tableInfo,null);
-        String filter = buildFilterSql(tableInfo,null,properties.keySet());
+        String filter = GeneralJsonObjectDao.buildFilterSql(tableInfo,null,properties.keySet());
         JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(
                  conn,
                  "select " + q.getLeft() +" from " +tableInfo.getTableName() + " where " + filter,
@@ -378,20 +399,25 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return (JSONObject) ja.get(0);
     }
 
-    @Override
-    public JSONArray listObjectsByProperties(final Map<String, Object> properties) throws SQLException, IOException {
-        Pair<String,String[]> q = buildFieldSqlWithFieldName(tableInfo,null);
-        String filter = buildFilterSql(tableInfo,null,properties.keySet());
-        String sql = "select " + q.getLeft() +" from " +tableInfo.getTableName();
+
+    public static Pair<String,String[]> buildQuerySqlByProperties(TableInfo tableInfo, final Map<String, Object> properties){
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(tableInfo,null);
+        String filter = GeneralJsonObjectDao.buildFilterSql(tableInfo,null,properties.keySet());
+        String sql = "select " + q.getLeft() + " from " +tableInfo.getTableName();
         if(StringUtils.isNotBlank(filter))
             sql = sql + " where " + filter;
+        String orderBySql = GeneralJsonObjectDao.fetchSelfOrderSql(tableInfo, properties);
+        if(StringUtils.isNotBlank(orderBySql))
+            sql = sql + " order by " + orderBySql;
+        return new ImmutablePair<>(sql,q.getRight());
+    }
 
-        if(StringUtils.isNotBlank(tableInfo.getOrderBy()))
-            sql = sql + " order by " + tableInfo.getOrderBy();
-
-        return DatabaseAccess.findObjectsByNamedSqlAsJSON(
+    @Override
+    public JSONArray listObjectsByProperties(final Map<String, Object> properties) throws SQLException, IOException {
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildQuerySqlByProperties(tableInfo,properties);
+          return DatabaseAccess.findObjectsByNamedSqlAsJSON(
                  conn,
-                 sql,
+                 q.getLeft(),
                  properties,
                  q.getRight());
     }

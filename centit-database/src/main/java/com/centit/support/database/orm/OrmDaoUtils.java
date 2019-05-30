@@ -354,6 +354,7 @@ public abstract class OrmDaoUtils {
         String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
         if(StringUtils.isNotBlank(filter))
             sql = sql + " where " + filter;
+
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(sql,
                         properties),
@@ -377,16 +378,10 @@ public abstract class OrmDaoUtils {
     public static <T> List<T> listObjectsByProperties(Connection connection, Map<String, Object> properties, Class<T> type)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(mapInfo,null);
-        String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
-        String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
-        if(StringUtils.isNotBlank(filter))
-            sql = sql + " where " + filter;
-        if(StringUtils.isNotBlank(mapInfo.getOrderBy()))
-            sql = sql + " order by " + mapInfo.getOrderBy();
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildQuerySqlByProperties(mapInfo,properties);
 
         return queryNamedParamsSql(
-                connection, new QueryAndNamedParams(sql,
+                connection, new QueryAndNamedParams(q.getLeft(),
                         properties),
                 (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
@@ -395,16 +390,9 @@ public abstract class OrmDaoUtils {
                                                final int startPos, final int maxSize)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(mapInfo,null);
-        String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
-        String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
-        if(StringUtils.isNotBlank(filter))
-            sql = sql + " where " + filter;
-        if(StringUtils.isNotBlank(mapInfo.getOrderBy()))
-            sql = sql + " order by " + mapInfo.getOrderBy();
-
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildQuerySqlByProperties(mapInfo,properties);
         return queryNamedParamsSql(
-                connection, new QueryAndNamedParams(sql,
+                connection, new QueryAndNamedParams(q.getLeft(),
                         properties),startPos, maxSize,
                 (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
@@ -431,7 +419,6 @@ public abstract class OrmDaoUtils {
                 connection, new QueryAndNamedParams(sql,params),
                 (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
-
 
     public static <T> List<T> queryObjectsBySql(Connection connection, String sql, Class<T> type,
                                          int startPos,  int maxSize)

@@ -36,17 +36,11 @@ public class SqlSvrJsonObjectDao extends GeneralJsonObjectDao {
             final int startPos,final int maxSize)
     throws SQLException, IOException {
         TableInfo tableInfo = this.getTableInfo();
-        Pair<String,String[]> q = buildFieldSqlWithFieldName(tableInfo,null);
-        String filter = buildFilterSql(tableInfo,null,properties.keySet());
-        String sql = "select " + q.getLeft() +" from " +tableInfo.getTableName();
-        if(StringUtils.isNotBlank(filter))
-            sql = sql + " where " + filter;
-        if(StringUtils.isNotBlank(tableInfo.getOrderBy()))
-            sql = sql + " order by " + tableInfo.getOrderBy();
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildQuerySqlByProperties(tableInfo,properties);
         return DatabaseAccess.findObjectsByNamedSqlAsJSON(
                     getConnect(),
                     QueryUtils.buildSqlServerLimitQuerySQL(
-                            sql,
+                            q.getLeft(),
                             startPos, maxSize),
                  properties,
                  q.getRight());
