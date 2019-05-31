@@ -28,6 +28,16 @@ public abstract  class GeneralAlgorithm {
         return obj==null ? obj3 : obj2;
     }
 
+    public static boolean equals(Object operand , Object operand2){
+        if (operand == operand2) {
+            return true;
+        }
+        if(operand == null || operand2 == null ){
+            return false;
+        }
+        return operand.equals(operand2);
+    }
+
     public static int compareTwoObject(Object operand , Object operand2){
         if (operand == null && operand2 == null) {
             return 0;
