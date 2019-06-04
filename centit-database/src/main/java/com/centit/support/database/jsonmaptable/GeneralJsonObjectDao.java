@@ -12,6 +12,7 @@ import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DBType;
 import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,6 +25,19 @@ import java.util.*;
 
 
 public abstract class GeneralJsonObjectDao implements JsonObjectDao {
+
+    /**
+     * 用户自定义排序描述，  放到 filterDesc 中
+     */
+    public static final String SELF_ORDER_BY = "ORDER_BY";
+    /**
+     * 用户自定义排序字段 ， 放到 filterDesc 中
+     */
+    public static final String TABLE_SORT_FIELD = "sort";
+    /**
+     * 用户自定义排序字段的排序顺序 ， 放到 filterDesc 中
+     */
+    public static final String TABLE_SORT_ORDER = "order";
 
     private Connection conn;
 
@@ -240,8 +254,72 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return GeneralJsonObjectDao.checkHasAllPkColumns(tableInfo,properties) ;
     }
 
+    /**
+     * 在sql语句中找到属性对应的字段语句
+     * @param querySql sql语句
+     * @param fieldName 属性
+     * @return 返回的对应这个属性的语句，如果找不到返回 null
+     */
+    public static String mapFieldToColumnPiece(String querySql, String fieldName){
+        List<Pair<String,String>> fields = QueryUtils.getSqlFieldNamePieceMap(querySql);
+        for(Pair<String,String> field : fields){
+            if(fieldName.equalsIgnoreCase(field.getLeft()) ||
+                fieldName.equals(DatabaseAccess.mapColumnNameToField(field.getKey())) ||
+                fieldName.equalsIgnoreCase(field.getRight())){
+                return  field.getRight();
+            }
+        }
+        return null;
+    }
+    /**
+     * querySql 用户检查order by 中的字段属性 对应的查询标识 比如，
+     * select a+b as ab from table
+     * 在 filterMap 中的 CodeBook.TABLE_SORT_FIELD (sort) 为 ab 字段 返回的排序语句为 a+b
+     * @param querySql SQL语句 用来检查字段对应的查询语句 片段
+     * @param filterMap 查询条件map其中包含排序属性
+     * @return order by 字句
+     */
+    public static String fetchSelfOrderSql(String querySql, Map<String, Object> filterMap) {
+        String selfOrderBy = StringBaseOpt.objectToString(filterMap.get(GeneralJsonObjectDao.SELF_ORDER_BY));
+        if(StringUtils.isNotBlank(selfOrderBy)) {
+            Lexer lexer = new Lexer(selfOrderBy,Lexer.LANG_TYPE_SQL);
+            StringBuilder orderBuilder = new StringBuilder();
+            String aWord = lexer.getAWord();
+            while(StringUtils.isNotBlank(aWord)){
+                if(StringUtils.equalsAnyIgnoreCase(aWord,
+                    ",","(",")","order","by","desc","asc","nulls","first","last")){
+                    orderBuilder.append(aWord);
+                }else{
+                    String orderField = GeneralJsonObjectDao.mapFieldToColumnPiece(querySql, aWord);
+                    if(orderField != null) {
+                        orderBuilder.append(orderField);
+                    } else {
+                        orderBuilder.append(aWord);
+                    }
+                }
+                orderBuilder.append(" ");
+                aWord = lexer.getAWord();
+            }
+            return orderBuilder.toString();
+        }
+
+        String sortField = StringBaseOpt.objectToString(filterMap.get(GeneralJsonObjectDao.TABLE_SORT_FIELD));
+        if (StringUtils.isNotBlank(sortField)) {
+            sortField = GeneralJsonObjectDao.mapFieldToColumnPiece(querySql, sortField);
+            if (sortField != null) {
+                String sOrder = StringBaseOpt.objectToString(filterMap.get(GeneralJsonObjectDao.TABLE_SORT_ORDER));
+                if (/*"asc".equalsIgnoreCase(sOrder) ||*/ "desc".equalsIgnoreCase(sOrder)) {
+                    selfOrderBy = sortField + " desc";
+                } else {
+                    selfOrderBy = sortField;
+                }
+            }
+        }
+        return selfOrderBy;
+    }
+
     public static String fetchSelfOrderSql(TableInfo ti, Map<String, Object> filterMap) {
-        String selfOrderBy = StringBaseOpt.objectToString(filterMap.get("ORDER_BY"));
+        String selfOrderBy = StringBaseOpt.objectToString(filterMap.get(GeneralJsonObjectDao.SELF_ORDER_BY));
         if(StringUtils.isNotBlank(selfOrderBy)) {
             Lexer lexer = new Lexer(selfOrderBy,Lexer.LANG_TYPE_SQL);
             StringBuilder orderBuilder = new StringBuilder();
@@ -266,11 +344,11 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             return orderBuilder.toString();
         }
 
-        String sortField = StringBaseOpt.objectToString(filterMap.get("sort"));
+        String sortField = StringBaseOpt.objectToString(filterMap.get(GeneralJsonObjectDao.TABLE_SORT_FIELD));
         if (StringUtils.isNotBlank(sortField)) {
             TableField field = ti.findFieldByName(sortField);
             if (field != null) {
-                String sOrder = StringBaseOpt.objectToString(filterMap.get("order"));
+                String sOrder = StringBaseOpt.objectToString(filterMap.get(GeneralJsonObjectDao.TABLE_SORT_ORDER));
                 if (/*"asc".equalsIgnoreCase(sOrder) ||*/ "desc".equalsIgnoreCase(sOrder)) {
                     selfOrderBy = field.getColumnName() + " desc";
                 } else {
