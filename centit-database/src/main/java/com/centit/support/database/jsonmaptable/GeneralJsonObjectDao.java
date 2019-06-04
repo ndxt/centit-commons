@@ -7,6 +7,7 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.compiler.Lexer;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DBType;
@@ -241,8 +242,26 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 
     public static String fetchSelfOrderSql(TableInfo ti, Map<String, Object> filterMap) {
         String selfOrderBy = StringBaseOpt.objectToString(filterMap.get("ORDER_BY"));
-        if (StringUtils.isNotBlank(selfOrderBy)) {
-            return selfOrderBy;
+        if(StringUtils.isNotBlank(selfOrderBy)) {
+            Lexer lexer = new Lexer(selfOrderBy,Lexer.LANG_TYPE_SQL);
+            StringBuilder orderBuilder = new StringBuilder();
+            String aWord = lexer.getAWord();
+            while(StringUtils.isNotBlank(aWord)){
+                if(StringUtils.equalsAnyIgnoreCase(aWord,
+                    ",","order","by","desc","asc")){
+                    orderBuilder.append(aWord);
+                }else{
+                    TableField field = ti.findFieldByName(aWord);
+                    if(field != null) {
+                        orderBuilder.append(field.getColumnName());
+                    } else {
+                        throw new RuntimeException("表"+ti.getTableName()
+                            +"应用排序语句"+selfOrderBy+"出错，找不到对应的排序字段");
+                    }
+                }
+                orderBuilder.append(" ");
+            }
+            return orderBuilder.toString();
         }
 
         String sortField = StringBaseOpt.objectToString(filterMap.get("sort"));
