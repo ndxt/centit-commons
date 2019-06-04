@@ -248,18 +248,20 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             String aWord = lexer.getAWord();
             while(StringUtils.isNotBlank(aWord)){
                 if(StringUtils.equalsAnyIgnoreCase(aWord,
-                    ",","order","by","desc","asc")){
+                    ",","(",")","order","by","desc","asc","nulls","first","last")){
                     orderBuilder.append(aWord);
                 }else{
                     TableField field = ti.findFieldByName(aWord);
                     if(field != null) {
                         orderBuilder.append(field.getColumnName());
                     } else {
-                        throw new RuntimeException("表"+ti.getTableName()
-                            +"应用排序语句"+selfOrderBy+"出错，找不到对应的排序字段");
+                        orderBuilder.append(aWord);
+                        //throw new RuntimeException("表"+ti.getTableName()
+                            //+"应用排序语句"+selfOrderBy+"出错，找不到对应的排序字段");
                     }
                 }
                 orderBuilder.append(" ");
+                aWord = lexer.getAWord();
             }
             return orderBuilder.toString();
         }
