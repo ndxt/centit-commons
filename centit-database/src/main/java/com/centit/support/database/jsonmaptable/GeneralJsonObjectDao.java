@@ -268,10 +268,11 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         if (StringUtils.isNotBlank(sortField)) {
             TableField field = ti.findFieldByName(sortField);
             if (field != null) {
-                selfOrderBy = field.getColumnName();
                 String sOrder = StringBaseOpt.objectToString(filterMap.get("order"));
                 if (/*"asc".equalsIgnoreCase(sOrder) ||*/ "desc".equalsIgnoreCase(sOrder)) {
-                    selfOrderBy = sortField + " desc";
+                    selfOrderBy = field.getColumnName() + " desc";
+                } else {
+                    selfOrderBy = field.getColumnName();
                 }
                 return selfOrderBy;
             }
