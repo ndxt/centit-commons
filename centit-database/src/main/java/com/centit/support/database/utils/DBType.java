@@ -53,7 +53,7 @@ public enum DBType {
                 ||    connurl.startsWith("jdbc:mysql"))
             return MySql;
         if("access".equalsIgnoreCase(connurl)
-                ||    connurl.startsWith("jdbc:odbc:driver"))
+                ||    connurl.startsWith("jdbc:ucanaccess"))
             return Access;
         if("postgresql".equalsIgnoreCase(connurl)
                 ||    connurl.startsWith("jdbc:postgresql"))
@@ -115,7 +115,7 @@ public enum DBType {
             case SqlServer:
                 return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
             case Access:
-                return "sun.jdbc.odbc.JdbcOdbcDriver";
+                return "net.ucanaccess.jdbc.UcanaccessDriver";
             case MySql:
                 return "com.mysql.jdbc.Driver";
             case H2:
