@@ -4,12 +4,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 public enum DBType {
     Unknown,SqlServer,Oracle,DB2,Access,MySql,H2,PostgreSql;
     protected static final Logger logger = LoggerFactory.getLogger(DBType.class);
+    private static HashMap<DBType, String> dbDrivers = new HashMap<DBType, String>(){
+        {
+            put(Oracle, "oracle.jdbc.driver.OracleDriver");
+            put(DB2, "com.ibm.db2.jdbc.app.DB2Driver");
+            put(SqlServer, "com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            put(Access, "sun.jdbc.odbc.JdbcOdbcDriver");
+            put(MySql, "com.mysql.jdbc.Driver");
+            put(H2, "org.h2.Driver");
+            put(PostgreSql, "org.postgresql.Driver");
+        }
+    };
 
     public static DBType valueOf(int ordinal){
 
@@ -105,26 +117,12 @@ public enum DBType {
         return dbtypes;
     }
 
-    public static String getDbDriver(DBType dt)
-    {
-        switch(dt){
-            case Oracle:
-                return "oracle.jdbc.driver.OracleDriver";
-            case DB2:
-                return "com.ibm.db2.jdbc.app.DB2Driver";
-            case SqlServer:
-                return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-            case Access:
-                return "sun.jdbc.odbc.JdbcOdbcDriver";
-            case MySql:
-                return "com.mysql.jdbc.Driver";
-            case H2:
-                return "org.h2.Driver";
-            case PostgreSql:
-                return "org.postgresql.Driver";
-            default:
-                return "";
-        }
+    public static String getDbDriver(DBType dt){
+        return dbDrivers.get(dt);
+    }
+
+    public static void setDbDriver(DBType dt, String driverClassName){
+        dbDrivers.put(dt, driverClassName);
     }
 
     public static String getDBTypeName(DBType type){
