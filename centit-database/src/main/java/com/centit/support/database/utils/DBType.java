@@ -16,7 +16,7 @@ public enum DBType {
             put(Oracle, "oracle.jdbc.driver.OracleDriver");
             put(DB2, "com.ibm.db2.jdbc.app.DB2Driver");
             put(SqlServer, "com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            put(Access, "sun.jdbc.odbc.JdbcOdbcDriver");
+            put(Access, "net.ucanaccess.jdbc.UcanaccessDriver");
             put(MySql, "com.mysql.jdbc.Driver");
             put(H2, "org.h2.Driver");
             put(PostgreSql, "org.postgresql.Driver");
@@ -65,7 +65,7 @@ public enum DBType {
                 ||    connurl.startsWith("jdbc:mysql"))
             return MySql;
         if("access".equalsIgnoreCase(connurl)
-                ||    connurl.startsWith("jdbc:odbc:driver"))
+            ||    connurl.startsWith("jdbc:ucanaccess"))
             return Access;
         if("postgresql".equalsIgnoreCase(connurl)
                 ||    connurl.startsWith("jdbc:postgresql"))
