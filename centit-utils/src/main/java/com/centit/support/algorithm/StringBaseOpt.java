@@ -525,6 +525,32 @@ public abstract class StringBaseOpt {
             return objValue.toString();
     }
 
+    public static String[] objectToStringArray(Object object){
+        if(object==null){
+            return null;
+        }else if (object instanceof Collection) {
+            String[] stringList = new String[((Collection<?>) object).size()];
+            int i=0;
+            for(Object po :(Collection<?>) object){
+                stringList[i++] = StringBaseOpt.castObjectToString(po);
+            }
+            return stringList;
+        } else if (object instanceof Object[]) {
+            String[] stringList = new String[((Object[]) object).length ];
+            int i=0;
+            for(Object po :(Object[])  object){
+                stringList[i++] = StringBaseOpt.castObjectToString(po);
+            }
+            return stringList;
+        } else if(object instanceof String){
+            return ((String)object).split(",");
+        }
+        String[] stringList = new String[1];
+        stringList[0] = StringBaseOpt.castObjectToString(object);
+        return stringList;
+        //}
+    }
+
     /**
      * 将对象转换为 string list
      * @param object 对象
@@ -545,7 +571,14 @@ public abstract class StringBaseOpt {
                 stringList.add(StringBaseOpt.castObjectToString(po));
             }
             return stringList;
-        }//else{
+        } else if(object instanceof String){
+            String[] ss = ((String)object).split(",");
+            List<String> stringList = new ArrayList<>(ss.length );
+            for(String s :ss ){
+                stringList.add(s);
+            }
+            return stringList;
+        }
 
         List<String> stringList = new ArrayList<>( 1 );
         stringList.add(StringBaseOpt.castObjectToString(object));
@@ -573,8 +606,14 @@ public abstract class StringBaseOpt {
                 stringSet.add(StringBaseOpt.castObjectToString(po));
             }
             return stringSet;
-        }//else{
-
+        }else if(object instanceof String){
+            String[] ss = ((String)object).split(",");
+            Set<String> stringList = new HashSet<>(ss.length );
+            for(String s :ss ){
+                stringList.add(s);
+            }
+            return stringList;
+        }
         Set<String> stringSet = new HashSet<>( 1 );
         stringSet.add(StringBaseOpt.castObjectToString(object));
         return stringSet;
