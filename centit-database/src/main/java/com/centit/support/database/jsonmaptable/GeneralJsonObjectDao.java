@@ -84,9 +84,8 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         }
     }
 
-    public static GeneralJsonObjectDao createJsonObjectDao(final Connection conn)
-            throws SQLException {
-        DBType dbtype = DBType.mapDBType(conn.getMetaData().getURL());
+    public static GeneralJsonObjectDao createJsonObjectDao(DBType dbtype, Connection conn)
+        throws SQLException {
         switch (dbtype){
             case Oracle:
                 return new OracleJsonObjectDao(conn);
@@ -104,6 +103,12 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             default:
                 throw new  SQLException("不支持的数据库类型："+dbtype.toString());
         }
+    }
+
+    public static GeneralJsonObjectDao createJsonObjectDao(final Connection conn)
+            throws SQLException {
+        DBType dbtype = DBType.mapDBType(conn.getMetaData().getURL());
+        return createJsonObjectDao(dbtype,conn);
     }
 
     public GeneralJsonObjectDao(final TableInfo tableInfo) {
