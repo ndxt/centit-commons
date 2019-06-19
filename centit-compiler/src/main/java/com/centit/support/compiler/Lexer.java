@@ -503,7 +503,11 @@ public class Lexer {
         return res;
     }
 
+    public static String getFirstWord(String str, int langType){
+        return new Lexer(str, langType).getAWord();
+    }
+
     public static String getFirstWord(String str){
-        return new Lexer(str).getARawWord();
+        return new Lexer(str).getAWord();
     }
 }
