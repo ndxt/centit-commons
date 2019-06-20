@@ -34,6 +34,15 @@ public class ConnectThreadWrapper implements Serializable {
         }
     }
 
+    public void rollbackAllWork() throws SQLException {
+        if(connectPools.size()==0){
+            return;
+        }
+        for(Connection conn : connectPools.values()){
+            conn.rollback();
+        }
+    }
+
     public void releaseAllConnect(){
         if(connectPools.size()==0){
             return;

@@ -35,6 +35,11 @@ public class ConnectThreadHolder extends ThreadLocal<ConnectThreadWrapper> {
         wrapper.commitAllWork();
     }
 
+    public static void rollback() throws SQLException{
+        ConnectThreadWrapper wrapper = getConnectThreadWrapper();
+        wrapper.rollbackAllWork();
+    }
+
     public static void release(){
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         wrapper.releaseAllConnect();
@@ -44,6 +49,15 @@ public class ConnectThreadHolder extends ThreadLocal<ConnectThreadWrapper> {
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         try {
             wrapper.commitAllWork();
+        } finally {
+            wrapper.releaseAllConnect();
+        }
+    }
+
+    public static void rollbackAndRelease() throws SQLException{
+        ConnectThreadWrapper wrapper = getConnectThreadWrapper();
+        try {
+            wrapper.rollbackAllWork();
         } finally {
             wrapper.releaseAllConnect();
         }
