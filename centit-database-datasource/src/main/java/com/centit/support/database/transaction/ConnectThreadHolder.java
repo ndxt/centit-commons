@@ -5,8 +5,8 @@ import com.centit.support.database.utils.DataSourceDescription;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class ConnectThreadHolder extends ThreadLocal<ConnectThreadWrapper> {
-    private static ThreadLocal<ConnectThreadWrapper> threadLocal = new ThreadLocal<>();
+public class ConnectThreadHolder{
+    private static ConnectThreadLocal threadLocal = new ConnectThreadLocal();
 
     private ConnectThreadHolder() {
         super();
@@ -18,7 +18,7 @@ public class ConnectThreadHolder extends ThreadLocal<ConnectThreadWrapper> {
 
     public static ConnectThreadWrapper getConnectThreadWrapper() {
         ConnectThreadWrapper wrapper = threadLocal.get();
-        if(wrapper==null){
+        if(wrapper == null){
             wrapper = new ConnectThreadWrapper();
             threadLocal.set(wrapper);
         }
@@ -43,6 +43,7 @@ public class ConnectThreadHolder extends ThreadLocal<ConnectThreadWrapper> {
     public static void release(){
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         wrapper.releaseAllConnect();
+        threadLocal.superRemove();
     }
 
     public static void commitAndRelease() throws SQLException{
@@ -51,6 +52,7 @@ public class ConnectThreadHolder extends ThreadLocal<ConnectThreadWrapper> {
             wrapper.commitAllWork();
         } finally {
             wrapper.releaseAllConnect();
+            threadLocal.superRemove();
         }
     }
 
@@ -60,6 +62,7 @@ public class ConnectThreadHolder extends ThreadLocal<ConnectThreadWrapper> {
             wrapper.rollbackAllWork();
         } finally {
             wrapper.releaseAllConnect();
+            threadLocal.superRemove();
         }
     }
 }
