@@ -473,60 +473,6 @@ public abstract class CollectionsOpt {
     }
 
     /**
-     * 对比两个表列表，判断哪些需要新增、哪些需要删除、哪些需要更新
-     * @param oldList 原始list
-     * @param newList 新的list
-     * @param compare 为对象T的主键排序对比函数，
-     * @return 返回三个list， 第一个是 需要新增的，第二个是 新旧对 他们拥有相同的排序值（主键），第三为新值中没有的，即需要删除的
-     *             insert T update(old,new) T,T  delete T
-     */
-    public  static <K,V> Triple<List<K>, List<Pair<V, K>>, List<V>>
-    compareTwoTableList(List<V> oldList, List<K> newList, Comparator compare){
-        if(oldList==null ||oldList.size()==0)
-            return new ImmutableTriple<> (
-                newList,null,null);
-        if(newList==null ||newList.size()==0)
-            return new ImmutableTriple<> (
-                null,null,oldList);
-        List<V> souList = cloneList(oldList);
-        List<K> desList = cloneList(newList);
-        Collections.sort(souList, compare);
-        Collections.sort(desList, compare);
-        //---------------------------------------
-        int i=0; int sl = souList.size();
-        int j=0; int dl = desList.size();
-        List<K> insertList = new ArrayList<>();
-        List<V> delList = new ArrayList<>();
-        List<Pair<V,K>> updateList = new ArrayList<>();
-        while(i<sl&&j<dl){
-            int n = compare.compare(souList.get(i), desList.get(j));
-            if(n<0){
-                delList.add(souList.get(i));
-                i++;
-            }else if(n==0){
-                updateList.add( new ImmutablePair<>(souList.get(i),desList.get(j)));
-                i++;
-                j++;
-            }else {
-                insertList.add(desList.get(j));
-                j++;
-            }
-        }
-
-        while(i<sl){
-            delList.add(souList.get(i));
-            i++;
-        }
-
-        while(j<dl){
-            insertList.add(desList.get(j));
-            j++;
-        }
-
-        return new ImmutableTriple<>(insertList,updateList,delList);
-    }
-
-    /**
      *将list(Collection 所以 set也可以) 转换为数组， list.toArray(T[]) 感觉不太好用，要new一个接受的数组对象
      * @param <T> 类型
      * @param listObj Collection 对象 可以是list 也可以是 set
