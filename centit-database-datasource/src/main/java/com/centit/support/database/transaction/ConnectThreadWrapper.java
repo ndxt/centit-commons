@@ -41,6 +41,7 @@ public class ConnectThreadWrapper implements Serializable {
         for(Connection conn : connectPools.values()){
             DbcpConnectPools.closeConnect(conn);
         }
+        connectPools.clear();
     }
 }
 
