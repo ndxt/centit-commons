@@ -19,8 +19,7 @@ public abstract class DbcpConnectPools {
         Map<DataSourceDescription,BasicDataSource> dbcpDataSourcePools
          = new ConcurrentHashMap<>();
 
-    private static synchronized BasicDataSource addDataSource(DataSourceDescription dsDesc){
-        //BasicDataSourceFactory.createDataSource(properties)
+    private static BasicDataSource mapDataSource(DataSourceDescription dsDesc){
         BasicDataSource ds = new BasicDataSource();
         ds.setDriverClassName(dsDesc.getDriver());
         ds.setUsername(dsDesc.getUsername());
@@ -31,6 +30,12 @@ public abstract class DbcpConnectPools {
         ds.setMaxIdle(dsDesc.getMaxIdle());
         ds.setMaxWaitMillis(dsDesc.getMaxWaitMillis());
         ds.setMinIdle(dsDesc.getMinIdle());
+        return ds;
+    }
+
+    private static synchronized BasicDataSource addDataSource(DataSourceDescription dsDesc){
+        //BasicDataSourceFactory.createDataSource(properties)
+        BasicDataSource ds = mapDataSource(dsDesc);
         //ds.setTestOnReturn(false);
         dbcpDataSourcePools.put(dsDesc, ds);
         return ds;
@@ -79,16 +84,7 @@ public abstract class DbcpConnectPools {
     }
 
     public static synchronized boolean testDataSource(DataSourceDescription dsDesc){
-        BasicDataSource ds = new BasicDataSource();
-        ds.setDriverClassName(dsDesc.getDriver());
-        ds.setUsername(dsDesc.getUsername());
-        ds.setPassword(dsDesc.getPassword());
-        ds.setUrl(dsDesc.getConnUrl());
-        ds.setInitialSize(dsDesc.getInitialSize()); // 初始的连接数；
-        ds.setMaxTotal(dsDesc.getMaxTotal());
-        ds.setMaxIdle(dsDesc.getMaxIdle());
-        ds.setMaxWaitMillis(dsDesc.getMaxWaitMillis());
-        ds.setMinIdle(dsDesc.getMinIdle());
+        BasicDataSource ds = mapDataSource(dsDesc);
         boolean connOk = false;
         try {
             //Class.forName(dsDesc.getDriver());
