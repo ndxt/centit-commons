@@ -14,7 +14,7 @@ public abstract class DbcpConnectPools {
     private DbcpConnectPools() {
         throw new IllegalAccessError("Utility class");
     }
-    protected static final Logger logger = LoggerFactory.getLogger(DbcpConnectPools.class);
+    private static final Logger logger = LoggerFactory.getLogger(DbcpConnectPools.class);
     private static final
         Map<DataSourceDescription,BasicDataSource> dbcpDataSourcePools
          = new ConcurrentHashMap<>();
@@ -81,6 +81,7 @@ public abstract class DbcpConnectPools {
                 logger.error(e.getMessage(),e);//e.printStackTrace();
             }
         }
+        //dbcpDataSourcePools.clear();
     }
 
     public static synchronized boolean testDataSource(DataSourceDescription dsDesc){
