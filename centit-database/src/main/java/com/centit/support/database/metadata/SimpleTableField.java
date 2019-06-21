@@ -1,6 +1,7 @@
 package com.centit.support.database.metadata;
 
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.database.utils.FieldType;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ public class SimpleTableField implements TableField {
     private String columnName;// 字段代码 PDM中的CODE
     private String columnComment;// 字段注释
     private String defaultValue;
+    // 这个不是java 的类型，这个是 我们框架抽象出来的 field 类型，解决不同数据库的 columnType 不一样的问题
     private String javaType;
     private boolean mandatory;
     private int     maxLength;//最大长度 Only used when sType=String
@@ -28,24 +30,26 @@ public class SimpleTableField implements TableField {
     public void mapToMetadata(){
         //这个和下面的 mapToDatabaseType 不对称
         propertyName = FieldType.mapPropName(columnName);
-        javaType = FieldType.mapToJavaType(columnType,scale);
-        if( ("Long".equals(javaType) || "Double".equals(javaType))
+        javaType = FieldType.mapToFieldType(columnType,scale);
+        if( (FieldType.LONG.equals(javaType) || FieldType.DOUBLE.equals(javaType))
                 && maxLength <= 0 )
             maxLength = 8;
-        if( ("Date".equals(javaType) || "Timestamp".equals(javaType)
-            || "sqlDate".equals(javaType) || "sqlTimestamp".equals(javaType))
+        if( (FieldType.DATE.equals(javaType) || FieldType.DATETIME.equals(javaType)
+            || FieldType.TIMESTAMP.equals(javaType))
                 && maxLength <= 0 )
             maxLength = 7;
     }
 
     public String getHibernateType(){
-        if(javaType !=null && ( javaType.equals("Date")|| javaType.equals("Timestamp")))
-            return "java.util."+javaType;
-        if("sqlDate".equals(javaType))
-            return "java.sql.Date";
-        if("sqlTimestamp".equals(javaType))
+        String hibernateType = FieldType.mapToJavaType(columnType,scale);
+        if("Date".equals(hibernateType))
+            return "java.util."+hibernateType;
+        if("Timestamp".equals(hibernateType))
             return "java.sql.Timestamp";
-        return "java.lang."+javaType;
+        if("byte[]".equals(hibernateType)){
+            return hibernateType;
+        }
+        return "java.lang."+hibernateType;
     }
 
     public SimpleTableField()
@@ -74,13 +78,12 @@ public class SimpleTableField implements TableField {
     }
 
 
-
     public void setJavaType(String st) {
-        javaType = FieldType.trimType(st);
+        javaType = FieldType.mapToFieldType(FieldType.trimType(st),0);
     }
 
     public void setJavaType(Class<?> type) {
-        javaType = ReflectionOpt.getJavaTypeName(type);
+        javaType = FieldType.mapToFieldType(ReflectionOpt.getJavaTypeName(type),0);
     }
 
     /**
@@ -135,19 +138,11 @@ public class SimpleTableField implements TableField {
     }
 
     public void setMandatory(String notnull) {
-        mandatory =
-            ("true".equalsIgnoreCase(notnull) ||
-                    "T".equalsIgnoreCase(notnull) ||
-                    "Y".equalsIgnoreCase(notnull) ||
-                    "1".equalsIgnoreCase(notnull));
+        mandatory = StringRegularOpt.isTrue(notnull);
     }
 
     public void setNullEnable(String nullEnable) {
-        mandatory =
-                ("false".equalsIgnoreCase(nullEnable) ||
-                        "F".equalsIgnoreCase(nullEnable) ||
-                        "N".equalsIgnoreCase(nullEnable) ||
-                        "0".equalsIgnoreCase(nullEnable));
+        mandatory = StringRegularOpt.isFalse(nullEnable);
     }
 
     /**

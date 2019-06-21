@@ -421,10 +421,12 @@ public abstract class FieldType {
             "VARCHAR2".equalsIgnoreCase(columnType)){
             return FieldType.STRING;
         }else if("DATE".equalsIgnoreCase(columnType) ||
+            "SQLDATE".equalsIgnoreCase(columnType) ||
             "TIME".equalsIgnoreCase(columnType)||
             "DATETIME".equalsIgnoreCase(columnType) ){
             return FieldType.DATETIME;
-        }else if("TIMESTAMP".equalsIgnoreCase(columnType) ){
+        }else if("TIMESTAMP".equalsIgnoreCase(columnType) ||
+                "SQLTIMESTAMP".equalsIgnoreCase(columnType) ){
             return FieldType.TIMESTAMP;
         }else if("CLOB".equalsIgnoreCase(columnType) ||
             "TEXT".equalsIgnoreCase(columnType) ){
