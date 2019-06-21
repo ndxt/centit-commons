@@ -20,7 +20,7 @@ public abstract class FieldType {
     public static final String TIMESTAMP= "timestamp";
     public static final String TEXT= "text";
     public static final String FILE = "file";
-    public static final String BYTE_ARRAY = "byte[]";
+    public static final String BYTE_ARRAY = "bytes";
 
     /**
      * @param st java类 名称
@@ -258,17 +258,19 @@ public abstract class FieldType {
 
     public static Map<String,String> getAllTypeMap(){
         Map<String,String> fts = new HashMap<>();
-        fts.put("string","string");
-        fts.put("integer","integer");
-        fts.put("float","float");
-        fts.put("boolean","boolean");
-        fts.put("date","date");
-        fts.put("datetime","datetime");
-        fts.put("timestamp","timestamp");
-        fts.put("text","text");
-        fts.put("blob","blob");
-        fts.put("money","money");
-        fts.put("file","file");
+        fts.put(FieldType.STRING,FieldType.STRING);
+        fts.put(FieldType.INTEGER,FieldType.INTEGER);
+        fts.put(FieldType.FLOAT,FieldType.FLOAT);
+        fts.put(FieldType.MONEY,FieldType.MONEY);
+        fts.put(FieldType.DOUBLE,FieldType.DOUBLE);
+        fts.put(FieldType.LONG,FieldType.LONG);
+        fts.put(FieldType.BOOLEAN,FieldType.BOOLEAN);
+        fts.put(FieldType.DATE,FieldType.DATE);
+        fts.put(FieldType.DATETIME,FieldType.DATETIME);
+        fts.put(FieldType.TIMESTAMP,FieldType.TIMESTAMP);
+        fts.put(FieldType.TEXT,FieldType.TEXT);
+        fts.put(FieldType.FILE,FieldType.FILE);
+        fts.put(FieldType.BYTE_ARRAY,FieldType.BYTE_ARRAY);
         return fts;
     }
 
@@ -277,33 +279,39 @@ public abstract class FieldType {
             "INTEGER".equalsIgnoreCase(columnType)||
             "DECIMAL".equalsIgnoreCase(columnType) ){
             if( scale > 0 ) {
-                return FieldType.DOUBLE;
+                return "double";
             } else {
-                return FieldType.LONG;
+                return "long";
             }
-        }else if("FLOAT".equalsIgnoreCase(columnType)){
-            return FieldType.FLOAT;
         }else if("CHAR".equalsIgnoreCase(columnType) ||
             "VARCHAR".equalsIgnoreCase(columnType)||
             "VARCHAR2".equalsIgnoreCase(columnType)||
-            "STRING".equalsIgnoreCase(columnType) ){
-            return FieldType.STRING;
+            FieldType.STRING.equalsIgnoreCase(columnType) ||
+            FieldType.FILE.equalsIgnoreCase(columnType) ||
+            FieldType.BOOLEAN.equalsIgnoreCase(columnType)){
+            return "String";
         }else if("DATE".equalsIgnoreCase(columnType) ||
             "TIME".equalsIgnoreCase(columnType)||
             "DATETIME".equalsIgnoreCase(columnType) ){
-            return FieldType.DATE;
+            return "Date";
         }else if("TIMESTAMP".equalsIgnoreCase(columnType) ){
-            return FieldType.TIMESTAMP;
-        }else if("CLOB".equalsIgnoreCase(columnType) /*||
-                   "LOB".equalsIgnoreCase(columnType)||
-                   "BLOB".equalsIgnoreCase(columnType)*/ ){
-            return  FieldType.TEXT;
-        }else if("BLOB".equalsIgnoreCase(columnType) ) {
-            return FieldType.BYTE_ARRAY;
-        }else if("BOOLEAN".equalsIgnoreCase(columnType) ){
-            return FieldType.BOOLEAN;
-        }else if("MONEY".equalsIgnoreCase(columnType) ){
+            return "Timestamp";
+        }else if("CLOB".equalsIgnoreCase(columnType) ||
+                "TEXT".equalsIgnoreCase(columnType) ){
+            return  "String";
+        }else if("BLOB".equalsIgnoreCase(columnType) ||
+                 FieldType.BYTE_ARRAY.equalsIgnoreCase(columnType)) {
+            return "byte[]";
+        }else if(FieldType.MONEY.equalsIgnoreCase(columnType) ){
             return "BigDecimal";//FieldType.MONEY;
+        }else if(FieldType.FLOAT.equalsIgnoreCase(columnType)){
+            return "float";
+        }else if(FieldType.INTEGER.equalsIgnoreCase(columnType)){
+            return "int";
+        } else if(FieldType.DOUBLE.equalsIgnoreCase(columnType)){
+            return "double";
+        }else if(FieldType.LONG.equalsIgnoreCase(columnType)){
+            return "long";
         }else {
             return columnType;
         }
@@ -316,6 +324,46 @@ public abstract class FieldType {
      * @see Types
      */
     public static String mapToJavaType(int dbType){
+        switch(dbType) {
+            case -6:
+            case -5:
+            case 5:
+            case 4:
+            case 2:
+                return "int";
+            case 6:
+            case 7:
+                return "float";
+            case 8:
+                return "double";
+            case 3:
+                return "long";
+            case -1:
+            case 1:
+            case 12:
+                return "String";
+            case 91:
+            case 92:
+                return "Date";
+            case 93:
+            case 2013:
+            case 2014:
+                return "Timestamp";
+            case -2:
+            case -3:
+            case -4:
+            case 2004:
+                return "byte[]";
+            /*case 2005:
+                return "String";
+            case 16:
+                return "String";*/
+            default:
+                return "String";
+        }
+    }
+
+    public static String mapToFieldType(int dbType){
         switch(dbType) {
             case -6:
             case -5:
