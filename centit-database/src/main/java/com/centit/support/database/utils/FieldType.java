@@ -276,12 +276,11 @@ public abstract class FieldType {
 
     public static String mapToJavaType(String columnType, int scale){
         if("NUMBER".equalsIgnoreCase(columnType) ||
-            "INTEGER".equalsIgnoreCase(columnType)||
             "DECIMAL".equalsIgnoreCase(columnType) ){
-            if( scale > 0 ) {
-                return "double";
+            if(scale > 0) {
+                return "Double";
             } else {
-                return "long";
+                return "Long";
             }
         }else if("CHAR".equalsIgnoreCase(columnType) ||
             "VARCHAR".equalsIgnoreCase(columnType)||
@@ -300,18 +299,21 @@ public abstract class FieldType {
                 "TEXT".equalsIgnoreCase(columnType) ){
             return  "String";
         }else if("BLOB".equalsIgnoreCase(columnType) ||
+                "VARBINARY".equalsIgnoreCase(columnType) ||
                  FieldType.BYTE_ARRAY.equalsIgnoreCase(columnType)) {
             return "byte[]";
         }else if(FieldType.MONEY.equalsIgnoreCase(columnType) ){
             return "BigDecimal";//FieldType.MONEY;
         }else if(FieldType.FLOAT.equalsIgnoreCase(columnType)){
-            return "float";
-        }else if(FieldType.INTEGER.equalsIgnoreCase(columnType)){
-            return "int";
+            return "Float";
+        }else if("Int".equalsIgnoreCase(columnType)||
+            FieldType.INTEGER.equalsIgnoreCase(columnType)){
+            return "Integer";
         } else if(FieldType.DOUBLE.equalsIgnoreCase(columnType)){
-            return "double";
-        }else if(FieldType.LONG.equalsIgnoreCase(columnType)){
-            return "long";
+            return "Double";
+        }else if("BIG INT".equalsIgnoreCase(columnType) ||
+                FieldType.LONG.equalsIgnoreCase(columnType)){
+            return "Long";
         }else {
             return columnType;
         }
@@ -330,14 +332,14 @@ public abstract class FieldType {
             case 5:
             case 4:
             case 2:
-                return "int";
+                return "Integer";
             case 6:
             case 7:
-                return "float";
+                return "Float";
             case 8:
-                return "double";
+                return "Double";
             case 3:
-                return "long";
+                return "Long";
             case -1:
             case 1:
             case 12:
@@ -401,6 +403,45 @@ public abstract class FieldType {
                 return FieldType.BOOLEAN;
             default:
                 return FieldType.STRING;
+        }
+    }
+
+
+    public static String mapToFieldType(String columnType, int scale){
+        if("NUMBER".equalsIgnoreCase(columnType) ||
+            "INTEGER".equalsIgnoreCase(columnType)||
+            "DECIMAL".equalsIgnoreCase(columnType) ){
+            if( scale > 0 ) {
+                return FieldType.DOUBLE;
+            } else {
+                return FieldType.LONG;
+            }
+        }else if("CHAR".equalsIgnoreCase(columnType) ||
+            "VARCHAR".equalsIgnoreCase(columnType)||
+            "VARCHAR2".equalsIgnoreCase(columnType)){
+            return FieldType.STRING;
+        }else if("DATE".equalsIgnoreCase(columnType) ||
+            "TIME".equalsIgnoreCase(columnType)||
+            "DATETIME".equalsIgnoreCase(columnType) ){
+            return FieldType.DATETIME;
+        }else if("TIMESTAMP".equalsIgnoreCase(columnType) ){
+            return FieldType.TIMESTAMP;
+        }else if("CLOB".equalsIgnoreCase(columnType) ||
+            "TEXT".equalsIgnoreCase(columnType) ){
+            return  FieldType.TEXT;
+        }else if("BLOB".equalsIgnoreCase(columnType)||
+                "VARBINARY".equalsIgnoreCase(columnType)) {
+            return FieldType.TEXT;
+        }else if("FLOAT".equalsIgnoreCase(columnType)) {
+            return FieldType.FLOAT;
+        }else if("DOUBLE".equalsIgnoreCase(columnType)) {
+            return FieldType.DOUBLE;
+        }if("BIG INT".equalsIgnoreCase(columnType)) {
+            return FieldType.LONG;
+        }if("INT".equalsIgnoreCase(columnType)) {
+            return FieldType.INTEGER;
+        }else {
+            return columnType;
         }
     }
 }
