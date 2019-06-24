@@ -105,7 +105,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
         this.refresher = refresher;
     }
 
-    public void setFreshtDate(T freshData){
+    public void setFreshData(T freshData){
         this.target = CollectionsOpt.unmodifiableObject(freshData);
         this.refreshTime = DatetimeOpt.currentUtilDate();
         this.evicted = false;
