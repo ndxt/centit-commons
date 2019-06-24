@@ -73,7 +73,7 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
             return target;
         }
 
-        void setFreshtData(T freshData){
+        void setFreshData(T freshData){
             this.target = CollectionsOpt.unmodifiableObject(freshData);
             this.refreshTime = DatetimeOpt.currentUtilDate();
             this.evicted = false;
@@ -209,7 +209,7 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
     public void setFreshData(K key, T freshData){
         CachedIdentifiedObject identifiedObject =  targetMap.get(key);
         if(identifiedObject != null){
-            identifiedObject.setFreshtData(freshData);
+            identifiedObject.setFreshData(freshData);
         }else{
             targetMap.put(key,
                     new CachedIdentifiedObject(freshData));
