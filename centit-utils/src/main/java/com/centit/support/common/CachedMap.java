@@ -206,7 +206,7 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
         return rawTargetMap;
     }
 
-    public void setFreshtDate(K key, T freshData){
+    public void setFreshData(K key, T freshData){
         CachedIdentifiedObject identifiedObject =  targetMap.get(key);
         if(identifiedObject != null){
             identifiedObject.setFreshtData(freshData);
