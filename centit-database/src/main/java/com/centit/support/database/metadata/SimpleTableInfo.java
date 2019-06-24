@@ -188,14 +188,15 @@ public class SimpleTableInfo implements TableInfo{
 
     private void saveProperty(SimpleTableField field,Element propElt,boolean keyProp){
         propElt.addAttribute("name", field.getPropertyName());
-        propElt.addAttribute("type", field.getHibernateType());
+        propElt.addAttribute("type", field.getJavaTypeFullName());
         Element colElt = propElt.addElement("column");
         saveColumn(field,colElt,keyProp);
     }
 
     private void saveColumn(SimpleTableField field,Element colElt,boolean keyProp){
         colElt.addAttribute("name", field.getColumnName().toUpperCase());
-        if("Long".equals(field.getJavaType()) || "Double".equals(field.getJavaType()) ){
+        if(FieldType.LONG.equals(field.getFieldType()) || FieldType.DOUBLE.equals(field.getFieldType())
+            || FieldType.INTEGER.equals(field.getFieldType()) || FieldType.FLOAT.equals(field.getFieldType())) {
             colElt.addAttribute("precision", String.valueOf(field.getPrecision()));
             colElt.addAttribute("scale", String.valueOf(field.getScale()));
         }else if(field.getMaxLength()>0)

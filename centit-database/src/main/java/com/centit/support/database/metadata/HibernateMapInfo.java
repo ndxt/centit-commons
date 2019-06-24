@@ -152,7 +152,7 @@ public class HibernateMapInfo {
                 sType = atType.getValue();
         }
 
-        field.setJavaType(sType);
+        field.setJavaTypeFullName(sType);
         Element columnNode =  fieldNode.element("column");
         if(columnNode != null){
             Attribute attr;
@@ -198,7 +198,7 @@ public class HibernateMapInfo {
             if(idNode != null){// 单个主键属性
                 SimpleTableField tf = loadField(idNode);
                 hasComplexId = false;
-                idType = FieldType.trimType(tf.getJavaType());
+                idType = FieldType.trimType(tf.getJavaTypeFullName());
                 idName = tf.getPropertyName();
                 keyProperties.add(tf);
             }else{//复合主键值

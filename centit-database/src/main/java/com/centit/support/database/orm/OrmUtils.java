@@ -8,6 +8,7 @@ import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.utils.DatabaseAccess;
+import com.centit.support.database.utils.FieldType;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -31,7 +32,7 @@ public abstract class OrmUtils {
                                            Object newValue)
             throws NoSuchFieldException, IOException {
         if (newValue instanceof Clob) {
-            if(field.getJavaType() == "Clob"){
+            if(FieldType.TEXT.equals(field.getFieldLabelName())){
                 field.setObjectFieldValue(object,
                         /*(Clob)*/ newValue );
             }else {
@@ -39,7 +40,7 @@ public abstract class OrmUtils {
                         DatabaseAccess.fetchClobString((Clob) newValue));
             }
         }else if (newValue instanceof Blob) {
-            if(field.getJavaType() == "Blob"){
+            if(FieldType.BYTE_ARRAY.equals(field.getFieldLabelName())){
                 field.setObjectFieldValue(object,
                         /*(Blob)*/ newValue );
             }else {

@@ -1,9 +1,9 @@
 package com.centit.support.database.metadata;
 
-import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.database.utils.FieldType;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,36 +20,47 @@ public class SimpleTableField implements TableField {
     private String columnComment;// 字段注释
     private String defaultValue;
     // 这个不是java 的类型，这个是 我们框架抽象出来的 field 类型，解决不同数据库的 columnType 不一样的问题
-    private String javaType;
+    private String javaTypeFullName;
+    private String fieldType;
     private boolean mandatory;
-    private int     maxLength;//最大长度 Only used when sType=String
-    private int  precision;//有效数据位数 Only used when sType=Long Number Float
-    private int  scale;//精度 Only used when sType= Long Number Float
+    private Integer  maxLength;//最大长度 Only used when sType=String
+    private Integer  precision;//有效数据位数 Only used when sType=Long Number Float
+    private Integer  scale;//精度 Only used when sType= Long Number Float
     private JavaBeanField beanField;
 
     public void mapToMetadata(){
         //这个和下面的 mapToDatabaseType 不对称
         propertyName = FieldType.mapPropName(columnName);
-        javaType = FieldType.mapToFieldType(columnType,scale);
-        if( (FieldType.LONG.equals(javaType) || FieldType.DOUBLE.equals(javaType))
+        fieldType = FieldType.mapToFieldType(columnType,scale);
+        if( (FieldType.LONG.equals(fieldType) || FieldType.DOUBLE.equals(fieldType))
                 && maxLength <= 0 )
             maxLength = 8;
-        if( (FieldType.DATE.equals(javaType) || FieldType.DATETIME.equals(javaType)
-            || FieldType.TIMESTAMP.equals(javaType))
+        if( (FieldType.DATE.equals(fieldType) || FieldType.DATETIME.equals(fieldType)
+            || FieldType.TIMESTAMP.equals(fieldType))
                 && maxLength <= 0 )
             maxLength = 7;
     }
 
-    public String getHibernateType(){
-        String hibernateType = FieldType.mapToJavaType(columnType,scale);
-        if("Date".equals(hibernateType))
-            return "java.util."+hibernateType;
-        if("Timestamp".equals(hibernateType))
-            return "java.sql.Timestamp";
-        if("byte[]".equals(hibernateType)){
-            return hibernateType;
+    public void setJavaTypeFullName(String javaTypeFullName){
+        this.javaTypeFullName = javaTypeFullName;
+    }
+    /**
+     * java type's full name
+     * @return String
+     */
+    public String getJavaTypeFullName(){
+        if(StringUtils.isBlank(javaTypeFullName)) {
+            String hibernateType = FieldType.mapToJavaType(columnType, scale);
+            if ("Date".equals(hibernateType))
+                return "java.util." + hibernateType;
+            if ("Timestamp".equals(hibernateType))
+                return "java.sql.Timestamp";
+            if ("byte[]".equals(hibernateType)) {
+                return hibernateType;
+            }
+            return "java.lang." + hibernateType;
         }
-        return "java.lang."+hibernateType;
+        return javaTypeFullName;
     }
 
     public SimpleTableField()
@@ -73,18 +84,20 @@ public class SimpleTableField implements TableField {
      * 字段属性java类别
      * @return String
      */
-    public String getJavaType() {
-        return javaType;
+    @Override
+    public String getFieldType() {
+        if(StringUtils.isBlank(fieldType)) {
+            return FieldType.mapToFieldType(columnType, scale);
+        }
+        return fieldType;
     }
 
 
-    public void setJavaType(String st) {
-        javaType = FieldType.mapToFieldType(FieldType.trimType(st),0);
+    public void setFieldType(String fieldType) {
+        this.fieldType = fieldType;
     }
 
-    public void setJavaType(Class<?> type) {
-        javaType = FieldType.mapToFieldType(ReflectionOpt.getJavaTypeName(type),0);
-    }
+
 
     /**
      * 字段中文名，对应Pdm中的name
@@ -150,7 +163,7 @@ public class SimpleTableField implements TableField {
      * 这个和Precision其实可以共用一个字段
      * @return 最大长度
      */
-    public int getMaxLength() {
+    public Integer getMaxLength() {
         return maxLength;
     }
     public void setMaxLength(int maxLength) {
@@ -163,11 +176,11 @@ public class SimpleTableField implements TableField {
      * @return 有效数据位数
      */
     @Override
-    public int getPrecision() {
+    public Integer getPrecision() {
         return precision;
     }
 
-    public void setPrecision(int precision) {
+    public void setPrecision(Integer precision) {
         this.precision = precision;
     }
     /**
@@ -175,10 +188,10 @@ public class SimpleTableField implements TableField {
      * @return 精度
      */
     @Override
-    public int getScale() {
+    public Integer getScale() {
         return scale;
     }
-    public void setScale(int scale) {
+    public void setScale(Integer scale) {
         this.scale = scale;
     }
     /**

@@ -19,7 +19,7 @@ public abstract class FieldType {
     public static final String DATETIME= "datetime";
     public static final String TIMESTAMP= "timestamp";
     public static final String TEXT= "text";
-    public static final String FILE = "file";
+    public static final String FILE_ID = "fileId";
     public static final String BYTE_ARRAY = "bytes";
 
     /**
@@ -105,7 +105,7 @@ public abstract class FieldType {
                 return "clob";//长文本
             case BYTE_ARRAY:
                 return "blob";//大字段
-            case FILE:
+            case FILE_ID:
                 return "varchar2(64)";//默认记录文件的ID号
             default:
                 return ft;
@@ -140,7 +140,7 @@ public abstract class FieldType {
                 return "text";//长文本
             case BYTE_ARRAY:
                 return "VarBinary(MAX)";
-            case FILE:
+            case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
             default:
                 return ft;
@@ -175,7 +175,7 @@ public abstract class FieldType {
                 return "clob(52428800)";//长文本
             case BYTE_ARRAY:
                 return "BLOB";
-            case FILE:
+            case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
             default:
                 return ft;
@@ -211,7 +211,7 @@ public abstract class FieldType {
                 return "TimeStamp";
             case TEXT:
                 return "clob";//长文本
-            case FILE:
+            case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
             case BYTE_ARRAY:
                 return "VARBINARY";
@@ -258,19 +258,19 @@ public abstract class FieldType {
 
     public static Map<String,String> getAllTypeMap(){
         Map<String,String> fts = new HashMap<>();
-        fts.put(FieldType.STRING,FieldType.STRING);
-        fts.put(FieldType.INTEGER,FieldType.INTEGER);
-        fts.put(FieldType.FLOAT,FieldType.FLOAT);
-        fts.put(FieldType.MONEY,FieldType.MONEY);
-        fts.put(FieldType.DOUBLE,FieldType.DOUBLE);
-        fts.put(FieldType.LONG,FieldType.LONG);
-        fts.put(FieldType.BOOLEAN,FieldType.BOOLEAN);
-        fts.put(FieldType.DATE,FieldType.DATE);
-        fts.put(FieldType.DATETIME,FieldType.DATETIME);
-        fts.put(FieldType.TIMESTAMP,FieldType.TIMESTAMP);
-        fts.put(FieldType.TEXT,FieldType.TEXT);
-        fts.put(FieldType.FILE,FieldType.FILE);
-        fts.put(FieldType.BYTE_ARRAY,FieldType.BYTE_ARRAY);
+        fts.put(FieldType.STRING,"字符串");
+        fts.put(FieldType.INTEGER,"整型");
+        fts.put(FieldType.FLOAT,"浮点型");
+        fts.put(FieldType.MONEY,"金额");
+        fts.put(FieldType.DOUBLE,"双精度浮点型");
+        fts.put(FieldType.LONG,"长整型");
+        fts.put(FieldType.BOOLEAN,"布尔型");
+        fts.put(FieldType.DATE,"日期型");
+        fts.put(FieldType.DATETIME,"日期时间型");
+        fts.put(FieldType.TIMESTAMP,"时间戳");
+        fts.put(FieldType.TEXT,"大文本");
+        fts.put(FieldType.FILE_ID,"文件ID");
+        fts.put(FieldType.BYTE_ARRAY,"大字段");
         return fts;
     }
 
@@ -286,14 +286,16 @@ public abstract class FieldType {
             "VARCHAR".equalsIgnoreCase(columnType)||
             "VARCHAR2".equalsIgnoreCase(columnType)||
             FieldType.STRING.equalsIgnoreCase(columnType) ||
-            FieldType.FILE.equalsIgnoreCase(columnType) ||
+            FieldType.FILE_ID.equalsIgnoreCase(columnType) ||
             FieldType.BOOLEAN.equalsIgnoreCase(columnType)){
             return "String";
         }else if("DATE".equalsIgnoreCase(columnType) ||
             "TIME".equalsIgnoreCase(columnType)||
-            "DATETIME".equalsIgnoreCase(columnType) ){
+            "DATETIME".equalsIgnoreCase(columnType)||
+            "SQLDATE".equalsIgnoreCase(columnType)){
             return "Date";
-        }else if("TIMESTAMP".equalsIgnoreCase(columnType) ){
+        }else if("TIMESTAMP".equalsIgnoreCase(columnType) ||
+            "SQLTIMESTAMP".equalsIgnoreCase(columnType)){
             return "Timestamp";
         }else if("CLOB".equalsIgnoreCase(columnType) ||
                 "TEXT".equalsIgnoreCase(columnType) ){
@@ -319,6 +321,9 @@ public abstract class FieldType {
         }
     }
 
+    public static String mapToJavaType(String columnType){
+        return mapToJavaType(columnType, 0);
+    }
     /**
      * map java.sql.Type to javaType
      * @param dbType java.sql.Type
@@ -445,5 +450,9 @@ public abstract class FieldType {
         }else {
             return columnType;
         }
+    }
+
+    public static String mapToFieldType(String columnType){
+        return mapToFieldType(columnType, 0);
     }
 }

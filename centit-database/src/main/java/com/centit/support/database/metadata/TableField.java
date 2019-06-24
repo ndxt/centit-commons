@@ -7,10 +7,14 @@ public interface TableField {
      */
     String getPropertyName();
     /**
+     * @return 字段属性Field类别, 是框架自定义的， 用于兼容不同的数据库
+     */
+    String getFieldType();
+
+    /**
      * @return 字段属性java类别
      */
-    String getJavaType();
-
+    String getJavaTypeFullName();
     /**
      * @return 字段中文名，对应Pdm中的name
      */
@@ -34,19 +38,19 @@ public interface TableField {
      * 这个和Precision其实可以共用一个字段
      * @return 最大长度
      */
-    int getMaxLength();
+    Integer getMaxLength();
 
     /**
      * 有效数据位数 Only used when sType=Long Number Float
      * 这个和maxlength其实可以共用一个字段
      * @return 有效数据位数
      */
-    int getPrecision();
+    Integer getPrecision();
     /**
      * 精度 Only used when sType= Long Number Float
      * @return 精度
      */
-    int getScale();
+    Integer getScale();
     /**
      * @return 字段属性在数据库表中的类型
      */

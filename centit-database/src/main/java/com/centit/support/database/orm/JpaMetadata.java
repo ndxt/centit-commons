@@ -4,6 +4,7 @@ import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.compiler.Lexer;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableReference;
+import com.centit.support.database.utils.FieldType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +120,8 @@ public abstract class JpaMetadata {
         Column colInfo = field.getAnnotation(Column.class);
         column.setColumnName(colInfo.name());
         //column.setColumnType( colInfo.);
-        column.setJavaType(field.getType());
+        column.setFieldType(FieldType.mapToFieldType(
+            ReflectionOpt.getJavaTypeName(field.getType())));
         column.setPropertyName(field.getName());
         column.setMaxLength(colInfo.length());
         column.setScale(colInfo.scale());

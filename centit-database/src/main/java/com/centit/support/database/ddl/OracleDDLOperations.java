@@ -2,10 +2,12 @@ package com.centit.support.database.ddl;
 
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.TableField;
+import com.centit.support.database.utils.FieldType;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,13 +61,17 @@ public class OracleDDLOperations extends GeneralDDLOperations {
         sqls.add(makeRenameColumnSql(tableCode, columnCode, tempColumn));
         sqls.add(makeAddColumnSql(tableCode, column));
 
-        if("String".equals(column.getJavaType()))
-            sqls.add("update "+tableCode+" set "+ column.getColumnName() + " = to_char(" + columnCode+")");
-        if("Date".equals(column.getJavaType()))
-            sqls.add("update "+tableCode+" set "+ column.getColumnName() + " = to_date(" + columnCode+")");
-        if("Long".equals(column.getJavaType()) || "Double".equals(column.getJavaType()))
-            sqls.add("update "+tableCode+" set "+ column.getColumnName() + " = to_number(" + columnCode+")");
-
+        if(FieldType.STRING.equals(column.getFieldType()) || FieldType.TEXT.equals(column.getFieldType())
+           || FieldType.FILE_ID.equals(column.getFieldType())) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_char(" + columnCode + ")");
+        } else if(FieldType.DATE.equals(column.getFieldType()) || FieldType.DATETIME.equals(column.getFieldType())) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_date(" + columnCode + ")");
+        } else if(FieldType.TIMESTAMP.equals(column.getFieldType())) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_timestamp(" + columnCode + ")");
+        } else if(FieldType.LONG.equals(column.getFieldType()) || FieldType.DOUBLE.equals(column.getFieldType())
+            || FieldType.INTEGER.equals(column.getFieldType()) || FieldType.FLOAT.equals(column.getFieldType())) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_number(" + columnCode + ")");
+        }
         sqls.add(makeDropColumnSql(tableCode, columnCode+"_1"));
         return sqls;
     }
