@@ -63,14 +63,14 @@ public class OracleDDLOperations extends GeneralDDLOperations {
 
         if(FieldType.STRING.equals(column.getFieldType()) || FieldType.TEXT.equals(column.getFieldType())
            || FieldType.FILE_ID.equals(column.getFieldType())) {
-            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_char(" + columnCode + ")");
-        } else if(FieldType.DATE.equals(column.getFieldType()) || FieldType.DATETIME.equals(column.getFieldType())) {
-            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_date(" + columnCode + ")");
-        } else if(FieldType.TIMESTAMP.equals(column.getFieldType())) {
-            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_timestamp(" + columnCode + ")");
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_char(" + columnCode + "_1)");
+        } else if(FieldType.DATE.equals(column.getFieldType()) ) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_date(" + columnCode + "_1,\'yyyy-mm-dd\')");
+        } else if(FieldType.TIMESTAMP.equals(column.getFieldType()) || FieldType.DATETIME.equals(column.getFieldType())) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_date(" + columnCode + "_1,\'yyyy-mm-dd hh24:mi:ss\')");
         } else if(FieldType.LONG.equals(column.getFieldType()) || FieldType.DOUBLE.equals(column.getFieldType())
             || FieldType.INTEGER.equals(column.getFieldType()) || FieldType.FLOAT.equals(column.getFieldType())) {
-            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_number(" + columnCode + ")");
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = to_number(" + columnCode + "_1)");
         }
         sqls.add(makeDropColumnSql(tableCode, columnCode+"_1"));
         return sqls;
