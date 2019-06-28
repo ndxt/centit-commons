@@ -1,10 +1,14 @@
 package com.centit.support.database.ddl;
 
+import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
+import com.centit.support.database.utils.FieldType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MySqlDDLOperations extends GeneralDDLOperations {
 
@@ -54,5 +58,28 @@ public class MySqlDDLOperations extends GeneralDDLOperations {
         appendColumnTypeSQL(column, sbsql);
         return sbsql.toString();
     }
+    @Override
+    public List<String> makeReconfigurationColumnSqls(final String tableCode, final String columnCode, final TableField column){
+        List<String> sqls = new ArrayList<>();
+        SimpleTableField tempColumn = new SimpleTableField();
+        tempColumn.setColumnName(columnCode+"_1");
+        sqls.add(makeRenameColumnSql(tableCode, columnCode, tempColumn));
+        sqls.add(makeAddColumnSql(tableCode, column));
 
+        if(FieldType.STRING.equals(column.getFieldType()) || FieldType.TEXT.equals(column.getFieldType())
+            || FieldType.FILE_ID.equals(column.getFieldType())) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as char)");
+        } else if(FieldType.DATE.equals(column.getFieldType()) ) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as date)");
+        } else if(FieldType.TIMESTAMP.equals(column.getFieldType()) || FieldType.DATETIME.equals(column.getFieldType())) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as datetime)");
+        } else if(FieldType.LONG.equals(column.getFieldType()) || FieldType.INTEGER.equals(column.getFieldType())) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as signed)");
+        } else if(FieldType.FLOAT.equals(column.getFieldType()) || FieldType.DOUBLE.equals(column.getFieldType())) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as decimal("+column.getMaxLength()
+                +","+column.getScale()+")");
+        }
+        sqls.add(makeDropColumnSql(tableCode, columnCode+"_1"));
+        return sqls;
+    }
 }
