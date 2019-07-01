@@ -1207,6 +1207,11 @@ public abstract class QueryUtils {
             if(tableAlias.containsKey(poClassName)) {
                 String alias = tableAlias.get(poClassName);
                 return StringUtils.isBlank(alias) ? columnDesc.substring(n + 1) : alias + '.' + columnDesc.substring(n + 1);
+            } /** 这个地方无法获取 表相关的元数据信息，如果可以校验一下字段中是否有对应的字段 就完美了；、
+               所以目前只能由于仅有一个表的过滤中 */
+            else if("*".equals(poClassName) && tableAlias.size()==1){
+                String alias = tableAlias.values().iterator().next();
+                return StringUtils.isBlank(alias) ? columnDesc.substring(n + 1) : alias + '.' + columnDesc.substring(n + 1);
             }
             return null;
         }
