@@ -393,7 +393,7 @@ public abstract class CollectionsOpt {
     /*
      * 克隆 一个 list
      */
-    public static <T> List<T> cloneList(List<T> souList){
+    public static <T> List<T> cloneList(Collection<T> souList){
         if(souList==null)
             return null;
         ArrayList<T> deslist = new ArrayList<>(souList.size()+1);

@@ -46,14 +46,5 @@
             <artifactId>itextpdf</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
-            <version>${jdk.version}</version>
-            <scope>system</scope>
-            <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
-            <!-- <systemPath>D:\Java\jdk1_6_0_29\lib\tools.jar</systemPath> -->
-        </dependency>
-
     </dependencies>
 </project>
