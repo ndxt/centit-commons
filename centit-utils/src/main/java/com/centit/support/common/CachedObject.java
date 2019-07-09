@@ -5,8 +5,6 @@ import com.centit.support.algorithm.DatetimeOpt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Collection;
-import java.util.Date;
 import java.util.function.Supplier;
 
 public class CachedObject<T> extends AbstractCachedObject<T>  {
@@ -14,9 +12,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
     private static Log logger = LogFactory.getLog(CachedObject.class);
 
     private Supplier<T> refresher;
-    private Date refreshTime;
     private long freshPeriod;
-    private T target;
 
     public  CachedObject(){
     }
@@ -59,7 +55,6 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
         this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
     }
 
-
     /**
      * @param freshPeriod 刷新周期 单位秒
      */
@@ -76,17 +71,11 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
         }catch (RuntimeException re){
             logger.error(re.getLocalizedMessage());
         }
-        // 如果获取失败 继续用以前的缓存
-        if(tempTarget != null) {
-            this.target = CollectionsOpt.unmodifiableObject(tempTarget);
-            this.refreshTime = DatetimeOpt.currentUtilDate();
-            this.evicted = false;
-        }
+        setRefreshDataAndState(tempTarget,freshPeriod, true);
     }
 
     public T getCachedTarget(){
-        if(this.target == null || this.evicted ||
-                System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 1000L){
+        if(this.target == null || isTargetOutOfDate(freshPeriod)){
             refreshData();
         }
         return target;

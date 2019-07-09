@@ -5,7 +5,6 @@ import com.centit.support.algorithm.DatetimeOpt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,11 +18,11 @@ import java.util.function.Function;
  */
 public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
     private static Log logger = LogFactory.getLog(CachedMap.class);
+    private ConcurrentMap<K, CachedIdentifiedObject> targetMap;
+    private long freshPeriod;
+    private Function<K, T> refresher;
 
     class CachedIdentifiedObject extends AbstractCachedObject<T> {
-
-        private Date refreshTime;
-        private T target;
 
         CachedIdentifiedObject(T target){
             this.target = CollectionsOpt.unmodifiableObject(target);
@@ -47,17 +46,11 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
             }catch (RuntimeException re){
                 logger.error(re.getLocalizedMessage());
             }
-            // 如果获取失败 继续用以前的缓存
-            if(tempTarget != null) {
-                this.target = CollectionsOpt.unmodifiableObject(tempTarget);
-                this.refreshTime = DatetimeOpt.currentUtilDate();
-                this.evicted = false;
-            }
+            setRefreshDataAndState(tempTarget,freshPeriod, true);
         }
 
         T getCachedTarget(K key){
-            if(this.target == null || this.evicted ||
-                    System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 1000L){
+            if(this.target == null || isTargetOutOfDate(freshPeriod)){
                 refreshData(key);
             }
             return target;
@@ -80,9 +73,6 @@ public class CachedMap<K,T> extends AbstractCachedObject<Map<K,T>>  {
         }
     }
 
-    private ConcurrentMap<K, CachedIdentifiedObject> targetMap;
-    private long freshPeriod;
-    private Function<K, T> refresher;
 
     public CachedMap(){
         this.targetMap = new ConcurrentHashMap<>(16);
