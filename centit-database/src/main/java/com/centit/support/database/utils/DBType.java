@@ -50,7 +50,7 @@ public enum DBType {
         if(connurl==null)
             return Unknown;
         if("oracle".equalsIgnoreCase(connurl)
-            ||    connurl.startsWith("jdbc:oracle"))
+            ||    connurl.startsWith("jdbc:oracle")||connurl.startsWith("jdbc:dm"))
             return Oracle;
         if("db2".equalsIgnoreCase(connurl)
             ||    connurl.startsWith("jdbc:db2"))
