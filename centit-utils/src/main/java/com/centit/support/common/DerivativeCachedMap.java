@@ -26,22 +26,19 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
     private CachedMap<K, D>  parentCachedMap;
 
     class CachedIdentifiedObject extends AbstractCachedObject<T> {
-        private Date refreshTime;
-        private T target;
         private AbstractCachedObject<D> parentCache;
-        /**
-         */
+
         CachedIdentifiedObject(){
             this.target = null;
             this.evicted = true;
-            parentCache = null;
+            this.parentCache = null;
         }
 
         synchronized void refreshData(K key){
-            if(parentCache==null){
-                parentCache = parentCachedMap.getCachedObject(key);
-                if(parentCache!=null) {
-                    parentCache.addDeriveCache(this);
+            if(this.parentCache==null){
+                this.parentCache = parentCachedMap.getCachedObject(key);
+                if(this.parentCache != null) {
+                    this.parentCache.addDeriveCache(this);
                 }else{
                     return;
                 }
@@ -53,18 +50,11 @@ public class DerivativeCachedMap<K, D ,T> extends AbstractCachedObject<Map<K,T>>
             }catch (RuntimeException re){
                 logger.error(re.getLocalizedMessage());
             }
-            // 如果获取失败 继续用以前的缓存
-            if(tempTarget != null) {
-                this.target = CollectionsOpt.unmodifiableObject(tempTarget);
-                this.refreshTime = DatetimeOpt.currentUtilDate();
-                this.evicted = false;
-            }
+            setRefreshDataAndState(tempTarget,freshPeriod, false);
         }
 
         T getCachedTarget(K key){
-            if(this.target == null || this.evicted
-                    //|| parentCachedMap.isFreshData(key)
-                    || System.currentTimeMillis() > refreshTime.getTime() + freshPeriod * 1000L){
+            if(this.target == null || isTargetOutOfDate(freshPeriod)){
                 refreshData(key);
             }
             return target;
