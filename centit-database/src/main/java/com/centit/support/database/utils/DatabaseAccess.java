@@ -749,30 +749,9 @@ public abstract class DatabaseAccess {
     }
 
     private static String makePageQuerySql(Connection conn, String sSql,  int pageNo,
-                                           int pageSize ){
+                                           int pageSize ) throws PersistenceException{
         int offset = (pageNo > 1 && pageSize > 0)?(pageNo - 1) * pageSize:0;
-        String query;
-        switch(DBType.mapDBType(conn)){
-            case Oracle:
-                query = QueryUtils.buildOracleLimitQuerySQL(sSql, offset, pageSize, false);
-                break;
-            case DB2:
-                query = QueryUtils.buildDB2LimitQuerySQL(sSql, offset, pageSize);
-                break;
-            case SqlServer:
-                query = QueryUtils.buildSqlServerLimitQuerySQL(sSql, offset, pageSize);
-                break;
-            case MySql:
-                query = QueryUtils.buildMySqlLimitQuerySQL(sSql, offset, pageSize, false);
-                break;
-            case PostgreSql:
-                query = QueryUtils.buildPostgreSqlLimitQuerySQL(sSql, offset, pageSize, false);
-                break;
-            default:
-                query = sSql;
-                break;
-        }
-        return query;
+        return QueryUtils.buildLimitQuerySQL(sSql, offset, pageSize,false,DBType.mapDBType(conn));
     }
 
     /** 下面是根据不同数据库生成不同的查询语句进行分页查询相关的语句 */

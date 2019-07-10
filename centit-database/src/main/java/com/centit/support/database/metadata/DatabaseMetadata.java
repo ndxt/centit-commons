@@ -17,6 +17,7 @@ public interface DatabaseMetadata {
             throws SQLException {
         switch (dbtype){
             case Oracle:
+            case DM:
                 return new OracleMetadata();
             case DB2:
                 return new DB2Metadata();

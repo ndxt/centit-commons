@@ -241,6 +241,7 @@ public abstract class FieldType {
             case SqlServer:
                 return mapToSqlServerColumnType(ft);
             case Oracle:
+            case DM:
                 return mapToOracleColumnType(ft);
             case DB2:
                 return mapToDB2ColumnType(ft);
