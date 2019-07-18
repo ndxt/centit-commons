@@ -42,7 +42,7 @@ public enum DBType {
             case 7:
                 return PostgreSql;
             case 8:
-                return PostgreSql;
+                return DM;
             default:
                 return Unknown;
         }
@@ -52,29 +52,29 @@ public enum DBType {
     public static DBType mapDBType(String connurl) {
         if (connurl == null)
             return Unknown;
-        if ("oracle".equalsIgnoreCase(connurl)
-            || connurl.startsWith("jdbc:oracle"))
+        if (connurl.startsWith("jdbc:oracle")
+            || "oracle".equalsIgnoreCase(connurl))
             return Oracle;
-        if ("db2".equalsIgnoreCase(connurl)
-            || connurl.startsWith("jdbc:db2"))
+        if (connurl.startsWith("jdbc:db2")
+            || "db2".equalsIgnoreCase(connurl))
             return DB2;
-        if ("sqlserver".equalsIgnoreCase(connurl)
-            || connurl.startsWith("jdbc:sqlserver"))
+        if (connurl.startsWith("jdbc:sqlserver")
+            || "sqlserver".equalsIgnoreCase(connurl))
             return SqlServer;
-        if ("h2".equalsIgnoreCase(connurl)
-            || connurl.startsWith("jdbc:h2"))
+        if (connurl.startsWith("jdbc:h2")
+            || "h2".equalsIgnoreCase(connurl))
             return H2;
-        if ("mysql".equalsIgnoreCase(connurl)
-            || connurl.startsWith("jdbc:mysql"))
+        if (connurl.startsWith("jdbc:mysql")
+            || "mysql".equalsIgnoreCase(connurl))
             return MySql;
-        if ("access".equalsIgnoreCase(connurl)
-            || connurl.startsWith("jdbc:ucanaccess"))
+        if (connurl.startsWith("jdbc:ucanaccess")
+            || "access".equalsIgnoreCase(connurl))
             return Access;
-        if ("postgresql".equalsIgnoreCase(connurl)
-            || connurl.startsWith("jdbc:postgresql"))
+        if (connurl.startsWith("jdbc:postgresql")
+            || "postgresql".equalsIgnoreCase(connurl))
             return PostgreSql;
-        if ("dm".equalsIgnoreCase(connurl)
-            || connurl.startsWith("jdbc:dm"))
+        if (connurl.startsWith("jdbc:dm")
+            || "dm".equalsIgnoreCase(connurl))
             return DM;
         return Unknown;
     }
