@@ -811,7 +811,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             return 1L;
         }else{
             DatabaseAccess.doExecuteSql(conn,
-                    "update simulate_sequence currvalue = currvalue + increment "
+                    "update simulate_sequence set currvalue = currvalue + increment "
                     + "where seqname= ?", new Object[]{sequenceName});
             object = DatabaseAccess.getScalarObjectQuery(
                      conn,
