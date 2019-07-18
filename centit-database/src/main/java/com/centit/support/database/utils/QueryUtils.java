@@ -454,10 +454,10 @@ public abstract class QueryUtils {
 
         String groupByField = QueryUtils.getGroupByField(sqlPieces.get(2));
         if(groupByField==null)
-             return sqlPieces.get(0) + " count(*) as rowcount from " +
+             return sqlPieces.get(0) + " count(*) as rowcounts from " +
                      removeOrderBy(sqlPieces.get(2));
 
-        return sqlPieces.get(0) + " count(*) as rowcount from (select "+
+        return sqlPieces.get(0) + " count(*) as rowcounts from (select "+
              groupByField  + " from " + removeOrderBy(sqlPieces.get(2)) + ") a";
     }
     /**
@@ -478,7 +478,7 @@ public abstract class QueryUtils {
             sqlPieces.set(1, " * from");
         }
 
-        return sqlPieces.get(0) + " count(*) as rowCount from (select "+
+        return sqlPieces.get(0) + " count(*) as rowCounts from (select "+
             sqlPieces.get(1) + sqlPieces.get(2) + ") a";
     }
 
