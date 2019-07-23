@@ -37,6 +37,7 @@ public abstract class GeneralDDLOperations implements DDLOperations {
         switch (dbtype){
             case Oracle:
             case DM:
+            case KBase:
                 return new OracleDDLOperations();
             case DB2:
                 return new DB2DDLOperations();

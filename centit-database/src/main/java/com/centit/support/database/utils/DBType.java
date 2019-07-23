@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum DBType {
-    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM;
+    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM,KBase;
     protected static final Logger logger = LoggerFactory.getLogger(DBType.class);
     private static HashMap<DBType, String> dbDrivers = new HashMap<DBType, String>() {
         {
@@ -21,6 +21,7 @@ public enum DBType {
             put(H2, "org.h2.Driver");
             put(PostgreSql, "org.postgresql.Driver");
             put(DM, "dm.jdbc.driver.DmDriver");
+            put(KBase,"com.kingbase.Driver");
         }
     };
 
@@ -43,6 +44,8 @@ public enum DBType {
                 return PostgreSql;
             case 8:
                 return DM;
+            case 9:
+                return KBase;
             default:
                 return Unknown;
         }
@@ -76,6 +79,9 @@ public enum DBType {
         if (connurl.startsWith("jdbc:dm")
             || "dm".equalsIgnoreCase(connurl))
             return DM;
+        if (connurl.startsWith("jdbc:kingbase")
+            || "kingbase".equalsIgnoreCase(connurl))
+            return KBase;
         return Unknown;
     }
 
@@ -108,6 +114,8 @@ public enum DBType {
             return PostgreSql;
         if (dialectName.contains("Dm"))
             return DM;
+        if (dialectName.contains("KingBase"))
+            return KBase;
         return Unknown;
     }
 
@@ -122,6 +130,7 @@ public enum DBType {
         dbtypes.add(H2);
         dbtypes.add(PostgreSql);
         dbtypes.add(DM);
+        dbtypes.add(KBase);
         return dbtypes;
     }
 
@@ -152,6 +161,8 @@ public enum DBType {
                 return "postgresql";
             case DM:
                 return "dm";
+            case KBase:
+                return "kingbase";
             default:
                 return "unknown";
         }
