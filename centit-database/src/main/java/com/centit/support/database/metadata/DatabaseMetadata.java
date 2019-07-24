@@ -18,7 +18,7 @@ public interface DatabaseMetadata {
         switch (dbtype){
             case Oracle:
             case DM:
-            case KBase:
+            case KingBase:
                 return new OracleMetadata();
             case DB2:
                 return new DB2Metadata();

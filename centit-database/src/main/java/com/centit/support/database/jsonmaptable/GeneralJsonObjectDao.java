@@ -68,7 +68,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         switch (dbtype){
             case Oracle:
             case DM:
-            case KBase:
+            case KingBase:
                 return new OracleJsonObjectDao(conn,tableInfo);
             case DB2:
                 return new DB2JsonObjectDao(conn,tableInfo);
@@ -91,7 +91,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         switch (dbtype){
             case Oracle:
             case DM:
-            case KBase:
+            case KingBase:
                 return new OracleJsonObjectDao(conn);
             case DB2:
                 return new DB2JsonObjectDao(conn);

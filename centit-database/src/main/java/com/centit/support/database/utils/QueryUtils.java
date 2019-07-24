@@ -642,7 +642,7 @@ public abstract class QueryUtils {
         switch (dbType){
             case Oracle:
             case DM:
-            case KBase:
+            case KingBase:
                 return buildOracleLimitQuerySQL(sql,offset, maxsize,asParameter);
             case DB2:
                 return buildDB2LimitQuerySQL(sql,offset, maxsize);

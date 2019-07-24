@@ -1,5 +1,6 @@
 package com.centit.support.database.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum DBType {
-    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM,KBase;
+    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM, KingBase;
     protected static final Logger logger = LoggerFactory.getLogger(DBType.class);
     private static HashMap<DBType, String> dbDrivers = new HashMap<DBType, String>() {
         {
@@ -21,12 +22,11 @@ public enum DBType {
             put(H2, "org.h2.Driver");
             put(PostgreSql, "org.postgresql.Driver");
             put(DM, "dm.jdbc.driver.DmDriver");
-            put(KBase,"com.kingbase.Driver");
+            put(KingBase,"com.kingbase.Driver");
         }
     };
 
     public static DBType valueOf(int ordinal) {
-
         switch (ordinal) {
             case 1:
                 return SqlServer;
@@ -45,15 +45,39 @@ public enum DBType {
             case 8:
                 return DM;
             case 9:
-                return KBase;
+                return KingBase;
             default:
                 return Unknown;
         }
     }
-
+    /*
+    public static DBType valueOf(String dbname) {
+        switch (dbname.toLowerCase()) {
+            case "sqlserver":
+                return SqlServer;
+            case "oracle":
+                return Oracle;
+            case "db2":
+                return DB2;
+            case "access":
+                return Access;
+            case "mysql":
+                return MySql;
+            case "h2":
+                return H2;
+            case "postgresql":
+                return PostgreSql;
+            case "dm":
+                return DM;
+            case "kingbase":
+                return KingBase;
+            default:
+                return Unknown;
+        }
+    }*/
 
     public static DBType mapDBType(String connurl) {
-        if (connurl == null)
+        if (StringUtils.isBlank(connurl))
             return Unknown;
         if (connurl.startsWith("jdbc:oracle")
             || "oracle".equalsIgnoreCase(connurl))
@@ -81,7 +105,7 @@ public enum DBType {
             return DM;
         if (connurl.startsWith("jdbc:kingbase")
             || "kingbase".equalsIgnoreCase(connurl))
-            return KBase;
+            return KingBase;
         return Unknown;
     }
 
@@ -115,7 +139,7 @@ public enum DBType {
         if (dialectName.contains("Dm"))
             return DM;
         if (dialectName.contains("KingBase"))
-            return KBase;
+            return KingBase;
         return Unknown;
     }
 
@@ -130,7 +154,7 @@ public enum DBType {
         dbtypes.add(H2);
         dbtypes.add(PostgreSql);
         dbtypes.add(DM);
-        dbtypes.add(KBase);
+        dbtypes.add(KingBase);
         return dbtypes;
     }
 
@@ -161,7 +185,7 @@ public enum DBType {
                 return "postgresql";
             case DM:
                 return "dm";
-            case KBase:
+            case KingBase:
                 return "kingbase";
             default:
                 return "unknown";
@@ -175,6 +199,6 @@ public enum DBType {
 
     public boolean isMadeInChina(){
         return DBType.DM.equals(this)
-            || DBType.KBase.equals(this);
+            || DBType.KingBase.equals(this);
     }
 }

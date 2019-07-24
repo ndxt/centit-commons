@@ -242,7 +242,7 @@ public abstract class FieldType {
                 return mapToSqlServerColumnType(ft);
             case Oracle:
             case DM:
-            case KBase:
+            case KingBase:
                 return mapToOracleColumnType(ft);
             case DB2:
                 return mapToDB2ColumnType(ft);
