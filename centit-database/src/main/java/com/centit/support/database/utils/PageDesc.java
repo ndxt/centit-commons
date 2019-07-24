@@ -110,4 +110,13 @@ public class PageDesc {
         return ( pageNo > 1 ? pageNo : 1 ) * pageSize;
     }
 
+    /**
+     * 没有分页，仅仅返回 条目总数
+     * @param totalRows 条目总数
+     */
+    public void noPaging(int totalRows){
+        this.totalRows = totalRows;
+        this.pageSize = totalRows;
+        this.pageNo = 1;
+    }
 }
