@@ -172,4 +172,9 @@ public enum DBType {
     public String toString() {
         return DBType.getDBTypeName(this);
     }
+
+    public boolean isMadeInChina(){
+        return DBType.DM.equals(this)
+            || DBType.KBase.equals(this);
+    }
 }
