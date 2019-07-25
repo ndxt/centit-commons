@@ -38,6 +38,7 @@ public abstract class GeneralDDLOperations implements DDLOperations {
             case Oracle:
             case DM:
             case KingBase:
+            case GBase:
                 return new OracleDDLOperations();
             case DB2:
                 return new DB2DDLOperations();

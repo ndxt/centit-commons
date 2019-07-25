@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum DBType {
-    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM, KingBase;
+    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM, KingBase,GBase;
     protected static final Logger logger = LoggerFactory.getLogger(DBType.class);
     private static HashMap<DBType, String> dbDrivers = new HashMap<DBType, String>() {
         {
@@ -23,6 +23,7 @@ public enum DBType {
             put(PostgreSql, "org.postgresql.Driver");
             put(DM, "dm.jdbc.driver.DmDriver");
             put(KingBase,"com.kingbase.Driver");
+            put(GBase,"com.gbasedbt.jdbc.IfxDriver");
         }
     };
 
@@ -46,6 +47,8 @@ public enum DBType {
                 return DM;
             case 9:
                 return KingBase;
+            case 10:
+                return GBase;
             default:
                 return Unknown;
         }
@@ -106,6 +109,9 @@ public enum DBType {
         if (connurl.startsWith("jdbc:kingbase")
             || "kingbase".equalsIgnoreCase(connurl))
             return KingBase;
+        if (connurl.startsWith("jdbc:gbasedbt-sqli")
+            || "gbasedbt-sqli".equalsIgnoreCase(connurl))
+            return GBase;
         return Unknown;
     }
 
@@ -140,6 +146,8 @@ public enum DBType {
             return DM;
         if (dialectName.contains("KingBase"))
             return KingBase;
+        if (dialectName.contains("GBase"))
+            return GBase;
         return Unknown;
     }
 
@@ -155,6 +163,7 @@ public enum DBType {
         dbtypes.add(PostgreSql);
         dbtypes.add(DM);
         dbtypes.add(KingBase);
+        dbtypes.add(GBase);
         return dbtypes;
     }
 
@@ -187,6 +196,8 @@ public enum DBType {
                 return "dm";
             case KingBase:
                 return "kingbase";
+            case GBase:
+                return "gbase";
             default:
                 return "unknown";
         }
@@ -199,6 +210,7 @@ public enum DBType {
 
     public boolean isMadeInChina(){
         return DBType.DM.equals(this)
-            || DBType.KingBase.equals(this);
+            || DBType.KingBase.equals(this)
+            || DBType.GBase.equals(this);
     }
 }

@@ -28,6 +28,7 @@ public interface DatabaseMetadata {
             case MySql:
             case Access:
             case H2:
+            case GBase:
             default:
                 return new JdbcMetadata();
         }

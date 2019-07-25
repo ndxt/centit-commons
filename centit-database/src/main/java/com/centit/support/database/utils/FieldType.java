@@ -111,7 +111,35 @@ public abstract class FieldType {
                 return ft;
       }
     }
-
+    public static String mapToGBaseColumnType(String ft){
+        switch(ft){
+            case STRING:
+                return "lvarchar";
+            case INTEGER:
+            case LONG:
+                return "int";
+            case FLOAT:
+            case DOUBLE:
+                return "decimal";
+            case MONEY:
+                return "decimal(30,4)";
+            case BOOLEAN:
+                return "varchar(1)";
+            case DATE:
+                return "Date";
+            case DATETIME:
+            case TIMESTAMP:
+                return "datatime";
+            case TEXT:
+                return "clob";//长文本
+            case BYTE_ARRAY:
+                return "blob";//大字段
+            case FILE_ID:
+                return "varchar(64)";//默认记录文件的ID号
+            default:
+                return ft;
+        }
+    }
     /**
      * 转换到Oracle的字段
      * @param ft String
@@ -252,6 +280,8 @@ public abstract class FieldType {
                 return mapToH2ColumnType(ft);
             case PostgreSql:
                 return mapToPostgreSqlColumnType(ft);
+            case GBase:
+                return mapToGBaseColumnType(ft);
             default:
                 return mapToOracleColumnType(ft);
         }
