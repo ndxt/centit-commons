@@ -11,7 +11,7 @@ public abstract class BooleanBaseOpt {
         throw new IllegalAccessError("Utility class");
     }
 
-    static Boolean check4CharStrIsTrue(String str){
+    static boolean check4CharStrIsTrue(String str){
         final char ch0 = str.charAt(0);
         final char ch1 = str.charAt(1);
         final char ch2 = str.charAt(2);
@@ -25,7 +25,7 @@ public abstract class BooleanBaseOpt {
         return false;
     }
 
-    static Boolean check5CharStrIsFlase(String str){
+    static boolean check5CharStrIsFlase(String str){
         final char ch0 = str.charAt(0);
         final char ch1 = str.charAt(1);
         final char ch2 = str.charAt(2);
