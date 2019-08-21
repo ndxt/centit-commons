@@ -4,10 +4,7 @@ import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +13,7 @@ public abstract class EmbedFunc {
         throw new IllegalAccessError("Utility class");
     }
     private static double MIN_DOUBLE = 0.00000001;
-    public static final int functionsSum = 59;
+    public static final int functionsSum = 63;
     protected static final FunctionInfo functionsList[]={
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte",2, ConstDefine.FUNC_BYTE,ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,2)=2
@@ -72,6 +69,11 @@ public abstract class EmbedFunc {
         new FunctionInfo("day",-1,ConstDefine.FUNC_DAY,ConstDefine.TYPE_STR),//日期函数
         new FunctionInfo("month",-1,ConstDefine.FUNC_MONTH,ConstDefine.TYPE_STR),//日期函数
         new FunctionInfo("year",-1,ConstDefine.FUNC_YEAR,ConstDefine.TYPE_STR),//日期函数
+        new FunctionInfo("week",-1,ConstDefine.FUNC_WEEK,ConstDefine.TYPE_STR),// 第几周
+        new FunctionInfo("weekday",-1,ConstDefine.FUNC_WEEK_DAY,ConstDefine.TYPE_STR),// 星期几
+        new FunctionInfo("formatdate",-1,ConstDefine.FUNC_FORMAT_DATE,ConstDefine.TYPE_STR),// 格式化日期
+        new FunctionInfo("dateinfo",-1,ConstDefine.FUNC_DATE_INFO,ConstDefine.TYPE_STR),// 日期信息
+
 
         new FunctionInfo("dayspan",-1,ConstDefine.FUNC_DAY_SPAN,ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
         new FunctionInfo("datespan",-1,ConstDefine.FUNC_DATE_SPAN,ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
@@ -561,8 +563,7 @@ public abstract class EmbedFunc {
             }
 
             case ConstDefine.FUNC_DAY:{//
-                Date dt = (nOpSum > 0)? DatetimeOpt.castObjectToDate(slOperand.get(0))
-                         :DatetimeOpt.currentUtilDate();
+                Date dt = (nOpSum > 0)? DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
                 if(dt==null)
                     dt = DatetimeOpt.currentUtilDate();
                 return DatetimeOpt.getDay(dt);
@@ -579,6 +580,43 @@ public abstract class EmbedFunc {
                     dt = DatetimeOpt.currentUtilDate();
                 return DatetimeOpt.getYear(dt);
             }
+
+            case ConstDefine.FUNC_WEEK:{//
+                Date dt = (nOpSum > 0)? DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+
+                return DatetimeOpt.getWeekOfYear(dt);
+            }
+
+            case ConstDefine.FUNC_WEEK_DAY:{//
+                Date dt = (nOpSum > 0)? DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+                return DatetimeOpt.getDayOfWeek(dt);
+            }
+
+            case ConstDefine.FUNC_FORMAT_DATE:{//
+                if (nOpSum < 1) return null;
+                String dateFormat = StringBaseOpt.castObjectToString(slOperand.get(0));
+                Date dt = (nOpSum > 1)? DatetimeOpt.castObjectToDate(slOperand.get(1)):null;
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+
+                return DatetimeOpt.convertDateToString(dt, dateFormat);
+            }
+
+            case ConstDefine.FUNC_DATE_INFO:{//
+                if (nOpSum < 1) return null;
+                int field = NumberBaseOpt.castObjectToInteger(slOperand.get(0),0);
+                Date dt = (nOpSum > 1)? DatetimeOpt.castObjectToDate(slOperand.get(1)):null;
+                if(dt==null)
+                    dt = DatetimeOpt.currentUtilDate();
+                Calendar cal = new GregorianCalendar();
+                cal.setTime(dt);
+                return cal.get(field);
+            }
+
             case ConstDefine.FUNC_DAY_SPAN:{//
                 if (nOpSum < 2) return null;
                 Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));

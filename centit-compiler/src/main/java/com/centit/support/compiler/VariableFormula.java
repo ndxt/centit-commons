@@ -5,7 +5,6 @@ import com.centit.support.algorithm.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 public class VariableFormula {
@@ -112,7 +111,16 @@ public class VariableFormula {
             lex.setPreword(str);
             return null;
         }
-        if(str.charAt(0) == '('){
+
+        /*if("-".equals(str)){
+            String numb = lex.getAWord();
+            if(StringRegularOpt.isNumber(numb)) {
+                return GeneralAlgorithm.subtractTwoObject(0,
+                 NumberBaseOpt.castObjectToNumber(numb));
+            }else{
+                return null;
+            }
+        } else*/ if(str.charAt(0) == '('){
             Object resStr = calcFormula();
             str = lex.getAWord();
             if( str == null || str.length()==0 || str.charAt(0) != ')') return null;

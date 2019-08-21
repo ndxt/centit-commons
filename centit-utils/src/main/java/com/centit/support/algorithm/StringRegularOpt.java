@@ -395,8 +395,7 @@ public abstract class StringRegularOpt {
         return b;
     }
 
-    public static boolean isTime(String szTime ,Calendar t_time)
-    {
+    public static boolean isTime(String szTime ,Calendar t_time) {
         if(szTime==null)
             return false;
         //t_time.setTime(time)
@@ -537,12 +536,18 @@ public abstract class StringRegularOpt {
             return null;
         int sp=0;
         int sl = szNumber.length();
+        boolean canBeSign = true;
         StringBuilder sTmp2 = new StringBuilder("");
         for( int j=0; j< sl; j++){
-            if (szNumber.charAt(j) >= '0' && szNumber.charAt(j) <= '9')
+            if (canBeSign &&(szNumber.charAt(j) == '-' || szNumber.charAt(j) == '+')) {
                 sTmp2.append(szNumber.charAt(j));
-            else if(sp==0 && szNumber.charAt(j) == '.'){
+                canBeSign = false;
+            } if (szNumber.charAt(j) >= '0' && szNumber.charAt(j) <= '9') {
                 sTmp2.append(szNumber.charAt(j));
+                canBeSign = false;
+            } else if(sp==0 && szNumber.charAt(j) == '.'){
+                sTmp2.append(szNumber.charAt(j));
+                canBeSign = false;
                 sp=1;
             }
         }

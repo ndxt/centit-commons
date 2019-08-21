@@ -28,5 +28,9 @@ public enum GeneratorType {
      *  函数，比如 当前日期
      *  这个调用compiler中的表达式运行，可以将同一个对象中的其他字段作为参数
      */
-    FUNCTION
+    FUNCTION,
+    /**
+     * 流水号； 代码（sequence）：模板 function  no:序列号
+     */
+    LSH
 }

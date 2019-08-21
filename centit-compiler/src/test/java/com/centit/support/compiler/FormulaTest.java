@@ -1,5 +1,6 @@
 package com.centit.support.compiler;
 
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 
 import java.util.HashMap;
@@ -12,7 +13,14 @@ public class FormulaTest {
     }
 
     public static void testFormula() {
-        Object s = VariableFormula.calculate("SINGLETON( [1,2,2,4,5,,3] ,5, 6, 7 , -1)");
+        Object  s = VariableFormula.calculate("-1 + 8");
+        System.out.println(s);
+        s = VariableFormula.calculate(
+            "concat('Y' , year(), 'M', month() ,no)", CollectionsOpt.createHashMap("no",100));
+        System.out.println(s);
+
+        s = VariableFormula.calculate(
+            "SINGLETON( [1,2,2,4,5,,3] ,5, 6, 7 , -1, 8)");
         System.out.println(s);
         s = VariableFormula.calculate("[1,2,2,4,5,,3] - 1");
         System.out.println(s);

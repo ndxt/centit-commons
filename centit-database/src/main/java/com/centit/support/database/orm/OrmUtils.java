@@ -1,5 +1,7 @@
 package com.centit.support.database.orm;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.LeftRightPair;
@@ -83,8 +85,23 @@ public abstract class OrmUtils {
                             break;
                         case FUNCTION:
                             setObjectFieldValue(object, filed,
-                                    VariableFormula.calculate(valueGenerator.value(),object));
+                                    VariableFormula.calculate(valueGenerator.value(), object));
                             break;
+                        case LSH:
+                            {
+                                String genValue = valueGenerator.value();
+                                int n = genValue.indexOf(':');
+                                if(n>0 && sqlDialect!=null){
+                                    String seq = genValue.substring(0,n);
+                                    Long seqNo = sqlDialect.getSequenceNextValue(valueGenerator.value());
+                                    JSONObject json = (JSONObject) JSON.toJSON(object);
+                                    json.put("no",seqNo);
+                                    setObjectFieldValue(object, filed,
+                                        VariableFormula.calculate(
+                                            genValue.substring(n+1), object));
+                                }
+                            }
+                        break;
                     }
                 }
             }
