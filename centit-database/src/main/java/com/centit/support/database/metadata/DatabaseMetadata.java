@@ -19,6 +19,7 @@ public interface DatabaseMetadata {
             case Oracle:
             case DM:
             case KingBase:
+            case ShenTong:
                 return new OracleMetadata();
             case DB2:
                 return new DB2Metadata();
@@ -28,6 +29,7 @@ public interface DatabaseMetadata {
             case MySql:
             case Access:
             case H2:
+            case GBase:
             default:
                 return new JdbcMetadata();
         }
