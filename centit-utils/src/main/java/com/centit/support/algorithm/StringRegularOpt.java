@@ -537,7 +537,7 @@ public abstract class StringRegularOpt {
         int sp=0;
         int sl = szNumber.length();
         boolean canBeSign = true;
-        StringBuilder sTmp2 = new StringBuilder("");
+        StringBuilder sTmp2 = new StringBuilder();
         for( int j=0; j< sl; j++){
             if (canBeSign &&(szNumber.charAt(j) == '-' || szNumber.charAt(j) == '+')) {
                 sTmp2.append(szNumber.charAt(j));
