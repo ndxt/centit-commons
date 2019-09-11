@@ -35,10 +35,19 @@ public abstract class QueryLogUtils {
     public static void printSql(Logger logger, String sql, Object param){
         if(jdbcShowSql) {
             if(userLog4jInfo) {
-                logger.info(sql + ":" + JSON.toJSONString(param));
+                if(param != null) {
+                    logger.info(sql + ":" + JSON.toJSONString(param));
+                } else {
+                    logger.info(sql);
+                }
             }else{
-                System.out.println(DatetimeOpt.currentDatetime()+ " 语句： "+
+                if(param != null) {
+                    System.out.println(DatetimeOpt.currentDatetime()+ " 语句： "+
                         sql + "参数为： "+JSON.toJSONString(param) );
+                } else {
+                    System.out.println(DatetimeOpt.currentDatetime()+ " 语句： "+
+                        sql);
+                }
             }
         }
     }
