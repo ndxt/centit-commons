@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -659,13 +660,41 @@ public abstract class DatabaseAccess {
 
     /* 下面是分页查询相关的语句 */
     /*----------------------------------------------------------------------------- */
-    public static Object fetchScalarObject(List<Object[]> rsDatas) throws IOException {
+    public static Object fetchScalarObject(List<Object[]> rsDatas) {
         if (rsDatas == null || rsDatas.size() == 0)
             return null;
         Object[] firstRow = rsDatas.get(0);
         if (firstRow == null || firstRow.length == 0)
             return null;
         return firstRow[0];
+    }
+
+    public static List<Object> fetchSingleColumn(List<Object[]> rsDatas, int columnIndex) {
+        if (rsDatas == null || rsDatas.size() == 0)
+            return null;
+        List<Object> columnData = new ArrayList<>(rsDatas.size());
+        for (Object[] row : rsDatas){
+            columnData.add(row[columnIndex]);
+        }
+        return columnData;
+    }
+
+    public static List<Object> fetchSingleColumn(List<Object[]> rsDatas) {
+        return fetchSingleColumn( rsDatas, 0);
+    }
+
+    public static List<String> fetchSingleColumnAsString(List<Object[]> rsDatas, int columnIndex) {
+        if (rsDatas == null || rsDatas.size() == 0)
+            return null;
+        List<String> columnData = new ArrayList<>(rsDatas.size());
+        for (Object[] row : rsDatas){
+            columnData.add(StringBaseOpt.castObjectToString(row[columnIndex]));
+        }
+        return columnData;
+    }
+
+    public static List<String> fetchSingleColumnAsString(List<Object[]> rsDatas) {
+        return fetchSingleColumnAsString( rsDatas, 0);
     }
 
     /**
