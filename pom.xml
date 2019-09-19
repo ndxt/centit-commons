@@ -55,6 +55,7 @@
         <module>centit-compiler</module>
         <module>centit-database</module>
         <module>centit-database-datasource</module>
+        <module>centit-database-transaction</module>
     </modules>
 
     <build>
