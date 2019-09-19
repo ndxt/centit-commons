@@ -1,7 +1,6 @@
 package com.centit.support.test;
 
 import com.centit.support.database.utils.DBType;
-import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.FieldType;
 
 public class TestStringMap {

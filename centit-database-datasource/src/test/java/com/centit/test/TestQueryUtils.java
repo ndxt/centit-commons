@@ -2,7 +2,6 @@ package com.centit.test;
 
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.LeftRightPair;
-import com.centit.support.compiler.Lexer;
 import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
 import org.apache.commons.lang3.tuple.Pair;

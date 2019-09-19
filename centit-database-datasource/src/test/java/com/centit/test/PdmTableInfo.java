@@ -1,12 +1,11 @@
 package com.centit.test;
 
-import java.util.List;
-
+import com.centit.support.database.metadata.PdmReader;
 import com.centit.support.database.metadata.SimpleTableField;
+import com.centit.support.database.metadata.SimpleTableInfo;
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.centit.support.database.metadata.PdmReader;
-import com.centit.support.database.metadata.SimpleTableInfo;
+import java.util.List;
 
 public class PdmTableInfo{
     public  static void  main(String[] args)   {

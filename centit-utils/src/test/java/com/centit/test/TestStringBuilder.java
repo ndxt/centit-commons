@@ -1,7 +1,6 @@
 package com.centit.test;
 
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.StringRegularOpt;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

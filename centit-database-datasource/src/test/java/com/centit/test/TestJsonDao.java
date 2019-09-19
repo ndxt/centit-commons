@@ -1,24 +1,24 @@
 package com.centit.test;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import com.alibaba.fastjson.JSONObject;
-import com.centit.support.database.utils.DataSourceDescription;
-import com.centit.support.database.utils.DbcpConnectPools;
 import com.centit.support.database.ddl.DDLOperations;
 import com.centit.support.database.ddl.OracleDDLOperations;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.jsonmaptable.OracleJsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableInfo;
+import com.centit.support.database.utils.DataSourceDescription;
+import com.centit.support.database.utils.DbcpConnectPools;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class TestJsonDao {
 
     public  static void  main(String[] args)   {
          testJDBCMetadata();
     }
-  
+
     public  static void testJDBCMetadata(){
         DataSourceDescription dbc = new DataSourceDescription();
         dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");

@@ -69,7 +69,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
         try{
             tempTarget = refresher.get();
         }catch (RuntimeException re){
-            logger.error(re.getLocalizedMessage());
+            logger.error(re.getMessage(), re);
         }
         setRefreshDataAndState(tempTarget,freshPeriod, true);
     }

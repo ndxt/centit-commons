@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.*;
 
 @SuppressWarnings("unused")
 public abstract class FileIOOpt {
@@ -57,7 +56,7 @@ public abstract class FileIOOpt {
     }
 
     public static String readStringFromRead(Reader reader) throws IOException{
-        try(StringWriter writer = new StringWriter()){  
+        try(StringWriter writer = new StringWriter()){
             char[] buf = new char[1024];
             int len;
             while ((len = reader.read(buf)) != -1) {

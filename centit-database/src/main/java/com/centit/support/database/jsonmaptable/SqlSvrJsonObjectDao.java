@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;

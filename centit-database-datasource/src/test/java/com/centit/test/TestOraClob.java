@@ -1,11 +1,11 @@
 package com.centit.test;
 
-import java.sql.*;
-
 import com.alibaba.fastjson.JSONArray;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.DbcpConnectPools;
+
+import java.sql.*;
 
 public class TestOraClob {
 
