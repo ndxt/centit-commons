@@ -256,15 +256,17 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public static boolean checkHasAllPkColumns(TableInfo tableInfo, Map<String, Object> properties){
         for(String pkc : tableInfo.getPkColumns() ){
             TableField field = tableInfo.findFieldByColumn(pkc);
-            if( field != null &&
-                    properties.get(field.getPropertyName()) == null)
+            if( field != null
+                && properties.get(field.getPropertyName()) == null
+                && properties.get(field.getColumnName()) == null) {
                 return false;
+            }
         }
         return true;
     }
 
     public boolean checkHasAllPkColumns(Map<String, Object> properties){
-        return GeneralJsonObjectDao.checkHasAllPkColumns(tableInfo,properties) ;
+        return GeneralJsonObjectDao.checkHasAllPkColumns(tableInfo, properties) ;
     }
 
     /**
@@ -470,13 +472,23 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 q.getRight());
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> makePkFieldMap(final Object keyValue) throws SQLException {
         if(keyValue instanceof Map) {
-            Map<String, Object> keyValues = (Map) keyValue;
-            if (!checkHasAllPkColumns(keyValues)) {
-                throw new SQLException("缺少主键对应的属性, 表：" + tableInfo.getTableName() +" ,参数：" + JSON.toJSONString(keyValue)  );
+            Map<String, Object> objectValues = (Map<String, Object>) keyValue;
+            Map<String, Object> pkMap = new HashMap<>(4);
+            for (String pkCol : tableInfo.getPkColumns()) {
+                TableField field = tableInfo.findFieldByColumn(pkCol);
+                Object pkValue = objectValues.get(field.getPropertyName());
+                if(pkValue==null){
+                    pkValue = objectValues.get(field.getColumnName());
+                }
+                if(pkValue==null){
+                    throw new SQLException("缺少主键对应的属性, 表：" + tableInfo.getTableName() +" ,参数：" + JSON.toJSONString(keyValue)  );
+                }
+                pkMap.put(field.getPropertyName(), pkValue);
             }
-            return keyValues;
+            return pkMap;
         }else {
             if (tableInfo.getPkColumns() == null || tableInfo.getPkColumns().size() != 1)
                 throw new SQLException("表" + tableInfo.getTableName() + "不是单主键表，这个方法不适用。");
