@@ -530,6 +530,16 @@ public abstract class CollectionsOpt {
         return paramsMap;
     }
 
+    public static <T> Map<String,T> createHashMap(String[] keys, T[] values){
+        if(keys == null || values == null)
+            return null;
+        int len = Math.min(keys.length, values.length);
+        Map<String,T> paramsMap = new HashMap<>(len+1);
+        for(int i=0; i<len; i++){
+            paramsMap.put(keys[i], values[i]);
+        }
+        return paramsMap;
+    }
 
     public  static <K,V> Map<K,V> unionTwoMap(Map<K,V> map1, Map<K,V> map2){
         Map<K,V> paramsMap = new HashMap<>(map1.size() + map2.size() + 2);

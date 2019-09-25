@@ -1,6 +1,7 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 
 import java.util.HashMap;
@@ -13,7 +14,14 @@ public class FormulaTest {
     }
 
     public static void testFormula() {
-        Object  s = VariableFormula.calculate("-1 + 8");
+
+        VariableFormula formula = new VariableFormula();
+        formula.setFormula("ex(4) + 5");
+        formula.addExtendFunc("ex",(a) -> NumberBaseOpt.castObjectToInteger(a[0]) * NumberBaseOpt.castObjectToInteger(a[0]));
+        Object r = formula.calcFormula();
+        System.out.println(r);
+
+        Object  s = VariableFormula.calculate("-1 + 8 + ${a}");
         System.out.println(s);
         s = VariableFormula.calculate(
             "concat('Y' , year(), 'M', month() ,no)", CollectionsOpt.createHashMap("no",100));

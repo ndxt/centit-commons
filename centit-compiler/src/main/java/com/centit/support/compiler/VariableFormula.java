@@ -3,14 +3,16 @@ package com.centit.support.compiler;
 import com.centit.support.algorithm.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 
 public class VariableFormula {
 
     private Lexer lex;
     private VariableTranslate trans;
+    private Map<String, Function<Object[], Object>> extendFuncMap;
+
+
     public VariableFormula() {
         lex = new Lexer();
         //m_preTreat.setVariableTranslate(new SimpleTranslate("1"));
@@ -22,6 +24,17 @@ public class VariableFormula {
 
     public void setFormula(String formula) {
         lex.setFormula(formula);
+    }
+
+    public void setExtendFuncMap(Map<String, Function<Object[], Object>> extendFuncMap) {
+        this.extendFuncMap = extendFuncMap;
+    }
+
+    public void addExtendFunc(String funcName, Function<Object[], Object> extendFunc) {
+        if(extendFuncMap==null){
+            extendFuncMap = new HashMap<>(16);
+        }
+        this.extendFuncMap.put(funcName, extendFunc);
     }
 
     public static int getOptID(String sOptName) {
@@ -111,7 +124,6 @@ public class VariableFormula {
             lex.setPreword(str);
             return null;
         }
-
         /*if("-".equals(str)){
             String numb = lex.getAWord();
             if(StringRegularOpt.isNumber(numb)) {
@@ -132,7 +144,11 @@ public class VariableFormula {
             str = lex.getAWord();
             if(str.equals("{")){
                 str = lex.getStringUntil("}");
-                return trans.getLabelValue(str);
+                if(trans!=null) {
+                    return trans.getLabelValue(str);
+                } else {
+                    return null;
+                }
             }else {
                 return null;
             }
@@ -149,11 +165,23 @@ public class VariableFormula {
                 }
             }
         }
+
+        if(extendFuncMap!=null) {
+            Function<Object[], Object> func = extendFuncMap.get(str);
+            if (func != null) {
+                String nextWord = lex.getAWord();
+                if ("(".equals(nextWord)) {
+                    return calcExtendFunc(func);
+                }
+                lex.setPreword(nextWord);
+            }
+        }
+
         int funcNo = EmbedFunc.getFuncNo(str);
         if( funcNo != -1) {
             String nextWord = lex.getAWord();
             if("(".equals(nextWord)) {
-                return calcFunc(funcNo, str);
+                return calcFunc(funcNo);
             }
             lex.setPreword(nextWord);
         }
@@ -363,7 +391,7 @@ public class VariableFormula {
         return  slOperand.get(0);
     }
 
-    private Object calcFunc(int nFuncNo, String funcName) {
+    private Object calcFunc(int nFuncNo) {
         String str;
         int prmNo = 0;
         // IF 语句单独处理
@@ -425,21 +453,46 @@ public class VariableFormula {
         return  EmbedFunc.runFuncWithObject(slOperand,EmbedFunc.functionsList[nFuncNo].nFuncID);
     }
 
+    private Object calcExtendFunc(Function<Object[], Object> func){
+        List<Object> slOperand = new ArrayList<>(5);
+        String str;
+        while( true ){
+            Object item = calcFormula();
+            slOperand.add(item);
+            str = lex.getAWord();
+            if(str==null || str.length()==0 || ( !str.equals(",") && !str.equals(")")))
+                return null;
+            if(str.equals(")")){
+                break;
+            }
+        }
+        if(/* str==null || str.length()==0 || */ !str.equals(")") ){
+            return null;
+        }
+        return func.apply(CollectionsOpt.listToArray(slOperand));
+    }
+
+
     public static Object calculate(String szExpress) {
         VariableFormula formula = new VariableFormula();
         formula.setFormula(szExpress);
         return formula.calcFormula();
     }
 
-    public static Object calculate(String szExpress,VariableTranslate varTrans) {
+    public static Object calculate(String szExpress,VariableTranslate varTrans, Map<String, Function<Object[], Object>> extendFuncMap) {
         VariableFormula formula = new VariableFormula();
+        formula.setExtendFuncMap(extendFuncMap);
         formula.setFormula(szExpress);
         formula.setTrans(varTrans);
         return formula.calcFormula();
     }
 
+    public static Object calculate(String szExpress,VariableTranslate varTrans) {
+        return calculate(szExpress, varTrans, null);
+    }
+
     public static Object calculate(String szExpress,Object varMap) {
-        return calculate(szExpress,new ObjectTranslate(varMap));
+        return calculate(szExpress, new ObjectTranslate(varMap), null);
     }
     /**
      *
