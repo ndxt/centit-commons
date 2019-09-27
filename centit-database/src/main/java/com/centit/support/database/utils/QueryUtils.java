@@ -1675,7 +1675,7 @@ public abstract class QueryUtils {
             String condition =  queryPiece.substring(curPos,prePos-1);
 
             Object sret = VariableFormula.calculate(condition, translater);
-            if(!BooleanBaseOpt.castObjectToBoolean(sret))
+            if(!BooleanBaseOpt.castObjectToBoolean(sret, false))
                 return null;
 
             String paramsString = null;

@@ -235,7 +235,7 @@ public abstract class EmbedFunc {
                 if (nOpSum <1) return null;
                 boolean nT = false;
                 if(nOpSum > 1)
-                    nT = BooleanBaseOpt.castObjectToBoolean(slOperand.get(1));
+                    nT = BooleanBaseOpt.castObjectToBoolean(slOperand.get(1), false);
                 if( !NumberBaseOpt.isNumber(slOperand.get(0)) )
                     return StringUtils.upperCase(
                             StringBaseOpt.objectToString(slOperand.get(0)));
@@ -508,7 +508,7 @@ public abstract class EmbedFunc {
 
             case ConstDefine.FUNC_IF:{// 108
                 if (nOpSum < 2) return null;
-                if(BooleanBaseOpt.castObjectToBoolean(slOperand.get(0)) ) {
+                if(BooleanBaseOpt.castObjectToBoolean(slOperand.get(0), false)) {
                     return slOperand.get(1);
                 }else{
                     if(nOpSum>2)
@@ -533,7 +533,7 @@ public abstract class EmbedFunc {
                 int i=1;
                 for( ;i+1<nOpSum; i+=2){
                     if( MatchType ==1 ){
-                        if (BooleanBaseOpt.castObjectToBoolean(slOperand.get(i)))
+                        if (BooleanBaseOpt.castObjectToBoolean(slOperand.get(i), false))
                             return slOperand.get(i+1);
                     }else if ( MatchType == 2 ){
                         if (NumberBaseOpt.isNumber(slOperand.get(i))){
