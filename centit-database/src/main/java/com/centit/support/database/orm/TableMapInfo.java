@@ -14,6 +14,11 @@ import java.util.List;
  */
 public class TableMapInfo extends SimpleTableInfo {
 
+    /**
+     * 懒加载的字段，不能包括主键
+     */
+    private List<SimpleTableField> lazyColumns=null;
+
     public List<LeftRightPair<String, ValueGenerator>> getValueGenerators() {
         return valueGenerators;
     }
@@ -27,12 +32,6 @@ public class TableMapInfo extends SimpleTableInfo {
         valueGenerators.add(new LeftRightPair<>(fieldName, generator));
         return this;
     }
-
-    /**
-     * 懒加载的字段，不能包括主键
-     */
-    private List<SimpleTableField> lazyColumns=null;
-
 
     public List<SimpleTableField> getLazyColumns() {
         if(lazyColumns==null)

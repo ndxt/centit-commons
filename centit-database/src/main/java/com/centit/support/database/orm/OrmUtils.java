@@ -2,6 +2,7 @@ package com.centit.support.database.orm;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.LeftRightPair;
@@ -147,11 +148,16 @@ public abstract class OrmUtils {
         List<SimpleTableField> tableFields = tableInfo.getColumns();
         if(tableFields == null)
             return null;
+
         Map<String, Object> fields = new HashMap<>(tableFields.size()*2+6);
         for(SimpleTableField column : tableFields){
             Object value = column.getObjectFieldValue(object);
             //ReflectionOpt.getFieldValue(object, column.getPropertyName());
             if(value!=null){
+                if(FieldType.BOOLEAN.equals(column.getFieldType())){
+                    value = BooleanBaseOpt.castObjectToBoolean(value,false)?
+                        BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
+                }
                 fields.put(column.getPropertyName(),value);
             }
         }
@@ -162,6 +168,11 @@ public abstract class OrmUtils {
                 Object value = column.getObjectFieldValue(object);
                 //ReflectionOpt.getFieldValue(object, column.getPropertyName());
                 if (value != null) {
+                    // BOOLEAN 不支持 懒加载，主要是没有这个必要
+                    /*if(FieldType.BOOLEAN.equals(column.getFieldType())){
+                        value = BooleanBaseOpt.castObjectToBoolean(value,false)?
+                            BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
+                    }*/
                     fields.put(column.getPropertyName(), value);
                 }
             }
