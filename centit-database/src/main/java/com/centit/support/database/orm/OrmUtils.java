@@ -33,7 +33,7 @@ public abstract class OrmUtils {
 
     public static void setObjectFieldValue(Object object, SimpleTableField field,
                                            Object newValue)
-            throws NoSuchFieldException, IOException {
+            throws IOException {
         if (newValue instanceof Clob) {
             if(FieldType.TEXT.equals(field.getFieldLabelName())){
                 field.setObjectFieldValue(object,
