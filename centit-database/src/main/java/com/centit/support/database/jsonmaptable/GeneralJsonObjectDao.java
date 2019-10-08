@@ -207,15 +207,18 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         boolean addAlias = StringUtils.isNotBlank(alias);
         int i=0;
         for(TableField col : columns){
-            if(i>0)
+            if(i>0) {
                 sBuilder.append(", ");
-            else
+            } else {
                 sBuilder.append(" ");
-            if(addAlias)
-                sBuilder.append(alias).append('.');
-            sBuilder.append(col.getColumnName());
+            }
             fieldNames[i] = col.getPropertyName();
             i++;
+            if(addAlias) {
+                sBuilder.append(alias).append('.');
+            }
+            sBuilder.append(col.getColumnName());
+
         }
         return new ImmutablePair<>(sBuilder.toString(),fieldNames);
     }

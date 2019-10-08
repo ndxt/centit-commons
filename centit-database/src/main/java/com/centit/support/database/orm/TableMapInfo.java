@@ -150,12 +150,15 @@ public class TableMapInfo extends SimpleTableInfo {
         int i=0;
 
         for(TableField col : lazyColumns){
-            if(i>0)
+            if(i>0) {
                 sBuilder.append(", ");
-            else
+            } else {
                 sBuilder.append(" ");
-            if(addAlias)
+            }
+            i++;
+            if(addAlias) {
                 sBuilder.append(alias).append('.');
+            }
             sBuilder.append(col.getColumnName());
         }
 

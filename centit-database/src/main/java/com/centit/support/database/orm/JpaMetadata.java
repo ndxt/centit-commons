@@ -61,6 +61,9 @@ public abstract class JpaMetadata {
      */
     public static String translatePropertyNameToColumnName(Class<?> type, String propertyName ){
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+        if(mapInfo == null){
+            return propertyName;
+        }
         SimpleTableField field = mapInfo.findFieldByName(propertyName);
         return field==null?propertyName:field.getColumnName();
     }

@@ -100,15 +100,18 @@ public abstract class ClassScannerOpt {
         Enumeration<JarEntry> jarEntries = jarFile.entries();
         while (jarEntries.hasMoreElements()) {
             JarEntry jarEntry = jarEntries.nextElement();
-            String jarEntryName = jarEntry.getName(); // 类似：sun/security/internal/interfaces/TlsMasterSecret.class
+            String jarEntryName = jarEntry.getName();
+            // 类似：sun/security/internal/interfaces/TlsMasterSecret.class
             String clazzName = jarEntryName.replace("/", ".");
             int endIndex = clazzName.lastIndexOf(".");
             String prefix = null;
             if (endIndex > 0) {
-                String prefix_name = clazzName.substring(0, endIndex);
-                endIndex = prefix_name.lastIndexOf(".");
+                //remove .class
+                String prefixName = clazzName.substring(0, endIndex);
+                endIndex = prefixName.lastIndexOf(".");
                 if(endIndex > 0){
-                    prefix = prefix_name.substring(0, endIndex);
+                    // package name
+                    prefix = prefixName.substring(0, endIndex);
                 }
             }
             if (prefix != null && jarEntryName.endsWith(".class")) {
