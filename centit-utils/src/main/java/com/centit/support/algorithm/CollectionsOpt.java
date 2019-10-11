@@ -541,6 +541,13 @@ public abstract class CollectionsOpt {
         return paramsMap;
     }
 
+    public static <K,V> HashMap<K,V> cloneHashMap(Map<K,V> souMap){
+        HashMap<K,V> paramsMap = new HashMap<>(souMap.size() +1);
+        paramsMap.putAll(souMap);
+        //paramsMap.clone()
+        return paramsMap;
+    }
+
     public  static <K,V> Map<K,V> unionTwoMap(Map<K,V> map1, Map<K,V> map2){
         Map<K,V> paramsMap = new HashMap<>(map1.size() + map2.size() + 2);
         paramsMap.putAll(map2);
@@ -560,7 +567,12 @@ public abstract class CollectionsOpt {
         return Arrays.asList(objs);
     }
 
-
+    public static <T> HashSet<T> cloneSet(Collection<T> souCollection){
+        HashSet<T> paramsSet = new HashSet<>(souCollection.size() +1);
+        paramsSet.addAll(souCollection);
+        //paramsSet.clone()
+        return paramsSet;
+    }
     /**
      * @param objs 参数类型需要一致
      * @param <T> 参数类型
@@ -570,7 +582,7 @@ public abstract class CollectionsOpt {
     public static  <T> HashSet<T> createHashSet(T... objs){
         if(objs==null)
             return null;
-        HashSet<T>  paramsSet = new  HashSet<>(objs.length*2+1);
+        HashSet<T> paramsSet = new HashSet<>(objs.length*2+1);
         Collections.addAll(paramsSet, objs);
         return paramsSet;
     }
