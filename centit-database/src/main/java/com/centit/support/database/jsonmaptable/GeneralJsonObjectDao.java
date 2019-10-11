@@ -527,6 +527,14 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return (JSONObject) ja.get(0);
     }
 
+    public static String buildCountSqlByProperties(TableInfo tableInfo, final Map<String, Object> properties){
+        String filter = GeneralJsonObjectDao.buildFilterSql(tableInfo,null,properties.keySet());
+        String sql = "select count(*) as row_sum from " +tableInfo.getTableName();
+        if(StringUtils.isNotBlank(filter)) {
+            sql = sql + " where " + filter;
+        }
+         return sql;
+    }
 
     public static Pair<String,String[]> buildQuerySqlByProperties(TableInfo tableInfo, final Map<String, Object> properties){
         Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(tableInfo,null);

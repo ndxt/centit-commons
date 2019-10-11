@@ -388,6 +388,21 @@ public abstract class OrmDaoUtils {
                 (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type));
     }
 
+    public static <T> int countObjectByProperties(Connection connection, Map<String, Object> properties, Class<T> type)
+        throws PersistenceException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
+        String countSql = GeneralJsonObjectDao.buildCountSqlByProperties(mapInfo,properties);
+        try {
+            return NumberBaseOpt.castObjectToInteger(
+                DatabaseAccess.getScalarObjectQuery(connection, countSql, properties), 0);
+        } catch (SQLException e) {
+            throw new PersistenceException(countSql, e);
+        } catch (IOException e) {
+            throw new PersistenceException(e);
+        }
+    }
+
+
     public static <T> List<T> listObjectsByProperties(Connection connection, Map<String, Object> properties, Class<T> type,
                                                final int startPos, final int maxSize)
             throws PersistenceException {
