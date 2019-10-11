@@ -1,27 +1,24 @@
 package com.centit.support.database.utils;
 
+import com.centit.support.common.ObjectException;
+
 import java.io.IOException;
 import java.sql.SQLException;
 
 @SuppressWarnings("unused")
-public class PersistenceException extends RuntimeException {
+public class PersistenceException extends ObjectException {
 
     private static final long serialVersionUID = 4050482305178810162L;
 
-    public static final int UNKNOWN_EXCEPTION = -1;
-    public static final int NULL_EXCEPTION = 2;
-    public static final int BLANK_EXCEPTION = 3;
-    public static final int FORMAT_DATE_EXCEPTION = 4;
-    public static final int FORMAT_NUMBER_EXCEPTION = 5;
-    public static final int DATABASE_OPERATE_EXCEPTION = 6;
-    public static final int DATABASE_OUT_SYNC_EXCEPTION = 7;
-    public static final int DATABASE_SQL_EXCEPTION = 8;
-    public static final int DATABASE_IO_EXCEPTION = 9;
-    public static final int NOSUCHFIELD_EXCEPTION = 10;
-    public static final int INSTANTIATION_EXCEPTION = 11;
-    public static final int ILLEGALACCESS_EXCEPTION = 12;
-    public static final int ORM_METADATA_EXCEPTION  = 14;
-    private int exceptionCode;
+    public static final int DATABASE_OPERATE_EXCEPTION = 620;
+    public static final int DATABASE_OUT_SYNC_EXCEPTION = 621;
+
+    public static final int DATABASE_SQL_EXCEPTION = 622;
+    public static final int DATABASE_IO_EXCEPTION = 623;
+    public static final int NOSUCHFIELD_EXCEPTION = 624;
+    public static final int INSTANTIATION_EXCEPTION = 625;
+    public static final int ILLEGALACCESS_EXCEPTION = 626;
+    public static final int ORM_METADATA_EXCEPTION  = 627;
     /**
      * Constructor for UserExistsException.
      * @param exceptionCode 异常码
@@ -109,6 +106,5 @@ public class PersistenceException extends RuntimeException {
     public void setExceptionCode(int exceptionCode) {
         this.exceptionCode = exceptionCode;
     }
-
 
 }
