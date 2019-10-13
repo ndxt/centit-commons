@@ -18,9 +18,11 @@ public abstract class FieldType {
     public static final String DATE= "date";
     public static final String DATETIME= "datetime";
     public static final String TIMESTAMP= "timestamp";
-    public static final String TEXT= "text";
+    public static final String TEXT= "text"; // CLOB
     public static final String FILE_ID = "fileId";
-    public static final String BYTE_ARRAY = "bytes";
+    public static final String BYTE_ARRAY = "bytes"; // BLOB
+    // 对象以JSON 格式 保存在 数据库中
+    public static final String JSON_OBJECT = "object";
 
     /**
      * @param st java类 名称
@@ -102,6 +104,7 @@ public abstract class FieldType {
             case TIMESTAMP:
                 return "TimeStamp";
             case TEXT:
+            case JSON_OBJECT:
                 return "clob";//长文本
             case BYTE_ARRAY:
                 return "blob";//大字段
@@ -131,6 +134,7 @@ public abstract class FieldType {
             case TIMESTAMP:
                 return "datatime";
             case TEXT:
+            case JSON_OBJECT:
                 return "clob";//长文本
             case BYTE_ARRAY:
                 return "blob";//大字段
@@ -165,6 +169,7 @@ public abstract class FieldType {
             case TIMESTAMP:
                 return "TimeStamp";
             case TEXT:
+            case JSON_OBJECT:
                 return "text";//长文本
             case BYTE_ARRAY:
                 return "VarBinary(MAX)";
@@ -200,6 +205,7 @@ public abstract class FieldType {
             case TIMESTAMP:
                 return "TimeStamp";
             case TEXT:
+            case JSON_OBJECT:
                 return "clob(52428800)";//长文本
             case BYTE_ARRAY:
                 return "BLOB";
@@ -238,7 +244,8 @@ public abstract class FieldType {
             case TIMESTAMP:
                 return "TimeStamp";
             case TEXT:
-                return "clob";//长文本
+            case JSON_OBJECT:
+                return "LONGTEXT";//长文本
             case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
             case BYTE_ARRAY:
@@ -304,6 +311,7 @@ public abstract class FieldType {
         fts.put(FieldType.TEXT,"大文本");
         fts.put(FieldType.FILE_ID,"文件ID");
         fts.put(FieldType.BYTE_ARRAY,"大字段");
+        fts.put(FieldType.JSON_OBJECT,"JSON对象");
         return fts;
     }
 
@@ -487,5 +495,10 @@ public abstract class FieldType {
 
     public static String mapToFieldType(String columnType){
         return mapToFieldType(columnType, 0);
+    }
+
+    public static String mapToFieldType(Class<?> javaType){
+        // 这个要重写ß
+        return mapToFieldType(javaType.getName(), 0);
     }
 }

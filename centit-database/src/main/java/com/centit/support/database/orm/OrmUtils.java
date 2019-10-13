@@ -35,7 +35,7 @@ public abstract class OrmUtils {
                                            Object newValue)
             throws IOException {
         if (newValue instanceof Clob) {
-            if(FieldType.TEXT.equals(field.getFieldLabelName())){
+            if(FieldType.TEXT.equals(field.getFieldType())){
                 field.setObjectFieldValue(object,
                         /*(Clob)*/ newValue );
             }else {
@@ -43,7 +43,7 @@ public abstract class OrmUtils {
                         DatabaseAccess.fetchClobString((Clob) newValue));
             }
         }else if (newValue instanceof Blob) {
-            if(FieldType.BYTE_ARRAY.equals(field.getFieldLabelName())){
+            if(FieldType.BYTE_ARRAY.equals(field.getFieldType())){
                 field.setObjectFieldValue(object,
                         /*(Blob)*/ newValue );
             }else {
