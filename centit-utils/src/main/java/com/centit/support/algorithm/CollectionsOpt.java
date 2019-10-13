@@ -394,8 +394,9 @@ public abstract class CollectionsOpt {
      * 克隆 一个 list
      */
     public static <T> List<T> cloneList(Collection<T> souList){
-        if(souList==null)
+        if(souList==null) {
             return null;
+        }
         ArrayList<T> deslist = new ArrayList<>(souList.size()+1);
         deslist.addAll(souList);
         return deslist;
@@ -405,8 +406,9 @@ public abstract class CollectionsOpt {
      * 克隆 一个 array
      */
     public static <T> T[] cloneArray(T[] souList){
-        if(souList==null)
+        if(souList==null) {
             return null;
+        }
         return souList.clone();
         /*if(souList==null || souList.length==0)
             return null;
@@ -542,6 +544,9 @@ public abstract class CollectionsOpt {
     }
 
     public static <K,V> HashMap<K,V> cloneHashMap(Map<K,V> souMap){
+        if(souMap==null){
+            return null;
+        }
         HashMap<K,V> paramsMap = new HashMap<>(souMap.size() +1);
         paramsMap.putAll(souMap);
         //paramsMap.clone()
@@ -568,6 +573,9 @@ public abstract class CollectionsOpt {
     }
 
     public static <T> HashSet<T> cloneSet(Collection<T> souCollection){
+        if(souCollection==null){
+            return null;
+        }
         HashSet<T> paramsSet = new HashSet<>(souCollection.size() +1);
         paramsSet.addAll(souCollection);
         //paramsSet.clone()
