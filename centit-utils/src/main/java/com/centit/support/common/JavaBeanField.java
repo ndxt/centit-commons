@@ -23,7 +23,7 @@ public class JavaBeanField {
     public JavaBeanField(Field objectField){
         this.setObjectField(objectField);
     }
-
+    // 缓存变量
     private String fieldJavaType;
     private Class<?> fieldType;
     private Method setFieldValueFunc;
@@ -65,9 +65,6 @@ public class JavaBeanField {
 
     }
 
-    public String getFieldJavaType() {
-        return fieldJavaType;
-    }
 
     public boolean isAssignableFrom(Class<?> valueType){
         return this.fieldType.isAssignableFrom(valueType);
@@ -98,7 +95,9 @@ public class JavaBeanField {
 
     public void setObjectFieldValue(Object object,  Object newValue){
         if(newValue==null){
-            if(StringUtils.equalsAny( this.getFieldJavaType(),
+            //if(this.getFieldType().isPrimitive()){
+            if( (this.getFieldType()!=null && this.getFieldType().isPrimitive())
+                || StringUtils.equalsAny( this.fieldJavaType,
                     "int","long","float","double")){
                 return;
             }
@@ -106,7 +105,7 @@ public class JavaBeanField {
             return;
         }
 
-        switch (this.getFieldJavaType()) {
+        switch (this.fieldJavaType) {
             case "int":
             case "Integer":
                 this.innerSetObjectFieldValue(object,

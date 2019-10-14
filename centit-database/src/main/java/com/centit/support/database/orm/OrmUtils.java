@@ -48,13 +48,8 @@ public abstract class OrmUtils {
                 field.setObjectFieldValue(object, sValue);
             }
         }else if (newValue instanceof Blob) {
-            /*if(FieldType.BYTE_ARRAY.equals(field.getFieldType())){
-                field.setObjectFieldValue(object,
-                        *//*(Blob)*//* newValue );
-            }else {*/
-                field.setObjectFieldValue(object,
+             field.setObjectFieldValue(object,
                         DatabaseAccess.fetchBlobBytes((Blob) newValue));
-            //}
         } else {
             if(FieldType.JSON_OBJECT.equals(field.getFieldType())){
                 Class<?> clazz = field.getJavaType();
