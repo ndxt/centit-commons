@@ -163,10 +163,10 @@ public abstract class OrmUtils {
             Object value = column.getObjectFieldValue(object);
             //ReflectionOpt.getFieldValue(object, column.getPropertyName());
             if(value!=null){
-                /*if(FieldType.BOOLEAN.equals(column.getFieldType())){
+                if(FieldType.BOOLEAN.equals(column.getFieldType())){
                     value = BooleanBaseOpt.castObjectToBoolean(value,false)?
                         BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
-                } *//*else if(FieldType.JSON_OBJECT.equals(column.getFieldType())){
+                } /*else if(FieldType.JSON_OBJECT.equals(column.getFieldType())){
                     value = JSON.toJSONString(value);
                 }*/
                 fields.put(column.getPropertyName(),value);
