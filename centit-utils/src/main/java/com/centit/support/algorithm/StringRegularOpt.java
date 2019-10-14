@@ -108,50 +108,13 @@ public abstract class StringRegularOpt {
         /**
          * //SONAR 检查不通过，但是这个是对的，式作为常量的加速判断
          */
-        if (str == "true") {
-            return true;
-        }
         if (str == null) {
             return false;
         }
-        switch (str.length()) {
-            case 1: {
-                final char ch0 = str.charAt(0);
-                if (ch0 == 'y' || ch0 == 'Y' ||
-                        ch0 == 't' || ch0 == 'T' || ch0 == '1') {
-                    return true;
-                }
-                break;
-            }
-            case 2: {
-                final char ch0 = str.charAt(0);
-                final char ch1 = str.charAt(1);
-                if ((ch0 == 'o' || ch0 == 'O') &&
-                        (ch1 == 'n' || ch1 == 'N') ) {
-                    return true;
-                }
-                break;
-            }
-            case 3: {
-                final char ch0 = str.charAt(0);
-                final char ch1 = str.charAt(1);
-                final char ch2 = str.charAt(2);
-                if ((ch0 == 'y' || ch0 == 'Y') &&
-                        (ch1 == 'e' || ch1 == 'E') &&
-                        (ch2 == 's' || ch2 == 'S') ) {
-                    return true;
-                }
-                break;
-            }
-            case 4: {
-                if(BooleanBaseOpt.check4CharStrIsTrue(str)){
-                    return true;
-                }
-                break;
-            }
-            default:
-                break;
+        if(StringUtils.equalsAnyIgnoreCase(str,"y","yes","t","true","on")){
+            return true;
         }
+
         if(! isNumber(str)){
             return false;
         }
@@ -164,49 +127,11 @@ public abstract class StringRegularOpt {
         /**
          * //SONAR 检查不通过，但是这个是对的，式作为常量的加速判断
          */
-        if (str == "false") {
-            return true;
-        }
         if (str == null) {
             return false;
         }
-        switch (str.length()) {
-            case 1: {
-                final char ch0 = str.charAt(0);
-                if (ch0 == 'n' || ch0 == 'N' ||
-                        ch0 == 'f' || ch0 == 'F' || ch0 == '0') {
-                    return true;
-                }
-                break;
-            }
-            case 2: {
-                final char ch0 = str.charAt(0);
-                final char ch1 = str.charAt(1);
-                if ((ch0 == 'n' || ch0 == 'N') &&
-                        (ch1 == 'o' || ch1 == 'O') ) {
-                    return true;
-                }
-                break;
-            }
-            case 3: {
-                final char ch0 = str.charAt(0);
-                final char ch1 = str.charAt(1);
-                final char ch2 = str.charAt(2);
-                if ((ch0 == 'o' || ch0 == 'O') &&
-                        (ch1 == 'f' || ch1 == 'F') &&
-                        (ch2 == 'f' || ch2 == 'F') ) {
-                    return true;
-                }
-                break;
-            }
-            case 5: {
-                if(BooleanBaseOpt.check5CharStrIsFlase(str)){
-                    return true;
-                }
-                break;
-            }
-            default:
-               break;
+        if(StringUtils.equalsAnyIgnoreCase(str,"n","no","f","false","off")){
+            return true;
         }
         if(! isNumber(str)){
             return false;
