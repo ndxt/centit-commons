@@ -36,13 +36,17 @@ public abstract class OrmUtils {
                                            Object newValue)
             throws IOException {
         if (newValue instanceof Clob) {
-            /*if(FieldType.TEXT.equals(field.getFieldType())){
-                field.setObjectFieldValue(object,
-                        *//*(Clob)*//* newValue );
-            }else {*/
-                field.setObjectFieldValue(object,
-                        DatabaseAccess.fetchClobString((Clob) newValue));
-            //}
+            String sValue = DatabaseAccess.fetchClobString((Clob) newValue);
+            if(FieldType.JSON_OBJECT.equals(field.getFieldType())){
+                Class<?> clazz = field.getJavaType();
+                if(JSON.class.isAssignableFrom(clazz)){
+                    field.setObjectFieldValue(object, JSON.parse(sValue));
+                }else {
+                    field.setObjectFieldValue(object,JSON.parseObject(sValue, clazz));
+                }
+            } else {
+                field.setObjectFieldValue(object, sValue);
+            }
         }else if (newValue instanceof Blob) {
             /*if(FieldType.BYTE_ARRAY.equals(field.getFieldType())){
                 field.setObjectFieldValue(object,
@@ -149,7 +153,7 @@ public abstract class OrmUtils {
         Map<String, Object> fields = new HashMap<>(objFields.length*2);
         for(Field field :objFields){
             Object value = ReflectionOpt.forceGetFieldValue(object,field);
-            fields.put(field.getName() ,value);
+            fields.put(field.getName(), value);
         }
         return fields;
     }
@@ -164,12 +168,12 @@ public abstract class OrmUtils {
             Object value = column.getObjectFieldValue(object);
             //ReflectionOpt.getFieldValue(object, column.getPropertyName());
             if(value!=null){
-                if(FieldType.BOOLEAN.equals(column.getFieldType())){
+                /*if(FieldType.BOOLEAN.equals(column.getFieldType())){
                     value = BooleanBaseOpt.castObjectToBoolean(value,false)?
                         BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
-                } else if(FieldType.JSON_OBJECT.equals(column.getFieldType())){
+                } *//*else if(FieldType.JSON_OBJECT.equals(column.getFieldType())){
                     value = JSON.toJSONString(value);
-                }
+                }*/
                 fields.put(column.getPropertyName(),value);
             }
         }
@@ -181,13 +185,9 @@ public abstract class OrmUtils {
                 //ReflectionOpt.getFieldValue(object, column.getPropertyName());
                 if (value != null) {
                     // BOOLEAN 不支持 懒加载，主要是没有这个必要
-                    /*if(FieldType.BOOLEAN.equals(column.getFieldType())){
-                        value = BooleanBaseOpt.castObjectToBoolean(value,false)?
-                            BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
-                    }*/
-                    if(FieldType.JSON_OBJECT.equals(column.getFieldType())){
+                    /*if(FieldType.JSON_OBJECT.equals(column.getFieldType())){
                         value = JSON.toJSONString(value);
-                    }
+                    }*/
                     fields.put(column.getPropertyName(), value);
                 }
             }

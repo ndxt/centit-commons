@@ -1,10 +1,9 @@
 package com.centit.support.database.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +24,21 @@ public abstract class DatabaseAccess {
     }
 
     protected static final Logger logger = LoggerFactory.getLogger(DatabaseAccess.class);
+
+    private static Object transObjectForSqlParam(Object param){
+        // 避免重复转换
+        if (param instanceof java.sql.Date) {
+            return param;
+        } else if (param instanceof java.util.Date) {
+            return DatetimeOpt.convertToSqlTimestamp((java.util.Date) param);
+        } else if (Boolean.class.isAssignableFrom(param.getClass())) {
+            return  BooleanBaseOpt.castObjectToBoolean(param,false) ?
+                    BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
+        } else if(!ReflectionOpt.isScalarType(param.getClass())) {
+            return JSON.toJSONString(param);
+        }
+        return param;
+    }
     /**
      * 调用数据库函数
      * @param conn  数据库链接
@@ -51,14 +65,12 @@ public abstract class DatabaseAccess {
         try(CallableStatement stmt = conn.prepareCall(sqlCen)){
             stmt.registerOutParameter(1, sqlType);
             for (int i = 0; i < n; i++) {
-                if (paramObjs[i] == null)
+                if (paramObjs[i] == null) {
                     stmt.setNull(i + 2, Types.NULL);
-                else if (paramObjs[i] instanceof java.sql.Date)
-                    stmt.setObject(i + 2, paramObjs[i]);
-                else if (paramObjs[i] instanceof java.util.Date)
-                    stmt.setObject(i + 2, DatetimeOpt.convertToSqlTimestamp((java.util.Date) paramObjs[i]));
-                else
-                    stmt.setObject(i + 2, paramObjs[i]);
+                } else {
+                    stmt.setObject(i + 2,
+                        transObjectForSqlParam(paramObjs[i]));
+                }
             }
             stmt.execute();
             return stmt.getObject(1);
@@ -81,8 +93,9 @@ public abstract class DatabaseAccess {
         StringBuilder procDesc = new StringBuilder("{call ");
         procDesc.append(procName).append("(");
         for (int i = 0; i < n; i++) {
-            if (i > 0)
+            if (i > 0) {
                 procDesc.append(",");
+            }
             procDesc.append("?");
         }
         procDesc.append(")}");
@@ -112,19 +125,16 @@ public abstract class DatabaseAccess {
         }
     }
 
-
     public static void setQueryStmtParameters(PreparedStatement stmt,Object[] paramObjs) throws SQLException{
         //query.getParameterMetadata().isOrdinalParametersZeroBased()?0:1;
         if (paramObjs != null) {
             for (int i = 0; i < paramObjs.length; i++) {
-                if (paramObjs[i] == null)
+                if (paramObjs[i] == null) {
                     stmt.setNull(i + 1, Types.NULL);
-                else if (paramObjs[i] instanceof java.sql.Date)
-                    stmt.setObject(i + 1, paramObjs[i]);
-                else if (paramObjs[i] instanceof java.util.Date)
-                    stmt.setObject(i + 1, DatetimeOpt.convertToSqlTimestamp((java.util.Date) paramObjs[i]));
-                else
-                    stmt.setObject(i + 1, paramObjs[i]);
+                } else {
+                    stmt.setObject(i + 1,
+                        transObjectForSqlParam(paramObjs[i]));
+                }
             }
         }
     }
@@ -132,14 +142,12 @@ public abstract class DatabaseAccess {
     public static void setQueryStmtParameters(PreparedStatement stmt,List<Object> paramObjs) throws SQLException{
         if (paramObjs != null) {
             for (int i = 0; i < paramObjs.size(); i++) {
-                if (paramObjs.get(i) == null)
+                if (paramObjs.get(i) == null) {
                     stmt.setNull(i + 1, Types.NULL);
-                else if (paramObjs.get(i) instanceof java.sql.Date)
-                    stmt.setObject(i + 1, paramObjs.get(i));
-                else if (paramObjs.get(i) instanceof java.util.Date)
-                    stmt.setObject(i + 1, DatetimeOpt.convertToSqlTimestamp((java.util.Date) paramObjs.get(i)));
-                else
-                    stmt.setObject(i + 1, paramObjs.get(i));
+                } else  {
+                    stmt.setObject(i + 1,
+                        transObjectForSqlParam(paramObjs.get(i)));
+                }
             }
         }
     }
@@ -150,14 +158,12 @@ public abstract class DatabaseAccess {
         if (paramObjs != null) {
             for (int i = 0; i < paramsName.size(); i++) {
                 Object pobj = paramObjs.get(paramsName.get(i));
-                if (pobj == null)
+                if (pobj == null) {
                     stmt.setNull(i + 1, Types.NULL);
-                else if (pobj instanceof java.sql.Date)
-                    stmt.setObject(i + 1, pobj);
-                else if (pobj instanceof java.util.Date)
-                    stmt.setObject(i + 1, DatetimeOpt.convertToSqlTimestamp((java.util.Date) pobj));
-                else
-                    stmt.setObject(i + 1, pobj);
+                } else  {
+                    stmt.setObject(i + 1,
+                        transObjectForSqlParam(pobj));
+                }
             }
         }
     }
