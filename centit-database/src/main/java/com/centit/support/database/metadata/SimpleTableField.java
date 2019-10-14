@@ -77,6 +77,7 @@ public class SimpleTableField implements TableField {
     public String getPropertyName() {
         return propertyName;
     }
+
     public void setPropertyName(String name) {
         propertyName = name;
     }
