@@ -3,6 +3,7 @@ package com.centit.support.database.metadata;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.database.utils.FieldType;
 import com.centit.support.xml.IgnoreDTDEntityResolver;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -151,8 +152,14 @@ public class HibernateMapInfo {
             if(atType != null )
                 sType = atType.getValue();
         }
+        if(StringUtils.isNotBlank(sType)) {
+            try {
+                field.setFieldType(FieldType.mapToFieldType(Class.forName(sType)));
+            } catch (ClassNotFoundException e) {
+                logger.error(e.getMessage());
+            }
+        }
 
-        field.setJavaTypeFullName(sType);
         Element columnNode =  fieldNode.element("column");
         if(columnNode != null){
             Attribute attr;
@@ -198,7 +205,7 @@ public class HibernateMapInfo {
             if(idNode != null){// 单个主键属性
                 SimpleTableField tf = loadField(idNode);
                 hasComplexId = false;
-                idType = FieldType.trimType(tf.getJavaTypeFullName());
+                idType = FieldType.trimType(tf.getJavaType().getName());
                 idName = tf.getPropertyName();
                 keyProperties.add(tf);
             }else{//复合主键值
@@ -208,7 +215,7 @@ public class HibernateMapInfo {
                 idName = idNode.attributeValue("name");
                 idType = FieldType.trimType(idType);
 
-                List<Element> keyNodes = (List<Element>) idNode.elements("key-property");
+                List<Element> keyNodes = idNode.elements("key-property");
                 for(Element key : keyNodes){
                     keyProperties.add(loadField(key));
                 }

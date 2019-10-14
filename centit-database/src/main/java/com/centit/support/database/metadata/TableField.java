@@ -14,7 +14,7 @@ public interface TableField {
     /**
      * @return 字段属性java类别
      */
-    String getJavaTypeFullName();
+    Class<?> getJavaType();
     /**
      * @return 字段中文名，对应Pdm中的name
      */

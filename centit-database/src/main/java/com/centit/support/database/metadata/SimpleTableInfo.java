@@ -188,7 +188,7 @@ public class SimpleTableInfo implements TableInfo{
 
     private void saveProperty(SimpleTableField field,Element propElt,boolean keyProp){
         propElt.addAttribute("name", field.getPropertyName());
-        propElt.addAttribute("type", field.getJavaTypeFullName());
+        propElt.addAttribute("type", field.getJavaType().getName());
         Element colElt = propElt.addElement("column");
         saveColumn(field,colElt,keyProp);
     }

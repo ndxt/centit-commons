@@ -20,7 +20,7 @@ public class SimpleTableField implements TableField {
     private String columnComment;// 字段注释
     private String defaultValue;
     // 这个不是java 的类型，这个是 我们框架抽象出来的 field 类型，解决不同数据库的 columnType 不一样的问题
-    private String javaTypeFullName;
+    //private String javaTypeFullName;
     private String fieldType;
     private boolean mandatory;
     private Integer  maxLength;//最大长度 Only used when sType=String
@@ -41,26 +41,15 @@ public class SimpleTableField implements TableField {
             maxLength = 7;
     }
 
-    public void setJavaTypeFullName(String javaTypeFullName){
-        this.javaTypeFullName = javaTypeFullName;
-    }
     /**
      * java type's full name
      * @return String
      */
-    public String getJavaTypeFullName(){
-        if(StringUtils.isBlank(javaTypeFullName)) {
-            String hibernateType = FieldType.mapToJavaType(columnType, scale);
-            if ("Date".equals(hibernateType))
-                return "java.util." + hibernateType;
-            if ("Timestamp".equals(hibernateType))
-                return "java.sql.Timestamp";
-            if ("byte[]".equals(hibernateType)) {
-                return hibernateType;
-            }
-            return "java.lang." + hibernateType;
+    public Class<?> getJavaType(){
+        if(beanField != null){
+            return beanField.getFieldType();
         }
-        return javaTypeFullName;
+        return FieldType.mapToJavaType(this.fieldType);
     }
 
     public SimpleTableField()

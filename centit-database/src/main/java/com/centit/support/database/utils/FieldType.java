@@ -1,5 +1,10 @@
 package com.centit.support.database.utils;
 
+import com.alibaba.fastjson.JSON;
+
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
@@ -315,13 +320,13 @@ public abstract class FieldType {
         return fts;
     }
 
-    public static String mapToJavaType(String columnType, int scale){
+    public static Class<?> mapToJavaType(String columnType, int scale){
         if("NUMBER".equalsIgnoreCase(columnType) ||
             "DECIMAL".equalsIgnoreCase(columnType) ){
             if(scale > 0) {
-                return "Double";
+                return Double.class;
             } else {
-                return "Long";
+                return Long.class;
             }
         }else if("CHAR".equalsIgnoreCase(columnType) ||
             "VARCHAR".equalsIgnoreCase(columnType)||
@@ -329,40 +334,42 @@ public abstract class FieldType {
             FieldType.STRING.equalsIgnoreCase(columnType) ||
             FieldType.FILE_ID.equalsIgnoreCase(columnType) ||
             FieldType.BOOLEAN.equalsIgnoreCase(columnType)){
-            return "String";
+            return String.class;
         }else if("DATE".equalsIgnoreCase(columnType) ||
             "TIME".equalsIgnoreCase(columnType)||
             "DATETIME".equalsIgnoreCase(columnType)||
             "SQLDATE".equalsIgnoreCase(columnType)){
-            return "Date";
+            return Date.class;
         }else if("TIMESTAMP".equalsIgnoreCase(columnType) ||
             "SQLTIMESTAMP".equalsIgnoreCase(columnType)){
-            return "Timestamp";
+            return Timestamp.class;
         }else if("CLOB".equalsIgnoreCase(columnType) ||
                 "TEXT".equalsIgnoreCase(columnType) ){
-            return  "String";
+            return String.class;
         }else if("BLOB".equalsIgnoreCase(columnType) ||
                 "VARBINARY".equalsIgnoreCase(columnType) ||
                  FieldType.BYTE_ARRAY.equalsIgnoreCase(columnType)) {
-            return "byte[]";
+            return byte[].class;
         }else if(FieldType.MONEY.equalsIgnoreCase(columnType) ){
-            return "BigDecimal";//FieldType.MONEY;
+            return BigDecimal.class;//FieldType.MONEY;
         }else if(FieldType.FLOAT.equalsIgnoreCase(columnType)){
-            return "Float";
+            return Float.class;
         }else if("Int".equalsIgnoreCase(columnType)||
             FieldType.INTEGER.equalsIgnoreCase(columnType)){
-            return "Integer";
+            return Integer.class;
         } else if(FieldType.DOUBLE.equalsIgnoreCase(columnType)){
-            return "Double";
+            return Double.class;
         }else if("BIG INT".equalsIgnoreCase(columnType) ||
                 FieldType.LONG.equalsIgnoreCase(columnType)){
-            return "Long";
-        }else {
-            return columnType;
+            return Long.class;
+        }else if(FieldType.JSON_OBJECT.equalsIgnoreCase(columnType)) {
+            return JSON.class;
+        }else{
+            return String.class;
         }
     }
 
-    public static String mapToJavaType(String columnType){
+    public static Class<?> mapToJavaType(String columnType){
         return mapToJavaType(columnType, 0);
     }
     /**
@@ -371,43 +378,43 @@ public abstract class FieldType {
      * @return java type
      * @see Types
      */
-    public static String mapToJavaType(int dbType){
+    public static Class<?> mapToJavaType(int dbType){
         switch(dbType) {
             case -6:
             case -5:
             case 5:
             case 4:
             case 2:
-                return "Integer";
+                return Integer.class;
             case 6:
             case 7:
-                return "Float";
+                return Float.class;
             case 8:
-                return "Double";
+                return Double.class;
             case 3:
-                return "Long";
+                return Long.class;
             case -1:
             case 1:
             case 12:
-                return "String";
+                return String.class;
             case 91:
             case 92:
-                return "Date";
+                return Date.class;
             case 93:
             case 2013:
             case 2014:
-                return "Timestamp";
+                return Timestamp.class;
             case -2:
             case -3:
             case -4:
             case 2004:
-                return "byte[]";
+                return byte[].class;
             /*case 2005:
                 return "String";
             case 16:
                 return "String";*/
             default:
-                return "String";
+                return String.class;
         }
     }
 
@@ -497,8 +504,56 @@ public abstract class FieldType {
         return mapToFieldType(columnType, 0);
     }
 
+
+
+
     public static String mapToFieldType(Class<?> javaType){
-        // 这个要重写ß
-        return mapToFieldType(javaType.getName(), 0);
+        // 这个要重写
+        if(javaType.equals(BigDecimal.class)){
+            return FieldType.MONEY;
+        }
+
+        if(javaType.equals(Integer.class)||
+            int.class == javaType){
+            return FieldType.INTEGER;
+        }
+
+        if(javaType.equals(Float.class)||
+            float.class == javaType){
+            return FieldType.FLOAT;
+        }
+
+        if(javaType.equals(Double.class)||
+            double.class == javaType){
+            return FieldType.DOUBLE;
+        }
+
+        if(javaType.equals(Long.class)||
+            long.class == javaType){
+            return FieldType.LONG;
+        }
+
+        if(String.class.isAssignableFrom(javaType)){
+            return FieldType.STRING;
+        }
+
+        if(Boolean.class.isAssignableFrom(javaType) ||
+            boolean.class == javaType){
+            return FieldType.BOOLEAN;
+        }
+
+        if(Timestamp.class.isAssignableFrom(javaType)){
+            return FieldType.TIMESTAMP;
+        }
+
+        if(java.util.Date.class.isAssignableFrom(javaType)){
+            return FieldType.DATE;
+        }
+
+        if(byte[].class == javaType){
+            return FieldType.BYTE_ARRAY;
+        }
+
+        return FieldType.JSON_OBJECT;
     }
 }

@@ -11,7 +11,7 @@ public class PdmTableInfo{
     public  static void  main(String[] args)   {
         SimpleTableField field = new SimpleTableField();
         field.setFieldType(byte[].class.getName());
-        System.out.println(field.getJavaTypeFullName());
+        System.out.println(field.getJavaType().getName());
         //System.out.println(DBType.valueOf("Oracle"));
         /*List<Pair<String, String>> tables = listTablesInPdm("D:/temp/im.pdm");
         for(Pair<String, String> t : tables )

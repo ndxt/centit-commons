@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.compiler.VariableFormula;
@@ -35,22 +36,31 @@ public abstract class OrmUtils {
                                            Object newValue)
             throws IOException {
         if (newValue instanceof Clob) {
-            if(FieldType.TEXT.equals(field.getFieldType())){
+            /*if(FieldType.TEXT.equals(field.getFieldType())){
                 field.setObjectFieldValue(object,
-                        /*(Clob)*/ newValue );
-            }else {
+                        *//*(Clob)*//* newValue );
+            }else {*/
                 field.setObjectFieldValue(object,
                         DatabaseAccess.fetchClobString((Clob) newValue));
-            }
+            //}
         }else if (newValue instanceof Blob) {
-            if(FieldType.BYTE_ARRAY.equals(field.getFieldType())){
+            /*if(FieldType.BYTE_ARRAY.equals(field.getFieldType())){
                 field.setObjectFieldValue(object,
-                        /*(Blob)*/ newValue );
-            }else {
+                        *//*(Blob)*//* newValue );
+            }else {*/
                 field.setObjectFieldValue(object,
                         DatabaseAccess.fetchBlobBytes((Blob) newValue));
-            }
+            //}
         } else {
+            if(FieldType.JSON_OBJECT.equals(field.getFieldType())){
+                Class<?> clazz = field.getJavaType();
+                if(JSON.class.isAssignableFrom(clazz)){
+                    newValue = JSON.parse(StringBaseOpt.castObjectToString(newValue));
+                }else {
+                    newValue = JSON.parseObject(
+                        StringBaseOpt.castObjectToString(newValue), clazz);
+                }
+            }
             field.setObjectFieldValue(object, newValue);
         }
     }
@@ -157,6 +167,8 @@ public abstract class OrmUtils {
                 if(FieldType.BOOLEAN.equals(column.getFieldType())){
                     value = BooleanBaseOpt.castObjectToBoolean(value,false)?
                         BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
+                } else if(FieldType.JSON_OBJECT.equals(column.getFieldType())){
+                    value = JSON.toJSONString(value);
                 }
                 fields.put(column.getPropertyName(),value);
             }
@@ -173,6 +185,9 @@ public abstract class OrmUtils {
                         value = BooleanBaseOpt.castObjectToBoolean(value,false)?
                             BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
                     }*/
+                    if(FieldType.JSON_OBJECT.equals(column.getFieldType())){
+                        value = JSON.toJSONString(value);
+                    }
                     fields.put(column.getPropertyName(), value);
                 }
             }
