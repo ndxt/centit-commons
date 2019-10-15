@@ -16,9 +16,8 @@ public class FormulaTest {
     public static void testFormula() {
 
         VariableFormula formula = new VariableFormula();
-        formula.setFormula("ex(4) + 5");
         formula.addExtendFunc("ex",(a) -> NumberBaseOpt.castObjectToInteger(a[0]) * NumberBaseOpt.castObjectToInteger(a[0]));
-        Object r = formula.calcFormula();
+        Object r = formula.calcFormula("ex(4) + 5");
         System.out.println(r);
 
         Object  s = VariableFormula.calculate("-1 + 8 + ${a}");

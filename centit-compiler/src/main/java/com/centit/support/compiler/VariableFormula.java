@@ -472,6 +472,10 @@ public class VariableFormula {
         return func.apply(CollectionsOpt.listToArray(slOperand));
     }
 
+    public Object calcFormula(String szExpress) {
+        this.setFormula(szExpress);
+        return this.calcFormula();
+    }
 
     public static Object calculate(String szExpress) {
         VariableFormula formula = new VariableFormula();
