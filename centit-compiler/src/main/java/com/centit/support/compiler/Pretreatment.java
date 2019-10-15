@@ -99,12 +99,12 @@ public abstract class Pretreatment {
                 sWord = varMorp.getAWord();
                 if(sWord.equals("{")){
                     sWord = varMorp.getStringUntil("}");
-                    sDesFormula.append( objectToFormulaString(varTrans.getLabelValue(sWord)))
+                    sDesFormula.append( objectToFormulaString(varTrans.getVarValue(sWord)))
                             .append(" ");
                 }else
                     sDesFormula.append( "$"+sWord+" ");
             }else if(Lexer.isLabel(sWord) && !VariableFormula.isKeyWord(sWord) && EmbedFunc.getFuncNo(sWord) == -1 ){
-                sDesFormula.append( objectToFormulaString(varTrans.getLabelValue(sWord)))
+                sDesFormula.append( objectToFormulaString(varTrans.getVarValue(sWord)))
                         .append(" ");
             }else
                 sDesFormula.append(sWord).append(" ");
@@ -114,15 +114,17 @@ public abstract class Pretreatment {
         return sDesFormula.toString();
     }
 
-    /** mapTemplateString
+
+    /**
+     * mapTemplateString
      * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
      *
      * @param template 模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
-     * @param object 传入的对象，可以是一个Map 、JSON 或者Pojo
+     * @param varTrans 变量解释其
      * @param nullValue 找不到变量时的值
      * @return 新的表达式
      */
-    public static String mapTemplateString(String template,Object object, String nullValue){
+    public static String mapTemplateString(String template, VariableTranslate varTrans, String nullValue){
         if(StringUtils.isBlank(template)){
             return nullValue;
         }
@@ -162,7 +164,8 @@ public abstract class Pretreatment {
                 String valueName = template.substring(ep, bp - 1);
                 mapString.append(GeneralAlgorithm.nvl(
                             StringBaseOpt.objectToString(
-                            ReflectionOpt.attainExpressionValue(object,valueName)),nullValue));
+                                varTrans.getVarValue(valueName)),nullValue));
+                            /*ReflectionOpt.attainExpressionValue(object,valueName)*/
             }
         }
         if(bp<nlen)
@@ -170,7 +173,17 @@ public abstract class Pretreatment {
         return mapString.toString();
     }
 
-
+    /** mapTemplateString
+     * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
+     *
+     * @param template 模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
+     * @param object 传入的对象，可以是一个Map 、JSON 或者Pojo
+     * @param nullValue 找不到变量时的值
+     * @return 新的表达式
+     */
+    public static String mapTemplateString(String template, Object object, String nullValue) {
+        return mapTemplateString(template, new ObjectTranslate(object), nullValue);
+    }
     /** mapTemplateString
      * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
      *
@@ -180,6 +193,6 @@ public abstract class Pretreatment {
      * @return 新的表达式
      */
     public static String mapTemplateString(String template,Object object) {
-        return mapTemplateString(template, object, "");
+        return mapTemplateString(template, new ObjectTranslate(object), "");
     }
 }

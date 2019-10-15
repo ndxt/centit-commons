@@ -145,7 +145,7 @@ public class VariableFormula {
             if(str.equals("{")){
                 str = lex.getStringUntil("}");
                 if(trans!=null) {
-                    return trans.getLabelValue(str);
+                    return trans.getVarValue(str);
                 } else {
                     return null;
                 }
@@ -187,7 +187,7 @@ public class VariableFormula {
         }
 
         if(trans!=null && Lexer.isLabel(str)){
-            return trans.getLabelValue(str);
+            return trans.getVarValue(str);
         }
 
         if(StringRegularOpt.isNumber(str)){

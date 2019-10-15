@@ -1240,10 +1240,6 @@ public abstract class QueryUtils {
             return mapTranslate.getVarValue(varName);
         }
 
-        @Override
-        public Object getLabelValue(String labelName) {
-            return mapTranslate.getLabelValue(labelName);
-        }
     }
     /**
      * 对参数进行预处理

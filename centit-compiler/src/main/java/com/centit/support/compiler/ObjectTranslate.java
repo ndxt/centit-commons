@@ -9,6 +9,7 @@ public class ObjectTranslate implements VariableTranslate {
     public ObjectTranslate(){
         varObj = null;
     }
+
     public ObjectTranslate(Object varObj) {
         this.varObj = varObj;
     }
@@ -27,14 +28,6 @@ public class ObjectTranslate implements VariableTranslate {
             return null;
         return ReflectionOpt.attainExpressionValue
                 /*ReflectionOpt.forceGetProperty*/(varObj, varName);
-    }    
-
-    @Override
-    public Object getLabelValue(String labelName) {
-        return getVarValue(labelName);
-        /*if("''".equals(res))//res == null ||
-            return labelName;
-        return res;*/
     }
 
     public void setVarObject(Object varObj) {
