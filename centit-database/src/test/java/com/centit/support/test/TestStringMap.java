@@ -5,6 +5,9 @@ import com.centit.support.database.utils.FieldType;
 
 public class TestStringMap {
     public static void main(String[] args) {
+        Boolean b = true;
+        System.out.println(b.getClass() == Boolean.class);
+
         byte[] a= new byte[23];
         System.out.println(FieldType.mapToFieldType(a.getClass()));
 

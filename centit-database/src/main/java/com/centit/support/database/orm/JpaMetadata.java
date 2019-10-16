@@ -123,12 +123,12 @@ public abstract class JpaMetadata {
         Column colInfo = field.getAnnotation(Column.class);
         column.setColumnName(colInfo.name());
         //column.setColumnType( colInfo.);
-        column.setFieldType(FieldType.mapToFieldType(
-            ReflectionOpt.getJavaTypeName(field.getType())));
+        column.setFieldType(FieldType.mapToFieldType(field.getType()));
         column.setPropertyName(field.getName());
         column.setMaxLength(colInfo.length());
         column.setScale(colInfo.scale());
         column.setPrecision(colInfo.precision());
+        //column.
 
         column.setObjectField(field);
         column.setObjectGetFieldValueFunc(ReflectionOpt.getGetterMethod(objType, field.getType(), field.getName()));
