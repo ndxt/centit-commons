@@ -372,6 +372,7 @@ public abstract class FieldType {
     public static Class<?> mapToJavaType(String columnType){
         return mapToJavaType(columnType, 0);
     }
+
     /**
      * map java.sql.Type to javaType
      * @param dbType java.sql.Type
@@ -459,7 +460,6 @@ public abstract class FieldType {
         }
     }
 
-
     public static String mapToFieldType(String columnType, int scale){
         if("NUMBER".equalsIgnoreCase(columnType) ||
             "INTEGER".equalsIgnoreCase(columnType)||
@@ -486,7 +486,7 @@ public abstract class FieldType {
             return  FieldType.TEXT;
         }else if("BLOB".equalsIgnoreCase(columnType)||
                 "VARBINARY".equalsIgnoreCase(columnType)) {
-            return FieldType.TEXT;
+            return FieldType.BYTE_ARRAY;
         }else if("FLOAT".equalsIgnoreCase(columnType)) {
             return FieldType.FLOAT;
         }else if("DOUBLE".equalsIgnoreCase(columnType)) {
@@ -503,9 +503,6 @@ public abstract class FieldType {
     public static String mapToFieldType(String columnType){
         return mapToFieldType(columnType, 0);
     }
-
-
-
 
     public static String mapToFieldType(Class<?> javaType){
         // 这个要重写
