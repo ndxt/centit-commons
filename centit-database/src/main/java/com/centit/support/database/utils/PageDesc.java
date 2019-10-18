@@ -119,4 +119,14 @@ public class PageDesc {
         this.pageSize = totalRows;
         this.pageNo = 1;
     }
+
+    /**
+     * 复制 另外一个对象的结果，用于深度复制
+     * @param other 另外一个对象
+     */
+    public void copy(PageDesc other){
+        this.totalRows = other.getTotalRows();
+        this.pageSize = other.getPageSize();
+        this.pageNo = other.getPageNo();
+    }
 }
