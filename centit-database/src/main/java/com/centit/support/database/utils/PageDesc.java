@@ -125,8 +125,10 @@ public class PageDesc {
      * @param other 另外一个对象
      */
     public void copy(PageDesc other){
-        this.totalRows = other.getTotalRows();
-        this.pageSize = other.getPageSize();
-        this.pageNo = other.getPageNo();
+        if(other!=null) {
+            this.totalRows = other.getTotalRows();
+            this.pageSize = other.getPageSize();
+            this.pageNo = other.getPageNo();
+        }
     }
 }
