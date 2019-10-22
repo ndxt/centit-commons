@@ -39,7 +39,8 @@ public abstract class OrmUtils {
             String sValue = DatabaseAccess.fetchClobString((Clob) newValue);
             if(FieldType.JSON_OBJECT.equals(field.getFieldType())){
                 Class<?> clazz = field.getJavaType();
-                if(JSON.class.isAssignableFrom(clazz)){
+                // 这个地方可能会出现类型不兼容的问题
+                if(JSON.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)){
                     field.setObjectFieldValue(object, JSON.parse(sValue));
                 }else {
                     field.setObjectFieldValue(object,JSON.parseObject(sValue, clazz));
@@ -53,7 +54,7 @@ public abstract class OrmUtils {
         } else {
             if(FieldType.JSON_OBJECT.equals(field.getFieldType())){
                 Class<?> clazz = field.getJavaType();
-                if(JSON.class.isAssignableFrom(clazz)){
+                if(JSON.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)){
                     newValue = JSON.parse(StringBaseOpt.castObjectToString(newValue));
                 }else {
                     newValue = JSON.parseObject(

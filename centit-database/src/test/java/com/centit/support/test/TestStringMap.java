@@ -1,12 +1,20 @@
 package com.centit.support.test;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.support.database.utils.DBType;
 import com.centit.support.database.utils.FieldType;
+
+import java.util.Map;
 
 public class TestStringMap {
     public static void main(String[] args) {
         Boolean b = true;
-        System.out.println(b.getClass() == Boolean.class);
+        System.out.println(JSON.class.isAssignableFrom(JSONObject.class));
+        System.out.println(JSON.class.isAssignableFrom(JSONArray.class));
+        System.out.println(Map.class.isAssignableFrom(JSONObject.class));
+        System.out.println(JSON.class.isAssignableFrom(Map.class));
 
         byte[] a= new byte[23];
         System.out.println(FieldType.mapToFieldType(a.getClass()));
