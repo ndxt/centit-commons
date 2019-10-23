@@ -44,38 +44,33 @@ public abstract class DatetimeOpt {
     private static String gmtDatePattern = "d MMM yyyy HH:mm:ss 'GMT'";
     /**
      * 获得当前日期的字符串 ，格式为 "yyyy-MM-dd" 示例 2015-08-24
-     * @return 当前时间
+     * @return 当前时间`
      */
     public static String currentDate() { // 取系统当前日期
-        SimpleDateFormat formatter = new SimpleDateFormat(defaultDatePattern);
-        Date dt = new Date(System.currentTimeMillis());
-        return formatter.format(dt);
+        return DatetimeOpt.convertDateToString(
+            new Date(System.currentTimeMillis()), defaultDatePattern);
     }
 
     public static String currentTime() { // 取系统当前时间
-        SimpleDateFormat formatter = new SimpleDateFormat(timePattern);
-        Date dt = new Date(System.currentTimeMillis());
-        return formatter.format(dt);
+        return DatetimeOpt.convertDateToString(
+            new Date(System.currentTimeMillis()), timePattern);
     }
 
     public static String currentTimeWithSecond() { // 取系统当前时间
-        SimpleDateFormat formatter = new SimpleDateFormat(timeWithSecondPattern);
-        Date dt = new Date(System.currentTimeMillis());
-        return formatter.format(dt);
+        return DatetimeOpt.convertDateToString(
+            new Date(System.currentTimeMillis()), timeWithSecondPattern);
     }
     /**
      * 获得当前日期的字符串 ，格式为 "yyyy-MM-dd HH:mm:ss"
      * @return 当前时间
      */
     public static String currentDatetime() { // 取系统当前日期
-        SimpleDateFormat formatter = new SimpleDateFormat(datetimePattern);
-        Date dt = new Date(System.currentTimeMillis());
-        return formatter.format(dt);
+        return DatetimeOpt.convertDateToString(
+            new Date(System.currentTimeMillis()), datetimePattern);
     }
 
     public static java.util.Date createUtilDate(int year, int month, int date,
-                                                int hourOfDay, int minute,int second,int milliSecond)
-    {
+             int hourOfDay, int minute,int second,int milliSecond) {
         Calendar cal = new GregorianCalendar();
         cal.set( year,  month-1,  date,
                 hourOfDay,  minute, second);
@@ -94,8 +89,7 @@ public abstract class DatetimeOpt {
      * @return 时间
      */
     public static java.util.Date createUtilDate(int year, int month, int date,
-            int hourOfDay, int minute,int second)
-    {
+            int hourOfDay, int minute,int second) {
         return createUtilDate( year,  month,  date,
                 hourOfDay,  minute, second, 0);
     }
@@ -112,8 +106,7 @@ public abstract class DatetimeOpt {
      * @return 时间
      */
     public static java.util.Date createUtilDate(int year, int month, int date,
-            int hourOfDay, int minute)
-    {
+            int hourOfDay, int minute) {
         return createUtilDate(year,  month,  date,
                  hourOfDay,  minute,0,0);
     }
@@ -269,16 +262,9 @@ public abstract class DatetimeOpt {
      * @see java.text.SimpleDateFormat 的说明
      */
     public static String convertDateToString(Date aDate, String aMask) {
-        String returnValue = "";
-
-        if (aDate == null) {
-            log.error("aDate is null!");
-        } else {
-            String sMask = (aMask ==null || "".equals(aMask))?"yyyy-MM-dd":aMask;
-            SimpleDateFormat df = new SimpleDateFormat(sMask);
-            returnValue = df.format(aDate);
-        }
-        return returnValue;
+        String sMask = (aMask==null || "".equals(aMask))?"yyyy-MM-dd":aMask;
+        SimpleDateFormat df = new SimpleDateFormat(sMask);
+        return df.format(aDate);
     }
 
     /**
@@ -314,7 +300,7 @@ public abstract class DatetimeOpt {
      * @return 字符串
      */
     public static String convertDateToGMTString(Date aDate) {
-        return convertDateToString( aDate,gmtDatePattern);
+        return convertDateToString(aDate, gmtDatePattern);
     }
 
     /**
