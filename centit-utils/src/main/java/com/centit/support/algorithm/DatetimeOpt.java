@@ -49,8 +49,7 @@ public abstract class DatetimeOpt {
     public static String currentDate() { // 取系统当前日期
         SimpleDateFormat formatter = new SimpleDateFormat(defaultDatePattern);
         Date dt = new Date(System.currentTimeMillis());
-        String sCurDate = formatter.format(dt);
-        return sCurDate;
+        return formatter.format(dt);
     }
 
     public static String currentTime() { // 取系统当前时间
@@ -71,8 +70,7 @@ public abstract class DatetimeOpt {
     public static String currentDatetime() { // 取系统当前日期
         SimpleDateFormat formatter = new SimpleDateFormat(datetimePattern);
         Date dt = new Date(System.currentTimeMillis());
-        String sCurDate = formatter.format(dt);
-        return sCurDate;
+        return formatter.format(dt);
     }
 
     public static java.util.Date createUtilDate(int year, int month, int date,
