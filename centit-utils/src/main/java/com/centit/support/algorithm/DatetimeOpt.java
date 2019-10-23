@@ -469,7 +469,6 @@ public abstract class DatetimeOpt {
     public static java.util.Date truncateToDay(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
-        int weekDay = cal.get(Calendar.DAY_OF_WEEK);
         resetToZeroPoint(cal);
         return cal.getTime();
         //createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,cal.get(Calendar.DAY_OF_MONTH));
@@ -478,7 +477,6 @@ public abstract class DatetimeOpt {
     public static java.util.Date truncateToMonth(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
-
         cal.set(Calendar.DATE, 1);
         resetToZeroPoint(cal);
         return cal.getTime();
@@ -507,14 +505,33 @@ public abstract class DatetimeOpt {
     }
 
     /**
+     * 获取一周第一天（周一凌晨一点）
+     * @param date 输入时间
+     * @return 周一凌晨一点
+     */
+    public static java.util.Date truncateToWeek(java.util.Date date){
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        resetToZeroPoint(cal);
+        int weekDay = cal.get(Calendar.DAY_OF_WEEK);
+        if(weekDay>2) {
+            cal.setTimeInMillis(cal.getTimeInMillis() -
+                Double.valueOf((weekDay-2) * 86400000.0).longValue());
+        } else if(weekDay == 1) {
+            cal.setTimeInMillis(cal.getTimeInMillis() -
+                Double.valueOf( 6 * 86400000.0).longValue());
+        }
+        return cal.getTime();
+    }
+
+    /**
      * 获取一周最后一天（周日凌晨一点）
      * @param date 输入时间
-     * @return 周六凌晨一点
+     * @return 周日凌晨一点
      */
     public static java.util.Date seekEndOfWeek(java.util.Date date){
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
-
         resetToZeroPoint(cal);
         int weekDay = cal.get(Calendar.DAY_OF_WEEK);
         if(weekDay>1) {
