@@ -73,7 +73,7 @@ public abstract class OrmUtils {
             return object;
         for(LeftRightPair<String, ValueGenerator> ent :  valueGenerators) {
             ValueGenerator valueGenerator =  ent.getRight();
-            if ( valueGenerator.occasion().matchTime(generatorTime)){
+            if (valueGenerator.occasion().matchTime(generatorTime)){
                 SimpleTableField filed = mapInfo.findFieldByName(ent.getLeft());
                 Object fieldValue = ReflectionOpt.forceGetProperty(object, filed.getPropertyName());
                 if( fieldValue == null || valueGenerator.condition() == GeneratorCondition.ALWAYS ){

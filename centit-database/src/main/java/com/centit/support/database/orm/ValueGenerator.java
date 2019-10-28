@@ -26,7 +26,7 @@ public @interface ValueGenerator {
      * 数值生成时机 NEW （insert） UPDATE （update） READ （select）
      * @return GeneratorTime
      */
-    GeneratorTime occasion() default GeneratorTime.NEW;
+    GeneratorTime occasion() default GeneratorTime.NEW_UPDATE;
 
     /**
      * 生成条件 IFNULL 数值为空时生成 ALWAYS 总是生成，会覆盖已有的值
