@@ -122,14 +122,11 @@ public abstract class JpaMetadata {
         SimpleTableField column = new SimpleTableField();
         Column colInfo = field.getAnnotation(Column.class);
         column.setColumnName(colInfo.name());
-        //column.setColumnType( colInfo.);
         column.setFieldType(FieldType.mapToFieldType(field.getType()));
         column.setPropertyName(field.getName());
         column.setMaxLength(colInfo.length());
         column.setScale(colInfo.scale());
         column.setPrecision(colInfo.precision());
-        //column.
-
         column.setObjectField(field);
         column.setObjectGetFieldValueFunc(ReflectionOpt.getGetterMethod(objType, field.getType(), field.getName()));
         column.setObjectSetFieldValueFunc(ReflectionOpt.getSetterMethod(objType, field.getType(), field.getName()));
@@ -154,10 +151,17 @@ public abstract class JpaMetadata {
                 if(field.isAnnotationPresent(Id.class) ){
                     mapInfo.addColumn(column);
                     mapInfo.addPkColumns(column.getPropertyName());
-                }else if( field.isAnnotationPresent(Lazy.class) ){
-                    mapInfo.addLazyColumn(column);
-                } else {
-                    mapInfo.addColumn(column);
+                }else {
+                    boolean isLazy = false;
+                    if (field.isAnnotationPresent(Basic.class)) {
+                        Basic colBasic = field.getAnnotation(Basic.class);
+                        isLazy = colBasic.fetch() == FetchType.LAZY;
+                    }
+                    if(isLazy){
+                        mapInfo.addLazyColumn(column);
+                    } else {
+                        mapInfo.addColumn(column);
+                    }
                 }
 
                 if(field.isAnnotationPresent(ValueGenerator.class) ){
