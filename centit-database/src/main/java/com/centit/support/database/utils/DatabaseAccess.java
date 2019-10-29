@@ -25,6 +25,13 @@ public abstract class DatabaseAccess {
 
     protected static final Logger logger = LoggerFactory.getLogger(DatabaseAccess.class);
 
+    public static SQLException createAccessException(String sql , SQLException e){
+        SQLException exception = new SQLException(sql +" raise "+ e.getMessage(), e.getSQLState(), e.getErrorCode(),e.getCause());
+        exception.setNextException(e.getNextException());
+        exception.setStackTrace(e.getStackTrace());
+        return exception;
+    }
+
     private static Object transObjectForSqlParam(Object param){
         // 避免重复转换
         if (param instanceof java.sql.Date) {
@@ -75,7 +82,7 @@ public abstract class DatabaseAccess {
             stmt.execute();
             return stmt.getObject(1);
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sqlCen,e);
+            throw DatabaseAccess.createAccessException(sqlCen,e);
         }
     }
 
@@ -105,7 +112,7 @@ public abstract class DatabaseAccess {
             DatabaseAccess.setQueryStmtParameters(stmt,paramObjs);
             return stmt.execute();
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sqlCen, e);
+            throw DatabaseAccess.createAccessException(sqlCen, e);
         }
     }
 
@@ -121,7 +128,7 @@ public abstract class DatabaseAccess {
             QueryLogUtils.printSql(logger,sSql);
             return stmt.execute();
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sSql,e);
+            throw DatabaseAccess.createAccessException(sSql,e);
         }
     }
 
@@ -177,7 +184,7 @@ public abstract class DatabaseAccess {
             setQueryStmtParameters(stmt, values);
             return stmt.executeUpdate();
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sSql, e);
+            throw DatabaseAccess.createAccessException(sSql, e);
         }
     }
 
@@ -334,7 +341,7 @@ public abstract class DatabaseAccess {
                 //return ja;
             }
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sSql,e);
+            throw DatabaseAccess.createAccessException(sSql,e);
         }
     }
 
@@ -358,7 +365,7 @@ public abstract class DatabaseAccess {
                 //return ja;
             }
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sSql,e);
+            throw DatabaseAccess.createAccessException(sSql,e);
         }
     }
 
@@ -548,7 +555,7 @@ public abstract class DatabaseAccess {
                 return fetchResultSetToObjectsList(rs);
             }
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sSql,e);
+            throw DatabaseAccess.createAccessException(sSql,e);
         }
     }
 
@@ -565,7 +572,7 @@ public abstract class DatabaseAccess {
                 return fetchResultSetToObjectsList(rs);
             }
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sSql,e);
+            throw DatabaseAccess.createAccessException(sSql,e);
         }
     }
 
@@ -586,7 +593,7 @@ public abstract class DatabaseAccess {
             //stmt.close();
             //return datas;
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sSql,e);
+            throw DatabaseAccess.createAccessException(sSql,e);
         }
     }
 
@@ -603,7 +610,7 @@ public abstract class DatabaseAccess {
             //stmt.close();
             //return datas;
         }catch (SQLException e) {
-            throw new DatabaseAccessException(sSql,e);
+            throw DatabaseAccess.createAccessException(sSql,e);
         }
     }
 
@@ -827,7 +834,7 @@ public abstract class DatabaseAccess {
                     //return datas;
                 }
             }catch (SQLException e) {
-                throw new DatabaseAccessException(sSql, e);
+                throw DatabaseAccess.createAccessException(sSql, e);
             }
         }else
             return findObjectsBySql(conn, query, values);
@@ -871,7 +878,7 @@ public abstract class DatabaseAccess {
                     return fetchResultSetToJSONArray(rs, fns);
                 }
             } catch (SQLException e) {
-                throw new DatabaseAccessException(sSql, e);
+                throw DatabaseAccess.createAccessException(sSql, e);
             }
         }else {
             String[] fns = fieldnames;
