@@ -26,8 +26,7 @@ public class PersistenceException extends ObjectException {
      * @param exception 异常信息
      */
     public PersistenceException(int exceptionCode, String message, Throwable exception) {
-        super(message,exception);
-        this.exceptionCode = exceptionCode;
+        super(exceptionCode, message, exception);
     }
 
     /**
@@ -36,8 +35,7 @@ public class PersistenceException extends ObjectException {
      * @param message 异常信息
      */
     public PersistenceException(int exceptionCode, String message) {
-        super(message);
-        this.exceptionCode = exceptionCode;
+        super(exceptionCode, message);
     }
 
     /**
@@ -46,8 +44,7 @@ public class PersistenceException extends ObjectException {
      * @param exception 异常信息
      */
     public PersistenceException(int exceptionCode, Throwable exception) {
-        super(exception);
-        this.exceptionCode = exceptionCode;
+        super(exceptionCode, exception);
     }
 
     /**
@@ -56,7 +53,6 @@ public class PersistenceException extends ObjectException {
      */
     public PersistenceException(Throwable exception) {
         super(exception);
-        this.exceptionCode = UNKNOWN_EXCEPTION;
     }
 
     /**
@@ -64,16 +60,15 @@ public class PersistenceException extends ObjectException {
      * @param exception Throwable
      */
     public PersistenceException(SQLException exception) {
-        super(exception);
-        this.exceptionCode = DATABASE_SQL_EXCEPTION;
+        super(DATABASE_SQL_EXCEPTION, exception);
     }
 
 
     public PersistenceException(String sql , SQLException e){
-        super(sql +" raise "+ e.getMessage(), e.getCause());
+        super(DATABASE_SQL_EXCEPTION, sql +" raise "+ e.getMessage(), e.getCause());
         //this.setNextException(e.getNextException());
         //this.setStackTrace(e.getStackTrace());
-        this.exceptionCode = DATABASE_SQL_EXCEPTION;
+        //this.exceptionCode = DATABASE_SQL_EXCEPTION;
     }
 
     /**
@@ -81,8 +76,8 @@ public class PersistenceException extends ObjectException {
      * @param exception Throwable
      */
     public PersistenceException(IOException exception) {
-        super(exception);
-        this.exceptionCode = DATABASE_IO_EXCEPTION;
+        super(DATABASE_IO_EXCEPTION, exception);
+        //this.exceptionCode = DATABASE_IO_EXCEPTION;
     }
     /**
      *
@@ -90,15 +85,7 @@ public class PersistenceException extends ObjectException {
      */
     public PersistenceException(String message) {
         super(message);
-        this.exceptionCode = UNKNOWN_EXCEPTION;
-    }
-
-    public int getExceptionCode() {
-        return exceptionCode;
-    }
-
-    public void setExceptionCode(int exceptionCode) {
-        this.exceptionCode = exceptionCode;
+        //this.exceptionCode = UNKNOWN_EXCEPTION;
     }
 
 }

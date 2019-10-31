@@ -36,8 +36,19 @@ public class ObjectException extends RuntimeException {
      * @param exceptionCode 异常码
      * @param exception 异常信息
      */
-    public ObjectException( int exceptionCode, Throwable exception) {
+    public ObjectException(int exceptionCode, Throwable exception) {
         super(exception);
+        this.exceptionCode = exceptionCode;
+    }
+
+    /**
+     * Constructor for UserExistsException.
+     * @param exceptionCode 异常码
+     * @param message 异常信息
+     * @param exception 异常信息
+     */
+    public ObjectException(int exceptionCode, String message, Throwable exception) {
+        super(message, exception);
         this.exceptionCode = exceptionCode;
     }
 
@@ -45,7 +56,7 @@ public class ObjectException extends RuntimeException {
      *
      * @param exception Throwable
      */
-    public ObjectException( Throwable exception) {
+    public ObjectException(Throwable exception) {
         super(exception);
         this.exceptionCode = UNKNOWN_EXCEPTION;
     }
@@ -65,7 +76,7 @@ public class ObjectException extends RuntimeException {
      * @param exceptionCode 异常码
      * @param message 异常信息
      */
-    public ObjectException(Object obj,int exceptionCode,String message) {
+    public ObjectException(Object obj, int exceptionCode, String message) {
         super(message);
         this.exceptionCode = exceptionCode;
         this.objectData = obj;
@@ -88,7 +99,7 @@ public class ObjectException extends RuntimeException {
      * @param obj Object
      * @param message String 异常信息
      */
-    public ObjectException(Object obj,String message) {
+    public ObjectException(Object obj, String message) {
         super(message);
         this.exceptionCode = UNKNOWN_EXCEPTION;
         this.objectData = obj;
