@@ -64,7 +64,9 @@ public class TestSortAsTree {
         nodeList.add(21);
         nodeList.add(2);
         nodeList.add(1);
-
+        nodeList.add(13);
+        nodeList.add(23);
+        nodeList.sort(Integer::compareTo);
         CollectionsOpt.sortAsTree(nodeList,(p,c)-> p == c / 10);
         System.out.println(nodeList);
     }
