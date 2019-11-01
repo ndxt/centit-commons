@@ -1,6 +1,7 @@
 package com.centit.test;
 
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.common.TreeNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,16 @@ public class TestSortAsTree {
     }
 
     public static void main(String[] args) {
-        List<Integer> nodeList = new ArrayList<Integer>();
+        TreeNode tn = new TreeNode<String>(){
+            {
+                this.setValue("hello world!");
+                this.addChild("say hello");
+                this.addChild("form init");
+            }
+        };
+        System.out.println(tn.toJSONObject());
+
+        List<Integer> nodeList = new ArrayList<>();
         nodeList.add(223);
         nodeList.add(222);
         nodeList.add(221);
