@@ -325,4 +325,21 @@ public abstract class FileSystemOpt {
         }
     }
 
+    public static String transformBlackSlant(String filePath){
+        return filePath.replaceAll("\\\\", "/");
+    }
+
+    public static String appendPath(String filePath, String subPath){
+        if(StringUtils.isBlank(filePath)){
+            return subPath;
+        }
+        int len = filePath.length();
+        char endChar = filePath.charAt(len-1);
+        if(endChar == '/' || endChar=='\\'){
+            return filePath + subPath;
+        } else {
+            return filePath + '/' + subPath;
+        }
+    }
+
 }

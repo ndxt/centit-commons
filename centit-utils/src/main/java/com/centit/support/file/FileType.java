@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 /**
- * 
+ *
  * @author 朱晓文 杨淮生 codefan@sina.com
  *
  */
@@ -862,13 +862,13 @@ public abstract class FileType {
             return String.valueOf(Hex.encodeHex(b,false));
     }
 
-    /** 
-     * 得到文件头 
-     *  
+    /**
+     * 得到文件头
+     *
      * @param file 文件
-     * @return 文件头 
-     * @throws IOException 
-     */  
+     * @return 文件头
+     * @throws IOException
+     */
     private static String getFileHeadContent(File file) throws IOException {
 
         try(InputStream inputStream = new FileInputStream(file)) {
@@ -901,21 +901,21 @@ public abstract class FileType {
         return "unknown";
     }
 
-    /** 
-     * 判断文件类型 
-     *  
+    /**
+     * 判断文件类型
+     *
      * @param file 文件
-     * @return 文件类型 
+     * @return 文件类型
      * @throws IOException 异常
-     */  
+     */
     public static String getFileType(File file) throws IOException {
         String fileHead = getFileHeadContent(file);
-        
-        if (fileHead == null || fileHead.length() == 0) {  
-            return null;  
-        }  
-          
-        fileHead = fileHead.toUpperCase();  
+
+        if (fileHead == null || fileHead.length() == 0) {
+            return null;
+        }
+
+        fileHead = fileHead.toUpperCase();
         for(Entry<String,String> entry : mFileTypes.entrySet()){
             if(fileHead.startsWith(entry.getKey())){
                 if("office2003".equals(entry.getValue()) || "officeX".equals(entry.getValue())){
@@ -925,15 +925,15 @@ public abstract class FileType {
                 }
                 return entry.getValue();
             }
-        }  
+        }
         //System.out.println("\n空");
-        return "unknown"; 
+        return "unknown";
     }
-    
+
     public static String getFileType(String fileName) throws IOException {
         return getFileType(new File(fileName));
     }
-    
+
     /**
      * 获取文件的名称 ，去掉后缀名
      * @param fileName 文件名
@@ -944,17 +944,17 @@ public abstract class FileType {
             return "";
         int firstIndex = fileName.lastIndexOf("/");
 
-        int    firstIndex2 = fileName.lastIndexOf("\\");
-        if(firstIndex<firstIndex2)
+        int firstIndex2 = fileName.lastIndexOf("\\");
+        if(firstIndex < firstIndex2) {
             firstIndex = firstIndex2;
-        if(firstIndex<0)
-            firstIndex = 0;
-        else
-            firstIndex = firstIndex+1;
+        }
+
+        firstIndex = firstIndex < 0 ? 0 : firstIndex +1;
 
         int lastIndex = fileName.lastIndexOf(".");
-        if(lastIndex<0)
+        if(lastIndex<0) {
             return fileName;
+        }
 
         return fileName.substring(firstIndex,lastIndex);
     }
@@ -972,7 +972,7 @@ public abstract class FileType {
         return fileName.substring(lastIndex + 1, fileName.length());
     }
 
-  
+
     /*
      * 判断输入的文件是够是office的文件
      */

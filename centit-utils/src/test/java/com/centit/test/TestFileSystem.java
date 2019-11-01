@@ -1,6 +1,7 @@
 package com.centit.test;
 
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
 
 import java.io.File;
@@ -11,8 +12,9 @@ import java.io.IOException;
 public class TestFileSystem {
 
     public static void main(String[] args) {
+        testGetFileType();
 
-        try (FileInputStream file = new FileInputStream(new File(
+        /*try (FileInputStream file = new FileInputStream(new File(
                 "/home/codefan/java_error_in_IDEA_14478.log"))) {
             byte[] buf = FileIOOpt.readBytesFromInputStream(file, 1024*1024*64);
             System.out.println(buf.length);
@@ -21,11 +23,12 @@ public class TestFileSystem {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
     }
 
     public static void testGetFileType() {
+        System.out.println(FileSystemOpt.transformBlackSlant("C:\\\\feile\\南大先腾.pdf"));
         System.out.println(FileType.truncateFileExtName("C:\\feile南大先腾.pdf"));
         System.out.println(FileType.truncateFileExtName("C:\\feile/南大先腾.pdf"));
         System.out.println(FileType.truncateFileExtName("C:/feile\\南大先腾.pdf"));
