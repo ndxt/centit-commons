@@ -4,6 +4,8 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.TreeNode;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class TestSortAsTree {
@@ -67,6 +69,8 @@ public class TestSortAsTree {
         nodeList.add(13);
         nodeList.add(23);
         nodeList.sort(Integer::compareTo);
+        /*Collections.sort(nodeList, Integer::compare);
+        Collections.sort(nodeList, Integer::compareTo);*/
         CollectionsOpt.sortAsTree(nodeList,(p,c)-> p == c / 10);
         System.out.println(nodeList);
     }

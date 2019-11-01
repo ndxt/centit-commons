@@ -333,9 +333,19 @@ public abstract class FileSystemOpt {
         if(StringUtils.isBlank(filePath)){
             return subPath;
         }
+        if(StringUtils.isBlank(subPath)){
+            return filePath;
+        }
         int len = filePath.length();
         char endChar = filePath.charAt(len-1);
+        char startChar = subPath.charAt(0);
         if(endChar == '/' || endChar=='\\'){
+            if(startChar == '/' || startChar=='\\') {
+                return filePath + subPath.substring(1);
+            }else {
+                return filePath + subPath;
+            }
+        } else if(startChar == '/' || startChar=='\\'){
             return filePath + subPath;
         } else {
             return filePath + '/' + subPath;
