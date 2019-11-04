@@ -502,16 +502,24 @@ public class VariableFormula {
      *
      * @param szExpress 表达式
      * @return 返回出错的位置，0 表示表达式格式检查通过
+     * */
+    public static int checkFormula(String szExpress) {
+        VariableFormula formula = new VariableFormula();
+        formula.setFormula(szExpress);
+        return formula.checkFormula();
+    }
+
+    /**
+     * @return 返回出错的位置，0 表示表达式格式检查通过
      */
-    public int checkFormula(String szExpress) {
+    public int checkFormula() {
         /*if(hasPreTreat)
             szExpress=preTreat.runPretreatment(szExpress);*/
         int nNextType = 1;
         int nBrackets = 0;
-
-        lex.setFormula(szExpress);
+        //lex.setFormula(szExpress);
         String sWord;
-        sWord =    lex.getAWord();
+        sWord = lex.getAWord();
         while(!StringBaseOpt.isNvl(sWord)){
             boolean bKW = VariableFormula.isKeyWord(sWord);
             if(nNextType == 1){
@@ -538,7 +546,7 @@ public class VariableFormula {
             }
             if(nBrackets<0)
                 return lex.getCurrPos()+1;
-            sWord =    lex.getAWord();
+            sWord = lex.getAWord();
         }
         if(nBrackets ==0)
             return 0;
