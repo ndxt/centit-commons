@@ -56,7 +56,7 @@ public abstract class ConstDefine {
     public static final int   FUNC_ADD_MONTHS    = 138;
     public static final int   FUNC_ADD_YEARS    = 139;
     public static final int   FUNC_TRUNC_DATE = 140;
-    public static final int   FUNC_FIRST_OF_MONTH    = 141;
+    public static final int   FUNC_LAST_OF_MONTH    = 141;
 
     public static final int   FUNC_STDDEV    = 133;
     public static final int   FUNC_GET_STR    = 134;

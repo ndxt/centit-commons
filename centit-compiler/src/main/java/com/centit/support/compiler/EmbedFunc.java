@@ -16,7 +16,7 @@ public abstract class EmbedFunc {
     public static final int functionsSum = 63;
     protected static final FunctionInfo functionsList[]={
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
-        new FunctionInfo("byte",2, ConstDefine.FUNC_BYTE,ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,2)=2
+        new FunctionInfo("byte",2, ConstDefine.FUNC_BYTE,ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
                                         //          byte (4321.789,-2)=8
                                         //          byte ("4321.789",2)=3
         new FunctionInfo("capital",1,ConstDefine.FUNC_CAPITAL,ConstDefine.TYPE_STR),  // capital (123.45)="一百二十三点四五"
@@ -31,7 +31,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("ave",-1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
         new FunctionInfo("count",-1,ConstDefine.FUNC_COUNT,ConstDefine.TYPE_NUM),    // 计数 count(1,"2",3,"5",1,1,4) = 7
         new FunctionInfo("countnotnull",-1,ConstDefine.FUNC_COUNTNOTNULL,ConstDefine.TYPE_NUM),    // 计数 非空参数 countnotnull(1,,"2",,,,1,1,4) = 5
-        new FunctionInfo("countnull",-1,ConstDefine.FUNC_COUNTNULL,ConstDefine.TYPE_NUM),    // 计数孔参数  countnull(1,,"2",,,,1,1,4) = 4
+        new FunctionInfo("countnull",-1,ConstDefine.FUNC_COUNTNULL,ConstDefine.TYPE_NUM),    // 计数空参数  countnull(1,,"2",,,,1,1,4) = 4
         new FunctionInfo("sum",-1,ConstDefine.FUNC_SUM, ConstDefine.TYPE_NUM),    // 求和 sum (1,2,3,4,5) = 15
         new FunctionInfo("stddev",-1,ConstDefine.FUNC_STDDEV,ConstDefine.TYPE_NUM),    // 求标准偏差
 
@@ -47,14 +47,14 @@ public abstract class EmbedFunc {
         new FunctionInfo("sin",1,ConstDefine.FUNC_SIN,ConstDefine.TYPE_NUM),    // 求正弦
         new FunctionInfo("cos",1,ConstDefine.FUNC_COS,ConstDefine.TYPE_NUM),    // 求余弦
         new FunctionInfo("tan",1,ConstDefine.FUNC_TAN,ConstDefine.TYPE_NUM),    // 求正切
-        new FunctionInfo("ctan",1,ConstDefine.FUNC_CTAN,ConstDefine.TYPE_NUM),    // 求正切
+        new FunctionInfo("ctan",1,ConstDefine.FUNC_CTAN,ConstDefine.TYPE_NUM),    // 求余切
         new FunctionInfo("exp",1,ConstDefine.FUNC_EXP,ConstDefine.TYPE_NUM),    // 求以e为底的指数
         new FunctionInfo("sqrt",1,ConstDefine.FUNC_SQRT,ConstDefine.TYPE_NUM),    // 求平方根
         new FunctionInfo("upcase",1,ConstDefine.FUNC_UPCASE,ConstDefine.TYPE_STR), // 字符串大写
         new FunctionInfo("lowcase",1,ConstDefine.FUNC_LOWCASE,ConstDefine.TYPE_STR), // 字符串小写
         new FunctionInfo("substr",2,ConstDefine.FUNC_SUBSTR,ConstDefine.TYPE_STR), // 求字符串子串 substr ("123456",2,3)="345"
-        new FunctionInfo("lpad",1,ConstDefine.FUNC_LPAD,ConstDefine.TYPE_STR), // 字符串小写
-        new FunctionInfo("rpad",1,ConstDefine.FUNC_RPAD,ConstDefine.TYPE_STR), // 求字符串子串 substr ("123456",2,3)="345"
+        new FunctionInfo("lpad",1,ConstDefine.FUNC_LPAD,ConstDefine.TYPE_STR), // 左侧补充字符串
+        new FunctionInfo("rpad",1,ConstDefine.FUNC_RPAD,ConstDefine.TYPE_STR), // 右侧补充字符串
 
         new FunctionInfo("find",2,ConstDefine.FUNC_FIND,ConstDefine.TYPE_NUM),  //求子串位置 find ("123456","34")=2  find ("123456","35")=-1
         new FunctionInfo("frequence",2,ConstDefine.FUNC_FREQUENCE,ConstDefine.TYPE_NUM), // 求子串个数 find ("12345236","23")=2
@@ -70,7 +70,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("month",-1,ConstDefine.FUNC_MONTH,ConstDefine.TYPE_STR),//日期函数
         new FunctionInfo("year",-1,ConstDefine.FUNC_YEAR,ConstDefine.TYPE_STR),//日期函数
         new FunctionInfo("week",-1,ConstDefine.FUNC_WEEK,ConstDefine.TYPE_STR),// 第几周
-        new FunctionInfo("weekday",-1,ConstDefine.FUNC_WEEK_DAY,ConstDefine.TYPE_STR),// 星期几
+        new FunctionInfo("weekday",-1,ConstDefine.FUNC_WEEK_DAY,ConstDefine.TYPE_STR),// 星期几， 取日期的星期几，周日为0，周一~六为1~6
         new FunctionInfo("formatdate",-1,ConstDefine.FUNC_FORMAT_DATE,ConstDefine.TYPE_STR),// 格式化日期
         new FunctionInfo("dateinfo",-1,ConstDefine.FUNC_DATE_INFO,ConstDefine.TYPE_STR),// 日期信息
 
@@ -85,7 +85,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("addmonths",2,ConstDefine.FUNC_ADD_MONTHS,ConstDefine.TYPE_ANY),//日期函数  加月数
         new FunctionInfo("addyears",2,ConstDefine.FUNC_ADD_YEARS,ConstDefine.TYPE_ANY),//日期函数   加年数
         new FunctionInfo("truncdate",-1,ConstDefine.FUNC_TRUNC_DATE,ConstDefine.TYPE_ANY),//日期函数   截断日期  第二个参数  Y ，M , D 分别返回一年、月的第一天 ，或者一日的零点
-        new FunctionInfo("firstofmonth",-1,ConstDefine.FUNC_FIRST_OF_MONTH,ConstDefine.TYPE_ANY),//日期函数   求这个月的第一天
+        new FunctionInfo("lastofmonth",-1,ConstDefine.FUNC_LAST_OF_MONTH,ConstDefine.TYPE_ANY),//日期函数   求这个月的第一天
 
         new FunctionInfo("toDate",1,ConstDefine.FUNC_TO_DATE,ConstDefine.TYPE_DATE),// 转换为日期
         new FunctionInfo("toString",1,ConstDefine.FUNC_TO_STRING,ConstDefine.TYPE_STR),//转换为String
@@ -684,11 +684,11 @@ public abstract class EmbedFunc {
                     return DatetimeOpt.truncateToDay(dt);
             }
 
-            case ConstDefine.FUNC_FIRST_OF_MONTH:{//
+            case ConstDefine.FUNC_LAST_OF_MONTH:{//
                 Date dt = (nOpSum > 0)?DatetimeOpt.castObjectToDate(slOperand.get(0)):null;
                 if(dt==null)
                     dt = DatetimeOpt.currentUtilDate();
-                return DatetimeOpt.truncateToMonth(dt);
+                return DatetimeOpt.seekEndOfMonth(dt);
             }
 
             case ConstDefine.FUNC_TO_DATE:{//

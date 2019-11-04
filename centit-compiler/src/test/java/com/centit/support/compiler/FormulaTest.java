@@ -14,6 +14,11 @@ public class FormulaTest {
     }
 
     public static void testFormula() {
+        System.out.println(VariableFormula.calculate("byte (4321.789,0)"));
+        System.out.println(VariableFormula.calculate("byte (4321.789,2)"));
+        System.out.println(VariableFormula.calculate("byte (4321.789,-2)"));
+        System.out.println(VariableFormula.calculate("capital (123.45)"));
+        System.out.println(VariableFormula.calculate("capital (123.45, true)"));
 
         VariableFormula formula = new VariableFormula();
         formula.addExtendFunc("ex",(a) -> NumberBaseOpt.castObjectToInteger(a[0]) * NumberBaseOpt.castObjectToInteger(a[0]));
