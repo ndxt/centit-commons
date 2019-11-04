@@ -131,6 +131,7 @@ public class SimpleTableReference implements TableReference{
     public void setTargetEntityType(Class<?> targetEntityType) {
         this.targetEntityType = targetEntityType;
     }
+
     public void setObjectField(Field objectField) {
         if(beanField==null)
             beanField = new JavaBeanField();

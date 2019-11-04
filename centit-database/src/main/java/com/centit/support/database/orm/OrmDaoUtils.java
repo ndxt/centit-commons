@@ -291,7 +291,7 @@ public abstract class OrmDaoUtils {
 
     }
 
-    public static <T> T getObjectCascadeShallowById(Connection connection, Object id, final Class<T> type)
+    public static <T> T getObjectWithReferences(Connection connection, Object id, final Class<T> type)
             throws PersistenceException {
 
         T object = getObjectById(connection, id, type);
@@ -299,11 +299,11 @@ public abstract class OrmDaoUtils {
         return object;
     }
 
-    public static <T> T getObjectCascadeById(Connection connection, Object id, final Class<T> type)
+    public static <T> T getObjectCascadeById(Connection connection, Object id, final Class<T> type, int depth)
             throws PersistenceException {
 
         T object = getObjectById(connection, id, type);
-        fetchObjectReferencesCascade(connection, object, type);
+        fetchObjectReferencesCascade(connection, object, type, depth);
         return object;
     }
 
@@ -325,7 +325,7 @@ public abstract class OrmDaoUtils {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
-        return deleteObjectById(connection, idMap,mapInfo);
+        return deleteObjectById(connection, idMap, mapInfo);
     }
 
     public static <T> int deleteObjectById(Connection connection, Object id, Class<T> type)
@@ -500,8 +500,8 @@ public abstract class OrmDaoUtils {
                 (rs) -> OrmUtils.fetchFieldsFormResultSet(rs,object,mapInfo));
     }
 
-    private static <T> T fetchObjectReference(Connection connection, T object,SimpleTableReference ref,
-                                              TableMapInfo mapInfo, boolean casecade)
+    private static <T> T innerFetchObjectReferencesCascade(Connection connection, T object,SimpleTableReference ref,
+                                              TableMapInfo mapInfo, int depth)
             throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
@@ -518,10 +518,11 @@ public abstract class OrmDaoUtils {
         }
 
         List<?> refs = listObjectsByProperties( connection, properties, refType);
+
         if(refs!=null && refs.size()>0) {
-            if(casecade){
+            if(depth > 1 ){
                 for(Object refObject : refs){
-                    fetchObjectReferencesCascade(connection, refObject,refType);
+                    fetchObjectReferencesCascade(connection, refObject, refType, depth-1);
                 }
             }
             if (//ref.getReferenceType().equals(refType) || oneToOne
@@ -538,19 +539,16 @@ public abstract class OrmDaoUtils {
 
     private static <T> T fetchObjectReference(Connection connection, T object,SimpleTableReference ref ,TableMapInfo mapInfo )
             throws PersistenceException {
-        return fetchObjectReference(connection, object,ref ,mapInfo , false);
+        return innerFetchObjectReferencesCascade(connection, object,ref ,mapInfo , 1);
     }
 
-    private static <T> T fetchObjectReferenceCascade(Connection connection, T object,SimpleTableReference ref ,TableMapInfo mapInfo )
-            throws PersistenceException {
-        return fetchObjectReference(connection, object,ref ,mapInfo , true);
-    }
 
-    public static <T> T fetchObjectReferencesCascade(Connection connection, T object, Class<?> objType ){
+
+    public static <T> T fetchObjectReferencesCascade(Connection connection, T object, Class<?> objType, int depth){
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         if(mapInfo.hasReferences()) {
             for (SimpleTableReference ref : mapInfo.getReferences()) {
-                fetchObjectReferenceCascade(connection, object, ref, mapInfo);
+                innerFetchObjectReferencesCascade(connection, object, ref, mapInfo, depth);
             }
         }
         return object;
@@ -601,7 +599,7 @@ public abstract class OrmDaoUtils {
 
         Map<String, Object> properties = new HashMap<>(6);
         for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
-            properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
+            properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object, ent.getKey()));
         }
 
         return deleteObjectByProperties(connection, properties, refType);
@@ -626,51 +624,52 @@ public abstract class OrmDaoUtils {
         return n;
     }
 
-    public static <T> int deleteObjectCascadeShallow(Connection connection, T object)
+    public static <T> int deleteObjectWithReferences(Connection connection, T object)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
         Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
 
         if(mapInfo.hasReferences()) {
             for (SimpleTableReference ref : mapInfo.getReferences()) {
-                deleteObjectReference(connection, object,ref);
+                deleteObjectReference(connection, object, ref);
             }
         }
 
         return deleteObjectById(connection, idMap,mapInfo);
     }
 
-    public static <T> int deleteObjectCascade(Connection connection, T object)
+    public static <T> int deleteObjectCascade(Connection connection, T object, int depth)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
-        if(mapInfo.hasReferences()) {
+        Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object ,mapInfo);
+        int res = deleteObjectById(connection, idMap, mapInfo);
+
+        if (depth > 0 && mapInfo.hasReferences()) {
             for (SimpleTableReference ref : mapInfo.getReferences()) {
                 Map<String, Object> properties = new HashMap<>(6);
                 Class<?> refType = ref.getTargetEntityType();
-                for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
-                    properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
+                for (Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()) {
+                    properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object, ent.getKey()));
                 }
 
-                List<?> refs = listObjectsByProperties(connection,  properties, refType);
-                for(Object refObject : refs){
-                    deleteObjectCascade(connection, refObject);
+                List<?> refs = listObjectsByProperties(connection, properties, refType);
+                for (Object refObject : refs) {
+                    deleteObjectCascade(connection, refObject, depth - 1);
                 }
             }
         }
-        return deleteObject(connection, object);
+        return res ;
     }
 
-    public static <T> int deleteObjectCascadeShallowById(Connection connection, Object id, final Class<T> type)
+    public static <T> int deleteObjectWithReferencesById(Connection connection, Object id, final Class<T> type)
             throws PersistenceException {
 
-        return deleteObjectCascadeShallow(connection, getObjectById(connection, id, type));
+        return deleteObjectWithReferences(connection, getObjectById(connection, id, type));
     }
 
-    public static <T> int deleteObjectCascadeById(Connection connection, Object id, final Class<T> type)
+    public static <T> int deleteObjectCascadeById(Connection connection, Object id, final Class<T> type, int depth)
             throws PersistenceException {
-
-        return deleteObjectCascade(connection, getObjectById(connection, id, type));
+        return deleteObjectCascade(connection, getObjectById(connection, id, type), depth);
     }
 
     public static class OrmObjectComparator<T> implements Comparator<T>{
@@ -763,8 +762,8 @@ public abstract class OrmDaoUtils {
         return replaceObjectsAsTabulation(connection, dbObjects,newObjects);
     }
 
-    private static <T> int saveNewObjectReferenceCascade(Connection connection, T object,
-                                                         SimpleTableReference ref ,TableMapInfo mapInfo )
+    private static <T> int innerSaveNewObjectReferenceCascade(Connection connection, T object,
+                   SimpleTableReference ref ,TableMapInfo mapInfo, int depth)
             throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
@@ -786,7 +785,7 @@ public abstract class OrmDaoUtils {
                 Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
                 refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(newObj,obj);
             }
-            saveNewObjectCascade(connection, newObj);
+            saveNewObjectCascade(connection, newObj, depth - 1);
         }else if(newObj instanceof Collection){
             for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
                 Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
@@ -795,7 +794,7 @@ public abstract class OrmDaoUtils {
                 }
             }
             for(Object subObj : (Collection<Object>)newObj){
-                saveNewObjectCascade(connection, subObj);
+                saveNewObjectCascade(connection, subObj, depth - 1);
             }
         }
         return 1;
@@ -872,32 +871,34 @@ public abstract class OrmDaoUtils {
         return n;
     }
 
-    public static <T> int saveNewObjectCascadeShallow (Connection connection, T object)
+    public static <T> int saveNewObjectWithReferences(Connection connection, T object)
             throws PersistenceException {
         return saveNewObject(connection, object)
                 + saveObjectReferences(connection, object);
     }
 
-    public static <T> int saveNewObjectCascade (Connection connection, T object)
+    public static <T> int saveNewObjectCascade (Connection connection, T object, int depth)
             throws PersistenceException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        int n= saveNewObject(connection, object);
-        if(mapInfo.hasReferences()) {
+        int n = saveNewObject(connection, object);
+
+        if(depth > 0 && mapInfo.hasReferences()) {
             for (SimpleTableReference ref : mapInfo.getReferences()) {
-                n += saveNewObjectReferenceCascade(connection, object, ref, mapInfo);
+                n += innerSaveNewObjectReferenceCascade(connection, object, ref, mapInfo, depth);
             }
         }
         return n;
     }
 
-    public static <T> int updateObjectCascadeShallow (Connection connection, T object)
+    public static <T> int updateObjectWithReferences(Connection connection, T object)
             throws PersistenceException {
         return updateObject(connection, object)
            + saveObjectReferences(connection, object);
     }
 
-    private static <T> int replaceObjectsAsTabulationCascade(Connection connection, List<T> dbObjects,List<T> newObjects)
+    private static <T> int innerReplaceObjectsAsTabulationCascade(Connection connection, List<T> dbObjects,
+                                                             List<T> newObjects, int depth)
             throws PersistenceException {
 
         if(newObjects == null || newObjects.size()==0){
@@ -905,7 +906,7 @@ public abstract class OrmDaoUtils {
                 return 0;
             }
             for(T obj: dbObjects){
-                deleteObjectCascade(connection, obj);
+                deleteObjectCascade(connection, obj, depth -1);
             }
             return dbObjects.size();
         }
@@ -919,23 +920,24 @@ public abstract class OrmDaoUtils {
         int resN = 0;
         if(comRes.getLeft() != null) {
             for (T obj : comRes.getLeft()) {
-                resN += saveNewObjectCascade(connection, obj);
+                resN += saveNewObjectCascade(connection, obj, depth-1);
             }
         }
         if(comRes.getRight() != null) {
             for (T obj : comRes.getRight()) {
-                resN += deleteObjectCascade(connection, obj);
+                resN += deleteObjectCascade(connection, obj,depth-1);
             }
         }
         if(comRes.getMiddle() != null) {
             for (Pair<T, T> pobj : comRes.getMiddle()) {
-                resN += updateObjectCascade(connection, pobj.getRight());
+                resN += updateObjectCascade(connection, pobj.getRight(), depth-1);
             }
         }
         return resN;
     }
 
-    private static <T> int updateObjectReferenceCascade(Connection connection, T object,SimpleTableReference ref ,TableMapInfo mapInfo )
+    private static <T> int innerUpdateObjectReferenceCascade(Connection connection, T object,
+                       SimpleTableReference ref ,TableMapInfo mapInfo, int depth)
             throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
@@ -952,16 +954,17 @@ public abstract class OrmDaoUtils {
         for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
             properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
         }
+
         int  n = 0;
         List<?> refs = listObjectsByProperties(connection,  properties, refType);
         if(newObj==null){
             if(refs!=null && refs.size()>0) {
                 if (//ref.getReferenceType().equals(refType) || oneToOne
                         ref.getReferenceType().isAssignableFrom(refType) ){
-                    n += deleteObjectCascade(connection, refs.get(0));
+                    n += deleteObjectCascade(connection, refs.get(0), depth);
                 } else {
                     for (Object subObj : refs) {
-                        n += deleteObjectCascade(connection, subObj);
+                        n += deleteObjectCascade(connection, subObj, depth);
                     }
                 }
             }
@@ -971,27 +974,27 @@ public abstract class OrmDaoUtils {
         if (//ref.getReferenceType().equals(refType) || oneToOne
                 ref.getReferenceType().isAssignableFrom(refType) ){
             if(refs!=null && refs.size()>0){
-                updateObjectCascade(connection, newObj);
+                updateObjectCascade(connection, newObj, depth);
             }else{
-                saveNewObjectCascade(connection, newObj);
+                saveNewObjectCascade(connection, newObj, depth);
             }
         }else if(Set.class.isAssignableFrom(ref.getReferenceType())){
-            replaceObjectsAsTabulationCascade(connection,  (List<Object>) refs,
-                    new ArrayList<>((Set<?>) newObj));
+            innerReplaceObjectsAsTabulationCascade(connection,  (List<Object>) refs,
+                    new ArrayList<>((Set<?>) newObj), depth);
         }else if(List.class.isAssignableFrom(ref.getReferenceType())){
-            replaceObjectsAsTabulationCascade(connection,  (List<Object>) refs,
-                    (List<Object>) newObj );
+            innerReplaceObjectsAsTabulationCascade(connection,  (List<Object>) refs,
+                    (List<Object>) newObj, depth);
         }
 
         return 1;
     }
 
-    public static <T> int updateObjectCascade (Connection connection, T object) throws PersistenceException {
+    public static <T> int updateObjectCascade (Connection connection, T object, int depth) throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        int n= updateObject(connection, object);
-        if(mapInfo.hasReferences()) {
+        int n = updateObject(connection, object);
+        if(depth > 0 && mapInfo.hasReferences()) {
             for (SimpleTableReference ref : mapInfo.getReferences()) {
-                n += updateObjectReferenceCascade(connection, object, ref, mapInfo);
+                n += innerUpdateObjectReferenceCascade(connection, object, ref, mapInfo, depth);
             }
         }
         return n;
@@ -1052,26 +1055,26 @@ public abstract class OrmDaoUtils {
             throw new PersistenceException(e);
         }
     }
-    public static <T> int mergeObjectCascadeShallow(Connection connection, T object)
+    public static <T> int mergeObjectWithReferences(Connection connection, T object)
             throws PersistenceException {
         object = prepareObjectForMerge(connection,  object);
         int  checkExists = checkObjectExists(connection, object);
         if(checkExists == 0){
-            return saveNewObjectCascadeShallow(connection, object);
+            return saveNewObjectWithReferences(connection, object);
         }else if(checkExists == 1){
-            return updateObjectCascadeShallow(connection, object);
+            return updateObjectWithReferences(connection, object);
         }else{
             throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"主键属性有误，返回多个条记录。");
         }
     }
 
-    public static <T> int mergeObjectCascade(Connection connection, T object) throws PersistenceException {
+    public static <T> int mergeObjectCascade(Connection connection, T object, int depth) throws PersistenceException {
         object = prepareObjectForMerge(connection,  object);
         int  checkExists = checkObjectExists(connection,object);
         if(checkExists == 0){
-            return saveNewObjectCascade(connection,object);
+            return saveNewObjectCascade(connection,object, depth);
         }else if(checkExists == 1){
-            return updateObjectCascade(connection, object);
+            return updateObjectCascade(connection, object, depth);
         }else{
             throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"主键属性有误，返回多个条记录。");
         }

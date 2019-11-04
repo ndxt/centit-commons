@@ -40,9 +40,9 @@ public abstract class FieldType {
         return st;
     }
 
-    public static String mapToHumpName(String dbObjectName, boolean firstUpCase){
-        String sTempName = dbObjectName.toLowerCase();
-        int nl = dbObjectName.length();
+    public static String mapToHumpName(String columnName, boolean firstUpCase){
+        String sTempName = columnName.toLowerCase();
+        int nl = columnName.length();
         int i=0;
 
         StringBuilder sClassName = new StringBuilder();
@@ -69,20 +69,20 @@ public abstract class FieldType {
     }
 
     /**
-     * @param dbObjectName 数据库中的名称（代码）
+     * @param columnName 数据库中的名称（代码）
      * @return 大驼峰 名称
      */
-    public static String mapClassName(String dbObjectName){
-        return mapToHumpName(dbObjectName, true);
+    public static String mapClassName(String columnName){
+        return mapToHumpName(columnName, true);
     }
 
 
     /**
-     * @param dbObjectName 数据库中的名称（代码）
+     * @param columnName 数据库中的名称（代码）
      * @return 小驼峰 名称
      */
-    public static String mapPropName(String dbObjectName){
-        return mapToHumpName(dbObjectName, false);
+    public static String mapPropName(String columnName){
+        return mapToHumpName(columnName, false);
     }
     /**
      * 转换到Oracle的字段

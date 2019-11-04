@@ -176,7 +176,7 @@ public abstract class JpaMetadata {
                     mapInfo.appendOrderBy(column, orderBy.value());
                 }
 
-            }else if(field.isAnnotationPresent(EmbeddedId.class)){
+            } else if(field.isAnnotationPresent(EmbeddedId.class)){
                 EmbeddedId embeddedId = field.getAnnotation(EmbeddedId.class);
                 mapInfo.setPkName(field.getName());
                 for(Field idField : field.getType().getDeclaredFields()){
@@ -199,46 +199,47 @@ public abstract class JpaMetadata {
                         }
                     }
                 }
-            }else if ( field.isAnnotationPresent(OneToOne.class)
-                    || field.isAnnotationPresent(OneToMany.class) ) {
+            } else { /*if ( field.isAnnotationPresent(OneToOne.class)
+                    || field.isAnnotationPresent(OneToMany.class)
+                    || field.isAnnotationPresent(ManyToOne.class)
+                    || field.isAnnotationPresent(ManyToMany.class))*/
+                Class targetClass = null;
 
-                SimpleTableReference reference = new SimpleTableReference();
                 if (field.isAnnotationPresent(OneToOne.class)) {
                     OneToOne oneToOne = field.getAnnotation(OneToOne.class);
-                    Class targetClass = oneToOne.targetEntity();
-                    if(/*targetClass ==null || */targetClass.equals(void.class) )
+                    targetClass = oneToOne.targetEntity();
+                    if(/*targetClass ==null || */targetClass.equals(void.class) ) {
                         targetClass = field.getType();
-                    reference.setTargetEntityType(targetClass);
+                    }
                 }else if (field.isAnnotationPresent(ManyToOne.class)) {
                     ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
-                    Class targetClass = manyToOne.targetEntity();
-                    if(/*targetClass ==null || */targetClass.equals(void.class) )
+                    targetClass = manyToOne.targetEntity();
+                    if(/*targetClass ==null || */targetClass.equals(void.class)) {
                         targetClass = field.getType();
-                    reference.setTargetEntityType(targetClass);
+                    }
                 }else if (field.isAnnotationPresent(OneToMany.class)) {
                     OneToMany oneToMany = field.getAnnotation(OneToMany.class);
-                    Class targetClass = oneToMany.targetEntity();
+                    targetClass = oneToMany.targetEntity();
                     if(/*targetClass ==null || */targetClass.equals(void.class) ) {
                         Type t = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
                         if(t instanceof Class){
                             targetClass = (Class<?>)t;
                         }
                     }
-                    reference.setTargetEntityType(targetClass);
                 }else if (field.isAnnotationPresent(ManyToMany.class)) {
                     ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
-                    Class targetClass = manyToMany.targetEntity();
+                    targetClass = manyToMany.targetEntity();
                     if(/*targetClass ==null ||*/ targetClass.equals(void.class) ) {
                         Type t = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
                         if(t instanceof Class){
                             targetClass = (Class<?>) t;
                         }
                     }
-                    reference.setTargetEntityType(targetClass);
                 }
 
-                if(reference.getTargetEntityType() !=null
-                        &&  ! reference.getTargetEntityType().equals(void.class) ) {
+                if(targetClass !=null && !targetClass.equals(void.class)) {
+                    SimpleTableReference reference = new SimpleTableReference();
+                    reference.setTargetEntityType(targetClass);
                     boolean haveJoinColumns = false;
                     if (field.isAnnotationPresent(JoinColumn.class)) {
                         JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
