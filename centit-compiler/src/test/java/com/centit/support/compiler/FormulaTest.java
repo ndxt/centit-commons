@@ -10,7 +10,20 @@ import java.util.Map;
 public class FormulaTest {
 
     public  static void  main(String[] args)   {
-        testFormula();
+        testFormula4();
+    }
+
+    public static void testFormula4() {
+        System.out.println(VariableFormula.checkFormula("a+b(),()"));
+        System.out.println(VariableFormula.checkFormula("today()"));
+        System.out.println(VariableFormula.checkFormula("today"));
+        System.out.println(VariableFormula.checkFormula("a+(b)"));
+        System.out.println(VariableFormula.checkFormula("a+(b,c)"));
+        System.out.println(VariableFormula.checkFormula("a+(b,+)"));
+        System.out.println(VariableFormula.checkFormula("a,b"));
+        System.out.println(VariableFormula.checkFormula("(a,b,c,(a,b),c)"));
+        System.out.println(VariableFormula.checkFormula("a+b()"));
+        System.out.println("Done!");
     }
 
     public static void testFormula() {
@@ -83,8 +96,6 @@ public class FormulaTest {
         System.out.println(StringBaseOpt.castObjectToString(s));
         System.out.println("Done!");
     }
-
-
 
     public static void testLexer() {
         Lexer l = new Lexer("hello jane , jan say!");

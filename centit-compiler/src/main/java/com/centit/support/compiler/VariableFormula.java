@@ -48,8 +48,18 @@ public class VariableFormula {
                     return(ConstDefine.OP_EQ);//m_iPreIsn = ConstDefine.OP_EQ ;return ConstDefine.OP_EQ;
                 }
                 return(ConstDefine.OP_EVALUATE);//    m_iPreIsn = ConstDefine.OP_EVALUATE;return ConstDefine.OP_EVALUATE;
-            case '+': return(ConstDefine.OP_ADD); //{ m_iPreIsn = ConstDefine.OP_ADD ; return ConstDefine.OP_ADD ;}
-            case '-': return(ConstDefine.OP_SUB);//{ m_iPreIsn = ConstDefine.OP_SUB ; return ConstDefine.OP_SUB;}
+            case '+': {
+                if(sl==1) {
+                return(ConstDefine.OP_ADD); //{ m_iPreIsn = ConstDefine.OP_ADD ; return ConstDefine.OP_ADD ;}
+                }
+                break;
+            }
+            case '-': {
+                if(sl==1) {
+                    return (ConstDefine.OP_SUB);//{ m_iPreIsn = ConstDefine.OP_SUB ; return ConstDefine.OP_SUB;}
+                }
+                break;
+            }
             case '*': return(ConstDefine.OP_MUL);//m_iPreIsn = ConstDefine.OP_MUL; return ConstDefine.OP_MUL;
             case '/': return(ConstDefine.OP_DIV);//m_iPreIsn = ConstDefine.OP_DIV; return ConstDefine.OP_DIV;
             case '%': return(ConstDefine.OP_MOD);
@@ -107,13 +117,25 @@ public class VariableFormula {
         return -1;
     }
 
-    public static final boolean isKeyWord(String sWord) {
+    public static boolean isKeyWord(String sWord) {
         if (sWord == null || sWord.length()==0)
             return false;
         char firstChar = sWord.charAt(0);
         if ((firstChar == ',') || (firstChar == '(') || (firstChar == ')'))
             return true;
-        if ((firstChar =='-') && (sWord.length()>1)) return false;
+        return getOptID(sWord)>0;
+    }
+
+    private  static boolean isBinocularOperator(String sWord) {
+        if (sWord == null || sWord.length()==0)
+            return false;
+        char firstChar = sWord.charAt(0);
+        if (firstChar == ',')
+            return true;
+        if ( (firstChar =='!' && sWord.length()==1) ||
+            "not".equalsIgnoreCase(sWord)){
+            return false;
+        }
         return getOptID(sWord)>0;
     }
 
@@ -513,37 +535,39 @@ public class VariableFormula {
      * @return 返回出错的位置，0 表示表达式格式检查通过
      */
     public int checkFormula() {
-        /*if(hasPreTreat)
-            szExpress=preTreat.runPretreatment(szExpress);*/
-        int nNextType = 1;
+        boolean endWithBracket = false;
+        boolean endWithOpt = true;
         int nBrackets = 0;
         //lex.setFormula(szExpress);
         String sWord;
         sWord = lex.getAWord();
         while(!StringBaseOpt.isNvl(sWord)){
-            boolean bKW = VariableFormula.isKeyWord(sWord);
-            if(nNextType == 1){
-                if(bKW){
-                    if ("(".equals(sWord) )
-                        nBrackets ++;
-                        //else if (")".equals(sWord))
-                        //    nBrackets --;
-                    else if ((!sWord.equalsIgnoreCase("NOT"))
-                            && (! "!".equals(sWord))) // sWord!="!"
-                        return lex.getCurrPos()+1;
-                }else nNextType = 0;
-            }else{
-                if(bKW){
-                    if (")".equals(sWord))
-                        nBrackets --;
-                    else if ("(".equals(sWord)){
-                        nBrackets ++;
-                        nNextType = 1;
-                    }
-                    else nNextType = 1;
-                }else
-                    return lex.getCurrPos()+1;
+            boolean isOpt = VariableFormula.isBinocularOperator(sWord);
+            if(isOpt && endWithOpt){
+                return lex.getCurrPos()+1;
             }
+
+            if ("(".equals(sWord)){
+                if(endWithBracket){
+                    return lex.getCurrPos()+1;
+                }
+                nBrackets ++;
+            } else if (")".equals(sWord)) {
+                if(endWithOpt){
+                    return lex.getCurrPos()+1;
+                }
+                nBrackets--;
+            }
+
+            if(",".equals(sWord)){
+                if(nBrackets==0){
+                    return lex.getCurrPos()+1;
+                }
+            }
+
+            endWithBracket = ")".equals(sWord);
+            endWithOpt = isOpt;
+
             if(nBrackets<0)
                 return lex.getCurrPos()+1;
             sWord = lex.getAWord();
