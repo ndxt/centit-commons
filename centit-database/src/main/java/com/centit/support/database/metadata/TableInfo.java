@@ -95,7 +95,7 @@ public interface TableInfo {
      * @return 否是主键
      */
     default boolean isParmaryKey(String colname){
-        TableField field = findFieldByName(colname);
+        TableField field = findFieldByColumn(colname);
         return field != null && field.isPrimaryKey();
     }
 
@@ -109,7 +109,7 @@ public interface TableInfo {
         if(columns!=null) {
             for (TableField field : columns) {
                 if (field.isPrimaryKey()) {
-                    pkCols.add(field.getPropertyName());
+                    pkCols.add(field.getColumnName());
                 }
             }
         }
