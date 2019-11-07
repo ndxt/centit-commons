@@ -157,11 +157,8 @@ public abstract class JpaMetadata {
                         Basic colBasic = field.getAnnotation(Basic.class);
                         isLazy = colBasic.fetch() == FetchType.LAZY;
                     }
-                    if(isLazy){
-                        mapInfo.addLazyColumn(column);
-                    } else {
-                        mapInfo.addColumn(column);
-                    }
+                    column.setLazyFetch(isLazy);
+                    mapInfo.addColumn(column);
                 }
 
                 if(field.isAnnotationPresent(ValueGenerator.class) ){

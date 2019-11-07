@@ -148,27 +148,42 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return this.tableInfo;
     }
 
-
     /**
      * 返回 sql 语句 和 属性名数组
      * @param ti TableInfo
      * @param alias String
+     * @param builderType 1 非lazy字段 2 lazy字段 3 all所有字段
      * @return Pair String String []
      */
-    public static String buildFieldSql(TableInfo ti, String alias){
+    public static String buildFieldSql(TableInfo ti, String alias, int builderType){
         StringBuilder sBuilder= new StringBuilder();
         List<? extends TableField> columns = ti.getColumns();
         boolean addAlias = StringUtils.isNotBlank(alias);
         int i=0;
         for(TableField col : columns){
-            sBuilder.append(i > 0 ? ", " : " ");
-            if(addAlias)
-                sBuilder.append(alias).append('.');
-            sBuilder.append(col.getColumnName());
-            i++;
+            if(builderType == 3 ||
+                (builderType==1 && !col.isLazyFetch()) ||
+                (builderType==2 && col.isLazyFetch())) {
+
+                sBuilder.append(i > 0 ? ", " : " ");
+                if (addAlias)
+                    sBuilder.append(alias).append('.');
+                sBuilder.append(col.getColumnName());
+                i++;
+            }
         }
         return sBuilder.toString();
     }
+
+   /*
+     * 返回 sql 语句 和 包括所有属性名数组
+     * @param ti TableInfo
+     * @param alias String
+     * @return Pair String String []
+    public static String buildFieldSql(TableInfo ti, String alias){
+        return buildFieldSql(ti, alias, 3);
+    }
+   */
 
     /**
      * 返回 sql 语句 和 属性名数组
@@ -194,19 +209,23 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         }
         return sBuilder.toString();
     }
+
     /**
      * 返回 sql 语句 和 属性名数组
      * @param ti TableInfo
      * @param alias String
      * @return Pair String String []
      */
-    public static Pair<String,String[]> buildFieldSqlWithFieldName(TableInfo ti, String alias){
+    public static Pair<String,String[]> buildFieldSqlWithFieldName(TableInfo ti, String alias, boolean excludeLazy){
         StringBuilder sBuilder= new StringBuilder();
         List<? extends TableField> columns = ti.getColumns();
         String [] fieldNames = new String[columns.size()];
         boolean addAlias = StringUtils.isNotBlank(alias);
         int i=0;
         for(TableField col : columns){
+            if(excludeLazy && col.isLazyFetch()){
+                continue;
+            }
             if(i>0) {
                 sBuilder.append(", ");
             } else {
@@ -218,7 +237,6 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 sBuilder.append(alias).append('.');
             }
             sBuilder.append(col.getColumnName());
-
         }
         return new ImmutablePair<>(sBuilder.toString(),fieldNames);
     }
@@ -468,8 +486,8 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return sBuilder.toString();
     }
 
-    public static Pair<String,String[]> buildGetObjectSqlByPk(TableInfo ti){
-        Pair<String,String[]> q = buildFieldSqlWithFieldName(ti,null);
+    public static Pair<String,String[]> buildGetObjectSqlByPk(TableInfo ti, boolean excludeLazy){
+        Pair<String,String[]> q = buildFieldSqlWithFieldName(ti,null, excludeLazy);
         return new ImmutablePair<>(
                 "select " + q.getLeft() +" from " +ti.getTableName() + " where " + buildFilterSqlByPk(ti,null),
                 q.getRight());
@@ -502,7 +520,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     @Override
     public JSONObject getObjectById(final Object keyValue) throws SQLException, IOException {
         Map<String, Object> keyValues = makePkFieldMap(keyValue);
-        Pair<String,String[]> q = buildGetObjectSqlByPk(tableInfo);
+        Pair<String,String[]> q = buildGetObjectSqlByPk(tableInfo, false);
         JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(
             conn, q.getLeft(),
             keyValues,
@@ -515,7 +533,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     @Override
     public JSONObject getObjectByProperties(final Map<String, Object> properties) throws SQLException, IOException {
 
-        Pair<String,String[]> q = buildFieldSqlWithFieldName(tableInfo,null);
+        Pair<String,String[]> q = buildFieldSqlWithFieldName(tableInfo,null, false);
         String filter = GeneralJsonObjectDao.buildFilterSql(tableInfo,null,properties.keySet());
         JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(
                  conn,
@@ -536,9 +554,15 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
          return sql;
     }
 
+    /**
+     * 查询语句默认 不包括 lazy 字段
+     * @param tableInfo 表信息
+     * @param properties 查询字段属性
+     * @return 语句和字段名称
+     */
     public static Pair<String,String[]> buildQuerySqlByProperties(TableInfo tableInfo, final Map<String, Object> properties){
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(tableInfo,null);
-        String filter = GeneralJsonObjectDao.buildFilterSql(tableInfo,null,properties.keySet());
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(tableInfo,null, true);
+        String filter = GeneralJsonObjectDao.buildFilterSql(tableInfo,null, properties.keySet());
         String sql = "select " + q.getLeft() + " from " +tableInfo.getTableName();
         if(StringUtils.isNotBlank(filter))
             sql = sql + " where " + filter;
@@ -866,7 +890,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     @Override
     public JSONArray findObjectsAsJSON(final String sSql, final Object[] values, final String[] fieldnames)
             throws SQLException, IOException {
-        return DatabaseAccess.findObjectsAsJSON(conn, sSql,values, fieldnames);
+        return DatabaseAccess.findObjectsAsJSON(conn, sSql, values, fieldnames);
     }
 
     @Override

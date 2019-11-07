@@ -173,21 +173,6 @@ public abstract class OrmUtils {
                 fields.put(column.getPropertyName(),value);
             }
         }
-
-        tableFields = tableInfo.getLazyColumns();
-        if(tableFields != null) {
-            for (SimpleTableField column : tableFields) {
-                Object value = column.getObjectFieldValue(object);
-                //ReflectionOpt.getFieldValue(object, column.getPropertyName());
-                if (value != null) {
-                    // BOOLEAN 不支持 懒加载，主要是没有这个必要
-                    /*if(FieldType.JSON_OBJECT.equals(column.getFieldType())){
-                        value = JSON.toJSONString(value);
-                    }*/
-                    fields.put(column.getPropertyName(), value);
-                }
-            }
-        }
         return fields;
     }
 

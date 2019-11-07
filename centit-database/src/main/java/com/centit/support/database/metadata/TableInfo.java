@@ -1,6 +1,13 @@
 package com.centit.support.database.metadata;
 
+import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface TableInfo {
     /**
@@ -66,4 +73,5 @@ public interface TableInfo {
      * @return 获取引用信息（外键）但是数据库中不一定有对应的外键
      */
     List<? extends TableReference> getReferences();
+
 }

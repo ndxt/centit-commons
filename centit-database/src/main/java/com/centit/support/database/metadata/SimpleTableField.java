@@ -27,6 +27,7 @@ public class SimpleTableField implements TableField {
     private Integer  precision;//有效数据位数 Only used when sType=Long Number Float
     private Integer  scale;//精度 Only used when sType= Long Number Float
     private JavaBeanField beanField;
+    private boolean lazyFetch;
 
     public void mapToMetadata(){
         //这个和下面的 mapToDatabaseType 不对称
@@ -45,6 +46,7 @@ public class SimpleTableField implements TableField {
      * java type's full name
      * @return String
      */
+    @Override
     public Class<?> getJavaType(){
         if(beanField != null){
             return beanField.getFieldType();
@@ -63,6 +65,7 @@ public class SimpleTableField implements TableField {
      * 字段属性名，是通过字段的code转化过来的
      * @return String
      */
+    @Override
     public String getPropertyName() {
         return propertyName;
     }
@@ -93,6 +96,7 @@ public class SimpleTableField implements TableField {
      * 字段中文名，对应Pdm中的name
      * @return String
      */
+    @Override
     public String getFieldLabelName() {
         return fieldLabelName;
     }
@@ -109,6 +113,7 @@ public class SimpleTableField implements TableField {
      * 字段代码，对应Pdm中的code
      * @return String
      */
+    @Override
     public String getColumnName() {
         return columnName;
     }
@@ -124,6 +129,7 @@ public class SimpleTableField implements TableField {
      * 字段描述，对应Pdm中的Comment
      * @return String
      */
+    @Override
     public String getColumnComment() {
         return columnComment;
     }
@@ -132,12 +138,22 @@ public class SimpleTableField implements TableField {
         columnComment = comment;
     }
 
+    @Override
     public boolean isMandatory() {
         return mandatory;
     }
 
     public void setMandatory(boolean notnull) {
         this.mandatory = notnull;
+    }
+
+    @Override
+    public boolean isLazyFetch() {
+        return lazyFetch;
+    }
+
+    public void setLazyFetch(boolean lazyFetch) {
+        this.lazyFetch = lazyFetch;
     }
 
     public void setMandatory(String notnull) {
@@ -153,6 +169,7 @@ public class SimpleTableField implements TableField {
      * 这个和Precision其实可以共用一个字段
      * @return 最大长度
      */
+    @Override
     public Integer getMaxLength() {
         return maxLength;
     }
@@ -188,6 +205,7 @@ public class SimpleTableField implements TableField {
      * 字段属性在数据库表中的类型
      * @return String
      */
+    @Override
     public String getColumnType() {
         return columnType;
     }
@@ -201,6 +219,7 @@ public class SimpleTableField implements TableField {
         }
     }
 
+    @Override
     public String getDefaultValue() {
         return defaultValue;
     }

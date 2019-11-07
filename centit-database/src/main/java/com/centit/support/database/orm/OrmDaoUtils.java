@@ -247,7 +247,7 @@ public abstract class OrmDaoUtils {
             throws PersistenceException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildGetObjectSqlByPk(mapInfo);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildGetObjectSqlByPk(mapInfo, false);
 
         if(ReflectionOpt.isScalarType(id.getClass())){
             if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
@@ -267,11 +267,11 @@ public abstract class OrmDaoUtils {
 
     }
 
-    public static <T> T getObjectIncludeLazyById(Connection connection, Object id, final Class<T> type)
+    public static <T> T getObjectExcludeLazyById(Connection connection, Object id, final Class<T> type)
             throws PersistenceException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        String  sql =  "select " + mapInfo.buildFieldIncludeLazySql("") +
+        String  sql =  "select " + GeneralJsonObjectDao.buildFieldSql(mapInfo,"", 1) +
                 " from " +mapInfo.getTableName() + " where " +
                 GeneralJsonObjectDao.buildFilterSqlByPk(mapInfo,null);
 
@@ -351,7 +351,7 @@ public abstract class OrmDaoUtils {
     public static <T> T getObjectByProperties(Connection connection, Map<String, Object> properties, Class<T> type)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(mapInfo,null);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(mapInfo,null, false);
         String filter = GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet());
         String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
         if(StringUtils.isNotBlank(filter))
@@ -366,7 +366,7 @@ public abstract class OrmDaoUtils {
     public static <T> List<T> listAllObjects(Connection connection, Class<T> type)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(mapInfo,null);
+        Pair<String,String[]> q = GeneralJsonObjectDao.buildFieldSqlWithFieldName(mapInfo,null, true);
         String sql = "select " + q.getLeft() +" from " +mapInfo.getTableName();
 
         if(StringUtils.isNotBlank(mapInfo.getOrderBy()))
@@ -483,7 +483,7 @@ public abstract class OrmDaoUtils {
     public static <T> T fetchObjectLazyColumns(Connection connection, T object)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        String fieldSql = mapInfo.buildLazyFieldSql(null);
+        String fieldSql =  GeneralJsonObjectDao.buildFieldSql(mapInfo,"", 2) ;
         if(fieldSql==null)
             return object;
         Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
