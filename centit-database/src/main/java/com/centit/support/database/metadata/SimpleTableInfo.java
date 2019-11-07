@@ -2,6 +2,7 @@ package com.centit.support.database.metadata;
 
 import com.centit.support.database.utils.FieldType;
 import com.centit.support.file.FileSystemOpt;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -107,6 +108,9 @@ public class SimpleTableInfo implements TableInfo{
     }
 
     public String getPkName() {
+        if(StringUtils.isBlank(pkName)){
+            return "PK_" + this.tableName;
+        }
         return pkName;
     }
 
