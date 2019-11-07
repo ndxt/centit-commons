@@ -176,7 +176,7 @@ public class SimpleTableInfo implements TableInfo{
                 return col;
         }
         for(SimpleTableField col : columns){
-            if(col.getColumnName().equals(name))
+            if(col.getColumnName().equalsIgnoreCase(name))
                 return col;
         }
         return null;
@@ -190,7 +190,7 @@ public class SimpleTableInfo implements TableInfo{
     @Override
     public SimpleTableField findFieldByColumn(String name){
         for(SimpleTableField col : columns){
-            if(col.getColumnName().equals(name))
+            if(col.getColumnName().equalsIgnoreCase(name))
                 return col;
         }
         for(SimpleTableField col : columns){
