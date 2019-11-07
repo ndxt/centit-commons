@@ -1,5 +1,7 @@
 package com.centit.support.database.metadata;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +47,6 @@ public interface TableInfo {
      */
     TableField findFieldByColumn(String name);
 
-
     /**
      * 获取所有的列名
      * @return 所有的列名
@@ -69,11 +70,15 @@ public interface TableInfo {
     /**
      * @return 获取主键列名 主键是有次序的
      */
+    @JSONField(serialize = false)
     default List<String> getPkColumns(){
         List<String> pkCols = new ArrayList<>(4);
-        for(TableField field : this.getColumns()){
-            if(field.isPrimaryKey()){
-                pkCols.add(field.getPropertyName());
+        List<? extends TableField> columns = this.getColumns();
+        if(columns!=null) {
+            for (TableField field : columns) {
+                if (field.isPrimaryKey()) {
+                    pkCols.add(field.getPropertyName());
+                }
             }
         }
         return pkCols;
