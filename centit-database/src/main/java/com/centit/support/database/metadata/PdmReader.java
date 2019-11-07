@@ -247,7 +247,7 @@ public class PdmReader implements DatabaseMetadata {
             hibernateMeta.setIdType( tableMeta.getPackageName()+'.'+tableMeta.getClassName()+"Id" );
             hibernateMeta.setIdName( "cid");
         }else if(tableMeta.countPkColumn()==1){
-            SimpleTableField field = tableMeta.findField(tableMeta.getPkColumns().get(0));
+            TableField field = tableMeta.getPkFields().get(0);
             hibernateMeta.setIdType(field.getJavaType().getName());
             hibernateMeta.setIdName( field.getPropertyName() );
         }

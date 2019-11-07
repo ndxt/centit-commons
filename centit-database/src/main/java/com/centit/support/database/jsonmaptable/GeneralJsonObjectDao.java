@@ -269,8 +269,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     }
 
     public static boolean checkHasAllPkColumns(TableInfo tableInfo, Map<String, Object> properties){
-        for(String pkc : tableInfo.getPkColumns() ){
-            TableField field = tableInfo.findFieldByColumn(pkc);
+        for(TableField field : tableInfo.getPkFields()){
             if( field != null
                 && properties.get(field.getPropertyName()) == null
                 && properties.get(field.getColumnName()) == null) {
@@ -393,14 +392,13 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public static String buildFilterSqlByPk(TableInfo ti,String alias){
         StringBuilder sBuilder= new StringBuilder();
         int i=0;
-        List<String> pkColumns = ti.getPkColumns();
+        List<TableField> pkColumns = ti.getPkFields();
         if(pkColumns == null || pkColumns.size()==0){
             throw new RuntimeException("表或者视图 " + ti.getTableName() +" 缺少对应主键。" );
         }
-        for(String plCol : pkColumns){
+        for(TableField col : pkColumns){
             if(i>0)
                 sBuilder.append(" and ");
-            TableField col = ti.findFieldByColumn(plCol);
             if(StringUtils.isNotBlank(alias))
                 sBuilder.append(alias).append('.');
             sBuilder.append(col.getColumnName()).append(" = :").append(col.getPropertyName());
@@ -492,8 +490,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         if(keyValue instanceof Map) {
             Map<String, Object> objectValues = (Map<String, Object>) keyValue;
             Map<String, Object> pkMap = new HashMap<>(4);
-            for (String pkCol : tableInfo.getPkColumns()) {
-                TableField field = tableInfo.findFieldByColumn(pkCol);
+            for (TableField field : tableInfo.getPkFields()) {
                 Object pkValue = objectValues.get(field.getPropertyName());
                 if(pkValue==null){
                     pkValue = objectValues.get(field.getColumnName());
@@ -507,7 +504,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         }else {
             if (tableInfo.countPkColumn() != 1)
                 throw new SQLException("表" + tableInfo.getTableName() + "不是单主键表，这个方法不适用。");
-            return CollectionsOpt.createHashMap(tableInfo.getPkColumns().get(0), keyValue);
+            return CollectionsOpt.createHashMap(tableInfo.getPkFields().get(0).getPropertyName(), keyValue);
         }
     }
 
@@ -759,8 +756,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         }
         @Override
         public int compare(Map<String,Object> o1, Map<String,Object> o2) {
-            for(String pkc : tableInfo.getPkColumns() ){
-                TableField field = tableInfo.findFieldByColumn(pkc);
+            for(TableField field : tableInfo.getPkFields()){
                 Object f1 = o1.get(field.getPropertyName());
                 Object f2 = o2.get(field.getPropertyName());
                 if(f1==null){

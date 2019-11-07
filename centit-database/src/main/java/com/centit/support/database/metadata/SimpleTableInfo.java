@@ -297,23 +297,22 @@ public class SimpleTableInfo implements TableInfo{
         classElt.addAttribute("table", tableName.toUpperCase());
         classElt.addAttribute("schema", schema);
         //save primary key
-        List<String> pkColumns = getPkColumns();
+        List<TableField> pkColumns = getPkFields();
         if(pkColumns.size()>1){
             Element idElt = classElt.addElement("composite-id");
             idElt.addAttribute("name", "cid");
             idElt.addAttribute("class", packageName+'.'+getClassName()+"Id");
-            for(String pkcol : pkColumns){
-                SimpleTableField field = findField(pkcol);
-                if(field!=null){
+            for(TableField field : pkColumns){
+                if(field != null){
                     Element keyElt = idElt.addElement("key-property");
-                    saveProperty(field,keyElt,true);
+                    saveProperty((SimpleTableField) field, keyElt,true);
                     //colElt.addAttribute("not-null", "true");
                 }
             }
         }else if(pkColumns.size()==1){
             Element idElt = classElt.addElement("id");
-            SimpleTableField field = findField(pkColumns.get(0));
-            saveProperty(field,idElt,true);
+            TableField field = pkColumns.get(0);
+            saveProperty((SimpleTableField) field,idElt,true);
             Element genElt = idElt.addElement("generator");
             genElt.addAttribute("class", "assigned");
         }

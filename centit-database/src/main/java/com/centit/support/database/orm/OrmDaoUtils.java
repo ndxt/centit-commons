@@ -8,7 +8,7 @@ import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableReference;
-import com.centit.support.database.metadata.TableInfo;
+import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.utils.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -272,7 +272,7 @@ public abstract class OrmDaoUtils {
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,
                         "表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return queryNamedParamsSql(connection,new QueryAndNamedParams(q.getKey(),
-                    CollectionsOpt.createHashMap(mapInfo.getPkColumns().get(0),id)),
+                    CollectionsOpt.createHashMap(mapInfo.getPkFields().get(0).getPropertyName(),id)),
                 (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, q.getRight()));
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
@@ -299,7 +299,7 @@ public abstract class OrmDaoUtils {
             if(mapInfo.countPkColumn() != 1)
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return getObjectBySql(connection, sql,
-                    CollectionsOpt.createHashMap(mapInfo.getPkColumns().get(0),id), type);
+                    CollectionsOpt.createHashMap(mapInfo.getPkFields().get(0).getPropertyName(),id), type);
 
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
@@ -350,15 +350,13 @@ public abstract class OrmDaoUtils {
 
     public static <T> int deleteObjectById(Connection connection, Object id, Class<T> type)
             throws PersistenceException {
-
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         if(ReflectionOpt.isScalarType(id.getClass())){
             if(mapInfo.countPkColumn() != 1)
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return deleteObjectById(connection,
-                    CollectionsOpt.createHashMap(mapInfo.getPkColumns().get(0),id),
+                    CollectionsOpt.createHashMap(mapInfo.getPkFields().get(0).getPropertyName(),id),
                     mapInfo);
-
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
             if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo, idObj)){
@@ -723,15 +721,19 @@ public abstract class OrmDaoUtils {
     }
 
     public static class OrmObjectComparator<T> implements Comparator<T>{
-        private TableInfo tableInfo;
+        private TableMapInfo tableInfo;
+
         public  OrmObjectComparator(TableMapInfo tableInfo){
             this.tableInfo = tableInfo;
         }
+
         @Override
         public int compare(T o1, T o2) {
-            for(String pkc : tableInfo.getPkColumns() ){
-                Object f1 = ReflectionOpt.getFieldValue(o1,pkc);
-                Object f2 = ReflectionOpt.getFieldValue(o2,pkc);
+            for(TableField pkc : tableInfo.getPkFields() ){
+                Object f1 = ((SimpleTableField)pkc).getObjectFieldValue(o1);
+                // ReflectionOpt.getFieldValue(o1, pkc.getPropertyName());
+                Object f2 = ((SimpleTableField)pkc).getObjectFieldValue(o2);
+                // ReflectionOpt.getFieldValue(o2, pkc.getPropertyName());
                 if(f1==null){
                     if(f2!=null)
                         return -1;

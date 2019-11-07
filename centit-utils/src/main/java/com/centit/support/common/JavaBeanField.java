@@ -167,7 +167,15 @@ public class JavaBeanField {
             if (getFieldValueFunc != null) {
                 return getFieldValueFunc.invoke(obj);
             } else {
-                return objectField.get(obj);
+                boolean accessible = objectField.isAccessible();
+                if(!accessible) {
+                    objectField.setAccessible(true);
+                }
+                Object result = objectField.get(obj);
+                if(!accessible) {
+                    objectField.setAccessible(accessible);
+                }
+                return result;
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
             logger.error(e.getMessage(), e);
