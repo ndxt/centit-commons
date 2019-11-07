@@ -225,11 +225,11 @@ public class PdmReader implements DatabaseMetadata {
                 field.setColumnComment(getElementText(col,"a","Comment"));
 
                 field.mapToMetadata();
-                ref.getFkColumns().add(field);
-                ref.getReferenceColumns().put(pkColID,
+                ref.addFkColumn(field);
+                ref.addReferenceColumn(pkColID,
                         field.getColumnName());
             }
-            tab.getReferences().add(ref );
+            tab.addReference(ref );
         }
         return tab;
     }
@@ -242,11 +242,11 @@ public class PdmReader implements DatabaseMetadata {
         hibernateMeta.setTableLabelName(tableMeta.getTableLabelName());
         hibernateMeta.setTableComment(tableMeta.getTableComment());
         hibernateMeta.setMainTable(true);
-        hibernateMeta.setHasID( tableMeta.getPkColumns().size()>1 );
-        if(hibernateMeta.isHasID()){
+        hibernateMeta.setComplexId(tableMeta.countPkColumn()>1);
+        if(hibernateMeta.isComplexId()){
             hibernateMeta.setIdType( tableMeta.getPackageName()+'.'+tableMeta.getClassName()+"Id" );
             hibernateMeta.setIdName( "cid");
-        }else if(tableMeta.getPkColumns().size()==1){
+        }else if(tableMeta.countPkColumn()==1){
             SimpleTableField field = tableMeta.findField(tableMeta.getPkColumns().get(0));
             hibernateMeta.setIdType(field.getJavaType().getName());
             hibernateMeta.setIdName( field.getPropertyName() );

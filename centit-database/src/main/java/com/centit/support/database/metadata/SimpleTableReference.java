@@ -69,6 +69,13 @@ public class SimpleTableReference implements TableReference{
         this.fkColumns = fkcolumns;
     }
 
+    public void addFkColumn(SimpleTableField fkcolumn) {
+        if(fkColumns==null) {
+            fkColumns = new ArrayList<>();
+        }
+        this.fkColumns.add(fkcolumn);
+    }
+
     public boolean containColumn(String sCol) {
         if(sCol==null || fkColumns==null || fkColumns.size() == 0)
             return false;
@@ -89,8 +96,9 @@ public class SimpleTableReference implements TableReference{
 
     @Override
     public Map<String, String> getReferenceColumns() {
-        if(this.referenceColumns==null)
+        if(this.referenceColumns==null) {
             this.referenceColumns = new HashMap<>(6);
+        }
         return this.referenceColumns;
     }
 
@@ -112,7 +120,10 @@ public class SimpleTableReference implements TableReference{
      * @param referencedColumn 子表字段
      */
     public void addReferenceColumn(String column, String referencedColumn) {
-        getReferenceColumns().put(column,
+        if(this.referenceColumns==null) {
+            this.referenceColumns = new HashMap<>(6);
+        }
+        this.referenceColumns.put(column,
                 StringUtils.isBlank(referencedColumn)?column:referencedColumn);
     }
 

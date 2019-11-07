@@ -109,11 +109,11 @@ public class DB2Metadata implements DatabaseMetadata {
                     for (int i = 0; i < p.length; i++) {
                         SimpleTableField field = new SimpleTableField();
                         field.setColumnName(p[i]);
-                        ref.getFkColumns().add(field);
+                        ref.addFkColumn(field);
                         if (i < pK.length)
-                            ref.getReferenceColumns().put(pK[i], p[i]);
+                            ref.addReferenceColumn(pK[i], p[i]);
                     }
-                    tab.getReferences().add(ref);
+                    tab.addReference(ref);
                 }
             }
         } catch (SQLException e1) {
@@ -123,8 +123,7 @@ public class DB2Metadata implements DatabaseMetadata {
         // get reference detail
         for (Iterator<SimpleTableReference> it = tab.getReferences().iterator(); it.hasNext(); ) {
             SimpleTableReference ref = it.next();
-            for (Iterator<SimpleTableField> it2 = ref.getFkColumns().iterator(); it2.hasNext(); ) {
-                SimpleTableField field = it2.next();
+            for (SimpleTableField field : ref.getFkColumns()) {
                 try (PreparedStatement pStmt = dbc.prepareStatement(sqlFKColumn)) {
                     pStmt.setString(1, sDBSchema);
                     pStmt.setString(2, ref.getTableName());

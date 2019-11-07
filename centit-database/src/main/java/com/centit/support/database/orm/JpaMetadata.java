@@ -282,7 +282,7 @@ public abstract class JpaMetadata {
                     if (!keyName.equals(field.getPropertyName())) {
                         reference.getReferenceColumns().remove(keyName);
                     }
-                    reference.getReferenceColumns().put(field.getPropertyName(), refField.getPropertyName());
+                    reference.addReferenceColumn(field.getPropertyName(), refField.getPropertyName());
 
                 }
             }

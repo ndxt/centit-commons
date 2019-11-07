@@ -25,7 +25,7 @@ public class TestJDBCDDL {
         System.out.println(GeneralDDLOperations.checkLabelName("hello abc"));
         System.out.println(GeneralDDLOperations.checkLabelName("你好"));
     }
-  
+
     public  static void testJDBCMetadata(){
          DataSourceDescription dbc = new DataSourceDescription();
           dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
@@ -64,10 +64,10 @@ public class TestJDBCDDL {
             tablfilef.setColumnName("f1");
             tablfilef.setColumnType("DECIMAL");
             tablfilef.setPrecision(8);
-            tablfilef.setScale(2);  
+            tablfilef.setScale(2);
             tf.add(tablfilef);
-            tableinfo.getPkColumns().add("c1");
-            tableinfo.getPkColumns().add("d1");
+            tableinfo.setColumnAsPrimaryKey("c1");
+            tableinfo.setColumnAsPrimaryKey("d1");
             DDLOperations ddl = new OracleDDLOperations(conn);
             ddl.dropTable("ddltemp");
             ddl.createTable(tableinfo);
@@ -146,8 +146,8 @@ public class TestJDBCDDL {
             tablfilef.setPrecision(8);
             tablfilef.setScale(2);
             tf.add(tablfilef);
-            tableinfo.getPkColumns().add("c1");
-            tableinfo.getPkColumns().add("d1");
+            tableinfo.setColumnAsPrimaryKey("c1");
+            tableinfo.setColumnAsPrimaryKey("d1");
             DDLOperations ddl = new DB2DDLOperations(conn);
             ddl.dropTable("ddltemp");
             ddl.createTable(tableinfo);
@@ -208,10 +208,10 @@ public class TestJDBCDDL {
             tablfilef.setColumnName("f1");
             tablfilef.setColumnType("DECIMAL");
           tablfilef.setPrecision(8);
-          tablfilef.setScale(2);  
+          tablfilef.setScale(2);
             tf.add(tablfilef);
-            tableinfo.getPkColumns().add("c1");
-            tableinfo.getPkColumns().add("d1");
+            tableinfo.setColumnAsPrimaryKey("c1");
+            tableinfo.setColumnAsPrimaryKey("d1");
             DDLOperations ddl = new MySqlDDLOperations(conn);
             ddl.dropTable("ddltemp");
             ddl.createTable(tableinfo);

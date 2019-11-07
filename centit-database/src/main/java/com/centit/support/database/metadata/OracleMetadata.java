@@ -110,7 +110,7 @@ public class OracleMetadata implements DatabaseMetadata {
                     ref.setParentTableName(tabName);
                     ref.setTableName(rs.getString("TABLE_NAME"));
                     ref.setReferenceCode(rs.getString("CONSTRAINT_NAME"));
-                    tab.getReferences().add(ref );
+                    tab.addReference(ref );
                 }
             }
         } catch (SQLException e) {
@@ -131,7 +131,7 @@ public class OracleMetadata implements DatabaseMetadata {
                         field.setScale(rs.getInt("DATA_SCALE"));
                         field.setNullEnable(rs.getString("NULLABLE"));
                         field.mapToMetadata();
-                        ref.getFkColumns().add(field);
+                        ref.addFkColumn(field);
                     }
                 }
             } catch (SQLException e) {

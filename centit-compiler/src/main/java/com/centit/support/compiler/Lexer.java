@@ -75,14 +75,34 @@ public class Lexer {
         return startPos;
     }
 
-    static public boolean isLabel(String sWord) {
-        if(sWord.length() < 1)
+    /**
+     * isLabel 判断一个字符串是否符合标识符，是否可以作为字段名或者表名
+     * @param seq CharSequence
+     * @return boolean
+     */
+    public static boolean isLabel(final CharSequence  seq) {
+        if (seq == null || seq.length() == 0) {
             return false;
-        char c = sWord.charAt(0);
-        return ( c == '_' ||
-                ( c >= 'a' && c <= 'z') ||
-                ( c >= 'A' && c <= 'Z')
-             );
+        }
+        final int strLen = seq.length();
+        char c = seq.charAt(0);
+        if( c != '_' &&
+            ( c < 'a' || c > 'z') &&
+            ( c < 'A' || c > 'Z')
+        ) {
+            return false;
+        }
+        for (int i = 1; i < strLen; i++) {
+            c = seq.charAt(i);
+            if( c != '_' &&
+                ( c < 'a' || c > 'z') &&
+                ( c < 'A' || c > 'Z') &&
+                ( c < '0' || c > '9')
+            ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String getARawWord(){

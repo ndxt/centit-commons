@@ -96,14 +96,14 @@ public class JdbcMetadata implements DatabaseMetadata {
                 }
                 SimpleTableField field = new SimpleTableField();
                 field.setColumnName(rs.getString("FKCOLUMN_NAME"));
-                ref.getReferenceColumns().put(rs.getString("PKCOLUMN_NAME"),
+                ref.addReferenceColumn(rs.getString("PKCOLUMN_NAME"),
                         field.getColumnName());
-                ref.getFkColumns().add(field);
+                ref.addFkColumn(field);
             }
             rs.close();
 
             for(Map.Entry<String , SimpleTableReference> entry:refs.entrySet()){
-                tab.getReferences().add(entry.getValue());
+                tab.addReference(entry.getValue());
             }
 
         } catch (SQLException e) {

@@ -31,7 +31,7 @@ public class HibernateMapInfo {
     private List<SimpleTableField> keyProperties;
     private List<SimpleTableField> properties;
     private boolean isMainTable;
-    private boolean hasComplexId;
+    private boolean complexId;
     private String idType;
     private String idName;
     private List<HibernateMapInfo> one2manys;
@@ -48,12 +48,12 @@ public class HibernateMapInfo {
         return references.get(refPos).containColumn(sCol);
     }
 
-    public boolean isHasID() {
-        return hasComplexId;
+    public boolean isComplexId() {
+        return complexId;
     }
 
-    public void setHasID(boolean hasID) {
-        this.hasComplexId = hasID;
+    public void setComplexId(boolean hasID) {
+        this.complexId = hasID;
     }
 
     public String getIdType() {
@@ -121,7 +121,7 @@ public class HibernateMapInfo {
     public HibernateMapInfo()
     {
         isMainTable = true;
-        hasComplexId = false;
+        complexId = false;
     }
     public static String trimToSimpleClassName(String className)
     {
@@ -204,13 +204,13 @@ public class HibernateMapInfo {
             Element idNode = classNode.element("id");
             if(idNode != null){// 单个主键属性
                 SimpleTableField tf = loadField(idNode);
-                hasComplexId = false;
+                complexId = false;
                 idType = FieldType.trimType(tf.getJavaType().getName());
                 idName = tf.getPropertyName();
                 keyProperties.add(tf);
             }else{//复合主键值
                 idNode = classNode.element("composite-id");//key-property
-                hasComplexId = true;
+                complexId = true;
                 idType = idNode.attributeValue("class");
                 idName = idNode.attributeValue("name");
                 idType = FieldType.trimType(idType);
@@ -265,7 +265,7 @@ public class HibernateMapInfo {
                             SimpleTableField field = new SimpleTableField();
                             field.setColumnName(colElt.attributeValue("name"));
                             field.mapToMetadata();
-                            ref.getFkColumns().add(field);
+                            ref.addFkColumn(field);
                         }
                          // <column name="FKCOL1" precision="22" scale="0" not-null="true" />
                         references.add(ref);

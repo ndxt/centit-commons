@@ -250,7 +250,7 @@ public abstract class OrmDaoUtils {
         Pair<String,String[]> q = GeneralJsonObjectDao.buildGetObjectSqlByPk(mapInfo, false);
 
         if(ReflectionOpt.isScalarType(id.getClass())){
-            if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
+            if(mapInfo.countPkColumn() != 1)
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,
                         "表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return getObjectBySql(connection,q.getKey(),
@@ -276,7 +276,7 @@ public abstract class OrmDaoUtils {
                 GeneralJsonObjectDao.buildFilterSqlByPk(mapInfo,null);
 
         if(ReflectionOpt.isScalarType(id.getClass())){
-            if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
+            if(mapInfo.countPkColumn() != 1)
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return getObjectBySql(connection, sql,
                     CollectionsOpt.createHashMap(mapInfo.getPkColumns().get(0),id), type);
@@ -333,10 +333,10 @@ public abstract class OrmDaoUtils {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         if(ReflectionOpt.isScalarType(id.getClass())){
-            if(mapInfo.getPkColumns()==null || mapInfo.getPkColumns().size()!=1)
+            if(mapInfo.countPkColumn() != 1)
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,"表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return deleteObjectById(connection,
-                    CollectionsOpt.createHashMap( mapInfo.getPkColumns().get(0),id),
+                    CollectionsOpt.createHashMap(mapInfo.getPkColumns().get(0),id),
                     mapInfo);
 
         }else{

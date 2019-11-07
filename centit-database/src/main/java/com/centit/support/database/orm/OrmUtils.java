@@ -156,9 +156,9 @@ public abstract class OrmUtils {
 
     public static Map<String, Object> fetchObjectDatabaseField(Object object, TableMapInfo tableInfo) {
         List<SimpleTableField> tableFields = tableInfo.getColumns();
-        if(tableFields == null)
+        if(tableFields == null) {
             return null;
-
+        }
         Map<String, Object> fields = new HashMap<>(tableFields.size()*2+6);
         for(SimpleTableField column : tableFields){
             Object value = column.getObjectFieldValue(object);

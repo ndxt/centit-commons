@@ -22,17 +22,54 @@ public class SimpleTableInfo implements TableInfo{
      * 包括主键
      */
     private List<SimpleTableField> columns=null;
-
+    /**
+     * oracle中的schema 其他数据库对应的是用户名
+     */
     private String schema;
-    private String orderBy;
-    private String tableType;
+    /**
+     * 表名
+     */
     private String tableName;// 其实是table 代码 code
-    //private String sClassName;//表对应的类名 同时作为业务模块名
+    /**
+     * V ： 视图 T : table
+     */
+    private String tableType;
+
+    /**
+     * 表的中文名称
+     */
     private String tableLabelName;// 表的 描述，中文名称
+    /**
+     * 表的备注信息
+     */
     private String tableComment;// 表的备注信息
+    /**
+     * 表的主键名称
+     */
     private String pkName;
-    private List<SimpleTableReference> references=null;
+    /**
+     * 表的模块名称，对应java的包名称
+     */
     private String packageName;
+    /**
+     * 默认排序字段
+     */
+    private String orderBy;
+
+    /**
+     * 引用关系，对应表的外建
+     */
+    private List<SimpleTableReference> references=null;
+
+    public SimpleTableInfo(){
+        this.tableType = "T";
+    }
+
+    public SimpleTableInfo(String tabname){
+        this.tableType = "T";
+        setTableName(tabname);
+    }
+
 
     /**
      * @return 数据库表名，对应pdm中的code，对应元数据中的 tabcode
@@ -161,17 +198,6 @@ public class SimpleTableInfo implements TableInfo{
                 return col;
         }
         return null;
-    }
-
-
-    public SimpleTableInfo()
-    {
-
-    }
-
-    public SimpleTableInfo(String tabname)
-    {
-        setTableName(tabname);
     }
 
     private void saveProperty(SimpleTableField field,Element propElt,boolean keyProp){
@@ -309,8 +335,7 @@ public class SimpleTableInfo implements TableInfo{
                 setElt.addAttribute("cascade", "all-delete-orphan");//"all-delete-orphan")//save-update,delete;
                 setElt.addAttribute("inverse", "true");
                 Element keyElt = setElt.addElement("key");
-                for(Iterator<SimpleTableField> it2 = ref.getFkColumns().iterator();it2.hasNext();){
-                    SimpleTableField col = it2.next();
+                for(SimpleTableField col :ref.getFkColumns()){
                     Element colElt = keyElt.addElement("column");
                     saveColumn(col,colElt,false);
                 }
@@ -328,7 +353,10 @@ public class SimpleTableInfo implements TableInfo{
     }
 
     public void addColumn(SimpleTableField column) {
-        getColumns().add(column);
+        if(columns==null) {
+            columns = new ArrayList<>(20);
+        }
+        columns.add(column);
     }
 
     public void setColumns(List<SimpleTableField> columns) {
@@ -342,8 +370,9 @@ public class SimpleTableInfo implements TableInfo{
     }
 
     public List<SimpleTableReference> getReferences() {
-        if(references==null)
+        if(references==null) {
             references = new ArrayList<>(4);
+        }
         return references;
     }
 
@@ -352,7 +381,10 @@ public class SimpleTableInfo implements TableInfo{
     }
 
     public void addReference(SimpleTableReference reference) {
-        getReferences().add(reference);
+        if(references==null) {
+            references = new ArrayList<>(4);
+        }
+        references.add(reference);
     }
 
     public SimpleTableReference findReference(String reference){

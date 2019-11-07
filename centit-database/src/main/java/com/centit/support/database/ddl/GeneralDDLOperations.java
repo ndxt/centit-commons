@@ -1,5 +1,6 @@
 package com.centit.support.database.ddl;
 
+import com.centit.support.compiler.Lexer;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
@@ -64,34 +65,6 @@ public abstract class GeneralDDLOperations implements DDLOperations {
         dllOperations.setConnect(conn);
         return dllOperations;
     }
-    /**
-     * checkLabelName 判断一个字符串是否符合标识符，是否可以作为字段名或者表名
-     * @param seq CharSequence
-     * @return boolean
-     */
-    public static final boolean checkLabelName(final CharSequence seq) {
-        if (seq == null || seq.length() == 0) {
-            return false;
-        }
-        final int strLen = seq.length();
-        char c = seq.charAt(0);
-        if( c != '_' &&
-                ( c < 'a' || c >'z') &&
-                ( c < 'A' || c > 'Z')
-             )
-            return false;
-
-        for (int i = 1; i < strLen; i++) {
-             c = seq.charAt(i);
-             if( c != '_' &&
-                     ( c < 'a' || c >'z') &&
-                     ( c < 'A' || c > 'Z')  &&
-                     ( c < '0' || c > '9')
-                  )
-                 return false;
-        }
-        return true;
-    }
 
     /**
      * 返回格式检查结果
@@ -99,11 +72,11 @@ public abstract class GeneralDDLOperations implements DDLOperations {
      * @return Pair
      */
     public static final Pair<Integer, String> checkTableWellDefined(final TableInfo tableInfo) {
-        if(! checkLabelName(tableInfo.getTableName())) {
+        if(!Lexer.isLabel(tableInfo.getTableName())) {
             return new ImmutablePair<>(-1, "表名" + tableInfo.getTableName() + "格式不正确！");
         }
         for(TableField field : tableInfo.getColumns()){
-            if(! checkLabelName(field.getColumnName())) {
+            if(!Lexer.isLabel(field.getColumnName())) {
                 return new ImmutablePair<>(-2, "字段名" + field.getColumnName() + "格式不正确！");
             }
             if(StringUtils.isBlank(field.getColumnType())) {
@@ -111,7 +84,7 @@ public abstract class GeneralDDLOperations implements DDLOperations {
             }
         }
 
-        if( tableInfo.getPkColumns()==null || tableInfo.getPkColumns().size()==0) {
+        if(!tableInfo.hasParmaryKey()) {
             return new ImmutablePair<>(-4, "没有定义主键！");
         }
 
@@ -144,7 +117,7 @@ public abstract class GeneralDDLOperations implements DDLOperations {
     }
 
     protected void appendPkSql(final TableInfo tableInfo, StringBuilder sbCreate) {
-        if (tableInfo.getPkColumns() !=null && tableInfo.getPkColumns().size()>0){
+        if (tableInfo.hasParmaryKey()){
             sbCreate.append(" constraint ");
             if (StringUtils.isBlank(tableInfo.getPkName())){
                sbCreate.append("pk_"+tableInfo.getTableName());

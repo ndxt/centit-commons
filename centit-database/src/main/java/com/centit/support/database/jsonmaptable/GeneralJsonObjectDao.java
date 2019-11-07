@@ -268,12 +268,6 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return new ImmutablePair<>(sBuilder.toString(),fieldNames);
     }
 
-
-    public static boolean isPkColumn(TableInfo ti, String propertyName){
-        TableField field = ti.findFieldByName(propertyName);
-        return field !=null ? ti.getPkColumns().contains(field.getColumnName()) : false;
-    }
-
     public static boolean checkHasAllPkColumns(TableInfo tableInfo, Map<String, Object> properties){
         for(String pkc : tableInfo.getPkColumns() ){
             TableField field = tableInfo.findFieldByColumn(pkc);
@@ -511,7 +505,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             }
             return pkMap;
         }else {
-            if (tableInfo.getPkColumns() == null || tableInfo.getPkColumns().size() != 1)
+            if (tableInfo.countPkColumn() != 1)
                 throw new SQLException("表" + tableInfo.getTableName() + "不是单主键表，这个方法不适用。");
             return CollectionsOpt.createHashMap(tableInfo.getPkColumns().get(0), keyValue);
         }
@@ -630,7 +624,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         sbUpdate.append(ti.getTableName()).append(" set ");
         int i=0;
         for(String f : fields){
-            if(exceptPk && isPkColumn(ti, f))
+            if(exceptPk && ti.isParmaryKey(f))
                 continue;
             TableField col = ti.findFieldByName(f);
             if(col != null) {

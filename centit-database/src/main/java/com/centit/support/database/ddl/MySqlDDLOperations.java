@@ -23,7 +23,7 @@ public class MySqlDDLOperations extends GeneralDDLOperations {
 
     @Override
     protected void appendPkSql(final TableInfo tableInfo, StringBuilder sbCreate) {
-        if (tableInfo.getPkColumns() !=null && tableInfo.getPkColumns().size()>0){
+        if (tableInfo.hasParmaryKey()){
             sbCreate.append(" primary key ");
             appendPkColumnSql(tableInfo, sbCreate);
         }

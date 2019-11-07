@@ -132,7 +132,7 @@ public class SqlSvrMetadata implements DatabaseMetadata {
                     ref.setTableName(rs.getString("tabname"));
                     ref.setReferenceCode(rs.getString("name"));
                     ref.setObjectId(rs.getInt("object_id"));
-                    tab.getReferences().add(ref);
+                    tab.addReference(ref);
                 }
             }
         } catch (SQLException e1) {
@@ -155,7 +155,7 @@ public class SqlSvrMetadata implements DatabaseMetadata {
                         field.setNullEnable(rs.getString("isnullable"));
                         field.mapToMetadata();
 
-                        ref.getFkColumns().add(field);
+                        ref.addFkColumn(field);
                     }
                 }
             } catch (SQLException e1) {

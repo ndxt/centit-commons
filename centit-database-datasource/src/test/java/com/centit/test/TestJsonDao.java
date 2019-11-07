@@ -34,14 +34,14 @@ public class TestJsonDao {
             field.setScale(0);
             field.setMandatory(true);
             field.setPropertyName("id");
-            tableInfo.getColumns().add(field);
+            tableInfo.addColumn(field);
 
             field = new SimpleTableField();
             field.setColumnName("USER_NAME");
             field.setColumnType("varchar2");
             field.setPropertyName("userName");
             field.setMaxLength(50);
-            tableInfo.getColumns().add(field);
+            tableInfo.addColumn(field);
 
             field = new SimpleTableField();
             field.setColumnName("USER_PHONE");
@@ -49,9 +49,9 @@ public class TestJsonDao {
             field.setMaxLength(20);
             field.setPropertyName("userPhone");
             field.setDefaultValue("'110'");
-            tableInfo.getColumns().add(field);
+            tableInfo.addColumn(field);
 
-            tableInfo.getPkColumns().add("ID");
+            tableInfo.setColumnAsPrimaryKey("ID");
 
             DDLOperations ddl = new OracleDDLOperations(conn);
             ddl.createTable(tableInfo);
