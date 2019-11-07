@@ -9,8 +9,9 @@ import com.centit.support.database.utils.FieldType;
 import java.util.Map;
 
 public class TestStringMap {
+
     public static void main(String[] args) {
-        Boolean b = true;
+
         System.out.println(JSON.class.isAssignableFrom(JSONObject.class));
         System.out.println(JSON.class.isAssignableFrom(JSONArray.class));
         System.out.println(Map.class.isAssignableFrom(JSONObject.class));

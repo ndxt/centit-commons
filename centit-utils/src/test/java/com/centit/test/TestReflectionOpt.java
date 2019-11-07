@@ -3,11 +3,18 @@ package com.centit.test;
 import com.centit.support.algorithm.Lunar;
 import com.centit.support.algorithm.ReflectionOpt;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 public class TestReflectionOpt {
     public static void main(String arg[]) {
+        for(Field field : Lunar.class.getDeclaredFields()){
+            System.out.print(field.getName()+": ");
+            System.out.println(boolean.class.equals(field.getType()));
+        }
+    }
+    public static void getMethodType(){
          Method [] methods = Lunar.class.getDeclaredMethods();
          for(Method md : methods){
              System.out.println(md.getName());

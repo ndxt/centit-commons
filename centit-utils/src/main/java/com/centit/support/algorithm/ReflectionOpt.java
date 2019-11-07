@@ -300,7 +300,7 @@ public abstract class ReflectionOpt  {
      */
     public static Method getGetterMethod(Class<?> classType, Class<?> propertyType, String fieldName) {
         try {
-            String getFuncName = (boolean.class.equals(propertyType) || Boolean.class.isAssignableFrom(propertyType))?
+            String getFuncName = boolean.class.equals(propertyType) ?/*|| Boolean.class.isAssignableFrom(propertyType)*/
                   "is" + StringUtils.capitalize(fieldName) : "get" + StringUtils.capitalize(fieldName);
             Method md = classType.getMethod(getFuncName);
             if(propertyType.isAssignableFrom( md.getReturnType()))
