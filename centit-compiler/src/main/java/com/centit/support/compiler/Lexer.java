@@ -94,7 +94,7 @@ public class Lexer {
         }
         for (int i = 1; i < strLen; i++) {
             c = seq.charAt(i);
-            if( c != '_' &&
+            if( c != '_' && c != '.' &&
                 ( c < 'a' || c > 'z') &&
                 ( c < 'A' || c > 'Z') &&
                 ( c < '0' || c > '9')
@@ -134,15 +134,15 @@ public class Lexer {
         // 标识符
         } else if (( formulaSen.charAt(startPos)>='a' && formulaSen.charAt(startPos)<='z') ||
             ( formulaSen.charAt(startPos)>='A' && formulaSen.charAt(startPos)<='Z') ||
-            formulaSen.charAt(startPos)=='_' ||
-            formulaSen.charAt(startPos)=='@'  ){
+            formulaSen.charAt(startPos)=='_' /*||
+            formulaSen.charAt(startPos)=='@' */ ){
             startPos++;
             while ( startPos < sl  && (
                     ( formulaSen.charAt(startPos)>='0' && formulaSen.charAt(startPos)<='9') ||
                     ( formulaSen.charAt(startPos)>='a' && formulaSen.charAt(startPos)<='z') ||
                     ( formulaSen.charAt(startPos)>='A' && formulaSen.charAt(startPos)<='Z') ||
-                      formulaSen.charAt(startPos)=='_' || formulaSen.charAt(startPos)=='.' ||
-                      formulaSen.charAt(startPos)=='@' ) )
+                      formulaSen.charAt(startPos)=='_' || formulaSen.charAt(startPos)=='.' /*||
+                      formulaSen.charAt(startPos)=='@'*/ ) )
                 startPos ++;
             canAcceptOpt = true;
         }else {

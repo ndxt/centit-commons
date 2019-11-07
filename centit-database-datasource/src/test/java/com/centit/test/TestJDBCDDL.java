@@ -2,6 +2,7 @@ package com.centit.test;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.compiler.Lexer;
 import com.centit.support.database.ddl.*;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableInfo;
@@ -18,12 +19,12 @@ public class TestJDBCDDL {
         //testJDBCMetadata();
         //testDB2JDBCMetadata();
         //testMysqlJDBCMetadata();
-        System.out.println(GeneralDDLOperations.checkLabelName("hello_world"));
-        System.out.println(GeneralDDLOperations.checkLabelName("9hello"));
-        System.out.println(GeneralDDLOperations.checkLabelName("_hell_o234"));
-        System.out.println(GeneralDDLOperations.checkLabelName("hello$abc"));
-        System.out.println(GeneralDDLOperations.checkLabelName("hello abc"));
-        System.out.println(GeneralDDLOperations.checkLabelName("你好"));
+        System.out.println(Lexer.isLabel("hello_world"));
+        System.out.println(Lexer.isLabel("9hello"));
+        System.out.println(Lexer.isLabel("_hell_o234"));
+        System.out.println(Lexer.isLabel("hello$abc"));
+        System.out.println(Lexer.isLabel("hello abc"));
+        System.out.println(Lexer.isLabel("你好"));
     }
 
     public  static void testJDBCMetadata(){
