@@ -188,11 +188,42 @@ public abstract class OrmUtils {
             }
         }
         return makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ);
-        //return object;
     }
 
-    public static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz)
+    private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo, SimpleTableField[] fields)
+        throws SQLException, NoSuchFieldException, IOException {
+        int fieldCount = rs.getMetaData().getColumnCount();
+        if(fieldCount > fields.length){
+            fieldCount = fields.length;
+        }
+        for (int i = 0; i < fieldCount; i++) {
+            setObjectFieldValue(object, fields[i] , rs.getObject(i+1));
+        }
+        return makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ);
+    }
+
+    static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz, SimpleTableField[] fields)
             throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException, IOException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
+        if(mapInfo == null)
+            return null;
+        if(rs.next()) {
+            return insideFetchFieldsFormResultSet(rs, clazz.newInstance(), mapInfo, fields);
+        }else {
+            return null;
+        }
+    }
+
+    static <T> T fetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo, SimpleTableField[] fields)
+            throws SQLException, NoSuchFieldException, IOException {
+        if(rs.next()) {
+            object = insideFetchFieldsFormResultSet(rs, object, mapInfo, fields);
+        }
+        return object;
+    }
+
+    static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz)
+        throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)
             return null;
@@ -203,16 +234,37 @@ public abstract class OrmUtils {
         }
     }
 
-    public static <T> T fetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo )
-            throws SQLException, NoSuchFieldException, IOException {
+    static <T> T fetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo)
+        throws SQLException, NoSuchFieldException, IOException {
         if(rs.next()) {
             object = insideFetchFieldsFormResultSet(rs, object, mapInfo);
         }
         return object;
     }
 
-    public static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz)
+    static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz, SimpleTableField[] fields)
             throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException, IOException {
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
+        if(mapInfo == null)
+            return null;
+        int fieldCount = rs.getMetaData().getColumnCount();
+        if(fieldCount > fields.length){
+            fieldCount = fields.length;
+        }
+
+        List<T> listObj = new ArrayList<>();
+        while(rs.next()){
+            T object = clazz.newInstance();
+            for(int i=0; i<fieldCount; i++){
+                setObjectFieldValue(object, fields[i], rs.getObject(i+1));
+            }
+            listObj.add(makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ));
+        }
+        return listObj;
+    }
+
+    static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz)
+        throws SQLException, IllegalAccessException, InstantiationException, NoSuchFieldException, IOException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)
@@ -229,7 +281,7 @@ public abstract class OrmUtils {
         while(rs.next()){
             T object = clazz.newInstance();
             for(int i=1;i<=fieldCount;i++){
-                if(fields[i] != null){
+                if(fields[i]!=null) {
                     setObjectFieldValue(object, fields[i], rs.getObject(i));
                 }
             }
