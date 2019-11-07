@@ -33,6 +33,10 @@ public class SimpleTableField implements TableField {
         //这个和下面的 mapToDatabaseType 不对称
         propertyName = FieldType.mapPropName(columnName);
         fieldType = FieldType.mapToFieldType(columnType,scale);
+        lazyFetch = FieldType.TEXT.equals(fieldType) ||
+            FieldType.BYTE_ARRAY.equals(fieldType) ||
+            FieldType.JSON_OBJECT.equals(fieldType) ;
+
         if( (FieldType.LONG.equals(fieldType) || FieldType.DOUBLE.equals(fieldType))
                 && maxLength <= 0 )
             maxLength = 8;

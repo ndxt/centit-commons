@@ -4,8 +4,6 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.common.TreeNode;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class TestSortAsTree {

@@ -1,13 +1,7 @@
 package com.centit.test;
 
-import com.centit.support.file.FileIOOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public class TestFileSystem {
 

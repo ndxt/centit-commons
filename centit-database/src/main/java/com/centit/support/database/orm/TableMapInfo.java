@@ -3,7 +3,6 @@ package com.centit.support.database.orm;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.SimpleTableInfo;
-import com.centit.support.database.metadata.TableField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
