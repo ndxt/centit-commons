@@ -1,5 +1,6 @@
 package com.centit.support.database.metadata;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface TableInfo {
@@ -42,14 +43,8 @@ public interface TableInfo {
      * @param name 属性名
      * @return 根据属性名查找 字段信息
      */
-     TableField findFieldByColumn(String name);
+    TableField findFieldByColumn(String name);
 
-    /**
-     * 判断一个字段是否是主键
-     * @param colname 字段
-     * @return 否是主键
-     */
-    boolean isParmaryKey(String colname);
 
     /**
      * 获取所有的列名
@@ -58,13 +53,30 @@ public interface TableInfo {
     List<? extends TableField> getColumns();
 
     /**
-     * @return 获取主键列名     *
-     */
-    List<String> getPkColumns();
-
-    /**
      * @return 获取引用信息（外键）但是数据库中不一定有对应的外键
      */
     List<? extends TableReference> getReferences();
+    /**
+     * 判断一个字段是否是主键
+     * @param colname 字段
+     * @return 否是主键
+     */
+    default boolean isParmaryKey(String colname){
+        TableField field = findFieldByName(colname);
+        return field != null && field.isPrimaryKey();
+    }
+
+    /**
+     * @return 获取主键列名 主键是有次序的
+     */
+    default List<String> getPkColumns(){
+        List<String> pkCols = new ArrayList<>(4);
+        for(TableField field : this.getColumns()){
+            if(field.isPrimaryKey()){
+                pkCols.add(field.getPropertyName());
+            }
+        }
+        return pkCols;
+    }
 
 }

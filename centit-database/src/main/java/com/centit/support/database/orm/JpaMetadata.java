@@ -148,18 +148,15 @@ public abstract class JpaMetadata {
             if(field.isAnnotationPresent(Column.class)){
                 SimpleTableField column = obtainColumnFromField(objType, field);
 
-                if(field.isAnnotationPresent(Id.class) ){
-                    mapInfo.addColumn(column);
-                    mapInfo.addPkColumns(column.getPropertyName());
-                }else {
-                    boolean isLazy = false;
-                    if (field.isAnnotationPresent(Basic.class)) {
-                        Basic colBasic = field.getAnnotation(Basic.class);
-                        isLazy = colBasic.fetch() == FetchType.LAZY;
-                    }
-                    column.setLazyFetch(isLazy);
-                    mapInfo.addColumn(column);
+                boolean isPK = field.isAnnotationPresent(Id.class);
+                column.setPrimaryKey(isPK);
+                boolean isLazy = false;
+                if(!isPK && field.isAnnotationPresent(Basic.class)) {
+                    Basic colBasic = field.getAnnotation(Basic.class);
+                    isLazy = colBasic.fetch() == FetchType.LAZY;
                 }
+                column.setLazyFetch(isLazy);
+                mapInfo.addColumn(column);
 
                 if(field.isAnnotationPresent(ValueGenerator.class) ){
                     ValueGenerator valueGenerator = field.getAnnotation(ValueGenerator.class);
@@ -180,8 +177,8 @@ public abstract class JpaMetadata {
 
                     if(idField.isAnnotationPresent(Column.class)) {
                         SimpleTableField column = obtainColumnFromField(objType, idField);
+                        column.setPrimaryKey(true);
                         mapInfo.addColumn(column);
-                        mapInfo.addPkColumns(column.getPropertyName());
 
                         if(idField.isAnnotationPresent(ValueGenerator.class) ){
                             ValueGenerator valueGenerator = idField.getAnnotation(ValueGenerator.class);

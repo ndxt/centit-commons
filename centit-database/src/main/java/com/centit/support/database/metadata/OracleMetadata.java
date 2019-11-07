@@ -74,7 +74,7 @@ public class OracleMetadata implements DatabaseMetadata {
                     field.setNullEnable(rs.getString("NULLABLE"));
                     field.mapToMetadata();
 
-                    tab.getColumns().add(field);
+                    tab.addColumn(field);
                 }
             }
         } catch (SQLException e) {
@@ -95,7 +95,7 @@ public class OracleMetadata implements DatabaseMetadata {
             pStmt.setString(1, tab.getPkName());
             try (ResultSet rs = pStmt.executeQuery()) {
                 while (rs.next()) {
-                    tab.getPkColumns().add(rs.getString("COLUMN_NAME"));
+                    tab.setColumnAsPrimaryKey(rs.getString("COLUMN_NAME"));
                 }
             }
         } catch (SQLException e) {

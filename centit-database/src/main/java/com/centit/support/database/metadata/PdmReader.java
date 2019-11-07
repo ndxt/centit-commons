@@ -144,7 +144,7 @@ public class PdmReader implements DatabaseMetadata {
 
             field.mapToMetadata();
 
-            tab.getColumns().add(field);
+            tab.addColumn(field);
         }
 
         //获取 表主键
@@ -165,7 +165,7 @@ public class PdmReader implements DatabaseMetadata {
                     "c:Columns/o:Column[@Id='"+((Attribute) pkCA).getValue()+"']/a:Code");
             if(elPKCol!=null){
                 //System.out.println(elPKCol.asXML());
-                tab.getPkColumns().add(elPKCol.getText());
+                tab.setColumnAsPrimaryKey(elPKCol.getText());
             }
         }
         //获取所有的外键

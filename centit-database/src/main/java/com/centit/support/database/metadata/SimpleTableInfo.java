@@ -22,10 +22,7 @@ public class SimpleTableInfo implements TableInfo{
      * 包括主键
      */
     private List<SimpleTableField> columns=null;
-    /**
-     * 主键字段
-     */
-    private List<String> pkColumns=null;
+
     private String schema;
     private String orderBy;
     private String tableType;
@@ -79,6 +76,7 @@ public class SimpleTableInfo implements TableInfo{
     public void setPkName(String pkName) {
         this.pkName = pkName;
     }
+
     public String getPackageName() {
         return packageName;
     }
@@ -165,16 +163,6 @@ public class SimpleTableInfo implements TableInfo{
         return null;
     }
 
-    @Override
-    public boolean isParmaryKey(String colname){
-        if(pkColumns==null)
-            return false;
-        for(String col : pkColumns){
-            if(col.equals(colname))
-                return true;
-        }
-        return false;
-    }
 
     public SimpleTableInfo()
     {
@@ -283,12 +271,12 @@ public class SimpleTableInfo implements TableInfo{
         classElt.addAttribute("table", tableName.toUpperCase());
         classElt.addAttribute("schema", schema);
         //save primary key
-        if(pkColumns!=null && pkColumns.size()>1){
+        List<String> pkColumns = getPkColumns();
+        if(pkColumns.size()>1){
             Element idElt = classElt.addElement("composite-id");
             idElt.addAttribute("name", "cid");
             idElt.addAttribute("class", packageName+'.'+getClassName()+"Id");
-            for(Iterator<String> it = pkColumns.iterator();it.hasNext();){
-                String pkcol = it.next();
+            for(String pkcol : pkColumns){
                 SimpleTableField field = findField(pkcol);
                 if(field!=null){
                     Element keyElt = idElt.addElement("key-property");
@@ -296,7 +284,7 @@ public class SimpleTableInfo implements TableInfo{
                     //colElt.addAttribute("not-null", "true");
                 }
             }
-        }else if(pkColumns !=null && pkColumns.size()==1){
+        }else if(pkColumns.size()==1){
             Element idElt = classElt.addElement("id");
             SimpleTableField field = findField(pkColumns.get(0));
             saveProperty(field,idElt,true);
@@ -347,20 +335,6 @@ public class SimpleTableInfo implements TableInfo{
         this.columns = columns;
     }
 
-    public List<String> getPkColumns() {
-        if(pkColumns==null)
-            pkColumns = new ArrayList<>(4);
-        return pkColumns;
-    }
-
-    public void addPkColumns(String pkColumn) {
-        getPkColumns().add(pkColumn);
-    }
-
-    public void setPkColumns(List<String> pkColumns) {
-        this.pkColumns = pkColumns;
-    }
-
     public String getClassName() {
         String sClassName = FieldType.mapPropName(tableName);
         return sClassName.substring(0,1).toUpperCase() +
@@ -402,5 +376,16 @@ public class SimpleTableInfo implements TableInfo{
 
     public void setTableType(String tableType) {
         this.tableType = tableType;
+    }
+
+    /**
+     * 将一个字段设为主键
+     * @param colname 字段
+     */
+    public void setColumnAsPrimaryKey(String colname){
+        SimpleTableField field = findFieldByName(colname);
+        if(field != null){
+            field.setPrimaryKey(true);
+        }
     }
 }

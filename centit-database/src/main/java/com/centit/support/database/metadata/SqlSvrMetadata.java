@@ -70,7 +70,7 @@ public class SqlSvrMetadata implements DatabaseMetadata {
 
     public SimpleTableInfo getTableMetadata(String tabName) {
         SimpleTableInfo tab = new SimpleTableInfo(tabName);
-        int table_id=0,pk_ind_id=0;
+        int tableId = 0, pkIndId=0;
 
         try (PreparedStatement pStmt = dbc.prepareStatement(sqlGetTabColumns)) {
             tab.setSchema(dbc.getSchema().toUpperCase());
@@ -88,7 +88,7 @@ public class SqlSvrMetadata implements DatabaseMetadata {
                     field.setNullEnable(rs.getString("isnullable"));
                     field.mapToMetadata();
 
-                    tab.getColumns().add(field);
+                    tab.addColumn(field);
                 }
             }
         } catch (SQLException e1) {
@@ -101,9 +101,9 @@ public class SqlSvrMetadata implements DatabaseMetadata {
             try (ResultSet rs = pStmt.executeQuery()) {
                 if (rs.next()) {
                     tab.setPkName(rs.getString("name"));
-                    table_id = rs.getInt("parent_object_id");
+                    tableId = rs.getInt("parent_object_id");
                     //pk_id = rs.getInt("object_id");
-                    pk_ind_id = rs.getInt("unique_index_id");
+                    pkIndId = rs.getInt("unique_index_id");
                 }
             }
         } catch (SQLException e1) {
@@ -111,11 +111,11 @@ public class SqlSvrMetadata implements DatabaseMetadata {
         }
 
         try (PreparedStatement pStmt = dbc.prepareStatement(sqlPKColumns)) {
-            pStmt.setInt(1, table_id);
-            pStmt.setInt(2, pk_ind_id);
+            pStmt.setInt(1, tableId);
+            pStmt.setInt(2, pkIndId);
             try (ResultSet rs = pStmt.executeQuery()) {
                 while (rs.next()) {
-                    tab.getPkColumns().add(rs.getString("name"));
+                    tab.setColumnAsPrimaryKey(rs.getString("name"));
                 }
             }
         } catch (SQLException e1) {
@@ -123,7 +123,7 @@ public class SqlSvrMetadata implements DatabaseMetadata {
         }
             // get reference info
         try (PreparedStatement pStmt = dbc.prepareStatement(sqlFKNames)) {
-            pStmt.setInt(1, table_id);
+            pStmt.setInt(1, tableId);
             try (ResultSet rs = pStmt.executeQuery()) {
                 while (rs.next()) {
                     SimpleTableReference ref = new SimpleTableReference();

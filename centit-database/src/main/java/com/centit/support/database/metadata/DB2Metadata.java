@@ -70,7 +70,7 @@ public class DB2Metadata implements DatabaseMetadata {
                     field.setNullEnable(rs.getString("nulls"));
                     field.mapToMetadata();
 
-                    tab.getColumns().add(field);
+                    tab.addColumn(field);
                 }
             }
         } catch (SQLException e) {
@@ -82,7 +82,7 @@ public class DB2Metadata implements DatabaseMetadata {
             try (ResultSet rs = pStmt.executeQuery()) {
                 while (rs.next()) {
                     tab.setPkName(rs.getString("constname"));
-                    tab.getPkColumns().add(rs.getString("colname"));
+                    tab.setColumnAsPrimaryKey(rs.getString("colname"));
                 }
             }
         } catch (SQLException e1) {

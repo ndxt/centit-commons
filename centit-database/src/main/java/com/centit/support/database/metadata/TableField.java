@@ -34,6 +34,11 @@ public interface TableField {
      */
     boolean isMandatory();
     /**
+     *
+     * @return 是否是主键
+     */
+    boolean isPrimaryKey();
+    /**
      * @return 是否是懒加载；
      * 获取单个对象时，一般加载所有字段，获取列表时默认不加载lazy字段
      * 一般 lob字段为懒加载

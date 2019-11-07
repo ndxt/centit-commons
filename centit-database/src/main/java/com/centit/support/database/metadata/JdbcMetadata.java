@@ -73,12 +73,12 @@ public class JdbcMetadata implements DatabaseMetadata {
                 field.setNullEnable(rs.getString("NULLABLE"));
                 field.setColumnComment( rs.getString("REMARKS"));
                 field.mapToMetadata();
-                tab.getColumns().add(field);
+                tab.addColumn(field);
             }
             rs.close();
             rs = dbmd.getPrimaryKeys(dbCatalog, dbSchema, tabName);
             while (rs.next()) {
-                tab.getPkColumns().add(rs.getString("COLUMN_NAME"));
+                tab.setColumnAsPrimaryKey(rs.getString("COLUMN_NAME"));
                 tab.setPkName(rs.getString("PK_NAME"));
             }
             rs.close();

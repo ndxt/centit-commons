@@ -4,15 +4,13 @@ import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.database.utils.FieldType;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class SimpleTableField implements TableField {
-    private static final Logger logger = LoggerFactory.getLogger(SimpleTableField.class);
-
+    //private static final Logger logger
+    // = LoggerFactory.getLogger(SimpleTableField.class);
     private String propertyName;// 字段属性名称
     private String fieldLabelName;// 字段的中文名称 label ，PDM中的 Name 和 元数据表格中的Name对应
     private String columnType;// 数据库中的字段类型
@@ -28,6 +26,7 @@ public class SimpleTableField implements TableField {
     private Integer  scale;//精度 Only used when sType= Long Number Float
     private JavaBeanField beanField;
     private boolean lazyFetch;
+    private boolean primaryKey;
 
     public void mapToMetadata(){
         //这个和下面的 mapToDatabaseType 不对称
@@ -61,6 +60,8 @@ public class SimpleTableField implements TableField {
     public SimpleTableField()
     {
         mandatory = false;
+        lazyFetch = false;
+        primaryKey = false;
         maxLength = 0;
         precision = 0;//有效数据位数 Only used when sType=Long Number Float
         scale = 0;//精度 Only used when sType= Long Number Float
@@ -149,6 +150,15 @@ public class SimpleTableField implements TableField {
 
     public void setMandatory(boolean notnull) {
         this.mandatory = notnull;
+    }
+
+    @Override
+    public boolean isPrimaryKey() {
+        return primaryKey;
+    }
+
+    public void setPrimaryKey(boolean primaryKey) {
+        this.primaryKey = primaryKey;
     }
 
     @Override
