@@ -616,22 +616,32 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return DatabaseAccess.doExecuteNamedSql(conn, sql, object);
     }
 
-    public static String buildUpdateSql(TableInfo ti, final Collection<String> fields,final boolean exceptPk){
+    /**
+     * 返回更新语句 update ，如果返回null表示 没有更新的内容
+     * @param ti 表信息
+     * @param fields 需要更新的字段
+     * param exceptPk 是否可剔除主键
+     * @return null 没有字段需要更新，
+     */
+    public static String buildUpdateSql(TableInfo ti, final Collection<String> fields){
         StringBuilder sbUpdate = new StringBuilder("update ");
         sbUpdate.append(ti.getTableName()).append(" set ");
-        int i=0;
+        int updateColCount=0;
         for(String f : fields){
-            if(exceptPk && ti.isParmaryKey(f))
+            if(/*exceptPk && */ti.isParmaryKey(f))
                 continue;
             TableField col = ti.findFieldByName(f);
             if(col != null) {
-                if (i > 0) {
+                if (updateColCount > 0) {
                     sbUpdate.append(", ");
                 }
                 sbUpdate.append(col.getColumnName());
                 sbUpdate.append(" = :").append(f);
-                i++;
+                updateColCount++;
             }
+        }
+        if(updateColCount == 0){
+            return null;// throw exception
         }
         return sbUpdate.toString();
     }
@@ -647,11 +657,13 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         if(! checkHasAllPkColumns(object)){
             throw new SQLException("缺少主键对应的属性。");
         }
-        String sql =  buildUpdateSql(tableInfo, fields ,true) +
-                " where " +  buildFilterSqlByPk(tableInfo,null);
+        String sql = buildUpdateSql(tableInfo, fields);
+        if(sql==null) {
+            return 0;
+        }
+        sql = sql + (" where " + buildFilterSqlByPk(tableInfo, null));
         return DatabaseAccess.doExecuteNamedSql(conn, sql, object);
     }
-
 
     @Override
     public int updateObject(final Map<String, Object> object) throws SQLException {
@@ -687,8 +699,13 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public int updateObjectsByProperties(final Collection<String> fields,
             final Map<String, Object> fieldValues,final Map<String, Object> properties)
             throws SQLException {
-        String sql =  buildUpdateSql(tableInfo, fields,true) +
-                " where " +  buildFilterSql(tableInfo,null,properties.keySet());
+
+        String sql = buildUpdateSql(tableInfo, fields);
+        if(sql == null) {
+            return 0;
+        }
+        sql = sql + " where " + buildFilterSql(tableInfo,null,properties.keySet());
+
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.putAll(fieldValues);
         paramMap.putAll(properties);
@@ -864,7 +881,6 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         }
         return NumberBaseOpt.castObjectToLong(object);
     }
-
 
     @Override
     public List<Object[]> findObjectsBySql(String sSql, Object[] values) throws SQLException, IOException {
