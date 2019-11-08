@@ -9,6 +9,10 @@ import java.lang.reflect.Parameter;
 
 public class TestReflectionOpt {
     public static void main(String arg[]) {
+        String [] strings = new String [] {"1","2","3","5"};
+        System.out.println(ReflectionOpt.isScalarType(strings.getClass()));
+        System.out.println(String.class.getPackage().getName());
+
         for(Field field : Lunar.class.getDeclaredFields()){
             System.out.print(field.getName()+": ");
             System.out.println(boolean.class.equals(field.getType()));

@@ -517,12 +517,8 @@ public abstract class ReflectionOpt  {
      */
     public static String mapGetter2Field(Method method){
         String methodName = method.getName();
-        if(methodName.startsWith("get")){
-            return StringUtils.uncapitalize(methodName.substring(3));
-        }else if(methodName.startsWith("is")){
-            return StringUtils.uncapitalize(methodName.substring(2));
-        }
-        return methodName;
+        return StringUtils.uncapitalize(
+            methodName.substring(methodName.startsWith("is")?2:3));
     }
     /*
      * 获取所有getMethod方法
@@ -660,12 +656,16 @@ public abstract class ReflectionOpt  {
      * @return isScalarType
      */
     public static boolean isScalarType(Class<?>  tp){
-        if(tp.isPrimitive())
+        if(tp.isPrimitive()) {
             return true;
-        String tpName = tp.getName();
-        if(tpName.startsWith("java.lang."))
-            return true;
-        if(tpName.startsWith("java.sql."))
+        }
+
+        if(tp.isArray()){
+            return false;
+        }
+        //tp.getPackage()
+        String tpName = tp.getPackage().getName();
+        if(tpName.equals("java.lang") || tpName.equals("java.sql") )
             return true;
         if( java.util.Date.class.isAssignableFrom(tp))// "java.util.Date".equals(tp.getName()))
             return true;

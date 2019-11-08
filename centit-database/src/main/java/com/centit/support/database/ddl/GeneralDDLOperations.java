@@ -132,11 +132,11 @@ public abstract class GeneralDDLOperations implements DDLOperations {
     protected void appendPkColumnSql(final TableInfo tableInfo, StringBuilder sbCreate) {
         sbCreate.append("(");
         int i=0;
-        for(String pkfield : tableInfo.getPkColumns()){
+        for(TableField pkField : tableInfo.getPkFields()){
             if(i>0) {
                 sbCreate.append(", ");
             }
-            sbCreate.append(pkfield);
+            sbCreate.append(pkField.getColumnName());
             i++;
         }
         sbCreate.append(")");

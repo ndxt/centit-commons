@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -464,6 +465,11 @@ public abstract class StringBaseOpt {
         return null;
     }
 
+    /**
+     * 浅层次的 非递归
+     * @param objValue 对象
+     * @return 字符串
+     */
     public static String objectToString(Object objValue){
         if(objValue==null)
             return null;
@@ -473,23 +479,18 @@ public abstract class StringBaseOpt {
         if(objValue instanceof byte[]){
             return new String((byte[])objValue);
         }
-        if(objValue instanceof Object[]){
-            Object [] objs=(Object[]) objValue;
+        if(objValue.getClass().isArray()){
+            int len = Array.getLength(objValue);
             StringBuilder sb = new StringBuilder();
-            if(objs.length>0){
-                for(int i=0;i<objs.length;i++){
+            if(len>0){
+                for(int i=0;i<len;i++){
                     if(i>0)
                         sb.append(',');
-                    if(objs[i]!=null){
-                        if(objs[i] instanceof java.util.Date)
-                            sb.append(DatetimeOpt.convertDatetimeToString((java.util.Date) objs[i]));
-                        /*else if(objs[i] instanceof java.sql.Date)
-                            sb.append(DatetimeOpt.convertDatetimeToString(
-                                    DatetimeOpt.convertToUtilDate(
-                                            (java.sql.Date) objs[i])));
-                        */else
-                            sb.append(objs[i].toString());
-                    }
+                    Object obj = Array.get(objValue, i);
+                    if(obj instanceof java.util.Date)
+                        sb.append(DatetimeOpt.convertDatetimeToString((java.util.Date) obj));
+                    else
+                        sb.append(obj.toString());
                 }
                 return sb.toString();
             }else{
@@ -505,23 +506,15 @@ public abstract class StringBaseOpt {
                         sb.append(",");
                     if(ov instanceof java.util.Date)
                         sb.append(DatetimeOpt.convertDatetimeToString((java.util.Date) ov));
-                    /*else if(ov instanceof java.sql.Date)
-                        sb.append(DatetimeOpt.convertDatetimeToString(
-                                DatetimeOpt.convertToUtilDate(
-                                        (java.sql.Date) ov)));*/
                     else
                         sb.append(ov.toString());
                     vc++;
                 }
             }
             return sb.toString();
-        }else if(objValue instanceof java.util.Date){
+        }else if(objValue instanceof java.util.Date) {
             return DatetimeOpt.convertDatetimeToString((java.util.Date) objValue);
-        }/*else if(objValue instanceof java.sql.Date){
-            return DatetimeOpt.convertDatetimeToString(
-                    DatetimeOpt.convertToUtilDate(
-                    (java.sql.Date) objValue));
-        }*/else
+        }else
             return objValue.toString();
     }
 
