@@ -112,7 +112,7 @@ public abstract class OrmUtils {
                         break;
                         case TABLE_ID:{
                             String genValue = valueGenerator.value();
-                            String params[] = genValue.split(":");
+                            String [] params = genValue.split(":");
                             if(params.length>=3 && sqlDialect!=null) {
                                 String prefix = params.length>3 ? params[3] : "";
                                 int len = NumberBaseOpt.castObjectToInteger(params[2],23);
