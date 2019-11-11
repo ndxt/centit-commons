@@ -43,7 +43,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 
     private TableInfo tableInfo;
 
-    public GeneralJsonObjectDao(){
+    GeneralJsonObjectDao(){
 
     }
 
@@ -119,15 +119,15 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return createJsonObjectDao(dbtype,conn);
     }
 
-    public GeneralJsonObjectDao(final TableInfo tableInfo) {
+    GeneralJsonObjectDao(final TableInfo tableInfo) {
         this.tableInfo = tableInfo;
     }
 
-    public GeneralJsonObjectDao(final Connection conn) {
+    GeneralJsonObjectDao(final Connection conn) {
         this.conn = conn;
     }
 
-    public GeneralJsonObjectDao(final Connection conn,final TableInfo tableInfo) {
+    GeneralJsonObjectDao(final Connection conn,final TableInfo tableInfo) {
         this.conn = conn;
         this.tableInfo = tableInfo;
     }
