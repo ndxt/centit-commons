@@ -2,10 +2,7 @@ package com.centit.support.database.orm;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.centit.support.algorithm.BooleanBaseOpt;
-import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.UuidOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
@@ -113,6 +110,31 @@ public abstract class OrmUtils {
                                 }
                             }
                         break;
+                        case TABLE_ID:{
+                            String genValue = valueGenerator.value();
+                            String params[] = genValue.split(":");
+                            if(params.length>=3 && sqlDialect!=null) {
+                                String prefix = params.length>3 ? params[3] : "";
+                                int len = NumberBaseOpt.castObjectToInteger(params[2],23);
+                                if(len>22){
+                                    setObjectFieldValue(object, filed, prefix + UuidOpt.getUuidAsString22());
+                                } else /*if (sqlDialect!=null)*/{
+                                    for(int i=0; i<100; i++) {
+                                        String no = prefix + UuidOpt.getUuidAsString22().substring(0,len);
+                                        //检查主键是否冲突
+                                        int nHasId = NumberBaseOpt.castObjectToInteger(
+                                                        DatabaseAccess.fetchScalarObject(
+                                                            sqlDialect.findObjectsBySql("select count(*) hasId from "+params[0]
+                                                                + " where " + params[1] +" = ?", new Object[] {no})),0);
+                                        if(nHasId==0) {
+                                            setObjectFieldValue(object, filed, no);
+                                            break;// for
+                                        }
+                                    }
+                                }
+                            }
+                            break;// case
+                        }
                     }
                 }
             }

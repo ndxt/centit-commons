@@ -32,5 +32,9 @@ public enum GeneratorType {
     /**
      * 流水号； 代码（sequence）：模板 function  no:序列号
      */
-    LSH
+    LSH,
+    /**
+     * 表的主键，随机生成;  表：字段：长度(长度不包括前缀)：前缀(可以为空)
+     */
+    TABLE_ID
 }

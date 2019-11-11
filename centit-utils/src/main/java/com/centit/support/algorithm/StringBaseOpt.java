@@ -521,17 +521,18 @@ public abstract class StringBaseOpt {
     public static String[] objectToStringArray(Object object){
         if(object==null){
             return null;
-        }else if (object instanceof Collection) {
+        } else if (object.getClass().isArray()) {
+            int len = Array.getLength(object);
+            String[] stringList = new String[len];
+            for(int i=0;i<len;i++){
+                Object obj = Array.get(object, i);
+                stringList[i++] = StringBaseOpt.castObjectToString(obj);
+            }
+            return stringList;
+        } else if (object instanceof Collection) {
             String[] stringList = new String[((Collection<?>) object).size()];
             int i=0;
             for(Object po :(Collection<?>) object){
-                stringList[i++] = StringBaseOpt.castObjectToString(po);
-            }
-            return stringList;
-        } else if (object instanceof Object[]) {
-            String[] stringList = new String[((Object[]) object).length ];
-            int i=0;
-            for(Object po :(Object[])  object){
                 stringList[i++] = StringBaseOpt.castObjectToString(po);
             }
             return stringList;
@@ -552,24 +553,24 @@ public abstract class StringBaseOpt {
     public static List<String> objectToStringList(Object object){
         if(object==null){
             return null;
-        }else if (object instanceof Collection) {
-            List<String> stringList = new ArrayList<>( ((Collection<?>) object).size()+1 );
-            for(Object po :(Collection<?>) object){
-                stringList.add(StringBaseOpt.castObjectToString(po));
+        } else if (object.getClass().isArray()) {
+            int len = Array.getLength(object);
+            List<String> stringList = new ArrayList<>( len+1 );
+            for(int i=0;i<len;i++){
+                Object obj = Array.get(object, i);
+                stringList.add(StringBaseOpt.castObjectToString(obj));
             }
             return stringList;
-        } else if (object instanceof Object[]) {
-            List<String> stringList = new ArrayList<>( ((Object[]) object).length+1 );
-            for(Object po :(Object[])  object){
+        } else if (object instanceof Collection) {
+            List<String> stringList = new ArrayList<>( ((Collection<?>) object).size()+1 );
+            for(Object po :(Collection<?>) object){
                 stringList.add(StringBaseOpt.castObjectToString(po));
             }
             return stringList;
         } else if(object instanceof String){
             String[] ss = ((String)object).split(",");
             List<String> stringList = new ArrayList<>(ss.length );
-            for(String s :ss ){
-                stringList.add(s);
-            }
+            stringList.addAll(Arrays.asList(ss));
             return stringList;
         }
 
@@ -587,19 +588,21 @@ public abstract class StringBaseOpt {
     public static Set<String> objectToStringSet(Object object){
         if(object==null){
             return null;
-        }else if (object instanceof Collection) {
+        } else if (object.getClass().isArray()) {
+            int len = Array.getLength(object);
+            Set<String> stringSet = new HashSet<>( len+1 );
+            for(int i=0;i<len;i++){
+                Object obj = Array.get(object, i);
+                stringSet.add(StringBaseOpt.castObjectToString(obj));
+            }
+            return stringSet;
+        } else if (object instanceof Collection) {
             Set<String> stringSet = new HashSet<>( ((Collection<?>) object).size()+1 );
             for(Object po :(Collection<?>) object){
                 stringSet.add(StringBaseOpt.castObjectToString(po));
             }
             return stringSet;
-        } else if (object instanceof Object[]) {
-            Set<String> stringSet = new HashSet<>( ((Object[]) object).length+1 );
-            for(Object po :(Object[])  object){
-                stringSet.add(StringBaseOpt.castObjectToString(po));
-            }
-            return stringSet;
-        }else if(object instanceof String){
+        } else if(object instanceof String){
             String[] ss = ((String)object).split(",");
             Set<String> stringList = new HashSet<>(ss.length );
             for(String s :ss ){
