@@ -5,11 +5,14 @@ package com.centit.support.database.orm;
  */
 public enum GeneratorType {
     /**
-     *  这个其实什么都不做，就是依赖数据库自动增长
+     *  这个其实什么都不做，就是依赖数据库自动增长；程序中什么也不做
      */
     AUTO,
     /**
-     * 数据库序列, 序列名称保存在value中
+     * 数据库序列, 序列名称保存在value中, 形式可以为：
+     * 1, SEQ_NAME  , 序列名称
+     * 2, SEQ_NAME:PREFIX  , 序列名称+ 前缀
+     * 3, SEQ_NAME:PREFIX:LEN:PAD_STRING , 序列名称 + 前缀 + 长度 + 中间不空字符串
      */
     SEQUENCE,
     /**
@@ -30,7 +33,8 @@ public enum GeneratorType {
      */
     FUNCTION,
     /**
-     * 流水号； 代码（sequence）：模板 function  no:序列号
+     * 流水号； 代码（sequence）：模板 function  seqNo:序列号
+     * LSH 和 FUNCTION 一样，只是多了一个 序列变量可以使用
      */
     LSH,
     /**

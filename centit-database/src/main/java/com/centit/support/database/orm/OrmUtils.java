@@ -84,8 +84,21 @@ public abstract class OrmUtils {
                         case SEQUENCE:
                             //GeneratorTime.READ 读取数据时不能用 SEQUENCE 生成值
                             if(sqlDialect!=null) {
-                                setObjectFieldValue(object, filed,
-                                        sqlDialect.getSequenceNextValue(valueGenerator.value()));
+                                String genValue = valueGenerator.value();
+                                String [] params = genValue.split(":");
+                                if(params.length==1) {
+                                    setObjectFieldValue(object, filed,
+                                        sqlDialect.getSequenceNextValue(params[0]));
+                                } else {
+                                    Long seqNo = sqlDialect.getSequenceNextValue(params[0]);
+                                    if(params.length>3){
+                                        setObjectFieldValue(object, filed, StringBaseOpt.midPad(seqNo.toString(),
+                                            NumberBaseOpt.castObjectToInteger(params[2],1),
+                                             params[1], params[3]));
+                                    } else if(params.length>1){
+                                        setObjectFieldValue(object, filed, params[1]+seqNo);
+                                    }
+                                }
                             }
                             break;
                         case CONSTANT:
@@ -101,9 +114,9 @@ public abstract class OrmUtils {
                                 int n = genValue.indexOf(':');
                                 if(n>0 && sqlDialect!=null){
                                     String seq = genValue.substring(0,n);
-                                    Long seqNo = sqlDialect.getSequenceNextValue(valueGenerator.value());
+                                    Long seqNo = sqlDialect.getSequenceNextValue(seq);
                                     JSONObject json = (JSONObject) JSON.toJSON(object);
-                                    json.put("no",seqNo);
+                                    json.put("seqNo",seqNo);
                                     setObjectFieldValue(object, filed,
                                         VariableFormula.calculate(
                                             genValue.substring(n+1), object));
