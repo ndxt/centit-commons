@@ -115,4 +115,44 @@ public interface TableInfo {
         }
         return pkCols;
     }
+
+    @JSONField(serialize = false)
+    default List<TableField> getLzayFields(){
+        List<TableField> pkCols = new ArrayList<>(4);
+        List<? extends TableField> columns = this.getColumns();
+        if(columns!=null) {
+            for (TableField field : columns) {
+                if (field.isLazyFetch()) {
+                    pkCols.add(field);
+                }
+            }
+        }
+        return pkCols;
+    }
+
+    @JSONField(serialize = false)
+    default List<String> getAllFieldsName(){
+        List<String> pkCols = new ArrayList<>(4);
+        List<? extends TableField> columns = this.getColumns();
+        if(columns!=null) {
+            for (TableField field : columns) {
+                pkCols.add(field.getPropertyName());
+            }
+        }
+        return pkCols;
+    }
+
+    @JSONField(serialize = false)
+    default List<String> getFieldsNameWithoutLazy(){
+        List<String> pkCols = new ArrayList<>(4);
+        List<? extends TableField> columns = this.getColumns();
+        if(columns!=null) {
+            for (TableField field : columns) {
+                if(!field.isLazyFetch()) {
+                    pkCols.add(field.getPropertyName());
+                }
+            }
+        }
+        return pkCols;
+    }
 }
