@@ -131,6 +131,20 @@ public interface TableInfo {
     }
 
     @JSONField(serialize = false)
+    default List<TableField> getMandatoryFields(){
+        List<TableField> pkCols = new ArrayList<>(4);
+        List<? extends TableField> columns = this.getColumns();
+        if(columns!=null) {
+            for (TableField field : columns) {
+                if (field.isMandatory()) {
+                    pkCols.add(field);
+                }
+            }
+        }
+        return pkCols;
+    }
+
+    @JSONField(serialize = false)
     default List<String> getAllFieldsName(){
         List<String> pkCols = new ArrayList<>(4);
         List<? extends TableField> columns = this.getColumns();
