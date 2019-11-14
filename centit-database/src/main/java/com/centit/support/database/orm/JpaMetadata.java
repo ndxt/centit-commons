@@ -117,9 +117,13 @@ public abstract class JpaMetadata {
         return translatePropertyNameToColumnName(propertyName, null);
     }
 
+    private static void obtainField(SimpleTableField column, Class<?> objType, Field field) {
+        column.setObjectField(field);
+        column.setObjectGetFieldValueFunc(ReflectionOpt.getGetterMethod(objType, field.getType(), field.getName()));
+        column.setObjectSetFieldValueFunc(ReflectionOpt.getSetterMethod(objType, field.getType(), field.getName()));
+    }
 
-    private static SimpleTableField obtainColumnFromField(Class<?> objType, Field field) {
-        SimpleTableField column = new SimpleTableField();
+    private static void obtainColumn(SimpleTableField column, Field field) {
         Column colInfo = field.getAnnotation(Column.class);
         column.setColumnName(colInfo.name());
         column.setFieldType(FieldType.mapToFieldType(field.getType()));
@@ -128,9 +132,12 @@ public abstract class JpaMetadata {
         column.setScale(colInfo.scale());
         column.setPrecision(colInfo.precision());
         column.setObjectField(field);
-        column.setObjectGetFieldValueFunc(ReflectionOpt.getGetterMethod(objType, field.getType(), field.getName()));
-        column.setObjectSetFieldValueFunc(ReflectionOpt.getSetterMethod(objType, field.getType(), field.getName()));
+    }
 
+    private static SimpleTableField obtainColumnFromField(Class<?> objType, Field field) {
+        SimpleTableField column = new SimpleTableField();
+        obtainColumn(column, field);
+        obtainField(column, objType, field);
         return column;
     }
 
@@ -172,11 +179,16 @@ public abstract class JpaMetadata {
 
             } else if(field.isAnnotationPresent(EmbeddedId.class)){
                 EmbeddedId embeddedId = field.getAnnotation(EmbeddedId.class);
+                mapInfo.setEmbeddedId(true);
                 mapInfo.setPkName(field.getName());
+                SimpleTableField pkColumn = new SimpleTableField();
+                obtainField(pkColumn, objType, field);
+                mapInfo.setEmbeddedIdField(pkColumn);
+
                 for(Field idField : field.getType().getDeclaredFields()){
 
                     if(idField.isAnnotationPresent(Column.class)) {
-                        SimpleTableField column = obtainColumnFromField(objType, idField);
+                        SimpleTableField column = obtainColumnFromField(field.getType(), idField);
                         column.setPrimaryKey(true);
                         mapInfo.addColumn(column);
 

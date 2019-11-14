@@ -13,6 +13,13 @@ import java.util.List;
  */
 public class TableMapInfo extends SimpleTableInfo {
 
+    public TableMapInfo() {
+        super();
+        this.embeddedId = false;
+    }
+
+    private boolean embeddedId;
+    private SimpleTableField embeddedIdField;
 
     public List<LeftRightPair<String, ValueGenerator>> getValueGenerators() {
         return valueGenerators;
@@ -44,5 +51,21 @@ public class TableMapInfo extends SimpleTableInfo {
         }else{
             super.setOrderBy(super.getOrderBy() +", " + orderBySql);
         }
+    }
+
+    public boolean isEmbeddedId() {
+        return embeddedId;
+    }
+
+    public void setEmbeddedId(boolean embeddedId) {
+        this.embeddedId = embeddedId;
+    }
+
+    public SimpleTableField getEmbeddedIdField() {
+        return embeddedIdField;
+    }
+
+    public void setEmbeddedIdField(SimpleTableField embeddedIdField) {
+        this.embeddedIdField = embeddedIdField;
     }
 }

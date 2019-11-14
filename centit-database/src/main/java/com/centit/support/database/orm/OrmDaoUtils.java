@@ -65,7 +65,7 @@ public abstract class OrmDaoUtils {
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
             object = OrmUtils.prepareObjectForInsert(object, mapInfo, sqlDialect);
             return sqlDialect.saveNewObject(OrmUtils.fetchObjectDatabaseField(object, mapInfo));
-        }catch (NoSuchFieldException | IOException | SQLException e){
+        }catch (IOException | SQLException | IllegalAccessException | InstantiationException e){
             throw  new PersistenceException(e);
         }
     }
@@ -77,7 +77,7 @@ public abstract class OrmDaoUtils {
             object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
 
             return sqlDialect.updateObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
-        }catch (NoSuchFieldException | IOException | SQLException e){
+        }catch (IOException | SQLException | IllegalAccessException | InstantiationException e){
             throw  new PersistenceException(e);
         }
     }
@@ -99,7 +99,7 @@ public abstract class OrmDaoUtils {
             object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
 
             return sqlDialect.updateObject(fields, OrmUtils.fetchObjectDatabaseField(object,mapInfo));
-        }catch (NoSuchFieldException | IOException | SQLException e){
+        }catch (IOException | SQLException | IllegalAccessException | InstantiationException e){
             throw  new PersistenceException(e);
         }
     }
@@ -127,7 +127,7 @@ public abstract class OrmDaoUtils {
                     fields,
                     OrmUtils.fetchObjectDatabaseField(object,mapInfo),
                     propertiesFilter);
-        }catch (NoSuchFieldException | IOException | SQLException e){
+        }catch (IOException | SQLException | IllegalAccessException | InstantiationException e){
             throw  new PersistenceException(e);
         }
     }
@@ -165,7 +165,7 @@ public abstract class OrmDaoUtils {
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
             object = OrmUtils.prepareObjectForMerge(object,mapInfo,sqlDialect );
             return sqlDialect.mergeObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
-        }catch (NoSuchFieldException | IOException | SQLException e){
+        }catch (IOException | SQLException | IllegalAccessException | InstantiationException e){
             throw  new PersistenceException(e);
         }
     }
@@ -198,7 +198,7 @@ public abstract class OrmDaoUtils {
             //return obj;
         }catch (SQLException e) {
             throw  new PersistenceException(sqlAndParams.getQuery(), e);
-        }catch (NoSuchFieldException | IOException | InstantiationException | IllegalAccessException e){
+        }catch (IOException | InstantiationException | IllegalAccessException | NoSuchFieldException e){
             throw  new PersistenceException(PersistenceException.ILLEGALACCESS_EXCEPTION,e);
         }
     }
@@ -1103,7 +1103,7 @@ public abstract class OrmDaoUtils {
             TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
             return OrmUtils.prepareObjectForMerge(object, mapInfo, sqlDialect);
-        } catch (IOException | SQLException| NoSuchFieldException e) {
+        } catch (IOException | SQLException | IllegalAccessException | InstantiationException e) {
             throw new PersistenceException(e);
         }
     }
