@@ -179,11 +179,18 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_GET_AT: {//148
                 if (nOpSum < 2)
                     return null;
+                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
                 Object objTemp = slOperand.get(0);
                 if (NumberBaseOpt.isNumber(objTemp)) {
-                    int nbit = NumberBaseOpt.castObjectToInteger(objTemp);
-                    if (nbit < nOpSum - 1) {
-                        return slOperand.get(nbit + 1);
+                    Integer nbit = NumberBaseOpt.castObjectToInteger(objTemp);
+                    if(nbit != null) {
+                        if (nbit < 0) {
+                            nbit = opt.getLeft() - 1 + nbit;
+                        }
+
+                        if (nbit >= 0 && nbit < opt.getLeft() - 1) {
+                            return opt.getRight().get(nbit + 1);
+                        }
                     }
                 }
                 return null;
