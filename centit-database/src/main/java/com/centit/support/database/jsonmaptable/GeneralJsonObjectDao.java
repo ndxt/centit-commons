@@ -994,4 +994,106 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return DatabaseAccess.doExecuteNamedSql(conn, sSql,values);
     }
 
+    @Override
+    public JSONArray listObjectsByProperties(final Map<String, Object> properties,
+                                             final int startPos,final int maxSize)
+        throws SQLException, IOException {
+        TableInfo tableInfo = this.getTableInfo();
+        Pair<String, TableField[]> q = buildFieldSqlWithFields(tableInfo, null, true,
+            GeneralJsonObjectDao.buildFilterSql(tableInfo,null, properties.keySet()),
+            true, GeneralJsonObjectDao.fetchSelfOrderSql(tableInfo, properties));
+        return GeneralJsonObjectDao.findObjectsByNamedSql(
+            conn,
+            QueryUtils.buildLimitQuerySQL(
+                q.getLeft(),
+                startPos, maxSize,false, DBType.mapDBType(conn)),
+            properties,
+            q.getRight());
+    }
+
+    @Override
+    public List<Object[]> findObjectsBySql(final String sSql, final Object[] values,
+                                           final int pageNo, final int pageSize)
+        throws SQLException, IOException {
+        int startPos=pageNo>1?(pageNo-1)*pageSize:0;
+        return DatabaseAccess.findObjectsBySql(
+            conn,
+            QueryUtils.buildLimitQuerySQL(
+                sSql,
+                startPos, pageSize,false, DBType.mapDBType(conn)),
+            values);
+    }
+
+    @Override
+    public List<Object[]> findObjectsByNamedSql(final String sSql, final Map<String, Object> values,
+                                                final int pageNo,final int pageSize) throws SQLException, IOException {
+        int startPos=pageNo>1?(pageNo-1)*pageSize:0;
+        return DatabaseAccess.findObjectsByNamedSql(
+            conn,
+            QueryUtils.buildLimitQuerySQL(
+                sSql,
+                startPos, pageSize,false, DBType.mapDBType(conn)),
+            values);
+    }
+
+    private JSONArray transObjectList(JSONArray ja, String[] fieldnames){
+        if(ja==null || ja.size()==0){
+            return ja;
+        }
+        List<TableField> fields = new ArrayList<>(5);
+        for(String fieldName : fieldnames){
+            TableField field = tableInfo.findFieldByName(fieldName);
+            if(field != null &&(
+                FieldType.BOOLEAN.equals(field.getFieldType())
+                || FieldType.JSON_OBJECT.equals(field.getFieldType()))){
+                fields.add(field);
+            }
+        }
+        if(fields.size()>0){
+            for(Object jo : ja){
+                Map<String, Object>  json = (Map<String, Object>)  jo;
+                for(TableField field : fields){
+                    if(FieldType.BOOLEAN.equals(field.getFieldType())){
+                        Object v = json.get(field.getPropertyName());
+                        if(v!=null){
+                            json.put(field.getPropertyName(),
+                                BooleanBaseOpt.castObjectToBoolean(v,false));
+                        }
+                    } else if(FieldType.JSON_OBJECT.equals(field.getFieldType())){
+                        Object v = json.get(field.getPropertyName());
+                        if(v!=null){
+                            json.put(field.getPropertyName(),
+                                JSON.parse(StringBaseOpt.castObjectToString(v)));
+                        }
+                    }
+                }
+            }
+        }
+        return ja;
+    }
+
+    @Override
+    public JSONArray findObjectsAsJSON(final String sSql, final Object[] values, final String[] fieldnames,
+                                       final int pageNo, final int pageSize)
+        throws SQLException, IOException {
+        int startPos=pageNo>1?(pageNo-1)*pageSize:0;
+        return transObjectList(DatabaseAccess.findObjectsAsJSON(
+            conn,
+            QueryUtils.buildLimitQuerySQL(
+                sSql,
+                startPos, pageSize,false, DBType.mapDBType(conn)),
+            values, fieldnames), fieldnames);
+    }
+
+    @Override
+    public JSONArray findObjectsByNamedSqlAsJSON(final String sSql, final Map<String, Object> values,
+                                                 final String[] fieldnames, final int pageNo, final int pageSize) throws SQLException, IOException {
+        int startPos=pageNo>1?(pageNo-1)*pageSize:0;
+        return transObjectList(DatabaseAccess.findObjectsByNamedSqlAsJSON(
+            conn,
+            QueryUtils.buildLimitQuerySQL(
+                sSql,
+                startPos, pageSize,false, DBType.mapDBType(conn)),
+            values, fieldnames), fieldnames);
+    }
 }
