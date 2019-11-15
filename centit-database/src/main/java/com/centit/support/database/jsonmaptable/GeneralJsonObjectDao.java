@@ -210,8 +210,12 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
 
     /**
      * 返回 sql 语句 和 属性名数组
-     * @param mapInfo TableInfo
-     * @param alias String
+     * @param mapInfo TableInfo 表信息
+     * @param alias String 别名
+     * @param excludeLazy String 是否剔除Lazy字段
+     * @param filterSql String 过滤语句
+     * @param withOrderBy String 是否排序
+     * @param orderSql String 排序语句
      * @return Pair String String []
      */
     public static Pair<String, TableField[]> buildFieldSqlWithFields(
@@ -236,7 +240,6 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         }
         return new ImmutablePair<>(sBuilder.toString(), fieldsAndSql.getRight());
     }
-
 
     public static Pair<String, TableField[]> buildFieldSqlWithFields(
         TableInfo mapInfo, String alias, boolean excludeLazy){
