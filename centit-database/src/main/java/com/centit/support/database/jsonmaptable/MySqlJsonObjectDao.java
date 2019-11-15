@@ -2,6 +2,7 @@ package com.centit.support.database.jsonmaptable;
 
 import com.alibaba.fastjson.JSONArray;
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.QueryUtils;
@@ -36,8 +37,10 @@ public class MySqlJsonObjectDao extends GeneralJsonObjectDao {
             final int startPos,final int maxSize)
             throws SQLException, IOException {
         TableInfo tableInfo = this.getTableInfo();
-        Pair<String,String[]> q = GeneralJsonObjectDao.buildQuerySqlByProperties(tableInfo,properties);
-        return DatabaseAccess.findObjectsByNamedSqlAsJSON(
+        Pair<String, TableField[]> q = buildFieldSqlWithFields(tableInfo, null, true,
+            GeneralJsonObjectDao.buildFilterSql(tableInfo,null, properties.keySet()),
+            true, GeneralJsonObjectDao.fetchSelfOrderSql(tableInfo, properties));
+        return GeneralJsonObjectDao.findObjectsByNamedSql(
                     getConnect(),
                     QueryUtils.buildMySqlLimitQuerySQL(
                             q.getLeft(),

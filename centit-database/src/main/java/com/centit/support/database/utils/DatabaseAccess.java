@@ -132,7 +132,7 @@ public abstract class DatabaseAccess {
         }
     }
 
-    public static void setQueryStmtParameters(PreparedStatement stmt,Object[] paramObjs) throws SQLException{
+    public static void setQueryStmtParameters(PreparedStatement stmt, Object[] paramObjs) throws SQLException{
         //query.getParameterMetadata().isOrdinalParametersZeroBased()?0:1;
         if (paramObjs != null) {
             for (int i = 0; i < paramObjs.length; i++) {
@@ -792,7 +792,7 @@ public abstract class DatabaseAccess {
 
     private static String makePageQuerySql(Connection conn, String sSql,  int pageNo,
                                            int pageSize ) throws PersistenceException{
-        int offset = (pageNo > 1 && pageSize > 0)?(pageNo - 1) * pageSize:0;
+        int offset = (pageNo > 1 && pageSize > 0)?(pageNo - 1) * pageSize : 0;
         return QueryUtils.buildLimitQuerySQL(sSql, offset, pageSize,false,DBType.mapDBType(conn));
     }
 
@@ -817,7 +817,7 @@ public abstract class DatabaseAccess {
     public static List<Object[]> findObjectsBySql(Connection conn, String sSql, Object[] values, int pageNo,
                                                         int pageSize) throws SQLException, IOException {
         String query = makePageQuerySql(conn, sSql, pageNo, pageSize );
-        if(query.equals(sSql)){
+        if(query.equals(sSql)){ // always false
             try(PreparedStatement stmt = conn.prepareStatement(sSql)){
                 setQueryStmtParameters(stmt,values);
                 if (pageNo > 0 && pageSize > 0)
@@ -829,15 +829,13 @@ public abstract class DatabaseAccess {
                         rs.absolute((pageNo - 1) * pageSize);
 
                     return DatabaseAccess.fetchResultSetToObjectsList(rs);
-                    //rs.close();
-                    //stmt.close();
-                    //return datas;
                 }
             }catch (SQLException e) {
                 throw DatabaseAccess.createAccessException(sSql, e);
             }
-        }else
+        }else {
             return findObjectsBySql(conn, query, values);
+        }
     }
 
     /**
@@ -860,7 +858,7 @@ public abstract class DatabaseAccess {
     public static JSONArray findObjectsAsJSON(Connection conn, String sSql, Object[] values, String[] fieldnames,
             int pageNo, int pageSize) throws SQLException, IOException {
         String query = makePageQuerySql(conn, sSql, pageNo, pageSize );
-        if(query.equals(sSql)) {
+        if(query.equals(sSql)) { // always false
             try (PreparedStatement stmt = conn.prepareStatement(sSql)){
                 setQueryStmtParameters(stmt, values);
                 if (pageNo > 0 && pageSize > 0)

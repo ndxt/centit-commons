@@ -21,13 +21,6 @@ public interface JsonObjectDao {
      * @throws IOException IOException
      */
     JSONObject getObjectById(final Object keyValue) throws SQLException, IOException;
-/*
-     * 联合主键表
-     * @param keyValues keyValues
-     * @return JSONObject
-     * @throws SQLException SQLException
-     * @throws IOException IOException
-    JSONObject getObjectById(final Map<String,Object> keyValues) throws SQLException, IOException;*/
 
     /**
      * 根据属性查询对象

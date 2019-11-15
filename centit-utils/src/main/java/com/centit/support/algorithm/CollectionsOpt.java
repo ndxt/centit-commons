@@ -626,4 +626,15 @@ public abstract class CollectionsOpt {
         return (JSONObject) JSON.toJSON(object);
     }
 
+    public static <T> T fetchFirstItem(Collection<T> collection){
+        if(collection==null || collection.isEmpty())
+            return null;
+        return collection.iterator().next();
+    }
+
+    public static <T> T fetchFirstItem(T [] array){
+        if(array==null || array.length<1)
+            return null;
+        return array[0];
+    }
 }

@@ -65,4 +65,16 @@ public interface TableField {
      * @return 字段的默认值
      */
     String getDefaultValue() ;
+
+    /**
+     * @param obj 对象
+     * @param fieldValue 字段值
+     */
+    void setObjectFieldValue(Object obj, Object fieldValue);
+
+    /**
+     * @param obj 对象
+     * @return 字段值
+     */
+    Object getObjectFieldValue(Object obj);
 }

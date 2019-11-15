@@ -8,6 +8,7 @@ import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
+import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.FieldType;
 
@@ -29,7 +30,7 @@ public abstract class OrmUtils {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static void setObjectFieldValue(Object object, TableMapInfo mapInfo, SimpleTableField field,
+    public static void setObjectFieldValue(Object object, TableMapInfo mapInfo, TableField field,
                                            Object newValue)
         throws IOException, IllegalAccessException, InstantiationException {
         if(field.isPrimaryKey() && mapInfo.isEmbeddedId()){
@@ -251,7 +252,7 @@ public abstract class OrmUtils {
         return makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ);
     }
 
-    private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo, SimpleTableField[] fields)
+    private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo, TableField[] fields)
         throws SQLException, IOException, InstantiationException, IllegalAccessException {
         int fieldCount = rs.getMetaData().getColumnCount();
         if(fieldCount > fields.length){
@@ -263,7 +264,7 @@ public abstract class OrmUtils {
         return makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ);
     }
 
-    static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz, SimpleTableField[] fields)
+    static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz, TableField[] fields)
             throws SQLException, IllegalAccessException, InstantiationException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)
@@ -303,7 +304,7 @@ public abstract class OrmUtils {
         return object;
     }
 
-    static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz, SimpleTableField[] fields)
+    static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz, TableField[] fields)
             throws SQLException, IllegalAccessException, InstantiationException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)

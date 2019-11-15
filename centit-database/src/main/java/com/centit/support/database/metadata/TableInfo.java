@@ -1,9 +1,12 @@
 package com.centit.support.database.metadata;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.centit.support.algorithm.StringBaseOpt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface TableInfo {
     /**
@@ -168,5 +171,61 @@ public interface TableInfo {
             }
         }
         return pkCols;
+    }
+
+    default Map<String, Object> fetchObjectPk(Map<String, Object> object){
+        Map<String, Object> pk = new HashMap<>(8);
+        List<? extends TableField> columns = this.getColumns();
+        if(columns!=null) {
+            for (TableField c : columns) {
+                if (c.isPrimaryKey()) {
+                    Object pkValue = object.get(c.getPropertyName());
+                    if (pkValue == null) {
+                        return null;
+                    }
+                    pk.put(c.getPropertyName(), pkValue);
+                }
+            }
+        }
+        return pk;
+    }
+
+    default String fetchObjectPkAsId(Map<String, Object> object){
+        StringBuilder pkId = new StringBuilder();
+        int pkNo = 0;
+        List<? extends TableField> columns = this.getColumns();
+        if(columns!=null) {
+            for (TableField c : columns) {
+                if (c.isPrimaryKey()) {
+                    Object pkValue = object.get(c.getPropertyName());
+                    if (pkNo > 0) {
+                        pkId.append(":");
+                    }
+                    pkId.append(StringBaseOpt.castObjectToString(pkValue));
+                    pkNo++;
+                }
+            }
+        }
+        return pkId.toString();
+    }
+
+    default Map<String, Object> parseObjectPkId(String pkId){
+        String [] pkIds = pkId.split(":");
+        int len = pkIds.length;
+        Map<String, Object> pk = new HashMap<>(8);
+        int pkNo = 0;
+        List<? extends TableField> columns = this.getColumns();
+        if(columns!=null) {
+            for (TableField c : columns) {
+                if (c.isPrimaryKey()) {
+                    if (pkNo >= len) {
+                        return null;
+                    }
+                    pk.put(c.getPropertyName(), pkIds[pkNo]);
+                    pkNo++;
+                }
+            }
+        }
+        return pk;
     }
 }
