@@ -123,15 +123,8 @@ public class OracleMetadata implements DatabaseMetadata {
                 pStmt.setString(1,ref.getReferenceCode());
                 try (ResultSet rs = pStmt.executeQuery()) {
                     while (rs.next()) {
-                        SimpleTableField field = new SimpleTableField();
-                        field.setColumnName(rs.getString("COLUMN_NAME"));
-                        field.setColumnType(rs.getString("DATA_TYPE"));
-                        field.setMaxLength(rs.getInt("DATA_LENGTH"));
-                        field.setPrecision(rs.getInt("DATA_PRECISION"));
-                        field.setScale(rs.getInt("DATA_SCALE"));
-                        field.setNullEnable(rs.getString("NULLABLE"));
-                        field.mapToMetadata();
-                        ref.addFkColumn(field);
+                        String columnName = rs.getString("COLUMN_NAME");
+                        ref.addReferenceColumn(columnName, columnName);
                     }
                 }
             } catch (SQLException e) {

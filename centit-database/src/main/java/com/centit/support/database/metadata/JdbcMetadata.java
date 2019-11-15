@@ -94,11 +94,8 @@ public class JdbcMetadata implements DatabaseMetadata {
                     ref.setParentTableName(tabName);
                     ref.setReferenceCode(rs.getString("FK_NAME"));
                 }
-                SimpleTableField field = new SimpleTableField();
-                field.setColumnName(rs.getString("FKCOLUMN_NAME"));
                 ref.addReferenceColumn(rs.getString("PKCOLUMN_NAME"),
-                        field.getColumnName());
-                ref.addFkColumn(field);
+                    rs.getString("FKCOLUMN_NAME"));
             }
             rs.close();
 

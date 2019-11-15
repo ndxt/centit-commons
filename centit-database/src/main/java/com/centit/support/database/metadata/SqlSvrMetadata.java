@@ -146,16 +146,8 @@ public class SqlSvrMetadata implements DatabaseMetadata {
                 try (ResultSet rs = pStmt.executeQuery()) {
                     while (rs.next()) {
                         //"select a.name,a.object_id,a.parent_object_id , b.name as tabname "+
-                        SimpleTableField field = new SimpleTableField();
-                        field.setColumnName(rs.getString("name"));
-                        field.setColumnType(rs.getString("typename"));
-                        field.setMaxLength(rs.getInt("length"));
-                        field.setPrecision(rs.getInt("xprec"));
-                        field.setScale(rs.getInt("xscale"));
-                        field.setNullEnable(rs.getString("isnullable"));
-                        field.mapToMetadata();
-
-                        ref.addFkColumn(field);
+                        String columnName = rs.getString("name");
+                        ref.addReferenceColumn(columnName, columnName);
                     }
                 }
             } catch (SQLException e1) {

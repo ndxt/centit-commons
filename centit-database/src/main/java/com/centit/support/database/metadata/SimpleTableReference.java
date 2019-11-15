@@ -1,14 +1,14 @@
 package com.centit.support.database.metadata;
 
 import com.centit.support.common.JavaBeanField;
+import com.centit.support.database.orm.JpaMetadata;
+import com.centit.support.database.orm.TableMapInfo;
 import com.centit.support.database.utils.FieldType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class SimpleTableReference implements TableReference{
@@ -17,14 +17,18 @@ public class SimpleTableReference implements TableReference{
     private String tableName;
     private String referenceName;
     private String referenceCode;
+    // 父表属性 类型
     private Class<?> referenceType;
+    // 字表类型 和 父表属性类型不一定相等， 父表属性类型可能是 List Set
     private Class<?> targetEntityType;
-    private List<SimpleTableField> fkColumns;
+   /* 字表关联的字段 这个以前只有 转换 Hibernate 的map文件需要，现在都用注解不需要了
+    private List<SimpleTableField> fkColumns;*/
     /**
      * key： 父表属性 value：子表属性
      */
     private Map<String, String> referenceColumns;
     private int nObjectId; //only used by sqlserver
+    // 父表 属性字段
     private JavaBeanField beanField;
 
     public int getObjectId() {
@@ -59,31 +63,10 @@ public class SimpleTableReference implements TableReference{
         this.referenceName = referenceName;
     }
 
-    public List<SimpleTableField> getFkColumns() {
-        if(fkColumns==null)
-            fkColumns = new ArrayList<>();
-        return fkColumns;
-    }
-
-    public void setFkColumns(List<SimpleTableField> fkcolumns) {
-        this.fkColumns = fkcolumns;
-    }
-
-    public void addFkColumn(SimpleTableField fkcolumn) {
-        if(fkColumns==null) {
-            fkColumns = new ArrayList<>();
-        }
-        this.fkColumns.add(fkcolumn);
-    }
-
     public boolean containColumn(String sCol) {
-        if(sCol==null || fkColumns==null || fkColumns.size() == 0)
+        if(sCol==null || referenceColumns==null || referenceColumns.size() == 0)
             return false;
-        for(SimpleTableField tf : fkColumns){
-            if(sCol.equalsIgnoreCase(tf.getColumnName()))
-                return true;
-        }
-        return false;
+        return referenceColumns.containsKey(sCol);
     }
 
     public String getClassName() {
@@ -124,7 +107,7 @@ public class SimpleTableReference implements TableReference{
             this.referenceColumns = new HashMap<>(6);
         }
         this.referenceColumns.put(column,
-                StringUtils.isBlank(referencedColumn)?column:referencedColumn);
+                StringUtils.isBlank(referencedColumn) ? column : referencedColumn);
     }
 
     public Class<?> getReferenceType() {
@@ -167,5 +150,34 @@ public class SimpleTableReference implements TableReference{
 
     public Object getObjectFieldValue(Object obj) {
         return beanField.getObjectFieldValue(obj);
+    }
+
+    public Map<String, Object> fetchChildFk(Object parentObject){
+        /*if(referenceColumns == null){
+            return null;
+        }*/
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(parentObject.getClass());
+        Map<String, Object> fk = new HashMap<>(8);
+        for (Map.Entry<String, String> end : referenceColumns.entrySet()) {
+            Object fkValue = mapInfo.getObjectFieldValue(parentObject, end.getKey());
+            if(fkValue == null){
+                return null;
+            }
+            fk.put(end.getValue(), fkValue);
+        }
+        return fk;
+    }
+
+    public Map<String, Object> fetchParentPk(Object childObject){
+        TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(childObject.getClass());
+        Map<String, Object> pk = new HashMap<>(8);
+        for (Map.Entry<String, String> end : referenceColumns.entrySet()) {
+            Object fkValue = mapInfo.getObjectFieldValue(childObject, end.getValue());
+            if(fkValue == null){
+                return null;
+            }
+            pk.put(end.getKey(), fkValue);
+        }
+        return pk;
     }
 }

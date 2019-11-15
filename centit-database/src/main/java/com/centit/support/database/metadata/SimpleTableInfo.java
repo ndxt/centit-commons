@@ -338,10 +338,10 @@ public class SimpleTableInfo implements TableInfo{
                 setElt.addAttribute("cascade", "all-delete-orphan");//"all-delete-orphan")//save-update,delete;
                 setElt.addAttribute("inverse", "true");
                 Element keyElt = setElt.addElement("key");
-                for(SimpleTableField col :ref.getFkColumns()){
+                /*for(SimpleTableField col :ref.getFkColumns()){
                     Element colElt = keyElt.addElement("column");
                     saveColumn(col,colElt,false);
-                }
+                }*/
                 Element maptypeElt = setElt.addElement("one-to-many");
                 maptypeElt.addAttribute("class", packageName+'.'+ ref.getClassName());
             }

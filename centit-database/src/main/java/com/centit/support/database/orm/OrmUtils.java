@@ -8,7 +8,6 @@ import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
-import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.FieldType;
 
@@ -30,54 +29,45 @@ public abstract class OrmUtils {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static void setObjectFieldValue(Object object, TableMapInfo mapInfo, TableField field,
+    public static void setObjectFieldValue(Object object, TableMapInfo mapInfo, SimpleTableField field,
                                            Object newValue)
-        throws IOException, IllegalAccessException, InstantiationException {
-        if(field.isPrimaryKey() && mapInfo.isEmbeddedId()){
-            SimpleTableField embeddedIdfield = mapInfo.getEmbeddedIdField();
-            Object pkId = embeddedIdfield.getObjectFieldValue(object);
-            if(pkId==null){
-                pkId = embeddedIdfield.getJavaType().newInstance();
-                field.setObjectFieldValue(pkId, newValue);
-                embeddedIdfield.setObjectFieldValue(object, pkId);
-            } else {
-                field.setObjectFieldValue(pkId, newValue);
-            }
-        } else {
-            if (newValue instanceof Clob) {
-                String sValue = DatabaseAccess.fetchClobString((Clob) newValue);
-                if (FieldType.JSON_OBJECT.equals(field.getFieldType())) {
-                    Class<?> clazz = field.getJavaType();
-                    // 这个地方可能会出现类型不兼容的问题
-                    if (JSON.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
-                        field.setObjectFieldValue(object, JSON.parse(sValue));
-                    } else {
-                        field.setObjectFieldValue(object, JSON.parseObject(sValue, clazz));
-                    }
+        throws IOException {
+
+        if (newValue instanceof Clob) {
+            String sValue = DatabaseAccess.fetchClobString((Clob) newValue);
+            if (FieldType.JSON_OBJECT.equals(field.getFieldType())) {
+                Class<?> clazz = field.getJavaType();
+                // 这个地方可能会出现类型不兼容的问题
+                if (JSON.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
+                    mapInfo.setObjectFieldValue(object, field, JSON.parse(sValue));
                 } else {
-                    field.setObjectFieldValue(object, sValue);
+                    mapInfo.setObjectFieldValue(object, field, JSON.parseObject(sValue, clazz));
                 }
-            } else if (newValue instanceof Blob) {
-                field.setObjectFieldValue(object,
-                    DatabaseAccess.fetchBlobBytes((Blob) newValue));
             } else {
-                if (FieldType.JSON_OBJECT.equals(field.getFieldType())) {
-                    Class<?> clazz = field.getJavaType();
-                    if (JSON.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
-                        newValue = JSON.parse(StringBaseOpt.castObjectToString(newValue));
-                    } else {
-                        newValue = JSON.parseObject(
-                            StringBaseOpt.castObjectToString(newValue), clazz);
-                    }
+                mapInfo.setObjectFieldValue(object, field, sValue);
+            }
+        } else if (newValue instanceof Blob) {
+            mapInfo.setObjectFieldValue(object, field,
+                DatabaseAccess.fetchBlobBytes((Blob) newValue));
+        } else {
+            if (FieldType.JSON_OBJECT.equals(field.getFieldType())) {
+                Class<?> clazz = field.getJavaType();
+                if (JSON.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
+                    newValue = JSON.parse(StringBaseOpt.castObjectToString(newValue));
+                } else {
+                    newValue = JSON.parseObject(
+                        StringBaseOpt.castObjectToString(newValue), clazz);
                 }
-                field.setObjectFieldValue(object, newValue);
+                mapInfo.setObjectFieldValue(object, field, newValue);
+            } else {
+                mapInfo.setObjectFieldValue(object, field, newValue);
             }
         }
     }
 
     private static <T> T makeObjectValueByGenerator(T object, TableMapInfo mapInfo,
                                                     JsonObjectDao sqlDialect, GeneratorTime generatorTime)
-        throws SQLException, IOException, InstantiationException, IllegalAccessException {
+        throws SQLException, IOException {
         List<LeftRightPair<String, ValueGenerator>>  valueGenerators = mapInfo.getValueGenerators();
         if(valueGenerators == null || valueGenerators.size()<1 )
             return object;
@@ -85,14 +75,14 @@ public abstract class OrmUtils {
             ValueGenerator valueGenerator =  ent.getRight();
             if (valueGenerator.occasion().matchTime(generatorTime)){
                 SimpleTableField filed = mapInfo.findFieldByName(ent.getLeft());
-                Object fieldValue = fetchObjectField(object, mapInfo, filed);
+                Object fieldValue = mapInfo.getObjectFieldValue(object, filed);
                 if( fieldValue == null || valueGenerator.condition() == GeneratorCondition.ALWAYS ){
                     switch (valueGenerator.strategy()){
                         case UUID:
-                            filed.setObjectFieldValue(object, UuidOpt.getUuidAsString32());
+                            mapInfo.setObjectFieldValue(object, filed, UuidOpt.getUuidAsString32());
                             break;
                         case UUID22:
-                            filed.setObjectFieldValue(object, UuidOpt.getUuidAsString22());
+                            mapInfo.setObjectFieldValue(object, filed, UuidOpt.getUuidAsString22());
                             break;
                         case SEQUENCE:
                             //GeneratorTime.READ 读取数据时不能用 SEQUENCE 生成值
@@ -100,25 +90,25 @@ public abstract class OrmUtils {
                                 String genValue = valueGenerator.value();
                                 String [] params = genValue.split(":");
                                 if(params.length==1) {
-                                    setObjectFieldValue(object, mapInfo, filed,
+                                    mapInfo.setObjectFieldValue(object, filed,
                                         sqlDialect.getSequenceNextValue(params[0]));
                                 } else {
                                     Long seqNo = sqlDialect.getSequenceNextValue(params[0]);
                                     if(params.length>3){
-                                        setObjectFieldValue(object, mapInfo, filed, StringBaseOpt.midPad(seqNo.toString(),
+                                        mapInfo.setObjectFieldValue(object, filed, StringBaseOpt.midPad(seqNo.toString(),
                                             NumberBaseOpt.castObjectToInteger(params[2],1),
                                              params[1], params[3]));
                                     } else if(params.length>1){
-                                        setObjectFieldValue(object, mapInfo, filed, params[1]+seqNo);
+                                        mapInfo.setObjectFieldValue(object, filed, params[1]+seqNo);
                                     }
                                 }
                             }
                             break;
                         case CONSTANT:
-                            setObjectFieldValue(object, mapInfo, filed, valueGenerator.value());
+                            mapInfo.setObjectFieldValue(object, filed, valueGenerator.value());
                             break;
                         case FUNCTION:
-                            setObjectFieldValue(object, mapInfo, filed,
+                            mapInfo.setObjectFieldValue(object, filed,
                                     VariableFormula.calculate(valueGenerator.value(), object));
                             break;
                         case LSH:
@@ -130,7 +120,7 @@ public abstract class OrmUtils {
                                     Long seqNo = sqlDialect.getSequenceNextValue(seq);
                                     JSONObject json = (JSONObject) JSON.toJSON(object);
                                     json.put("seqNo",seqNo);
-                                    setObjectFieldValue(object, mapInfo, filed,
+                                    mapInfo.setObjectFieldValue(object, filed,
                                         VariableFormula.calculate(
                                             genValue.substring(n+1), object));
                                 }
@@ -143,7 +133,7 @@ public abstract class OrmUtils {
                                 String prefix = params.length>3 ? params[3] : "";
                                 int len = NumberBaseOpt.castObjectToInteger(params[2],23);
                                 if(len>22){
-                                    setObjectFieldValue(object, mapInfo, filed, prefix + UuidOpt.getUuidAsString22());
+                                    mapInfo.setObjectFieldValue(object, filed, prefix + UuidOpt.getUuidAsString22());
                                 } else /*if (sqlDialect!=null)*/{
                                     for(int i=0; i<100; i++) {
                                         String no = prefix + UuidOpt.getUuidAsString22().substring(0,len);
@@ -153,7 +143,7 @@ public abstract class OrmUtils {
                                                             sqlDialect.findObjectsBySql("select count(*) hasId from "+params[0]
                                                                 + " where " + params[1] +" = ?", new Object[] {no})),0);
                                         if(nHasId==0) {
-                                            setObjectFieldValue(object, mapInfo, filed, no);
+                                            mapInfo.setObjectFieldValue(object, filed, no);
                                             break;// for
                                         }
                                     }
@@ -169,17 +159,17 @@ public abstract class OrmUtils {
     }
 
     public static <T> T prepareObjectForInsert(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
-        throws SQLException, IOException, IllegalAccessException, InstantiationException {
+        throws SQLException, IOException {
         return makeObjectValueByGenerator(object, mapInfo, sqlDialect,GeneratorTime.NEW);
     }
 
     public static <T> T prepareObjectForUpdate(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
-        throws SQLException, IOException, IllegalAccessException, InstantiationException {
+        throws SQLException, IOException {
         return makeObjectValueByGenerator(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
     }
 
     public static <T> T prepareObjectForMerge(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
-        throws SQLException, IOException, IllegalAccessException, InstantiationException {
+        throws SQLException, IOException {
         Map<String,Object> objectMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
         if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,objectMap)){
             return makeObjectValueByGenerator(object, mapInfo, sqlDialect, GeneratorTime.NEW);
@@ -202,19 +192,6 @@ public abstract class OrmUtils {
         return fields;
     }
 
-    public static Object fetchObjectField(Object object, TableMapInfo tableInfo, SimpleTableField field) {
-        if(field.isPrimaryKey() && tableInfo.isEmbeddedId()){
-            SimpleTableField embeddedIdfield = tableInfo.getEmbeddedIdField();
-            Object pkId = embeddedIdfield.getObjectFieldValue(object);
-            if(pkId!=null) {
-                return field.getObjectFieldValue(pkId);
-            } else {
-                return null;
-            }
-        } else {
-            return field.getObjectFieldValue(object);
-        }
-    }
 
     public static Map<String, Object> fetchObjectDatabaseField(Object object, TableMapInfo tableInfo) {
         List<SimpleTableField> tableFields = tableInfo.getColumns();
@@ -223,7 +200,7 @@ public abstract class OrmUtils {
         }
         Map<String, Object> fields = new HashMap<>(tableFields.size()+6);
         for(SimpleTableField column : tableFields){
-            Object value = fetchObjectField(object, tableInfo, column);
+            Object value = tableInfo.getObjectFieldValue(object, column);
             //ReflectionOpt.getFieldValue(object, column.getPropertyName());
             if(value!=null){
                 if(FieldType.BOOLEAN.equals(column.getFieldType())){
@@ -239,7 +216,7 @@ public abstract class OrmUtils {
     }
 
     private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo )
-        throws SQLException, IOException, InstantiationException, IllegalAccessException {
+        throws SQLException, IOException {
         ResultSetMetaData resMeta = rs.getMetaData();
         int fieldCount = resMeta.getColumnCount();
         for (int i = 1; i <= fieldCount; i++) {
@@ -252,8 +229,8 @@ public abstract class OrmUtils {
         return makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ);
     }
 
-    private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo, TableField[] fields)
-        throws SQLException, IOException, InstantiationException, IllegalAccessException {
+    private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo, SimpleTableField[] fields)
+        throws SQLException, IOException {
         int fieldCount = rs.getMetaData().getColumnCount();
         if(fieldCount > fields.length){
             fieldCount = fields.length;
@@ -264,7 +241,7 @@ public abstract class OrmUtils {
         return makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ);
     }
 
-    static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz, TableField[] fields)
+    static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz, SimpleTableField[] fields)
             throws SQLException, IllegalAccessException, InstantiationException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)
@@ -277,7 +254,7 @@ public abstract class OrmUtils {
     }
 
     static <T> T fetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo, SimpleTableField[] fields)
-        throws SQLException, IOException, IllegalAccessException, InstantiationException {
+        throws SQLException, IOException {
         if(rs.next()) {
             object = insideFetchFieldsFormResultSet(rs, object, mapInfo, fields);
         }
@@ -297,14 +274,14 @@ public abstract class OrmUtils {
     }
 
     static <T> T fetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo)
-        throws SQLException, IOException, IllegalAccessException, InstantiationException {
+        throws SQLException, IOException {
         if(rs.next()) {
             object = insideFetchFieldsFormResultSet(rs, object, mapInfo);
         }
         return object;
     }
 
-    static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz, TableField[] fields)
+    static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz, SimpleTableField[] fields)
             throws SQLException, IllegalAccessException, InstantiationException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)

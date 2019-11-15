@@ -195,7 +195,6 @@ public class PdmReader implements DatabaseMetadata {
             ref.setTableName(getElementText(eChildTab,"a","Code"));
 
             for(String pkColID : pkColumnIDs) {
-                SimpleTableField field = new SimpleTableField();
                 String sChildColId = getAttributeValue(((Element)elRef),
                     "c:Joins/o:ReferenceJoin[c:Object1/o:Column/@Ref='"+pkColID+"']/c:Object2/o:Column/@Ref");
                 //System.out.println(sChildColId);
@@ -204,30 +203,9 @@ public class PdmReader implements DatabaseMetadata {
                 if(col==null)
                     continue;
                 //System.out.println(col.asXML());
+                String columnName = getElementText(col,"a","Code");
 
-                field.setColumnName(getElementText(col,"a","Code"));
-                //System.out.println(col.attributeValue("a:Code"));
-                field.setColumnType(getElementText(col,"a","DataType"));
-                String stemp = getElementText(col,"a","Length");
-                if(stemp !=null){
-                    field.setMaxLength(Integer.valueOf(stemp));
-                    field.setPrecision(Integer.valueOf(stemp));
-                }
-
-                stemp = getElementText(col,"a","Precision");
-                if(stemp !=null)
-                    field.setScale(Integer.valueOf(stemp));
-
-                stemp = getElementText(col,"a","Mandatory");
-                if(stemp !=null)
-                    field.setMandatory(stemp);
-                field.setFieldLabelName(getElementText(col,"a","Name"));
-                field.setColumnComment(getElementText(col,"a","Comment"));
-
-                field.mapToMetadata();
-                ref.addFkColumn(field);
-                ref.addReferenceColumn(pkColID,
-                        field.getColumnName());
+                ref.addReferenceColumn(pkColID, columnName);
             }
             tab.addReference(ref );
         }

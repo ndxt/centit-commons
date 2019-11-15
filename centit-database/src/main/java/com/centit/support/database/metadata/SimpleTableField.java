@@ -24,6 +24,7 @@ public class SimpleTableField implements TableField {
     private Integer  maxLength;//最大长度 Only used when sType=String
     private Integer  precision;//有效数据位数 Only used when sType=Long Number Float
     private Integer  scale;//精度 Only used when sType= Long Number Float
+
     private JavaBeanField beanField;
     private boolean lazyFetch;
     private boolean primaryKey;
@@ -260,11 +261,7 @@ public class SimpleTableField implements TableField {
         beanField.setGetFieldValueFunc(objectGetFieldValueFunc);
     }
 
-    public void setObjectFieldValue(Object obj, Object fieldValue) {
-        beanField.setObjectFieldValue(obj,fieldValue);
-    }
-
-    public Object getObjectFieldValue(Object obj) {
-        return beanField.getObjectFieldValue(obj);
+    public JavaBeanField getBeanField() {
+        return beanField;
     }
 }

@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
 
 public class DB2Metadata implements DatabaseMetadata {
 
@@ -107,9 +106,6 @@ public class DB2Metadata implements DatabaseMetadata {
                         System.out.println("外键" + ref.getReferenceCode() + "字段分隔出错！");
                     }
                     for (int i = 0; i < p.length; i++) {
-                        SimpleTableField field = new SimpleTableField();
-                        field.setColumnName(p[i]);
-                        ref.addFkColumn(field);
                         if (i < pK.length)
                             ref.addReferenceColumn(pK[i], p[i]);
                     }
@@ -120,29 +116,6 @@ public class DB2Metadata implements DatabaseMetadata {
             logger.error(e1.getLocalizedMessage(),e1);
         }
 
-        // get reference detail
-        for (Iterator<SimpleTableReference> it = tab.getReferences().iterator(); it.hasNext(); ) {
-            SimpleTableReference ref = it.next();
-            for (SimpleTableField field : ref.getFkColumns()) {
-                try (PreparedStatement pStmt = dbc.prepareStatement(sqlFKColumn)) {
-                    pStmt.setString(1, sDBSchema);
-                    pStmt.setString(2, ref.getTableName());
-                    pStmt.setString(3, field.getColumnName());
-                    try (ResultSet rs = pStmt.executeQuery()) {
-                        if (rs.next()) {
-                            field.setColumnType(rs.getString("coltype"));
-                            field.setMaxLength(rs.getInt("length"));
-                            field.setPrecision(field.getMaxLength());
-                            field.setScale(rs.getInt("scale"));
-                            field.setNullEnable(rs.getString("nulls"));
-                            field.mapToMetadata();
-                        }
-                    }
-                } catch (SQLException e) {
-                    logger.error(e.getLocalizedMessage(),e);
-                }
-            }
-        }
         return tab;
     }
 

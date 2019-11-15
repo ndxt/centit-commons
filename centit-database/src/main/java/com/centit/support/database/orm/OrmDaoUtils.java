@@ -64,7 +64,7 @@ public abstract class OrmDaoUtils {
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
             object = OrmUtils.prepareObjectForInsert(object, mapInfo, sqlDialect);
             return sqlDialect.saveNewObject(OrmUtils.fetchObjectDatabaseField(object, mapInfo));
-        }catch (IOException | SQLException | IllegalAccessException | InstantiationException e){
+        }catch (IOException | SQLException e){
             throw  new PersistenceException(e);
         }
     }
@@ -76,7 +76,7 @@ public abstract class OrmDaoUtils {
             object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
 
             return sqlDialect.updateObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
-        }catch (IOException | SQLException | IllegalAccessException | InstantiationException e){
+        }catch (IOException | SQLException e){
             throw  new PersistenceException(e);
         }
     }
@@ -98,7 +98,7 @@ public abstract class OrmDaoUtils {
             object = OrmUtils.prepareObjectForUpdate(object,mapInfo,sqlDialect );
 
             return sqlDialect.updateObject(fields, OrmUtils.fetchObjectDatabaseField(object,mapInfo));
-        }catch (IOException | SQLException | IllegalAccessException | InstantiationException e){
+        }catch (IOException | SQLException e){
             throw  new PersistenceException(e);
         }
     }
@@ -126,7 +126,7 @@ public abstract class OrmDaoUtils {
                     fields,
                     OrmUtils.fetchObjectDatabaseField(object,mapInfo),
                     propertiesFilter);
-        }catch (IOException | SQLException | IllegalAccessException | InstantiationException e){
+        }catch (IOException | SQLException e){
             throw  new PersistenceException(e);
         }
     }
@@ -164,7 +164,7 @@ public abstract class OrmDaoUtils {
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
             object = OrmUtils.prepareObjectForMerge(object,mapInfo,sqlDialect );
             return sqlDialect.mergeObject( OrmUtils.fetchObjectDatabaseField(object,mapInfo));
-        }catch (IOException | SQLException | IllegalAccessException | InstantiationException e){
+        }catch (IOException | SQLException e){
             throw  new PersistenceException(e);
         }
     }
@@ -254,7 +254,7 @@ public abstract class OrmDaoUtils {
         return queryNamedParamsSql(
             connection, new QueryAndNamedParams(q.getLeft(),
                 properties),
-            (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, q.getRight()));
+            (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
     }
 
     public static <T> T getObjectById(Connection connection, Object id, final Class<T> type)
@@ -272,7 +272,7 @@ public abstract class OrmDaoUtils {
                         "表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return queryNamedParamsSql(connection,new QueryAndNamedParams(q.getKey(),
                     CollectionsOpt.createHashMap(mapInfo.getPkFields().get(0).getPropertyName(),id)),
-                (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, q.getRight()));
+                (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
             if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idObj)){
@@ -281,7 +281,7 @@ public abstract class OrmDaoUtils {
             }
             return queryNamedParamsSql(connection,
                 new QueryAndNamedParams(q.getKey(),idObj),
-                (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, q.getRight()));
+                (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
         }
 
     }
@@ -375,7 +375,7 @@ public abstract class OrmDaoUtils {
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(q.getLeft(),
                         new HashMap<>(1)),
-                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, q.getRight()));
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
     }
 
     public static <T> List<T> listObjectsByProperties(Connection connection, Map<String, Object> properties, Class<T> type)
@@ -388,7 +388,7 @@ public abstract class OrmDaoUtils {
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(q.getLeft(),
                         properties),
-                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, q.getRight()));
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
     }
 
     public static <T> int countObjectByProperties(Connection connection, Map<String, Object> properties, Class<T> type)
@@ -416,7 +416,7 @@ public abstract class OrmDaoUtils {
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(q.getLeft(),
                         properties),startPos, maxSize,
-                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, q.getRight()));
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
     }
 
     public static <T> List<T> queryObjectsBySql(Connection connection, String sql, Class<T> type)
@@ -518,10 +518,7 @@ public abstract class OrmDaoUtils {
         if( refMapInfo == null )
             return object;
 
-        Map<String, Object> properties = new HashMap<>(6);
-        for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
-            properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
-        }
+        Map<String, Object> properties = ref.fetchChildFk(object);
 
         List<?> refs = listObjectsByProperties( connection, properties, refType);
 
@@ -592,21 +589,13 @@ public abstract class OrmDaoUtils {
         }
     }
 
-    public static <T> int deleteObjectReference(Connection connection, T object,SimpleTableReference ref)
+    public static <T> int deleteObjectReference(Connection connection, T object, SimpleTableReference ref)
             throws PersistenceException {
 
         if(ref==null || ref.getReferenceColumns().size()<1)
             return 0;
-
         Class<?> refType = ref.getTargetEntityType();
-        TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
-        if( refMapInfo == null )
-            return 0;
-
-        Map<String, Object> properties = new HashMap<>(6);
-        for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
-            properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object, ent.getKey()));
-        }
+        Map<String, Object> properties = ref.fetchChildFk(object);
 
         return deleteObjectByProperties(connection, properties, refType);
     }
@@ -633,7 +622,7 @@ public abstract class OrmDaoUtils {
     public static <T> int deleteObjectWithReferences(Connection connection, T object)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
-        Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
+        Map<String, Object> idMap = OrmUtils.fetchObjectDatabaseField(object, mapInfo);
 
         if(mapInfo.hasReferences()) {
             for (SimpleTableReference ref : mapInfo.getReferences()) {
@@ -652,11 +641,8 @@ public abstract class OrmDaoUtils {
 
         if (depth > 0 && mapInfo.hasReferences()) {
             for (SimpleTableReference ref : mapInfo.getReferences()) {
-                Map<String, Object> properties = new HashMap<>(6);
+                Map<String, Object> properties = ref.fetchChildFk(object);
                 Class<?> refType = ref.getTargetEntityType();
-                for (Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()) {
-                    properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object, ent.getKey()));
-                }
 
                 List<?> refs = listObjectsByProperties(connection, properties, refType);
                 for (Object refObject : refs) {
@@ -688,10 +674,8 @@ public abstract class OrmDaoUtils {
         @Override
         public int compare(T o1, T o2) {
             for(TableField pkc : tableInfo.getPkFields() ){
-                Object f1 = ((SimpleTableField)pkc).getObjectFieldValue(o1);
-                // ReflectionOpt.getFieldValue(o1, pkc.getPropertyName());
-                Object f2 = ((SimpleTableField)pkc).getObjectFieldValue(o2);
-                // ReflectionOpt.getFieldValue(o2, pkc.getPropertyName());
+                Object f1 = tableInfo.getObjectFieldValue(o1, (SimpleTableField) pkc);
+                Object f2 = tableInfo.getObjectFieldValue(o2, (SimpleTableField) pkc);
                 if(f1==null){
                     if(f2!=null)
                         return -1;
@@ -780,7 +764,6 @@ public abstract class OrmDaoUtils {
             return 0;
 
         Object newObj = ref.getObjectFieldValue(object);
-        //ReflectionOpt.getFieldValue( object, ref.getReferenceName());
         if(newObj==null){
             return 0;
         }
@@ -791,16 +774,16 @@ public abstract class OrmDaoUtils {
             return 0;
         if (//ref.getReferenceType().equals(refType) || oneToOne
                 ref.getReferenceType().isAssignableFrom(refType) ){
-            for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
-                Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
-                refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(newObj,obj);
+            for (Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()) {
+                Object obj = mapInfo.getObjectFieldValue(object, ent.getKey());
+                refMapInfo.setObjectFieldValue(newObj, ent.getValue(), obj);
             }
             saveNewObjectCascade(connection, newObj, depth - 1);
         }else if(newObj instanceof Collection){
             for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
-                Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
+                Object obj = mapInfo.getObjectFieldValue(object, ent.getKey());
                 for(Object subObj : (Collection<Object>)newObj) {
-                    refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(subObj, obj);
+                    refMapInfo.setObjectFieldValue(subObj, ent.getValue(),obj);
                 }
             }
             for(Object subObj : (Collection<Object>)newObj){
@@ -817,7 +800,6 @@ public abstract class OrmDaoUtils {
             return 0;
 
         Object newObj = ref.getObjectFieldValue(object);
-        //ReflectionOpt.getFieldValue( object, ref.getReferenceName());
         if(newObj==null){
             return deleteObjectReference(connection, object,ref);
         }
@@ -827,19 +809,17 @@ public abstract class OrmDaoUtils {
         if( refMapInfo == null )
             return 0;
 
-        Map<String, Object> properties = new HashMap<>(6);
-        for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
-            properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
-        }
-
+        Map<String, Object> properties = ref.fetchChildFk(object);
         List<?> refs = listObjectsByProperties(connection,  properties, refType);
 
         if (//ref.getReferenceType().equals(refType) || oneToOne
                 ref.getReferenceType().isAssignableFrom(refType) ){
+
             for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
-                Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
-                refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(newObj,obj);
+                Object obj = mapInfo.getObjectFieldValue(object, ent.getKey());
+                refMapInfo.setObjectFieldValue(newObj, ent.getValue(), obj);
             }
+
             if(refs!=null && refs.size()>0){
                 updateObject(connection, newObj);
             }else{
@@ -848,15 +828,13 @@ public abstract class OrmDaoUtils {
         }else {
             List<Object> newListObj = Set.class.isAssignableFrom(ref.getReferenceType())?
                   new ArrayList<>((Set<?>) newObj):(List<Object>) newObj;
-
             for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
-                Object obj = mapInfo.findFieldByName(ent.getKey()).getObjectFieldValue(object);
+                Object obj = mapInfo.getObjectFieldValue(object, ent.getKey());
                 for(Object subObj : newListObj) {
-                    refMapInfo.findFieldByName(ent.getValue()).setObjectFieldValue(subObj, obj);
+                    refMapInfo.setObjectFieldValue(subObj, ent.getValue(), obj);
                 }
             }
             replaceObjectsAsTabulation(connection, (List<Object>) refs, newListObj);
-
         }
         return 1;
     }
@@ -954,16 +932,12 @@ public abstract class OrmDaoUtils {
             return 0;
 
         Object newObj = ref.getObjectFieldValue(object);
-        // ReflectionOpt.getFieldValue( object, ref.getReferenceName());
         Class<?> refType = ref.getTargetEntityType();
         TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
         if( refMapInfo == null )
             return 0;
 
-        Map<String, Object> properties = new HashMap<>(6);
-        for(Map.Entry<String,String> ent : ref.getReferenceColumns().entrySet()){
-            properties.put(ent.getValue(), ReflectionOpt.getFieldValue(object,ent.getKey()));
-        }
+        Map<String, Object> properties = ref.fetchChildFk(object);
 
         int  n = 0;
         List<?> refs = listObjectsByProperties(connection,  properties, refType);
@@ -1061,7 +1035,7 @@ public abstract class OrmDaoUtils {
             TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
             JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
             return OrmUtils.prepareObjectForMerge(object, mapInfo, sqlDialect);
-        } catch (IOException | SQLException | IllegalAccessException | InstantiationException e) {
+        } catch (IOException | SQLException e) {
             throw new PersistenceException(e);
         }
     }

@@ -233,16 +233,16 @@ public class HibernateMapInfo {
                 }
                 */
             }
-            List<Element> propNodes = (List<Element>)classNode.elements("property");
+            List<Element> propNodes = classNode.elements("property");
             for(Element prop : propNodes){
                 properties.add(loadField(prop));
             }
             if (isMainTable){
-                List<Element> setElements = (List<Element>) classNode.elements("set");
+                List<Element> setElements = classNode.elements("set");
                 //List<Element> one2manyNodes = (List<Element>)setElement.elements("//one-to-many");
                 if(setElements != null && setElements.size()>0){
-                    one2manys = new ArrayList<HibernateMapInfo>();
-                    references = new ArrayList<SimpleTableReference>();
+                    one2manys = new ArrayList<>();
+                    references = new ArrayList<>();
                     for(Element setElement : setElements){
                         Element one2manyNode = setElement.element("one-to-many");
                         String sSubClassName = one2manyNode.attributeValue("class");
@@ -260,12 +260,10 @@ public class HibernateMapInfo {
                         ref.setParentTableName(tableName);
                         ref.setReferenceCode(setElement.attributeValue("name"));
                         Element keyElt = setElement.element("key");
-                        List<Element> colElements = (List<Element>) keyElt.elements("column");
+                        List<Element> colElements = keyElt.elements("column");
                         for(Element colElt : colElements){
-                            SimpleTableField field = new SimpleTableField();
-                            field.setColumnName(colElt.attributeValue("name"));
-                            field.mapToMetadata();
-                            ref.addFkColumn(field);
+                            ref.addReferenceColumn(colElt.attributeValue("name"),
+                                colElt.attributeValue("column"));
                         }
                          // <column name="FKCOL1" precision="22" scale="0" not-null="true" />
                         references.add(ref);
