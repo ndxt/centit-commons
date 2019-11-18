@@ -107,7 +107,7 @@ public class TableMapInfo extends SimpleTableInfo {
     }
 
     public Object getObjectFieldValue(Object object, String fieldName) {
-        SimpleTableField field = this.findField(fieldName);
+        SimpleTableField field = this.findFieldByName(fieldName);
         if(field==null){
             return null;
         }
@@ -115,7 +115,7 @@ public class TableMapInfo extends SimpleTableInfo {
     }
 
     public void setObjectFieldValue(Object object, String fieldName, Object newValue) {
-        SimpleTableField field = this.findField(fieldName);
+        SimpleTableField field = this.findFieldByName(fieldName);
         if(field==null){
             return;
         }

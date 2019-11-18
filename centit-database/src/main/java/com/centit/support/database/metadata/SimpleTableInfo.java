@@ -156,19 +156,6 @@ public class SimpleTableInfo implements TableInfo{
     }
 
     /**
-     * 根据字段名查找 字段信息
-     * @param colname 字段名
-     * @return 字段信息
-     */
-    public SimpleTableField findField(String colname){
-        for(SimpleTableField col : columns){
-            if(col.getColumnName().equals(colname))
-                return col;
-        }
-        return null;
-    }
-
-    /**
      * 根据属性名查找 字段信息
      * @param name 字段属性名
      * @return 字段信息
