@@ -254,7 +254,7 @@ public abstract class OrmDaoUtils {
         return queryNamedParamsSql(
             connection, new QueryAndNamedParams(q.getLeft(),
                 properties),
-            (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
+            (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, q.getRight()));
     }
 
     public static <T> T getObjectById(Connection connection, Object id, final Class<T> type)
@@ -272,7 +272,7 @@ public abstract class OrmDaoUtils {
                         "表"+mapInfo.getTableName()+"不是单主键表，这个方法不适用。");
             return queryNamedParamsSql(connection,new QueryAndNamedParams(q.getKey(),
                     CollectionsOpt.createHashMap(mapInfo.getPkFields().get(0).getPropertyName(),id)),
-                (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
+                (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, q.getRight()));
         }else{
             Map<String, Object> idObj = OrmUtils.fetchObjectField(id);
             if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,idObj)){
@@ -281,7 +281,7 @@ public abstract class OrmDaoUtils {
             }
             return queryNamedParamsSql(connection,
                 new QueryAndNamedParams(q.getKey(),idObj),
-                (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
+                (rs) -> OrmUtils.fetchObjectFormResultSet(rs, type, q.getRight()));
         }
 
     }
@@ -375,7 +375,7 @@ public abstract class OrmDaoUtils {
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(q.getLeft(),
                         new HashMap<>(1)),
-                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, q.getRight()));
     }
 
     public static <T> List<T> listObjectsByProperties(Connection connection, Map<String, Object> properties, Class<T> type)
@@ -388,7 +388,7 @@ public abstract class OrmDaoUtils {
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(q.getLeft(),
                         properties),
-                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, q.getRight()));
     }
 
     public static <T> int countObjectByProperties(Connection connection, Map<String, Object> properties, Class<T> type)
@@ -416,7 +416,7 @@ public abstract class OrmDaoUtils {
         return queryNamedParamsSql(
                 connection, new QueryAndNamedParams(q.getLeft(),
                         properties),startPos, maxSize,
-                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, (SimpleTableField[]) q.getRight()));
+                (rs) -> OrmUtils.fetchObjectListFormResultSet(rs, type, q.getRight()));
     }
 
     public static <T> List<T> queryObjectsBySql(Connection connection, String sql, Class<T> type)

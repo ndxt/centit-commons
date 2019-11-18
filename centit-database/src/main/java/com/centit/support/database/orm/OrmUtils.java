@@ -8,6 +8,7 @@ import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
 import com.centit.support.database.metadata.SimpleTableField;
+import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.FieldType;
 
@@ -29,8 +30,8 @@ public abstract class OrmUtils {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static void setObjectFieldValue(Object object, TableMapInfo mapInfo, SimpleTableField field,
-                                           Object newValue)
+    private static void putResultSetObjectToField(Object object, TableMapInfo mapInfo, SimpleTableField field,
+                                                  Object newValue)
         throws IOException {
 
         if (newValue instanceof Clob) {
@@ -223,25 +224,26 @@ public abstract class OrmUtils {
             String columnName = resMeta.getColumnName(i);
             SimpleTableField filed = mapInfo.findFieldByColumn(columnName);
             if (filed != null) {
-                setObjectFieldValue(object, mapInfo, filed, rs.getObject(i));
+                putResultSetObjectToField(object, mapInfo, filed, rs.getObject(i));
             }
         }
         return makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ);
     }
 
-    private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo, SimpleTableField[] fields)
+    private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo,
+                                                        TableField[] fields)
         throws SQLException, IOException {
         int fieldCount = rs.getMetaData().getColumnCount();
         if(fieldCount > fields.length){
             fieldCount = fields.length;
         }
         for (int i = 0; i < fieldCount; i++) {
-            setObjectFieldValue(object, mapInfo, fields[i] , rs.getObject(i+1));
+            putResultSetObjectToField(object, mapInfo, (SimpleTableField) fields[i] , rs.getObject(i+1));
         }
         return makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ);
     }
 
-    static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz, SimpleTableField[] fields)
+    static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz, TableField[] fields)
             throws SQLException, IllegalAccessException, InstantiationException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)
@@ -281,7 +283,7 @@ public abstract class OrmUtils {
         return object;
     }
 
-    static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz, SimpleTableField[] fields)
+    static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz, TableField[] fields)
             throws SQLException, IllegalAccessException, InstantiationException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
         if(mapInfo == null)
@@ -295,7 +297,7 @@ public abstract class OrmUtils {
         while(rs.next()){
             T object = clazz.newInstance();
             for(int i=0; i<fieldCount; i++){
-                setObjectFieldValue(object, mapInfo, fields[i], rs.getObject(i+1));
+                putResultSetObjectToField(object, mapInfo, (SimpleTableField) fields[i], rs.getObject(i+1));
             }
             listObj.add(makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ));
         }
@@ -321,7 +323,7 @@ public abstract class OrmUtils {
             T object = clazz.newInstance();
             for(int i=1;i<=fieldCount;i++){
                 if(fields[i]!=null) {
-                    setObjectFieldValue(object, mapInfo, fields[i], rs.getObject(i));
+                    putResultSetObjectToField(object, mapInfo, fields[i], rs.getObject(i));
                 }
             }
             listObj.add(makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ));
