@@ -664,7 +664,11 @@ public abstract class OrmDaoUtils {
         return deleteObjectCascade(connection, getObjectById(connection, id, type), depth);
     }
 
-    private static class OrmObjectComparator<T> implements Comparator<T>{
+    /**
+     * BaseDaoImpl 中有引用，所有必须是 public
+     * @param <T> T为持久化对象 必须 和 tableInfo 一致
+     */
+    public static class OrmObjectComparator<T> implements Comparator<T>{
         private TableMapInfo tableInfo;
 
         public OrmObjectComparator(TableMapInfo tableInfo){
