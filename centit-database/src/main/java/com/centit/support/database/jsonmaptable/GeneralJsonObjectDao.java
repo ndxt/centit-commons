@@ -223,7 +223,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         boolean withOrderBy, String orderSql){
         StringBuilder sBuilder= new StringBuilder("select");
 
-        Pair<String, ? extends TableField[]> fieldsAndSql =
+        Pair<String, TableField[]> fieldsAndSql =
             buildFieldSqlWithFields(mapInfo, alias, excludeLazy);
 
         sBuilder.append(fieldsAndSql.getLeft());
@@ -241,7 +241,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return new ImmutablePair<>(sBuilder.toString(), fieldsAndSql.getRight());
     }
 
-    public static Pair<String, ? extends TableField[]> buildFieldSqlWithFields(
+    public static Pair<String, TableField[]> buildFieldSqlWithFields(
         TableInfo mapInfo, String alias, boolean excludeLazy){
         StringBuilder sBuilder = new StringBuilder();
         List<? extends TableField> columns = mapInfo.getColumns();
@@ -270,7 +270,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
      * @param alias String
      * @return Pair String String []
      */
-    public static Pair<String, ? extends TableField[]> buildPartFieldSqlWithFields(
+    public static Pair<String, TableField[]> buildPartFieldSqlWithFields(
             TableInfo ti, Collection<String> fields, String alias){
         StringBuilder sBuilder = new StringBuilder();
         boolean addAlias = StringUtils.isNotBlank(alias);
