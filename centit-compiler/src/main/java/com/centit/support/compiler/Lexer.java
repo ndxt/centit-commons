@@ -50,7 +50,7 @@ public class Lexer {
         setFormula(sFormula);
     }
 
-    public void setPreword(String preWord) {
+    public void writeBackAWord(String preWord) {
         curWord = preWord;
         isBack = true;
     }
@@ -388,14 +388,14 @@ public class Lexer {
             else if (sWord.equals(")")){
                 nBracket--;
                 if(nBracket<0) {
-                    setPreword(")");
+                    writeBackAWord(")");
                     return;
                 }
             }
 
             if(sWord.equals(",")){
                 if(nBracket==0) {
-                    setPreword(",");
+                    writeBackAWord(",");
                     return;
                 }
             }

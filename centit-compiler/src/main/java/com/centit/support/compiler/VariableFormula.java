@@ -143,7 +143,7 @@ public class VariableFormula {
         String str = lex.getAWord();
         if( str == null || str.length()==0) return null;
         if(str.charAt(0) == ')' || str.charAt(0) == ',' ){
-            lex.setPreword(str);
+            lex.writeBackAWord(str);
             return null;
         }
         /*if("-".equals(str)){
@@ -195,7 +195,7 @@ public class VariableFormula {
                 if ("(".equals(nextWord)) {
                     return calcExtendFunc(func);
                 }
-                lex.setPreword(nextWord);
+                lex.writeBackAWord(nextWord);
             }
         }
 
@@ -205,7 +205,7 @@ public class VariableFormula {
             if("(".equals(nextWord)) {
                 return calcFunc(funcNo);
             }
-            lex.setPreword(nextWord);
+            lex.writeBackAWord(nextWord);
         }
 
         if(trans!=null && Lexer.isLabel(str)){
@@ -348,7 +348,7 @@ public class VariableFormula {
 
             int optID = VariableFormula.getOptID(str);
             if( optID == -1){
-                lex.setPreword(str);
+                lex.writeBackAWord(str);
                 break;
             }
     //--------run OP_IN----------------------------------
@@ -384,7 +384,7 @@ public class VariableFormula {
                     str = lex.getAWord();
                     if( str==null || str.length()==0 ||(  !str.equals(",")  && !str.equals(")") ) ) return null;
                     if( str.equals(")") ) {
-                        lex.setPreword(str);
+                        lex.writeBackAWord(str);
                         break;
                     }
                 }
@@ -393,7 +393,7 @@ public class VariableFormula {
                 str = lex.getAWord();
                 optID = VariableFormula.getOptID(str);
                 if( optID == -1){
-                    lex.setPreword(str);
+                    lex.writeBackAWord(str);
                     break;
                 }
             }
@@ -415,8 +415,7 @@ public class VariableFormula {
 
     private Object calcFunc(int nFuncNo) {
         String str;
-        int prmNo = 0;
-        // IF 语句单独处理
+         // IF 语句单独处理
         if( EmbedFunc.functionsList[nFuncNo].nFuncID == ConstDefine.FUNC_IF){
             Object sCondition = calcFormula();
             if(sCondition==null) return null;
@@ -450,23 +449,20 @@ public class VariableFormula {
         }
 
         List<Object> slOperand = new ArrayList<>(5);
-
-        while( true )
-            //( m_sFunctionList[nFuncNo].nPrmSum == -1
-            //  || prmNo < m_sFunctionList[nFuncNo].nPrmSum )
-        {
-            prmNo ++;
-            Object item = calcFormula();
-            slOperand.add(item);
+        int prmNo = 0;
+        while(true) {
             str = lex.getAWord();
-            if( str==null || str.length()==0 || ( !str.equals(",") && !str.equals(")"))  )
-                return null;
-            if( str.equals(")") ){
+            if(str.equals(")")){
                 break;
             }
+            lex.writeBackAWord(str);
+            Object item = calcFormula();
+            slOperand.add(item);
+            prmNo ++;
+            str = lex.getAWord();
+            if(! ",".equals(str)) break;
         }
-        //str = m_lex.getAWord();
-        if(/* str==null || str.length()==0 || */ !str.equals(")") ){
+        if(!")".equals(str)){
             return null;
         }
         if(EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
@@ -479,16 +475,19 @@ public class VariableFormula {
         List<Object> slOperand = new ArrayList<>(5);
         String str;
         while( true ){
-            Object item = calcFormula();
-            slOperand.add(item);
             str = lex.getAWord();
-            if(str==null || str.length()==0 || ( !str.equals(",") && !str.equals(")")))
-                return null;
             if(str.equals(")")){
                 break;
             }
+            lex.writeBackAWord(str);
+            Object item = calcFormula();
+            if(item != null) { // 外部函数不可以传入 null 数值参数
+                slOperand.add(item);
+            }
+            str = lex.getAWord();
+            if(! ",".equals(str)) break;
         }
-        if(/* str==null || str.length()==0 || */ !str.equals(")") ){
+        if(!")".equals(str)){
             return null;
         }
         return func.apply(CollectionsOpt.listToArray(slOperand));

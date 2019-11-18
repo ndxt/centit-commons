@@ -10,12 +10,13 @@ import java.util.Map;
 public class FormulaTest {
 
     public  static void  main(String[] args)   {
+        testFormula();
+        testFormula2();
         testFormula4();
     }
 
     public static void testFormula4() {
-        System.out.println(VariableFormula.checkFormula("a+b(),()"));
-        System.out.println(VariableFormula.checkFormula("today()"));
+        System.out.println(VariableFormula.calculate("today()"));
         System.out.println(VariableFormula.checkFormula("today"));
         System.out.println(VariableFormula.checkFormula("a+(b)"));
         System.out.println(VariableFormula.checkFormula("a+(b,c)"));
@@ -35,7 +36,8 @@ public class FormulaTest {
 
         VariableFormula formula = new VariableFormula();
         formula.addExtendFunc("ex",(a) -> NumberBaseOpt.castObjectToInteger(a[0]) * NumberBaseOpt.castObjectToInteger(a[0]));
-        Object r = formula.calcFormula("ex(4) + 5");
+        formula.addExtendFunc("pi",(a) -> 3.14159);
+        Object r = formula.calcFormula("ex(4) + pi()");
         System.out.println(r);
 
         Object  s = VariableFormula.calculate("-1 + 8 + ${a}");
