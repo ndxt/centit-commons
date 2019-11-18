@@ -270,7 +270,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
      * @param alias String
      * @return Pair String String []
      */
-    public static Pair<String, TableField[]> buildPartFieldSqlWithFields(
+    public static Pair<String, ? extends TableField[]> buildPartFieldSqlWithFields(
             TableInfo ti, Collection<String> fields, String alias){
         StringBuilder sBuilder = new StringBuilder();
         boolean addAlias = StringUtils.isNotBlank(alias);
