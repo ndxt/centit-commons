@@ -247,7 +247,7 @@ public abstract class OrmDaoUtils {
     public static <T> T getObjectByProperties(Connection connection, Map<String, Object> properties, Class<T> type)
         throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String, TableField[]> q =
+        Pair<String, ? extends TableField[]> q =
             GeneralJsonObjectDao.buildFieldSqlWithFields(mapInfo,null, false,
                 GeneralJsonObjectDao.buildFilterSql(mapInfo,null,properties.keySet()), false, null);
 
@@ -262,7 +262,7 @@ public abstract class OrmDaoUtils {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         //Pair<String,String[]> q = GeneralJsonObjectDao.buildGetObjectSqlByPk(mapInfo, false);
-        Pair<String, TableField[]> q =
+        Pair<String, ? extends TableField[]> q =
             GeneralJsonObjectDao.buildFieldSqlWithFields(mapInfo,null, false,
                 GeneralJsonObjectDao.buildFilterSqlByPk(mapInfo,null), false, null);
 
@@ -369,7 +369,7 @@ public abstract class OrmDaoUtils {
     public static <T> List<T> listAllObjects(Connection connection, Class<T> type)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String, TableField[]> q =
+        Pair<String, ? extends TableField[]> q =
             GeneralJsonObjectDao.buildFieldSqlWithFields(mapInfo, null, true,
                 null,true, null);
         return queryNamedParamsSql(
@@ -381,7 +381,7 @@ public abstract class OrmDaoUtils {
     public static <T> List<T> listObjectsByProperties(Connection connection, Map<String, Object> properties, Class<T> type)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String, TableField[]> q =
+        Pair<String, ? extends TableField[]> q =
             GeneralJsonObjectDao.buildFieldSqlWithFields(mapInfo, null, true,
                 GeneralJsonObjectDao.buildFilterSql(mapInfo,null, properties.keySet()),
                 true, GeneralJsonObjectDao.fetchSelfOrderSql(mapInfo, properties));
@@ -409,7 +409,7 @@ public abstract class OrmDaoUtils {
                                                final int startPos, final int maxSize)
             throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        Pair<String, TableField[]> q =
+        Pair<String, ? extends TableField[]> q =
             GeneralJsonObjectDao.buildFieldSqlWithFields(mapInfo,null, true,
                 GeneralJsonObjectDao.buildFilterSql(mapInfo,null, properties.keySet())
                 ,true, GeneralJsonObjectDao.fetchSelfOrderSql(mapInfo, properties));
@@ -664,10 +664,10 @@ public abstract class OrmDaoUtils {
         return deleteObjectCascade(connection, getObjectById(connection, id, type), depth);
     }
 
-    public static class OrmObjectComparator<T> implements Comparator<T>{
+    private static class OrmObjectComparator<T> implements Comparator<T>{
         private TableMapInfo tableInfo;
 
-        public  OrmObjectComparator(TableMapInfo tableInfo){
+        public OrmObjectComparator(TableMapInfo tableInfo){
             this.tableInfo = tableInfo;
         }
 
@@ -719,7 +719,7 @@ public abstract class OrmDaoUtils {
         Triple<List<T>, List<Pair<T,T>>, List<T>>
                 comRes=
                 CollectionsOpt.compareTwoList(dbObjects, newObjects,
-                        new OrmObjectComparator<>( mapInfo) );
+                        new OrmObjectComparator<>(mapInfo));
         int resN = 0;
         if(comRes.getLeft() != null) {
             for (T obj : comRes.getLeft()) {
@@ -904,7 +904,7 @@ public abstract class OrmDaoUtils {
         Triple<List<T>, List<Pair<T,T>>, List<T>>
                 comRes=
                 CollectionsOpt.compareTwoList(dbObjects, newObjects,
-                        new OrmObjectComparator<>(mapInfo) );
+                        new OrmObjectComparator<>(mapInfo));
         int resN = 0;
         if(comRes.getLeft() != null) {
             for (T obj : comRes.getLeft()) {

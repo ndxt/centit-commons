@@ -223,7 +223,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         boolean withOrderBy, String orderSql){
         StringBuilder sBuilder= new StringBuilder("select");
 
-        Pair<String, TableField[]> fieldsAndSql =
+        Pair<String, ? extends TableField[]> fieldsAndSql =
             buildFieldSqlWithFields(mapInfo, alias, excludeLazy);
 
         sBuilder.append(fieldsAndSql.getLeft());
@@ -241,7 +241,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return new ImmutablePair<>(sBuilder.toString(), fieldsAndSql.getRight());
     }
 
-    public static Pair<String, TableField[]> buildFieldSqlWithFields(
+    public static Pair<String, ? extends TableField[]> buildFieldSqlWithFields(
         TableInfo mapInfo, String alias, boolean excludeLazy){
         StringBuilder sBuilder = new StringBuilder();
         List<? extends TableField> columns = mapInfo.getColumns();
@@ -415,7 +415,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public static String buildFilterSqlByPk(TableInfo ti,String alias){
         StringBuilder sBuilder= new StringBuilder();
         int i=0;
-        List<TableField> pkColumns = ti.getPkFields();
+        List<? extends TableField> pkColumns = ti.getPkFields();
         if(pkColumns == null || pkColumns.size()==0){
             throw new RuntimeException("表或者视图 " + ti.getTableName() +" 缺少对应主键。" );
         }
@@ -834,32 +834,13 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             for(TableField field : tableInfo.getPkFields()){
                 Object f1 = o1.get(field.getPropertyName());
                 Object f2 = o2.get(field.getPropertyName());
-                if(f1==null){
-                    if(f2!=null)
-                        return -1;
-                }else{
-                    if(f2==null)
-                        return 1;
-                    if( ReflectionOpt.isNumberType(f1.getClass()) &&
-                            ReflectionOpt.isNumberType(f2.getClass())){
-                        double db1 = ((Number)f1).doubleValue();
-                        double db2 = ((Number)f2).doubleValue();
-                        if(db1>db2)
-                            return 1;
-                        if(db1<db2)
-                            return -1;
-                    }else{
-                        String s1 = StringBaseOpt.objectToString(f1);
-                        String s2 = StringBaseOpt.objectToString(f2);
-                        int nc = s1.compareTo(s2);
-                        if(nc!=0)
-                            return nc;
-                    }
+                int compareRes = GeneralAlgorithm.compareTwoObject(f1, f2);
+                if(compareRes != 0){
+                    return compareRes;
                 }
             }
             return 0;
         }
-
     }
 
     @Override

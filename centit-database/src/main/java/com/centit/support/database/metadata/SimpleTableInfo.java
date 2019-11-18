@@ -301,7 +301,7 @@ public class SimpleTableInfo implements TableInfo{
         classElt.addAttribute("table", tableName.toUpperCase());
         classElt.addAttribute("schema", schema);
         //save primary key
-        List<TableField> pkColumns = getPkFields();
+        List<? extends TableField> pkColumns = getPkFields();
         if(pkColumns.size()>1){
             Element idElt = classElt.addElement("composite-id");
             idElt.addAttribute("name", "cid");

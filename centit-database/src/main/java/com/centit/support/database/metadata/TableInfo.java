@@ -188,7 +188,7 @@ public interface TableInfo {
      * @return 获取主键列名 主键是有次序的
      */
     @JSONField(serialize = false)
-    default List<TableField> getPkFields(){
+    default List<? extends TableField> getPkFields(){
         List<TableField> pkCols = new ArrayList<>(4);
         List<? extends TableField> columns = this.getColumns();
         if(columns!=null) {
@@ -202,7 +202,7 @@ public interface TableInfo {
     }
 
     @JSONField(serialize = false)
-    default List<TableField> getLzayFields(){
+    default List<? extends TableField> getLzayFields(){
         List<TableField> pkCols = new ArrayList<>(4);
         List<? extends TableField> columns = this.getColumns();
         if(columns!=null) {
@@ -216,7 +216,7 @@ public interface TableInfo {
     }
 
     @JSONField(serialize = false)
-    default List<TableField> getMandatoryFields(){
+    default List<? extends TableField> getMandatoryFields(){
         List<TableField> pkCols = new ArrayList<>(4);
         List<? extends TableField> columns = this.getColumns();
         if(columns!=null) {
