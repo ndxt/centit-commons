@@ -182,21 +182,22 @@ public abstract class ImageOpt {
                 int n = (i * step + j) / 8;
                 int b = (i * step + j) % 8;
                 boolean isColor = (idMd5[n] & (1<< b)) != 0;
-                if(isColor){
-                    if(j==0 || i==0 || j==step-1 || i==step-1 ){
+
+                if(j==0 || i==0 || j==step-1 || i==step-1 ) { // 边框
+                    if(isColor) {
                         g.setColor(new Color(214, 214, 214));
                     } else {
-                        g.setColor(new Color( idMd5[n] & 0xff,
-                            idMd5[(n+1) % 16] % 256 & 0xff,
-                            idMd5[(n+2) % 16] % 256 & 0xff ) );
+                        g.setColor(new Color(235, 235, 235));
+
                     }
                 } else {
-                    if(j==0 || i==0 || j==step-1 || i==step-1 ){
-                        g.setColor(new Color(235, 235, 235));
+                    if(isColor) {
+                        g.setColor(new Color(idMd5[n] & 0xff,
+                            idMd5[(n * b + b) % 16] % 256 & 0xff,
+                            idMd5[(n + b) % 16] % 256 & 0xff));
                     } else {
                         g.setColor(Color.LIGHT_GRAY);
                     }
-
                 }
                 g.fillRect(i*pointWidth, j*pointWidth, pointWidth, pointWidth);
             }
