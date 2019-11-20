@@ -159,19 +159,19 @@ public abstract class ImageOpt {
     }
 
     // ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan3.png"));
-
     public static BufferedImage createIdIcon(String id, int imageSize, int pointWidth) {
         int step = imageSize / pointWidth;
-        if ( step > 11 || imageSize % pointWidth != 0){
-            imageSize = 64;
-            pointWidth = 8;
+        if (step > 11){
+            pointWidth = imageSize / 10;
+        }
+        if(imageSize % pointWidth != 0){
+            imageSize = pointWidth * pointWidth;
         }
         byte[] idMd5 = Md5Encoder.rawEncode(id.getBytes());
         if(idMd5 == null){
             return null;
         }
         //assert (idMd5.length == 16);
-
         BufferedImage image = new BufferedImage(imageSize, imageSize,
             BufferedImage.TYPE_INT_RGB);
         // 获取图形上下文
