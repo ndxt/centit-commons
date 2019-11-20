@@ -9,7 +9,23 @@ import java.io.IOException;
 import java.util.List;
 
 public class TestImage {
-     public static void main(String arg[]){
+     public static void main(String arg[]) {
+         try {
+             BufferedImage image = ImageOpt.createIdIcon("codefan@sina.com", 64, 8);
+             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan2.png"));
+
+             image = ImageOpt.createIdIcon("codefan@sina.com", 32, 8);
+             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan3.png"));
+
+             image = ImageOpt.createIdIcon("codefan@sina.com", 80, 8);
+             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan4.png"));
+
+         } catch (IOException e) {
+             //e.printStackTrace();
+         }
+     }
+
+     public static void testImageOpt(){
          try {
             BufferedImage image = ImageIO.read(new File("D:/Projects/RunData/demo_home/images/word9.png"));
             List<BufferedImage> subimages = ImageOpt.splitImage(image, 6);
@@ -21,7 +37,7 @@ public class TestImage {
         }
      }
 
-     public static void testImageOpt(){
+     public static void testImageOpt2(){
          try {
             ImageOpt.captureScreen("D:/Projects/RunData/demo_home/images/screen.jpg");
             ImageOpt.createThumbnail("D:/Projects/RunData/demo_home/images/screen.jpg",
