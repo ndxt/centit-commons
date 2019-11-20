@@ -162,10 +162,11 @@ public abstract class ImageOpt {
     public static BufferedImage createIdIcon(String id, int imageSize, int pointWidth) {
         int step = imageSize / pointWidth;
         if (step > 11){
+            step = 10;
             pointWidth = imageSize / 10;
         }
         if(imageSize % pointWidth != 0){
-            imageSize = pointWidth * pointWidth;
+            imageSize = step * pointWidth;
         }
         byte[] idMd5 = Md5Encoder.rawEncode(id.getBytes());
         if(idMd5 == null){
