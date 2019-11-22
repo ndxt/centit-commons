@@ -11,14 +11,14 @@ import java.util.List;
 public class TestImage {
      public static void main(String arg[]) {
          try {
-             BufferedImage image = ImageOpt.createIdIcon("codefan@sina.com", 64, 8);
-             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan2.png"));
+             BufferedImage image = ImageOpt.createIdIcon("codefan@centit.com", 64, 8);
+             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan5.png"));
 
-             image = ImageOpt.createIdIcon("codefan@sina.com", 32, 8);
-             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan3.png"));
+             image = ImageOpt.createIdIcon("codefan@centit.com", 60, 12);
+             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan6.png"));
 
-             image = ImageOpt.createIdIcon("codefan@sina.com", 80, 8);
-             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan4.png"));
+             image = ImageOpt.createIdIcon("codefan@centit.com", 80, 8);
+             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan7.png"));
 
          } catch (IOException e) {
              //e.printStackTrace();

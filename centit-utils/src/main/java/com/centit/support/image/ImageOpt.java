@@ -159,7 +159,8 @@ public abstract class ImageOpt {
     }
 
     // ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan3.png"));
-    public static BufferedImage createIdIcon(String id, int imageSize, int pointWidth) {
+    public static BufferedImage createIdIcon(String id, int imageSize, int pointWidth,
+                                             boolean singleColor, boolean symmetric) {
         int step = imageSize / pointWidth;
         if (step > 11){
             step = 10;
@@ -175,27 +176,33 @@ public abstract class ImageOpt {
         //assert (idMd5.length == 16);
         BufferedImage image = new BufferedImage(imageSize, imageSize,
             BufferedImage.TYPE_INT_RGB);
+        Color showColor = new Color(idMd5[0] & 0xff,idMd5[1] & 0xff, idMd5[2] & 0xff);
         // 获取图形上下文
         Graphics g = image.createGraphics();
         // 设定图像背景色(因为是做背景，所以偏淡)
+        int mid = (step - 1) / 2;
         for(int i=0; i<step; i++){
             for(int j=0; j<step; j++){
-                int n = (i * step + j) / 8;
-                int b = (i * step + j) % 8;
+                int row = symmetric && i>mid? step - i - 1 :i;
+                int n = (row * step + j) / 8;
+                int b = (row * step + j) % 8;
                 boolean isColor = (idMd5[n] & (1<< b)) != 0;
 
-                if(j==0 || i==0 || j==step-1 || i==step-1 ) { // 边框
+                if(j==0 || row==0 || j==step-1 || row==step-1 ) { // 边框
                     if(isColor) {
                         g.setColor(new Color(214, 214, 214));
                     } else {
                         g.setColor(new Color(235, 235, 235));
-
                     }
                 } else {
                     if(isColor) {
-                        g.setColor(new Color(idMd5[n] & 0xff,
-                            idMd5[(n * b + b) % 16] % 256 & 0xff,
-                            idMd5[(n + b) % 16] % 256 & 0xff));
+                        if(singleColor) {
+                            g.setColor(showColor);
+                        } else {
+                            g.setColor(new Color(idMd5[n] & 0xff,
+                                idMd5[(n * b + b) % 16] % 256 & 0xff,
+                                idMd5[(n + b) % 16] % 256 & 0xff));
+                        }
                     } else {
                         g.setColor(Color.LIGHT_GRAY);
                     }
@@ -206,5 +213,9 @@ public abstract class ImageOpt {
         // 图象生效
         g.dispose();
         return image;
+    }
+
+    public static BufferedImage createIdIcon(String id, int imageSize, int pointWidth) {
+        return createIdIcon(id, imageSize, pointWidth, true, true);
     }
 }
