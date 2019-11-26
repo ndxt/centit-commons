@@ -59,17 +59,23 @@ public class JavaBeanField {
         this.fieldJavaType = ReflectionOpt.getJavaTypeName(fieldType);
     }
 
+    /**
+     * 在 ExcelImportUtil 中使用
+     * @return JAVA类名
+     */
+    public String getFieldJavaTypeShortName(){
+        return this.fieldJavaType;
+    }
+
     public void setObjectField(Field objectField) {
         this.objectField = objectField;
         this.setFieldType(objectField.getType());
 
     }
 
-
     public boolean isAssignableFrom(Class<?> valueType){
         return this.fieldType.isAssignableFrom(valueType);
     }
-
 
     private void innerSetObjectFieldValue(Object obj, Object fieldValue) {
         //if( fieldType.isAssignableFrom(fieldValue.getClass()) ) {
