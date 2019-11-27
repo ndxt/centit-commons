@@ -2,6 +2,7 @@ package com.centit.support.database.metadata;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.network.HtmlFormUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -178,6 +179,44 @@ public interface TableInfo {
                     }
                     pk.put(c.getPropertyName(), pkIds[pkNo]);
                     pkNo++;
+                }
+            }
+        }
+        return pk;
+    }
+
+    default String fetchObjectPkAsUrlParams(Map<String, Object> object){
+        StringBuilder pkId = new StringBuilder();
+        int pkNo = 0;
+        List<? extends TableField> columns = this.getColumns();
+        if(columns!=null) {
+            for (TableField c : columns) {
+                if (c.isPrimaryKey()) {
+                    Object pkValue = object.get(c.getPropertyName());
+                    if (pkNo > 0) {
+                        pkId.append("&");
+                    }
+                    pkId.append(c.getPropertyName())
+                        .append("=")
+                        .append(HtmlFormUtils.htmlValue(
+                            StringBaseOpt.castObjectToString(pkValue)));
+                    pkNo++;
+                }
+            }
+        }
+        return pkId.toString();
+    }
+
+    default Map<String, Object> parseObjectPkUrlParams(String pkParamString){
+        String [] pkParams = pkParamString.split("&");
+        Map<String, Object> pk = new HashMap<>(8);
+        for(String param : pkParams){
+            String [] params = param.split("=");
+            if(params.length>1){
+                TableField field = findFieldByName(params[0]);
+                if(field!=null){
+                    pk.put(field.getPropertyName(),
+                        HtmlFormUtils.htmlString(params[1]));
                 }
             }
         }
