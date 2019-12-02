@@ -542,6 +542,10 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                     return objects;
                 }
                 int colCount = rs.getMetaData().getColumnCount();
+                //在oracle分页查询中可能会多一个 rownum 字段
+                if(colCount > fields.length){
+                    colCount = fields.length;
+                }
                 while(rs.next()){
                     JSONObject jo = new JSONObject();
                     for (int i = 0; i < colCount; i++) {
