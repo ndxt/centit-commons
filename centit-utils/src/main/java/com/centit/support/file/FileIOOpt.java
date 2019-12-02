@@ -45,13 +45,13 @@ public abstract class FileIOOpt {
         }
     }
 
-    public static void writeStringToFile(String strData,File file) throws IOException{
+    public static void writeStringToFile(String strData, File file) throws IOException{
         try(Writer writer = new FileWriter(file)){
             writer.write(strData);
         }
     }
 
-    public static void writeStringToFile(String strData,String fileName) throws IOException{
+    public static void writeStringToFile(String strData, String fileName) throws IOException{
         writeStringToFile(strData,new File(fileName));
     }
 
@@ -146,8 +146,18 @@ public abstract class FileIOOpt {
         writeStringToFile(sjson,fileName);
     }
 
+    public static void writeBytesToFile(byte[] bytes, String fileName) throws IOException{
+        writeBytesToFile(bytes, new File(fileName));
+    }
+
+    public static void writeBytesToFile(byte[] bytes, File file) throws IOException{
+        try(FileOutputStream writer = new FileOutputStream(file)){
+            writer.write(bytes);
+        }
+    }
+
     public static <T> T readObjectAsJsonFromFile(String fileName, Class<T> clazz)
-            throws IOException, ClassNotFoundException{
+            throws IOException{
         String sjson = readStringFromFile(fileName);
         return JSON.parseObject(sjson,clazz);
     }

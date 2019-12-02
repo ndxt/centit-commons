@@ -685,7 +685,7 @@ public abstract class HttpExecutor {
         String sUrl;// = url;
         if (url.indexOf('?') == -1) {
             sUrl = url +"?_method="+method;
-        }else if(url.endsWith("?")){
+        }else if(url.endsWith("?") || url.endsWith("&")){
             sUrl = url + "_method="+method;
         }else{
             sUrl = url +"&_method="+method;
