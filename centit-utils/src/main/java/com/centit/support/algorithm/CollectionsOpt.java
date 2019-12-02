@@ -12,6 +12,7 @@ import org.apache.commons.lang3.tuple.Triple;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.function.Function;
 
 
 /**
@@ -88,6 +89,16 @@ public abstract class CollectionsOpt {
         list.set(p1, list.get(p2));
         list.set(p2, tmp);    */
     }
+
+    public static <T, U> ParentChild<? super T> mapParentANdChild(
+        Function<? super T, ? extends U> pkExtractor,
+        Function<? super T, ? extends U> parentPkExtractor) {
+        //Objects.requireNonNull(parentExtractor);
+        //Objects.requireNonNull(childExtractor);
+        return (p, c) ->
+            GeneralAlgorithm.equals(pkExtractor.apply(p), parentPkExtractor.apply(c));
+    }
+
     /**
      * 将数组结构按照树形展示的形式进行排序，将所有孩子元素放到父元素的下面
      * 深度优先的排序
@@ -144,6 +155,22 @@ public abstract class CollectionsOpt {
             //sortedInd = sortAsTreePiece(list,c,sortedInd);
         }
     }
+
+    /**
+     * 将数组结构按照树形展示的形式进行排序，将所有孩子元素放到父元素的下面
+     * 深度优先的排序
+     * @param list 输入列表
+     * @param pkExtractor        父对象 获取 自己的主键
+     * @param parentPkExtractor  子对象 获取 父对象主键
+     * @param <T> 泛型类型
+     * @param <U> 主键类型
+     */
+    public static <T,U> void sortAsTree(List<T> list,  Function<? super T, ? extends U> pkExtractor,
+                                        Function<? super T, ? extends U> parentPkExtractor) {
+        CollectionsOpt.sortAsTree(list,
+            CollectionsOpt.mapParentANdChild(pkExtractor, parentPkExtractor));
+    }
+
     /**
      * 对排序号的树形数组结构 找到JQueryTree要的Indexes
      * @param <T> 泛型类型

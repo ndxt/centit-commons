@@ -5,9 +5,11 @@ import com.alibaba.fastjson.util.TypeUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * Created by codefan on 17-9-7.
@@ -38,17 +40,17 @@ public abstract  class GeneralAlgorithm {
         return operand.equals(operand2);
     }
 
-    public static int compareTwoObject(Object operand , Object operand2){
+    public static int compareTwoObject(Object operand , Object operand2, boolean nullAsFirst){
         if (operand == null && operand2 == null) {
             return 0;
         }
 
         if(operand == null ){
-            return -1;
+            return nullAsFirst?-1:1;
         }
 
         if(operand2 == null ){
-            return 1;
+            return nullAsFirst?1:-1;
         }
 
         if (NumberBaseOpt.isNumber(operand)
@@ -63,22 +65,47 @@ public abstract  class GeneralAlgorithm {
                 StringBaseOpt.objectToString(operand2));
     }
 
+    public static int compareTwoObject(Object operand , Object operand2){
+        return compareTwoObject(operand , operand2, true);
+    }
+
     /**  int compare(final T c1, final T c2)
      * 等价于 ObjectUtils.compare
      * @param <T> 比较对对象类型
      * @param l1 参数1
      * @param l2 参数2
+     * @param nullAsFirst true null 在最前面否则在最后面
      * @return 返回比较值 0 相等 1 大于 -1 小于
      * @see org.apache.commons.lang3.ObjectUtils compare
      */
-    public static <T extends Comparable<? super T>> int compareTwoComparableObject(T l1 , T l2){
+    public static <T extends Comparable<? super T>> int compareTwoComparableObject(T l1 , T l2, boolean nullAsFirst){
         return (l1 == null && l2 == null) ? 0:(
-                l1 == null ? -1 :(
-                        l2 == null ? 1 :(
+                l1 == null ? (nullAsFirst?-1:1) :(
+                        l2 == null ? (nullAsFirst?1:-1) :(
                                 l1.compareTo(l2)
                         )
                 )
         );
+    }
+
+    public static <T extends Comparable<? super T>> int compareTwoComparableObject(T l1 , T l2){
+        return compareTwoComparableObject(l1, l2, true);
+    }
+
+    /**
+     *
+     * @param keyExtractor 获取主键方法
+     * @param nullAsFirst  true null 在最前面否则在最后面
+     * @param <T> 比较对象类型
+     * @param <U> 比较主键类型
+     * @return 比较结果
+     */
+    public static <T, U extends Comparable<? super U>> Comparator<T> comparing(
+        Function<? super T, ? extends U> keyExtractor, boolean nullAsFirst) {
+        Objects.requireNonNull(keyExtractor);
+        return (Comparator<T> & Serializable)
+            (c1, c2) ->
+                compareTwoComparableObject(keyExtractor.apply(c1), keyExtractor.apply(c2), nullAsFirst);
     }
 
     private static int getJavaTypeOrder(Object a){
