@@ -59,12 +59,12 @@ public abstract class TransactionHandler {
     public static <T> T executeQueryInTransaction(Connection conn, QueryWork<T> realWork)
         throws SQLException, IOException {
         try{
-            T relRet = realWork.execute(conn);
-            conn.commit();
-            return relRet;
+            return realWork.execute(conn);
+            //conn.commit();
+            //return relRet;
         } catch (SQLException e){
             logger.error("error code :" + e.getSQLState() + e.getLocalizedMessage(),e);
-            conn.rollback();
+            //conn.rollback();
             throw e;
         }
     }

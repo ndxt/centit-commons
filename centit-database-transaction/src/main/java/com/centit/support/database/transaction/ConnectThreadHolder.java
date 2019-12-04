@@ -1,5 +1,6 @@
 package com.centit.support.database.transaction;
 
+import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.database.utils.DataSourceDescription;
 
 import java.sql.Connection;
@@ -28,6 +29,10 @@ public class ConnectThreadHolder{
     public static Connection fetchConnect(DataSourceDescription description) throws SQLException{
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         return wrapper.fetchConnect(description);
+    }
+
+    public static Connection fetchConnect(IDatabaseInfo description) throws SQLException{
+        return fetchConnect(DataSourceDescription.valueOf(description));
     }
 
     public static void commit() throws SQLException{

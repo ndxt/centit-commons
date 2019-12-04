@@ -1,6 +1,7 @@
 package com.centit.support.database.utils;
 
 import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.xml.IgnoreDTDEntityResolver;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -118,8 +119,28 @@ public final class DataSourceDescription implements Serializable{
         return driver;
     }
 
+    public void setDriver(String driver) {
+        this.driver = driver;
+    }
+
+    public int getMinIdle() {
+        return minIdle;
+    }
+
+    public void setMinIdle(int minIdle) {
+        this.minIdle = minIdle;
+    }
+
     public DBType getDbType() {
         return dbType;
+    }
+
+    public String getDatabaseCode() {
+        return databaseCode;
+    }
+
+    public void setDatabaseCode(String databaseCode) {
+        this.databaseCode = databaseCode;
     }
 
     @Override
@@ -135,7 +156,6 @@ public final class DataSourceDescription implements Serializable{
             return false;
         }
     }
-
 
     @Override
     public int hashCode(){
@@ -154,8 +174,8 @@ public final class DataSourceDescription implements Serializable{
         builder.setValidation(false);
         builder.setEntityResolver(new IgnoreDTDEntityResolver());
 
-        Document doc = null;
-        Element bean = null;
+        Document doc;
+        Element bean;
 
         try {
             if(sConfFile.indexOf(':')>=0){
@@ -191,18 +211,6 @@ public final class DataSourceDescription implements Serializable{
         dbType = DBType.mapDBType(connUrl);
     }
 
-    public void setDriver(String driver) {
-        this.driver = driver;
-    }
-
-    public int getMinIdle() {
-        return minIdle;
-    }
-
-    public void setMinIdle(int minIdle) {
-        this.minIdle = minIdle;
-    }
-
     public static boolean testConntect(DataSourceDescription dsDesc){
         boolean connOk = false;
         try {
@@ -217,16 +225,19 @@ public final class DataSourceDescription implements Serializable{
         return connOk;
     }
 
+    public static DataSourceDescription valueOf(IDatabaseInfo dbinfo){
+        DataSourceDescription desc = new DataSourceDescription();
+        desc.setConnUrl(dbinfo.getDatabaseUrl());
+        desc.setUsername(dbinfo.getUsername());
+        desc.setPassword(dbinfo.getClearPassword());
+        desc.setDatabaseCode(dbinfo.getDatabaseCode());
+        desc.setMaxIdle(10);
+        desc.setMaxTotal(20);
+        desc.setMaxWaitMillis(20000);
+        return desc;
+    }
+
     public boolean testConntect(){
         return DataSourceDescription.testConntect(this);
     }
-
-    public String getDatabaseCode() {
-        return databaseCode;
-    }
-
-    public void setDatabaseCode(String databaseCode) {
-        this.databaseCode = databaseCode;
-    }
-
 }
