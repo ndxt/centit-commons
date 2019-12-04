@@ -1,5 +1,6 @@
 package com.centit.support.database.utils;
 
+import com.centit.support.database.metadata.IDatabaseInfo;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,22 @@ public abstract class DbcpConnectPools {
         return ds;
     }
 
+    public static BasicDataSource mapDataSource(IDatabaseInfo dbinfo){
+        return mapDataSource(mapDataSourceDesc(dbinfo));
+    }
+
+    public static DataSourceDescription mapDataSourceDesc(IDatabaseInfo dbinfo){
+        DataSourceDescription desc=new DataSourceDescription();
+        desc.setConnUrl(dbinfo.getDatabaseUrl());
+        desc.setUsername(dbinfo.getUsername());
+        desc.setPassword(dbinfo.getClearPassword());
+        desc.setDatabaseCode(dbinfo.getDatabaseCode());
+        desc.setMaxIdle(10);
+        desc.setMaxTotal(20);
+        desc.setMaxWaitMillis(20000);
+        return desc;
+    }
+
     private static synchronized BasicDataSource addDataSource(DataSourceDescription dsDesc){
         //BasicDataSourceFactory.createDataSource(properties)
         BasicDataSource ds = mapDataSource(dsDesc);
@@ -54,11 +71,14 @@ public abstract class DbcpConnectPools {
         if(ds==null) {
             ds = addDataSource(dsDesc);
         }
-        Connection conn = null;
-        conn = ds.getConnection();
+        Connection conn = ds.getConnection();
         conn.setAutoCommit(false);
         ///*dsDesc.getUsername(),dsDesc.getDbType(),*/
         return conn;
+    }
+
+    public static Connection getDbcpConnect(IDatabaseInfo dbinfo) throws SQLException {
+        return DbcpConnectPools.getDbcpConnect(mapDataSourceDesc(dbinfo));//.getConn();
     }
 
     /* 获得数据源连接状态 */
