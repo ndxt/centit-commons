@@ -521,6 +521,10 @@ public abstract class StringBaseOpt {
     public static String[] objectToStringArray(Object object){
         if(object==null){
             return null;
+        } else if(object instanceof byte[]){
+            String[] stringList = new String[1];
+            stringList[0] = StringBaseOpt.castObjectToString(object);
+            return stringList;
         } else if (object.getClass().isArray()) {
             int len = Array.getLength(object);
             String[] stringList = new String[len];
@@ -553,6 +557,10 @@ public abstract class StringBaseOpt {
     public static List<String> objectToStringList(Object object){
         if(object==null){
             return null;
+        } else if(object instanceof byte[]){
+            List<String> stringList = new ArrayList<>( 1 );
+            stringList.add(StringBaseOpt.castObjectToString(object));
+            return stringList;
         } else if (object.getClass().isArray()) {
             int len = Array.getLength(object);
             List<String> stringList = new ArrayList<>( len+1 );
@@ -577,7 +585,6 @@ public abstract class StringBaseOpt {
         List<String> stringList = new ArrayList<>( 1 );
         stringList.add(StringBaseOpt.castObjectToString(object));
         return stringList;
-        //}
     }
 
     /**

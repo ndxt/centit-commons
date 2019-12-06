@@ -1,6 +1,7 @@
 package com.centit.support.file;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,20 @@ public abstract class FileIOOpt {
         }
     }
 
+
+    /**
+     * @param is 输入流
+     * @return 读取的字节
+     * @throws IOException 异常
+     */
+    public static byte[] readBytesFromInputStream(InputStream is) throws IOException{
+        int len = is.available();
+        if(len>0){
+            return readBytesFromInputStream(is, len);
+        } else {
+            return readBytesFromInputStream(is, 32*1024*1024);
+        }
+    }
     /**
      * @param is 输入流
      * @param length 最大读取长度
@@ -100,8 +115,18 @@ public abstract class FileIOOpt {
         }
     }
 
+    public static byte[] readBytesFromFile(File file) throws IOException{
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return FileIOOpt.readBytesFromInputStream(fis,(int) file.length());
+        }
+    }
+
     public static byte[] readBytesFromFile(String filePath, int length) throws IOException{
         return FileIOOpt.readBytesFromFile(new File(filePath), length);
+    }
+
+    public static byte[] readBytesFromFile(String filePath) throws IOException{
+        return FileIOOpt.readBytesFromFile(new File(filePath));
     }
 
     public static String readStringFromInputStream(InputStream is,String charsetName) throws IOException{
