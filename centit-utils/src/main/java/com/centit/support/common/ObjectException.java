@@ -19,6 +19,21 @@ public class ObjectException extends RuntimeException {
     public static final int FORMAT_NUMBER_EXCEPTION = 607;
 
 
+    public static String extortExceptionMessage(Throwable ex){
+        StringBuilder errorMsg = new StringBuilder(ex.getMessage());
+        StackTraceElement[] traces = ex.getStackTrace();
+        if(traces != null){
+            int len = traces.length > 15 ? 15 : traces.length;
+            for(int i=0; i<len; i++){
+                errorMsg.append("\r\n")
+                    .append(traces[i].getClassName()).append(":")
+                    .append(traces[i].getMethodName()).append(":")
+                    .append(traces[i].getLineNumber());
+            }
+        }
+        return errorMsg.toString();
+    }
+
     protected int exceptionCode;
     private Object objectData;
     /**
