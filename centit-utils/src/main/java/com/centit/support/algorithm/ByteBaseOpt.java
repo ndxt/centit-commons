@@ -1,5 +1,6 @@
 package com.centit.support.algorithm;
 
+import java.lang.reflect.Array;
 import java.util.Date;
 
 @SuppressWarnings("unused")
@@ -11,6 +12,31 @@ public abstract class ByteBaseOpt {
     public static byte[] castObjectToBytes(Object obj){
         if(obj instanceof byte[]){
             return (byte[]) obj;
+        }
+        if (obj.getClass().isArray()) {
+            int len = Array.getLength(obj);
+            if(len == 0){
+                return null;
+            }
+            Object firstObj = Array.get(obj, 0);
+            if(firstObj instanceof Byte){
+                byte [] bytes = new byte[len];
+                for(int i=0;i<len;i++){
+                    Object bObj = Array.get(obj, i);
+                    bytes[i] = (Byte) bObj;
+                }
+                return bytes;
+            }
+
+            if(firstObj instanceof Character){
+                byte [] bytes = new byte[len];
+                for(int i=0;i<len;i++){
+                    Object bObj = Array.get(obj, i);
+                    bytes[i] = (byte)((Character) bObj).charValue();
+                }
+                return bytes;
+            }
+            return StringBaseOpt.objectToString(obj).getBytes();
         }
 
         if (obj instanceof Long) {
