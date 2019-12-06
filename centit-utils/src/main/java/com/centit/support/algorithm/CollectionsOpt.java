@@ -14,7 +14,6 @@ import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
 
-
 /**
  *
  * 一些通用的算法，这些算法都和具体的业务数据结构解耦
@@ -172,7 +171,7 @@ public abstract class CollectionsOpt {
     }
 
     /**
-     * 对排序号的树形数组结构 找到JQueryTree要的Indexes
+     * 对排序好的树形数组结构 找到JQueryTree要的Indexes
      * @param <T> 泛型类型
      * @param list 输入列表
      * @param c 对比接口
@@ -649,8 +648,27 @@ public abstract class CollectionsOpt {
         if(ReflectionOpt.isScalarType(object.getClass())){
             return CollectionsOpt.createHashMap("scalar",object);
         }
-
-        return (JSONObject) JSON.toJSON(object);
+        if (object.getClass().isArray()) {
+            int len = Array.getLength(object);
+            HashMap<String, Object> map = new HashMap<>( len*5/4+1 );
+            for(int i=0;i<len;i++){
+                map.put(String.valueOf(i), Array.get(object, i));
+            }
+            return map;
+        }
+        if (object instanceof Collection) {
+            HashMap<String, Object> map = new HashMap<>();
+            int i=0;
+            for(Object po :(Collection<?>) object){
+                map.put(String.valueOf(i++), po);
+            }
+            return map;
+        }
+        Object obj = JSON.toJSON(object);
+        if(obj instanceof JSONObject){
+            return (JSONObject) obj;
+        }
+        return CollectionsOpt.createHashMap("data", object);
     }
 
     public static <T> T fetchFirstItem(Collection<T> collection){
