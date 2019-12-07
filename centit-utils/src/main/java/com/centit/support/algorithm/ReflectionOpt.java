@@ -372,7 +372,6 @@ public abstract class ReflectionOpt  {
                         }
                     }
                 }
-
                 if(bmatch && nps>matchParam){
                     matchParam = nps;
                     mp.setLeft(mth);
@@ -382,39 +381,44 @@ public abstract class ReflectionOpt  {
         }
         return mp;
     }
-    /*
-     * 获得 对象的 属性
-     * @param sourceObj
-     * @param expression
-     * @return
-     */
-    public static Object attainExpressionValue(Object sourceObj , String expression){
-        if(sourceObj==null || StringUtils.isBlank(expression))
-            return null;
-        if(".".equals(expression))
-            return sourceObj;
 
+    /**
+     * 获得 对象的 属性; 目前只能支持一维数组的获取，多维数据暂时不支持，目前看也没有这个需要
+     * @param sourceObj 可以是 任意对象
+     * @param expression 表达式 a.b[1].c 也可以 a.b[1].[2].c 间接实现二维数组
+     * @return 返回结果
+     */
+    public static Object attainExpressionValue(Object sourceObj, String expression){
+        if(sourceObj == null || StringUtils.isBlank(expression))
+            return null;
+        if(".".equals(expression)) {
+            return sourceObj;
+        }
         int nPos = expression.indexOf('.');
         String fieldValue;
         String restExpression=".";
-        if(nPos>0){
+        if (nPos>0) {
             fieldValue = expression.substring(0,nPos).trim();
-            if(expression.length()>nPos+1)
-                restExpression = expression.substring(nPos+1);
-        }else
+            if(expression.length()>nPos+1) {
+                restExpression = expression.substring(nPos + 1);
+            }
+        } else {
             fieldValue = expression.trim();
-
+        }
         int nAarrayInd = -1;
         nPos = fieldValue.indexOf('[');
-        if(nPos>0){
+        if(nPos>=0){
             String sArrayInd = fieldValue.substring(nPos+1,fieldValue.length()-1);
-            if(StringRegularOpt.isNumber(sArrayInd))
-                nAarrayInd = Double.valueOf(sArrayInd).intValue();
+            if(StringRegularOpt.isNumber(sArrayInd)) {
+                nAarrayInd = NumberBaseOpt.castObjectToInteger(sArrayInd, 0);
+            }
             fieldValue = fieldValue.substring(0,nPos);
         }
 
         Object retObj;
-        if(sourceObj instanceof Map ){
+        if(StringUtils.isBlank(fieldValue)){
+            retObj = sourceObj;
+        } else if(sourceObj instanceof Map ){
             @SuppressWarnings("unchecked")
             Map<String ,Object> objMap = (Map<String ,Object>) sourceObj;
             retObj = objMap.get(fieldValue);
@@ -439,8 +443,9 @@ public abstract class ReflectionOpt  {
                 if( nAarrayInd <objSize){
                     int i=0;
                     for(Object obj: objlist){
-                        if(nAarrayInd==i)
-                            return attainExpressionValue(obj,restExpression);
+                        if(nAarrayInd==i) {
+                            return attainExpressionValue(obj, restExpression);
+                        }
                         i++;
                     }
                 }
@@ -449,7 +454,7 @@ public abstract class ReflectionOpt  {
                 Object [] retObjArray = new Object[objSize];
                 int i=0;
                 for(Object obj: objlist){
-                    retObjArray[i] = attainExpressionValue(obj,restExpression);
+                    retObjArray[i] = attainExpressionValue(obj, restExpression);
                     i++;
                 }
                 return retObjArray;
@@ -457,24 +462,25 @@ public abstract class ReflectionOpt  {
         }else if(retObj instanceof Object[]){
             Object[] objs = (Object[]) retObj;
             int objSize = objs.length;
-            if(objSize<1)
+            if(objSize<1) {
                 return null;
-
+            }
             if(nAarrayInd>=0){
-                if(nAarrayInd <objSize)
-                    return attainExpressionValue(objs[nAarrayInd],restExpression);
+                if(nAarrayInd < objSize) {
+                    return attainExpressionValue(objs[nAarrayInd], restExpression);
+                }
                 return null;
             }else{
                 Object [] retObjArray = new Object[objSize];
                 int i=0;
-                for(Object obj: objs){
-                    retObjArray[i] = attainExpressionValue(obj,restExpression);
+                for (Object obj : objs) {
+                    retObjArray[i] = attainExpressionValue(obj, restExpression);
                     i++;
                 }
                 return retObjArray;
             }
         }else{
-            return attainExpressionValue(retObj,restExpression);
+            return attainExpressionValue(retObj, restExpression);
         }
     }
 
