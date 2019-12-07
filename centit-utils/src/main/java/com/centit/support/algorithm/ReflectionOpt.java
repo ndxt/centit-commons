@@ -402,9 +402,12 @@ public abstract class ReflectionOpt  {
             if(expression.length()>nPos+1) {
                 restExpression = expression.substring(nPos + 1);
             }
+        } else if (nPos == 0) {
+            return attainExpressionValue(sourceObj, expression.substring(1));
         } else {
             fieldValue = expression.trim();
         }
+
         int nAarrayInd = -1;
         nPos = fieldValue.indexOf('[');
         if(nPos>=0){
@@ -424,12 +427,12 @@ public abstract class ReflectionOpt  {
             retObj = objMap.get(fieldValue);
         }else{
             //如果是一个标量则不应该再有属性，所以统一返回null
-            if(ReflectionOpt.isScalarType(sourceObj.getClass())){
+            if(ReflectionOpt.isScalarType(sourceObj.getClass())) {
                 return null;
-            }else
-                retObj = ReflectionOpt.getFieldValue(sourceObj,fieldValue);
+            } else {
+                retObj = ReflectionOpt.getFieldValue(sourceObj, fieldValue);
+            }
         }
-
         if(retObj==null)
             return null;
 

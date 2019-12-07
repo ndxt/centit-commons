@@ -12,7 +12,7 @@ public class TestReflectionOpt {
 
         String [] strings = new String [] {"1","2","3","5"};
         Object [] objects = new Object[]{"1",strings,3};
-        System.out.println(ReflectionOpt.attainExpressionValue(objects,"[1].[3]"));
+        System.out.println(ReflectionOpt.attainExpressionValue(objects,"..."));
         System.out.println(ReflectionOpt.isScalarType(strings.getClass()));
         System.out.println(String.class.getPackage().getName());
 
