@@ -41,10 +41,11 @@ public abstract class DatabaseAccess {
         } else if (Boolean.class.isAssignableFrom(param.getClass())) {
             return  BooleanBaseOpt.castObjectToBoolean(param,false) ?
                     BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
-        } else if(!ReflectionOpt.isScalarType(param.getClass())) {
+        } else if(ReflectionOpt.isScalarType(param.getClass()) || param instanceof byte[]) {
+            return param;
+        }else {
             return JSON.toJSONString(param);
         }
-        return param;
     }
     /**
      * 调用数据库函数

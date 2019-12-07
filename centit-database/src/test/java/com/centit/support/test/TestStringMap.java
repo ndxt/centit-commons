@@ -11,7 +11,8 @@ import java.util.Map;
 public class TestStringMap {
 
     public static void main(String[] args) {
-
+        byte[] bytes =new byte[]{'1','2'};
+        System.out.println(bytes.getClass().isPrimitive());
         System.out.println(JSON.class.isAssignableFrom(JSONObject.class));
         System.out.println(JSON.class.isAssignableFrom(JSONArray.class));
         System.out.println(Map.class.isAssignableFrom(JSONObject.class));
