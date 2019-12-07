@@ -26,9 +26,9 @@ public class ObjectException extends RuntimeException {
             int len = traces.length > 15 ? 15 : traces.length;
             for(int i=0; i<len; i++){
                 errorMsg.append("\r\n")
-                    .append(traces[i].getClassName()).append(":")
-                    .append(traces[i].getMethodName()).append(":")
-                    .append(traces[i].getLineNumber());
+                    .append("class: ").append(traces[i].getClassName()).append(",")
+                    .append("method: ").append(traces[i].getMethodName()).append(",")
+                    .append("line: ").append(traces[i].getLineNumber()).append(".");
             }
         }
         return errorMsg.toString();
