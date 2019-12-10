@@ -17,7 +17,7 @@ public class ObjectException extends RuntimeException {
     public static final int EMPTY_RESULT_EXCEPTION  = 605;
     public static final int FORMAT_DATE_EXCEPTION = 606;
     public static final int FORMAT_NUMBER_EXCEPTION = 607;
-
+    public static final int FORMULA_GRAMMAR_ERROE = 608;
 
     public static String extortExceptionMessage(Throwable ex){
         StringBuilder errorMsg = new StringBuilder(ex.getMessage());
