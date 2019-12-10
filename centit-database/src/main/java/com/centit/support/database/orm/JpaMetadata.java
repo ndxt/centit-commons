@@ -250,13 +250,13 @@ public abstract class JpaMetadata {
                     if (field.isAnnotationPresent(JoinColumn.class)) {
                         JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
                         reference.setReferenceName(field.getName());
-                        reference.setReferenceType(field.getType());
+                        reference.setReferenceFieldType(field.getType());
                         reference.addReferenceColumn(joinColumn.name(), joinColumn.referencedColumnName());
                         haveJoinColumns = true;
                     } else if (field.isAnnotationPresent(JoinColumns.class)) {
                         JoinColumns joinColumns = field.getAnnotation(JoinColumns.class);
                         reference.setReferenceName(field.getName());
-                        reference.setReferenceType(field.getType());
+                        reference.setReferenceFieldType(field.getType());
                         for (JoinColumn joinColumn : joinColumns.value()) {
                             reference.addReferenceColumn(joinColumn.name(), joinColumn.referencedColumnName());
                         }

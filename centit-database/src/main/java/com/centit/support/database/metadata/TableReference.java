@@ -13,12 +13,16 @@ public interface TableReference {
      * @return 约束名称
      */
     String getReferenceName();
+
+    /*
+     * @return 关联类别 OM 一对多 OO 一对一 MO 多对一
+     */
+    //String getReferenceType();
     /**
      *
      * @return 表名称
      */
     String getTableName();
-
     /**
      *
      * @return 父表表名称

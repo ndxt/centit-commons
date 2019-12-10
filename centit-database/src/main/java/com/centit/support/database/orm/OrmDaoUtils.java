@@ -528,12 +528,12 @@ public abstract class OrmDaoUtils {
                     fetchObjectReferencesCascade(connection, refObject, refType, depth-1);
                 }
             }
-            if (//ref.getReferenceType().equals(refType) || oneToOne
-                    ref.getReferenceType().isAssignableFrom(refType) ){
+            if (//ref.getReferenceFieldType().equals(refType) || oneToOne
+                    ref.getReferenceFieldType().isAssignableFrom(refType) ){
                 ref.setObjectFieldValue(object, refs.get(0));
-            }else if(Set.class.isAssignableFrom(ref.getReferenceType())){
+            }else if(Set.class.isAssignableFrom(ref.getReferenceFieldType())){
                 ref.setObjectFieldValue(object, new HashSet<>(refs));
-            }else if(List.class.isAssignableFrom(ref.getReferenceType())){
+            }else if(List.class.isAssignableFrom(ref.getReferenceFieldType())){
                 ref.setObjectFieldValue(object, refs);
             }
         }
@@ -776,8 +776,8 @@ public abstract class OrmDaoUtils {
         TableMapInfo refMapInfo = JpaMetadata.fetchTableMapInfo( refType );
         if( refMapInfo == null )
             return 0;
-        if (//ref.getReferenceType().equals(refType) || oneToOne
-                ref.getReferenceType().isAssignableFrom(refType) ){
+        if (//ref.getReferenceFieldType().equals(refType) || oneToOne
+                ref.getReferenceFieldType().isAssignableFrom(refType) ){
             for (Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()) {
                 Object obj = mapInfo.getObjectFieldValue(object, ent.getKey());
                 refMapInfo.setObjectFieldValue(newObj, ent.getValue(), obj);
@@ -816,8 +816,8 @@ public abstract class OrmDaoUtils {
         Map<String, Object> properties = ref.fetchChildFk(object);
         List<?> refs = listObjectsByProperties(connection,  properties, refType);
 
-        if (//ref.getReferenceType().equals(refType) || oneToOne
-                ref.getReferenceType().isAssignableFrom(refType) ){
+        if (//ref.getReferenceFieldType().equals(refType) || oneToOne
+                ref.getReferenceFieldType().isAssignableFrom(refType) ){
 
             for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
                 Object obj = mapInfo.getObjectFieldValue(object, ent.getKey());
@@ -830,7 +830,7 @@ public abstract class OrmDaoUtils {
                 saveNewObject(connection, newObj);
             }
         }else {
-            List<Object> newListObj = Set.class.isAssignableFrom(ref.getReferenceType())?
+            List<Object> newListObj = Set.class.isAssignableFrom(ref.getReferenceFieldType())?
                   new ArrayList<>((Set<?>) newObj):(List<Object>) newObj;
             for(Map.Entry<String, String> ent : ref.getReferenceColumns().entrySet()){
                 Object obj = mapInfo.getObjectFieldValue(object, ent.getKey());
@@ -947,8 +947,8 @@ public abstract class OrmDaoUtils {
         List<?> refs = listObjectsByProperties(connection,  properties, refType);
         if(newObj==null){
             if(refs!=null && refs.size()>0) {
-                if (//ref.getReferenceType().equals(refType) || oneToOne
-                        ref.getReferenceType().isAssignableFrom(refType) ){
+                if (//ref.getReferenceFieldType().equals(refType) || oneToOne
+                        ref.getReferenceFieldType().isAssignableFrom(refType) ){
                     n += deleteObjectCascade(connection, refs.get(0), depth);
                 } else {
                     for (Object subObj : refs) {
@@ -959,17 +959,17 @@ public abstract class OrmDaoUtils {
             return n;
         }
 
-        if (//ref.getReferenceType().equals(refType) || oneToOne
-                ref.getReferenceType().isAssignableFrom(refType) ){
+        if (//ref.getReferenceFieldType().equals(refType) || oneToOne
+                ref.getReferenceFieldType().isAssignableFrom(refType) ){
             if(refs!=null && refs.size()>0){
                 updateObjectCascade(connection, newObj, depth);
             }else{
                 saveNewObjectCascade(connection, newObj, depth);
             }
-        }else if(Set.class.isAssignableFrom(ref.getReferenceType())){
+        }else if(Set.class.isAssignableFrom(ref.getReferenceFieldType())){
             innerReplaceObjectsAsTabulationCascade(connection,  (List<Object>) refs,
                     new ArrayList<>((Set<?>) newObj), depth);
-        }else if(List.class.isAssignableFrom(ref.getReferenceType())){
+        }else if(List.class.isAssignableFrom(ref.getReferenceFieldType())){
             innerReplaceObjectsAsTabulationCascade(connection,  (List<Object>) refs,
                     (List<Object>) newObj, depth);
         }

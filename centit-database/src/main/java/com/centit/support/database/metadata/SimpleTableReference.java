@@ -18,7 +18,7 @@ public class SimpleTableReference implements TableReference{
     private String referenceName;
     private String referenceCode;
     // 父表属性 类型
-    private Class<?> referenceType;
+    private Class<?> referenceFieldType;
     // 字表类型 和 父表属性类型不一定相等， 父表属性类型可能是 List Set
     private Class<?> targetEntityType;
    /* 字表关联的字段 这个以前只有 转换 Hibernate 的map文件需要，现在都用注解不需要了
@@ -110,12 +110,12 @@ public class SimpleTableReference implements TableReference{
                 StringUtils.isBlank(referencedColumn) ? column : referencedColumn);
     }
 
-    public Class<?> getReferenceType() {
-        return referenceType;
+    public Class<?> getReferenceFieldType() {
+        return referenceFieldType;
     }
 
-    public void setReferenceType(Class<?> referenceType) {
-        this.referenceType = referenceType;
+    public void setReferenceFieldType(Class<?> referenceFieldType) {
+        this.referenceFieldType = referenceFieldType;
     }
 
     public Class<?> getTargetEntityType() {
