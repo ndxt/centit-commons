@@ -1,5 +1,7 @@
 package com.centit.support.algorithm;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
@@ -239,9 +241,11 @@ public abstract class NumberBaseOpt {
             return ((Date) obj).getTime();
         }
         if (obj instanceof String) {
+            if(StringUtils.isBlank((String) obj)){
+                return null;
+            }
             return parseLong((String) obj, null);
         }
-
         return parseLong(StringBaseOpt.objectToString(obj),null);
     }
 
@@ -260,10 +264,12 @@ public abstract class NumberBaseOpt {
         if (obj instanceof Date) {
             return Long.valueOf(((Date) obj).getTime()).intValue();
         }
-
-        if (obj instanceof String)
-            return parseInteger((String)obj,null);
-
+        if (obj instanceof String) {
+            if (StringUtils.isBlank((String) obj)) {
+                return null;
+            }
+            return parseInteger((String) obj, null);
+        }
         return parseInteger(StringBaseOpt.objectToString(obj),null);
     }
 
@@ -279,11 +285,14 @@ public abstract class NumberBaseOpt {
             return null;
         if (obj instanceof Float)
             return (Float) obj;
-
-        if (obj instanceof String)
-            return parseFloat((String)obj,null);
         if (obj instanceof Number)
             return ((Number) obj).floatValue();
+        if (obj instanceof String) {
+            if(StringUtils.isBlank((String) obj)){
+                return null;
+            }
+            return parseFloat((String) obj, null);
+        }
         return parseFloat(StringBaseOpt.objectToString(obj),null);
     }
 
@@ -304,10 +313,14 @@ public abstract class NumberBaseOpt {
             return ((Long) obj).doubleValue();
         if (obj instanceof Float)
             return ((Float) obj).doubleValue();*/
-        if (obj instanceof String)
-            return parseDouble((String)obj,null);
         if (obj instanceof Number)
             return ((Number) obj).doubleValue();
+        if (obj instanceof String) {
+            if(StringUtils.isBlank((String) obj)){
+                return null;
+            }
+            return parseDouble((String) obj, null);
+        }
         return parseDouble(StringBaseOpt.objectToString(obj),null);
     }
 
@@ -360,5 +373,26 @@ public abstract class NumberBaseOpt {
         }else{
             return castObjectToBigDecimal(strNum);
         }
+    }
+
+    public static Number round(Number number, int pos){
+        double power = Math.pow(10, pos);
+        long value = Math.round(number.doubleValue() * power);
+        BigDecimal bd = BigDecimal.valueOf(value, pos);
+        return pos<0 ? bd.longValue() : bd;
+    }
+
+    public static Number floor(Number number, int pos){
+        double power = Math.pow(10, pos);
+        double value = Math.floor(number.doubleValue() * power);
+        BigDecimal bd = BigDecimal.valueOf(Double.valueOf(value).longValue(), pos);
+        return pos<0 ? bd.longValue() : bd;
+    }
+
+    public static Number ceil(Number number, int pos){
+        double power = Math.pow(10, pos);
+        double value = Math.ceil(number.doubleValue() * power);
+        BigDecimal bd = BigDecimal.valueOf(Double.valueOf(value).longValue(), pos);
+        return pos<0 ? bd.longValue() : bd;
     }
 }

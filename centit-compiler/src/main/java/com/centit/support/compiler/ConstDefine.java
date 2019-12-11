@@ -83,6 +83,8 @@ public abstract class ConstDefine {
     public static final int   FUNC_WEEK_DAY    = 162;
     public static final int   FUNC_FORMAT_DATE    = 163;
     public static final int   FUNC_DATE_INFO    = 164;
+    public static final int   FUNC_FLOOR    = 165;
+    public static final int   FUNC_CEIL    = 166;
 
     public static final int   OP_BASE        = 30;    // +
     public static final int   OP_ADD         = 30;    // +

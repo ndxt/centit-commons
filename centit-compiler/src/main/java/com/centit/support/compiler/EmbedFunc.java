@@ -12,8 +12,8 @@ public abstract class EmbedFunc {
     private EmbedFunc() {
         throw new IllegalAccessError("Utility class");
     }
-    private static double MIN_DOUBLE = 0.00000001;
-    public static final int functionsSum = 63;
+    private static double COMPARE_MIN_DOUBLE = 0.0000001;
+    public static final int functionsSum = 65;
     protected static final FunctionInfo functionsList[]={
         new FunctionInfo("getat",-1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte",2, ConstDefine.FUNC_BYTE,ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -35,7 +35,9 @@ public abstract class EmbedFunc {
         new FunctionInfo("sum",-1,ConstDefine.FUNC_SUM, ConstDefine.TYPE_NUM),    // 求和 sum (1,2,3,4,5) = 15
         new FunctionInfo("stddev",-1,ConstDefine.FUNC_STDDEV,ConstDefine.TYPE_NUM),    // 求标准偏差
 
-        new FunctionInfo("round",1,ConstDefine.FUNC_ROUND,ConstDefine.TYPE_NUM),    // 四舍五入
+        new FunctionInfo("round",-1,ConstDefine.FUNC_ROUND,ConstDefine.TYPE_NUM),    // 四舍五入
+        new FunctionInfo("floor",-1,ConstDefine.FUNC_FLOOR,ConstDefine.TYPE_NUM),    // 四舍五入
+        new FunctionInfo("ceil",-1,ConstDefine.FUNC_CEIL,ConstDefine.TYPE_NUM),    // 四舍五入
         new FunctionInfo("concat",-1,ConstDefine.FUNC_STRCAT,ConstDefine.TYPE_STR),    // 连接字符串 concat ("12","34","56")="123456"
         new FunctionInfo("strcat",-1,ConstDefine.FUNC_STRCAT,ConstDefine.TYPE_STR),    // 连接字符串 strcat ("12","34","56")="123456"
         new FunctionInfo("isempty",1,ConstDefine.FUNC_ISEMPTY,ConstDefine.TYPE_NUM),    // 判断参数是否为空 isempty("")=1
@@ -442,8 +444,43 @@ public abstract class EmbedFunc {
                     return null;
                 if (! NumberBaseOpt.isNumber(slOperand.get(0)) )
                     return slOperand.get(0);
-                Double tempDouble = NumberBaseOpt.castObjectToDouble(slOperand.get(0))+0.5;
-                return tempDouble.intValue();
+                Double tempDouble = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                int pos = nOpSum>1 ?
+                    NumberBaseOpt.castObjectToInteger(slOperand.get(1), 0)
+                    : 0;
+                if(pos != 0){
+                    return NumberBaseOpt.round(tempDouble, pos);
+                }
+                return Math.round(tempDouble);
+            }
+            case ConstDefine.FUNC_FLOOR:{
+                if (nOpSum <1)
+                    return null;
+                if (! NumberBaseOpt.isNumber(slOperand.get(0)) )
+                    return slOperand.get(0);
+                Double tempDouble = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                int pos = nOpSum>1 ?
+                    NumberBaseOpt.castObjectToInteger(slOperand.get(1), 0)
+                    : 0;
+                if(pos != 0){
+                    return NumberBaseOpt.floor(tempDouble, pos);
+                }
+                //四舍五入
+                return Double.valueOf(Math.floor(tempDouble)).longValue();
+            }
+            case ConstDefine.FUNC_CEIL:{
+                if (nOpSum <1)
+                    return null;
+                if (! NumberBaseOpt.isNumber(slOperand.get(0)) )
+                    return slOperand.get(0);
+                Double tempDouble = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                int pos = nOpSum>1 ?
+                    NumberBaseOpt.castObjectToInteger(slOperand.get(1), 0)
+                    : 0;
+                if(pos != 0){
+                    return NumberBaseOpt.ceil(tempDouble, pos);
+                }
+                return Double.valueOf(Math.ceil(tempDouble)).longValue();
             }
 
             case ConstDefine.FUNC_ISEMPTY: //判断参数是否为空
@@ -544,8 +581,8 @@ public abstract class EmbedFunc {
                             return slOperand.get(i+1);
                     }else if ( MatchType == 2 ){
                         if (NumberBaseOpt.isNumber(slOperand.get(i))){
-                            if( Math.abs( dbtemp -
-                                    NumberBaseOpt.castObjectToDouble(slOperand.get(i))) < MIN_DOUBLE)
+                            if(Math.abs(dbtemp -
+                                    NumberBaseOpt.castObjectToDouble(slOperand.get(i))) < COMPARE_MIN_DOUBLE)
                                 return slOperand.get(i+1);
                         }
                     }else {
@@ -699,8 +736,8 @@ public abstract class EmbedFunc {
             }
 
             case ConstDefine.FUNC_TO_DATE:{//
-                Object dt = (nOpSum > 0)?slOperand.get(0):null;
-                if(dt==null) {
+                Object dt = (nOpSum > 0) ? slOperand.get(0) : null;
+                if(dt == null) {
                     return DatetimeOpt.currentUtilDate();
                 }
                 if(nOpSum > 1) {
@@ -714,11 +751,25 @@ public abstract class EmbedFunc {
             }
 
             case ConstDefine.FUNC_TO_STRING:{//
-                return (nOpSum > 0)?StringBaseOpt.castObjectToString(slOperand.get(0)):null;
+                if(nOpSum<1){
+                    return null;
+                }
+                String svalue = StringBaseOpt.castObjectToString(slOperand.get(0));
+                if(StringUtils.isBlank(svalue) && nOpSum>1){
+                    return slOperand.get(1);
+                }
+                return svalue;
             }
 
             case ConstDefine.FUNC_TO_NUMBER:{//
-                return (nOpSum > 0)?NumberBaseOpt.castObjectToNumber(slOperand.get(0)):null;
+                if(nOpSum<1){
+                    return null;
+                }
+                Number num = NumberBaseOpt.castObjectToNumber(slOperand.get(0));
+                if(num == null && nOpSum>1){
+                    return slOperand.get(1);
+                }
+                return num;
             }
 
             case ConstDefine.FUNC_GET_PY://

@@ -4,6 +4,8 @@ import com.centit.support.algorithm.ByteBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 
+import java.math.BigDecimal;
+
 public class TestNumber {
 
     public static String rmbDX(String f){
@@ -16,6 +18,7 @@ public class TestNumber {
     }
 
     public static void main(String[] args) {
+        System.out.println(BigDecimal.valueOf(1000, -2));
         String cs ="chinese我是中文";
         System.out.println(cs.length());
         System.out.println(cs.substring(6,10));

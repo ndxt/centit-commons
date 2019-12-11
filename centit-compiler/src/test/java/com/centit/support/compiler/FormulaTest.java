@@ -10,13 +10,23 @@ import java.util.Map;
 public class FormulaTest {
 
     public  static void  main(String[] args)   {
-        testFormula();
-        testFormula2();
+        //testFormula();
+        //testFormula2();
         testFormula4();
     }
 
     public static void testFormula4() {
-        System.out.println(VariableFormula.calculate("today()"));
+        System.out.println(VariableFormula.calculate("'25.36'*5"));
+        System.out.println(VariableFormula.calculate(".36*5"));
+        System.out.println(VariableFormula.calculate("tonumber('',12)"));
+        System.out.println(VariableFormula.calculate("tonumber(,34)"));
+        System.out.println(VariableFormula.calculate("tonumber('123')"));
+        System.out.println(VariableFormula.calculate("round('1232325.3236',2)"));
+        System.out.println(VariableFormula.calculate("round('2355.3236',-2)"));
+        System.out.println(VariableFormula.calculate("floor('1232325.3236',2)"));
+        System.out.println(VariableFormula.calculate("floor('2355.3236',-2)"));
+        System.out.println(VariableFormula.calculate("ceil('1232325.3236',2)"));
+        System.out.println(VariableFormula.calculate("ceil('2355.3236',-2)"));
         System.out.println(VariableFormula.checkFormula("today"));
         System.out.println(VariableFormula.checkFormula("a+(b)"));
         System.out.println(VariableFormula.checkFormula("a+(b,c)"));
