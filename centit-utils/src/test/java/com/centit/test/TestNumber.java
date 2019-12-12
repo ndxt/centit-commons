@@ -3,6 +3,7 @@ package com.centit.test;
 import com.centit.support.algorithm.ByteBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.common.DoubleAspect;
 
 import java.math.BigDecimal;
 
@@ -18,6 +19,13 @@ public class TestNumber {
     }
 
     public static void main(String[] args) {
+        DoubleAspect yes = DoubleAspect.YES;
+        DoubleAspect on = DoubleAspect.ON;
+        System.out.println(yes ==on);
+        System.out.println(yes.equals(on));
+        System.out.println(yes.sameAspect(on));
+        System.out.println(yes.matchAspect(on));
+
         System.out.println(BigDecimal.valueOf(1000, -2));
         String cs ="chinese我是中文";
         System.out.println(cs.length());
