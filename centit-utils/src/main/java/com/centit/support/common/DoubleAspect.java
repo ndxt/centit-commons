@@ -41,4 +41,12 @@ public enum DoubleAspect {
         return (this.intAspect & other.intAspect) != 0;
     }
 
+    /**
+     * except NONE
+     * @return this.intAspect != 0
+     */
+    public boolean anyAspect() {
+        return this.intAspect != 0;
+    }
+
 }
