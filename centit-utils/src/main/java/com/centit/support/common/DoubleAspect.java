@@ -8,33 +8,37 @@ public enum DoubleAspect {
     NONE(0),
     // 正面的
     POSITIVE(1),
-    ON(1),
-    OPEN(1),
-    YES(1),
-    OK(1),
-    SUCCESS(1),
-    GOOD(1),
     // 负面的
     NEGATIVE(2),
-    OFF(2),
-    CLOSE(2),
-    NO(2),
-    ERROR(2),
-    FAIL(2),
-    BAD(2),
     // 任何情况
-    BOTH(3);
+    BOTH(3),
+    // 正面的 ordinal 是奇数 3 除外 负面的 ordinal 是偶数 0 除外
+    OFF(2),
+    ON(1),
+    CLOSE(2),
+    OPEN(1),
+    NO(2),
+    YES(1),
+    ERROR(2),
+    OK(1),
+    FAIL(2),
+    SUCCESS(1),
+    BAD(2),
+    GOOD(1),
+    FALSE(2),
+    TRUE(1);
 
-    int intState;
-    DoubleAspect(int intState){
-        this.intState = intState;
+    int intAspect;
+    DoubleAspect(int intAspect){
+        this.intAspect = intAspect;
     }
 
     public boolean sameAspect(DoubleAspect other) {
-        return this.intState == other.intState;
+        return this.intAspect == other.intAspect;
     }
 
     public boolean matchAspect(DoubleAspect other){
-        return (this.intState & other.intState) != 0;
+        return (this.intAspect & other.intAspect) != 0;
     }
+
 }

@@ -38,12 +38,16 @@ public abstract class DatabaseAccess {
             return param;
         } else if (param instanceof java.util.Date) {
             return DatetimeOpt.convertToSqlTimestamp((java.util.Date) param);
-        } else if (Boolean.class.isAssignableFrom(param.getClass())) {
+        }
+        Class<?> paramClass = param.getClass();
+        if (Boolean.class.isAssignableFrom(paramClass)) {
             return  BooleanBaseOpt.castObjectToBoolean(param,false) ?
                     BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
-        } else if(ReflectionOpt.isScalarType(param.getClass()) || param instanceof byte[]) {
+        } else if(paramClass.isEnum()) {
+            return EnumBaseOpt.enumToOrdinal(param);
+        } else if(ReflectionOpt.isScalarType(paramClass) || param instanceof byte[]) {
             return param;
-        }else {
+        } else {
             return JSON.toJSONString(param);
         }
     }

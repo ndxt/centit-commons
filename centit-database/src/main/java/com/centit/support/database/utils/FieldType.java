@@ -26,6 +26,7 @@ public abstract class FieldType {
     public static final String TEXT= "text"; // CLOB
     public static final String FILE_ID = "fileId";
     public static final String BYTE_ARRAY = "bytes"; // BLOB
+    public static final String ENUM_ORDINAL = "enum";
     // 对象以JSON 格式 保存在 数据库中
     public static final String JSON_OBJECT = "object";
 
@@ -95,7 +96,7 @@ public abstract class FieldType {
                 return "varchar2";
             case INTEGER:
             case LONG:
-                return "number";
+                return "number(12,0)";
             case FLOAT:
             case DOUBLE:
                 return "number";
@@ -115,6 +116,8 @@ public abstract class FieldType {
                 return "blob";//大字段
             case FILE_ID:
                 return "varchar2(64)";//默认记录文件的ID号
+            case ENUM_ORDINAL:
+                return "number(4,0)";//
             default:
                 return ft;
       }
@@ -145,6 +148,8 @@ public abstract class FieldType {
                 return "blob";//大字段
             case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
+            case ENUM_ORDINAL:
+                return "decimal(4,0)";//
             default:
                 return ft;
         }
@@ -180,6 +185,8 @@ public abstract class FieldType {
                 return "VarBinary(MAX)";
             case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
+            case ENUM_ORDINAL:
+                return "decimal(4,0)";//
             default:
                 return ft;
       }
@@ -216,6 +223,8 @@ public abstract class FieldType {
                 return "BLOB";
             case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
+            case ENUM_ORDINAL:
+                return "decimal(4,0)";//
             default:
                 return ft;
       }
@@ -255,6 +264,8 @@ public abstract class FieldType {
                 return "varchar(64)";//默认记录文件的ID号
             case BYTE_ARRAY:
                 return "VARBINARY";
+            case ENUM_ORDINAL:
+                return "smallint";//
             default:
                 return ft;
         }
@@ -537,6 +548,10 @@ public abstract class FieldType {
         if(Boolean.class.isAssignableFrom(javaType) ||
             boolean.class == javaType){
             return FieldType.BOOLEAN;
+        }
+
+        if(javaType.isEnum()){
+            return FieldType.ENUM_ORDINAL;
         }
 
         if(Timestamp.class.isAssignableFrom(javaType)){

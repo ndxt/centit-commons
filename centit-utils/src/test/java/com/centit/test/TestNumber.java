@@ -1,6 +1,7 @@
 package com.centit.test;
 
 import com.centit.support.algorithm.ByteBaseOpt;
+import com.centit.support.algorithm.EnumBaseOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.common.DoubleAspect;
@@ -18,10 +19,15 @@ public class TestNumber {
                 String.valueOf(NumberBaseOpt.getNumByte(f,-2)))+"分";
     }
 
+
+
     public static void main(String[] args) {
         DoubleAspect yes = DoubleAspect.YES;
         DoubleAspect on = DoubleAspect.ON;
-        System.out.println(yes ==on);
+        System.out.println(DoubleAspect.class.isPrimitive());
+        System.out.println(EnumBaseOpt.ordinalToEnum(DoubleAspect.class, 5));
+        System.out.println(yes);
+        System.out.println(EnumBaseOpt.enumToOrdinal(yes));
         System.out.println(yes.equals(on));
         System.out.println(yes.sameAspect(on));
         System.out.println(yes.matchAspect(on));

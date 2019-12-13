@@ -99,15 +99,27 @@ public class JavaBeanField {
         //}
     }
 
-    public void setObjectFieldValue(Object object,  Object newValue){
+    public void setObjectFieldValue(Object object, Object newValue){
         if(newValue==null){
             //if(this.getFieldType().isPrimitive()){
-            if( (this.getFieldType()!=null && this.getFieldType().isPrimitive())
+            if( (this.fieldType !=null && this.fieldType.isPrimitive())
                 || StringUtils.equalsAny( this.fieldJavaType,
                     "int","long","float","double")){
                 return;
             }
             this.innerSetObjectFieldValue(object, null);
+            return;
+        }
+
+        if (this.fieldType.isAssignableFrom(newValue.getClass())) {
+            this.innerSetObjectFieldValue(object, newValue);
+            return;
+        }
+        // 这个专门针对数据库中 保存的 枚举型数据类型
+        if(this.fieldType.isEnum()){
+            this.innerSetObjectFieldValue(object,
+                EnumBaseOpt.ordinalToEnum(this.fieldType,
+                    NumberBaseOpt.castObjectToInteger(newValue)));
             return;
         }
 
