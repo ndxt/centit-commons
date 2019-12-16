@@ -18,6 +18,10 @@ import java.util.List;
 
 public class TestJsonOrm {
 
+    public  static void  main(String[] args)   {
+        testOrm();
+    }
+
     @Data
     @Table(name = "F_USERINFO")
     public static class UserInfo implements java.io.Serializable {
@@ -26,19 +30,12 @@ public class TestJsonOrm {
         @Column(name = "USER_CODE")
         @ValueGenerator(strategy = GeneratorType.TABLE_ID, value = "F_USERINFO:USER_CODE:7")
         private String userCode; // 用户代码
-
         @Column(name = "USER_NAME")
         private String userName; // 用户姓名
-
         @Column(name = "CREATE_DATE")
         @ValueGenerator(strategy = GeneratorType.FUNCTION, value = "today()")
         protected Date createDate;
     }
-
-    public  static void  main(String[] args)   {
-        testOrm();
-    }
-
     public  static void testOrm(){
         UserInfo userInfo = new UserInfo();
         userInfo.setUserCode("u0001");

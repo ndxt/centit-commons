@@ -67,7 +67,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             case DM:
             case KingBase:
             case GBase:
-            case ShenTong:
+            case Oscar:
                 return new OracleJsonObjectDao(conn,tableInfo);
             case DB2:
                 return new DB2JsonObjectDao(conn,tableInfo);
@@ -92,7 +92,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             case DM:
             case KingBase:
             case GBase:
-            case ShenTong:
+            case Oscar:
                 return new OracleJsonObjectDao(conn);
             case DB2:
                 return new DB2JsonObjectDao(conn);

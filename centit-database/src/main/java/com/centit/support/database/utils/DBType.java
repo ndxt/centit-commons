@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum DBType {
-    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM, KingBase,GBase,ShenTong;
+    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM, KingBase,GBase, Oscar;
     protected static final Logger logger = LoggerFactory.getLogger(DBType.class);
     private static HashMap<DBType, String> dbDrivers = new HashMap<DBType, String>() {
         {
@@ -24,7 +24,7 @@ public enum DBType {
             put(DM, "dm.jdbc.driver.DmDriver");
             put(KingBase,"com.kingbase.Driver");
             put(GBase,"com.gbasedbt.jdbc.IfxDriver");
-            put(ShenTong,"com.oscar.Driver");
+            put(Oscar,"com.oscar.Driver");
         }
     };
 
@@ -51,7 +51,7 @@ public enum DBType {
             case 10:
                 return GBase;
             case 11:
-                return ShenTong;
+                return Oscar;
             default:
                 return Unknown;
         }
@@ -117,7 +117,7 @@ public enum DBType {
             return GBase;
         if (connurl.startsWith("jdbc:oscar")
             || "oscar".equalsIgnoreCase(connurl))
-            return ShenTong;
+            return Oscar;
         return Unknown;
     }
 
@@ -154,8 +154,8 @@ public enum DBType {
             return KingBase;
         if (dialectName.contains("GBase"))
             return GBase;
-        if (dialectName.contains("ShenTong"))
-            return ShenTong;
+        if (dialectName.contains("Oscar"))
+            return Oscar;
         return Unknown;
     }
 
@@ -172,7 +172,7 @@ public enum DBType {
         dbtypes.add(DM);
         dbtypes.add(KingBase);
         dbtypes.add(GBase);
-        dbtypes.add(ShenTong);
+        dbtypes.add(Oscar);
         return dbtypes;
     }
 
@@ -207,7 +207,7 @@ public enum DBType {
                 return "kingbase";
             case GBase:
                 return "gbase";
-            case ShenTong:
+            case Oscar:
                 return "shentong";
             default:
                 return "unknown";
@@ -223,6 +223,6 @@ public enum DBType {
         return DBType.DM.equals(this)
             || DBType.KingBase.equals(this)
             || DBType.GBase.equals(this)
-            || DBType.ShenTong.equals(this);
+            || DBType.Oscar.equals(this);
     }
 }

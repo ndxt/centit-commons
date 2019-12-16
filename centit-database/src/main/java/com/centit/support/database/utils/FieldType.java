@@ -294,7 +294,7 @@ public abstract class FieldType {
             case Oracle:
             case DM:
             case KingBase:
-            case ShenTong:
+            case Oscar:
                 return mapToOracleColumnType(ft);
             case DB2:
                 return mapToDB2ColumnType(ft);

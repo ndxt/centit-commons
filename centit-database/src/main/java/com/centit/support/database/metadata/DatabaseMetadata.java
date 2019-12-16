@@ -19,7 +19,7 @@ public interface DatabaseMetadata {
             case Oracle:
             case DM:
             case KingBase:
-            case ShenTong:
+            case Oscar:
                 return new OracleMetadata();
             case DB2:
                 return new DB2Metadata();
