@@ -115,6 +115,10 @@ public abstract class UrlOptUtils {
         return urlBuilder.toString();
     }
 
+    public static String makeParamsToUrl(Map<String,Object> queryParam){
+        return appendParamsToUrl("", queryParam);
+    }
+
     public static String appendParamToUrl(String uri, String queryUrl){
         if (queryUrl == null || "".equals(queryUrl))
             return uri;
@@ -122,13 +126,13 @@ public abstract class UrlOptUtils {
                 (uri.indexOf('?') == -1 ?  uri+'?'+queryUrl :  uri+'&'+queryUrl );
     }
 
-        public static String appendParamToUrl(String uri, String paramName, Object paramValue){
-            return (uri.endsWith("?") || uri.endsWith("&")) ?
-                    uri + paramName +"="+ StringBaseOpt.objectToString(paramValue):
-                    uri + (uri.indexOf('?') == -1 ? '?':'&')
-                            + paramName +"="+ StringEscapeUtils.escapeHtml4(
-                                    StringBaseOpt.objectToString(paramValue));
-        }
+    public static String appendParamToUrl(String uri, String paramName, Object paramValue){
+        return (uri.endsWith("?") || uri.endsWith("&")) ?
+                uri + paramName +"="+ StringBaseOpt.objectToString(paramValue):
+                uri + (uri.indexOf('?') == -1 ? '?':'&')
+                        + paramName +"="+ StringEscapeUtils.escapeHtml4(
+                                StringBaseOpt.objectToString(paramValue));
+    }
 
     /**
      * 简化的url压缩算法，算法如下：
