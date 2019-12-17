@@ -78,15 +78,15 @@ public abstract class OrmUtils {
         for(LeftRightPair<String, ValueGenerator> ent :  valueGenerators) {
             ValueGenerator valueGenerator =  ent.getRight();
             if (valueGenerator.occasion().matchTime(generatorTime)){
-                SimpleTableField filed = mapInfo.findFieldByName(ent.getLeft());
-                Object fieldValue = mapInfo.getObjectFieldValue(object, filed);
+                SimpleTableField field = mapInfo.findFieldByName(ent.getLeft());
+                Object fieldValue = mapInfo.getObjectFieldValue(object, field);
                 if( fieldValue == null || valueGenerator.condition() == GeneratorCondition.ALWAYS ){
                     switch (valueGenerator.strategy()){
                         case UUID:
-                            mapInfo.setObjectFieldValue(object, filed, UuidOpt.getUuidAsString32());
+                            mapInfo.setObjectFieldValue(object, field, UuidOpt.getUuidAsString32());
                             break;
                         case UUID22:
-                            mapInfo.setObjectFieldValue(object, filed, UuidOpt.getUuidAsString22());
+                            mapInfo.setObjectFieldValue(object, field, UuidOpt.getUuidAsString22());
                             break;
                         case SEQUENCE:
                             //GeneratorTime.READ 读取数据时不能用 SEQUENCE 生成值
@@ -94,25 +94,25 @@ public abstract class OrmUtils {
                                 String genValue = valueGenerator.value();
                                 String [] params = genValue.split(":");
                                 if(params.length==1) {
-                                    mapInfo.setObjectFieldValue(object, filed,
+                                    mapInfo.setObjectFieldValue(object, field,
                                         sqlDialect.getSequenceNextValue(params[0]));
                                 } else {
                                     Long seqNo = sqlDialect.getSequenceNextValue(params[0]);
                                     if(params.length>3){
-                                        mapInfo.setObjectFieldValue(object, filed, StringBaseOpt.midPad(seqNo.toString(),
+                                        mapInfo.setObjectFieldValue(object, field, StringBaseOpt.midPad(seqNo.toString(),
                                             NumberBaseOpt.castObjectToInteger(params[2],1),
                                              params[1], params[3]));
                                     } else if(params.length>1){
-                                        mapInfo.setObjectFieldValue(object, filed, params[1]+seqNo);
+                                        mapInfo.setObjectFieldValue(object, field, params[1]+seqNo);
                                     }
                                 }
                             }
                             break;
                         case CONSTANT:
-                            mapInfo.setObjectFieldValue(object, filed, valueGenerator.value());
+                            mapInfo.setObjectFieldValue(object, field, valueGenerator.value());
                             break;
                         case FUNCTION:
-                            mapInfo.setObjectFieldValue(object, filed,
+                            mapInfo.setObjectFieldValue(object, field,
                                     VariableFormula.calculate(valueGenerator.value(), object));
                             break;
                         case SERIAL_NO:
@@ -124,7 +124,7 @@ public abstract class OrmUtils {
                                     Long seqNo = sqlDialect.getSequenceNextValue(seq);
                                     JSONObject json = (JSONObject) JSON.toJSON(object);
                                     json.put("seqNo",seqNo);
-                                    mapInfo.setObjectFieldValue(object, filed,
+                                    mapInfo.setObjectFieldValue(object, field,
                                         VariableFormula.calculate(
                                             genValue.substring(n+1), object));
                                 }
@@ -137,9 +137,9 @@ public abstract class OrmUtils {
                                 String prefix = params.length>1 ? params[1] : "";
                                 int len = NumberBaseOpt.castObjectToInteger(params[0],23);
                                 if(len>22){
-                                    mapInfo.setObjectFieldValue(object, filed, prefix + UuidOpt.getUuidAsString22());
+                                    mapInfo.setObjectFieldValue(object, field, prefix + UuidOpt.getUuidAsString22());
                                 } else /*if (sqlDialect!=null)*/{
-                                    if(mapInfo.countPkColumn() != 1 || !filed.isPrimaryKey()){
+                                    if(mapInfo.countPkColumn() != 1 || !field.isPrimaryKey()){
                                         throw new ObjectException(PersistenceException.ORM_METADATA_EXCEPTION,
                                             "主键生成规则RANDOM_ID只能用于单主键表中！");
                                     }
@@ -149,9 +149,9 @@ public abstract class OrmUtils {
                                         int nHasId = NumberBaseOpt.castObjectToInteger(
                                                         DatabaseAccess.fetchScalarObject(
                                                             sqlDialect.findObjectsBySql("select count(*) hasId from " + mapInfo.getTableName()
-                                                                + " where " + filed.getColumnName() +" = ?", new Object[] {no})),0);
+                                                                + " where " + field.getColumnName() +" = ?", new Object[] {no})),0);
                                         if(nHasId==0) {
-                                            mapInfo.setObjectFieldValue(object, filed, no);
+                                            mapInfo.setObjectFieldValue(object, field, no);
                                             break;// for
                                         }
                                     }
@@ -162,12 +162,12 @@ public abstract class OrmUtils {
 
                         case SUB_ORDER:{
                             int pkCount = mapInfo.countPkColumn();
-                            if(pkCount < 2 || !filed.isPrimaryKey() /*|| filed.getFieldType()*/){
+                            if(pkCount < 2 || !field.isPrimaryKey() /*|| filed.getFieldType()*/){
                                 throw new ObjectException(PersistenceException.ORM_METADATA_EXCEPTION,
                                     "主键生成规则SUB_ORDER必须用于符合主键表中，并且只能用于整型字段！");
                             }
                             StringBuilder sqlBuilder = new StringBuilder("select max(" );
-                            sqlBuilder.append(filed.getColumnName())
+                            sqlBuilder.append(field.getColumnName())
                                 .append(" ) as maxOrder from ")
                                 .append(mapInfo.getTableName())
                                 .append(" where ");
@@ -175,7 +175,7 @@ public abstract class OrmUtils {
                             Object[] pkValues = new Object[pkCount-1];
                             for(SimpleTableField col : mapInfo.getColumns()){
                                 if(col.isPrimaryKey() &&
-                                    ! StringUtils.equals(col.getPropertyName(), filed.getPropertyName())){
+                                    ! StringUtils.equals(col.getPropertyName(), field.getPropertyName())){
                                     if(pki>0){
                                         sqlBuilder.append(" and ");
                                     }
@@ -187,7 +187,7 @@ public abstract class OrmUtils {
                             Long pkSubOrder = NumberBaseOpt.castObjectToLong(
                                 DatabaseAccess.fetchScalarObject(
                                     sqlDialect.findObjectsBySql(sqlBuilder.toString(), pkValues)) , 0L);
-                            mapInfo.setObjectFieldValue(object, filed, pkSubOrder+1);
+                            mapInfo.setObjectFieldValue(object, field, pkSubOrder+1);
                             break;
                         }
                     }
