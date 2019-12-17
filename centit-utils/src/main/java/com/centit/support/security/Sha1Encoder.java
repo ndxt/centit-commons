@@ -7,39 +7,40 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 /**
- * Secure Hash Algorithm  安全散列算法 
+ * Secure Hash Algorithm  安全散列算法
  * 算法比MD5效率低（算法复杂度高）所以更为安全
  * SHA-1 散列算法返回的160bit的编码，HEX编码后的长度为40Byte
- * @author codefan
  *
+ * @author codefan
  */
 @SuppressWarnings("unused")
 public abstract class Sha1Encoder {
+
+    protected static final Logger logger = LoggerFactory.getLogger(Sha1Encoder.class);
 
     private Sha1Encoder() {
         throw new IllegalAccessError("Utility class");
     }
 
-    protected static final Logger logger = LoggerFactory.getLogger(Sha1Encoder.class);
-
-    public static String encode(byte[] data){
+    public static String encode(byte[] data) {
         MessageDigest SHA1;
         try {
             SHA1 = MessageDigest.getInstance("SHA-1");
             SHA1.update(data, 0, data.length);
             return new String(Hex.encodeHex(SHA1.digest()));
         } catch (NoSuchAlgorithmException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
         }
     }
 
-    public static String encode(String data){
+    public static String encode(String data) {
         try {
             return encode(data.getBytes("utf8"));
         } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
         }
     }

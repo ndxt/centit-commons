@@ -7,8 +7,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 
-public class PdmTableInfo{
-    public  static void  main(String[] args)   {
+public class PdmTableInfo {
+    public static void main(String[] args) {
         SimpleTableField field = new SimpleTableField();
         field.setFieldType(byte[].class.getName());
         System.out.println(field.getJavaType().getName());
@@ -18,9 +18,10 @@ public class PdmTableInfo{
             System.out.println("table "+ t.getLeft() +" name "+ t.getRight());
         System.out.println("Done!");*/
     }
+
     public static List<Pair<String, String>> listTablesInPdm(String pdmFilePath) {
         PdmReader pdmReader = new PdmReader();
-        if(!pdmReader.loadPdmFile(pdmFilePath))
+        if (!pdmReader.loadPdmFile(pdmFilePath))
             return null;
 
         return pdmReader.getAllTableCode();
@@ -28,7 +29,7 @@ public class PdmTableInfo{
 
     public static SimpleTableInfo importTableFromPdm(String pdmFilePath, String tableCode) {
         PdmReader pdmReader = new PdmReader();
-        if(!pdmReader.loadPdmFile(pdmFilePath))
+        if (!pdmReader.loadPdmFile(pdmFilePath))
             return null;
         return pdmReader.getTableMetadata(tableCode);
     }

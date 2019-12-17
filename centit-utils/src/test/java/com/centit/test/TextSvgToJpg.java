@@ -19,20 +19,20 @@ public class TextSvgToJpg {
     public static void main(String[] args) {
         try {
             System.out.println(FileType.getFileType(
-                    new File("D:/WorkDoc/业务拓展/复星集团/星采网+技术标第二轮+评分标准+－供应商版.pdf")));
+                new File("D:/WorkDoc/业务拓展/复星集团/星采网+技术标第二轮+评分标准+－供应商版.pdf")));
         } catch (IOException e) {
             //e.printStackTrace();
         }
     }
 
-    public static void testDate(){
+    public static void testDate() {
         Date date = DatetimeOpt.currentUtilDate();
 
         System.out.println(DatetimeOpt.convertTimestampToString(date));
 
-        try{
-            String [] sArray = new String[3];
-            sArray[1]="hello!";
+        try {
+            String[] sArray = new String[3];
+            sArray[1] = "hello!";
             List<String> sList = new ArrayList<>();
             sList.add(sArray[1]);
 
@@ -41,16 +41,16 @@ public class TextSvgToJpg {
 
             if (obj1 instanceof Collection) {//end of map
                 System.out.println("sArray is Collection");
-            }else if (obj1 instanceof Object[]) {
+            } else if (obj1 instanceof Object[]) {
                 System.out.println("sArray is Object[]");
-            }else
+            } else
                 System.out.println("sArray is unknown");
 
             if (obj2 instanceof Collection) {//end of map
                 System.out.println("sList is Collection");
-            }else if (obj2 instanceof Object[]) {
+            } else if (obj2 instanceof Object[]) {
                 System.out.println("sList is Object[]");
-            }else
+            } else
                 System.out.println("sList is unknown");
 
 
@@ -85,7 +85,7 @@ public class TextSvgToJpg {
             jpg.flush();
             jpg.close();*/
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             //e.printStackTrace();
         }
     }

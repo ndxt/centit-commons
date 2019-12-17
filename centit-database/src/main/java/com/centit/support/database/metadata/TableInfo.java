@@ -39,13 +39,14 @@ public interface TableInfo {
      * @return 默认排序语句
      */
     String getOrderBy();
+
     /**
-     * @return 根据属性名查找 字段信息
      * @param name 属性名
+     * @return 根据属性名查找 字段信息
      */
     TableField findFieldByName(String name);
+
     /**
-     *
      * @param name 属性名
      * @return 根据属性名查找 字段信息
      */
@@ -53,6 +54,7 @@ public interface TableInfo {
 
     /**
      * 获取所有的列名
+     *
      * @return 所有的列名
      */
     List<? extends TableField> getColumns();
@@ -64,27 +66,30 @@ public interface TableInfo {
 
     /**
      * 判断表是否定义单一主键
+     *
      * @return 否是定义单一主键
      */
-    default int countPkColumn(){
+    default int countPkColumn() {
         int pkColumn = 0;
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField field : columns) {
                 if (field.isPrimaryKey()) {
-                    pkColumn ++;
+                    pkColumn++;
                 }
             }
         }
         return pkColumn;
     }
+
     /**
      * 判断表是否定义主键
+     *
      * @return 否是定义主键
      */
-    default boolean hasParmaryKey(){
+    default boolean hasParmaryKey() {
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField field : columns) {
                 if (field.isPrimaryKey()) {
                     return true;
@@ -93,21 +98,23 @@ public interface TableInfo {
         }
         return false;
     }
+
     /**
      * 判断一个字段是否是主键
+     *
      * @param colname 字段
      * @return 否是主键
      */
-    default boolean isParmaryKey(String colname){
+    default boolean isParmaryKey(String colname) {
         TableField field = findFieldByColumn(colname);
         return field != null && field.isPrimaryKey();
     }
 
     @JSONField(serialize = false)
-    default List<String> getAllFieldsName(){
+    default List<String> getAllFieldsName() {
         List<String> pkCols = new ArrayList<>(4);
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField field : columns) {
                 pkCols.add(field.getPropertyName());
             }
@@ -116,12 +123,12 @@ public interface TableInfo {
     }
 
     @JSONField(serialize = false)
-    default List<String> getFieldsNameWithoutLazy(){
+    default List<String> getFieldsNameWithoutLazy() {
         List<String> pkCols = new ArrayList<>(4);
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField field : columns) {
-                if(!field.isLazyFetch()) {
+                if (!field.isLazyFetch()) {
                     pkCols.add(field.getPropertyName());
                 }
             }
@@ -129,10 +136,10 @@ public interface TableInfo {
         return pkCols;
     }
 
-    default Map<String, Object> fetchObjectPk(Map<String, Object> object){
+    default Map<String, Object> fetchObjectPk(Map<String, Object> object) {
         Map<String, Object> pk = new HashMap<>(8);
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField c : columns) {
                 if (c.isPrimaryKey()) {
                     Object pkValue = object.get(c.getPropertyName());
@@ -146,11 +153,11 @@ public interface TableInfo {
         return pk;
     }
 
-    default String fetchObjectPkAsId(Map<String, Object> object){
+    default String fetchObjectPkAsId(Map<String, Object> object) {
         StringBuilder pkId = new StringBuilder();
         int pkNo = 0;
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField c : columns) {
                 if (c.isPrimaryKey()) {
                     Object pkValue = object.get(c.getPropertyName());
@@ -165,13 +172,13 @@ public interface TableInfo {
         return pkId.toString();
     }
 
-    default Map<String, Object> parseObjectPkId(String pkId){
-        String [] pkIds = pkId.split(":");
+    default Map<String, Object> parseObjectPkId(String pkId) {
+        String[] pkIds = pkId.split(":");
         int len = pkIds.length;
         Map<String, Object> pk = new HashMap<>(8);
         int pkNo = 0;
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField c : columns) {
                 if (c.isPrimaryKey()) {
                     if (pkNo >= len) {
@@ -185,11 +192,11 @@ public interface TableInfo {
         return pk;
     }
 
-    default String fetchObjectPkAsUrlParams(Map<String, Object> object){
+    default String fetchObjectPkAsUrlParams(Map<String, Object> object) {
         StringBuilder pkId = new StringBuilder();
         int pkNo = 0;
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField c : columns) {
                 if (c.isPrimaryKey()) {
                     Object pkValue = object.get(c.getPropertyName());
@@ -207,14 +214,14 @@ public interface TableInfo {
         return pkId.toString();
     }
 
-    default Map<String, Object> parseObjectPkUrlParams(String pkParamString){
-        String [] pkParams = pkParamString.split("&");
+    default Map<String, Object> parseObjectPkUrlParams(String pkParamString) {
+        String[] pkParams = pkParamString.split("&");
         Map<String, Object> pk = new HashMap<>(8);
-        for(String param : pkParams){
-            String [] params = param.split("=");
-            if(params.length>1){
+        for (String param : pkParams) {
+            String[] params = param.split("=");
+            if (params.length > 1) {
                 TableField field = findFieldByName(params[0]);
-                if(field!=null){
+                if (field != null) {
                     pk.put(field.getPropertyName(),
                         HtmlFormUtils.htmlString(params[1]));
                 }
@@ -227,10 +234,10 @@ public interface TableInfo {
      * @return 获取主键列名 主键是有次序的
      */
     @JSONField(serialize = false)
-    default List<? extends TableField> getPkFields(){
+    default List<? extends TableField> getPkFields() {
         List<TableField> pkCols = new ArrayList<>(4);
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField field : columns) {
                 if (field.isPrimaryKey()) {
                     pkCols.add(field);
@@ -241,10 +248,10 @@ public interface TableInfo {
     }
 
     @JSONField(serialize = false)
-    default List<? extends TableField> getLzayFields(){
+    default List<? extends TableField> getLzayFields() {
         List<TableField> pkCols = new ArrayList<>(4);
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField field : columns) {
                 if (field.isLazyFetch()) {
                     pkCols.add(field);
@@ -255,10 +262,10 @@ public interface TableInfo {
     }
 
     @JSONField(serialize = false)
-    default List<? extends TableField> getMandatoryFields(){
+    default List<? extends TableField> getMandatoryFields() {
         List<TableField> pkCols = new ArrayList<>(4);
         List<? extends TableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (TableField field : columns) {
                 if (field.isMandatory()) {
                     pkCols.add(field);

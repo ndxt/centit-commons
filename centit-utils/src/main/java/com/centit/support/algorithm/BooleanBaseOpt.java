@@ -13,29 +13,29 @@ public abstract class BooleanBaseOpt {
         throw new IllegalAccessError("Utility class");
     }
 
-    static public Boolean castObjectToBoolean(Object obj){
-        if(obj==null)
+    static public Boolean castObjectToBoolean(Object obj) {
+        if (obj == null)
             return null;
-        if(obj instanceof Boolean)
-            return (Boolean)obj;
+        if (obj instanceof Boolean)
+            return (Boolean) obj;
         if (obj instanceof Number)
             return ((Number) obj).intValue() != 0;
 
         final String str = StringBaseOpt.objectToString(obj);
-        if(StringUtils.equalsAnyIgnoreCase(str,"y","yes","t","true","on")){
+        if (StringUtils.equalsAnyIgnoreCase(str, "y", "yes", "t", "true", "on")) {
             return true;
         }
-        if(StringUtils.equalsAnyIgnoreCase(str,"n","no","f","false","off")){
+        if (StringUtils.equalsAnyIgnoreCase(str, "n", "no", "f", "false", "off")) {
             return false;
         }
         return null;//ringRegularOpt.isNumber(str);
     }
 
-    public static Boolean castObjectToBoolean(Object obj, Boolean defaultValue){
-        return GeneralAlgorithm.nvl(castObjectToBoolean(obj),defaultValue);
+    public static Boolean castObjectToBoolean(Object obj, Boolean defaultValue) {
+        return GeneralAlgorithm.nvl(castObjectToBoolean(obj), defaultValue);
     }
 
-    static public boolean isBoolean(Object obj){
-        return BooleanBaseOpt.castObjectToBoolean(obj)!= null;
+    static public boolean isBoolean(Object obj) {
+        return BooleanBaseOpt.castObjectToBoolean(obj) != null;
     }
 }

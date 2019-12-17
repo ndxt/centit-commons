@@ -8,7 +8,7 @@ import java.sql.Connection;
 
 public class PostgreSqlDDLOperations extends GeneralDDLOperations {
 
-    public PostgreSqlDDLOperations(){
+    public PostgreSqlDDLOperations() {
 
     }
 
@@ -17,7 +17,7 @@ public class PostgreSqlDDLOperations extends GeneralDDLOperations {
     }
 
     @Override
-    public String makeCreateSequenceSql(final String sequenceName){
+    public String makeCreateSequenceSql(final String sequenceName) {
         return "create sequence " + QueryUtils.cleanSqlStatement(sequenceName);
     }
 
@@ -34,15 +34,15 @@ public class PostgreSqlDDLOperations extends GeneralDDLOperations {
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
         sbsql.append(" ALTER ").append(column.getColumnName()).append(" ");
-        if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
-                || !oldColumn.getMaxLength().equals(column.getMaxLength())
-                || !oldColumn.getPrecision().equals(column.getPrecision()) ){
+        if (!StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
+            || !oldColumn.getMaxLength().equals(column.getMaxLength())
+            || !oldColumn.getPrecision().equals(column.getPrecision())) {
             sbsql.append(" type ");
             appendColumnTypeSQL(column, sbsql);
         }
 
-        if( oldColumn.isMandatory() != column.isMandatory()){
-            sbsql.append(column.isMandatory()?" set not null": " drop not null");
+        if (oldColumn.isMandatory() != column.isMandatory()) {
+            sbsql.append(column.isMandatory() ? " set not null" : " drop not null");
         }
 
         return sbsql.toString();

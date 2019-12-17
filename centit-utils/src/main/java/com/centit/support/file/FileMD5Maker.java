@@ -10,24 +10,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 /**
- * 
  * @author 朱晓文
  */
 @SuppressWarnings("unused")
 public abstract class FileMD5Maker {
+    protected static final Logger logger = LoggerFactory.getLogger(FileMD5Maker.class);
+
     private FileMD5Maker() {
         throw new IllegalAccessError("Utility class");
     }
-    protected static final Logger logger = LoggerFactory.getLogger(FileMD5Maker.class);
+
     public static String makeFileMD5(File file) throws IOException {
 
-        try(FileInputStream fis = new FileInputStream(file)) {
+        try (FileInputStream fis = new FileInputStream(file)) {
             return makeFileMD5(fis);
         }
     }
 
-    public static String makeFileMD5(InputStream is) throws IOException{
+    public static String makeFileMD5(InputStream is) throws IOException {
         try {
             MessageDigest MD5 = MessageDigest.getInstance("MD5");
             byte[] buffer = new byte[8192];
@@ -37,8 +39,8 @@ public abstract class FileMD5Maker {
             }
             return new String(Hex.encodeHex(MD5.digest()));
         } catch (NoSuchAlgorithmException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
-        } 
+        }
     }
 }

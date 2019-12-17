@@ -18,43 +18,69 @@ import java.sql.SQLException;
 
 /**
  * 数据源描述信息，这些信息和参数是创建连接池的参数
- * @author codefan
  *
+ * @author codefan
  */
-public final class DataSourceDescription implements Serializable{
+public final class DataSourceDescription implements Serializable {
     protected static final Logger logger = LoggerFactory.getLogger(DataSourceDescription.class);
     private static final long serialVersionUID = 1L;
-    private String connUrl ;
-    private String username ;
-    private String driver ;
-    private String password ;
+    private String connUrl;
+    private String username;
+    private String driver;
+    private String password;
     private DBType dbType;
-    private int    maxTotal ;
-    private int    maxIdle ;
-    private int    minIdle ;
-    private int    maxWaitMillis;
-    private int    initialSize ;
+    private int maxTotal;
+    private int maxIdle;
+    private int minIdle;
+    private int maxWaitMillis;
+    private int initialSize;
     private String databaseCode;
 
-    public DataSourceDescription(){
-        this.maxTotal  = 10;
-        this.maxIdle  = 5;
+    public DataSourceDescription() {
+        this.maxTotal = 10;
+        this.maxIdle = 5;
         this.minIdle = 1;
         this.initialSize = 3;
         this.maxWaitMillis = 10000;
     }
 
-    public DataSourceDescription(String connectURI, String username){
+    public DataSourceDescription(String connectURI, String username) {
         this();
         this.setConnUrl(connectURI);
         this.username = username;
     }
 
-    public DataSourceDescription(String connectURI, String username, String pswd){
+    public DataSourceDescription(String connectURI, String username, String pswd) {
         this();
         this.setConnUrl(connectURI);
         this.username = username;
         this.password = pswd;
+    }
+
+    public static boolean testConntect(DataSourceDescription dsDesc) {
+        boolean connOk = false;
+        try {
+            Class.forName(dsDesc.getDriver());//.newInstance();
+            Connection conn = DriverManager.getConnection(dsDesc.getConnUrl(),
+                dsDesc.getUsername(), dsDesc.getPassword());
+            connOk = true;
+            conn.close();
+        } catch (ReflectiveOperationException | SQLException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+        }
+        return connOk;
+    }
+
+    public static DataSourceDescription valueOf(IDatabaseInfo dbinfo) {
+        DataSourceDescription desc = new DataSourceDescription();
+        desc.setConnUrl(dbinfo.getDatabaseUrl());
+        desc.setUsername(dbinfo.getUsername());
+        desc.setPassword(dbinfo.getClearPassword());
+        desc.setDatabaseCode(dbinfo.getDatabaseCode());
+        desc.setMaxIdle(10);
+        desc.setMaxTotal(20);
+        desc.setMaxWaitMillis(20000);
+        return desc;
     }
 
     public String getConnUrl() {
@@ -144,33 +170,33 @@ public final class DataSourceDescription implements Serializable{
     }
 
     @Override
-    public boolean equals(Object dbco){
-        if(this==dbco)
+    public boolean equals(Object dbco) {
+        if (this == dbco)
             return true;
 
-        if( dbco instanceof DataSourceDescription ){
-            DataSourceDescription dbc =(DataSourceDescription) dbco;
-            return connUrl !=null && connUrl.equals(dbc.getConnUrl())
+        if (dbco instanceof DataSourceDescription) {
+            DataSourceDescription dbc = (DataSourceDescription) dbco;
+            return connUrl != null && connUrl.equals(dbc.getConnUrl())
                 && username != null && username.equals(dbc.getUsername());
-        }else {
+        } else {
             return false;
         }
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         int result = 17;
         result = 37 * result +
-             (this.connUrl == null ? 0 :this.connUrl.hashCode());
+            (this.connUrl == null ? 0 : this.connUrl.hashCode());
 
         result = 37 * result +
-             (this.username == null ? 0 :this.username.hashCode());
+            (this.username == null ? 0 : this.username.hashCode());
 
         return result;
     }
 
-    public void loadHibernateConfig(String sConfFile,String sDbBeanName){
-        SAXReader  builder = new SAXReader(false);
+    public void loadHibernateConfig(String sConfFile, String sDbBeanName) {
+        SAXReader builder = new SAXReader(false);
         builder.setValidation(false);
         builder.setEntityResolver(new IgnoreDTDEntityResolver());
 
@@ -178,66 +204,40 @@ public final class DataSourceDescription implements Serializable{
         Element bean;
 
         try {
-            if(sConfFile.indexOf(':')>=0){
-                if(sConfFile.startsWith("classpath:")){
-                    doc= builder.read(this.getClass().getResourceAsStream(sConfFile.substring(10)));
-                }else
-                    doc= builder.read(new File(sConfFile));
-            }else
-                doc= builder.read(this.getClass().getResourceAsStream(sConfFile));
-            Element root  = doc.getRootElement();//获取根元素
-            bean = (Element) root.selectSingleNode("bean[@id="+
-                    StringRegularOpt.quotedString(sDbBeanName)+"]");
-            if(bean != null){ //
+            if (sConfFile.indexOf(':') >= 0) {
+                if (sConfFile.startsWith("classpath:")) {
+                    doc = builder.read(this.getClass().getResourceAsStream(sConfFile.substring(10)));
+                } else
+                    doc = builder.read(new File(sConfFile));
+            } else
+                doc = builder.read(this.getClass().getResourceAsStream(sConfFile));
+            Element root = doc.getRootElement();//获取根元素
+            bean = (Element) root.selectSingleNode("bean[@id=" +
+                StringRegularOpt.quotedString(sDbBeanName) + "]");
+            if (bean != null) { //
                 Element property;
 
-                property = (Element)bean.selectSingleNode("property[@name=\"url\"]");
-                if(property!=null)
+                property = (Element) bean.selectSingleNode("property[@name=\"url\"]");
+                if (property != null)
                     connUrl = property.attributeValue("value");
-                property = (Element)bean.selectSingleNode("property[@name=\"driverClassName\"]");
-                if(property!=null)
+                property = (Element) bean.selectSingleNode("property[@name=\"driverClassName\"]");
+                if (property != null)
                     driver = property.attributeValue("value");
-                property = (Element)bean.selectSingleNode("property[@name=\"username\"]");
-                if(property!=null)
+                property = (Element) bean.selectSingleNode("property[@name=\"username\"]");
+                if (property != null)
                     username = property.attributeValue("value");
-                property = (Element)bean.selectSingleNode("property[@name=\"password\"]");
-                if(property!=null)
+                property = (Element) bean.selectSingleNode("property[@name=\"password\"]");
+                if (property != null)
                     password = property.attributeValue("value");
             }
         } catch (DocumentException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
 
         dbType = DBType.mapDBType(connUrl);
     }
 
-    public static boolean testConntect(DataSourceDescription dsDesc){
-        boolean connOk = false;
-        try {
-            Class.forName(dsDesc.getDriver());//.newInstance();
-            Connection conn = DriverManager.getConnection(dsDesc.getConnUrl(),
-                    dsDesc.getUsername(),dsDesc.getPassword());
-            connOk = true;
-            conn.close();
-        } catch (ReflectiveOperationException |SQLException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
-        }
-        return connOk;
-    }
-
-    public static DataSourceDescription valueOf(IDatabaseInfo dbinfo){
-        DataSourceDescription desc = new DataSourceDescription();
-        desc.setConnUrl(dbinfo.getDatabaseUrl());
-        desc.setUsername(dbinfo.getUsername());
-        desc.setPassword(dbinfo.getClearPassword());
-        desc.setDatabaseCode(dbinfo.getDatabaseCode());
-        desc.setMaxIdle(10);
-        desc.setMaxTotal(20);
-        desc.setMaxWaitMillis(20000);
-        return desc;
-    }
-
-    public boolean testConntect(){
+    public boolean testConntect() {
         return DataSourceDescription.testConntect(this);
     }
 }

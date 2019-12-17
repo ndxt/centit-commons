@@ -6,52 +6,52 @@ import com.centit.support.database.utils.DataSourceDescription;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class ConnectThreadHolder{
+public class ConnectThreadHolder {
     private static ConnectThreadLocal threadLocal = new ConnectThreadLocal();
 
     private ConnectThreadHolder() {
         super();
     }
 
-    public static void setConnectThreadWrapper(ConnectThreadWrapper wrapper) {
-        threadLocal.set(wrapper);
-    }
-
     public static ConnectThreadWrapper getConnectThreadWrapper() {
         ConnectThreadWrapper wrapper = threadLocal.get();
-        if(wrapper == null){
+        if (wrapper == null) {
             wrapper = new ConnectThreadWrapper();
             threadLocal.set(wrapper);
         }
         return wrapper;
     }
 
-    public static Connection fetchConnect(DataSourceDescription description) throws SQLException{
+    public static void setConnectThreadWrapper(ConnectThreadWrapper wrapper) {
+        threadLocal.set(wrapper);
+    }
+
+    public static Connection fetchConnect(DataSourceDescription description) throws SQLException {
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         return wrapper.fetchConnect(description);
     }
 
-    public static Connection fetchConnect(IDatabaseInfo description) throws SQLException{
+    public static Connection fetchConnect(IDatabaseInfo description) throws SQLException {
         return fetchConnect(DataSourceDescription.valueOf(description));
     }
 
-    public static void commit() throws SQLException{
+    public static void commit() throws SQLException {
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         wrapper.commitAllWork();
     }
 
-    public static void rollback() throws SQLException{
+    public static void rollback() throws SQLException {
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         wrapper.rollbackAllWork();
     }
 
-    public static void release(){
+    public static void release() {
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         wrapper.releaseAllConnect();
         threadLocal.superRemove();
     }
 
-    public static void commitAndRelease() throws SQLException{
+    public static void commitAndRelease() throws SQLException {
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         try {
             wrapper.commitAllWork();
@@ -61,7 +61,7 @@ public class ConnectThreadHolder{
         }
     }
 
-    public static void rollbackAndRelease() throws SQLException{
+    public static void rollbackAndRelease() throws SQLException {
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         try {
             wrapper.rollbackAllWork();

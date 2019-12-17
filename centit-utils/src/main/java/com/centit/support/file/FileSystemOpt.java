@@ -8,24 +8,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 @SuppressWarnings("unused")
 public abstract class FileSystemOpt {
     private FileSystemOpt() {
         throw new IllegalAccessError("Utility class");
     }
+
     /**
      * 获取指定目录下特定后缀名的文件
      *
-     * @param dir
-     *            指定目录
-     * @param extName
-     *            指定以“”结尾的文件
+     * @param dir     指定目录
+     * @param extName 指定以“”结尾的文件
      * @return 得到的文件列表
      */
     public static List<File> findFilesByExt(String dir, String extName) {
         File dirFile = new File(dir);
         File[] fileArray = dirFile.listFiles();
-        String fileExtName = extName.startsWith(".")?extName:"."+extName;
+        String fileExtName = extName.startsWith(".") ? extName : "." + extName;
         List<File> resFiles = new ArrayList<>();
         // 如果传进来一个以文件作为对象的allList 返回0
         if (null == fileArray) {
@@ -36,7 +36,7 @@ public abstract class FileSystemOpt {
             // 如果是个目录
             if (fileArray[i].isFile()) {
                 // 如果是以“”结尾的文件
-                if (StringUtils.endsWithIgnoreCase(fileArray[i].getName(),fileExtName)) {
+                if (StringUtils.endsWithIgnoreCase(fileArray[i].getName(), fileExtName)) {
                     resFiles.add(fileArray[i]);
                 }
             }
@@ -48,8 +48,7 @@ public abstract class FileSystemOpt {
     /**
      * 在本文件夹下查找
      *
-     * @param s
-     *            String 文件名
+     * @param s String 文件名
      * @return File[] 找到的文件
      */
     public static List<File> findFiles(String s) {
@@ -59,10 +58,8 @@ public abstract class FileSystemOpt {
     /**
      * 获取文件 可以根据正则表达式查找
      *
-     * @param dir
-     *            String 文件夹名称
-     * @param s
-     *            String 查找文件名，可带*.?进行模糊查询
+     * @param dir String 文件夹名称
+     * @param s   String 查找文件名，可带*.?进行模糊查询
      * @return File[] 找到的文件
      */
     public static List<File> findFiles(String dir, String s) {
@@ -85,10 +82,8 @@ public abstract class FileSystemOpt {
     /**
      * 根据通配符查找文件
      *
-     * @param file
-     *            File 起始文件夹
-     * @param p
-     *            Pattern 匹配类型
+     * @param file File 起始文件夹
+     * @param p    Pattern 匹配类型
      * @return ArrayList 其文件夹下的文件夹
      */
 
@@ -131,6 +126,7 @@ public abstract class FileSystemOpt {
 
     /**
      * 创建目录
+     *
      * @param f 文件
      * @return 是否成功
      */
@@ -140,8 +136,9 @@ public abstract class FileSystemOpt {
         //if (f.isDirectory())
         return f.mkdirs();
         //else
-            //new File(f.getParent()).mkdir();
+        //new File(f.getParent()).mkdir();
     }
+
     /**
      * 创建目录
      *
@@ -195,11 +192,11 @@ public abstract class FileSystemOpt {
      * 使用NIO进行快速的文件拷贝
      */
     public static void fileCopy(File in, File out) throws IOException {
-        try(FileInputStream fileInputStream = new FileInputStream(in);
-            FileChannel inChannel = fileInputStream.getChannel();
-            FileOutputStream fileOutputStream = new FileOutputStream(out);
-            FileChannel outChannel = fileOutputStream.getChannel()
-        ){
+        try (FileInputStream fileInputStream = new FileInputStream(in);
+             FileChannel inChannel = fileInputStream.getChannel();
+             FileOutputStream fileOutputStream = new FileOutputStream(out);
+             FileChannel outChannel = fileOutputStream.getChannel()
+        ) {
             // inChannel.transferTo(0, inChannel.size(), outChannel); //
             // original -- apparently has trouble copying large files on Windows
 
@@ -218,9 +215,9 @@ public abstract class FileSystemOpt {
      *
      */
     public static void fileCopy(String souFile, String destFile) throws IOException {
-        if(StringUtils.equalsIgnoreCase(souFile, destFile))
+        if (StringUtils.equalsIgnoreCase(souFile, destFile))
             return;
-        fileCopy(new File(souFile),new File(destFile));
+        fileCopy(new File(souFile), new File(destFile));
     }
 
     public static boolean deleteDirect(File dir) {
@@ -241,19 +238,21 @@ public abstract class FileSystemOpt {
     public static boolean deleteDirect(String dirPath) {
         return deleteDirect(new File(dirPath));
     }
+
     /*
      *  删除成功 或者文件本来就不存在  false
      */
     public static boolean deleteFile(File file) {
-        if(file.exists())
+        if (file.exists())
             return file.delete();
         return true;
     }
 
     /**
      * 删除成功 或者文件本来就不存在  false
+     *
      * @param filePath 文件路径
-     * @return  是否删除成功
+     * @return 是否删除成功
      */
     public static boolean deleteFile(String filePath) {
         return deleteFile(new File(filePath));
@@ -263,17 +262,14 @@ public abstract class FileSystemOpt {
      * 创建临时文件
      *
      * @param inputStream 输入流
-     * @param name
-     *            文件名
-     * @param ext
-     *            扩展名
-     * @param tmpDirFile
-     *            临时文件夹目录
+     * @param name        文件名
+     * @param ext         扩展名
+     * @param tmpDirFile  临时文件夹目录
      * @return 临时文件
      * @throws IOException 异常
      */
     public static File createTmpFile(InputStream inputStream, String name, String ext, File tmpDirFile)
-            throws IOException {
+        throws IOException {
         File tmpFile;
         if (tmpDirFile == null) {
             tmpFile = File.createTempFile(name, '.' + ext);
@@ -281,7 +277,7 @@ public abstract class FileSystemOpt {
             tmpFile = File.createTempFile(name, '.' + ext, tmpDirFile);
         }
         tmpFile.deleteOnExit();
-        try(FileOutputStream fos = new FileOutputStream(tmpFile)){
+        try (FileOutputStream fos = new FileOutputStream(tmpFile)) {
             int read = 0;
             byte[] bytes = new byte[1024 * 100];
             while ((read = inputStream.read(bytes)) != -1) {
@@ -297,10 +293,8 @@ public abstract class FileSystemOpt {
      * 创建临时文件
      *
      * @param inputStream 输入流
-     * @param name
-     *            文件名
-     * @param ext
-     *            扩展名
+     * @param name        文件名
+     * @param ext         扩展名
      * @return 文件
      * @throws IOException 异常
      */
@@ -313,7 +307,7 @@ public abstract class FileSystemOpt {
      */
     public static boolean createFile(InputStream inputStream, String filePath) throws IOException {
 
-        try(FileOutputStream fos = new FileOutputStream(filePath)){
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
             int read = 0;
             byte[] bytes = new byte[1024 * 100];
             while ((read = inputStream.read(bytes)) != -1) {
@@ -325,27 +319,27 @@ public abstract class FileSystemOpt {
         }
     }
 
-    public static String transformBlackSlant(String filePath){
+    public static String transformBlackSlant(String filePath) {
         return filePath.replaceAll("\\\\", "/");
     }
 
-    public static String appendPath(String filePath, String subPath){
-        if(StringUtils.isBlank(filePath)){
+    public static String appendPath(String filePath, String subPath) {
+        if (StringUtils.isBlank(filePath)) {
             return subPath;
         }
-        if(StringUtils.isBlank(subPath)){
+        if (StringUtils.isBlank(subPath)) {
             return filePath;
         }
         int len = filePath.length();
-        char endChar = filePath.charAt(len-1);
+        char endChar = filePath.charAt(len - 1);
         char startChar = subPath.charAt(0);
-        if(endChar == '/' || endChar=='\\'){
-            if(startChar == '/' || startChar=='\\') {
+        if (endChar == '/' || endChar == '\\') {
+            if (startChar == '/' || startChar == '\\') {
                 return filePath + subPath.substring(1);
-            }else {
+            } else {
                 return filePath + subPath;
             }
-        } else if(startChar == '/' || startChar=='\\'){
+        } else if (startChar == '/' || startChar == '\\') {
             return filePath + subPath;
         } else {
             return filePath + '/' + subPath;

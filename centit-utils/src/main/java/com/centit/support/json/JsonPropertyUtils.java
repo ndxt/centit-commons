@@ -49,7 +49,7 @@ public abstract class JsonPropertyUtils {
     }
 
     public static PropertyPreFilter getExcludePropPreFilter(Map<Class<?>, String[]> excludes) {
-        if (excludes==null || excludes.isEmpty()) {
+        if (excludes == null || excludes.isEmpty()) {
             return null;
         }
 

@@ -12,13 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectThreadWrapper implements Serializable {
     private final
     Map<DataSourceDescription, Connection> connectPools;
-    public ConnectThreadWrapper(){
+
+    public ConnectThreadWrapper() {
         this.connectPools = new ConcurrentHashMap<>(4);
     }
 
     public Connection fetchConnect(DataSourceDescription description) throws SQLException {
         Connection conn = connectPools.get(description);
-        if(conn == null){
+        if (conn == null) {
             conn = DbcpConnectPools.getDbcpConnect(description);
             connectPools.put(description, conn);
         }
@@ -26,28 +27,28 @@ public class ConnectThreadWrapper implements Serializable {
     }
 
     public void commitAllWork() throws SQLException {
-        if(connectPools.size()==0){
+        if (connectPools.size() == 0) {
             return;
         }
-        for(Connection conn : connectPools.values()){
+        for (Connection conn : connectPools.values()) {
             conn.commit();
         }
     }
 
     public void rollbackAllWork() throws SQLException {
-        if(connectPools.size()==0){
+        if (connectPools.size() == 0) {
             return;
         }
-        for(Connection conn : connectPools.values()){
+        for (Connection conn : connectPools.values()) {
             conn.rollback();
         }
     }
 
-    public void releaseAllConnect(){
-        if(connectPools.size()==0){
+    public void releaseAllConnect() {
+        if (connectPools.size() == 0) {
             return;
         }
-        for(Connection conn : connectPools.values()){
+        for (Connection conn : connectPools.values()) {
             DbcpConnectPools.closeConnect(conn);
         }
         connectPools.clear();

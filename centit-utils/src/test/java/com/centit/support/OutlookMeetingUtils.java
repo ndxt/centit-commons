@@ -32,17 +32,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+
 @SuppressWarnings("unused")
 public abstract class OutlookMeetingUtils {
-    private OutlookMeetingUtils() {
-        throw new IllegalAccessError("Utility class");
-    }
-
     protected static final Logger logger = LoggerFactory.getLogger(OutlookMeetingUtils.class);
     public static String mailHost = "mail.centit.com";
     public static String mailUser = "accounts@centit.com";
     public static String mailPassword = "yhs@yhs1";
     public static int smtpPort = 25;
+    private OutlookMeetingUtils() {
+        throw new IllegalAccessError("Utility class");
+    }
 
     public static void setOutlookServer(String mailHost, String mailUser, String mailPassword) {
         OutlookMeetingUtils.mailHost = mailHost;
@@ -72,8 +72,8 @@ public abstract class OutlookMeetingUtils {
      **/
 
     public static void sendTextEmail(String content, String subject, final String sendMail, final String password,
-            List<String> receiveMail, String mailHost, int port)
-            throws MessagingException, IOException {
+                                     List<String> receiveMail, String mailHost, int port)
+        throws MessagingException, IOException {
         Properties props = new Properties();
         props.setProperty("mail.smtp.auth", "true");
         props.setProperty("mail.transport.protocol", "smtp");
@@ -111,7 +111,7 @@ public abstract class OutlookMeetingUtils {
         // 测试下来如果不这么转换的话，会以纯文本的形式发送过去，
         // 如果没有method=REQUEST;charset=\"UTF-8\"，outlook会议附件的形式存在，而不是直接打开就是一个会议请求
         messageBodyPart.setDataHandler(
-                new DataHandler(new ByteArrayDataSource(content, "text/calendar;method=REQUEST;charset=\"UTF-8\"")));
+            new DataHandler(new ByteArrayDataSource(content, "text/calendar;method=REQUEST;charset=\"UTF-8\"")));
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(messageBodyPart);
         msg.setContent(multipart);
@@ -121,7 +121,7 @@ public abstract class OutlookMeetingUtils {
     }
 
     public static void sendTextEmail(String content, String subject, List<String> receiveMail)
-            throws AddressException, MessagingException, IOException {
+        throws AddressException, MessagingException, IOException {
         sendTextEmail(content, subject, mailUser, mailPassword, receiveMail, mailHost, smtpPort);
     }
 
@@ -132,30 +132,22 @@ public abstract class OutlookMeetingUtils {
     /**
      * 将会议邀请信息生成标准格式的字符串
      *
-     * @param uid
-     *            会议唯一标示,uid == null 为新增,uid != null 为修改
-     * @param startTime
-     *            开始时间 格式yyyy-MM-dd-HH-mm-ss
-     * @param endTime
-     *            结束时间
-     * @param title
-     *            会议名称
-     * @param organizerName
-     *            组织者名称
-     * @param organizerEmail
-     *            组织者Email
-     * @param location
-     *            地点
-     * @param description
-     *            描述
-     * @param participators Pair<姓名 ，email地址>
-     *            参与者名称列表，
-     * @Return 文本
+     * @param uid            会议唯一标示,uid == null 为新增,uid != null 为修改
+     * @param startTime      开始时间 格式yyyy-MM-dd-HH-mm-ss
+     * @param endTime        结束时间
+     * @param title          会议名称
+     * @param organizerName  组织者名称
+     * @param organizerEmail 组织者Email
+     * @param location       地点
+     * @param description    描述
+     * @param participators  Pair<姓名 ，email地址>
+     *                       参与者名称列表，
      * @throws IOException 异常
+     * @Return 文本
      */
     private static String makeICalMeetingText(Uid uid, Date startTime, Date endTime, String title,
-            String organizerName, String organizerEmail, String location, String description,
-            List<Pair<String, String>> participators) throws IOException {
+                                              String organizerName, String organizerEmail, String location, String description,
+                                              List<Pair<String, String>> participators) throws IOException {
         // 创建事件
         DateTime start = utilDateToIcalDatetime(startTime);
         DateTime end = utilDateToIcalDatetime(endTime);
@@ -222,8 +214,8 @@ public abstract class OutlookMeetingUtils {
      * 删除已预订过的会议
      */
     private static String makeICalCancelMeetingText(Uid uid,
-            Date startTime, Date endTime, String title, String organizerName,
-            String organizerEmail, String location, String description) throws IOException {
+                                                    Date startTime, Date endTime, String title, String organizerName,
+                                                    String organizerEmail, String location, String description) throws IOException {
 
         // 创建一个时区（TimeZone)
         // 创建事件
@@ -266,33 +258,26 @@ public abstract class OutlookMeetingUtils {
     /**
      * 新增
      *
-     * @param startTime
-     *            开始时间 格式yyyy-MM-dd-HH-mm-ss
-     * @param endTime
-     *            结束时间
-     * @param title
-     *            会议名称
-     * @param organizerName
-     *            组织者名称
-     * @param organizerEmail
-     *            组织者Email
-     * @param location
-     *            地点
-     * @param description
-     *            描述
-     * @param participators Pair 姓名 ，email地址
-     *            参与者名称列表，
+     * @param startTime      开始时间 格式yyyy-MM-dd-HH-mm-ss
+     * @param endTime        结束时间
+     * @param title          会议名称
+     * @param organizerName  组织者名称
+     * @param organizerEmail 组织者Email
+     * @param location       地点
+     * @param description    描述
+     * @param participators  Pair 姓名 ，email地址
+     *                       参与者名称列表，
      * @return String 返回 会议id  长度 60
      * @throws MessagingException 异常
-     * @throws IOException 异常
+     * @throws IOException        异常
      */
     public static String createMeeting(Date startTime, Date endTime, String title, String organizerName,
-            String organizerEmail, String location, String description, List<Pair<String, String>> participators)
-            throws MessagingException, IOException {
+                                       String organizerEmail, String location, String description, List<Pair<String, String>> participators)
+        throws MessagingException, IOException {
         UidGenerator ug = new RandomUidGenerator();// new UidGenerator("uidGen");
         Uid uid = ug.generateUid();
         String content = makeICalMeetingText(uid, startTime, endTime, title, organizerName, organizerEmail,
-                location, description, participators);
+            location, description, participators);
         List<String> receiveMail = new ArrayList<String>();
         for (Pair<String, String> p : participators) {
             receiveMail.add(p.getRight());
@@ -304,33 +289,25 @@ public abstract class OutlookMeetingUtils {
     /**
      * 更新已预订过的会议
      *
-     * @param uidStr
-     *            会议ID
-     * @param startTime
-     *            开始时间 格式yyyy-MM-dd-HH-mm-ss
-     * @param endTime
-     *            结束时间
-     * @param title
-     *            会议名称
-     * @param organizerName
-     *            组织者名称
-     * @param organizerEmail
-     *            组织者Email
-     * @param location
-     *            地点
-     * @param description
-     *            会议内容描述
-     * @param participators Pair 姓名 ，email地址
-     *            参与者名称列表，
+     * @param uidStr         会议ID
+     * @param startTime      开始时间 格式yyyy-MM-dd-HH-mm-ss
+     * @param endTime        结束时间
+     * @param title          会议名称
+     * @param organizerName  组织者名称
+     * @param organizerEmail 组织者Email
+     * @param location       地点
+     * @param description    会议内容描述
+     * @param participators  Pair 姓名 ，email地址
+     *                       参与者名称列表，
      * @throws MessagingException 异常
-     * @throws IOException 异常
+     * @throws IOException        异常
      */
     public static void updateMeeting(String uidStr, Date startTime, Date endTime, String title, String organizerName,
-            String organizerEmail, String location, String description, List<Pair<String, String>> participators)
-            throws MessagingException, IOException {
+                                     String organizerEmail, String location, String description, List<Pair<String, String>> participators)
+        throws MessagingException, IOException {
         Uid uid = new Uid(uidStr);
         String content = makeICalMeetingText(uid, startTime, endTime, title, organizerName, organizerEmail,
-                location, description, participators);
+            location, description, participators);
         List<String> receiveMail = new ArrayList<String>();
         for (Pair<String, String> p : participators) {
             receiveMail.add(p.getRight());
@@ -340,34 +317,25 @@ public abstract class OutlookMeetingUtils {
     }
 
     /**
-     *
-     * @param uidStr
-     *            会议ID
-     * @param startTime
-     *            开始时间 格式yyyy-MM-dd-HH-mm-ss
-     * @param endTime
-     *            结束时间
-     * @param title
-     *            会议名称
-     * @param organizerName
-     *            组织者名称
-     * @param organizerEmail
-     *            组织者Email
-     * @param location
-     *            地点
-     * @param description
-     *            会议内容描述
-     * @param participators Pair 姓名 ，email地址
-     *            参与者名称列表，
+     * @param uidStr         会议ID
+     * @param startTime      开始时间 格式yyyy-MM-dd-HH-mm-ss
+     * @param endTime        结束时间
+     * @param title          会议名称
+     * @param organizerName  组织者名称
+     * @param organizerEmail 组织者Email
+     * @param location       地点
+     * @param description    会议内容描述
+     * @param participators  Pair 姓名 ，email地址
+     *                       参与者名称列表，
      * @throws MessagingException 异常
-     * @throws IOException 异常
+     * @throws IOException        异常
      */
     public static void deleteMeeting(String uidStr, Date startTime, Date endTime, String title, String organizerName,
-            String organizerEmail, String location, String description,List<Pair<String, String>> participators)
-            throws  MessagingException, IOException {
+                                     String organizerEmail, String location, String description, List<Pair<String, String>> participators)
+        throws MessagingException, IOException {
         Uid uid = new Uid(uidStr);
         String content = makeICalCancelMeetingText(uid, startTime, endTime, title, organizerName, organizerEmail,
-                location,description);
+            location, description);
         List<String> receiveMail = new ArrayList<String>();
         for (Pair<String, String> p : participators) {
             receiveMail.add(p.getRight());

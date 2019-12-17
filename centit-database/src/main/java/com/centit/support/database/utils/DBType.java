@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum DBType {
-    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM, KingBase,GBase, Oscar;
+    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM, KingBase, GBase, Oscar;
     protected static final Logger logger = LoggerFactory.getLogger(DBType.class);
     private static HashMap<DBType, String> dbDrivers = new HashMap<DBType, String>() {
         {
@@ -22,9 +22,9 @@ public enum DBType {
             put(H2, "org.h2.Driver");
             put(PostgreSql, "org.postgresql.Driver");
             put(DM, "dm.jdbc.driver.DmDriver");
-            put(KingBase,"com.kingbase.Driver");
-            put(GBase,"com.gbasedbt.jdbc.IfxDriver");
-            put(Oscar,"com.oscar.Driver");
+            put(KingBase, "com.kingbase.Driver");
+            put(GBase, "com.gbasedbt.jdbc.IfxDriver");
+            put(Oscar, "com.oscar.Driver");
         }
     };
 
@@ -219,7 +219,7 @@ public enum DBType {
         return DBType.getDBTypeName(this);
     }
 
-    public boolean isMadeInChina(){
+    public boolean isMadeInChina() {
         return DBType.DM.equals(this)
             || DBType.KingBase.equals(this)
             || DBType.GBase.equals(this)

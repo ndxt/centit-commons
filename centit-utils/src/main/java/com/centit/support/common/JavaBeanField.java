@@ -15,20 +15,18 @@ import java.lang.reflect.Method;
 public class JavaBeanField {
 
     private static final Logger logger = LoggerFactory.getLogger(JavaBeanField.class);
-
-    public JavaBeanField(){
-
-    }
-
-    public JavaBeanField(Field objectField){
-        this.setObjectField(objectField);
-    }
     // 缓存变量
     private String fieldJavaType;
     private Class<?> fieldType;
     private Method setFieldValueFunc;
     private Method getFieldValueFunc;
     private Field objectField;
+    public JavaBeanField() {
+
+    }
+    public JavaBeanField(Field objectField) {
+        this.setObjectField(objectField);
+    }
 
     public Method getSetFieldValueFunc() {
         return setFieldValueFunc;
@@ -50,6 +48,12 @@ public class JavaBeanField {
         return objectField;
     }
 
+    public void setObjectField(Field objectField) {
+        this.objectField = objectField;
+        this.setFieldType(objectField.getType());
+
+    }
+
     public Class<?> getFieldType() {
         return fieldType;
     }
@@ -61,50 +65,45 @@ public class JavaBeanField {
 
     /**
      * 在 ExcelImportUtil 中使用
+     *
      * @return JAVA类名
      */
-    public String getFieldJavaTypeShortName(){
+    public String getFieldJavaTypeShortName() {
         return this.fieldJavaType;
     }
 
-    public void setObjectField(Field objectField) {
-        this.objectField = objectField;
-        this.setFieldType(objectField.getType());
-
-    }
-
-    public boolean isAssignableFrom(Class<?> valueType){
+    public boolean isAssignableFrom(Class<?> valueType) {
         return this.fieldType.isAssignableFrom(valueType);
     }
 
     private void innerSetObjectFieldValue(Object obj, Object fieldValue) {
         //if( fieldType.isAssignableFrom(fieldValue.getClass()) ) {
-            try {
-                if (setFieldValueFunc != null) {
-                    setFieldValueFunc.invoke(obj, fieldValue);
-                } else {
+        try {
+            if (setFieldValueFunc != null) {
+                setFieldValueFunc.invoke(obj, fieldValue);
+            } else {
 
-                    boolean accessible = objectField.isAccessible();
-                    if (!accessible) {
-                        objectField.setAccessible(true);
-                    }
-                    objectField.set(obj, fieldValue);
-                    if (!accessible) {
-                        objectField.setAccessible(accessible);
-                    }
+                boolean accessible = objectField.isAccessible();
+                if (!accessible) {
+                    objectField.setAccessible(true);
                 }
-            } catch (InvocationTargetException | IllegalAccessException e) {
-                logger.error(e.getMessage(), e);
+                objectField.set(obj, fieldValue);
+                if (!accessible) {
+                    objectField.setAccessible(accessible);
+                }
             }
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            logger.error(e.getMessage(), e);
+        }
         //}
     }
 
-    public void setObjectFieldValue(Object object, Object newValue){
-        if(newValue==null){
+    public void setObjectFieldValue(Object object, Object newValue) {
+        if (newValue == null) {
             //if(this.getFieldType().isPrimitive()){
-            if( (this.fieldType !=null && this.fieldType.isPrimitive())
-                || StringUtils.equalsAny( this.fieldJavaType,
-                    "int","long","float","double")){
+            if ((this.fieldType != null && this.fieldType.isPrimitive())
+                || StringUtils.equalsAny(this.fieldJavaType,
+                "int", "long", "float", "double")) {
                 return;
             }
             this.innerSetObjectFieldValue(object, null);
@@ -116,7 +115,7 @@ public class JavaBeanField {
             return;
         }
         // 这个专门针对数据库中 保存的 枚举型数据类型
-        if(this.fieldType.isEnum()){
+        if (this.fieldType.isEnum()) {
             this.innerSetObjectFieldValue(object,
                 EnumBaseOpt.ordinalToEnum(this.fieldType,
                     NumberBaseOpt.castObjectToInteger(newValue)));
@@ -127,52 +126,52 @@ public class JavaBeanField {
             case "int":
             case "Integer":
                 this.innerSetObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToInteger(newValue));
+                    NumberBaseOpt.castObjectToInteger(newValue));
                 break;
             case "long":
             case "Long":
                 this.innerSetObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToLong(newValue));
+                    NumberBaseOpt.castObjectToLong(newValue));
                 break;
             case "float":
             case "double":
             case "Float":
             case "Double":
                 this.innerSetObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToDouble(newValue));
+                    NumberBaseOpt.castObjectToDouble(newValue));
                 break;
             case "byte[]":
                 this.innerSetObjectFieldValue(object,
-                        ByteBaseOpt.castObjectToBytes(newValue));
+                    ByteBaseOpt.castObjectToBytes(newValue));
                 break;
             case "BigDecimal":
                 this.innerSetObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToBigDecimal(newValue));
+                    NumberBaseOpt.castObjectToBigDecimal(newValue));
                 break;
             case "BigInteger":
                 this.innerSetObjectFieldValue(object,
-                        NumberBaseOpt.castObjectToBigInteger(newValue));
+                    NumberBaseOpt.castObjectToBigInteger(newValue));
                 break;
             case "String":
                 this.innerSetObjectFieldValue(object,
-                        StringBaseOpt.objectToString(newValue));
+                    StringBaseOpt.objectToString(newValue));
                 break;
             case "Date":
                 this.innerSetObjectFieldValue(object,
-                        DatetimeOpt.castObjectToDate(newValue));
+                    DatetimeOpt.castObjectToDate(newValue));
                 break;
             case "sqlDate":
                 this.innerSetObjectFieldValue(object,
-                        DatetimeOpt.castObjectToSqlDate(newValue));
+                    DatetimeOpt.castObjectToSqlDate(newValue));
                 break;
             case "sqlTimestamp":
                 this.innerSetObjectFieldValue(object,
-                        DatetimeOpt.castObjectToSqlTimestamp(newValue));
+                    DatetimeOpt.castObjectToSqlTimestamp(newValue));
                 break;
             case "boolean":
             case "Boolean":
                 this.innerSetObjectFieldValue(object,
-                        BooleanBaseOpt.castObjectToBoolean(newValue, false));
+                    BooleanBaseOpt.castObjectToBoolean(newValue, false));
                 break;
             default:
                 this.innerSetObjectFieldValue(object, newValue);
@@ -186,11 +185,11 @@ public class JavaBeanField {
                 return getFieldValueFunc.invoke(obj);
             } else {
                 boolean accessible = objectField.isAccessible();
-                if(!accessible) {
+                if (!accessible) {
                     objectField.setAccessible(true);
                 }
                 Object result = objectField.get(obj);
-                if(!accessible) {
+                if (!accessible) {
                     objectField.setAccessible(accessible);
                 }
                 return result;

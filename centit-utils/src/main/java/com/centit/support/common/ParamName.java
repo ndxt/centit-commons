@@ -17,6 +17,7 @@ public @interface ParamName {
 
     /**
      * 是否可以为空
+     *
      * @return true可以为空 false 不能为空
      */
     boolean nullable() default true;

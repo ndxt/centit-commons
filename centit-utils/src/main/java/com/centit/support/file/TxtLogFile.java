@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- *
  * 这个类是用来对纯文本的文件追加文本内容
  * 可以用来写操作日志
- *
+ * <p>
  * 他有两组函数，一组静态函数打开、写入、关闭 一次完成
- *                 一组是类成员函数，可以打开，重复写入，关闭，
+ * 一组是类成员函数，可以打开，重复写入，关闭，
  * 两组成员函数用于不同的场合
  *
  * @author codefan
@@ -23,54 +22,52 @@ import java.io.Writer;
 @SuppressWarnings("unused")
 public class TxtLogFile {
     protected static final Logger logger = LoggerFactory.getLogger(TxtLogFile.class);
+    private BufferedWriter logWriter;
+    private FileWriter fileWriter;
 
-    private final static void innerWriteLog(Writer bw, String slog, boolean bNewLine, boolean bShowTime) throws IOException{
-        if(bShowTime){
+    private final static void innerWriteLog(Writer bw, String slog, boolean bNewLine, boolean bShowTime) throws IOException {
+        if (bShowTime) {
             bw.write(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(),
                 DatetimeOpt.getDateTimePattern()));
             bw.write(" -- ");
-         }
+        }
         bw.write(slog);
-        if(bNewLine){
+        if (bNewLine) {
             bw.write("\r\n");
         }
     }
 
-    public static void writeLog(String sLogFileName,String slog, boolean bNewLine,boolean bShowTime){
-        try(BufferedWriter bw = new BufferedWriter(
-                 new FileWriter(sLogFileName, true))){
-            innerWriteLog(bw,slog,bNewLine,bShowTime);
+    public static void writeLog(String sLogFileName, String slog, boolean bNewLine, boolean bShowTime) {
+        try (BufferedWriter bw = new BufferedWriter(
+            new FileWriter(sLogFileName, true))) {
+            innerWriteLog(bw, slog, bNewLine, bShowTime);
             bw.flush();
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
     }
 
-    public static void writeLogEx(String sLogFileName,String slog, boolean bNewLine,boolean bShowTime){
-        try(BufferedWriter bw = new BufferedWriter(
-                 new FileWriter(sLogFileName, true))){
-            innerWriteLog(bw,slog,bNewLine,bShowTime);
-            System.out.println(DatetimeOpt.currentDatetime() + " - "+ slog);
+    public static void writeLogEx(String sLogFileName, String slog, boolean bNewLine, boolean bShowTime) {
+        try (BufferedWriter bw = new BufferedWriter(
+            new FileWriter(sLogFileName, true))) {
+            innerWriteLog(bw, slog, bNewLine, bShowTime);
+            System.out.println(DatetimeOpt.currentDatetime() + " - " + slog);
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
     }
 
-
-    public static void writeLog(String sLogFileName,String slog){
-        try(BufferedWriter bw = new BufferedWriter(
-                     new FileWriter(sLogFileName, true))){
+    public static void writeLog(String sLogFileName, String slog) {
+        try (BufferedWriter bw = new BufferedWriter(
+            new FileWriter(sLogFileName, true))) {
             bw.write(slog);
             //bw.close();
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
     }
 
-    private BufferedWriter logWriter;
-    private FileWriter fileWriter;
-
-    public boolean openLogFile(String sLogFileName){
+    public boolean openLogFile(String sLogFileName) {
         closeLogFile();
         boolean bOpened = false;
         try {
@@ -78,40 +75,40 @@ public class TxtLogFile {
             logWriter = new BufferedWriter(fileWriter);
             bOpened = true;
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
         return bOpened;
     }
 
-    public boolean closeLogFile(){
+    public boolean closeLogFile() {
         boolean bClosed = false;
         try {
-            if(logWriter!=null ) {
+            if (logWriter != null) {
                 logWriter.close();
                 fileWriter.close();
             }
             logWriter = null;
             bClosed = true;
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
         return bClosed;
     }
 
-    public void writeLog(String slog, boolean bNewLine,boolean bShowTime){
+    public void writeLog(String slog, boolean bNewLine, boolean bShowTime) {
         try {
-            innerWriteLog(logWriter,slog,bNewLine,bShowTime);
+            innerWriteLog(logWriter, slog, bNewLine, bShowTime);
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
     }
 
-    public void writeLogEx(String slog, boolean bNewLine,boolean bShowTime){
+    public void writeLogEx(String slog, boolean bNewLine, boolean bShowTime) {
         try {
-            innerWriteLog(logWriter,slog,bNewLine,bShowTime);
-            System.out.println(DatetimeOpt.currentDatetime() + " - "+ slog);
+            innerWriteLog(logWriter, slog, bNewLine, bShowTime);
+            System.out.println(DatetimeOpt.currentDatetime() + " - " + slog);
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
     }
 }

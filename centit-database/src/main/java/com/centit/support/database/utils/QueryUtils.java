@@ -17,9 +17,6 @@ import java.util.*;
 @SuppressWarnings("unused")
 public abstract class QueryUtils {
 
-    private QueryUtils() {
-        throw new IllegalAccessError("Utility class");
-    }
     /**
      * 表示这个参数不需要
      */
@@ -36,7 +33,6 @@ public abstract class QueryUtils {
      * 用于like语句，只在参数前面添加一个 %
      */
     public static final String SQL_PRETREAT_ENDWITH = "ENDWITH";
-
     /**
      * 转化为日期类型,
      */
@@ -50,7 +46,6 @@ public abstract class QueryUtils {
     public static final String SQL_PRETREAT_PREV_DAY = "PREVDAY";
     public static final String SQL_PRETREAT_PREV_MONTH = "PREVMONTH";
     public static final String SQL_PRETREAT_PREV_YEAR = "PREVYEAR";
-
     /**
      * 转化为带时间的，日期的类型
      */
@@ -95,7 +90,6 @@ public abstract class QueryUtils {
      * 转化为 Double 类型
      */
     public static final String SQL_PRETREAT_FLOAT = "FLOAT";
-
     /**
      * 将对象转换为 String， 如果是数组用 ','连接。
      */
@@ -105,7 +99,8 @@ public abstract class QueryUtils {
      * 或者hibernate中的hql用这个处理就可以了，先腾实现的jpa也支持数组参数
      */
     public static final String SQL_PRETREAT_SPLITFORIN = "SPLITFORIN";
-    /** 对于不支持数组参数的执行引擎，需要将参数按照数值的格式进行扩展
+    /**
+     * 对于不支持数组参数的执行引擎，需要将参数按照数值的格式进行扩展
      * 修改语句中的 命名参数，使其能够接受 多个参数以便用于in语句，比如： in(:a)
      * 传入a为一个数组，会根据a的实际长度变为 in(:a0,:a1,a2,......)
      */
@@ -114,13 +109,18 @@ public abstract class QueryUtils {
      * 将参数值 拼接到 sql对应的参数位置，同时要避免sql注入；一般用与Order by中
      */
     public static final String SQL_PRETREAT_INPLACE = "INPLACE";
-
     /**
      * 过滤参数中的html标签
      */
     public static final String SQL_PRETREAT_ESCAPE_HTML = "ESCAPEHTML";
+
+    private QueryUtils() {
+        throw new IllegalAccessError("Utility class");
+    }
+
     /**
      * 把字符串string包装成'string',并将字符传中的数里的"'"替换为“''”
+     *
      * @param value value
      * @return 对应的'value'
      */
@@ -131,14 +131,14 @@ public abstract class QueryUtils {
     }
 
 
-    public static String buildObjectsStringForQuery(Object [] objects) {
-        if (objects == null || objects.length<1)
+    public static String buildObjectsStringForQuery(Object[] objects) {
+        if (objects == null || objects.length < 1)
             return "()";
         StringBuilder sb = new StringBuilder("(");
-        int dataCount=0;
-        for(Object obj:objects){
-            if(obj!=null){
-                if(dataCount>0)
+        int dataCount = 0;
+        for (Object obj : objects) {
+            if (obj != null) {
+                if (dataCount > 0)
                     sb.append(",");
                 sb.append(buildStringForQuery(String.valueOf(obj)));
                 dataCount++;
@@ -149,13 +149,13 @@ public abstract class QueryUtils {
     }
 
     public static String buildObjectsStringForQuery(Collection<?> objects) {
-        if (objects == null || objects.size()<1)
+        if (objects == null || objects.size() < 1)
             return "()";
         StringBuilder sb = new StringBuilder("(");
-        int dataCount=0;
-        for(Object obj:objects){
-            if(obj!=null){
-                if(dataCount>0)
+        int dataCount = 0;
+        for (Object obj : objects) {
+            if (obj != null) {
+                if (dataCount > 0)
                     sb.append(",");
                 sb.append(buildStringForQuery(String.valueOf(obj)));
                 dataCount++;
@@ -166,37 +166,39 @@ public abstract class QueryUtils {
     }
 
     public static String buildObjectStringForQuery(Object fieldValue) {
-        if(fieldValue instanceof java.util.Date){
-            return QueryUtils.buildDatetimeStringForQuery((java.util.Date)fieldValue);
-        }else if(fieldValue instanceof java.sql.Date){
-            return QueryUtils.buildDatetimeStringForQuery((java.sql.Date)fieldValue);
-        }else if(fieldValue.getClass().getSuperclass().equals(Number.class)){
+        if (fieldValue instanceof java.util.Date) {
+            return QueryUtils.buildDatetimeStringForQuery((java.util.Date) fieldValue);
+        } else if (fieldValue instanceof java.sql.Date) {
+            return QueryUtils.buildDatetimeStringForQuery((java.sql.Date) fieldValue);
+        } else if (fieldValue.getClass().getSuperclass().equals(Number.class)) {
             return fieldValue.toString();
-        }else if(fieldValue instanceof Object[]) {
+        } else if (fieldValue instanceof Object[]) {
             return QueryUtils.buildObjectsStringForQuery((Object[]) fieldValue);
-        }else if(fieldValue instanceof Collection<?>) {
+        } else if (fieldValue instanceof Collection<?>) {
             return QueryUtils.buildObjectsStringForQuery((Collection<?>) fieldValue);
-        }else {
+        } else {
             return QueryUtils.buildStringForQuery(fieldValue.toString());
         }
     }
 
     public static String buildDateStringForQuery(Date value) {
         return "'" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd")
-                + "'";
+            + "'";
     }
+
     public static String buildDateStringForQuery(java.sql.Date value) {
         return "'" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd")
-                + "'";
+            + "'";
     }
 
     public static String buildDatetimeStringForQuery(Date value) {
         return "'" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd HH:mm:ss")
-                + "'";
+            + "'";
     }
+
     public static String buildDatetimeStringForQuery(java.sql.Date value) {
         return "'" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd HH:mm:ss")
-                + "'";
+            + "'";
     }
 
     /**
@@ -207,11 +209,12 @@ public abstract class QueryUtils {
      */
     public static String buildDateStringForOracle(Date value) {
         return "TO_DATE('" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd")
-                + "','yyyy-MM-dd')";
+            + "','yyyy-MM-dd')";
     }
+
     public static String buildDateStringForOracle(java.sql.Date value) {
         return "TO_DATE('" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd")
-                + "','yyyy-MM-dd')";
+            + "','yyyy-MM-dd')";
     }
 
 
@@ -224,17 +227,18 @@ public abstract class QueryUtils {
      */
     public static String buildDateTimeStringForOracle(java.util.Date value) {
         return "TO_DATE('" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd HH:mm:ss")
-                + "','yyyy-MM-dd hh24:mi:ss')";
+            + "','yyyy-MM-dd hh24:mi:ss')";
     }
 
     public static String buildDateTimeStringForOracle(java.sql.Date value) {
         return "TO_DATE('" + DatetimeOpt.convertDateToString(value, "yyyy-MM-dd HH:mm:ss")
-                + "','yyyy-MM-dd hh24:mi:ss')";
+            + "','yyyy-MM-dd hh24:mi:ss')";
     }
 
-     /**
+    /**
      * 将string中的 空格换成 % 作为like语句的匹配串
      * 比如在客户端输入 “hello world”，会转变为  "%hello%world%"，即将头尾和中间的空白转换为%用于匹配。
+     *
      * @param sMatch sMatch
      * @return String
      */
@@ -244,17 +248,17 @@ public abstract class QueryUtils {
         int sL = sMatch.length();
         for (int i = 0; i < sL; i++) {
             curChar = sMatch.charAt(i);
-            if ((curChar == ' ') || (curChar == '\t')  || (curChar == '%') || (curChar == '*')) {
+            if ((curChar == ' ') || (curChar == '\t') || (curChar == '%') || (curChar == '*')) {
                 curChar = '%';
                 if (preChar != '%') {
                     sRes.append(curChar);
                     preChar = curChar;
                 }
-            } else if (curChar == '?' ){
+            } else if (curChar == '?') {
                 //|| curChar == '\'' || curChar == '\"' || curChar == '<' || curChar == '>') {
                 sRes.append("_");
                 preChar = curChar;
-            }else{
+            } else {
                 sRes.append(curChar);
                 preChar = curChar;
             }
@@ -263,38 +267,42 @@ public abstract class QueryUtils {
             sRes.append('%');
         return sRes.toString();
     }
+
     /**
      * 将查序变量中 用于 like语句的变量转换为match字符串，比如“hello world”会转变为  "%hello%world%"，
+     *
      * @param queryParams 查询命名变量和值对
-     * @param likeParams 用于like 的变量名
+     * @param likeParams  用于like 的变量名
      * @return 返回在查询变量中找到的like变量
      */
-    public static int replaceMatchParams(Map<String,Object> queryParams,Collection<String> likeParams){
-        if(likeParams==null||likeParams.size()==0||queryParams==null)
+    public static int replaceMatchParams(Map<String, Object> queryParams, Collection<String> likeParams) {
+        if (likeParams == null || likeParams.size() == 0 || queryParams == null)
             return 0;
-        int n=0;
-        for(String f:likeParams){
+        int n = 0;
+        for (String f : likeParams) {
             Object value = queryParams.get(f);
-            if(value!=null){
+            if (value != null) {
                 queryParams.put(f, getMatchString(StringBaseOpt.objectToString(value)));
                 n++;
             }
         }
         return n;
     }
+
     /**
      * 将查序变量中 用于 like语句的变量转换为match字符串，比如“hello world”会转变为  "%hello%world%"，
+     *
      * @param queryParams 查询命名变量和值对
-     * @param likeParams 用于like 的变量名
+     * @param likeParams  用于like 的变量名
      * @return 返回在查询变量中找到的like变量
      */
-    public static int replaceMatchParams(Map<String,Object> queryParams,String... likeParams){
-        if(likeParams==null||likeParams.length==0||queryParams==null)
+    public static int replaceMatchParams(Map<String, Object> queryParams, String... likeParams) {
+        if (likeParams == null || likeParams.length == 0 || queryParams == null)
             return 0;
-        int n=0;
-        for(String f:likeParams){
+        int n = 0;
+        for (String f : likeParams) {
             Object value = queryParams.get(f);
-            if(value!=null){
+            if (value != null) {
                 queryParams.put(f, getMatchString(StringBaseOpt.objectToString(value)));
                 n++;
             }
@@ -305,11 +313,12 @@ public abstract class QueryUtils {
 
     /**
      * 去掉 order by 语句
+     *
      * @param sql sql
      * @return sql
      */
-    public static boolean hasOrderBy(String sql){
-        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+    public static boolean hasOrderBy(String sql) {
+        Lexer lex = new Lexer(sql, Lexer.LANG_TYPE_SQL);
         String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord) && !"order".equalsIgnoreCase(aWord)) {
             aWord = lex.getAWord();
@@ -319,11 +328,12 @@ public abstract class QueryUtils {
 
     /**
      * 去掉 order by 语句
+     *
      * @param sql sql
      * @return sql
      */
-    public static String removeOrderBy(String sql){
-        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+    public static String removeOrderBy(String sql) {
+        Lexer lex = new Lexer(sql, Lexer.LANG_TYPE_SQL);
         String aWord = lex.getAWord();
         int nPos = lex.getCurrPos();
         while (aWord != null && !"".equals(aWord) && !"order".equalsIgnoreCase(aWord)) {
@@ -340,11 +350,12 @@ public abstract class QueryUtils {
 
     /**
      * 去掉 order by 语句
+     *
      * @param sql sql
      * @return sql
      */
-    public static String getGroupByField(String sql){
-        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+    public static String getGroupByField(String sql) {
+        Lexer lex = new Lexer(sql, Lexer.LANG_TYPE_SQL);
         String aWord = lex.getAWord();
 
         while (aWord != null && !"".equals(aWord) && !"group".equalsIgnoreCase(aWord)) {
@@ -357,12 +368,12 @@ public abstract class QueryUtils {
                 return null;
 
         }
-        if("group".equalsIgnoreCase(aWord)){
-             while (aWord != null && !"".equals(aWord) && !"by".equalsIgnoreCase(aWord)){
-                 aWord = lex.getAWord();
-             }
+        if ("group".equalsIgnoreCase(aWord)) {
+            while (aWord != null && !"".equals(aWord) && !"by".equalsIgnoreCase(aWord)) {
+                aWord = lex.getAWord();
+            }
         }
-        if(!"by".equalsIgnoreCase(aWord))
+        if (!"by".equalsIgnoreCase(aWord))
             return null;
         int nPos = lex.getCurrPos();
         int nEnd = nPos;
@@ -371,8 +382,8 @@ public abstract class QueryUtils {
             nEnd = lex.getCurrPos();
             aWord = lex.getAWord();
         }
-        if(nEnd>nPos)
-            return sql.substring(nPos,nEnd);
+        if (nEnd > nPos)
+            return sql.substring(nPos, nEnd);
         return null;
     }
 
@@ -385,9 +396,9 @@ public abstract class QueryUtils {
      * @param sql sql
      * @return sql
      */
-    public static List<String> splitSqlByFields(String sql){
+    public static List<String> splitSqlByFields(String sql) {
 
-        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+        Lexer lex = new Lexer(sql, Lexer.LANG_TYPE_SQL);
         List<String> sqlPiece = new ArrayList<>(5);
         int sl = sql.length();
         String aWord = lex.getAWord();
@@ -404,12 +415,12 @@ public abstract class QueryUtils {
         int nSelectPos = lex.getCurrPos();
         int nFieldBegin = nSelectPos;
 
-        if(nSelectPos>=sl){
+        if (nSelectPos >= sl) {
             lex.setFormula(sql);
-            nSelectPos=0;
-            nFieldBegin=0;
+            nSelectPos = 0;
+            nFieldBegin = 0;
             aWord = lex.getAWord();
-        }else{
+        } else {
             //特别处理sql server 的 top 语句
             aWord = lex.getAWord();
             if ("top".equalsIgnoreCase(aWord)) {
@@ -419,7 +430,7 @@ public abstract class QueryUtils {
             }
         }
 
-        while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)){
+        while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
             if (aWord.equals("(")) {
                 lex.seekToRightBracket();
             }
@@ -441,6 +452,7 @@ public abstract class QueryUtils {
      * 将查询语句转换为相同条件的查询符合条件的记录数的语句, 需要考虑with语句
      * 即将 select 的字段部分替换为 count(*) 并去掉 order by排序部分
      * 对查询语句中有distinct的sql语句不使用
+     *
      * @param sql sql
      * @return sql
      */
@@ -448,20 +460,22 @@ public abstract class QueryUtils {
         List<String> sqlPieces = splitSqlByFields(sql);
         if (sqlPieces == null || sqlPieces.size() < 3)
             return "";
-        if(StringUtils.isBlank(sqlPieces.get(0))) {
+        if (StringUtils.isBlank(sqlPieces.get(0))) {
             sqlPieces.set(0, "select");
         }
 
         String groupByField = QueryUtils.getGroupByField(sqlPieces.get(2));
-        if(groupByField==null)
-             return sqlPieces.get(0) + " count(*) as rowcounts from " +
-                     removeOrderBy(sqlPieces.get(2));
+        if (groupByField == null)
+            return sqlPieces.get(0) + " count(*) as rowcounts from " +
+                removeOrderBy(sqlPieces.get(2));
 
-        return sqlPieces.get(0) + " count(*) as rowcounts from (select "+
-             groupByField  + " from " + removeOrderBy(sqlPieces.get(2)) + ") a";
+        return sqlPieces.get(0) + " count(*) as rowcounts from (select " +
+            groupByField + " from " + removeOrderBy(sqlPieces.get(2)) + ") a";
     }
+
     /**
      * 通过子查询来实现获取计数语句
+     *
      * @param sql sql 或者 hql 语句
      * @return sql
      */
@@ -470,21 +484,21 @@ public abstract class QueryUtils {
         if (sqlPieces == null || sqlPieces.size() < 3)
             return "";
 
-        if(StringUtils.isBlank(sqlPieces.get(0))) {
+        if (StringUtils.isBlank(sqlPieces.get(0))) {
             sqlPieces.set(0, "select");
         }
         //这个仅仅为了兼容hibernate
-        if("from".equalsIgnoreCase(sqlPieces.get(1).trim())) {
+        if ("from".equalsIgnoreCase(sqlPieces.get(1).trim())) {
             sqlPieces.set(1, " * from");
         }
 
-        return sqlPieces.get(0) + " count(*) as rowCounts from (select "+
+        return sqlPieces.get(0) + " count(*) as rowCounts from (select " +
             sqlPieces.get(1) + sqlPieces.get(2) + ") a";
     }
 
     /**
      * sql 语句可以用 子查询和替换查询字段的方式获得总数，
-     *     但是 有distinct的语句只能用子查询的方式。distinct的语句也可以用 group by的方式来转换，
+     * 但是 有distinct的语句只能用子查询的方式。distinct的语句也可以用 group by的方式来转换，
      *
      * @param sql sql
      * @return sql
@@ -495,76 +509,78 @@ public abstract class QueryUtils {
 
     /**
      * hql语句不能用子查询的方式，只能用buildGetCountSQLByReplaceFields
+     *
      * @param hql sql
      * @return sql
      */
     public static String buildGetCountHQL(String hql) {
         return buildGetCountSQLByReplaceFields(hql);
     }
+
     /**
      * 生成PostgreSql分页查询语句
-     * @param sql sql
-     * @param offset offset
-     * @param maxsize maxsize
+     *
+     * @param sql         sql
+     * @param offset      offset
+     * @param maxsize     maxsize
      * @param asParameter asParameter
      * @return String
      */
-    public static String buildPostgreSqlLimitQuerySQL(String sql,int offset,int maxsize,boolean asParameter) {
-        if(asParameter)
-            return sql + (offset>0 ? " limit ? offset ?" : " limit ?");
+    public static String buildPostgreSqlLimitQuerySQL(String sql, int offset, int maxsize, boolean asParameter) {
+        if (asParameter)
+            return sql + (offset > 0 ? " limit ? offset ?" : " limit ?");
         else
-            return sql + (offset>0 ? " limit "+String.valueOf(maxsize)+" offset "+String.valueOf(offset) :
-                                     " limit "+String.valueOf(maxsize));
+            return sql + (offset > 0 ? " limit " + String.valueOf(maxsize) + " offset " + String.valueOf(offset) :
+                " limit " + String.valueOf(maxsize));
     }
 
-    public static String buildMySqlLimitQuerySQL(String sql,int offset,int maxsize,boolean asParameter) {
-        if(asParameter)
-            return sql + (offset>0 ? " limit ?, ?" : " limit ?");
+    public static String buildMySqlLimitQuerySQL(String sql, int offset, int maxsize, boolean asParameter) {
+        if (asParameter)
+            return sql + (offset > 0 ? " limit ?, ?" : " limit ?");
         else
-            return sql + (offset>0 ? " limit "+String.valueOf(offset)+","+String.valueOf(maxsize) :
-                    " limit "+String.valueOf(maxsize));
+            return sql + (offset > 0 ? " limit " + String.valueOf(offset) + "," + String.valueOf(maxsize) :
+                " limit " + String.valueOf(maxsize));
     }
-    /** org.hibernate.dialect
+
+    /**
+     * org.hibernate.dialect
      * 生成Oracle分页查询语句, 不考虑for update语句
-     * @param sql sql
-     * @param offset offset
-     * @param maxsize maxsize
+     *
+     * @param sql         sql
+     * @param offset      offset
+     * @param maxsize     maxsize
      * @param asParameter asParameter
      * @return String
      */
-    public static String buildOracleLimitQuerySQL(String sql,int offset,int maxsize,boolean asParameter) {
+    public static String buildOracleLimitQuerySQL(String sql, int offset, int maxsize, boolean asParameter) {
 
-        final StringBuilder pagingSelect = new StringBuilder( sql.length()+100 );
-        if(asParameter){
-            if (offset>0) {
-                pagingSelect.append( "select * from ( select row_.*, rownum rownum_ from ( " );
+        final StringBuilder pagingSelect = new StringBuilder(sql.length() + 100);
+        if (asParameter) {
+            if (offset > 0) {
+                pagingSelect.append("select * from ( select row_.*, rownum rownum_ from ( ");
+            } else {
+                pagingSelect.append("select * from ( ");
             }
-            else {
-                pagingSelect.append( "select * from ( " );
+            pagingSelect.append(sql);
+            if (offset > 0) {
+                pagingSelect.append(" ) row_ ) where rownum_ <= ? and rownum_ > ?");
+            } else {
+                pagingSelect.append(" ) where rownum <= ?");
             }
-            pagingSelect.append( sql );
-            if (offset>0) {
-                pagingSelect.append( " ) row_ ) where rownum_ <= ? and rownum_ > ?" );
+        } else {
+            if (offset > 0) {
+                pagingSelect.append("select * from ( select row_.*, rownum rownum_ from ( ");
+            } else {
+                pagingSelect.append("select * from ( ");
             }
-            else {
-                pagingSelect.append( " ) where rownum <= ?" );
-            }
-        }else{
-            if (offset>0) {
-                pagingSelect.append( "select * from ( select row_.*, rownum rownum_ from ( " );
-            }
-            else {
-                pagingSelect.append( "select * from ( " );
-            }
-            pagingSelect.append( sql );
-            if (offset>0) {
-                pagingSelect.append( " ) row_ ) where rownum_ <= ")
+            pagingSelect.append(sql);
+            if (offset > 0) {
+                pagingSelect.append(" ) row_ ) where rownum_ <= ")
                     .append(offset + maxsize)
                     .append(" and rownum_ > ")
                     .append(offset);
-            }
-            else {
-                pagingSelect.append( " ) where rownum <= " ).append(maxsize);
+            } else {
+                pagingSelect.append(" ) where rownum <= ").append(maxsize);
             }
         }
 
@@ -573,38 +589,40 @@ public abstract class QueryUtils {
 
     /**
      * 生成DB2分页查询语句
-     * @param sql sql
-     * @param offset offset
+     *
+     * @param sql     sql
+     * @param offset  offset
      * @param maxsize maxsize
      * @return String
      */
-    public static String buildDB2LimitQuerySQL(String sql,int offset,int maxsize/*,boolean asParameter*/)
-        /*throws SQLException*/{
+    public static String buildDB2LimitQuerySQL(String sql, int offset, int maxsize/*,boolean asParameter*/)
+    /*throws SQLException*/ {
         /*if(asParameter)*/
-            //throw new SQLException("DB2 unsupported parameter in fetch statement.");
-        if ( offset == 0 ) {
-            return maxsize>1?sql + " fetch first " + maxsize + " rows only":
-                                   " fetch first 1 row only";
+        //throw new SQLException("DB2 unsupported parameter in fetch statement.");
+        if (offset == 0) {
+            return maxsize > 1 ? sql + " fetch first " + maxsize + " rows only" :
+                " fetch first 1 row only";
         }
         //nest the main query in an outer select
         return "select * from ( select inner2_.*, rownumber() over(order by order of inner2_) as rownumber_ from ( "
-                + sql + " fetch first " + String.valueOf(offset+maxsize) + " rows only ) as inner2_ ) as inner1_ where rownumber_ > "
-                + offset + " order by rownumber_";
+            + sql + " fetch first " + String.valueOf(offset + maxsize) + " rows only ) as inner2_ ) as inner1_ where rownumber_ > "
+            + offset + " order by rownumber_";
     }
 
     /**
      * 生成SqlServer分页查询语句
-     * @param sql sql
-     * @param offset offset
+     *
+     * @param sql     sql
+     * @param offset  offset
      * @param maxsize maxsize
      * @return String
      */
-    public static String buildSqlServerLimitQuerySQL(String sql,int offset,int maxsize/*,boolean asParameter*/)
-            /*throws SQLException*/{
+    public static String buildSqlServerLimitQuerySQL(String sql, int offset, int maxsize/*,boolean asParameter*/)
+    /*throws SQLException*/ {
         /*if(asParameter)
             throw new SQLException("SQL Server unsupported parameter in fetch statement.");
          */
-        if ( offset > 0 ) {
+        if (offset > 0) {
             // SQL SERVER 2012  才支持
             /*return sql + "offset "+String.valueOf(offset)
                     + " rows fetch next "+String.valueOf(maxsize)+" rows only";*/
@@ -616,50 +634,50 @@ public abstract class QueryUtils {
              * )
              * SELECT alias_list FROM query WHERE __row_nr__ >= offset AND __row_nr__ < offset + maxsize
              * </pre>
-            */
-            String alias_list = StringBaseOpt.objectToString( getSqlFiledNames(sql));
+             */
+            String alias_list = StringBaseOpt.objectToString(getSqlFiledNames(sql));
             return "WITH query AS ("
-                     +"SELECT inner_query.* "
-                     +", ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP) as __row_nr__ "
-                     +" FROM ( " + sql + ") inner_query"
-                     +" ) "
-                     +" SELECT "+ alias_list +" FROM query WHERE __row_nr__ >=" + String.valueOf(offset)
-                     + " AND __row_nr__ < " + String.valueOf(offset + maxsize);
+                + "SELECT inner_query.* "
+                + ", ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP) as __row_nr__ "
+                + " FROM ( " + sql + ") inner_query"
+                + " ) "
+                + " SELECT " + alias_list + " FROM query WHERE __row_nr__ >=" + String.valueOf(offset)
+                + " AND __row_nr__ < " + String.valueOf(offset + maxsize);
 
-        }else{
-               int selectIndex = sql.toLowerCase(Locale.ROOT).indexOf( "select" );
-            int selectDistinctIndex = sql.toLowerCase(Locale.ROOT).indexOf( "select distinct" );
-            selectIndex =  selectIndex + (selectDistinctIndex == selectIndex ? 15 : 6);
-            return new StringBuilder( sql.length() + 8 )
-                    .append( sql )
-                    .insert( selectIndex, " top " + maxsize )
-                    .toString();
+        } else {
+            int selectIndex = sql.toLowerCase(Locale.ROOT).indexOf("select");
+            int selectDistinctIndex = sql.toLowerCase(Locale.ROOT).indexOf("select distinct");
+            selectIndex = selectIndex + (selectDistinctIndex == selectIndex ? 15 : 6);
+            return new StringBuilder(sql.length() + 8)
+                .append(sql)
+                .insert(selectIndex, " top " + maxsize)
+                .toString();
         }
     }
 
-    public static String buildLimitQuerySQL(String sql,int offset,int maxsize,
-                                            boolean asParameter, DBType dbType){
-        switch (dbType){
+    public static String buildLimitQuerySQL(String sql, int offset, int maxsize,
+                                            boolean asParameter, DBType dbType) {
+        switch (dbType) {
             case Oracle:
             case DM:
             case KingBase:
             case GBase:
             case Oscar:
-                return buildOracleLimitQuerySQL(sql,offset, maxsize,asParameter);
+                return buildOracleLimitQuerySQL(sql, offset, maxsize, asParameter);
             case DB2:
-                return buildDB2LimitQuerySQL(sql,offset, maxsize);
+                return buildDB2LimitQuerySQL(sql, offset, maxsize);
             case SqlServer:
             case Access:
-                return buildSqlServerLimitQuerySQL(sql,offset, maxsize);
+                return buildSqlServerLimitQuerySQL(sql, offset, maxsize);
             case MySql:
             case H2:
-                return buildMySqlLimitQuerySQL(sql,offset, maxsize,asParameter);
+                return buildMySqlLimitQuerySQL(sql, offset, maxsize, asParameter);
             case PostgreSql:
-                return  buildPostgreSqlLimitQuerySQL(sql,offset, maxsize,asParameter);
+                return buildPostgreSqlLimitQuerySQL(sql, offset, maxsize, asParameter);
 
             default:
                 throw new PersistenceException(PersistenceException.ORM_METADATA_EXCEPTION,
-                        "不支持的数据库类型："+dbType.toString());
+                    "不支持的数据库类型：" + dbType.toString());
         }
     }
 
@@ -668,20 +686,20 @@ public abstract class QueryUtils {
      *
      * @param sql sql
      * @return 返回sql语句中所有的 命令变量（:变量名）,最后一个String 为转换为？变量的sql语句
-     *             Key 为转化成？的sql语句，value为对应的命名变量名，如果一个变量出现多次在list中也会出现多次
+     * Key 为转化成？的sql语句，value为对应的命名变量名，如果一个变量出现多次在list中也会出现多次
      */
-    public static LeftRightPair<String,List<String>> transNamedParamSqlToParamSql(String sql){
+    public static LeftRightPair<String, List<String>> transNamedParamSqlToParamSql(String sql) {
         StringBuilder sqlb = new StringBuilder();
         List<String> params = new ArrayList<>();
-        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+        Lexer lex = new Lexer(sql, Lexer.LANG_TYPE_SQL);
         int prePos = 0;
         String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord)) {
             if (":".equals(aWord)) {
 
                 int curPos = lex.getCurrPos();
-                if(curPos-1>prePos)
-                    sqlb.append(sql.substring(prePos, curPos-1));
+                if (curPos - 1 > prePos)
+                    sqlb.append(sql.substring(prePos, curPos - 1));
 
                 aWord = lex.getAWord();
                 if (aWord == null || "".equals(aWord))
@@ -695,17 +713,18 @@ public abstract class QueryUtils {
         }
         sqlb.append(sql.substring(prePos));
         //params.add(sqlb.toString());
-        return new LeftRightPair<>(sqlb.toString(),params);
+        return new LeftRightPair<>(sqlb.toString(), params);
     }
 
     /**
      * 获取sql语句中所有的 命名参数
+     *
      * @param sql sql
      * @return 按照参数出现顺序排列的 list
      */
-    public static List<String> getSqlNamedParameters(String sql){
+    public static List<String> getSqlNamedParameters(String sql) {
         List<String> params = new ArrayList<String>();
-        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+        Lexer lex = new Lexer(sql, Lexer.LANG_TYPE_SQL);
         String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord)) {
             if (":".equals(aWord)) {
@@ -724,38 +743,41 @@ public abstract class QueryUtils {
      * 二、:(like)ps return ps
      * 三、:ps return ps
      * 四、 ps return ps
+     *
      * @param pramePiece pramePiece
      * @return String
      */
-    public static String fetchTemplateParamName(String pramePiece){
-        String paramName=null;
+    public static String fetchTemplateParamName(String pramePiece) {
+        String paramName = null;
         int n = pramePiece.indexOf(':');
-        if(n<0){//四
+        if (n < 0) {//四
             return pramePiece.trim();
         }
-        if(n>1){
+        if (n > 1) {
             paramName = pramePiece.substring(0, n).trim();
-            if(StringUtils.isNotBlank(paramName))//一
+            if (StringUtils.isNotBlank(paramName))//一
                 return paramName;
         }
         //二、三
-        String paramAlias = pramePiece.substring(n+1).trim();
+        String paramAlias = pramePiece.substring(n + 1).trim();
         n = paramAlias.lastIndexOf(')');
-        if(n<0)
+        if (n < 0)
             return paramAlias;
-        return paramAlias.substring(n+1).trim();
+        return paramAlias.substring(n + 1).trim();
     }
+
     /**
      * 参数 模板 p1.1:(like,,)ps
      * 条件模板： [(条件)(参数)| 语句]
-     *           [参数| 语句]
+     * [参数| 语句]
+     *
      * @param paramString paramString
-     * @return  Set String
+     * @return Set String
      */
-    public static Set<String> fetchTemplateParamNames(String paramString){
+    public static Set<String> fetchTemplateParamNames(String paramString) {
         Set<String> params = new HashSet<>();
         List<String> pramePieces = Lexer.splitByWord(paramString, ",");
-        for(String pramePiece : pramePieces){
+        for (String pramePiece : pramePieces) {
             params.add(fetchTemplateParamName(pramePiece));
         }
         return params;
@@ -764,39 +786,40 @@ public abstract class QueryUtils {
     /**
      * 参数 模板 p1.1:(like)ps
      * 条件模板： [(条件)(参数)| 语句]
-     *           [参数| 语句]
+     * [参数| 语句]
+     *
      * @param queryPiece queryPiece
      * @return Set String
      */
-    public static Set<String> fetchParamsFromTemplateConditions(String queryPiece){
+    public static Set<String> fetchParamsFromTemplateConditions(String queryPiece) {
 
-        Lexer varMorp = new Lexer(queryPiece,Lexer.LANG_TYPE_SQL);
+        Lexer varMorp = new Lexer(queryPiece, Lexer.LANG_TYPE_SQL);
         String aWord = varMorp.getARawWord();
-        if(aWord==null || aWord.length() == 0)
+        if (aWord == null || aWord.length() == 0)
             return null;
 
         Set<String> paramList = new HashSet<String>();
 
-        if("(".equals(aWord)){
+        if ("(".equals(aWord)) {
             //获取条件语句，如果条件语句没有，则返回 null
             int curPos = varMorp.getCurrPos();
-            if(!varMorp.seekToRightBracket())
+            if (!varMorp.seekToRightBracket())
                 return null;
             int prePos = varMorp.getCurrPos();
-            String condition =  queryPiece.substring(curPos,prePos-1);
+            String condition = queryPiece.substring(curPos, prePos - 1);
 
-            Lexer labelSelected = new Lexer(condition,Lexer.LANG_TYPE_SQL);
+            Lexer labelSelected = new Lexer(condition, Lexer.LANG_TYPE_SQL);
             aWord = labelSelected.getARawWord();
-            while(StringUtils.isNotBlank(aWord)){
+            while (StringUtils.isNotBlank(aWord)) {
 
-                if( aWord.equals("$")){
+                if (aWord.equals("$")) {
                     aWord = labelSelected.getAWord();
-                    if(aWord.equals("{")){
+                    if (aWord.equals("{")) {
                         aWord = labelSelected.getStringUntil("}");
                         paramList.add(aWord);
                     }
-                }else if(Lexer.isLabel(aWord) && !VariableFormula.isKeyWord(aWord)
-                        && EmbedFunc.getFuncNo(aWord) == -1){
+                } else if (Lexer.isLabel(aWord) && !VariableFormula.isKeyWord(aWord)
+                    && EmbedFunc.getFuncNo(aWord) == -1) {
                     paramList.add(aWord);
                 }
 
@@ -804,32 +827,33 @@ public abstract class QueryUtils {
             }
 
             aWord = varMorp.getARawWord();
-            if("(".equals(aWord)){
+            if ("(".equals(aWord)) {
                 curPos = varMorp.getCurrPos();
-                if(!varMorp.seekToRightBracket())
+                if (!varMorp.seekToRightBracket())
                     return null;
                 prePos = varMorp.getCurrPos();
                 aWord = varMorp.getARawWord();
                 String paramsString = null;
-                if(prePos-1>curPos)
-                    paramsString =  queryPiece.substring(curPos,prePos-1);
-                if(paramsString!=null){//找出所有的 变量，如果变量表中没有则设置为 null
+                if (prePos - 1 > curPos)
+                    paramsString = queryPiece.substring(curPos, prePos - 1);
+                if (paramsString != null) {//找出所有的 变量，如果变量表中没有则设置为 null
                     paramList.addAll(fetchTemplateParamNames(paramsString));
                 }
             }
-        }else{ // 简易写法  ([:]params)* | queryPiece
-            if(!varMorp.seekTo("|",false))
+        } else { // 简易写法  ([:]params)* | queryPiece
+            if (!varMorp.seekTo("|", false))
                 return null;
 
             int curPos = varMorp.getCurrPos();
-            String paramsString =  queryPiece.substring(0,curPos-1);
-            if(StringUtils.isBlank(paramsString))
+            String paramsString = queryPiece.substring(0, curPos - 1);
+            if (StringUtils.isBlank(paramsString))
                 return null;
             paramList.addAll(fetchTemplateParamNames(paramsString));
         }
 
         return paramList;
     }
+
     /*
      * 返回SqlTemplate(sql语句模板)中所有的 命令变量（:变量名）
      *  包括 [(${p1.1} &gt; 2 && p2 &gt; 2)| table1 t1,]
@@ -838,10 +862,10 @@ public abstract class QueryUtils {
      * @param sql sql
      * @return 返回sql语句中所有的 命令变量（:变量名）
      */
-    public static Set<String> getSqlTemplateParameters(String sql){
+    public static Set<String> getSqlTemplateParameters(String sql) {
 
         Set<String> params = new HashSet<String>();
-        Lexer lex = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+        Lexer lex = new Lexer(sql, Lexer.LANG_TYPE_SQL);
 
         String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord)) {
@@ -851,15 +875,15 @@ public abstract class QueryUtils {
                     return params;
                 params.add(aWord);
 
-            }else if(aWord.equals("[")){
+            } else if (aWord.equals("[")) {
                 int beginPos = lex.getCurrPos();
 
                 lex.seekToRightSquareBracket();
                 int endPos = lex.getCurrPos();
                 //分析表别名， 格式为 TableNameOrClass:alias,TableNameOrClass:alias,.....
-                String queryPiece =  sql.substring(beginPos,endPos-1).trim();
-                Set<String> subParams=fetchParamsFromTemplateConditions(queryPiece);
-                if(subParams!=null && subParams.size()>0)
+                String queryPiece = sql.substring(beginPos, endPos - 1).trim();
+                Set<String> subParams = fetchParamsFromTemplateConditions(queryPiece);
+                if (subParams != null && subParams.size() > 0)
                     params.addAll(subParams);
             }
             aWord = lex.getAWord();
@@ -870,31 +894,32 @@ public abstract class QueryUtils {
     /**
      * 返回sql语句中所有的 字段 语句表达式
      * 获得查询语句中的所有 字段描述 ,比如 select a, (b+c) as d, f fn from ta 语句 返回 [ a, (b+c) as d , f fn ]
+     *
      * @param sql sql
      * @return 返回feild字句，这个用户 sql语句编辑界面，在dde，stat项目中使用，一般用不到。
      */
-    public static List<Pair<String,String>> getSqlFieldNamePieceMap(String sql){
+    public static List<Pair<String, String>> getSqlFieldNamePieceMap(String sql) {
 
-        List<Pair<String,String>>  fields = new ArrayList<>(20);
+        List<Pair<String, String>> fields = new ArrayList<>(20);
         List<String> sqlPieces = splitSqlByFields(sql);
         if (sqlPieces == null || sqlPieces.size() < 3)
             return fields;
 
         String sFieldSql = sqlPieces.get(1);
-        Lexer lex = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
-        int nFiledNo=0;
+        Lexer lex = new Lexer(sFieldSql, Lexer.LANG_TYPE_SQL);
+        int nFiledNo = 0;
         int nPos = 0;
         String aWord = lex.getAWord();
 
         while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
             int nPos2 = lex.getCurrPos();
-            int nPosEnd=-1;
+            int nPosEnd = -1;
             String filedName = null;
             boolean prewordIsOpt = false;
-            while ( (!"".equals(aWord) &&
-                     !",".equals(aWord) &&
-                     !"from".equalsIgnoreCase(aWord))) {
-                if ("(".equals(aWord)){
+            while ((!"".equals(aWord) &&
+                !",".equals(aWord) &&
+                !"from".equalsIgnoreCase(aWord))) {
+                if ("(".equals(aWord)) {
                     lex.seekToRightBracket();
                     prewordIsOpt = false;
                 } else {
@@ -922,11 +947,11 @@ public abstract class QueryUtils {
 
             }
 
-            nFiledNo ++;
-            if(filedName==null) {
+            nFiledNo++;
+            if (filedName == null) {
                 filedName = "column" + String.valueOf(nFiledNo);
                 nPosEnd = -1;
-            }else {
+            } else {
                 /*if(filedName.endsWith("*"))
                     return null;*/
                 int n = filedName.lastIndexOf('.');
@@ -935,7 +960,7 @@ public abstract class QueryUtils {
                 }
             }
             fields.add(new MutablePair<>(
-                    filedName, sFieldSql.substring(nPos, (nPosEnd>nPos ? nPosEnd: nPos2)).trim()));
+                filedName, sFieldSql.substring(nPos, (nPosEnd > nPos ? nPosEnd : nPos2)).trim()));
 
             nPos = nPos2;
             if (",".equals(aWord)) {
@@ -951,13 +976,15 @@ public abstract class QueryUtils {
    /* public static String trimFieldPiece(String fieldPiece){
 
     }*/
+
     /**
      * 返回sql语句中所有的 字段 语句表达式
      * 获得查询语句中的所有 字段描述 ,比如 select a, (b+c) as d, f fn from ta 语句 返回 [ a, (b+c) as d , f fn ]
+     *
      * @param sql sql
      * @return 返回feild字句，这个用户 sql语句编辑界面，在dde，stat项目中使用，一般用不到。
      */
-    public static List<String> getSqlFieldPieces(String sql){
+    public static List<String> getSqlFieldPieces(String sql) {
 
         List<String> fields = new ArrayList<>(5);
         List<String> sqlPieces = splitSqlByFields(sql);
@@ -965,14 +992,14 @@ public abstract class QueryUtils {
             return fields;
 
         String sFieldSql = sqlPieces.get(1);
-        Lexer lex = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
+        Lexer lex = new Lexer(sFieldSql, Lexer.LANG_TYPE_SQL);
 
         int nPos = 0;
         String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
             int nPos2 = lex.getCurrPos();
             while (!"".equals(aWord) && !",".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
-                if ("(".equals(aWord)){
+                if ("(".equals(aWord)) {
                     lex.seekToRightBracket();
                 }
                 nPos2 = lex.getCurrPos();
@@ -994,26 +1021,27 @@ public abstract class QueryUtils {
     /**
      * 返回sql语句中所有的 字段 名称
      * 获得 查询语句中的所有 字段名称,比如   a, (b+c) as d, f fn from 语句 返回 [a,d,fn]
+     *
      * @param sFieldSql sFieldSql
      * @return 字段名子列表
      */
-    public static List<String> splitSqlFieldNames(String sFieldSql){
+    public static List<String> splitSqlFieldNames(String sFieldSql) {
         List<String> fields = new ArrayList<>(20);
-        Lexer lex = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
+        Lexer lex = new Lexer(sFieldSql, Lexer.LANG_TYPE_SQL);
 
         String aWord = lex.getAWord();
         String filedName = aWord;
-        int nFiledNo=0;
+        int nFiledNo = 0;
         while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
             boolean prewordIsOpt = false;
             while (!"".equals(aWord) && !",".equals(aWord)
-                                    && !"from".equalsIgnoreCase(aWord)) {
-                if ("(".equals(aWord)){
+                && !"from".equalsIgnoreCase(aWord)) {
+                if ("(".equals(aWord)) {
                     lex.seekToRightBracket();
                     prewordIsOpt = false;
                 } else {
                     // 如果有 * 则不能解析 字段名
-                    if("*".equals(aWord)){
+                    if ("*".equals(aWord)) {
                         return null;
                     }
                     if (Lexer.isLabel(aWord)) {
@@ -1031,18 +1059,18 @@ public abstract class QueryUtils {
                 aWord = lex.getAWord();
             }
 
-            nFiledNo ++;
+            nFiledNo++;
 
-            if(filedName==null) {
+            if (filedName == null) {
                 filedName = "";
-            }else {
+            } else {
                 /*if(filedName.endsWith("*"))
                     return null;*/
                 int n = filedName.lastIndexOf('.');
                 if (n > 0) {
                     filedName = filedName.substring(n + 1);
                     // 如果有 * 则不能解析 字段名
-                    if("*".equals(filedName)){
+                    if ("*".equals(filedName)) {
                         return null;
                     }
                 }
@@ -1061,51 +1089,53 @@ public abstract class QueryUtils {
     /**
      * 返回sql语句中所有的 字段 名称
      * 获得 查询语句中的所有 字段名称,比如 select a, (b+c) as d, f fn from ta 语句 返回 [a,d,fn]
+     *
      * @param sql sql
      * @return 字段名子列表 ，  如果 查询语句中有 * 将返回  null
      */
-    public static List<String> getSqlFiledNames(String sql){
+    public static List<String> getSqlFiledNames(String sql) {
         List<String> sqlPieces = splitSqlByFields(sql);
         if (sqlPieces == null || sqlPieces.size() < 3)
             return null;
         return splitSqlFieldNames(sqlPieces.get(1));
-     }
+    }
 
 
     /**
-     *  返回SqlTemplate(sql语句模板)中所有的所有的 字段 名称
+     * 返回SqlTemplate(sql语句模板)中所有的所有的 字段 名称
      * 获得 查询语句中的所有 字段名称,比如 select a, (b+c) as d, f fn from ta 语句 返回 [a,d,fn]
+     *
      * @param sql sql
      * @return 字段名子列表
      */
-    public static List<String> getSqlTemplateFiledNames(String sql){
+    public static List<String> getSqlTemplateFiledNames(String sql) {
         List<String> sqlPieces = splitSqlByFields(sql);
         if (sqlPieces == null || sqlPieces.size() < 3)
             return null;
 
         String sFieldSql = sqlPieces.get(1);
-        Lexer varMorp = new Lexer(sFieldSql,Lexer.LANG_TYPE_SQL);
+        Lexer varMorp = new Lexer(sFieldSql, Lexer.LANG_TYPE_SQL);
         StringBuilder sbSql = new StringBuilder();
         int prePos = 0;
         String aWord = varMorp.getAWord();
         while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
-            if(aWord.equals("[")){
+            if (aWord.equals("[")) {
                 int curPos = varMorp.getCurrPos();
-                if(curPos-1>prePos)
-                    sbSql.append( sFieldSql.substring(prePos, curPos-1));
+                if (curPos - 1 > prePos)
+                    sbSql.append(sFieldSql.substring(prePos, curPos - 1));
 
                 aWord = varMorp.getAWord();
-                while(aWord != null && !"|".equals(aWord)){
-                    if("(".equals(aWord)){
+                while (aWord != null && !"|".equals(aWord)) {
+                    if ("(".equals(aWord)) {
                         varMorp.seekToRightBracket();
                     }
                     aWord = varMorp.getAWord();
                 }
-                if("|".equals(aWord)){
+                if ("|".equals(aWord)) {
                     curPos = varMorp.getCurrPos();
                     varMorp.seekToRightSquareBracket();
                     prePos = varMorp.getCurrPos();
-                    sbSql.append( sFieldSql.substring(curPos, prePos-1));
+                    sbSql.append(sFieldSql.substring(curPos, prePos - 1));
                 }
                 aWord = varMorp.getAWord();
             }
@@ -1115,25 +1145,27 @@ public abstract class QueryUtils {
 
         return splitSqlFieldNames(sbSql.toString());
     }
+
     /**
      * 过滤 order by 语句中无效信息，在可能带入乱码和注入的情况下使用
+     *
      * @param sqlOrderBy sqlOrderBy
      * @return String
      */
-    public static String trimSqlOrderByField(String sqlOrderBy){
+    public static String trimSqlOrderByField(String sqlOrderBy) {
         if (sqlOrderBy == null)
             return null;
 
-        StringBuilder sb= new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-        Lexer lex = new Lexer(sqlOrderBy,Lexer.LANG_TYPE_SQL);
+        Lexer lex = new Lexer(sqlOrderBy, Lexer.LANG_TYPE_SQL);
         boolean haveOrder = false;
         boolean bLastDouHao = false;
         String aWord = lex.getAWord();
         while (aWord != null && !"".equals(aWord)) {
-            if(Lexer.isLabel(aWord) || StringUtils.isNumeric(aWord) ){
-                if( haveOrder){
-                    if(bLastDouHao)
+            if (Lexer.isLabel(aWord) || StringUtils.isNumeric(aWord)) {
+                if (haveOrder) {
+                    if (bLastDouHao)
                         sb.append(",");
                     else
                         return null;
@@ -1142,24 +1174,24 @@ public abstract class QueryUtils {
                 haveOrder = true;
                 bLastDouHao = false;
                 aWord = lex.getAWord();
-                if("asc".equalsIgnoreCase(aWord) || "desc".equalsIgnoreCase(aWord)){
+                if ("asc".equalsIgnoreCase(aWord) || "desc".equalsIgnoreCase(aWord)) {
                     sb.append(" ").append(aWord);
                     aWord = lex.getAWord();
                 }
-                if("nulls".equalsIgnoreCase(aWord)){
+                if ("nulls".equalsIgnoreCase(aWord)) {
                     aWord = lex.getAWord();
-                    if("first".equalsIgnoreCase(aWord) || "last".equalsIgnoreCase(aWord)){
+                    if ("first".equalsIgnoreCase(aWord) || "last".equalsIgnoreCase(aWord)) {
                         sb.append(" nulls ").append(aWord);
                         aWord = lex.getAWord();
-                    }else
+                    } else
                         return null;
                 }
-            }else if(",".equals(aWord)){
-                if(bLastDouHao)
+            } else if (",".equals(aWord)) {
+                if (bLastDouHao)
                     return null;
                 bLastDouHao = true;//sb.append(",");
                 aWord = lex.getAWord();
-            }else
+            } else
                 return null;
         }
 
@@ -1168,87 +1200,25 @@ public abstract class QueryUtils {
 
     /**
      * 创建sql语句参数键值对
+     *
      * @param objs 奇数变量为参数名，类型为string，偶数变量为参数值，类型为任意对象（object）
-     * @return  Map String Object
+     * @return Map String Object
      * @see com.centit.support.algorithm.CollectionsOpt 方法 createHashMap
      */
     @Deprecated
-    public static Map<String,Object> createSqlParamsMap(Object... objs){
+    public static Map<String, Object> createSqlParamsMap(Object... objs) {
         return CollectionsOpt.createHashMap(objs);
     }
 
-    public interface IFilterTranslater extends VariableTranslate {
-        void setTableAlias(Map<String, String> tableAlias);
-        String translateColumn(String columnDesc);
-        LeftRightPair<String,Object> translateParam(String paramName);
-    }
-
-    public static class SimpleFilterTranslater implements IFilterTranslater{
-        private Map<String,Object> paramsMap;
-        private Map<String,String> tableAlias;
-        private ObjectTranslate mapTranslate;
-        public SimpleFilterTranslater(Map<String, Object> paramsMap)
-        {
-            this.tableAlias = null;
-            this.paramsMap = paramsMap;
-            this.mapTranslate = new ObjectTranslate(paramsMap);
-        }
-
-        @Override
-        public void setTableAlias(Map<String, String> tableAlias) {
-            this.tableAlias = tableAlias;
-        }
-
-        @Override
-        public String translateColumn(String columnDesc){
-            if(tableAlias==null||columnDesc==null||tableAlias.size()==0)
-                return null;
-            int n = columnDesc.indexOf('.');
-            if(n<0){
-                return null;
-            }
-
-            String poClassName = columnDesc.substring(0,n);
-            if(tableAlias.containsKey(poClassName)) {
-                String alias = tableAlias.get(poClassName);
-                return StringUtils.isBlank(alias) ? columnDesc.substring(n + 1) : alias + '.' + columnDesc.substring(n + 1);
-            } /** 这个地方无法获取 表相关的元数据信息，如果可以校验一下字段中是否有对应的字段 就完美了；、
-               所以目前只能由于仅有一个表的过滤中 */
-            else if("*".equals(poClassName) && tableAlias.size()==1){
-                String alias = tableAlias.values().iterator().next();
-                return StringUtils.isBlank(alias) ? columnDesc.substring(n + 1) : alias + '.' + columnDesc.substring(n + 1);
-            }
-            return null;
-        }
-
-        @Override
-        public LeftRightPair<String,Object> translateParam(String paramName){
-            if(paramsMap==null)
-                return null;
-            Object obj = ReflectionOpt.attainExpressionValue(paramsMap, paramName);
-            if(obj==null)
-                return null;
-            if(obj instanceof String){
-                if(StringUtils.isBlank((String)obj))
-                    return null;
-            }
-            return new LeftRightPair<>(paramName, obj);
-        }
-
-        @Override
-        public Object getVarValue(String varName) {
-            return mapTranslate.getVarValue(varName);
-        }
-
-    }
     /**
      * 对参数进行预处理
+     *
      * @param pretreatment pretreatment
-     * @param paramValue paramValue
+     * @param paramValue   paramValue
      * @return Object
      */
-    public static Object scalarPretreatParameter(String pretreatment,Object paramValue){
-        if(paramValue==null)
+    public static Object scalarPretreatParameter(String pretreatment, Object paramValue) {
+        if (paramValue == null)
             return null;
         switch (pretreatment.toUpperCase()) {
             case SQL_PRETREAT_LIKE:
@@ -1314,161 +1284,165 @@ public abstract class QueryUtils {
         }
     }
 
-    public static Object onePretreatParameter(String pretreatment,Object paramValue){
-        if(paramValue==null)
+    public static Object onePretreatParameter(String pretreatment, Object paramValue) {
+        if (paramValue == null)
             return null;
-        if(SQL_PRETREAT_STRING.equalsIgnoreCase(pretreatment))
+        if (SQL_PRETREAT_STRING.equalsIgnoreCase(pretreatment))
             return StringBaseOpt.objectToString(paramValue);
-        if(SQL_PRETREAT_SPLITFORIN.equalsIgnoreCase(pretreatment)){
+        if (SQL_PRETREAT_SPLITFORIN.equalsIgnoreCase(pretreatment)) {
             String sValue = StringBaseOpt.objectToString(paramValue);
-            if(sValue==null)
+            if (sValue == null)
                 return null;
             return sValue.split(",");
         }
-        if(paramValue instanceof Collection){
-             Collection<?> valueList = (Collection<?> )paramValue;
-             List<Object> retValue = new ArrayList<>();
-             for(Object ov : valueList){
-                 Object ro = scalarPretreatParameter( pretreatment, ov);
-                 if(ro!=null){
-                     retValue.add(ro);
-                 }
-             }
-             if(retValue.size()<1)
-                 return null;
-             return retValue;
-         }else if(paramValue instanceof Object[]){
-             Object [] objs=(Object[]) paramValue;
+        if (paramValue instanceof Collection) {
+            Collection<?> valueList = (Collection<?>) paramValue;
+            List<Object> retValue = new ArrayList<>();
+            for (Object ov : valueList) {
+                Object ro = scalarPretreatParameter(pretreatment, ov);
+                if (ro != null) {
+                    retValue.add(ro);
+                }
+            }
+            if (retValue.size() < 1)
+                return null;
+            return retValue;
+        } else if (paramValue instanceof Object[]) {
+            Object[] objs = (Object[]) paramValue;
 
-             List<Object> retValue = new ArrayList<>();
-             for(Object ov : objs){
-                 Object ro = scalarPretreatParameter( pretreatment, ov);
-                 if(ro!=null){
-                     retValue.add(ro);
-                 }
-             }
-             if(retValue.size()<1)
-                 return null;
-             return retValue;
-         }else
-             return scalarPretreatParameter( pretreatment, paramValue);
+            List<Object> retValue = new ArrayList<>();
+            for (Object ov : objs) {
+                Object ro = scalarPretreatParameter(pretreatment, ov);
+                if (ro != null) {
+                    retValue.add(ro);
+                }
+            }
+            if (retValue.size() < 1)
+                return null;
+            return retValue;
+        } else
+            return scalarPretreatParameter(pretreatment, paramValue);
         //if(SQL_PRETREAT_CREEPFORIN.equalsIgnoreCase(pretreatment))
-            //return String.valueOf(paramValue).split(",");
+        //return String.valueOf(paramValue).split(",");
     }
 
     /**
      * 对参数进行预处理
+     *
      * @param pretreatment, 可以有多个，用','分开
-     * @param paramValue paramString
+     * @param paramValue    paramString
      * @return Object
      */
-    public static Object pretreatParameter(String pretreatment,Object paramValue){
-        if(StringUtils.isBlank(pretreatment))
+    public static Object pretreatParameter(String pretreatment, Object paramValue) {
+        if (StringUtils.isBlank(pretreatment))
             return paramValue;
-        if(pretreatment.indexOf(',')<0)
-            return onePretreatParameter(pretreatment,paramValue);
-        String [] pretreats = pretreatment.split(",");
+        if (pretreatment.indexOf(',') < 0)
+            return onePretreatParameter(pretreatment, paramValue);
+        String[] pretreats = pretreatment.split(",");
         Object paramObj = paramValue;
-        for(String p : pretreats){
-            paramObj = onePretreatParameter(p,paramObj);
+        for (String p : pretreats) {
+            paramObj = onePretreatParameter(p, paramObj);
         }
         return paramObj;
     }
 
-    public static List<String> splitParamString(String paramString){
+    public static List<String> splitParamString(String paramString) {
         List<String> params = new ArrayList<>();
-        Lexer lex = new Lexer(paramString,Lexer.LANG_TYPE_SQL);
+        Lexer lex = new Lexer(paramString, Lexer.LANG_TYPE_SQL);
         int prePos = 0;
         String aWord = lex.getAWord();
-        while (aWord != null && !"".equals(aWord) ) {
-             if(aWord.equals("(")){
-                 lex.seekToRightBracket();
-             }else if(aWord.equals(",")){
-                 int currPos = lex.getCurrPos();
-                 params.add(paramString.substring(prePos,currPos-1));
-                 prePos = currPos;
-             }
+        while (aWord != null && !"".equals(aWord)) {
+            if (aWord.equals("(")) {
+                lex.seekToRightBracket();
+            } else if (aWord.equals(",")) {
+                int currPos = lex.getCurrPos();
+                params.add(paramString.substring(prePos, currPos - 1));
+                prePos = currPos;
+            }
 
-             aWord = lex.getAWord();
+            aWord = lex.getAWord();
         }
-        if(prePos < paramString.length())
+        if (prePos < paramString.length())
             params.add(paramString.substring(prePos));
         return params;
     }
+
     /**
      * 参数表示式的完整形式是  :  表达式：(预处理,预处理2,......)参数名称
+     *
      * @param paramString paramString
      * @return 返回为Triple "表达式","参数名称","预处理,预处理2,......"
      */
-    public static ImmutableTriple<String,String,String> parseParameter(String paramString){
+    public static ImmutableTriple<String, String, String> parseParameter(String paramString) {
         /*if(StringUtils.isBlank(paramString))
             return null;*/
         String paramName;
         String paramRight;
-        String paramPretreatment=null;
-        String paramAlias=null;
+        String paramPretreatment = null;
+        String paramAlias = null;
         int n = paramString.indexOf(':');
-        if(n>=0){
-            paramRight = paramString.substring(n+1).trim();
-            if(paramRight.charAt(0)=='('){
+        if (n >= 0) {
+            paramRight = paramString.substring(n + 1).trim();
+            if (paramRight.charAt(0) == '(') {
                 int e = paramRight.indexOf(')');
-                if(e>0){
+                if (e > 0) {
                     paramPretreatment = paramRight.substring(1, e).trim();
-                    paramAlias =  paramRight.substring(e+1).trim();
+                    paramAlias = paramRight.substring(e + 1).trim();
                 }
-            }else
+            } else
                 paramAlias = paramRight;
 
-            if(n>1){
+            if (n > 1) {
                 paramName = paramString.substring(0, n).trim();
-            }else
+            } else
                 paramName = paramAlias;
-        }else{
-            if(paramString.charAt(0)=='('){
+        } else {
+            if (paramString.charAt(0) == '(') {
                 int e = paramString.indexOf(')');
-                if(e>0){
+                if (e > 0) {
                     paramPretreatment = paramString.substring(1, e).trim();
-                    paramAlias =  paramString.substring(e+1).trim();
+                    paramAlias = paramString.substring(e + 1).trim();
                 }
                 paramName = paramAlias;
-            }else
+            } else
                 paramName = paramString;
         }
-        return new ImmutableTriple<>(paramName,paramAlias,paramPretreatment);
+        return new ImmutableTriple<>(paramName, paramAlias, paramPretreatment);
     }
 
     /**
      * 通过参数数组 编译in语句
+     *
      * @param paramAlias 参数别名
-     * @param realParam 参数实际值
+     * @param realParam  参数实际值
      * @return sql语句和参数列表
      */
-    public static QueryAndNamedParams buildInStatement(String paramAlias,Object realParam){
-        StringBuilder hqlPiece= new StringBuilder();
+    public static QueryAndNamedParams buildInStatement(String paramAlias, Object realParam) {
+        StringBuilder hqlPiece = new StringBuilder();
         QueryAndNamedParams hqlAndParams = new QueryAndNamedParams();
 
         //hqlPiece.append("(");
         if (realParam instanceof Collection) {
-            int n=0;
-            for(Object obj :(Collection<?>)  realParam){
-                if(n>0)
+            int n = 0;
+            for (Object obj : (Collection<?>) realParam) {
+                if (n > 0)
                     hqlPiece.append(",");
                 hqlPiece.append(":").append(paramAlias).append('_').append(n);
-                hqlAndParams.addParam(paramAlias+"_"+n,obj);
+                hqlAndParams.addParam(paramAlias + "_" + n, obj);
                 n++;
             }
         } else if (realParam instanceof Object[]) {
-            int n=0;
-            for(Object obj :(Object[])  realParam){
-                if(n>0)
+            int n = 0;
+            for (Object obj : (Object[]) realParam) {
+                if (n > 0)
                     hqlPiece.append(",");
                 hqlPiece.append(":").append(paramAlias).append('_').append(n);
-                hqlAndParams.addParam(paramAlias+"_"+n,obj);
+                hqlAndParams.addParam(paramAlias + "_" + n, obj);
                 n++;
             }
         } else {
             hqlPiece.append(":").append(paramAlias);
-            hqlAndParams.addParam(paramAlias,realParam);
+            hqlAndParams.addParam(paramAlias, realParam);
         }
         //hqlPiece.append(")");
         hqlAndParams.setQuery(hqlPiece.toString());
@@ -1477,34 +1451,35 @@ public abstract class QueryUtils {
 
     /**
      * 去掉 分号 ； 和  单行注释   / * 注释保留 * /
+     *
      * @param fieldsSql paramString
      * @return String
      */
-    public static String cleanSqlStatement(String fieldsSql){
-        if(StringUtils.isBlank(fieldsSql))
+    public static String cleanSqlStatement(String fieldsSql) {
+        if (StringUtils.isBlank(fieldsSql))
             return fieldsSql;
-        Lexer lex = new Lexer(fieldsSql,Lexer.LANG_TYPE_SQL);
+        Lexer lex = new Lexer(fieldsSql, Lexer.LANG_TYPE_SQL);
         String aWord = lex.getARegularWord();
         int prePos = 0;
-        while (aWord != null && !"".equals(aWord) ) {
-            if(aWord.equals(";")){
+        while (aWord != null && !"".equals(aWord)) {
+            if (aWord.equals(";")) {
                 int currPos = lex.getCurrPos();
-                return fieldsSql.substring(0,currPos-1);
-             }else if(aWord.equals("--")){
-                 int currPos = lex.getCurrPos();
-                 return fieldsSql.substring(0,currPos-2);
-             }else if(aWord.equals("/*")){
-                 int currPos = lex.getCurrPos();
-                 lex.seekToAnnotateEnd();
-                 int currPos2 = lex.getCurrPos();
-                 if(! "*/".equals(fieldsSql.substring(currPos2-2,currPos2))){
-                     return fieldsSql.substring(0,currPos-2);
-                 }
-             }
+                return fieldsSql.substring(0, currPos - 1);
+            } else if (aWord.equals("--")) {
+                int currPos = lex.getCurrPos();
+                return fieldsSql.substring(0, currPos - 2);
+            } else if (aWord.equals("/*")) {
+                int currPos = lex.getCurrPos();
+                lex.seekToAnnotateEnd();
+                int currPos2 = lex.getCurrPos();
+                if (!"*/".equals(fieldsSql.substring(currPos2 - 2, currPos2))) {
+                    return fieldsSql.substring(0, currPos - 2);
+                }
+            }
             prePos = lex.getCurrPos();
-             aWord = lex.getARegularWord();
+            aWord = lex.getARegularWord();
         }
-        return fieldsSql.substring(0,prePos);
+        return fieldsSql.substring(0, prePos);
 
         /*char [] ch = fieldsSql.toCharArray();
 
@@ -1522,23 +1497,24 @@ public abstract class QueryUtils {
                 sBuilder.append(c);
         }
         return sBuilder.toString();
-*/    }
+*/
+    }
 
-    public static String replaceParamAsSqlString(String sql, String paramAlias,String paramSqlString){
-        Lexer varMorp = new Lexer(sql,Lexer.LANG_TYPE_SQL);
+    public static String replaceParamAsSqlString(String sql, String paramAlias, String paramSqlString) {
+        Lexer varMorp = new Lexer(sql, Lexer.LANG_TYPE_SQL);
 
         String sWord = varMorp.getAWord();
-        while( sWord!=null && ! sWord.equals("") ){
-            if(":".equals(sWord)){
+        while (sWord != null && !sWord.equals("")) {
+            if (":".equals(sWord)) {
                 int prePos = varMorp.getCurrPos();
                 sWord = varMorp.getAWord();
-                if(paramAlias.equals(sWord)){
+                if (paramAlias.equals(sWord)) {
                     int curPos = varMorp.getCurrPos();
-                    String resSql="";
-                    if(prePos>1)
-                        resSql = sql.substring(0,prePos-1);
-                    resSql = resSql + paramSqlString ;
-                    if(curPos<sql.length())
+                    String resSql = "";
+                    if (prePos > 1)
+                        resSql = sql.substring(0, prePos - 1);
+                    resSql = resSql + paramSqlString;
+                    if (curPos < sql.length())
                         resSql = resSql + sql.substring(curPos);
                     return resSql;
                 }
@@ -1548,39 +1524,39 @@ public abstract class QueryUtils {
         return sql;
     }
 
-    public static boolean hasPretreatment(String pretreatStr, String onePretreat){
-        if(pretreatStr==null) return false;
+    public static boolean hasPretreatment(String pretreatStr, String onePretreat) {
+        if (pretreatStr == null) return false;
 
         return pretreatStr.toUpperCase().indexOf(onePretreat) >= 0;
     }
-    /**
 
-     * @param filter 转换为 sql
+    /**
+     * @param filter     转换为 sql
      * @param translater 变量内嵌在语句中，不用参数
      * @return QueryAndNamedParams
      */
-    public static QueryAndNamedParams translateQueryFilter(String filter,IFilterTranslater translater){
+    public static QueryAndNamedParams translateQueryFilter(String filter, IFilterTranslater translater) {
         QueryAndNamedParams hqlAndParams = new QueryAndNamedParams();
-        Lexer varMorp = new Lexer(filter,Lexer.LANG_TYPE_SQL);
-        StringBuilder hqlPiece= new StringBuilder();
+        Lexer varMorp = new Lexer(filter, Lexer.LANG_TYPE_SQL);
+        StringBuilder hqlPiece = new StringBuilder();
         String sWord = varMorp.getAWord();
         int prePos = 0;
-        while( sWord!=null && ! sWord.equals("") ){
-            if( sWord.equals("[")){
+        while (sWord != null && !sWord.equals("")) {
+            if (sWord.equals("[")) {
                 int curPos = varMorp.getCurrPos();
-                if(curPos-1>prePos)
-                    hqlPiece.append( filter.substring(prePos, curPos-1));
+                if (curPos - 1 > prePos)
+                    hqlPiece.append(filter.substring(prePos, curPos - 1));
                 varMorp.seekToRightSquareBracket();//.seekTo(']');
                 prePos = varMorp.getCurrPos();
-                String columnDesc =  filter.substring(curPos,prePos-1).trim();
+                String columnDesc = filter.substring(curPos, prePos - 1).trim();
 
                 String qp = translater.translateColumn(columnDesc);
-                if(qp==null)
+                if (qp == null)
                     return null;
 
                 hqlPiece.append(qp);
 
-            }else if( sWord.equals("{")) {
+            } else if (sWord.equals("{")) {
                 int curPos = varMorp.getCurrPos();
                 if (curPos - 1 > prePos)
                     hqlPiece.append(filter.substring(prePos, curPos - 1));
@@ -1624,146 +1600,146 @@ public abstract class QueryUtils {
     }
 
     public static QueryAndNamedParams translateQueryFilter(Collection<String> filters,
-            IFilterTranslater translater, boolean isUnion){
-        if(filters==null ||filters.size()<1)
+                                                           IFilterTranslater translater, boolean isUnion) {
+        if (filters == null || filters.size() < 1)
             return null;
         QueryAndNamedParams hqlAndParams = new QueryAndNamedParams();
-        StringBuilder hqlBuilder= new StringBuilder();
+        StringBuilder hqlBuilder = new StringBuilder();
 
-        boolean haveSql=false;
-        for(String filter : filters){
-            QueryAndNamedParams hqlPiece =  translateQueryFilter(filter,translater);
-            if(hqlPiece!=null){
-                if(!haveSql)
+        boolean haveSql = false;
+        for (String filter : filters) {
+            QueryAndNamedParams hqlPiece = translateQueryFilter(filter, translater);
+            if (hqlPiece != null) {
+                if (!haveSql)
                     hqlBuilder.append("(");
                 else
-                    hqlBuilder.append(isUnion ? " or ":" and ");
+                    hqlBuilder.append(isUnion ? " or " : " and ");
                 haveSql = true;
                 hqlBuilder.append(hqlPiece.getQuery());
                 hqlAndParams.addAllParams(hqlPiece.getParams());
             }
         }
 
-        if(haveSql)
+        if (haveSql)
             hqlBuilder.append(" )");
 
         hqlAndParams.setQuery(hqlBuilder.toString());
         return hqlAndParams;
     }
 
-
     public static QueryAndNamedParams translateQueryPiece(
-            String queryPiece,IFilterTranslater translater){
+        String queryPiece, IFilterTranslater translater) {
 
-        Lexer varMorp = new Lexer(queryPiece,Lexer.LANG_TYPE_SQL);
+        Lexer varMorp = new Lexer(queryPiece, Lexer.LANG_TYPE_SQL);
         String aWord = varMorp.getARawWord();
-        if(aWord==null || aWord.length() == 0)
+        if (aWord == null || aWord.length() == 0)
             return null;
 
         QueryAndNamedParams hqlAndParams = new QueryAndNamedParams();
 
-        if("(".equals(aWord)){
+        if ("(".equals(aWord)) {
             //获取条件语句，如果条件语句没有，则返回 null
             int curPos = varMorp.getCurrPos();
-            if(!varMorp.seekToRightBracket())
+            if (!varMorp.seekToRightBracket())
                 return null;
             int prePos = varMorp.getCurrPos();
-            String condition =  queryPiece.substring(curPos,prePos-1);
+            String condition = queryPiece.substring(curPos, prePos - 1);
 
             Object sret = VariableFormula.calculate(condition, translater);
-            if(!BooleanBaseOpt.castObjectToBoolean(sret, false))
+            if (!BooleanBaseOpt.castObjectToBoolean(sret, false))
                 return null;
 
             String paramsString = null;
             aWord = varMorp.getARawWord();
 
-            if("(".equals(aWord)){
+            if ("(".equals(aWord)) {
                 curPos = varMorp.getCurrPos();
-                if(!varMorp.seekToRightBracket())
+                if (!varMorp.seekToRightBracket())
                     return null;
                 prePos = varMorp.getCurrPos();
-                if(prePos-1>curPos)
-                    paramsString =  queryPiece.substring(curPos,prePos-1);
+                if (prePos - 1 > curPos)
+                    paramsString = queryPiece.substring(curPos, prePos - 1);
                 aWord = varMorp.getARawWord();
             }
 
-            if("|".equals(aWord)){
+            if ("|".equals(aWord)) {
                 prePos = varMorp.getCurrPos();
             }//按道理这里是需要报错的
             String sql = queryPiece.substring(prePos);
-            if(StringUtils.isBlank(sql))
+            if (StringUtils.isBlank(sql))
                 return null;
 
-            if(paramsString!=null){//找出所有的 变量，如果变量表中没有则设置为 null
+            if (paramsString != null) {//找出所有的 变量，如果变量表中没有则设置为 null
                 List<String> params = splitParamString(paramsString);
                 //String [] params = paramsString.split(",");
-                for(String param:params){
-                    if(StringUtils.isNotBlank(param)){
-                        ImmutableTriple<String,String,String> paramMeta= parseParameter(param);
+                for (String param : params) {
+                    if (StringUtils.isNotBlank(param)) {
+                        ImmutableTriple<String, String, String> paramMeta = parseParameter(param);
                         //{paramName,paramAlias,paramPretreatment};
-                        String paramName=StringUtils.isBlank(paramMeta.left)?paramMeta.middle:paramMeta.left;
-                        String paramAlias=StringUtils.isBlank(paramMeta.middle)?paramMeta.left:paramMeta.middle;
-                        LeftRightPair<String,Object> paramPair = translater.translateParam(paramName);
-                        if(paramPair!=null && paramPair.getRight()!=null){
+                        String paramName = StringUtils.isBlank(paramMeta.left) ? paramMeta.middle : paramMeta.left;
+                        String paramAlias = StringUtils.isBlank(paramMeta.middle) ? paramMeta.left : paramMeta.middle;
+                        LeftRightPair<String, Object> paramPair = translater.translateParam(paramName);
+                        if (paramPair != null && paramPair.getRight() != null) {
                             Object realParam = pretreatParameter(paramMeta.right, paramPair.getRight());
-                            if( hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
-                                QueryAndNamedParams inSt = buildInStatement(paramAlias,realParam);
+                            if (hasPretreatment(paramMeta.right, SQL_PRETREAT_CREEPFORIN)) {
+                                QueryAndNamedParams inSt = buildInStatement(paramAlias, realParam);
                                 hqlAndParams.addAllParams(inSt.getParams());
                                 sql = replaceParamAsSqlString(
-                                        sql,paramAlias,inSt.getQuery());
-                            }else if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_INPLACE)){
+                                    sql, paramAlias, inSt.getQuery());
+                            } else if (hasPretreatment(paramMeta.right, SQL_PRETREAT_INPLACE)) {
                                 sql = replaceParamAsSqlString(
-                                        sql,paramAlias,cleanSqlStatement(StringBaseOpt.objectToString(realParam)));
-                            }else{
-                                hqlAndParams.addParam(paramAlias,realParam);
+                                    sql, paramAlias, cleanSqlStatement(StringBaseOpt.objectToString(realParam)));
+                            } else {
+                                hqlAndParams.addParam(paramAlias, realParam);
 
                             }
                         }
                     }
                 }
                 hqlAndParams.setQuery(sql);
-            }else
+            } else
                 hqlAndParams.setQuery(sql);
 
-        }else{ // 简易写法  ([:]params)* | queryPiece
-            if(!varMorp.seekTo("|",false))
+        } else { // 简易写法  ([:]params)* | queryPiece
+            if (!varMorp.seekTo("|", false))
                 return null;
 
             int curPos = varMorp.getCurrPos();
             String sql = queryPiece.substring(curPos);
-            if(StringUtils.isBlank(sql))
+            if (StringUtils.isBlank(sql))
                 return null;
 
-            String paramsString =  queryPiece.substring(0,curPos-1);
-            if(StringUtils.isBlank(paramsString))
+            String paramsString = queryPiece.substring(0, curPos - 1);
+            if (StringUtils.isBlank(paramsString))
                 return null;
 
             List<String> params = splitParamString(paramsString);
             //String [] params = paramsString.split(",");
-            for(String param:params){
-                if(StringUtils.isNotBlank(param)){
-                    ImmutableTriple<String,String,String> paramMeta= parseParameter(param);
+            for (String param : params) {
+                if (StringUtils.isNotBlank(param)) {
+                    ImmutableTriple<String, String, String> paramMeta = parseParameter(param);
                     //{paramName,paramAlias,paramPretreatment};
                     boolean addParams = !StringUtils.isBlank(paramMeta.middle);
-                    String paramName=StringUtils.isBlank(paramMeta.left)?paramMeta.middle:paramMeta.left;
-                    String paramAlias=addParams?paramMeta.middle:paramMeta.left;
+                    String paramName = StringUtils.isBlank(paramMeta.left) ? paramMeta.middle : paramMeta.left;
+                    String paramAlias = addParams ? paramMeta.middle : paramMeta.left;
 
-                    LeftRightPair<String,Object> paramPair = translater.translateParam(paramName);
-                    if(paramPair==null || paramPair.getRight()==null)
+                    LeftRightPair<String, Object> paramPair = translater.translateParam(paramName);
+                    if (paramPair == null || paramPair.getRight() == null)
                         return null;
-                    if(addParams){
+                    if (addParams) {
                         Object realParam = pretreatParameter(paramMeta.right, paramPair.getRight());
-                        if( hasPretreatment(paramMeta.right ,SQL_PRETREAT_CREEPFORIN)){
-                            QueryAndNamedParams inSt = buildInStatement(paramAlias,realParam);
+                        if (hasPretreatment(paramMeta.right, SQL_PRETREAT_CREEPFORIN)) {
+                            QueryAndNamedParams inSt = buildInStatement(paramAlias, realParam);
                             hqlAndParams.addAllParams(inSt.getParams());
                             sql = replaceParamAsSqlString(
-                                    sql,paramAlias,inSt.getQuery());
-                        }if(hasPretreatment(paramMeta.right ,SQL_PRETREAT_INPLACE)){
+                                sql, paramAlias, inSt.getQuery());
+                        }
+                        if (hasPretreatment(paramMeta.right, SQL_PRETREAT_INPLACE)) {
                             sql = replaceParamAsSqlString(
-                                    sql,paramAlias,cleanSqlStatement(StringBaseOpt.objectToString(realParam)));
-                        }else{
+                                sql, paramAlias, cleanSqlStatement(StringBaseOpt.objectToString(realParam)));
+                        } else {
 
-                            hqlAndParams.addParam(paramAlias,realParam);
+                            hqlAndParams.addParam(paramAlias, realParam);
                         }
                     }
                 }
@@ -1774,30 +1750,30 @@ public abstract class QueryUtils {
     }
 
     public static QueryAndNamedParams translateQuery(
-            String queryStatement,Collection<String> filters,
-            boolean isUnion,IFilterTranslater translater){
+        String queryStatement, Collection<String> filters,
+        boolean isUnion, IFilterTranslater translater) {
 
         QueryAndNamedParams hqlAndParams = new QueryAndNamedParams();
-        Lexer varMorp = new Lexer(queryStatement,Lexer.LANG_TYPE_SQL);
-        StringBuilder hqlBuilder= new StringBuilder();
+        Lexer varMorp = new Lexer(queryStatement, Lexer.LANG_TYPE_SQL);
+        StringBuilder hqlBuilder = new StringBuilder();
         String sWord = varMorp.getAWord();
         int prePos = 0;
-        while( sWord!=null && ! sWord.equals("") ){
-            if( sWord.equals("{")){
+        while (sWord != null && !sWord.equals("")) {
+            if (sWord.equals("{")) {
                 int curPos = varMorp.getCurrPos();
-                if(curPos-1>prePos)
-                    hqlBuilder.append( queryStatement.substring(prePos, curPos-1));
+                if (curPos - 1 > prePos)
+                    hqlBuilder.append(queryStatement.substring(prePos, curPos - 1));
                 varMorp.seekToRightBrace();//.seekTo('}');
                 prePos = varMorp.getCurrPos();
                 //分析表别名， 格式为 TableNameOrClass:alias,TableNameOrClass:alias,.....
-                String tablesDesc =  queryStatement.substring(curPos,prePos-1).trim();
-                String [] tables = tablesDesc.split(",");
+                String tablesDesc = queryStatement.substring(curPos, prePos - 1).trim();
+                String[] tables = tablesDesc.split(",");
                 Map<String, String> tableMap = new HashMap<>();
-                for(String tableDesc:tables){
+                for (String tableDesc : tables) {
                     Lexer tableLexer = new Lexer(tableDesc);
                     String tableName = tableLexer.getAWord();
                     String aliasName = tableLexer.getAWord();
-                    if(":".equals(aliasName)){
+                    if (":".equals(aliasName)) {
                         aliasName = tableLexer.getAWord();
                     }
                     tableMap.put(tableName, aliasName);
@@ -1811,26 +1787,26 @@ public abstract class QueryUtils {
                 }
                 translater.setTableAlias(tableMap);
                 QueryAndNamedParams hqlPiece =
-                        translateQueryFilter(filters,
-                                 translater,isUnion);
+                    translateQueryFilter(filters,
+                        translater, isUnion);
 
-                if(hqlPiece!=null && !StringBaseOpt.isNvl(hqlPiece.getQuery())){
+                if (hqlPiece != null && !StringBaseOpt.isNvl(hqlPiece.getQuery())) {
                     hqlBuilder.append(" and ").append(hqlPiece.getQuery());
                     hqlAndParams.addAllParams(hqlPiece.getParams());
                 }
-            }else if( sWord.equals("[")){
+            } else if (sWord.equals("[")) {
                 int curPos = varMorp.getCurrPos();
-                if(curPos-1>prePos)
-                    hqlBuilder.append( queryStatement.substring(prePos, curPos-1));
+                if (curPos - 1 > prePos)
+                    hqlBuilder.append(queryStatement.substring(prePos, curPos - 1));
                 varMorp.seekToRightSquareBracket();
                 prePos = varMorp.getCurrPos();
                 //分析表别名， 格式为 TableNameOrClass:alias,TableNameOrClass:alias,.....
-                String queryPiece =  queryStatement.substring(curPos,prePos-1).trim();
+                String queryPiece = queryStatement.substring(curPos, prePos - 1).trim();
 
                 QueryAndNamedParams hqlPiece =
-                        translateQueryPiece(queryPiece ,translater);
+                    translateQueryPiece(queryPiece, translater);
 
-                if(hqlPiece!=null && !StringBaseOpt.isNvl(hqlPiece.getQuery())){
+                if (hqlPiece != null && !StringBaseOpt.isNvl(hqlPiece.getQuery())) {
                     hqlBuilder.append(hqlPiece.getQuery());
                     hqlAndParams.addAllParams(hqlPiece.getParams());
                 }
@@ -1952,47 +1928,116 @@ public abstract class QueryUtils {
      * @return 转换后的查询语句和这个语句中使用的查询参数，这个查询参数是paramsMap的一个子集。
      */
     public static QueryAndNamedParams translateQuery(
-            String queryStatement,Collection<String> filters,
-            Map<String,Object> paramsMap, boolean isUnion){
+        String queryStatement, Collection<String> filters,
+        Map<String, Object> paramsMap, boolean isUnion) {
 
-        return translateQuery( queryStatement, filters,
-                 isUnion ,new SimpleFilterTranslater(paramsMap));
+        return translateQuery(queryStatement, filters,
+            isUnion, new SimpleFilterTranslater(paramsMap));
 
     }
 
     /**
      * 和public static QueryAndNamedParams translateQuery(
-            String queryStatement,Collection《String》 filters,
-            Map《String,Object》 paramsMap, boolean isUnion)
-            一样，不同的是这个方法在没有外部过滤条件的情况下使用，就是没有上面的方法一
+     * String queryStatement,Collection《String》 filters,
+     * Map《String,Object》 paramsMap, boolean isUnion)
+     * 一样，不同的是这个方法在没有外部过滤条件的情况下使用，就是没有上面的方法一
+     *
      * @param queryStatement queryStatement
-     * @param paramsMap paramsMap
+     * @param paramsMap      paramsMap
      * @return QueryAndNamedParams
      */
     public static QueryAndNamedParams translateQuery(
-            String queryStatement,Map<String,Object> paramsMap){
+        String queryStatement, Map<String, Object> paramsMap) {
 
-        return translateQuery( queryStatement, null,
-                 false ,new SimpleFilterTranslater(paramsMap));
+        return translateQuery(queryStatement, null,
+            false, new SimpleFilterTranslater(paramsMap));
     }
 
     /**
      * 是这个方法只生成外部过滤条件的 过滤语句片段
-     * @param tableMap 管理的表名 和 别名
-     * @param filters  相关的过滤条件
+     *
+     * @param tableMap  管理的表名 和 别名
+     * @param filters   相关的过滤条件
      * @param paramsMap 参数
-     * @param isUnion 拼接方式，是在同一个占位符中有多个符合条件的过滤语句时之间的拼接方式，true用Or拼接，false用and拼接
-     * @return  QueryAndNamedParams
+     * @param isUnion   拼接方式，是在同一个占位符中有多个符合条件的过滤语句时之间的拼接方式，true用Or拼接，false用and拼接
+     * @return QueryAndNamedParams
      */
     public static QueryAndNamedParams translateQuery(
-            Map<String,String> tableMap,Collection<String> filters,
-            Map<String,Object> paramsMap,boolean isUnion){
+        Map<String, String> tableMap, Collection<String> filters,
+        Map<String, Object> paramsMap, boolean isUnion) {
 
         SimpleFilterTranslater translater = new SimpleFilterTranslater(paramsMap);
         translater.setTableAlias(tableMap);
 
         return translateQueryFilter(filters,
-                 translater,isUnion);
+            translater, isUnion);
+    }
+
+    public interface IFilterTranslater extends VariableTranslate {
+        void setTableAlias(Map<String, String> tableAlias);
+
+        String translateColumn(String columnDesc);
+
+        LeftRightPair<String, Object> translateParam(String paramName);
+    }
+
+    public static class SimpleFilterTranslater implements IFilterTranslater {
+        private Map<String, Object> paramsMap;
+        private Map<String, String> tableAlias;
+        private ObjectTranslate mapTranslate;
+
+        public SimpleFilterTranslater(Map<String, Object> paramsMap) {
+            this.tableAlias = null;
+            this.paramsMap = paramsMap;
+            this.mapTranslate = new ObjectTranslate(paramsMap);
+        }
+
+        @Override
+        public void setTableAlias(Map<String, String> tableAlias) {
+            this.tableAlias = tableAlias;
+        }
+
+        @Override
+        public String translateColumn(String columnDesc) {
+            if (tableAlias == null || columnDesc == null || tableAlias.size() == 0)
+                return null;
+            int n = columnDesc.indexOf('.');
+            if (n < 0) {
+                return null;
+            }
+
+            String poClassName = columnDesc.substring(0, n);
+            if (tableAlias.containsKey(poClassName)) {
+                String alias = tableAlias.get(poClassName);
+                return StringUtils.isBlank(alias) ? columnDesc.substring(n + 1) : alias + '.' + columnDesc.substring(n + 1);
+            } /** 这个地方无法获取 表相关的元数据信息，如果可以校验一下字段中是否有对应的字段 就完美了；、
+             所以目前只能由于仅有一个表的过滤中 */
+            else if ("*".equals(poClassName) && tableAlias.size() == 1) {
+                String alias = tableAlias.values().iterator().next();
+                return StringUtils.isBlank(alias) ? columnDesc.substring(n + 1) : alias + '.' + columnDesc.substring(n + 1);
+            }
+            return null;
+        }
+
+        @Override
+        public LeftRightPair<String, Object> translateParam(String paramName) {
+            if (paramsMap == null)
+                return null;
+            Object obj = ReflectionOpt.attainExpressionValue(paramsMap, paramName);
+            if (obj == null)
+                return null;
+            if (obj instanceof String) {
+                if (StringUtils.isBlank((String) obj))
+                    return null;
+            }
+            return new LeftRightPair<>(paramName, obj);
+        }
+
+        @Override
+        public Object getVarValue(String varName) {
+            return mapTranslate.getVarValue(varName);
+        }
+
     }
 
 }

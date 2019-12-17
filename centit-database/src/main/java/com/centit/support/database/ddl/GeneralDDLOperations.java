@@ -21,7 +21,7 @@ public abstract class GeneralDDLOperations implements DDLOperations {
 
     protected Connection conn;
 
-    public GeneralDDLOperations(){
+    public GeneralDDLOperations() {
 
     }
 
@@ -29,13 +29,9 @@ public abstract class GeneralDDLOperations implements DDLOperations {
         this.conn = conn;
     }
 
-    public void setConnect(Connection conn) {
-        this.conn = conn;
-    }
-
     public static GeneralDDLOperations createDDLOperations(final DBType dbtype)
-            throws SQLException {
-        switch (dbtype){
+        throws SQLException {
+        switch (dbtype) {
             case Oracle:
             case DM:
             case KingBase:
@@ -54,12 +50,12 @@ public abstract class GeneralDDLOperations implements DDLOperations {
                 return new PostgreSqlDDLOperations();
             case Access:
             default:
-                throw new  SQLException("不支持的数据库类型："+dbtype.toString());
+                throw new SQLException("不支持的数据库类型：" + dbtype.toString());
         }
     }
 
     public static GeneralDDLOperations createDDLOperations(final Connection conn)
-            throws SQLException {
+        throws SQLException {
         DBType dbtype = DBType.mapDBType(conn.getMetaData().getURL());
         GeneralDDLOperations dllOperations = createDDLOperations(dbtype);
         dllOperations.setConnect(conn);
@@ -68,32 +64,37 @@ public abstract class GeneralDDLOperations implements DDLOperations {
 
     /**
      * 返回格式检查结果
+     *
      * @param tableInfo 表
      * @return Pair
      */
     public static final Pair<Integer, String> checkTableWellDefined(final TableInfo tableInfo) {
-        if(!Lexer.isLabel(tableInfo.getTableName())) {
+        if (!Lexer.isLabel(tableInfo.getTableName())) {
             return new ImmutablePair<>(-1, "表名" + tableInfo.getTableName() + "格式不正确！");
         }
-        for(TableField field : tableInfo.getColumns()){
-            if(!Lexer.isLabel(field.getColumnName())) {
+        for (TableField field : tableInfo.getColumns()) {
+            if (!Lexer.isLabel(field.getColumnName())) {
                 return new ImmutablePair<>(-2, "字段名" + field.getColumnName() + "格式不正确！");
             }
-            if(StringUtils.isBlank(field.getColumnType())) {
+            if (StringUtils.isBlank(field.getColumnType())) {
                 return new ImmutablePair<>(-3, "字段" + field.getColumnName() + "没有指定类型！");
             }
         }
 
-        if(!tableInfo.hasParmaryKey()) {
+        if (!tableInfo.hasParmaryKey()) {
             return new ImmutablePair<>(-4, "没有定义主键！");
         }
 
-        return new ImmutablePair<>(0,"ok！");
+        return new ImmutablePair<>(0, "ok！");
+    }
+
+    public void setConnect(Connection conn) {
+        this.conn = conn;
     }
 
     /**
      * 创建序列
-      * 用表来模拟sequence
+     * 用表来模拟sequence
      * create table simulate_sequence (seqname varchar(100) not null primary key,
      * currvalue integer, increment integer);
      *
@@ -101,13 +102,13 @@ public abstract class GeneralDDLOperations implements DDLOperations {
      * @return sql语句
      */
     @Override
-    public String makeCreateSequenceSql(final String sequenceName){
+    public String makeCreateSequenceSql(final String sequenceName) {
         return "INSERT INTO simulate_sequence (seqname, currvalue , increment)"
-                + " VALUES ("+ QueryUtils.buildStringForQuery(sequenceName)+", 0, 1)";
+            + " VALUES (" + QueryUtils.buildStringForQuery(sequenceName) + ", 0, 1)";
     }
 
     @Override
-    public String makeCreateTableSql(final TableInfo tableInfo){
+    public String makeCreateTableSql(final TableInfo tableInfo) {
         StringBuilder sbCreate = new StringBuilder("create table ");
         sbCreate.append(tableInfo.getTableName()).append(" (");
         appendColumnsSQL(tableInfo, sbCreate);
@@ -117,11 +118,11 @@ public abstract class GeneralDDLOperations implements DDLOperations {
     }
 
     protected void appendPkSql(final TableInfo tableInfo, StringBuilder sbCreate) {
-        if (tableInfo.hasParmaryKey()){
+        if (tableInfo.hasParmaryKey()) {
             sbCreate.append(" constraint ");
-            if (StringUtils.isBlank(tableInfo.getPkName())){
-               sbCreate.append("pk_"+tableInfo.getTableName());
-            }else{
+            if (StringUtils.isBlank(tableInfo.getPkName())) {
+                sbCreate.append("pk_" + tableInfo.getTableName());
+            } else {
                 sbCreate.append(tableInfo.getPkName());
             }
             sbCreate.append(" primary key ");
@@ -131,9 +132,9 @@ public abstract class GeneralDDLOperations implements DDLOperations {
 
     protected void appendPkColumnSql(final TableInfo tableInfo, StringBuilder sbCreate) {
         sbCreate.append("(");
-        int i=0;
-        for(TableField pkField : tableInfo.getPkFields()){
-            if(i>0) {
+        int i = 0;
+        for (TableField pkField : tableInfo.getPkFields()) {
+            if (i > 0) {
                 sbCreate.append(", ");
             }
             sbCreate.append(pkField.getColumnName());
@@ -143,16 +144,16 @@ public abstract class GeneralDDLOperations implements DDLOperations {
     }
 
     protected void appendColumnsSQL(final TableInfo tableInfo, StringBuilder sbCreate) {
-        for(TableField field : tableInfo.getColumns()){
-            appendColumnSQL(field,sbCreate);
-            if(StringUtils.isNotBlank(field.getDefaultValue())) {
+        for (TableField field : tableInfo.getColumns()) {
+            appendColumnSQL(field, sbCreate);
+            if (StringUtils.isNotBlank(field.getDefaultValue())) {
                 sbCreate.append(" default ").append(field.getDefaultValue());
             }
             sbCreate.append(",");
         }
     }
 
-    protected void appendColumnTypeSQL(final TableField field,StringBuilder sbCreate) {
+    protected void appendColumnTypeSQL(final TableField field, StringBuilder sbCreate) {
         sbCreate.append(field.getColumnType());
         //StringUtils.equalsIgnoreCase(str1, str2)
         if ("varchar".equalsIgnoreCase(field.getColumnType()) || "varchar2".equalsIgnoreCase(field.getColumnType())) {
@@ -174,60 +175,60 @@ public abstract class GeneralDDLOperations implements DDLOperations {
         }
     }
 
-    protected void appendColumnSQL(final TableField field,StringBuilder sbCreate) {
+    protected void appendColumnSQL(final TableField field, StringBuilder sbCreate) {
         sbCreate.append(field.getColumnName())
-                .append(" ");
+            .append(" ");
         appendColumnTypeSQL(field, sbCreate);
-        if(field.isMandatory()) {
+        if (field.isMandatory()) {
             sbCreate.append(" not null");
         }
     }
 
     @Override
-    public String makeDropTableSql(final String tableCode){
+    public String makeDropTableSql(final String tableCode) {
         return "drop table " + tableCode;
     }
 
     @Override
-    public String makeAddColumnSql(final String tableCode, final TableField column){
+    public String makeAddColumnSql(final String tableCode, final TableField column) {
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
         sbsql.append(" add column ");
-        appendColumnSQL(column,sbsql);
+        appendColumnSQL(column, sbsql);
         return sbsql.toString();
     }
 
     @Override
-    public String makeDropColumnSql(final String tableCode, final String columnCode){
-        return  "alter table " + tableCode +" drop COLUMN " + columnCode;
+    public String makeDropColumnSql(final String tableCode, final String columnCode) {
+        return "alter table " + tableCode + " drop COLUMN " + columnCode;
 
     }
 
     @Override
-    public String makeRenameColumnSql(final String tableCode, final String columnCode, TableField column){
+    public String makeRenameColumnSql(final String tableCode, final String columnCode, TableField column) {
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
         sbsql.append(" rename COLUMN ");
         sbsql.append(columnCode);
         sbsql.append(" to ");
         sbsql.append(column.getColumnName());
-        return  sbsql.toString();
+        return sbsql.toString();
     }
 
     @Override
-    public List<String> makeReconfigurationColumnSqls(final String tableCode, final String columnCode, final TableField column){
+    public List<String> makeReconfigurationColumnSqls(final String tableCode, final String columnCode, final TableField column) {
         List<String> sqls = new ArrayList<String>();
         SimpleTableField tempColumn = new SimpleTableField();
-        tempColumn.setColumnName(columnCode+"_1");
+        tempColumn.setColumnName(columnCode + "_1");
         sqls.add(makeRenameColumnSql(tableCode, columnCode, tempColumn));
         sqls.add(makeAddColumnSql(tableCode, column));
-        sqls.add("update tableCode set "+ column.getColumnName() + " = " + columnCode);
-        sqls.add(makeDropColumnSql(tableCode, columnCode+"_1"));
+        sqls.add("update tableCode set " + column.getColumnName() + " = " + columnCode);
+        sqls.add(makeDropColumnSql(tableCode, columnCode + "_1"));
         return sqls;
     }
 
     @Override
-    public void createSequence(final String sequenceName)throws SQLException{
+    public void createSequence(final String sequenceName) throws SQLException {
         DatabaseAccess.doExecuteSql(conn, makeCreateSequenceSql(sequenceName));
     }
 
@@ -243,30 +244,30 @@ public abstract class GeneralDDLOperations implements DDLOperations {
 
     @Override
     public void addColumn(String tableCode, TableField column) throws SQLException {
-        DatabaseAccess.doExecuteSql(conn, makeAddColumnSql(tableCode,column));
+        DatabaseAccess.doExecuteSql(conn, makeAddColumnSql(tableCode, column));
     }
 
     @Override
     public void modifyColumn(String tableCode, TableField oldColumn, TableField column) throws SQLException {
-        DatabaseAccess.doExecuteSql(conn, makeModifyColumnSql(tableCode,oldColumn, column));
+        DatabaseAccess.doExecuteSql(conn, makeModifyColumnSql(tableCode, oldColumn, column));
     }
 
     @Override
     public void dropColumn(String tableCode, String columnCode) throws SQLException {
-        DatabaseAccess.doExecuteSql(conn, makeDropColumnSql(tableCode,columnCode));
+        DatabaseAccess.doExecuteSql(conn, makeDropColumnSql(tableCode, columnCode));
     }
 
     @Override
     public void renameColumn(String tableCode, String columnCode, TableField column) throws SQLException {
-        DatabaseAccess.doExecuteSql(conn, makeRenameColumnSql(tableCode,columnCode,column));
+        DatabaseAccess.doExecuteSql(conn, makeRenameColumnSql(tableCode, columnCode, column));
     }
 
     @Override
     public void reconfigurationColumn(String tableCode, String columnCode, TableField column) throws SQLException {
         List<String> sqList = makeReconfigurationColumnSqls(tableCode, columnCode, column);
-        if(sqList==null)
+        if (sqList == null)
             return;
-        for(String sql:sqList){
+        for (String sql : sqList) {
             DatabaseAccess.doExecuteSql(conn, sql);
         }
     }

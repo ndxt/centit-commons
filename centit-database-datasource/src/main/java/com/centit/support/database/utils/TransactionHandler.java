@@ -9,18 +9,10 @@ import java.sql.SQLException;
 
 public abstract class TransactionHandler {
 
-    private TransactionHandler() {
-        throw new IllegalAccessError("Utility class");
-    }
-
     private static final Logger logger = LoggerFactory.getLogger(TransactionHandler.class);
 
-    public interface TransactionWork<T> {
-        T execute(Connection conn) throws SQLException;
-    }
-
-    public interface QueryWork<T> {
-        T execute(Connection conn) throws SQLException, IOException;
+    private TransactionHandler() {
+        throw new IllegalAccessError("Utility class");
     }
 
     public static <T> T executeInTransaction(DataSourceDescription dataSourceDesc, TransactionWork<T> realWork)
@@ -34,13 +26,13 @@ public abstract class TransactionHandler {
     }
 
     public static <T> T executeInTransaction(Connection conn, TransactionWork<T> realWork)
-            throws SQLException {
-        try{
+        throws SQLException {
+        try {
             T relRet = realWork.execute(conn);
             conn.commit();
             return relRet;
-        } catch (SQLException e){
-            logger.error("error code :" + e.getSQLState() + e.getLocalizedMessage(),e);
+        } catch (SQLException e) {
+            logger.error("error code :" + e.getSQLState() + e.getLocalizedMessage(), e);
             conn.rollback();
             throw e;
         }
@@ -58,14 +50,22 @@ public abstract class TransactionHandler {
 
     public static <T> T executeQueryInTransaction(Connection conn, QueryWork<T> realWork)
         throws SQLException, IOException {
-        try{
+        try {
             return realWork.execute(conn);
             //conn.commit();
             //return relRet;
-        } catch (SQLException e){
-            logger.error("error code :" + e.getSQLState() + e.getLocalizedMessage(),e);
+        } catch (SQLException e) {
+            logger.error("error code :" + e.getSQLState() + e.getLocalizedMessage(), e);
             //conn.rollback();
             throw e;
         }
+    }
+
+    public interface TransactionWork<T> {
+        T execute(Connection conn) throws SQLException;
+    }
+
+    public interface QueryWork<T> {
+        T execute(Connection conn) throws SQLException, IOException;
     }
 }

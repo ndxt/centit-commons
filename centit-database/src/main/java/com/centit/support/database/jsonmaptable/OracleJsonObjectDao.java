@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 public class OracleJsonObjectDao extends GeneralJsonObjectDao {
 
-    public OracleJsonObjectDao(){
+    public OracleJsonObjectDao() {
 
     }
 
@@ -22,17 +22,16 @@ public class OracleJsonObjectDao extends GeneralJsonObjectDao {
         super(tableInfo);
     }
 
-    public OracleJsonObjectDao(Connection conn,TableInfo tableInfo) {
-        super(conn,tableInfo);
+    public OracleJsonObjectDao(Connection conn, TableInfo tableInfo) {
+        super(conn, tableInfo);
     }
-
 
 
     @Override
     public Long getSequenceNextValue(final String sequenceName) throws SQLException, IOException {
         Object object = DatabaseAccess.getScalarObjectQuery(
-                 getConnect(),
-                 "SELECT " + sequenceName + ".nextval from dual");
+            getConnect(),
+            "SELECT " + sequenceName + ".nextval from dual");
         return NumberBaseOpt.castObjectToLong(object);
     }
 

@@ -34,29 +34,29 @@ public class JdbcMetadata implements DatabaseMetadata {
             DatabaseMetaData dbmd = dbc.getMetaData();
 
             ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, null, null);
-            while(rs.next()) {
+            while (rs.next()) {
                 SimpleTableInfo tab = new SimpleTableInfo();
-                if(dbSechema!=null) {
+                if (dbSechema != null) {
                     tab.setSchema(dbSechema.toUpperCase());
                 }
-                tab.setTableName(rs.getString("TABLE_NAME") );
+                tab.setTableName(rs.getString("TABLE_NAME"));
                 tab.setTableLabelName(rs.getString("REMARKS"));
                 String tt = rs.getString("TABLE_TYPE");
-                if("view".equalsIgnoreCase(tt) || "table".equalsIgnoreCase(tt) ) {
+                if ("view".equalsIgnoreCase(tt) || "table".equalsIgnoreCase(tt)) {
                     fetchTableDetail(tab, dbmd);
-                    tab.setTableType("view".equalsIgnoreCase(tt)?"V":"T");
+                    tab.setTableType("view".equalsIgnoreCase(tt) ? "V" : "T");
                     tables.add(tab);
                 }
             }
             rs.close();
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
         return tables;
     }
 
 
-    private void fetchTableDetail(SimpleTableInfo tab ,DatabaseMetaData dbmd  ) {
+    private void fetchTableDetail(SimpleTableInfo tab, DatabaseMetaData dbmd) {
         String tabName = tab.getTableName();
         try {
             String dbSchema = this.getDBSchema();
@@ -71,7 +71,7 @@ public class JdbcMetadata implements DatabaseMetadata {
                 field.setPrecision(rs.getInt("COLUMN_SIZE"));
                 field.setScale(rs.getInt("DECIMAL_DIGITS"));
                 field.setNullEnable(rs.getString("NULLABLE"));
-                field.setColumnComment( rs.getString("REMARKS"));
+                field.setColumnComment(rs.getString("REMARKS"));
                 field.mapToMetadata();
                 tab.addColumn(field);
             }
@@ -84,11 +84,11 @@ public class JdbcMetadata implements DatabaseMetadata {
             rs.close();
 
             rs = dbmd.getExportedKeys(dbCatalog, dbSchema, tabName);
-            Map<String , SimpleTableReference> refs = new HashMap<String , SimpleTableReference>();
+            Map<String, SimpleTableReference> refs = new HashMap<String, SimpleTableReference>();
             while (rs.next()) {
                 String fkTableName = rs.getString("FKTABLE_NAME");
-                SimpleTableReference ref= refs.get(fkTableName);
-                if(ref==null){
+                SimpleTableReference ref = refs.get(fkTableName);
+                if (ref == null) {
                     ref = new SimpleTableReference();
                     ref.setTableName(fkTableName);
                     ref.setParentTableName(tabName);
@@ -99,12 +99,12 @@ public class JdbcMetadata implements DatabaseMetadata {
             }
             rs.close();
 
-            for(Map.Entry<String , SimpleTableReference> entry:refs.entrySet()){
+            for (Map.Entry<String, SimpleTableReference> entry : refs.entrySet()) {
                 tab.addReference(entry.getValue());
             }
 
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
     }
 
@@ -117,13 +117,13 @@ public class JdbcMetadata implements DatabaseMetadata {
         try {
             String dbSechema = this.getDBSchema();
             String dbCatalog = this.getDBCatalog();
-            if(dbSechema!=null) {
+            if (dbSechema != null) {
                 tab.setSchema(dbc.getSchema().toUpperCase());
             }
             DatabaseMetaData dbmd = dbc.getMetaData();
 
             ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, tabName, null);
-            if(rs.next()) {
+            if (rs.next()) {
                 tab.setTableLabelName(rs.getString("REMARKS"));
             }
             rs.close();
@@ -131,33 +131,22 @@ public class JdbcMetadata implements DatabaseMetadata {
             fetchTableDetail(tab, dbmd);
 
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
         return tab;
     }
 
     @Override
     public String getDBSchema() {
-        if(StringUtils.isNotBlank(this.dbSchema)){
+        if (StringUtils.isNotBlank(this.dbSchema)) {
             return this.dbSchema;
         }
         try {
             return dbc.getSchema();
-        }catch (AbstractMethodError error){
+        } catch (AbstractMethodError error) {
             return null;
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
-            return null;
-        }
-    }
-
-    public String getDBCatalog() {
-        try {
-            return dbc.getCatalog();
-        }catch (AbstractMethodError error){
-            return null;
-        } catch (SQLException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
         }
     }
@@ -165,5 +154,16 @@ public class JdbcMetadata implements DatabaseMetadata {
     @Override
     public void setDBSchema(String schema) {
         this.dbSchema = schema;
+    }
+
+    public String getDBCatalog() {
+        try {
+            return dbc.getCatalog();
+        } catch (AbstractMethodError error) {
+            return null;
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
+        }
     }
 }

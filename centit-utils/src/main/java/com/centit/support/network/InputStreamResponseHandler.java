@@ -12,17 +12,17 @@ import java.io.InputStream;
 
 public class InputStreamResponseHandler implements ResponseHandler<InputStream> {
 
-  public static final ResponseHandler<InputStream> INSTANCE = new InputStreamResponseHandler();
+    public static final ResponseHandler<InputStream> INSTANCE = new InputStreamResponseHandler();
 
-  @Override
-  public InputStream handleResponse(final HttpResponse response) throws IOException {
-    final StatusLine statusLine = response.getStatusLine();
-    final HttpEntity entity = response.getEntity();
-    if (statusLine.getStatusCode() >= 300) {
-      EntityUtils.consume(entity);
-      throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
+    @Override
+    public InputStream handleResponse(final HttpResponse response) throws IOException {
+        final StatusLine statusLine = response.getStatusLine();
+        final HttpEntity entity = response.getEntity();
+        if (statusLine.getStatusCode() >= 300) {
+            EntityUtils.consume(entity);
+            throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
+        }
+        return entity == null ? null : entity.getContent();
     }
-    return entity == null ? null : entity.getContent();
-  }
 
 }

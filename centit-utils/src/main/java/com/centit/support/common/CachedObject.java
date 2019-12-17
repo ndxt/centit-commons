@@ -7,17 +7,17 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.function.Supplier;
 
-public class CachedObject<T> extends AbstractCachedObject<T>  {
+public class CachedObject<T> extends AbstractCachedObject<T> {
 
     private static Log logger = LogFactory.getLog(CachedObject.class);
 
     private Supplier<T> refresher;
     private long freshPeriod;
 
-    public  CachedObject(){
+    public CachedObject() {
     }
 
-    public  CachedObject(Supplier<T> refresher){
+    public CachedObject(Supplier<T> refresher) {
         this.target = null;
         this.evicted = true;
         this.refresher = refresher;
@@ -25,11 +25,10 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
     }
 
     /**
-     *
-     * @param refresher 重新获取代码的接口
+     * @param refresher   重新获取代码的接口
      * @param freshPeriod 保鲜时间，单位为秒
      */
-    public  CachedObject(Supplier<T> refresher, int freshPeriod){
+    public CachedObject(Supplier<T> refresher, int freshPeriod) {
         this.target = null;
         this.evicted = true;
         this.refresher = refresher;
@@ -37,7 +36,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
     }
 
 
-    public  CachedObject(Supplier<T> refresher, AbstractCachedObject<?> parentCache ){
+    public CachedObject(Supplier<T> refresher, AbstractCachedObject<?> parentCache) {
         this.target = null;
         this.evicted = true;
         this.refresher = refresher;
@@ -45,11 +44,11 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
         this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
     }
 
-    public  CachedObject(Supplier<T> refresher, AbstractCachedObject<?> [] parentCaches ){
+    public CachedObject(Supplier<T> refresher, AbstractCachedObject<?>[] parentCaches) {
         this.target = null;
         this.evicted = true;
         this.refresher = refresher;
-        for(AbstractCachedObject<?> parentCache: parentCaches) {
+        for (AbstractCachedObject<?> parentCache : parentCaches) {
             parentCache.addDeriveCache(this);
         }
         this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
@@ -62,31 +61,31 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
         this.freshPeriod = freshPeriod;
     }
 
-    private synchronized void refreshData(){
+    private synchronized void refreshData() {
         //刷新派生缓存
         evictDerivativeCahce();
         T tempTarget = null;
-        try{
+        try {
             tempTarget = refresher.get();
-        }catch (RuntimeException re){
+        } catch (RuntimeException re) {
             logger.error(re.getMessage(), re);
         }
-        setRefreshDataAndState(tempTarget,freshPeriod, true);
+        setRefreshDataAndState(tempTarget, freshPeriod, true);
     }
 
-    public T getCachedTarget(){
-        if(this.target == null || isTargetOutOfDate(freshPeriod)){
+    public T getCachedTarget() {
+        if (this.target == null || isTargetOutOfDate(freshPeriod)) {
             refreshData();
         }
         return target;
     }
 
-    public T getFreshTarget(){
+    public T getFreshTarget() {
         refreshData();
         return target;
     }
 
-    public T getRawTarget(){
+    public T getRawTarget() {
         return target;
     }
 
@@ -94,7 +93,7 @@ public class CachedObject<T> extends AbstractCachedObject<T>  {
         this.refresher = refresher;
     }
 
-    public void setFreshData(T freshData){
+    public void setFreshData(T freshData) {
         this.target = CollectionsOpt.unmodifiableObject(freshData);
         this.refreshTime = DatetimeOpt.currentUtilDate();
         this.evicted = false;

@@ -25,25 +25,26 @@ import java.util.Random;
         </property>
     </bean>
  */
-/** 对辨析难度要求高的可以用 google的kaptcha ，
+
+/**
+ * 对辨析难度要求高的可以用 google的kaptcha ，
  * 这个类设计就是为了辨析容易，哈哈虽然有点搞笑，但是有的用户就是有这个要求
  * google的kaptcha 是用方法 ，先配置bean
  * 在类中注入这个bean
  * 然后调用 BufferedImage bi = captchaProducer.createImage(String captchaKey);方法
  * 着用用法就和CaptchaImageUtil的generateCaptchaImage 方法一致了
- * @author codefan
  *
+ * @author codefan
  */
 @SuppressWarnings("unused")
 public abstract class CaptchaImageUtil {
 
+    public static final String SESSIONCHECKCODE = "session_checkcode";
+    public static final String REQUESTCHECKCODE = "j_checkcode";
+    private static final String range = "0123456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSRUVWXYZ";
     private CaptchaImageUtil() {
         throw new IllegalAccessError("Utility class");
     }
-
-    private static final String range = "0123456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSRUVWXYZ";
-    public static final String SESSIONCHECKCODE = "session_checkcode";
-    public static final String REQUESTCHECKCODE = "j_checkcode";
 
     public static String getRandomString(int len) {
         Random random = new Random();
@@ -58,14 +59,14 @@ public abstract class CaptchaImageUtil {
         return getRandomString(4);
     }
 
-    public static boolean checkcodeMatch(String session_checkcode, String request_checkcode){
-       if(request_checkcode==null || session_checkcode==null
-               || "".equals(request_checkcode))
-           return false;
-       return session_checkcode.equalsIgnoreCase(
-                   request_checkcode.replaceAll("O", "0").replaceAll("o", "0")
-                       .replaceAll("I", "1").replaceAll("i", "1")
-                       .replaceAll("L", "1").replaceAll("l", "1"));
+    public static boolean checkcodeMatch(String session_checkcode, String request_checkcode) {
+        if (request_checkcode == null || session_checkcode == null
+            || "".equals(request_checkcode))
+            return false;
+        return session_checkcode.equalsIgnoreCase(
+            request_checkcode.replaceAll("O", "0").replaceAll("o", "0")
+                .replaceAll("I", "1").replaceAll("i", "1")
+                .replaceAll("L", "1").replaceAll("l", "1"));
     }
     /*    public static BufferedImage generateCaptchaImage(String captchaKey){
         DefaultKaptcha producer = new DefaultKaptcha();
@@ -77,11 +78,11 @@ public abstract class CaptchaImageUtil {
 
     public static BufferedImage generateCaptchaImage(String captchaKey, Font font) {
         // 设置图片的长宽
-        int width = 10+13*captchaKey.length();
+        int width = 10 + 13 * captchaKey.length();
         int height = 22;
         // ////// 创建内存图像
         BufferedImage image = new BufferedImage(width, height,
-                BufferedImage.TYPE_INT_RGB);
+            BufferedImage.TYPE_INT_RGB);
         // 获取图形上下文
         Graphics g = image.createGraphics();
         // 设定图像背景色(因为是做背景，所以偏淡)

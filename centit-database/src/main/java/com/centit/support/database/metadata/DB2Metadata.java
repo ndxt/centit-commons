@@ -11,43 +11,44 @@ import java.sql.SQLException;
 public class DB2Metadata implements DatabaseMetadata {
 
     protected static final Logger logger = LoggerFactory.getLogger(DB2Metadata.class);
-    private final static String sqlGetTabColumns=
-        "select a.name,a.coltype,a.length, a.scale, a.nulls "+
-        "from sysibm.systables b , sysibm.syscolumns a "+
-        "where a.tbcreator= ? and a.tbname= ? "+
-              "and b.name=a.tbname and b.creator=a.tbcreator";
+    private final static String sqlGetTabColumns =
+        "select a.name,a.coltype,a.length, a.scale, a.nulls " +
+            "from sysibm.systables b , sysibm.syscolumns a " +
+            "where a.tbcreator= ? and a.tbname= ? " +
+            "and b.name=a.tbname and b.creator=a.tbcreator";
 
-    private final static String sqlPKInfo=
-        "select constname, colname "+
-        "from sysibm.syskeycoluse "+
-        "where tbcreator=? and tbname=? "+
-        "order by colseq";
+    private final static String sqlPKInfo =
+        "select constname, colname " +
+            "from sysibm.syskeycoluse " +
+            "where tbcreator=? and tbname=? " +
+            "order by colseq";
 
-    private final static String sqlFKInfo=
-        "select tbname, relname, colcount, fkcolnames, pkcolnames "+
-        "from sysibm.sysrels "+
-        "where refkeyname= ?";
+    private final static String sqlFKInfo =
+        "select tbname, relname, colcount, fkcolnames, pkcolnames " +
+            "from sysibm.sysrels " +
+            "where refkeyname= ?";
 
-    private final static String sqlFKColumn=
-        "select a.name,a.coltype,a.length, a.scale, a.nulls "+
-        "from sysibm.systables b , sysibm.syscolumns a "+
-        "where a.tbcreator= ? and a.tbname= ? and a.name= ? "+
-              "and b.name=a.tbname and b.creator=a.tbcreator";
+    private final static String sqlFKColumn =
+        "select a.name,a.coltype,a.length, a.scale, a.nulls " +
+            "from sysibm.systables b , sysibm.syscolumns a " +
+            "where a.tbcreator= ? and a.tbname= ? and a.name= ? " +
+            "and b.name=a.tbname and b.creator=a.tbcreator";
 
-    private String sDBSchema ;
+    private String sDBSchema;
 
     private Connection dbc;
 
     @Override
-    public void setDBConfig(Connection dbc){
-        this.dbc=dbc;
+    public void setDBConfig(Connection dbc) {
+        this.dbc = dbc;
     }
+
     public String getDBSchema() {
         return sDBSchema;
     }
 
     public void setDBSchema(String schema) {
-        if(schema !=null)
+        if (schema != null)
             sDBSchema = schema.toUpperCase();
     }
 
@@ -73,7 +74,7 @@ public class DB2Metadata implements DatabaseMetadata {
                 }
             }
         } catch (SQLException e) {
-            logger.error(e.getLocalizedMessage(),e);
+            logger.error(e.getLocalizedMessage(), e);
         }
         try (PreparedStatement pStmt = dbc.prepareStatement(sqlPKInfo)) {
             pStmt.setString(1, sDBSchema);
@@ -85,7 +86,7 @@ public class DB2Metadata implements DatabaseMetadata {
                 }
             }
         } catch (SQLException e1) {
-            logger.error(e1.getLocalizedMessage(),e1);
+            logger.error(e1.getLocalizedMessage(), e1);
         }
         // get reference info
 
@@ -113,7 +114,7 @@ public class DB2Metadata implements DatabaseMetadata {
                 }
             }
         } catch (SQLException e1) {
-            logger.error(e1.getLocalizedMessage(),e1);
+            logger.error(e1.getLocalizedMessage(), e1);
         }
 
         return tab;

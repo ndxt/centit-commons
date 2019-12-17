@@ -17,7 +17,7 @@ public class ConnectThreadLocal extends ThreadLocal<ConnectThreadWrapper> {
     @Override
     public void remove() {
         ConnectThreadWrapper wrapper = super.get();
-        if(wrapper!=null) {
+        if (wrapper != null) {
             try {
                 wrapper.rollbackAllWork();
             } catch (SQLException e) {

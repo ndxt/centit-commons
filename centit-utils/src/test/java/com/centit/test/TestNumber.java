@@ -10,15 +10,14 @@ import java.math.BigDecimal;
 
 public class TestNumber {
 
-    public static String rmbDX(String f){
+    public static String rmbDX(String f) {
         return NumberBaseOpt.capitalization(
-                        (f.indexOf('.')>=0? f.substring(0,f.indexOf('.')):f)) + "元"
-        + NumberBaseOpt.capitalization(
-                String.valueOf(NumberBaseOpt.getNumByte(f,-1)))+"角"
-        + NumberBaseOpt.capitalization(
-                String.valueOf(NumberBaseOpt.getNumByte(f,-2)))+"分";
+            (f.indexOf('.') >= 0 ? f.substring(0, f.indexOf('.')) : f)) + "元"
+            + NumberBaseOpt.capitalization(
+            String.valueOf(NumberBaseOpt.getNumByte(f, -1))) + "角"
+            + NumberBaseOpt.capitalization(
+            String.valueOf(NumberBaseOpt.getNumByte(f, -2))) + "分";
     }
-
 
 
     public static void main(String[] args) {
@@ -33,16 +32,16 @@ public class TestNumber {
         System.out.println(yes.matchAspect(on));
 
         System.out.println(BigDecimal.valueOf(1000, -2));
-        String cs ="chinese我是中文";
+        String cs = "chinese我是中文";
         System.out.println(cs.length());
-        System.out.println(cs.substring(6,10));
+        System.out.println(cs.substring(6, 10));
         System.out.println(StringRegularOpt.isDoubleByteChar(cs.charAt(7)));
         //System.out.println(rmbDX("123.45"));
         //System.out.println(rmbDX("3456700000000089123.45"));
     }
 
     public static void testByte() {
-        byte [] buf = new byte[1024];
+        byte[] buf = new byte[1024];
 
         short s = (short) 62342;
         int n = s & 0xFFFF;
@@ -51,7 +50,7 @@ public class TestNumber {
 
         System.out.println(s);
 
-        System.out.println(ByteBaseOpt.readUInt16(buf,  0));
-        System.out.println(ByteBaseOpt.readInt16(buf,  0));
+        System.out.println(ByteBaseOpt.readUInt16(buf, 0));
+        System.out.println(ByteBaseOpt.readInt16(buf, 0));
     }
 }

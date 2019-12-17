@@ -14,17 +14,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  提供一些反射方面缺失功能的封装.
- *  @author codefan
+ * 提供一些反射方面缺失功能的封装.
+ *
+ * @author codefan
  */
 @SuppressWarnings("unused")
-public abstract class ReflectionOpt  {
+public abstract class ReflectionOpt {
+
+    protected static final Logger logger = LoggerFactory.getLogger(ReflectionOpt.class);
 
     private ReflectionOpt() {
         throw new IllegalAccessError("Utility class");
     }
-
-    protected static final Logger logger = LoggerFactory.getLogger(ReflectionOpt.class);
 
     /*
      * 循环向上转型,获取对象的DeclaredField.
@@ -32,8 +33,8 @@ public abstract class ReflectionOpt  {
      * @throws NoSuchFieldException 如果没有该Field时抛出.
      */
     public static Field getDeclaredField(Object object, String propertyName) throws NoSuchFieldException {
-        assert(object != null);
-        assert(propertyName != null && !propertyName.isEmpty());
+        assert (object != null);
+        assert (propertyName != null && !propertyName.isEmpty());
 
         return getDeclaredField(object.getClass(), propertyName);
     }
@@ -44,14 +45,14 @@ public abstract class ReflectionOpt  {
      * @throws NoSuchFieldException 如果没有该Field时抛出.
      */
     public static Field getDeclaredField(Class<?> clazz, String propertyName) throws NoSuchFieldException {
-        assert(clazz != null);
-        assert(propertyName != null && !propertyName.isEmpty());
+        assert (clazz != null);
+        assert (propertyName != null && !propertyName.isEmpty());
         //Assert.notNull(object);
         //Assert.hasText(propertyName);
         for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
             try {
                 Field f = superClass.getDeclaredField(propertyName);
-                if(f!=null)
+                if (f != null)
                     return f;
             } catch (NoSuchFieldException e) {
                 logger.debug(e.getMessage());
@@ -68,8 +69,8 @@ public abstract class ReflectionOpt  {
      * @return
      * @throws NoSuchFieldException
      */
-    public static Object forceGetFieldValue(Object object,Field field ) {
-        assert(object != null);
+    public static Object forceGetFieldValue(Object object, Field field) {
+        assert (object != null);
 
         boolean accessible = field.isAccessible();
         field.setAccessible(true);
@@ -78,7 +79,7 @@ public abstract class ReflectionOpt  {
         try {
             result = field.get(object);
         } catch (IllegalAccessException e) {
-            logger.info("error wont' happen."+ e.getMessage());
+            logger.info("error wont' happen." + e.getMessage());
         }
         field.setAccessible(accessible);
         return result;
@@ -89,27 +90,27 @@ public abstract class ReflectionOpt  {
      * 获得get field value by getter
      */
     public static Object getFieldValue(Object obj, String fieldName) {
-        Method md=null;
+        Method md = null;
         try {
             md = obj.getClass().getMethod("get" + StringUtils.capitalize(fieldName));
-        }catch (NoSuchMethodException noGet ){
+        } catch (NoSuchMethodException noGet) {
             try {
                 md = obj.getClass().getMethod("is" + StringUtils.capitalize(fieldName));
-            }catch (Exception e ){
+            } catch (Exception e) {
                 logger.error(noGet.getMessage() + e.getMessage());
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
 
-        if(md==null){
-            try{
+        if (md == null) {
+            try {
                 return forceGetProperty(obj, fieldName);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 logger.error(e.getMessage());
             }
-        }else{
-            try{
+        } else {
+            try {
                 return md.invoke(obj);
             } catch (Exception e) {
                 logger.error(e.getMessage());
@@ -119,9 +120,9 @@ public abstract class ReflectionOpt  {
     }
 
     public static boolean setFieldValue(Object object, String fieldName, Object newValue, Class<?> paramType) {
-        Class<?> relParamType = (paramType!=null)?paramType:(newValue!=null?newValue.getClass():null);
-        boolean hasSetValue=false;
-        if(relParamType != null) {
+        Class<?> relParamType = (paramType != null) ? paramType : (newValue != null ? newValue.getClass() : null);
+        boolean hasSetValue = false;
+        if (relParamType != null) {
             try {
                 Method md = object.getClass().getMethod("set" + StringUtils.capitalize(fieldName), relParamType);
                 md.invoke(object, newValue);
@@ -132,11 +133,11 @@ public abstract class ReflectionOpt  {
                 logger.error(e.getMessage());
             }
         }
-        if(!hasSetValue){
-            try{
+        if (!hasSetValue) {
+            try {
                 forceSetProperty(object, fieldName, newValue);
                 hasSetValue = true;
-            }catch (Exception e) {
+            } catch (Exception e) {
                 logger.error(e.getMessage());
             }
         }
@@ -144,12 +145,13 @@ public abstract class ReflectionOpt  {
     }
 
     public static boolean setFieldValue(Object object, String fieldName, Object newValue) {
-            return setFieldValue(object, fieldName, newValue, null);
+        return setFieldValue(object, fieldName, newValue, null);
     }
+
     /*
      * 获得get field value by getter
      */
-    public static Object getFieldValue(Object obj,  Field field) {
+    public static Object getFieldValue(Object obj, Field field) {
         try {
             return field.get(obj);
         } catch (Exception e) {
@@ -165,15 +167,15 @@ public abstract class ReflectionOpt  {
      * @throws NoSuchFieldException 如果没有该Field时抛出.
      */
     public static Object forceGetProperty(Object object, String propertyName) throws NoSuchFieldException {
-        assert(object != null);
-        assert(propertyName != null && !propertyName.isEmpty());
+        assert (object != null);
+        assert (propertyName != null && !propertyName.isEmpty());
 
         Field field = getDeclaredField(object, propertyName);
 /*        if(field==null){
             log.debug("property not found. (没有找到对应的属性) 对象：" + object.toString() +" 属性 ："+ propertyName);
             return null;
         }*/
-        return  forceGetFieldValue(object,field);
+        return forceGetFieldValue(object, field);
     }
 
     /*
@@ -182,9 +184,9 @@ public abstract class ReflectionOpt  {
      * @throws NoSuchFieldException 如果没有该Field时抛出.
      */
     public static void forceSetProperty(Object object, String propertyName, Object newValue)
-            throws NoSuchFieldException {
-        assert(object != null);
-        assert(propertyName != null && !propertyName.isEmpty());
+        throws NoSuchFieldException {
+        assert (object != null);
+        assert (propertyName != null && !propertyName.isEmpty());
 
         Field field = getDeclaredField(object, propertyName);
 /*        if(field==null){
@@ -192,15 +194,15 @@ public abstract class ReflectionOpt  {
             return;
         }*/
         boolean accessible = field.isAccessible();
-        if(!accessible) {
+        if (!accessible) {
             field.setAccessible(true);
         }
         try {
             field.set(object, newValue);
         } catch (IllegalAccessException e) {
-            logger.error("Error won't happen."+e.getMessage(), e);
+            logger.error("Error won't happen." + e.getMessage(), e);
         }
-        if(!accessible) {
+        if (!accessible) {
             field.setAccessible(accessible);
         }
     }
@@ -211,9 +213,9 @@ public abstract class ReflectionOpt  {
      * @throws NoSuchMethodException 如果没有该Method时抛出.
      */
     public static Object invokePrivateMethod(Object object, String methodName, Object... params)
-            throws NoSuchMethodException {
-        assert(object != null);
-        assert(methodName != null && !methodName.isEmpty());
+        throws NoSuchMethodException {
+        assert (object != null);
+        assert (methodName != null && !methodName.isEmpty());
 
         Class<?>[] types = new Class[params.length];
         for (int i = 0; i < params.length; i++) {
@@ -242,8 +244,8 @@ public abstract class ReflectionOpt  {
             result = method.invoke(object, params);
         } catch (Exception e) {
             //ReflectionUtils.handleReflectionException(e);
-            logger.error(e.getMessage() );
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
         method.setAccessible(accessible);
         return result;
@@ -278,32 +280,32 @@ public abstract class ReflectionOpt  {
     }
 
 
-
     /*
      * 获得field的getter函数名称.
      */
     public static String methodNameToField(String methodName) {
-        if(methodName== null)
+        if (methodName == null)
             return null;
         int sl = methodName.length();
 
-        if( sl > 3 && (methodName.startsWith("get") || methodName.startsWith("set") ))
-            return methodName.substring(3,4).toLowerCase() + methodName.substring(4);
+        if (sl > 3 && (methodName.startsWith("get") || methodName.startsWith("set")))
+            return methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
 
-        if( sl > 2 && methodName.startsWith("is"))
-            return methodName.substring(2,3).toLowerCase() + methodName.substring(3);
+        if (sl > 2 && methodName.startsWith("is"))
+            return methodName.substring(2, 3).toLowerCase() + methodName.substring(3);
 
         return methodName;
     }
+
     /*
      * 获得field的getter函数,如果找不到该方法,返回null.
      */
     public static Method getGetterMethod(Class<?> classType, Class<?> propertyType, String fieldName) {
         try {
             String getFuncName = boolean.class.equals(propertyType) ?/*|| Boolean.class.isAssignableFrom(propertyType)*/
-                  "is" + StringUtils.capitalize(fieldName) : "get" + StringUtils.capitalize(fieldName);
+                "is" + StringUtils.capitalize(fieldName) : "get" + StringUtils.capitalize(fieldName);
             Method md = classType.getMethod(getFuncName);
-            if(propertyType.isAssignableFrom( md.getReturnType()))
+            if (propertyType.isAssignableFrom(md.getReturnType()))
                 return md;
             else
                 return null;
@@ -316,10 +318,10 @@ public abstract class ReflectionOpt  {
     /*
      * 获得field的getter函数,如果找不到该方法,返回null.
      */
-    public static Method getGetterMethod(Class<?> classType,  String fieldName) {
+    public static Method getGetterMethod(Class<?> classType, String fieldName) {
         try {
             Method md = classType.getMethod("get" + StringUtils.capitalize(fieldName));
-            if(void.class.equals(md.getReturnType()))
+            if (void.class.equals(md.getReturnType()))
                 return null;
             else
                 return md;
@@ -341,18 +343,18 @@ public abstract class ReflectionOpt  {
         }
     }
 
-    public static LeftRightPair<Method, Object[]> getMatchBestMethod(Class<?> classType, String methodName, Map<String, Object> params){
-        Method[] mths =  classType.getMethods();
+    public static LeftRightPair<Method, Object[]> getMatchBestMethod(Class<?> classType, String methodName, Map<String, Object> params) {
+        Method[] mths = classType.getMethods();
         List<Method> getMths = new ArrayList<>();
         int matchParam = -1;
         LeftRightPair<Method, Object[]> mp = new LeftRightPair<>();
         for (Method mth : mths) {
-            if (mth.getName().equals(methodName)){
+            if (mth.getName().equals(methodName)) {
                 Parameter[] parameters = mth.getParameters();
                 int nps = parameters.length;
                 boolean bmatch = true;
                 Object[] prams = null;
-                if(nps>0) {
+                if (nps > 0) {
                     prams = new Object[nps];
                     for (int i = 0; i < nps; i++) {
                         String paramName = parameters[i].getName();
@@ -372,7 +374,7 @@ public abstract class ReflectionOpt  {
                         }
                     }
                 }
-                if(bmatch && nps>matchParam){
+                if (bmatch && nps > matchParam) {
                     matchParam = nps;
                     mp.setLeft(mth);
                     mp.setRight(prams);
@@ -384,22 +386,23 @@ public abstract class ReflectionOpt  {
 
     /**
      * 获得 对象的 属性; 目前只能支持一维数组的获取，多维数据暂时不支持，目前看也没有这个需要
-     * @param sourceObj 可以是 任意对象
+     *
+     * @param sourceObj  可以是 任意对象
      * @param expression 表达式 a.b[1].c 也可以 a.b[1].[2].c 间接实现二维数组
      * @return 返回结果
      */
-    public static Object attainExpressionValue(Object sourceObj, String expression){
-        if(sourceObj == null || StringUtils.isBlank(expression))
+    public static Object attainExpressionValue(Object sourceObj, String expression) {
+        if (sourceObj == null || StringUtils.isBlank(expression))
             return null;
-        if(".".equals(expression)) {
+        if (".".equals(expression)) {
             return sourceObj;
         }
         int nPos = expression.indexOf('.');
         String fieldValue;
-        String restExpression=".";
-        if (nPos>0) {
-            fieldValue = expression.substring(0,nPos).trim();
-            if(expression.length()>nPos+1) {
+        String restExpression = ".";
+        if (nPos > 0) {
+            fieldValue = expression.substring(0, nPos).trim();
+            if (expression.length() > nPos + 1) {
                 restExpression = expression.substring(nPos + 1);
             }
         } else if (nPos == 0) {
@@ -410,79 +413,79 @@ public abstract class ReflectionOpt  {
 
         int nAarrayInd = -1;
         nPos = fieldValue.indexOf('[');
-        if(nPos>=0){
-            String sArrayInd = fieldValue.substring(nPos+1,fieldValue.length()-1);
-            if(StringRegularOpt.isNumber(sArrayInd)) {
+        if (nPos >= 0) {
+            String sArrayInd = fieldValue.substring(nPos + 1, fieldValue.length() - 1);
+            if (StringRegularOpt.isNumber(sArrayInd)) {
                 nAarrayInd = NumberBaseOpt.castObjectToInteger(sArrayInd, 0);
             }
-            fieldValue = fieldValue.substring(0,nPos);
+            fieldValue = fieldValue.substring(0, nPos);
         }
 
         Object retObj;
-        if(StringUtils.isBlank(fieldValue)){
+        if (StringUtils.isBlank(fieldValue)) {
             retObj = sourceObj;
-        } else if(sourceObj instanceof Map ){
+        } else if (sourceObj instanceof Map) {
             @SuppressWarnings("unchecked")
-            Map<String ,Object> objMap = (Map<String ,Object>) sourceObj;
+            Map<String, Object> objMap = (Map<String, Object>) sourceObj;
             retObj = objMap.get(fieldValue);
-        }else{
+        } else {
             //如果是一个标量则不应该再有属性，所以统一返回null
-            if(ReflectionOpt.isScalarType(sourceObj.getClass())) {
+            if (ReflectionOpt.isScalarType(sourceObj.getClass())) {
                 return null;
             } else {
                 retObj = ReflectionOpt.getFieldValue(sourceObj, fieldValue);
             }
         }
-        if(retObj==null)
+        if (retObj == null)
             return null;
 
-        if(retObj instanceof Collection){
+        if (retObj instanceof Collection) {
             Collection<?> objlist = (Collection<?>) retObj;
             int objSize = objlist.size();
-            if(objSize<1)
+            if (objSize < 1)
                 return null;
 
-            if(nAarrayInd>=0){
-                if( nAarrayInd <objSize){
-                    int i=0;
-                    for(Object obj: objlist){
-                        if(nAarrayInd==i) {
+            if (nAarrayInd >= 0) {
+                if (nAarrayInd < objSize) {
+                    int i = 0;
+                    for (Object obj : objlist) {
+                        if (nAarrayInd == i) {
                             return attainExpressionValue(obj, restExpression);
                         }
                         i++;
                     }
                 }
                 return null;
-            }else{
-                Object [] retObjArray = new Object[objSize];
-                int i=0;
-                for(Object obj: objlist){
+            } else {
+                Object[] retObjArray = new Object[objSize];
+                int i = 0;
+                for (Object obj : objlist) {
                     retObjArray[i] = attainExpressionValue(obj, restExpression);
                     i++;
                 }
                 return retObjArray;
             }
-        }else if(retObj instanceof Object[]){
+        } else if (retObj instanceof Object[]) {
             Object[] objs = (Object[]) retObj;
             int objSize = objs.length;
-            if(objSize<1) {
+            if (objSize < 1) {
                 return null;
             }
-            if(nAarrayInd>=0){
-                if(nAarrayInd < objSize) {
+            if (nAarrayInd >= 0) {
+                if (nAarrayInd < objSize) {
                     return attainExpressionValue(objs[nAarrayInd], restExpression);
                 }
                 return null;
-            }else{
-                Object [] retObjArray = new Object[objSize];
-                int i=0;
+            } else {
+                Object[] retObjArray = new Object[objSize];
+                int i = 0;
                 for (Object obj : objs) {
                     retObjArray[i] = attainExpressionValue(obj, restExpression);
                     i++;
                 }
                 return retObjArray;
             }
-        }else{
+        } else {
             return attainExpressionValue(retObj, restExpression);
         }
     }
@@ -490,16 +493,16 @@ public abstract class ReflectionOpt  {
     /*
      * 获得get boolean field value by getter
      */
-    public static Boolean getBooleanFieldValue(Object obj,  String fieldName) {
+    public static Boolean getBooleanFieldValue(Object obj, String fieldName) {
         try {
             Method md = obj.getClass().getMethod("is" + StringUtils.capitalize(fieldName));
-            if(md==null)
+            if (md == null)
                 return null;
             Object objValue = md.invoke(obj);
-            if(objValue==null)
+            if (objValue == null)
                 return null;
-            if(objValue instanceof Boolean)
-                return (Boolean)objValue;
+            if (objValue instanceof Boolean)
+                return (Boolean) objValue;
             return Boolean.valueOf(objValue.toString());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -510,7 +513,7 @@ public abstract class ReflectionOpt  {
     /*
      * 获得boolean 型 field的getter函数,如果找不到该方法,返回null.
      */
-    public static Method getBooleanGetterMethod(Class<?> classType,  String fieldName) {
+    public static Method getBooleanGetterMethod(Class<?> classType, String fieldName) {
         try {
             return classType.getMethod("is" + StringUtils.capitalize(fieldName));
         } catch (NoSuchMethodException e) {
@@ -521,27 +524,29 @@ public abstract class ReflectionOpt  {
 
     /**
      * 将getter方法映射为对应属性
+     *
      * @param method Getter方法
      * @return 对应属性名
      */
-    public static String mapGetter2Field(Method method){
+    public static String mapGetter2Field(Method method) {
         String methodName = method.getName();
         return StringUtils.uncapitalize(
-            methodName.substring(methodName.startsWith("is")?2:3));
+            methodName.substring(methodName.startsWith("is") ? 2 : 3));
     }
+
     /*
      * 获取所有getMethod方法
      */
     public static List<Method> getAllGetterMethod(Class<?> type) {
         try {
-            Method[] mths =  type.getMethods();
+            Method[] mths = type.getMethods();
             List<Method> getMths = new ArrayList<>();
             for (Method mth : mths)
-                if( ( mth.getName().startsWith("get") ||  mth.getName().startsWith("is") )
-                        && ! mth.getName().equals("getClass")
-                        && ! void.class.equals(mth.getReturnType())
-                        //&& ! mth.getReturnType().getName().equals("void")
-                        && mth.getGenericParameterTypes().length < 1 )
+                if ((mth.getName().startsWith("get") || mth.getName().startsWith("is"))
+                    && !mth.getName().equals("getClass")
+                    && !void.class.equals(mth.getReturnType())
+                    //&& ! mth.getReturnType().getName().equals("void")
+                    && mth.getGenericParameterTypes().length < 1)
                     getMths.add(mth);
             return getMths;
 
@@ -556,14 +561,14 @@ public abstract class ReflectionOpt  {
      */
     public static List<Method> getAllSetterMethod(Class<?> type) {
         try {
-            Method[] mths =  type.getMethods();
+            Method[] mths = type.getMethods();
             List<Method> setMths = new ArrayList<Method>();
             for (Method mth : mths) {
                 String methodName = mth.getName();
-                if(  methodName.startsWith("set")
-                    &&  methodName.length()>=4
-                        //&& mth.getReturnType().getName().equals("void")
-                        && mth.getGenericParameterTypes().length == 1 ) {
+                if (methodName.startsWith("set")
+                    && methodName.length() >= 4
+                    //&& mth.getReturnType().getName().equals("void")
+                    && mth.getGenericParameterTypes().length == 1) {
                     setMths.add(mth);
                 }
             }
@@ -578,7 +583,7 @@ public abstract class ReflectionOpt  {
     /*
      * 调用对象的无参数函数
      */
-    public static void  invokeNoParamFunc(Object demander,String smethod) {
+    public static void invokeNoParamFunc(Object demander, String smethod) {
         try {
             //"copyNotNullProperty"
             Method setV = demander.getClass().getMethod(smethod);
@@ -587,7 +592,7 @@ public abstract class ReflectionOpt  {
                 return;    */
             setV.invoke(demander);
         } catch (NoSuchMethodException | SecurityException
-                | IllegalAccessException | InvocationTargetException e) {
+            | IllegalAccessException | InvocationTargetException e) {
             logger.error(e.getMessage(), e);
         }
     }
@@ -595,16 +600,16 @@ public abstract class ReflectionOpt  {
     /*
      * 调用相同类型的类之间的二元操作
      */
-    public static <T extends Object>  void  invokeBinaryOpt(T demander,String smethod,T param) {
+    public static <T extends Object> void invokeBinaryOpt(T demander, String smethod, T param) {
         try {
             //"copyNotNullProperty"
-            Method setV = demander.getClass().getMethod(smethod ,demander.getClass());
+            Method setV = demander.getClass().getMethod(smethod, demander.getClass());
             //Class rt = d.getReturnType();
 /*            if(setV == null)
                 return;    */
-            setV.invoke(demander,param);
+            setV.invoke(demander, param);
         } catch (NoSuchMethodException | SecurityException | IllegalArgumentException
-                | IllegalAccessException | InvocationTargetException e) {
+            | IllegalAccessException | InvocationTargetException e) {
             logger.error(e.getMessage(), e);
         }
     }
@@ -618,12 +623,10 @@ public abstract class ReflectionOpt  {
     }
 
     /**
-     * @param clazz
-     *            clazz The class to introspect
-     * @param index
-     *            the Index of the generic declaration,start from 0.
+     * @param clazz clazz The class to introspect
+     * @param index the Index of the generic declaration,start from 0.
      * @return the index generic declaration, or <code>Object.class</code> if
-     *         cannot be determined
+     * cannot be determined
      */
     public static Class<?> getSuperClassGenricType(Class<?> clazz, int index) {
 
@@ -638,7 +641,7 @@ public abstract class ReflectionOpt  {
 
         if (index >= params.length || index < 0) {
             logger.warn("Index: " + index + ", Size of " + clazz.getSimpleName() + "'s Parameterized Type: "
-                    + params.length);
+                + params.length);
             return Object.class;
         }
         if (!(params[index] instanceof Class)) {
@@ -649,70 +652,78 @@ public abstract class ReflectionOpt  {
     }
 
 
-    /** isPrimitiveType
+    /**
+     * isPrimitiveType
      * 判断一个类型是否是基础类型 int boolean void float double char
      * 或者单值类型 String Date Integer Float Double，  scalar
+     *
      * @param tp isPrimitiveType
      * @return isPrimitiveType
      */
-    public static boolean isPrimitiveType(Class<?>  tp){
+    public static boolean isPrimitiveType(Class<?> tp) {
         return tp.isPrimitive() || tp.getName().startsWith("java.lang.");
     }
-    /** isScalarType
+
+    /**
+     * isScalarType
      * 判断一个类型是否是基础类型 int boolean void float double char
      * 或者单值类型 String Date Integer Float Double，  scalar
+     *
      * @param tp isScalarType
      * @return isScalarType
      */
-    public static boolean isScalarType(Class<?>  tp){
-        if(tp.isPrimitive()) {
+    public static boolean isScalarType(Class<?> tp) {
+        if (tp.isPrimitive()) {
             return true;
         }
 
-        if(tp.isArray()){
+        if (tp.isArray()) {
             return false;
         }
         //tp.getPackage()
         String tpName = tp.getPackage().getName();
-        if(tpName.equals("java.lang") || tpName.equals("java.sql") )
+        if (tpName.equals("java.lang") || tpName.equals("java.sql"))
             return true;
-        if( java.util.Date.class.isAssignableFrom(tp))// "java.util.Date".equals(tp.getName()))
+        if (java.util.Date.class.isAssignableFrom(tp))// "java.util.Date".equals(tp.getName()))
             return true;
-        if( java.util.UUID.class.isAssignableFrom(tp))// "java.util.UUID".equals(tp.getName()))
+        if (java.util.UUID.class.isAssignableFrom(tp))// "java.util.UUID".equals(tp.getName()))
             return true;
 
         return false;
     }
 
-    public static boolean isNumberType(Class<?>  tp){
+    public static boolean isNumberType(Class<?> tp) {
         return java.lang.Number.class.isAssignableFrom(tp);
-                //tp.getSuperclass().equals(Number.class) || tp.equals(Number.class);
+        //tp.getSuperclass().equals(Number.class) || tp.equals(Number.class);
     }
+
     /**
      * 判断一个对象是否是 数组[]、Collection(List)
+     *
      * @param obj 对象
      * @return 否是 数组[]
      */
-    public static boolean isArray(Object obj){
-        Class<?>  tp = obj.getClass();
-        if(tp.isArray())
+    public static boolean isArray(Object obj) {
+        Class<?> tp = obj.getClass();
+        if (tp.isArray())
             return true;
         //if(obj instanceof Object[])
         //    return true;
-        if(obj instanceof Collection<?>)
+        if (obj instanceof Collection<?>)
             return true;
         return false;
     }
 
     /**
      * 判断一个类型是否是 数组[]、Collection(List)
+     *
      * @param tp 类型
      * @return 否是 数组[]
      */
-    public static boolean isArrayType(Class<?>  tp){
-        if(tp.isArray())
+    public static boolean isArrayType(Class<?> tp) {
+        if (tp.isArray())
             return true;
-        if(Collection.class.isAssignableFrom(tp))
+        if (Collection.class.isAssignableFrom(tp))
             return true;
         return false;
     }
@@ -720,10 +731,29 @@ public abstract class ReflectionOpt  {
     /*
      *  得到当前方法的名字
      */
-    public static String getCurrentMethodName(){
+    public static String getCurrentMethodName() {
         return Thread.currentThread().getStackTrace()[1].getMethodName();
     }
 
+    public static String getJavaTypeName(Class<?> type) {
+
+        String typeName = type.getTypeName();
+        if (typeName.indexOf('.') < 1) {
+            return typeName;
+        } else if (typeName.startsWith("java.lang.")
+            || "java.util.Date".equals(typeName)
+            || "java.sql.Clob".equals(typeName)
+            || "java.sql.Blob".equals(typeName)
+            || "java.util.UUID".equals(typeName)
+            || "java.math.BigDecimal".equals(typeName)
+            || "java.math.BigInteger".equals(typeName)) {
+            return FileType.getFileExtName(typeName);
+        } else if (typeName.startsWith("java.sql.")) {
+            return "sql" + FileType.getFileExtName(typeName);
+        } else {
+            return typeName;
+        }
+    }
 
     /*
      * 类 clazz 必需有一个无参数的默认构造函数
@@ -737,21 +767,21 @@ public abstract class ReflectionOpt  {
      * @throws InvocationTargetException
      * @throws IllegalArgumentException
      */
-    public <T> T createObjectFromMap( Class<T> clazz, Map<String,Object> properties)
-            throws InstantiationException, IllegalAccessException,
-            IllegalArgumentException, InvocationTargetException{
+    public <T> T createObjectFromMap(Class<T> clazz, Map<String, Object> properties)
+        throws InstantiationException, IllegalAccessException,
+        IllegalArgumentException, InvocationTargetException {
         T obj = (T) clazz.newInstance();
         try {
-            Method[] mths =  clazz.getMethods();
-            for (Method mth : mths){
+            Method[] mths = clazz.getMethods();
+            for (Method mth : mths) {
                 Type[] paramTypes = mth.getGenericParameterTypes();
                 String methodName = mth.getName();
-                if(  methodName.startsWith("set")
-                        &&  methodName.length()>=4
-                        && paramTypes.length == 1 ){
-                    Object value = properties.get(methodName.substring(3,4).toLowerCase() + methodName.substring(4));
-                    if(value!=null){
-                        mth.invoke(obj,value);
+                if (methodName.startsWith("set")
+                    && methodName.length() >= 4
+                    && paramTypes.length == 1) {
+                    Object value = properties.get(methodName.substring(3, 4).toLowerCase() + methodName.substring(4));
+                    if (value != null) {
+                        mth.invoke(obj, value);
                     }
                 }
             }
@@ -759,27 +789,6 @@ public abstract class ReflectionOpt  {
             logger.error(e.getMessage(), e);
         }
         return obj;
-    }
-
-
-    public static String getJavaTypeName(Class<?> type) {
-
-        String typeName = type.getTypeName();
-        if(typeName.indexOf('.')<1) {
-            return typeName;
-        } else if(typeName.startsWith("java.lang.")
-                || "java.util.Date".equals(typeName)
-                || "java.sql.Clob".equals(typeName)
-                || "java.sql.Blob".equals(typeName)
-                || "java.util.UUID".equals(typeName)
-                || "java.math.BigDecimal".equals(typeName)
-                || "java.math.BigInteger".equals(typeName)) {
-            return FileType.getFileExtName(typeName);
-        } else if(typeName.startsWith("java.sql.")) {
-            return "sql" + FileType.getFileExtName(typeName);
-        } else {
-            return typeName;
-        }
     }
 }
 

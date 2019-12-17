@@ -13,14 +13,15 @@ import java.util.List;
 
 /**
  * Created by codefan on 2017/11/3.
+ *
  * @author codefan
  */
 public class MathOpt {
 
 
     //将 数字和操作排序
-    public static void sortFormulaOpt( List<Integer> rList ){
-        for(Integer i : rList){
+    public static void sortFormulaOpt(List<Integer> rList) {
+        for (Integer i : rList) {
             System.out.print(i);
             System.out.print(" ");
         }
@@ -34,31 +35,31 @@ public class MathOpt {
         while (true) {
             System.out.println("输入用空格隔开整数，推出输入exit");
             String s = br.readLine().trim();
-            if(StringUtils.isBlank(s)){
+            if (StringUtils.isBlank(s)) {
                 continue;
             }
-            if(StringUtils.equalsIgnoreCase("exit",s)){
+            if (StringUtils.equalsIgnoreCase("exit", s)) {
                 break;
             }
             int nSelect = -1;
             String[] nums = s.split(" ");
             List<Integer> alist = new ArrayList<>(4);
-            for(int i=0; i<nums.length; i++){
-                if(StringRegularOpt.isNumber(nums[i])){
-                    if( nSelect == -1 ){
+            for (int i = 0; i < nums.length; i++) {
+                if (StringRegularOpt.isNumber(nums[i])) {
+                    if (nSelect == -1) {
                         nSelect = NumberBaseOpt.castObjectToInteger(nums[i]);
-                    }else {
+                    } else {
                         alist.add(NumberBaseOpt.castObjectToInteger(nums[i]));
                     }
                 }
             }
 
-            if( alist.size() < 1){
+            if (alist.size() < 1) {
                 continue;
             }
 
             Mathematics.permutationAndCombination(
-                    alist,nSelect, Integer::compare, MathOpt::sortFormulaOpt
+                alist, nSelect, Integer::compare, MathOpt::sortFormulaOpt
             );
         }
     }

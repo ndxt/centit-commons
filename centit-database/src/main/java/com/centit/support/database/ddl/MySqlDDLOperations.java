@@ -13,7 +13,7 @@ import java.util.List;
 public class MySqlDDLOperations extends GeneralDDLOperations {
 
 
-    public MySqlDDLOperations(){
+    public MySqlDDLOperations() {
 
     }
 
@@ -23,31 +23,31 @@ public class MySqlDDLOperations extends GeneralDDLOperations {
 
     @Override
     protected void appendPkSql(final TableInfo tableInfo, StringBuilder sbCreate) {
-        if (tableInfo.hasParmaryKey()){
+        if (tableInfo.hasParmaryKey()) {
             sbCreate.append(" primary key ");
             appendPkColumnSql(tableInfo, sbCreate);
         }
     }
 
     @Override
-    public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column){
+    public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column) {
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
         sbsql.append(" MODIFY COLUMN  ").append(column.getColumnName()).append(" ");
-        if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
-                || !oldColumn.getMaxLength().equals(column.getMaxLength())
-                || !oldColumn.getPrecision().equals(column.getPrecision()) ){
+        if (!StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
+            || !oldColumn.getMaxLength().equals(column.getMaxLength())
+            || !oldColumn.getPrecision().equals(column.getPrecision())) {
             appendColumnTypeSQL(column, sbsql);
         }
 
-        if( oldColumn.isMandatory() != column.isMandatory()){
-            sbsql.append(column.isMandatory()?" not null": " null");
+        if (oldColumn.isMandatory() != column.isMandatory()) {
+            sbsql.append(column.isMandatory() ? " not null" : " null");
         }
         return sbsql.toString();
     }
 
     @Override
-    public String makeRenameColumnSql(final String tableCode, final String columnCode, final TableField column){
+    public String makeRenameColumnSql(final String tableCode, final String columnCode, final TableField column) {
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
         sbsql.append(" CHANGE ");
@@ -58,28 +58,29 @@ public class MySqlDDLOperations extends GeneralDDLOperations {
         appendColumnTypeSQL(column, sbsql);
         return sbsql.toString();
     }
+
     @Override
-    public List<String> makeReconfigurationColumnSqls(final String tableCode, final String columnCode, final TableField column){
+    public List<String> makeReconfigurationColumnSqls(final String tableCode, final String columnCode, final TableField column) {
         List<String> sqls = new ArrayList<>();
         SimpleTableField tempColumn = new SimpleTableField();
-        tempColumn.setColumnName(columnCode+"_1");
+        tempColumn.setColumnName(columnCode + "_1");
         sqls.add(makeRenameColumnSql(tableCode, columnCode, tempColumn));
         sqls.add(makeAddColumnSql(tableCode, column));
 
-        if(FieldType.STRING.equals(column.getFieldType()) || FieldType.TEXT.equals(column.getFieldType())
+        if (FieldType.STRING.equals(column.getFieldType()) || FieldType.TEXT.equals(column.getFieldType())
             || FieldType.FILE_ID.equals(column.getFieldType())) {
             sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as char)");
-        } else if(FieldType.DATE.equals(column.getFieldType()) ) {
+        } else if (FieldType.DATE.equals(column.getFieldType())) {
             sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as date)");
-        } else if(FieldType.TIMESTAMP.equals(column.getFieldType()) || FieldType.DATETIME.equals(column.getFieldType())) {
+        } else if (FieldType.TIMESTAMP.equals(column.getFieldType()) || FieldType.DATETIME.equals(column.getFieldType())) {
             sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as datetime)");
-        } else if(FieldType.LONG.equals(column.getFieldType()) || FieldType.INTEGER.equals(column.getFieldType())) {
+        } else if (FieldType.LONG.equals(column.getFieldType()) || FieldType.INTEGER.equals(column.getFieldType())) {
             sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as signed)");
-        } else if(FieldType.FLOAT.equals(column.getFieldType()) || FieldType.DOUBLE.equals(column.getFieldType())) {
-            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as decimal("+column.getMaxLength()
-                +","+column.getScale()+")");
+        } else if (FieldType.FLOAT.equals(column.getFieldType()) || FieldType.DOUBLE.equals(column.getFieldType())) {
+            sqls.add("update " + tableCode + " set " + column.getColumnName() + " = cast(" + columnCode + "_1 as decimal(" + column.getMaxLength()
+                + "," + column.getScale() + ")");
         }
-        sqls.add(makeDropColumnSql(tableCode, columnCode+"_1"));
+        sqls.add(makeDropColumnSql(tableCode, columnCode + "_1"));
         return sqls;
     }
 }

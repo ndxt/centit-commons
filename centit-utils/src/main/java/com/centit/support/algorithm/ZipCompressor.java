@@ -8,7 +8,7 @@ import java.util.zip.*;
 
 
 @SuppressWarnings("unused")
-public abstract  class ZipCompressor {
+public abstract class ZipCompressor {
     static final int BUFFER = 8192;
 
     //private File zipFile;
@@ -19,16 +19,17 @@ public abstract  class ZipCompressor {
     /**
      * 将OutputStream 转换为 ZipOutputStream 并作为 compressFile 的输入参数
      * 这个可以用于 打包下载
+     *
      * @param os os
      * @return ZipOutputStream
      */
-    public static ZipOutputStream convertToZipOutputStream(OutputStream os){
-         return new ZipOutputStream(
-                 new CheckedOutputStream(os,
-                         new CRC32()));
+    public static ZipOutputStream convertToZipOutputStream(OutputStream os) {
+        return new ZipOutputStream(
+            new CheckedOutputStream(os,
+                new CRC32()));
     }
 
-    public static void compress(String zipFilePathName,  String fileName, String srcPathName) {
+    public static void compress(String zipFilePathName, String fileName, String srcPathName) {
         File file = new File(srcPathName);
         if (!file.exists())
             throw new RuntimeException(srcPathName + "不存在！");
@@ -48,7 +49,7 @@ public abstract  class ZipCompressor {
         }
     }
 
-    public static void compress(String zipFilePathName,  String srcPathName) {
+    public static void compress(String zipFilePathName, String srcPathName) {
         File file = new File(srcPathName);
         if (!file.exists())
             throw new RuntimeException(srcPathName + "不存在！");
@@ -61,7 +62,7 @@ public abstract  class ZipCompressor {
             // new ZipOutputStream(cos);
             String basedir = "";
 
-            compress(file,  out, basedir);
+            compress(file, out, basedir);
             out.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -70,8 +71,9 @@ public abstract  class ZipCompressor {
 
     /**
      * 将多个文件 压缩到一个 zip 文件中
+     *
      * @param zipFilePathName 输出zip文件的路径名
-     * @param srcPathNames 输入的文件路径列表
+     * @param srcPathNames    输入的文件路径列表
      */
     public static void compressFiles(String zipFilePathName, String[] srcPathNames) {
         try {
@@ -81,7 +83,7 @@ public abstract  class ZipCompressor {
             ZipOutputStream out = convertToZipOutputStream(fileOutputStream);
             // new ZipOutputStream(cos);
             String basedir = "";
-            for(String srcPathName : srcPathNames){
+            for (String srcPathName : srcPathNames) {
                 File file = new File(srcPathName);
                 if (file.exists()) {
                     compress(file, out, basedir);
@@ -95,11 +97,12 @@ public abstract  class ZipCompressor {
 
     /**
      * 将多个文件 压缩到一个 zip 文件中
+     *
      * @param zipFilePathName 输出zip文件的路径名
-     * @param srcPathNames 输入的文件路径列表
+     * @param srcPathNames    输入的文件路径列表
      */
     public static void compressFiles(String zipFilePathName, Collection<String> srcPathNames) {
-        compressFiles(zipFilePathName, srcPathNames.toArray(new String [srcPathNames.size()]));
+        compressFiles(zipFilePathName, srcPathNames.toArray(new String[srcPathNames.size()]));
     }
 
     public static void compressFileInDirectory(String zipFilePathName, String srcPathName) {
@@ -126,7 +129,7 @@ public abstract  class ZipCompressor {
         }
     }
 
-    public static void compress(File file,String fileName, ZipOutputStream out, String basedir) {
+    public static void compress(File file, String fileName, ZipOutputStream out, String basedir) {
         /* 判断是目录还是文件 */
         if (file.isDirectory()) {
             //System.out.println("压缩：" + basedir + file.getName());
@@ -162,9 +165,9 @@ public abstract  class ZipCompressor {
 
     public static void compressFile(InputStream fis, String fileName, ZipOutputStream out, String basedir) {
 
-        try(BufferedInputStream bis = new BufferedInputStream(fis)){
+        try (BufferedInputStream bis = new BufferedInputStream(fis)) {
 
-            ZipEntry entry = new ZipEntry(basedir +fileName);
+            ZipEntry entry = new ZipEntry(basedir + fileName);
             out.putNextEntry(entry);
             int count;
             byte data[] = new byte[BUFFER];
@@ -182,16 +185,17 @@ public abstract  class ZipCompressor {
         if (!file.exists()) {
             return;
         }
-        try(FileInputStream fis = new FileInputStream(file)){
-            compressFile(fis,fileName, out, basedir);
+        try (FileInputStream fis = new FileInputStream(file)) {
+            compressFile(fis, fileName, out, basedir);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void compressFile(File file,  ZipOutputStream out, String basedir) {
-        compressFile( file, file.getName(), out,  basedir);
+    public static void compressFile(File file, ZipOutputStream out, String basedir) {
+        compressFile(file, file.getName(), out, basedir);
     }
+
     /**
      * 解压到指定目录
      *
@@ -212,16 +216,16 @@ public abstract  class ZipCompressor {
      */
     public static void release(File zipFile, String dirPath) {
         String descDir = dirPath;
-        if(!descDir.endsWith("/"))
-            descDir = dirPath+"/";
+        if (!descDir.endsWith("/"))
+            descDir = dirPath + "/";
 
         File pathFile = new File(descDir);
         if (!pathFile.exists()) {
             pathFile.mkdirs();
         }
-        try(ZipFile zip = new ZipFile(zipFile)){
+        try (ZipFile zip = new ZipFile(zipFile)) {
             // zip.entries()
-            for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
+            for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements(); ) {
                 ZipEntry entry = entries.nextElement();
                 String zipEntryName = entry.getName();
 
@@ -238,8 +242,8 @@ public abstract  class ZipCompressor {
                 }
                 // 输出文件路径信息
                 //System.out.println(outPath);
-                try ( InputStream in = zip.getInputStream(entry);
-                    OutputStream out = new FileOutputStream(outPath)) {
+                try (InputStream in = zip.getInputStream(entry);
+                     OutputStream out = new FileOutputStream(outPath)) {
                     byte[] buf1 = new byte[1024];
                     int len;
                     while ((len = in.read(buf1)) > 0) {
@@ -248,7 +252,7 @@ public abstract  class ZipCompressor {
                 }
             }
             //zip.close();
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         // System.out.println("******************解压完毕********************");

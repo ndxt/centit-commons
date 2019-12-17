@@ -16,11 +16,12 @@ public enum GeneratorTime {
     ALWAYS(7);
 
     int generatorTime;
-    GeneratorTime(int generatorTime){
+
+    GeneratorTime(int generatorTime) {
         this.generatorTime = generatorTime;
     }
 
-    public boolean matchTime(GeneratorTime other){
+    public boolean matchTime(GeneratorTime other) {
         return (this.generatorTime & other.generatorTime) != 0;
     }
 }

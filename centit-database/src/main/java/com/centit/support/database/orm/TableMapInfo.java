@@ -16,22 +16,21 @@ import java.util.Map;
  */
 public class TableMapInfo extends SimpleTableInfo {
 
+    private boolean embeddedId;
+    private SimpleTableField embeddedIdField;
+    private List<LeftRightPair<String, ValueGenerator>> valueGenerators;
+
     public TableMapInfo() {
         super();
         this.embeddedId = false;
     }
 
-    private boolean embeddedId;
-    private SimpleTableField embeddedIdField;
-
     public List<LeftRightPair<String, ValueGenerator>> getValueGenerators() {
         return valueGenerators;
     }
 
-    private List<LeftRightPair<String,ValueGenerator>> valueGenerators;
-
-    public TableMapInfo addValueGenerator(String fieldName, ValueGenerator generator ){
-        if(valueGenerators ==null)
+    public TableMapInfo addValueGenerator(String fieldName, ValueGenerator generator) {
+        if (valueGenerators == null)
             valueGenerators = new ArrayList<>(5);
         /*boolean add = */
         valueGenerators.add(new LeftRightPair<>(fieldName, generator));
@@ -39,20 +38,20 @@ public class TableMapInfo extends SimpleTableInfo {
     }
 
     public void appendOrderBy(SimpleTableField column, String orderBy) {
-        String orderBySql ;
-        if( StringUtils.isBlank(orderBy) || "ASC".equalsIgnoreCase(orderBy) ){
+        String orderBySql;
+        if (StringUtils.isBlank(orderBy) || "ASC".equalsIgnoreCase(orderBy)) {
             orderBySql = column.getColumnName();
-        }else if("DESC".equalsIgnoreCase(orderBy)){
+        } else if ("DESC".equalsIgnoreCase(orderBy)) {
             // StringUtils.equalsAnyIgnoreCase(orderByTrim, "DESC", "ASC" )){
             orderBySql = column.getColumnName() + " DESC";
-        }else{
+        } else {
             orderBySql = orderBy;
         }
 
-        if( StringUtils.isBlank(this.getOrderBy()) ){
-            super.setOrderBy( orderBySql);
-        }else{
-            super.setOrderBy(super.getOrderBy() +", " + orderBySql);
+        if (StringUtils.isBlank(this.getOrderBy())) {
+            super.setOrderBy(orderBySql);
+        } else {
+            super.setOrderBy(super.getOrderBy() + ", " + orderBySql);
         }
     }
 
@@ -73,9 +72,9 @@ public class TableMapInfo extends SimpleTableInfo {
     }
 
     public Object getObjectFieldValue(Object object, SimpleTableField field) {
-        if(field.isPrimaryKey() && this.isEmbeddedId()){
+        if (field.isPrimaryKey() && this.isEmbeddedId()) {
             Object pkId = embeddedIdField.getBeanField().getObjectFieldValue(object);
-            if(pkId!=null) {
+            if (pkId != null) {
                 return field.getBeanField().getObjectFieldValue(pkId);
             } else {
                 return null;
@@ -99,7 +98,7 @@ public class TableMapInfo extends SimpleTableInfo {
             } else {
                 field.getBeanField().setObjectFieldValue(object, newValue);
             }
-        }  catch (IllegalAccessException | InstantiationException e){
+        } catch (IllegalAccessException | InstantiationException e) {
             PersistenceException exception = new PersistenceException(500, "创建EmbeddedId 实例错误", e);
             exception.setObjectData(this);
             throw exception;
@@ -108,7 +107,7 @@ public class TableMapInfo extends SimpleTableInfo {
 
     public Object getObjectFieldValue(Object object, String fieldName) {
         SimpleTableField field = this.findFieldByName(fieldName);
-        if(field==null){
+        if (field == null) {
             return null;
         }
         return getObjectFieldValue(object, field);
@@ -116,16 +115,16 @@ public class TableMapInfo extends SimpleTableInfo {
 
     public void setObjectFieldValue(Object object, String fieldName, Object newValue) {
         SimpleTableField field = this.findFieldByName(fieldName);
-        if(field==null){
+        if (field == null) {
             return;
         }
         setObjectFieldValue(object, field, newValue);
     }
 
-    public Map<String, Object> fetchObjectPk(Object object){
+    public Map<String, Object> fetchObjectPk(Object object) {
         Map<String, Object> pk = new HashMap<>(8);
         List<SimpleTableField> columns = this.getColumns();
-        if(columns!=null) {
+        if (columns != null) {
             for (SimpleTableField c : columns) {
                 if (c.isPrimaryKey()) {
                     Object pkValue = this.getObjectFieldValue(object, c);

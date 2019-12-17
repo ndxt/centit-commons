@@ -15,14 +15,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+
 @SuppressWarnings("unused")
-public class SimpleTableInfo implements TableInfo{
+public class SimpleTableInfo implements TableInfo {
 
     protected static final Logger logger = LoggerFactory.getLogger(SimpleTableInfo.class);
     /**
      * 包括主键
      */
-    private List<SimpleTableField> columns=null;
+    private List<SimpleTableField> columns = null;
     /**
      * oracle中的schema 其他数据库对应的是用户名
      */
@@ -60,17 +61,28 @@ public class SimpleTableInfo implements TableInfo{
     /**
      * 引用关系，对应表的外建
      */
-    private List<SimpleTableReference> references=null;
+    private List<SimpleTableReference> references = null;
 
-    public SimpleTableInfo(){
+    public SimpleTableInfo() {
         this.tableType = "T";
     }
 
-    public SimpleTableInfo(String tabname){
+    public SimpleTableInfo(String tabname) {
         this.tableType = "T";
         setTableName(tabname);
     }
 
+    protected static void writerXMLFile(Document doc, String xmlFile) {
+        XMLWriter output;
+        try {
+            output = new XMLWriter(
+                new FileWriter(new File(xmlFile)));
+            output.write(doc);
+            output.close();
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+        }
+    }
 
     /**
      * @return 数据库表名，对应pdm中的code，对应元数据中的 tabcode
@@ -108,7 +120,7 @@ public class SimpleTableInfo implements TableInfo{
     }
 
     public String getPkName() {
-        if(StringUtils.isBlank(pkName)){
+        if (StringUtils.isBlank(pkName)) {
             return "PK_" + this.tableName;
         }
         return pkName;
@@ -143,31 +155,20 @@ public class SimpleTableInfo implements TableInfo{
         this.orderBy = orderBy;
     }
 
-    protected static void writerXMLFile(Document doc, String xmlFile){
-        XMLWriter output;
-        try {
-            output = new XMLWriter(
-                      new FileWriter( new File(xmlFile) ));
-            output.write( doc );
-            output.close();
-        } catch (IOException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
-        }
-    }
-
     /**
      * 根据属性名查找 字段信息
+     *
      * @param name 字段属性名
      * @return 字段信息
      */
     @Override
-    public SimpleTableField findFieldByName(String name){
-        for(SimpleTableField col : columns){
-            if(col.getPropertyName().equals(name))
+    public SimpleTableField findFieldByName(String name) {
+        for (SimpleTableField col : columns) {
+            if (col.getPropertyName().equals(name))
                 return col;
         }
-        for(SimpleTableField col : columns){
-            if(col.getColumnName().equalsIgnoreCase(name))
+        for (SimpleTableField col : columns) {
+            if (col.getColumnName().equalsIgnoreCase(name))
                 return col;
         }
         return null;
@@ -175,153 +176,152 @@ public class SimpleTableInfo implements TableInfo{
 
     /**
      * 根据属性名查找 字段信息
+     *
      * @param name 属性名
      * @return 字段信息
      */
     @Override
-    public SimpleTableField findFieldByColumn(String name){
-        for(SimpleTableField col : columns){
-            if(col.getColumnName().equalsIgnoreCase(name))
+    public SimpleTableField findFieldByColumn(String name) {
+        for (SimpleTableField col : columns) {
+            if (col.getColumnName().equalsIgnoreCase(name))
                 return col;
         }
-        for(SimpleTableField col : columns){
-            if(col.getPropertyName().equals(name))
+        for (SimpleTableField col : columns) {
+            if (col.getPropertyName().equals(name))
                 return col;
         }
         return null;
     }
 
-    private void saveProperty(SimpleTableField field,Element propElt,boolean keyProp){
+    private void saveProperty(SimpleTableField field, Element propElt, boolean keyProp) {
         propElt.addAttribute("name", field.getPropertyName());
         propElt.addAttribute("type", field.getJavaType().getName());
         Element colElt = propElt.addElement("column");
-        saveColumn(field,colElt,keyProp);
+        saveColumn(field, colElt, keyProp);
     }
 
-    private void saveColumn(SimpleTableField field,Element colElt,boolean keyProp){
+    private void saveColumn(SimpleTableField field, Element colElt, boolean keyProp) {
         colElt.addAttribute("name", field.getColumnName().toUpperCase());
-        if(FieldType.LONG.equals(field.getFieldType()) || FieldType.DOUBLE.equals(field.getFieldType())
+        if (FieldType.LONG.equals(field.getFieldType()) || FieldType.DOUBLE.equals(field.getFieldType())
             || FieldType.INTEGER.equals(field.getFieldType()) || FieldType.FLOAT.equals(field.getFieldType())) {
             colElt.addAttribute("precision", String.valueOf(field.getPrecision()));
             colElt.addAttribute("scale", String.valueOf(field.getScale()));
-        }else if(field.getMaxLength()>0)
+        } else if (field.getMaxLength() > 0)
             colElt.addAttribute("length", String.valueOf(field.getMaxLength()));
 
-        if(!keyProp && field.isMandatory())
+        if (!keyProp && field.isMandatory())
             colElt.addAttribute("not-null", "true");
     }
 
-    private void setAppPropertiesValue(Properties prop,String key,String value )
-    {
-        String sKey = /*sModuleName +'.'+ */ FieldType.mapPropName(tableName) +'.'+key;
-        if(! prop.containsKey(sKey))
-            prop.setProperty(sKey,  value);
+    private void setAppPropertiesValue(Properties prop, String key, String value) {
+        String sKey = /*sModuleName +'.'+ */ FieldType.mapPropName(tableName) + '.' + key;
+        if (!prop.containsKey(sKey))
+            prop.setProperty(sKey, value);
     }
 
-    public void addResource(String filename)
-    {
+    public void addResource(String filename) {
 
         try {
             Properties prop = new Properties();
-            if( FileSystemOpt.existFile(filename+"_zh_CN.properties")){
-                try(FileInputStream fis  = new FileInputStream(filename+"_zh_CN.properties")){
-                        prop.load(fis);
-                }
-            }
-
-            setAppPropertiesValue(prop,"list.title",tableLabelName+"列表");
-            setAppPropertiesValue(prop,"edit.title","编辑"+tableLabelName);
-            setAppPropertiesValue(prop,"view.title","查看"+tableLabelName);
-            for(SimpleTableField col : columns )
-                setAppPropertiesValue(prop,FieldType.mapPropName(col.getColumnName()),col.getFieldLabelName());
-
-            try(FileOutputStream outputFile = new FileOutputStream(filename+"_zh_CN.properties")){
-                prop.store(outputFile, "create by centit B/S framework!");
-                //outputFile.close();
-            }
-            //prop.list(System.out);
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
-        }
-
-        try {
-            Properties prop = new Properties();
-            if( FileSystemOpt.existFile(filename+".properties")){
-                try(FileInputStream fis  = new FileInputStream(filename+".properties")){
+            if (FileSystemOpt.existFile(filename + "_zh_CN.properties")) {
+                try (FileInputStream fis = new FileInputStream(filename + "_zh_CN.properties")) {
                     prop.load(fis);
                 }
             }
 
-            setAppPropertiesValue(prop,"list.title",FieldType.mapPropName(tableName)+" list");
-            setAppPropertiesValue(prop,"edit.title","new or edit "+FieldType.mapPropName(tableName)+" piece");
-            setAppPropertiesValue(prop,"view.title","view "+FieldType.mapPropName(tableName)+" piece");
-            for(SimpleTableField col : columns )
-                setAppPropertiesValue(prop,FieldType.mapPropName(col.getColumnName()),col.getPropertyName());
+            setAppPropertiesValue(prop, "list.title", tableLabelName + "列表");
+            setAppPropertiesValue(prop, "edit.title", "编辑" + tableLabelName);
+            setAppPropertiesValue(prop, "view.title", "查看" + tableLabelName);
+            for (SimpleTableField col : columns)
+                setAppPropertiesValue(prop, FieldType.mapPropName(col.getColumnName()), col.getFieldLabelName());
 
-            try(FileOutputStream outputFile = new FileOutputStream(filename+".properties")){
+            try (FileOutputStream outputFile = new FileOutputStream(filename + "_zh_CN.properties")) {
                 prop.store(outputFile, "create by centit B/S framework!");
                 //outputFile.close();
             }
             //prop.list(System.out);
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+        }
+
+        try {
+            Properties prop = new Properties();
+            if (FileSystemOpt.existFile(filename + ".properties")) {
+                try (FileInputStream fis = new FileInputStream(filename + ".properties")) {
+                    prop.load(fis);
+                }
+            }
+
+            setAppPropertiesValue(prop, "list.title", FieldType.mapPropName(tableName) + " list");
+            setAppPropertiesValue(prop, "edit.title", "new or edit " + FieldType.mapPropName(tableName) + " piece");
+            setAppPropertiesValue(prop, "view.title", "view " + FieldType.mapPropName(tableName) + " piece");
+            for (SimpleTableField col : columns)
+                setAppPropertiesValue(prop, FieldType.mapPropName(col.getColumnName()), col.getPropertyName());
+
+            try (FileOutputStream outputFile = new FileOutputStream(filename + ".properties")) {
+                prop.store(outputFile, "create by centit B/S framework!");
+                //outputFile.close();
+            }
+            //prop.list(System.out);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
         }
     }
 
-    public void saveHibernateMappingFile(String filename ){
+    public void saveHibernateMappingFile(String filename) {
         Document doc = null;
 
-        if(FileSystemOpt.existFile(filename )){
-            System.out.println("文件："+filename+" 已存在！");
+        if (FileSystemOpt.existFile(filename)) {
+            System.out.println("文件：" + filename + " 已存在！");
             return;
         }
 
         doc = DocumentHelper.createDocument();
         //doc.addProcessingInstruction("xml", "version=\"1.0\" encoding=\"utf\"");
         doc.addDocType("hibernate-mapping", "-//Hibernate/Hibernate Mapping DTD 3.0//EN",
-                "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd");
+            "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd");
         doc.addComment("Mapping file autogenerated by codefan@centit.com");
-        Element root  = doc.addElement("hibernate-mapping");//首先建立根元素
+        Element root = doc.addElement("hibernate-mapping");//首先建立根元素
         //create class
         Element classElt = root.addElement("class");
-        classElt.addAttribute("name", packageName+'.'+getClassName());
+        classElt.addAttribute("name", packageName + '.' + getClassName());
         classElt.addAttribute("table", tableName.toUpperCase());
         classElt.addAttribute("schema", schema);
         //save primary key
         List<? extends TableField> pkColumns = getPkFields();
-        if(pkColumns.size()>1){
+        if (pkColumns.size() > 1) {
             Element idElt = classElt.addElement("composite-id");
             idElt.addAttribute("name", "cid");
-            idElt.addAttribute("class", packageName+'.'+getClassName()+"Id");
-            for(TableField field : pkColumns){
-                if(field != null){
+            idElt.addAttribute("class", packageName + '.' + getClassName() + "Id");
+            for (TableField field : pkColumns) {
+                if (field != null) {
                     Element keyElt = idElt.addElement("key-property");
-                    saveProperty((SimpleTableField) field, keyElt,true);
+                    saveProperty((SimpleTableField) field, keyElt, true);
                     //colElt.addAttribute("not-null", "true");
                 }
             }
-        }else if(pkColumns.size()==1){
+        } else if (pkColumns.size() == 1) {
             Element idElt = classElt.addElement("id");
             TableField field = pkColumns.get(0);
-            saveProperty((SimpleTableField) field,idElt,true);
+            saveProperty((SimpleTableField) field, idElt, true);
             Element genElt = idElt.addElement("generator");
             genElt.addAttribute("class", "assigned");
         }
         //save property
-        if(columns !=null){
-            for(Iterator<SimpleTableField> it = columns.iterator();it.hasNext();){
+        if (columns != null) {
+            for (Iterator<SimpleTableField> it = columns.iterator(); it.hasNext(); ) {
                 SimpleTableField col = it.next();
-                if(isParmaryKey(col.getColumnName()))
+                if (isParmaryKey(col.getColumnName()))
                     continue;
                 Element propElt = classElt.addElement("property");
-                saveProperty(col,propElt,false);
+                saveProperty(col, propElt, false);
             }
         }
-        if(references !=null){
-            for(Iterator<SimpleTableReference> it = references.iterator();it.hasNext();){
+        if (references != null) {
+            for (Iterator<SimpleTableReference> it = references.iterator(); it.hasNext(); ) {
                 SimpleTableReference ref = it.next();
                 Element setElt = classElt.addElement("set");
-                setElt.addAttribute("name", FieldType.mapPropName(ref.getTableName())+'s');
+                setElt.addAttribute("name", FieldType.mapPropName(ref.getTableName()) + 's');
                 setElt.addAttribute("cascade", "all-delete-orphan");//"all-delete-orphan")//save-update,delete;
                 setElt.addAttribute("inverse", "true");
                 Element keyElt = setElt.addElement("key");
@@ -330,66 +330,66 @@ public class SimpleTableInfo implements TableInfo{
                     saveColumn(col,colElt,false);
                 }*/
                 Element maptypeElt = setElt.addElement("one-to-many");
-                maptypeElt.addAttribute("class", packageName+'.'+ ref.getClassName());
+                maptypeElt.addAttribute("class", packageName + '.' + ref.getClassName());
             }
         }
-        writerXMLFile(doc,filename);
+        writerXMLFile(doc, filename);
     }
 
     public List<SimpleTableField> getColumns() {
-        if(columns==null)
+        if (columns == null)
             columns = new ArrayList<>(20);
         return columns;
-    }
-
-    public void addColumn(SimpleTableField column) {
-        if(columns==null) {
-            columns = new ArrayList<>(20);
-        }
-        columns.add(column);
     }
 
     public void setColumns(List<SimpleTableField> columns) {
         this.columns = columns;
     }
 
+    public void addColumn(SimpleTableField column) {
+        if (columns == null) {
+            columns = new ArrayList<>(20);
+        }
+        columns.add(column);
+    }
+
     public String getClassName() {
         String sClassName = FieldType.mapPropName(tableName);
-        return sClassName.substring(0,1).toUpperCase() +
-                sClassName.substring(1);
+        return sClassName.substring(0, 1).toUpperCase() +
+            sClassName.substring(1);
     }
 
     public List<SimpleTableReference> getReferences() {
-        if(references==null) {
+        if (references == null) {
             references = new ArrayList<>(4);
         }
         return references;
     }
 
-    public boolean hasReferences(){
-        return references!=null && references.size()>0;
+    public void setReferences(List<SimpleTableReference> references) {
+        this.references = references;
+    }
+
+    public boolean hasReferences() {
+        return references != null && references.size() > 0;
     }
 
     public void addReference(SimpleTableReference reference) {
-        if(references==null) {
+        if (references == null) {
             references = new ArrayList<>(4);
         }
         references.add(reference);
     }
 
-    public SimpleTableReference findReference(String reference){
-        if(references==null)
+    public SimpleTableReference findReference(String reference) {
+        if (references == null)
             return null;
 
-        for(SimpleTableReference ref : references){
-            if(ref.getReferenceName().equals(reference))
+        for (SimpleTableReference ref : references) {
+            if (ref.getReferenceName().equals(reference))
                 return ref;
         }
         return null;
-    }
-
-    public void setReferences(List<SimpleTableReference> references) {
-        this.references = references;
     }
 
     public String getTableType() {
@@ -402,11 +402,12 @@ public class SimpleTableInfo implements TableInfo{
 
     /**
      * 将一个字段设为主键
+     *
      * @param colname 字段
      */
-    public void setColumnAsPrimaryKey(String colname){
+    public void setColumnAsPrimaryKey(String colname) {
         SimpleTableField field = findFieldByName(colname);
-        if(field != null){
+        if (field != null) {
             field.setPrimaryKey(true);
         }
     }

@@ -6,7 +6,7 @@ package com.centit.test;
 public class DemoClass implements DemoInterface {
     private String name;
 
-    public DemoClass(String name){
+    public DemoClass(String name) {
         this.name = name;
     }
 

@@ -9,23 +9,23 @@ import java.util.Map;
 
 public class TestJsonObject {
 
-    public static void main(String arg[]){
+    public static void main(String arg[]) {
 
-        System.out.println(JSON.toJSONString(new Object[]{5,6,"hello"}));
+        System.out.println(JSON.toJSONString(new Object[]{5, 6, "hello"}));
 
-        Map<String,Object> mp = CollectionsOpt.createHashMap("osid",
-                CollectionsOpt.createHashMap("type","string","index","analyzed"),
-                "optid",
-                CollectionsOpt.createHashMap("type","string","index","analyzed"));
+        Map<String, Object> mp = CollectionsOpt.createHashMap("osid",
+            CollectionsOpt.createHashMap("type", "string", "index", "analyzed"),
+            "optid",
+            CollectionsOpt.createHashMap("type", "string", "index", "analyzed"));
         JSONObject jo = new JSONObject();
-        JSONOpt.setAttribute(jo,"object.properties",mp);
-        System.out.println( jo.toString());
+        JSONOpt.setAttribute(jo, "object.properties", mp);
+        System.out.println(jo.toString());
 
         testObjectToJson();
 
     }
-    
-    public static void testObjectToJson(){
+
+    public static void testObjectToJson() {
       /*    B b = new B();
           A a = new A();
 
@@ -57,16 +57,16 @@ public class TestJsonObject {
         JSONOpt.appendData(jObj , "thirdValue", JSONOpt.objectToJSONObject(a));
         System.out.println( jObj.toString());*/
         JSONObject json = new JSONObject();
-         //json.fromString("{a:{b:[{h:{c:\"hello\"}},{c:[\"chartDiv\",\"chartDiv2\",\"chartDiv3\"]}]}}");
+        //json.fromString("{a:{b:[{h:{c:\"hello\"}},{c:[\"chartDiv\",\"chartDiv2\",\"chartDiv3\"]}]}}");
         /*Map<String ,Object> map = new HashMap<String ,Object>();
- 
+
         map.put("renderTo", new Object[]{"chartDiv","chartDiv2","chartDiv3"});
         map.put("defaultSeriesType", "line");
-        
+
         json.appendSeries("renderTo", new Object[]{"chartDiv","chartDiv2","chartDiv3"});
         json.appendSeries("renderTo2", new Object[]{"chartDiv","chartDiv2","chartDiv3"});
         json.appendSeries("renderTo3", new Object[]{"chartDiv","chartDiv2","chartDiv3"});
-        
+
          * //json.appendYAxisPlotLines(map);
         map = new HashMap<String ,Object>();
         map.put("renderTo2", "chartDiv");
@@ -77,17 +77,17 @@ public class TestJsonObject {
         map.put("defaultSeri", "line");
         JSONOpt.setAttribute(json.getChartJson(), "a.b[0]", map);
         */
-        JSONOpt.setAttribute(json, "a.b.c.d.e.f.g", new Object[]{"chartDiv","chartDiv2","chartDiv3"});
+        JSONOpt.setAttribute(json, "a.b.c.d.e.f.g", new Object[]{"chartDiv", "chartDiv2", "chartDiv3"});
         JSONOpt.setAttribute(json, "b.b", "a");
-       
+
         JSONOpt.setAttribute(json, "b.d", "你好");
-        
+
         //json.appendData("series", null);
         //json.appendData("series", new Object[]{"chartDiv","chartDiv2","chartDiv3"});
         //json.appendData("series", new Object[]{"chartDiv4","chartDiv5","chartDiv6"});
         //json.appendXAxisCategories( new Object[]{"chartDiv","chartDiv2","chartDiv3"});
         //json.appendXAxisCategories( new Object[]{"chartDiv","chartDiv2","chartDiv3"});
 
-       System.out.println( json.toString() );
+        System.out.println(json.toString());
     }
 }

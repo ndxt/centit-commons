@@ -30,36 +30,32 @@ public class OptStack {
     /**
      * @param args 数值越小优先级越低
      */
-    final static private int optsPri[]={ 5,5,6,6, 4,4,4, 4, 4, 4,2,3,9,8, 5, 5,   4, 7, 2,  3,6,    6,4,4,4};
-                                       //+ - * / == > < <= >= != | & ! ^ >> << like in or and % dbmod
-                                       //5 is normal
+    final static private int optsPri[] = {5, 5, 6, 6, 4, 4, 4, 4, 4, 4, 2, 3, 9, 8, 5, 5, 4, 7, 2, 3, 6, 6, 4, 4, 4};
+    //+ - * / == > < <= >= != | & ! ^ >> << like in or and % dbmod
+    //5 is normal
     private int sourceLen;
     private int optsStack[];
 
-    public OptStack()
-    {
+    public OptStack() {
         sourceLen = 0;
         optsStack = new int[10];
     }
 
-    public void empty()
-    {
+    public void empty() {
         sourceLen = 0;
     }
 
-    public int  pushOpt(int optID)
-    {
-        if( sourceLen == 0 || optsPri[optID - ConstDefine.OP_BASE] > optsPri[ optsStack[sourceLen-1]-ConstDefine.OP_BASE]){
+    public int pushOpt(int optID) {
+        if (sourceLen == 0 || optsPri[optID - ConstDefine.OP_BASE] > optsPri[optsStack[sourceLen - 1] - ConstDefine.OP_BASE]) {
             optsStack[sourceLen] = optID;
-            sourceLen ++;
+            sourceLen++;
             return 0;
-        }else
+        } else
             return popOpt();
     }
 
-    public int popOpt()
-    {
-        if(sourceLen>0)
+    public int popOpt() {
+        if (sourceLen > 0)
             return optsStack[--sourceLen];
         return 0;
     }

@@ -12,32 +12,35 @@ import java.util.Map;
 /**
  * java 的内省机制实现了 javaBean 的信息获取，后面希望通过这套jdk标准的方法重写这部分内容。
  * Created by codefan on 17-9-22.
+ *
  * @see java.beans.BeanInfo
  * @see java.beans.Introspector
  */
 public class JavaBeanMetaData {
     private Class<?> javaType;
     private Map<String, JavaBeanField> fileds;
-    private JavaBeanMetaData(){}
 
-    private JavaBeanMetaData(Class<?> javaType){
+    private JavaBeanMetaData() {
+    }
+
+    private JavaBeanMetaData(Class<?> javaType) {
         this.javaType = javaType;
         this.fileds = new HashMap<>(30);
     }
 
     /**
      * @param javaType java对象
-     * @param getType 1 获取 get方法 2 获取set方法 3 all所有方法
+     * @param getType  1 获取 get方法 2 获取set方法 3 all所有方法
      * @return JavaBeanMetaData
      */
-    public static JavaBeanMetaData createBeanMetaDataFromType(Class<?> javaType, int getType){
+    public static JavaBeanMetaData createBeanMetaDataFromType(Class<?> javaType, int getType) {
         JavaBeanMetaData metaData = new JavaBeanMetaData(javaType);
         Field[] objFields = javaType.getDeclaredFields();
-        for(Field field :objFields){
+        for (Field field : objFields) {
             metaData.getFileds().put(field.getName(), new JavaBeanField(field));
         }
 
-        if(getType==1 || getType==3) {
+        if (getType == 1 || getType == 3) {
             List<Method> getters = ReflectionOpt.getAllGetterMethod(javaType);
             if (getters != null) {
                 for (Method md : getters) {
@@ -59,11 +62,11 @@ public class JavaBeanMetaData {
             }
         }
 
-        if(getType==2 || getType==3) {
+        if (getType == 2 || getType == 3) {
             List<Method> setters = ReflectionOpt.getAllSetterMethod(javaType);
             if (setters != null) {
                 for (Method md : setters) {
-                    String fieldName =  StringUtils.uncapitalize(
+                    String fieldName = StringUtils.uncapitalize(
                         md.getName().substring(3));
 
                     JavaBeanField javaField = metaData.getFiled(fieldName);
@@ -84,7 +87,7 @@ public class JavaBeanMetaData {
         return metaData;
     }
 
-    public static JavaBeanMetaData createBeanMetaDataFromType(Class<?> javaType){
+    public static JavaBeanMetaData createBeanMetaDataFromType(Class<?> javaType) {
         return createBeanMetaDataFromType(javaType, 3);
     }
 
@@ -92,24 +95,24 @@ public class JavaBeanMetaData {
         return javaType.newInstance();
     }
 
-    public Object createBeanObjectFromMap(Map<String,Object> properties) throws IllegalAccessException, InstantiationException {
+    public Object createBeanObjectFromMap(Map<String, Object> properties) throws IllegalAccessException, InstantiationException {
         Object object = javaType.newInstance();
-        for(Map.Entry<String, Object> pro : properties.entrySet() ){
+        for (Map.Entry<String, Object> pro : properties.entrySet()) {
             setObjectFieldValue(object, pro.getKey(), pro.getValue());
         }
         return object;
     }
 
-    public void setObjectFieldValue(Object object, String fieldName, Object newValue){
+    public void setObjectFieldValue(Object object, String fieldName, Object newValue) {
         JavaBeanField field = this.getFiled(fieldName);
-        if(field==null)
-            return ;
-        field.setObjectFieldValue(object,newValue);
+        if (field == null)
+            return;
+        field.setObjectFieldValue(object, newValue);
     }
 
     public Object getObjectFieldValue(Object object, String fieldName) {
         JavaBeanField field = this.getFiled(fieldName);
-        if(field==null)
+        if (field == null)
             return null;
         return field.getObjectFieldValue(object);
     }

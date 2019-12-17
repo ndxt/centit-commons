@@ -6,7 +6,7 @@ import com.centit.support.database.utils.DBType;
 /**
  * 数据库基本信息
  */
-public interface IDatabaseInfo  {
+public interface IDatabaseInfo {
 
     String getDatabaseName();
 
@@ -25,7 +25,7 @@ public interface IDatabaseInfo  {
     @JSONField(serialize = false)
     String getClearPassword();
 
-    default DBType getDBType(){
+    default DBType getDBType() {
         return DBType.mapDBType(getDatabaseUrl());
     }
 }

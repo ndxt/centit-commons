@@ -10,18 +10,10 @@ import java.sql.SQLException;
 
 public abstract class DatabaseWorkHandler {
 
-    private DatabaseWorkHandler() {
-        throw new IllegalAccessError("Utility class");
-    }
-
     private static final Logger logger = LoggerFactory.getLogger(DatabaseWorkHandler.class);
 
-    public interface ExecuteWork<T> {
-        T execute(Connection conn) throws SQLException;
-    }
-
-    public interface QueryWork<T> {
-        T execute(Connection conn) throws SQLException, IOException;
+    private DatabaseWorkHandler() {
+        throw new IllegalAccessError("Utility class");
     }
 
     public static <T> T executeInTransaction(DataSourceDescription dataSourceDesc, ExecuteWork<T> realWork)
@@ -30,11 +22,19 @@ public abstract class DatabaseWorkHandler {
         return realWork.execute(conn);
     }
 
-
     public static <T> T executeQueryInTransaction(DataSourceDescription dataSourceDesc, QueryWork<T> realWork)
         throws SQLException, IOException {
         Connection conn = ConnectThreadHolder.fetchConnect(dataSourceDesc);
         return realWork.execute(conn);
+    }
+
+    public interface ExecuteWork<T> {
+        T execute(Connection conn) throws SQLException;
+    }
+
+
+    public interface QueryWork<T> {
+        T execute(Connection conn) throws SQLException, IOException;
     }
 
 }

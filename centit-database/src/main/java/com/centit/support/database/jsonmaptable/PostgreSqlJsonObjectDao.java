@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 public class PostgreSqlJsonObjectDao extends GeneralJsonObjectDao {
 
-    public PostgreSqlJsonObjectDao(){
+    public PostgreSqlJsonObjectDao() {
 
     }
 
@@ -23,15 +23,15 @@ public class PostgreSqlJsonObjectDao extends GeneralJsonObjectDao {
     }
 
     public PostgreSqlJsonObjectDao(Connection conn, TableInfo tableInfo) {
-        super(conn,tableInfo);
+        super(conn, tableInfo);
     }
 
     // nextval currval
     @Override
     public Long getSequenceNextValue(final String sequenceName) throws SQLException, IOException {
         Object object = DatabaseAccess.getScalarObjectQuery(
-                 getConnect(),
-                 "SELECT nextval('" + sequenceName + "')");
+            getConnect(),
+            "SELECT nextval('" + sequenceName + "')");
         return NumberBaseOpt.castObjectToLong(object);
     }
 

@@ -5,7 +5,7 @@ package com.centit.support.database.orm;
  */
 public enum GeneratorType {
     /**
-     *  这个其实什么都不做，就是依赖数据库自动增长；程序中什么也不做
+     * 这个其实什么都不做，就是依赖数据库自动增长；程序中什么也不做
      */
     AUTO,
     /**
@@ -28,8 +28,8 @@ public enum GeneratorType {
      */
     CONSTANT,
     /**
-     *  函数，比如 当前日期
-     *  这个调用compiler中的表达式运行，可以将同一个对象中的其他字段作为参数
+     * 函数，比如 当前日期
+     * 这个调用compiler中的表达式运行，可以将同一个对象中的其他字段作为参数
      */
     FUNCTION,
     /**

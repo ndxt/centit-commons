@@ -26,7 +26,7 @@ public class JsonPropertyPreFilters implements PropertyPreFilter {
     public JsonPropertyPreFilters(Class<?>[] clazzs) {
         super();
         this.clazzs = new HashSet<Class<?>>();
-        
+
         for (Class<?> clazz : clazzs) {
             this.clazzs.add(clazz);
         }
@@ -40,7 +40,7 @@ public class JsonPropertyPreFilters implements PropertyPreFilter {
         if (object == null) {
             return true;
         }
-        
+
         for (Class<?> clazz : clazzs) {
             if (clazz.isInstance(object)) {
                 if (this.excludes.get(clazz).contains(name)) {
@@ -57,7 +57,7 @@ public class JsonPropertyPreFilters implements PropertyPreFilter {
             Set<String> fields = new HashSet<String>();
             this.excludes.put(clazz, fields);
         }
-        
+
         Set<String> fields = this.excludes.get(clazz);
         fields.add(exclude);
     }

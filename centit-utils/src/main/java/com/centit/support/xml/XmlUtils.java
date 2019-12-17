@@ -20,21 +20,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
- *     XML公用操作类
- * 
+ * XML公用操作类
+ *
  * @author <a href="mailto:ljy@centit.com">ljy</a>
  * @version $Rev$ <br>
- *          $Id$
+ * $Id$
  */
 @SuppressWarnings("unused")
 public abstract class XmlUtils {
 
+    private static Logger logger = LoggerFactory.getLogger(XmlUtils.class);
+
     private XmlUtils() {
         throw new IllegalAccessError("Utility class");
     }
-
-    private static Logger logger = LoggerFactory.getLogger(XmlUtils.class);
 
     public static Document string2xml(String xmlStr) {
 
@@ -47,7 +46,7 @@ public abstract class XmlUtils {
 //            xmlDoc = saxReader.read(isReader);
             xmlDoc = DocumentHelper.parseText(xmlStr);
         } catch (DocumentException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
 //        } catch (UnsupportedEncodingException e) {
 //            logger.error(e.getMessage(),e.getCause());
@@ -57,10 +56,9 @@ public abstract class XmlUtils {
     }
 
     /*
-      * 替换字符串中特殊字符
-      */
-    public static String encodeString(String strData)
-    {
+     * 替换字符串中特殊字符
+     */
+    public static String encodeString(String strData) {
         return StringEscapeUtils.escapeXml11(strData);
         /* if (strData == null)
          {
@@ -93,13 +91,12 @@ public abstract class XmlUtils {
              }
          }
          return strData;  */
-     }
+    }
 
-     /*
-      * 还原字符串中特殊字符
-      */
-    public static String decodeString(String xmlData)
-    {
+    /*
+     * 还原字符串中特殊字符
+     */
+    public static String decodeString(String xmlData) {
         return StringEscapeUtils.unescapeXml(xmlData);
         /*String strData = xmlData.replaceAll("&lt;", "<");
          strData = strData.replaceAll( "&gt;", ">");

@@ -18,19 +18,20 @@ public class TestFromPost {
         testUploadFile();
 
     }
-    public static void testUploadFile(){
+
+    public static void testUploadFile() {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         Map<String, File> files = new HashMap<>();
-        files.put("file",new File("D:/temp/server-productsvr.cer"));
-        Map<String,Object> params = new HashMap<>();
+        files.put("file", new File("D:/temp/server-productsvr.cer"));
+        Map<String, Object> params = new HashMap<>();
         params.put("osId", "FILE_SVR");
-        params.put("optId","LOCAL_FILE");
+        params.put("optId", "LOCAL_FILE");
         String jsonStr;
         try {
             jsonStr = HttpExecutor.formPostWithFileUpload(HttpExecutorContext.create(),
-                    "http://codefanpc:8180/product-file/service/upload/file",
-                    params,
-                    files);
+                "http://codefanpc:8180/product-file/service/upload/file",
+                params,
+                files);
             System.out.println(jsonStr);
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,29 +39,29 @@ public class TestFromPost {
         }
 
     }
-    
-    public static void testSession(){
+
+    public static void testSession() {
         try {
             CloseableHttpClient httpClient = HttpClients.createDefault();
-       
+
             String s = HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),
-                    "http://codefanbook:8180/TestSession/TestSession",(String)null);
-            System.out.println(s);
-            
-            s = HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),
-                    "http://codefanbook:8180/TestSession/TestSession",(String)null);
+                "http://codefanbook:8180/TestSession/TestSession", (String) null);
             System.out.println(s);
 
             s = HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),
-                    "http://codefanbook:8180/TestSession/TestSession",(String)null);
+                "http://codefanbook:8180/TestSession/TestSession", (String) null);
             System.out.println(s);
-            
+
+            s = HttpExecutor.simpleGet(HttpExecutorContext.create(httpClient),
+                "http://codefanbook:8180/TestSession/TestSession", (String) null);
+            System.out.println(s);
+
         } catch (Exception e) {
             //e.printStackTrace();
         }
     }
 
-    public static void testLogin(){
+    public static void testLogin() {
         //CloseableHttpClient client2 = HttpClients.createDefault();
         HttpClientContext context = HttpClientContext.create();
 
@@ -69,14 +70,14 @@ public class TestFromPost {
         HttpExecutorContext executorContext = HttpExecutorContext.create(httpClient).context(context);
         try {
 
-            Map<String,String> params = new HashMap<>();
+            Map<String, String> params = new HashMap<>();
             params.put("j_username", "admin");
             params.put("j_password", "000000");
             params.put("remember", "true");
 
             String s = HttpExecutor.formPost(executorContext,
-                    "http://codefanbook:8180/framework-sys-module/j_spring_security_check?ajax=true",
-                    params,true);
+                "http://codefanbook:8180/framework-sys-module/j_spring_security_check?ajax=true",
+                params, true);
             System.out.println(s);
 
 
@@ -85,12 +86,12 @@ public class TestFromPost {
             //context.setAttribute("JSESSIONID", jsessionid);
 
             s = HttpExecutor.simpleGet(executorContext,
-                    "http://codefanbook:8180/framework-sys-module/service/sys/currentuser",(String)null);
+                "http://codefanbook:8180/framework-sys-module/service/sys/currentuser", (String) null);
 
             System.out.println(s);
 
             s = HttpExecutor.simpleGet(executorContext,
-                    "http://codefanbook:8180/framework-sys-module/service/sys/currentuser",(String)null);
+                "http://codefanbook:8180/framework-sys-module/service/sys/currentuser", (String) null);
 
             System.out.println(s);
 

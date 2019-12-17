@@ -5,51 +5,35 @@ package com.centit.support.common;
  * An exception that is thrown by classes wanting to trap unique
  * constraint violations.  This is used to wrap Spring's
  * DataIntegrityViolationException so it's checked in the web layer.
+ *
  * @author <a href="mailto:codefan@sina.com">codefan</a>
  */
 public class ObjectException extends RuntimeException {
-    private static final long serialVersionUID = 4050482305178810162L;
-
     public static final int UNKNOWN_EXCEPTION = 601;
     public static final int NULL_EXCEPTION = 602;
     public static final int BLANK_EXCEPTION = 603;
-    public static final int DATA_NOT_FOUND_EXCEPTION  = 604;
-    public static final int EMPTY_RESULT_EXCEPTION  = 605;
+    public static final int DATA_NOT_FOUND_EXCEPTION = 604;
+    public static final int EMPTY_RESULT_EXCEPTION = 605;
     public static final int FORMAT_DATE_EXCEPTION = 606;
     public static final int FORMAT_NUMBER_EXCEPTION = 607;
     public static final int FORMULA_GRAMMAR_ERROE = 608;
-
-    public static String extortExceptionMessage(Throwable ex){
-        StringBuilder errorMsg = new StringBuilder(ex.getMessage());
-        StackTraceElement[] traces = ex.getStackTrace();
-        if(traces != null){
-            int len = traces.length > 15 ? 15 : traces.length;
-            for(int i=0; i<len; i++){
-                errorMsg.append("\r\n")
-                    .append("class: ").append(traces[i].getClassName()).append(",")
-                    .append("method: ").append(traces[i].getMethodName()).append(",")
-                    .append("line: ").append(traces[i].getLineNumber()).append(".");
-            }
-        }
-        return errorMsg.toString();
-    }
-
+    private static final long serialVersionUID = 4050482305178810162L;
     protected int exceptionCode;
     private Object objectData;
     /**
      * Constructor for UserExistsException.
+     *
      * @param exceptionCode 异常码
-     * @param message 异常信息
+     * @param message       异常信息
      */
-    public ObjectException(int exceptionCode,String message) {
+    public ObjectException(int exceptionCode, String message) {
         super(message);
         this.exceptionCode = exceptionCode;
     }
 
     /**
-     *
      * @param exceptionCode 异常码
-     * @param exception 异常信息
+     * @param exception     异常信息
      */
     public ObjectException(int exceptionCode, Throwable exception) {
         super(exception);
@@ -58,9 +42,10 @@ public class ObjectException extends RuntimeException {
 
     /**
      * Constructor for UserExistsException.
+     *
      * @param exceptionCode 异常码
-     * @param message 异常信息
-     * @param exception 异常信息
+     * @param message       异常信息
+     * @param exception     异常信息
      */
     public ObjectException(int exceptionCode, String message, Throwable exception) {
         super(message, exception);
@@ -68,7 +53,6 @@ public class ObjectException extends RuntimeException {
     }
 
     /**
-     *
      * @param exception Throwable
      */
     public ObjectException(Throwable exception) {
@@ -77,19 +61,17 @@ public class ObjectException extends RuntimeException {
     }
 
     /**
-     *
      * @param message String
      */
     public ObjectException(String message) {
-         super(message);
-         this.exceptionCode = UNKNOWN_EXCEPTION;
+        super(message);
+        this.exceptionCode = UNKNOWN_EXCEPTION;
     }
 
     /**
-     *
-     * @param obj Object
+     * @param obj           Object
      * @param exceptionCode 异常码
-     * @param message 异常信息
+     * @param message       异常信息
      */
     public ObjectException(Object obj, int exceptionCode, String message) {
         super(message);
@@ -98,10 +80,9 @@ public class ObjectException extends RuntimeException {
     }
 
     /**
-     *
-     * @param obj Object
+     * @param obj           Object
      * @param exceptionCode 异常码
-     * @param exception 异常信息
+     * @param exception     异常信息
      */
     public ObjectException(Object obj, int exceptionCode, Throwable exception) {
         super(exception);
@@ -110,8 +91,7 @@ public class ObjectException extends RuntimeException {
     }
 
     /**
-     *
-     * @param obj Object
+     * @param obj     Object
      * @param message String 异常信息
      */
     public ObjectException(Object obj, String message) {
@@ -121,14 +101,28 @@ public class ObjectException extends RuntimeException {
     }
 
     /**
-     *
-     * @param obj Object
+     * @param obj       Object
      * @param exception Throwable
      */
     public ObjectException(Object obj, Throwable exception) {
         super(exception);
         this.exceptionCode = UNKNOWN_EXCEPTION;
         this.objectData = obj;
+    }
+
+    public static String extortExceptionMessage(Throwable ex) {
+        StringBuilder errorMsg = new StringBuilder(ex.getMessage());
+        StackTraceElement[] traces = ex.getStackTrace();
+        if (traces != null) {
+            int len = traces.length > 15 ? 15 : traces.length;
+            for (int i = 0; i < len; i++) {
+                errorMsg.append("\r\n")
+                    .append("class: ").append(traces[i].getClassName()).append(",")
+                    .append("method: ").append(traces[i].getMethodName()).append(",")
+                    .append("line: ").append(traces[i].getLineNumber()).append(".");
+            }
+        }
+        return errorMsg.toString();
     }
 
     public int getExceptionCode() {

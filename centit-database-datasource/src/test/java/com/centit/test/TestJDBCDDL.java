@@ -18,7 +18,7 @@ import java.util.List;
 
 public class TestJDBCDDL {
 
-    public  static void  main(String[] args)   {
+    public static void main(String[] args) {
         //testJDBCMetadata();
         //testDB2JDBCMetadata();
         //testMysqlJDBCMetadata();
@@ -30,19 +30,19 @@ public class TestJDBCDDL {
         System.out.println(Lexer.isLabel("你好"));
     }
 
-    public  static void testJDBCMetadata(){
-         DataSourceDescription dbc = new DataSourceDescription();
-          dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
-          dbc.setUsername("fdemo2");
-          dbc.setPassword("fdemo2");
-          try {
-              Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
+    public static void testJDBCMetadata() {
+        DataSourceDescription dbc = new DataSourceDescription();
+        dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
+        dbc.setUsername("fdemo2");
+        dbc.setPassword("fdemo2");
+        try {
+            Connection conn = DbcpConnectPools.getDbcpConnect(dbc);
             JSONArray ja = DatabaseAccess.fetchResultSetToJSONArray(
-                    conn.getMetaData().getTables(null, "FDEMO2","F_USERINFO", null) , null);
+                conn.getMetaData().getTables(null, "FDEMO2", "F_USERINFO", null), null);
             System.out.println(ja.toJSONString());
 
             ja = DatabaseAccess.fetchResultSetToJSONArray(
-                    conn.getMetaData().getColumns(null, "FDEMO2", "F_USERINFO", null), null);
+                conn.getMetaData().getColumns(null, "FDEMO2", "F_USERINFO", null), null);
             System.out.println(ja.toJSONString());
 
             System.out.println(conn.getMetaData().getDatabaseProductName());
@@ -85,7 +85,7 @@ public class TestJDBCDDL {
             ddl.dropColumn("ddltemp", "f1");
             tablfilef2.setPrecision(10);
             tablfilef2.setScale(2);
-            ddl.modifyColumn("ddltemp",tablfilef2, tablfilef2);
+            ddl.modifyColumn("ddltemp", tablfilef2, tablfilef2);
 
             tablfilef2.setColumnType("varchar");
             tablfilef2.setMaxLength(200);
@@ -98,35 +98,35 @@ public class TestJDBCDDL {
         System.out.println("done!");
     }
 
-    public  static void testDataSource(){
-      DataSourceDescription dbc = new DataSourceDescription();
-      dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
-      dbc.setUsername("fdemo2");
-      dbc.setPassword("fdemo2");
+    public static void testDataSource() {
+        DataSourceDescription dbc = new DataSourceDescription();
+        dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
+        dbc.setUsername("fdemo2");
+        dbc.setPassword("fdemo2");
       /* String sql = "select loginName,userName from f_userinfo " +
                 "where [:(creepforin)userCodes| usercode in (:userCodes)]";*/
 
-      String sql = "select loginName,userName from f_userinfo " +
-                "where usercode in (:userCodes)";
+        String sql = "select loginName,userName from f_userinfo " +
+            "where usercode in (:userCodes)";
       /*QueryAndParams qp = QueryAndParams.createFromQueryAndNamedParams(sql,
              CollectionsOpt.createHashMap("userCodes",new Object[]{"U0000041","U0001013"}));*/
-      try {
-          Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
-            JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, sql,  CollectionsOpt.createHashMap("userCodes",new Object[]{"U0000041","U0001013"}));
+        try {
+            Connection conn = DbcpConnectPools.getDbcpConnect(dbc);
+            JSONArray ja = DatabaseAccess.findObjectsByNamedSqlAsJSON(conn, sql, CollectionsOpt.createHashMap("userCodes", new Object[]{"U0000041", "U0001013"}));
             conn.close();
             System.out.println(ja.toJSONString());
         } catch (Exception e) {
             //e.printStackTrace();
         }
-      }
+    }
 
-    public  static void testDB2JDBCMetadata(){
-          DataSourceDescription dbc = new DataSourceDescription();
-          dbc.setConnUrl("jdbc:db2://192.168.128.14:50000/jsmsa");
-          dbc.setUsername("ns");
-          dbc.setPassword("xxb@200914");
-          try {
-              Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
+    public static void testDB2JDBCMetadata() {
+        DataSourceDescription dbc = new DataSourceDescription();
+        dbc.setConnUrl("jdbc:db2://192.168.128.14:50000/jsmsa");
+        dbc.setUsername("ns");
+        dbc.setPassword("xxb@200914");
+        try {
+            Connection conn = DbcpConnectPools.getDbcpConnect(dbc);
 
             SimpleTableInfo tableinfo = new SimpleTableInfo("ddltemp");
             List<SimpleTableField> tf = tableinfo.getColumns();
@@ -167,14 +167,14 @@ public class TestJDBCDDL {
             conn.commit();
             tablfilef2.setPrecision(10);
             tablfilef2.setScale(2);
-            ddl.modifyColumn("ddltemp",tablfilef2, tablfilef2);
+            ddl.modifyColumn("ddltemp", tablfilef2, tablfilef2);
             conn.commit();
             tablfilef2.setColumnType("varchar");
             tablfilef2.setMaxLength(200);
             ddl.reconfigurationColumn("ddltemp", "fest2", tablfilef2);
             conn.commit();
             tablfilef2.setColumnName("f3");
-            ddl.renameColumn("ddltemp", "fest2",  tablfilef2);
+            ddl.renameColumn("ddltemp", "fest2", tablfilef2);
             conn.commit();
             conn.close();
 
@@ -184,13 +184,13 @@ public class TestJDBCDDL {
         System.out.println("done!");
     }
 
-    public  static void testMysqlJDBCMetadata(){
-          DataSourceDescription dbc = new DataSourceDescription();
-          dbc.setConnUrl("jdbc:mysql://192.168.131.44:3306/yhgxpt");
-          dbc.setUsername("root");
-          dbc.setPassword("centit.1");
-          try {
-              Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
+    public static void testMysqlJDBCMetadata() {
+        DataSourceDescription dbc = new DataSourceDescription();
+        dbc.setConnUrl("jdbc:mysql://192.168.131.44:3306/yhgxpt");
+        dbc.setUsername("root");
+        dbc.setPassword("centit.1");
+        try {
+            Connection conn = DbcpConnectPools.getDbcpConnect(dbc);
 
             SimpleTableInfo tableinfo = new SimpleTableInfo("ddltemp");
             List<SimpleTableField> tf = tableinfo.getColumns();
@@ -211,8 +211,8 @@ public class TestJDBCDDL {
             SimpleTableField tablfilef = new SimpleTableField();
             tablfilef.setColumnName("f1");
             tablfilef.setColumnType("DECIMAL");
-          tablfilef.setPrecision(8);
-          tablfilef.setScale(2);
+            tablfilef.setPrecision(8);
+            tablfilef.setScale(2);
             tf.add(tablfilef);
             tableinfo.setColumnAsPrimaryKey("c1");
             tableinfo.setColumnAsPrimaryKey("d1");
@@ -231,14 +231,14 @@ public class TestJDBCDDL {
             conn.commit();
             tablfilef2.setPrecision(10);
             tablfilef2.setScale(2);
-            ddl.modifyColumn("ddltemp",tablfilef2, tablfilef2);
+            ddl.modifyColumn("ddltemp", tablfilef2, tablfilef2);
             conn.commit();
             tablfilef2.setColumnType("varchar");
             tablfilef2.setMaxLength(200);
             ddl.reconfigurationColumn("ddltemp", "fest2", tablfilef2);
             conn.commit();
             tablfilef2.setColumnName("F3");
-            ddl.renameColumn("ddltemp", "fest2",  tablfilef2);
+            ddl.renameColumn("ddltemp", "fest2", tablfilef2);
             conn.commit();
             conn.close();
 

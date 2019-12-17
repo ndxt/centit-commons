@@ -12,23 +12,23 @@ import java.io.IOException;
 
 /**
  * copy from {@link org.apache.http.impl.client.BasicResponseHandler}
- * @author Daniel Qian
  *
+ * @author Daniel Qian
  */
 public class Utf8ResponseHandler implements ResponseHandler<String> {
 
-  public static final ResponseHandler<String> INSTANCE = new Utf8ResponseHandler();
+    public static final ResponseHandler<String> INSTANCE = new Utf8ResponseHandler();
 
-  @Override
-  public String handleResponse(final HttpResponse response) throws IOException {
-    final StatusLine statusLine = response.getStatusLine();
-    final HttpEntity entity = response.getEntity();
-    if (statusLine.getStatusCode() >= 300) {
-      EntityUtils.consume(entity);
-      throw new HttpResponseException(statusLine.getStatusCode(), "Error Code : "+
-                  String.valueOf(statusLine.getStatusCode())+", " +statusLine.getReasonPhrase()+"。");
+    @Override
+    public String handleResponse(final HttpResponse response) throws IOException {
+        final StatusLine statusLine = response.getStatusLine();
+        final HttpEntity entity = response.getEntity();
+        if (statusLine.getStatusCode() >= 300) {
+            EntityUtils.consume(entity);
+            throw new HttpResponseException(statusLine.getStatusCode(), "Error Code : " +
+                String.valueOf(statusLine.getStatusCode()) + ", " + statusLine.getReasonPhrase() + "。");
+        }
+        return entity == null ? null : EntityUtils.toString(entity, Consts.UTF_8);
     }
-    return entity == null ? null : EntityUtils.toString(entity, Consts.UTF_8);
-  }
 
 }

@@ -13,24 +13,16 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 /**
- *
  * @author 朱晓文 杨淮生 codefan@sina.com
- *
  */
 @SuppressWarnings("unused")
 public abstract class FileType {
 
-    private FileType() {
-        throw new IllegalAccessError("Utility class");
-    }
-
-    protected static final Logger logger = LoggerFactory.getLogger(FileIOOpt.class);
-
     public static final String OFFICE2003_FILE_HEAD = "D0CF11E0";
     public static final String OFFICE_XML_FILE_HEAD = "504B0304";
-
+    protected static final Logger logger = LoggerFactory.getLogger(FileIOOpt.class);
     protected static final HashMap<String, String> mFileTypes =
-        new HashMap<String, String>(50){{
+        new HashMap<String, String>(50) {{
             // images
             put("FFD8FF", "jpg");
             put("89504E47", "png");
@@ -60,9 +52,8 @@ public abstract class FileType {
             put("4D546864", "mid");
             put("1F8B08", "gz");
         }};
-
     protected static final HashMap<String, String> extMimeTypeMap
-        = new HashMap<String, String>(1200){{
+        = new HashMap<String, String>(1200) {{
         put("123", "application/vnd.lotus-1-2-3");
         put("323", "text/h323");
         put("3dml", "text/vnd.in3d.3dml");
@@ -850,7 +841,9 @@ public abstract class FileType {
         put("zmm", "application/vnd.handheld-entertainment+xml");
     }};
 
-
+    private FileType() {
+        throw new IllegalAccessError("Utility class");
+    }
 
     /**
      * 得到文件头
@@ -860,9 +853,9 @@ public abstract class FileType {
      * @throws IOException
      */
     private static String getFileHeadContent(InputStream inputStream) throws IOException {
-            byte[] b = new byte[28];
-            inputStream.read(b, 0, 28);
-            return String.valueOf(Hex.encodeHex(b,false));
+        byte[] b = new byte[28];
+        inputStream.read(b, 0, 28);
+        return String.valueOf(Hex.encodeHex(b, false));
     }
 
     /**
@@ -874,7 +867,7 @@ public abstract class FileType {
      */
     private static String getFileHeadContent(File file) throws IOException {
 
-        try(InputStream inputStream = new FileInputStream(file)) {
+        try (InputStream inputStream = new FileInputStream(file)) {
             return getFileHeadContent(inputStream);
         }
     }
@@ -895,8 +888,8 @@ public abstract class FileType {
         }
 
         fileHead = fileHead.toUpperCase();
-        for(Entry<String,String> entry : mFileTypes.entrySet()){
-            if(fileHead.startsWith(entry.getKey())){
+        for (Entry<String, String> entry : mFileTypes.entrySet()) {
+            if (fileHead.startsWith(entry.getKey())) {
                 return entry.getValue();
             }
         }
@@ -919,10 +912,10 @@ public abstract class FileType {
         }
 
         fileHead = fileHead.toUpperCase();
-        for(Entry<String,String> entry : mFileTypes.entrySet()){
-            if(fileHead.startsWith(entry.getKey())){
-                if("office2003".equals(entry.getValue()) || "officeX".equals(entry.getValue())){
-                    if(isOfficeFileByExtName(file.getName())){
+        for (Entry<String, String> entry : mFileTypes.entrySet()) {
+            if (fileHead.startsWith(entry.getKey())) {
+                if ("office2003".equals(entry.getValue()) || "officeX".equals(entry.getValue())) {
+                    if (isOfficeFileByExtName(file.getName())) {
                         return StringUtils.lowerCase(getFileExtName(file.getName()));
                     }
                 }
@@ -939,38 +932,41 @@ public abstract class FileType {
 
     /**
      * 获取文件的名称 ，去掉后缀名
+     *
      * @param fileName 文件名
-     * @return  文件名
+     * @return 文件名
      */
-    public static String truncateFileExtName(String fileName){
+    public static String truncateFileExtName(String fileName) {
         if (fileName == null || fileName.isEmpty())
             return "";
         int firstIndex = fileName.lastIndexOf("/");
 
         int firstIndex2 = fileName.lastIndexOf("\\");
-        if(firstIndex < firstIndex2) {
+        if (firstIndex < firstIndex2) {
             firstIndex = firstIndex2;
         }
 
-        firstIndex = firstIndex < 0 ? 0 : firstIndex +1;
+        firstIndex = firstIndex < 0 ? 0 : firstIndex + 1;
 
         int lastIndex = fileName.lastIndexOf(".");
-        if(lastIndex<0) {
+        if (lastIndex < 0) {
             return fileName;
         }
 
-        return fileName.substring(firstIndex,lastIndex);
+        return fileName.substring(firstIndex, lastIndex);
     }
+
     /**
      * 获取文件的后缀名
+     *
      * @param fileName 文件名
      * @return 后缀名
      */
-    public static String getFileExtName(String fileName){
+    public static String getFileExtName(String fileName) {
         if (fileName == null || fileName.isEmpty())
             return "";
         int lastIndex = fileName.lastIndexOf(".");
-        if(lastIndex<0)
+        if (lastIndex < 0)
             return "";
         return fileName.substring(lastIndex + 1, fileName.length());
     }
@@ -978,9 +974,9 @@ public abstract class FileType {
     /*
      * 判断输入的文件是够是office的文件
      */
-    public static boolean isOfficeFileByExtName(String fileName){
-        String suffix =StringUtils.lowerCase(getFileExtName(fileName));
-        if(StringUtils.isBlank(suffix))
+    public static boolean isOfficeFileByExtName(String fileName) {
+        String suffix = StringUtils.lowerCase(getFileExtName(fileName));
+        if (StringUtils.isBlank(suffix))
             return false;
 
         return suffix.equalsIgnoreCase("doc") || suffix.equalsIgnoreCase("docx")
@@ -993,11 +989,11 @@ public abstract class FileType {
     /*
      * 判断输入的文件是够是office的文件
      */
-    public static boolean isOffice2003FileByExtName(String fileName){
+    public static boolean isOffice2003FileByExtName(String fileName) {
 
-        String suffix =StringUtils.lowerCase(getFileExtName(fileName));
+        String suffix = StringUtils.lowerCase(getFileExtName(fileName));
 
-        if(StringUtils.isBlank(suffix))
+        if (StringUtils.isBlank(suffix))
             return false;
 
         return suffix.equalsIgnoreCase("doc")
@@ -1010,47 +1006,47 @@ public abstract class FileType {
     /*
      * 判断输入的文件是够是office的文件
      */
-    public static boolean isOfficeFile(File file){
+    public static boolean isOfficeFile(File file) {
         try {
             String fileHead = getFileHeadContent(file);
-            if(fileHead.startsWith(OFFICE2003_FILE_HEAD))//mFileTypes.get("office2003")))
+            if (fileHead.startsWith(OFFICE2003_FILE_HEAD))//mFileTypes.get("office2003")))
                 return true;
-            if(fileHead.startsWith(OFFICE_XML_FILE_HEAD))//mFileTypes.get("officeX")))
+            if (fileHead.startsWith(OFFICE_XML_FILE_HEAD))//mFileTypes.get("officeX")))
                 return true;
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return false;
     }
 
-    public static boolean isOfficeFile(String fileName){
+    public static boolean isOfficeFile(String fileName) {
         return isOfficeFile(new File(fileName));
     }
 
-    public static boolean isOffice2003File(File file){
+    public static boolean isOffice2003File(File file) {
         try {
             String fileHead = getFileHeadContent(file);
-            if(fileHead.startsWith(OFFICE2003_FILE_HEAD))//mFileTypes.get("office2003")))
+            if (fileHead.startsWith(OFFICE2003_FILE_HEAD))//mFileTypes.get("office2003")))
                 return true;
 
         } catch (IOException e) {
-            logger.error(e.getMessage(),e);
+            logger.error(e.getMessage(), e);
         }
         return false;
     }
 
-    public static boolean isOffice2003File(String fileName){
+    public static boolean isOffice2003File(String fileName) {
         return isOffice2003File(new File(fileName));
     }
 
-    public static String mapExtNameToMimeType(String extName){
-          String mimeType = extMimeTypeMap.get(StringUtils.lowerCase(extName));
-          if(mimeType!=null)
-              return mimeType;
-          return "application/octet-stream";
+    public static String mapExtNameToMimeType(String extName) {
+        String mimeType = extMimeTypeMap.get(StringUtils.lowerCase(extName));
+        if (mimeType != null)
+            return mimeType;
+        return "application/octet-stream";
     }
 
-    public static String getFileMimeType(String fileUrl){
+    public static String getFileMimeType(String fileUrl) {
         return mapExtNameToMimeType(getFileExtName(fileUrl));
     }
 }

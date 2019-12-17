@@ -8,14 +8,9 @@ import java.sql.SQLException;
 
 @SuppressWarnings("unused")
 public interface DatabaseMetadata {
-    void setDBConfig(Connection dbc);
-    SimpleTableInfo getTableMetadata(String tabName);
-    String getDBSchema();
-    void setDBSchema(String schema);
-
     static DatabaseMetadata createDatabaseMetadata(final DBType dbtype)
-            throws SQLException {
-        switch (dbtype){
+        throws SQLException {
+        switch (dbtype) {
             case Oracle:
             case DM:
             case KingBase:
@@ -34,5 +29,13 @@ public interface DatabaseMetadata {
                 return new JdbcMetadata();
         }
     }
+
+    void setDBConfig(Connection dbc);
+
+    SimpleTableInfo getTableMetadata(String tabName);
+
+    String getDBSchema();
+
+    void setDBSchema(String schema);
 
 }

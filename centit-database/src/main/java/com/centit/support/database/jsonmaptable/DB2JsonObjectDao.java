@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 public class DB2JsonObjectDao extends GeneralJsonObjectDao {
 
-    public DB2JsonObjectDao(){
+    public DB2JsonObjectDao() {
 
     }
 
@@ -22,17 +22,17 @@ public class DB2JsonObjectDao extends GeneralJsonObjectDao {
         super(tableInfo);
     }
 
-    public DB2JsonObjectDao(Connection conn,TableInfo tableInfo) {
-        super(conn,tableInfo);
+    public DB2JsonObjectDao(Connection conn, TableInfo tableInfo) {
+        super(conn, tableInfo);
     }
 
 
     @Override
     public Long getSequenceNextValue(final String sequenceName) throws SQLException, IOException {
         Object object = DatabaseAccess.getScalarObjectQuery(
-                 getConnect(),
-                 "SELECT nextval for "
-                         + sequenceName + " from sysibm.sysdummy1");
+            getConnect(),
+            "SELECT nextval for "
+                + sequenceName + " from sysibm.sysdummy1");
         return NumberBaseOpt.castObjectToLong(object);
     }
 

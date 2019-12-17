@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 
-public class DB2DDLOperations extends GeneralDDLOperations{
+public class DB2DDLOperations extends GeneralDDLOperations {
 
     public DB2DDLOperations() {
 
@@ -17,29 +17,29 @@ public class DB2DDLOperations extends GeneralDDLOperations{
     }
 
     @Override
-    public String makeCreateSequenceSql(final String sequenceName){
+    public String makeCreateSequenceSql(final String sequenceName) {
         return "CREATE SEQUENCE " + QueryUtils.cleanSqlStatement(sequenceName) +
-                " AS INTEGER START WITH 1 INCREMENT BY 1";
+            " AS INTEGER START WITH 1 INCREMENT BY 1";
     }
 
     @Override
-    public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column){
+    public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column) {
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
 
-        if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
-                || oldColumn.getMaxLength() != column.getMaxLength()
-                || oldColumn.getPrecision() != column.getPrecision() ){
+        if (!StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
+            || oldColumn.getMaxLength() != column.getMaxLength()
+            || oldColumn.getPrecision() != column.getPrecision()) {
             sbsql.append(" alter column ")
-                    .append(column.getColumnName())
-                    .append(" set data type ");
+                .append(column.getColumnName())
+                .append(" set data type ");
             appendColumnTypeSQL(column, sbsql);
         }
 
-        if( oldColumn.isMandatory() != column.isMandatory()){
+        if (oldColumn.isMandatory() != column.isMandatory()) {
             sbsql.append(" alter column ")
-                    .append(column.getColumnName())
-                    .append(column.isMandatory() ? " set not null" : " drop not null");
+                .append(column.getColumnName())
+                .append(column.isMandatory() ? " set not null" : " drop not null");
         }
 
         return sbsql.toString();

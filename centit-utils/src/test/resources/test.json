@@ -1,1 +1,14 @@
-{"object":{"properties":{"optid":{"type":"string","index":"analyzed"},"osid":{"type":"string","index":"analyzed"}}}}
+{
+  "object": {
+    "properties": {
+      "optid": {
+        "type": "string",
+        "index": "analyzed"
+      },
+      "osid": {
+        "type": "string",
+        "index": "analyzed"
+      }
+    }
+  }
+}

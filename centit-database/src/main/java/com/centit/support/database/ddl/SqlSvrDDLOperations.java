@@ -8,7 +8,7 @@ import java.sql.Connection;
 public class SqlSvrDDLOperations extends GeneralDDLOperations {
 
 
-    public SqlSvrDDLOperations(){
+    public SqlSvrDDLOperations() {
 
     }
 
@@ -17,26 +17,26 @@ public class SqlSvrDDLOperations extends GeneralDDLOperations {
     }
 
     @Override
-    public String makeRenameColumnSql(final String tableCode, final String columnCode, final TableField column){
+    public String makeRenameColumnSql(final String tableCode, final String columnCode, final TableField column) {
 /*        dropColumn(tableCode, columnCode);
         column.setColumnName(newColumnCode);
         addColumn(tableCode, column);*/
-        return "exec sp_rename ' "+tableCode +"." + columnCode +"','"+ column.getColumnName() +"','COLUMN'";
+        return "exec sp_rename ' " + tableCode + "." + columnCode + "','" + column.getColumnName() + "','COLUMN'";
     }
 
     @Override
-    public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column){
+    public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column) {
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
         sbsql.append(" ALTER COLUMN ").append(column.getColumnName()).append(" ");
-        if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
-                || !oldColumn.getMaxLength().equals(column.getMaxLength())
-                || !oldColumn.getPrecision().equals(column.getPrecision()) ){
+        if (!StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
+            || !oldColumn.getMaxLength().equals(column.getMaxLength())
+            || !oldColumn.getPrecision().equals(column.getPrecision())) {
             appendColumnTypeSQL(column, sbsql);
         }
 
-        if( oldColumn.isMandatory() != column.isMandatory()){
-            sbsql.append(column.isMandatory()?" not null": " null");
+        if (oldColumn.isMandatory() != column.isMandatory()) {
+            sbsql.append(column.isMandatory() ? " not null" : " null");
         }
         return sbsql.toString();
     }

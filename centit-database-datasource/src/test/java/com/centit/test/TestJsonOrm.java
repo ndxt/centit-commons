@@ -18,25 +18,11 @@ import java.util.List;
 
 public class TestJsonOrm {
 
-    public  static void  main(String[] args)   {
+    public static void main(String[] args) {
         testOrm();
     }
 
-    @Data
-    @Table(name = "F_USERINFO")
-    public static class UserInfo implements java.io.Serializable {
-        private static final long serialVersionUID = -1753127177790732963L;
-        @Id
-        @Column(name = "USER_CODE")
-        @ValueGenerator(strategy = GeneratorType.RANDOM_ID, value = "7:U")
-        private String userCode; // 用户代码
-        @Column(name = "USER_NAME")
-        private String userName; // 用户姓名
-        @Column(name = "CREATE_DATE")
-        @ValueGenerator(strategy = GeneratorType.FUNCTION, value = "today()")
-        protected Date createDate;
-    }
-    public  static void testOrm(){
+    public static void testOrm() {
         UserInfo userInfo = new UserInfo();
         userInfo.setUserCode("u0001");
         userInfo.setUserName("先腾用户");
@@ -53,9 +39,24 @@ public class TestJsonOrm {
                 }
             );
             System.out.println(JSON.toJSONString(users));
-        } catch (SQLException  | IOException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
         System.out.println("done!");
+    }
+
+    @Data
+    @Table(name = "F_USERINFO")
+    public static class UserInfo implements java.io.Serializable {
+        private static final long serialVersionUID = -1753127177790732963L;
+        @Column(name = "CREATE_DATE")
+        @ValueGenerator(strategy = GeneratorType.FUNCTION, value = "today()")
+        protected Date createDate;
+        @Id
+        @Column(name = "USER_CODE")
+        @ValueGenerator(strategy = GeneratorType.RANDOM_ID, value = "7:U")
+        private String userCode; // 用户代码
+        @Column(name = "USER_NAME")
+        private String userName; // 用户姓名
     }
 }

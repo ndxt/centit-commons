@@ -11,19 +11,19 @@ import java.util.Map;
 
 public abstract class FieldType {
     public static final String STRING = "string";
-    public static final String INTEGER= "integer";
-    public static final String FLOAT= "float";
+    public static final String INTEGER = "integer";
+    public static final String FLOAT = "float";
     /**
      * 要考虑 定点数，用于存储金钱
      */
-    public static final String MONEY= "money";
-    public static final String DOUBLE= "double";
-    public static final String LONG= "long";
-    public static final String BOOLEAN= "boolean";
-    public static final String DATE= "date";
-    public static final String DATETIME= "datetime";
-    public static final String TIMESTAMP= "timestamp";
-    public static final String TEXT= "text"; // CLOB
+    public static final String MONEY = "money";
+    public static final String DOUBLE = "double";
+    public static final String LONG = "long";
+    public static final String BOOLEAN = "boolean";
+    public static final String DATE = "date";
+    public static final String DATETIME = "datetime";
+    public static final String TIMESTAMP = "timestamp";
+    public static final String TEXT = "text"; // CLOB
     public static final String FILE_ID = "fileId";
     public static final String BYTE_ARRAY = "bytes"; // BLOB
     public static final String ENUM_ORDINAL = "enum";
@@ -34,33 +34,33 @@ public abstract class FieldType {
      * @param st java类 名称
      * @return java类 短名
      */
-    public static String trimType(String st ){
+    public static String trimType(String st) {
         int p = st.lastIndexOf('.');
-        if(p>0)
-            return  st.substring(p+1);
+        if (p > 0)
+            return st.substring(p + 1);
         return st;
     }
 
-    public static String mapToHumpName(String columnName, boolean firstUpCase){
+    public static String mapToHumpName(String columnName, boolean firstUpCase) {
         String sTempName = columnName.toLowerCase();
         int nl = columnName.length();
-        int i=0;
+        int i = 0;
 
         StringBuilder sClassName = new StringBuilder();
         boolean upCase = firstUpCase;
-        while(i<nl){
-            if(sTempName.charAt(i) == '_' ){
-               if(sClassName.length()==1){
-                    sClassName.delete(0,1);
+        while (i < nl) {
+            if (sTempName.charAt(i) == '_') {
+                if (sClassName.length() == 1) {
+                    sClassName.delete(0, 1);
                     upCase = firstUpCase;
-                }else {
+                } else {
                     upCase = true;
                 }
-            }else{
-                if(upCase) {
-                    sClassName.append((char)(sTempName.charAt(i)-32));
+            } else {
+                if (upCase) {
+                    sClassName.append((char) (sTempName.charAt(i) - 32));
                     upCase = false;
-                }else {
+                } else {
                     sClassName.append(sTempName.charAt(i));
                 }
             }
@@ -73,7 +73,7 @@ public abstract class FieldType {
      * @param columnName 数据库中的名称（代码）
      * @return 大驼峰 名称
      */
-    public static String mapClassName(String columnName){
+    public static String mapClassName(String columnName) {
         return mapToHumpName(columnName, true);
     }
 
@@ -82,16 +82,18 @@ public abstract class FieldType {
      * @param columnName 数据库中的名称（代码）
      * @return 小驼峰 名称
      */
-    public static String mapPropName(String columnName){
+    public static String mapPropName(String columnName) {
         return mapToHumpName(columnName, false);
     }
+
     /**
      * 转换到Oracle的字段
+     *
      * @param ft String
      * @return String
      */
-    public static String mapToOracleColumnType(String ft){
-        switch(ft){
+    public static String mapToOracleColumnType(String ft) {
+        switch (ft) {
             case STRING:
                 return "varchar2";
             case INTEGER:
@@ -120,10 +122,11 @@ public abstract class FieldType {
                 return "number(4,0)";//
             default:
                 return ft;
-      }
+        }
     }
-    public static String mapToGBaseColumnType(String ft){
-        switch(ft){
+
+    public static String mapToGBaseColumnType(String ft) {
+        switch (ft) {
             case STRING:
                 return "lvarchar";
             case INTEGER:
@@ -154,13 +157,15 @@ public abstract class FieldType {
                 return ft;
         }
     }
+
     /**
      * 转换到Oracle的字段
+     *
      * @param ft String
      * @return String
      */
-    public static String mapToSqlServerColumnType(String ft){
-        switch(ft){
+    public static String mapToSqlServerColumnType(String ft) {
+        switch (ft) {
             case STRING:
                 return "varchar";
             case INTEGER:
@@ -189,21 +194,22 @@ public abstract class FieldType {
                 return "decimal(4,0)";//
             default:
                 return ft;
-      }
+        }
     }
 
     /**
      * 转换到Oracle的字段
+     *
      * @param ft String
      * @return String
      */
-    public static String mapToDB2ColumnType(String ft){
-        switch(ft){
-        case STRING:
-            return "varchar";
+    public static String mapToDB2ColumnType(String ft) {
+        switch (ft) {
+            case STRING:
+                return "varchar";
             case INTEGER:
             case LONG:
-                 return "INTEGER";
+                return "INTEGER";
             case DOUBLE:
             case FLOAT:
                 return "DECIMAL";
@@ -227,22 +233,23 @@ public abstract class FieldType {
                 return "decimal(4,0)";//
             default:
                 return ft;
-      }
+        }
     }
 
     /**
      * 转换到Oracle的字段
+     *
      * @param ft String
      * @return String
      */
-    public static String mapToMySqlColumnType(String ft){
-        switch(ft){
+    public static String mapToMySqlColumnType(String ft) {
+        switch (ft) {
             case STRING:
                 return "varchar";
             case INTEGER:
                 return "INT";
             case LONG:
-                  return "BIG INT";
+                return "BIG INT";
             case MONEY:
                 return "DECIMAL(30,4)";
             case FLOAT:
@@ -271,24 +278,23 @@ public abstract class FieldType {
         }
     }
 
-    public static String mapToH2ColumnType(String ft){
+    public static String mapToH2ColumnType(String ft) {
         return mapToMySqlColumnType(ft);
     }
 
-    public static String mapToPostgreSqlColumnType(String ft){
+    public static String mapToPostgreSqlColumnType(String ft) {
         return mapToMySqlColumnType(ft);
     }
 
     /**
-     *
      * @param dt 数据库类别
      * @param ft 字段 java 类别
      * @return String
      */
-    public static String mapToDatabaseType(String ft, DBType dt ){
-        if(dt==null)
+    public static String mapToDatabaseType(String ft, DBType dt) {
+        if (dt == null)
             return ft;
-        switch(dt) {
+        switch (dt) {
             case SqlServer:
                 return mapToSqlServerColumnType(ft);
             case Oracle:
@@ -312,86 +318,87 @@ public abstract class FieldType {
 
     }
 
-    public static Map<String,String> getAllTypeMap(){
-        Map<String,String> fts = new HashMap<>();
-        fts.put(FieldType.STRING,"字符串");
-        fts.put(FieldType.INTEGER,"整型");
-        fts.put(FieldType.FLOAT,"浮点型");
-        fts.put(FieldType.MONEY,"金额");
-        fts.put(FieldType.DOUBLE,"双精度浮点型");
-        fts.put(FieldType.LONG,"长整型");
-        fts.put(FieldType.BOOLEAN,"布尔型");
-        fts.put(FieldType.DATE,"日期型");
-        fts.put(FieldType.DATETIME,"日期时间型");
-        fts.put(FieldType.TIMESTAMP,"时间戳");
-        fts.put(FieldType.TEXT,"大文本");
-        fts.put(FieldType.FILE_ID,"文件ID");
-        fts.put(FieldType.BYTE_ARRAY,"大字段");
-        fts.put(FieldType.JSON_OBJECT,"JSON对象");
+    public static Map<String, String> getAllTypeMap() {
+        Map<String, String> fts = new HashMap<>();
+        fts.put(FieldType.STRING, "字符串");
+        fts.put(FieldType.INTEGER, "整型");
+        fts.put(FieldType.FLOAT, "浮点型");
+        fts.put(FieldType.MONEY, "金额");
+        fts.put(FieldType.DOUBLE, "双精度浮点型");
+        fts.put(FieldType.LONG, "长整型");
+        fts.put(FieldType.BOOLEAN, "布尔型");
+        fts.put(FieldType.DATE, "日期型");
+        fts.put(FieldType.DATETIME, "日期时间型");
+        fts.put(FieldType.TIMESTAMP, "时间戳");
+        fts.put(FieldType.TEXT, "大文本");
+        fts.put(FieldType.FILE_ID, "文件ID");
+        fts.put(FieldType.BYTE_ARRAY, "大字段");
+        fts.put(FieldType.JSON_OBJECT, "JSON对象");
         return fts;
     }
 
-    public static Class<?> mapToJavaType(String columnType, int scale){
-        if("NUMBER".equalsIgnoreCase(columnType) ||
-            "DECIMAL".equalsIgnoreCase(columnType) ){
-            if(scale > 0) {
+    public static Class<?> mapToJavaType(String columnType, int scale) {
+        if ("NUMBER".equalsIgnoreCase(columnType) ||
+            "DECIMAL".equalsIgnoreCase(columnType)) {
+            if (scale > 0) {
                 return Double.class;
             } else {
                 return Long.class;
             }
-        }else if("CHAR".equalsIgnoreCase(columnType) ||
-            "VARCHAR".equalsIgnoreCase(columnType)||
-            "VARCHAR2".equalsIgnoreCase(columnType)||
+        } else if ("CHAR".equalsIgnoreCase(columnType) ||
+            "VARCHAR".equalsIgnoreCase(columnType) ||
+            "VARCHAR2".equalsIgnoreCase(columnType) ||
             FieldType.STRING.equalsIgnoreCase(columnType) ||
             FieldType.FILE_ID.equalsIgnoreCase(columnType) ||
-            FieldType.BOOLEAN.equalsIgnoreCase(columnType)){
+            FieldType.BOOLEAN.equalsIgnoreCase(columnType)) {
             return String.class;
-        }else if("DATE".equalsIgnoreCase(columnType) ||
-            "TIME".equalsIgnoreCase(columnType)||
-            "DATETIME".equalsIgnoreCase(columnType)||
-            "SQLDATE".equalsIgnoreCase(columnType)){
+        } else if ("DATE".equalsIgnoreCase(columnType) ||
+            "TIME".equalsIgnoreCase(columnType) ||
+            "DATETIME".equalsIgnoreCase(columnType) ||
+            "SQLDATE".equalsIgnoreCase(columnType)) {
             return Date.class;
-        }else if("TIMESTAMP".equalsIgnoreCase(columnType) ||
-            "SQLTIMESTAMP".equalsIgnoreCase(columnType)){
+        } else if ("TIMESTAMP".equalsIgnoreCase(columnType) ||
+            "SQLTIMESTAMP".equalsIgnoreCase(columnType)) {
             return Timestamp.class;
-        }else if("CLOB".equalsIgnoreCase(columnType) ||
-                "TEXT".equalsIgnoreCase(columnType) ){
+        } else if ("CLOB".equalsIgnoreCase(columnType) ||
+            "TEXT".equalsIgnoreCase(columnType)) {
             return String.class;
-        }else if("BLOB".equalsIgnoreCase(columnType) ||
-                "VARBINARY".equalsIgnoreCase(columnType) ||
-                 FieldType.BYTE_ARRAY.equalsIgnoreCase(columnType)) {
+        } else if ("BLOB".equalsIgnoreCase(columnType) ||
+            "VARBINARY".equalsIgnoreCase(columnType) ||
+            FieldType.BYTE_ARRAY.equalsIgnoreCase(columnType)) {
             return byte[].class;
-        }else if(FieldType.MONEY.equalsIgnoreCase(columnType) ){
+        } else if (FieldType.MONEY.equalsIgnoreCase(columnType)) {
             return BigDecimal.class;//FieldType.MONEY;
-        }else if(FieldType.FLOAT.equalsIgnoreCase(columnType)){
+        } else if (FieldType.FLOAT.equalsIgnoreCase(columnType)) {
             return Float.class;
-        }else if("Int".equalsIgnoreCase(columnType)||
-            FieldType.INTEGER.equalsIgnoreCase(columnType)){
+        } else if ("Int".equalsIgnoreCase(columnType) ||
+            FieldType.INTEGER.equalsIgnoreCase(columnType)) {
             return Integer.class;
-        } else if(FieldType.DOUBLE.equalsIgnoreCase(columnType)){
+        } else if (FieldType.DOUBLE.equalsIgnoreCase(columnType)) {
             return Double.class;
-        }else if("BIG INT".equalsIgnoreCase(columnType) ||
-                FieldType.LONG.equalsIgnoreCase(columnType)){
+        } else if ("BIG INT".equalsIgnoreCase(columnType) ||
+            FieldType.LONG.equalsIgnoreCase(columnType)) {
             return Long.class;
-        }else if(FieldType.JSON_OBJECT.equalsIgnoreCase(columnType)) {
+        } else if (FieldType.JSON_OBJECT.equalsIgnoreCase(columnType)) {
             return JSON.class;
-        }else{
+        } else {
             return String.class;
         }
     }
 
-    public static Class<?> mapToJavaType(String columnType){
+    public static Class<?> mapToJavaType(String columnType) {
         return mapToJavaType(columnType, 0);
     }
 
     /**
      * map java.sql.Type to javaType
+     *
      * @param dbType java.sql.Type
      * @return java type
      * @see Types
      */
-    public static Class<?> mapToJavaType(int dbType){
-        switch(dbType) {
+    public static Class<?> mapToJavaType(int dbType) {
+        switch (dbType) {
             case -6:
             case -5:
             case 5:
@@ -430,8 +437,8 @@ public abstract class FieldType {
         }
     }
 
-    public static String mapToFieldType(int dbType){
-        switch(dbType) {
+    public static String mapToFieldType(int dbType) {
+        switch (dbType) {
             case -6:
             case -5:
             case 5:
@@ -471,98 +478,100 @@ public abstract class FieldType {
         }
     }
 
-    public static String mapToFieldType(String columnType, int scale){
-        if("NUMBER".equalsIgnoreCase(columnType) ||
-            "INTEGER".equalsIgnoreCase(columnType)||
-            "DECIMAL".equalsIgnoreCase(columnType) ){
-            if( scale > 0 ) {
+    public static String mapToFieldType(String columnType, int scale) {
+        if ("NUMBER".equalsIgnoreCase(columnType) ||
+            "INTEGER".equalsIgnoreCase(columnType) ||
+            "DECIMAL".equalsIgnoreCase(columnType)) {
+            if (scale > 0) {
                 return FieldType.DOUBLE;
             } else {
                 return FieldType.LONG;
             }
-        }else if("CHAR".equalsIgnoreCase(columnType) ||
-            "VARCHAR".equalsIgnoreCase(columnType)||
-            "VARCHAR2".equalsIgnoreCase(columnType)){
+        } else if ("CHAR".equalsIgnoreCase(columnType) ||
+            "VARCHAR".equalsIgnoreCase(columnType) ||
+            "VARCHAR2".equalsIgnoreCase(columnType)) {
             return FieldType.STRING;
-        }else if("DATE".equalsIgnoreCase(columnType) ||
+        } else if ("DATE".equalsIgnoreCase(columnType) ||
             "SQLDATE".equalsIgnoreCase(columnType) ||
-            "TIME".equalsIgnoreCase(columnType)||
-            "DATETIME".equalsIgnoreCase(columnType) ){
+            "TIME".equalsIgnoreCase(columnType) ||
+            "DATETIME".equalsIgnoreCase(columnType)) {
             return FieldType.DATETIME;
-        }else if("TIMESTAMP".equalsIgnoreCase(columnType) ||
-                "SQLTIMESTAMP".equalsIgnoreCase(columnType) ){
+        } else if ("TIMESTAMP".equalsIgnoreCase(columnType) ||
+            "SQLTIMESTAMP".equalsIgnoreCase(columnType)) {
             return FieldType.TIMESTAMP;
-        }else if("CLOB".equalsIgnoreCase(columnType) ||
-            "TEXT".equalsIgnoreCase(columnType) ){
-            return  FieldType.TEXT;
-        }else if("BLOB".equalsIgnoreCase(columnType)||
-                "VARBINARY".equalsIgnoreCase(columnType)) {
+        } else if ("CLOB".equalsIgnoreCase(columnType) ||
+            "TEXT".equalsIgnoreCase(columnType)) {
+            return FieldType.TEXT;
+        } else if ("BLOB".equalsIgnoreCase(columnType) ||
+            "VARBINARY".equalsIgnoreCase(columnType)) {
             return FieldType.BYTE_ARRAY;
-        }else if("FLOAT".equalsIgnoreCase(columnType)) {
+        } else if ("FLOAT".equalsIgnoreCase(columnType)) {
             return FieldType.FLOAT;
-        }else if("DOUBLE".equalsIgnoreCase(columnType)) {
+        } else if ("DOUBLE".equalsIgnoreCase(columnType)) {
             return FieldType.DOUBLE;
-        }if("BIG INT".equalsIgnoreCase(columnType)) {
+        }
+        if ("BIG INT".equalsIgnoreCase(columnType)) {
             return FieldType.LONG;
-        }if("INT".equalsIgnoreCase(columnType)) {
+        }
+        if ("INT".equalsIgnoreCase(columnType)) {
             return FieldType.INTEGER;
-        }else {
+        } else {
             return columnType;
         }
     }
 
-    public static String mapToFieldType(String columnType){
+    public static String mapToFieldType(String columnType) {
         return mapToFieldType(columnType, 0);
     }
 
-    public static String mapToFieldType(Class<?> javaType){
+    public static String mapToFieldType(Class<?> javaType) {
         // 这个要重写
-        if(javaType.equals(BigDecimal.class)){
+        if (javaType.equals(BigDecimal.class)) {
             return FieldType.MONEY;
         }
 
-        if(javaType.equals(Integer.class)||
-            int.class == javaType){
+        if (javaType.equals(Integer.class) ||
+            int.class == javaType) {
             return FieldType.INTEGER;
         }
 
-        if(javaType.equals(Float.class)||
-            float.class == javaType){
+        if (javaType.equals(Float.class) ||
+            float.class == javaType) {
             return FieldType.FLOAT;
         }
 
-        if(javaType.equals(Double.class)||
-            double.class == javaType){
+        if (javaType.equals(Double.class) ||
+            double.class == javaType) {
             return FieldType.DOUBLE;
         }
 
-        if(javaType.equals(Long.class)||
-            long.class == javaType){
+        if (javaType.equals(Long.class) ||
+            long.class == javaType) {
             return FieldType.LONG;
         }
 
-        if(String.class.isAssignableFrom(javaType)){
+        if (String.class.isAssignableFrom(javaType)) {
             return FieldType.STRING;
         }
 
-        if(Boolean.class.isAssignableFrom(javaType) ||
-            boolean.class == javaType){
+        if (Boolean.class.isAssignableFrom(javaType) ||
+            boolean.class == javaType) {
             return FieldType.BOOLEAN;
         }
 
-        if(javaType.isEnum()){
+        if (javaType.isEnum()) {
             return FieldType.ENUM_ORDINAL;
         }
 
-        if(Timestamp.class.isAssignableFrom(javaType)){
+        if (Timestamp.class.isAssignableFrom(javaType)) {
             return FieldType.TIMESTAMP;
         }
 
-        if(java.util.Date.class.isAssignableFrom(javaType)){
+        if (java.util.Date.class.isAssignableFrom(javaType)) {
             return FieldType.DATE;
         }
 
-        if(byte[].class == javaType){
+        if (byte[].class == javaType) {
             return FieldType.BYTE_ARRAY;
         }
 

@@ -25,6 +25,7 @@ import java.util.Map;
 
 /**
  * Created by codefan on 17-8-27.
+ *
  * @author codefan@sina.com
  */
 @SuppressWarnings("unused")
@@ -72,16 +73,16 @@ public abstract class OrmUtils {
     private static <T> T makeObjectValueByGenerator(T object, TableMapInfo mapInfo,
                                                     JsonObjectDao sqlDialect, GeneratorTime generatorTime)
         throws SQLException, IOException {
-        List<LeftRightPair<String, ValueGenerator>>  valueGenerators = mapInfo.getValueGenerators();
-        if(valueGenerators == null || valueGenerators.size()<1 )
+        List<LeftRightPair<String, ValueGenerator>> valueGenerators = mapInfo.getValueGenerators();
+        if (valueGenerators == null || valueGenerators.size() < 1)
             return object;
-        for(LeftRightPair<String, ValueGenerator> ent :  valueGenerators) {
-            ValueGenerator valueGenerator =  ent.getRight();
-            if (valueGenerator.occasion().matchTime(generatorTime)){
+        for (LeftRightPair<String, ValueGenerator> ent : valueGenerators) {
+            ValueGenerator valueGenerator = ent.getRight();
+            if (valueGenerator.occasion().matchTime(generatorTime)) {
                 SimpleTableField field = mapInfo.findFieldByName(ent.getLeft());
                 Object fieldValue = mapInfo.getObjectFieldValue(object, field);
-                if( fieldValue == null || valueGenerator.condition() == GeneratorCondition.ALWAYS ){
-                    switch (valueGenerator.strategy()){
+                if (fieldValue == null || valueGenerator.condition() == GeneratorCondition.ALWAYS) {
+                    switch (valueGenerator.strategy()) {
                         case UUID:
                             mapInfo.setObjectFieldValue(object, field, UuidOpt.getUuidAsString32());
                             break;
@@ -90,20 +91,20 @@ public abstract class OrmUtils {
                             break;
                         case SEQUENCE:
                             //GeneratorTime.READ 读取数据时不能用 SEQUENCE 生成值
-                            if(sqlDialect!=null) {
+                            if (sqlDialect != null) {
                                 String genValue = valueGenerator.value();
-                                String [] params = genValue.split(":");
-                                if(params.length==1) {
+                                String[] params = genValue.split(":");
+                                if (params.length == 1) {
                                     mapInfo.setObjectFieldValue(object, field,
                                         sqlDialect.getSequenceNextValue(params[0]));
                                 } else {
                                     Long seqNo = sqlDialect.getSequenceNextValue(params[0]);
-                                    if(params.length>3){
+                                    if (params.length > 3) {
                                         mapInfo.setObjectFieldValue(object, field, StringBaseOpt.midPad(seqNo.toString(),
-                                            NumberBaseOpt.castObjectToInteger(params[2],1),
-                                             params[1], params[3]));
-                                    } else if(params.length>1){
-                                        mapInfo.setObjectFieldValue(object, field, params[1]+seqNo);
+                                            NumberBaseOpt.castObjectToInteger(params[2], 1),
+                                            params[1], params[3]));
+                                    } else if (params.length > 1) {
+                                        mapInfo.setObjectFieldValue(object, field, params[1] + seqNo);
                                     }
                                 }
                             }
@@ -113,44 +114,43 @@ public abstract class OrmUtils {
                             break;
                         case FUNCTION:
                             mapInfo.setObjectFieldValue(object, field,
-                                    VariableFormula.calculate(valueGenerator.value(), object));
+                                VariableFormula.calculate(valueGenerator.value(), object));
                             break;
-                        case SERIAL_NO:
-                            {
-                                String genValue = valueGenerator.value();
-                                int n = genValue.indexOf(':');
-                                if(n>0 && sqlDialect!=null){
-                                    String seq = genValue.substring(0,n);
-                                    Long seqNo = sqlDialect.getSequenceNextValue(seq);
-                                    JSONObject json = (JSONObject) JSON.toJSON(object);
-                                    json.put("seqNo",seqNo);
-                                    mapInfo.setObjectFieldValue(object, field,
-                                        VariableFormula.calculate(
-                                            genValue.substring(n+1), object));
-                                }
-                            }
-                        break;
-                        case RANDOM_ID:{
+                        case SERIAL_NO: {
                             String genValue = valueGenerator.value();
-                            String [] params = genValue.split(":");
-                            if(params.length>0 && sqlDialect!=null) {
-                                String prefix = params.length>1 ? params[1] : "";
-                                int len = NumberBaseOpt.castObjectToInteger(params[0],23);
-                                if(len>22){
+                            int n = genValue.indexOf(':');
+                            if (n > 0 && sqlDialect != null) {
+                                String seq = genValue.substring(0, n);
+                                Long seqNo = sqlDialect.getSequenceNextValue(seq);
+                                JSONObject json = (JSONObject) JSON.toJSON(object);
+                                json.put("seqNo", seqNo);
+                                mapInfo.setObjectFieldValue(object, field,
+                                    VariableFormula.calculate(
+                                        genValue.substring(n + 1), object));
+                            }
+                        }
+                        break;
+                        case RANDOM_ID: {
+                            String genValue = valueGenerator.value();
+                            String[] params = genValue.split(":");
+                            if (params.length > 0 && sqlDialect != null) {
+                                String prefix = params.length > 1 ? params[1] : "";
+                                int len = NumberBaseOpt.castObjectToInteger(params[0], 23);
+                                if (len > 22) {
                                     mapInfo.setObjectFieldValue(object, field, prefix + UuidOpt.getUuidAsString22());
-                                } else /*if (sqlDialect!=null)*/{
-                                    if(mapInfo.countPkColumn() != 1 || !field.isPrimaryKey()){
+                                } else /*if (sqlDialect!=null)*/ {
+                                    if (mapInfo.countPkColumn() != 1 || !field.isPrimaryKey()) {
                                         throw new ObjectException(PersistenceException.ORM_METADATA_EXCEPTION,
                                             "主键生成规则RANDOM_ID只能用于单主键表中！");
                                     }
-                                    for(int i=0; i<100; i++) {
-                                        String no = prefix + UuidOpt.getUuidAsString22().substring(0,len);
+                                    for (int i = 0; i < 100; i++) {
+                                        String no = prefix + UuidOpt.getUuidAsString22().substring(0, len);
                                         //检查主键是否冲突
                                         int nHasId = NumberBaseOpt.castObjectToInteger(
-                                                        DatabaseAccess.fetchScalarObject(
-                                                            sqlDialect.findObjectsBySql("select count(*) hasId from " + mapInfo.getTableName()
-                                                                + " where " + field.getColumnName() +" = ?", new Object[] {no})),0);
-                                        if(nHasId==0) {
+                                            DatabaseAccess.fetchScalarObject(
+                                                sqlDialect.findObjectsBySql("select count(*) hasId from " + mapInfo.getTableName()
+                                                    + " where " + field.getColumnName() + " = ?", new Object[]{no})), 0);
+                                        if (nHasId == 0) {
                                             mapInfo.setObjectFieldValue(object, field, no);
                                             break;// for
                                         }
@@ -160,23 +160,23 @@ public abstract class OrmUtils {
                             break;// case
                         }
 
-                        case SUB_ORDER:{
+                        case SUB_ORDER: {
                             int pkCount = mapInfo.countPkColumn();
-                            if(pkCount < 2 || !field.isPrimaryKey() /*|| filed.getFieldType()*/){
+                            if (pkCount < 2 || !field.isPrimaryKey() /*|| filed.getFieldType()*/) {
                                 throw new ObjectException(PersistenceException.ORM_METADATA_EXCEPTION,
                                     "主键生成规则SUB_ORDER必须用于符合主键表中，并且只能用于整型字段！");
                             }
-                            StringBuilder sqlBuilder = new StringBuilder("select max(" );
+                            StringBuilder sqlBuilder = new StringBuilder("select max(");
                             sqlBuilder.append(field.getColumnName())
                                 .append(" ) as maxOrder from ")
                                 .append(mapInfo.getTableName())
                                 .append(" where ");
                             int pki = 0;
-                            Object[] pkValues = new Object[pkCount-1];
-                            for(SimpleTableField col : mapInfo.getColumns()){
-                                if(col.isPrimaryKey() &&
-                                    ! StringUtils.equals(col.getPropertyName(), field.getPropertyName())){
-                                    if(pki>0){
+                            Object[] pkValues = new Object[pkCount - 1];
+                            for (SimpleTableField col : mapInfo.getColumns()) {
+                                if (col.isPrimaryKey() &&
+                                    !StringUtils.equals(col.getPropertyName(), field.getPropertyName())) {
+                                    if (pki > 0) {
                                         sqlBuilder.append(" and ");
                                     }
                                     sqlBuilder.append(col.getColumnName()).append(" = ?");
@@ -186,8 +186,8 @@ public abstract class OrmUtils {
                             }
                             Long pkSubOrder = NumberBaseOpt.castObjectToLong(
                                 DatabaseAccess.fetchScalarObject(
-                                    sqlDialect.findObjectsBySql(sqlBuilder.toString(), pkValues)) , 0L);
-                            mapInfo.setObjectFieldValue(object, field, pkSubOrder+1);
+                                    sqlDialect.findObjectsBySql(sqlBuilder.toString(), pkValues)), 0L);
+                            mapInfo.setObjectFieldValue(object, field, pkSubOrder + 1);
                             break;
                         }
                     }
@@ -197,35 +197,35 @@ public abstract class OrmUtils {
         return object;
     }
 
-    public static <T> T prepareObjectForInsert(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
+    public static <T> T prepareObjectForInsert(T object, TableMapInfo mapInfo, JsonObjectDao sqlDialect)
         throws SQLException, IOException {
-        return makeObjectValueByGenerator(object, mapInfo, sqlDialect,GeneratorTime.NEW);
+        return makeObjectValueByGenerator(object, mapInfo, sqlDialect, GeneratorTime.NEW);
     }
 
-    public static <T> T prepareObjectForUpdate(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
+    public static <T> T prepareObjectForUpdate(T object, TableMapInfo mapInfo, JsonObjectDao sqlDialect)
         throws SQLException, IOException {
         return makeObjectValueByGenerator(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
     }
 
-    public static <T> T prepareObjectForMerge(T object, TableMapInfo mapInfo,JsonObjectDao sqlDialect)
+    public static <T> T prepareObjectForMerge(T object, TableMapInfo mapInfo, JsonObjectDao sqlDialect)
         throws SQLException, IOException {
-        Map<String,Object> objectMap = OrmUtils.fetchObjectDatabaseField(object,mapInfo);
-        if(! GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo,objectMap)){
+        Map<String, Object> objectMap = OrmUtils.fetchObjectDatabaseField(object, mapInfo);
+        if (!GeneralJsonObjectDao.checkHasAllPkColumns(mapInfo, objectMap)) {
             return makeObjectValueByGenerator(object, mapInfo, sqlDialect, GeneratorTime.NEW);
-        }else {
+        } else {
             return makeObjectValueByGenerator(object, mapInfo, sqlDialect, GeneratorTime.UPDATE);
         }
     }
 
     public static Map<String, Object> fetchObjectField(Object object) {
-        if(object instanceof Map) {
+        if (object instanceof Map) {
             return (Map<String, Object>) object;
         }
         // 这个地方为什么 不用 JsonObject.toJSONObject
         Field[] objFields = object.getClass().getDeclaredFields();
-        Map<String, Object> fields = new HashMap<>(objFields.length*2);
-        for(Field field :objFields){
-            Object value = ReflectionOpt.forceGetFieldValue(object,field);
+        Map<String, Object> fields = new HashMap<>(objFields.length * 2);
+        for (Field field : objFields) {
+            Object value = ReflectionOpt.forceGetFieldValue(object, field);
             fields.put(field.getName(), value);
         }
         return fields;
@@ -234,27 +234,27 @@ public abstract class OrmUtils {
 
     public static Map<String, Object> fetchObjectDatabaseField(Object object, TableMapInfo tableInfo) {
         List<SimpleTableField> tableFields = tableInfo.getColumns();
-        if(tableFields == null) {
+        if (tableFields == null) {
             return null;
         }
-        Map<String, Object> fields = new HashMap<>(tableFields.size()+6);
-        for(SimpleTableField column : tableFields){
+        Map<String, Object> fields = new HashMap<>(tableFields.size() + 6);
+        for (SimpleTableField column : tableFields) {
             Object value = tableInfo.getObjectFieldValue(object, column);
             //ReflectionOpt.getFieldValue(object, column.getPropertyName());
-            if(value!=null){
-                if(FieldType.BOOLEAN.equals(column.getFieldType())){
-                    value = BooleanBaseOpt.castObjectToBoolean(value,false)?
+            if (value != null) {
+                if (FieldType.BOOLEAN.equals(column.getFieldType())) {
+                    value = BooleanBaseOpt.castObjectToBoolean(value, false) ?
                         BooleanBaseOpt.ONE_CHAR_TRUE : BooleanBaseOpt.ONE_CHAR_FALSE;
                 } /*else if(FieldType.JSON_OBJECT.equals(column.getFieldType())){
                     value = JSON.toJSONString(value);
                 }*/
-                fields.put(column.getPropertyName(),value);
+                fields.put(column.getPropertyName(), value);
             }
         }
         return fields;
     }
 
-    private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo )
+    private static <T> T insideFetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo)
         throws SQLException, IOException {
         ResultSetMetaData resMeta = rs.getMetaData();
         int fieldCount = resMeta.getColumnCount();
@@ -272,30 +272,30 @@ public abstract class OrmUtils {
                                                         TableField[] fields)
         throws SQLException, IOException {
         int fieldCount = rs.getMetaData().getColumnCount();
-        if(fieldCount > fields.length){
+        if (fieldCount > fields.length) {
             fieldCount = fields.length;
         }
         for (int i = 0; i < fieldCount; i++) {
-            putResultSetObjectToField(object, mapInfo, (SimpleTableField) fields[i] , rs.getObject(i+1));
+            putResultSetObjectToField(object, mapInfo, (SimpleTableField) fields[i], rs.getObject(i + 1));
         }
         return makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ);
     }
 
     static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz, TableField[] fields)
-            throws SQLException, IllegalAccessException, InstantiationException, IOException {
+        throws SQLException, IllegalAccessException, InstantiationException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
-        if(mapInfo == null)
+        if (mapInfo == null)
             return null;
-        if(rs.next()) {
+        if (rs.next()) {
             return insideFetchFieldsFormResultSet(rs, clazz.newInstance(), mapInfo, fields);
-        }else {
+        } else {
             return null;
         }
     }
 
     static <T> T fetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo, SimpleTableField[] fields)
         throws SQLException, IOException {
-        if(rs.next()) {
+        if (rs.next()) {
             object = insideFetchFieldsFormResultSet(rs, object, mapInfo, fields);
         }
         return object;
@@ -304,38 +304,38 @@ public abstract class OrmUtils {
     static <T> T fetchObjectFormResultSet(ResultSet rs, Class<T> clazz)
         throws SQLException, IllegalAccessException, InstantiationException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
-        if(mapInfo == null)
+        if (mapInfo == null)
             return null;
-        if(rs.next()) {
+        if (rs.next()) {
             return insideFetchFieldsFormResultSet(rs, clazz.newInstance(), mapInfo);
-        }else {
+        } else {
             return null;
         }
     }
 
     static <T> T fetchFieldsFormResultSet(ResultSet rs, T object, TableMapInfo mapInfo)
         throws SQLException, IOException {
-        if(rs.next()) {
+        if (rs.next()) {
             object = insideFetchFieldsFormResultSet(rs, object, mapInfo);
         }
         return object;
     }
 
     static <T> List<T> fetchObjectListFormResultSet(ResultSet rs, Class<T> clazz, TableField[] fields)
-            throws SQLException, IllegalAccessException, InstantiationException, IOException {
+        throws SQLException, IllegalAccessException, InstantiationException, IOException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
-        if(mapInfo == null)
+        if (mapInfo == null)
             return null;
         int fieldCount = rs.getMetaData().getColumnCount();
-        if(fieldCount > fields.length){
+        if (fieldCount > fields.length) {
             fieldCount = fields.length;
         }
 
         List<T> listObj = new ArrayList<>();
-        while(rs.next()){
+        while (rs.next()) {
             T object = clazz.newInstance();
-            for(int i=0; i<fieldCount; i++){
-                putResultSetObjectToField(object, mapInfo, (SimpleTableField) fields[i], rs.getObject(i+1));
+            for (int i = 0; i < fieldCount; i++) {
+                putResultSetObjectToField(object, mapInfo, (SimpleTableField) fields[i], rs.getObject(i + 1));
             }
             listObj.add(makeObjectValueByGenerator(object, mapInfo, null, GeneratorTime.READ));
         }
@@ -346,21 +346,21 @@ public abstract class OrmUtils {
         throws SQLException, IllegalAccessException, InstantiationException, IOException {
 
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(clazz);
-        if(mapInfo == null)
+        if (mapInfo == null)
             return null;
         ResultSetMetaData resMeta = rs.getMetaData();
         int fieldCount = resMeta.getColumnCount();
-        SimpleTableField[] fields = new SimpleTableField[fieldCount+1];
-        for(int i=1;i<=fieldCount;i++) {
+        SimpleTableField[] fields = new SimpleTableField[fieldCount + 1];
+        for (int i = 1; i <= fieldCount; i++) {
             String columnName = resMeta.getColumnName(i);
             fields[i] = mapInfo.findFieldByColumn(columnName);
         }
 
         List<T> listObj = new ArrayList<>();
-        while(rs.next()){
+        while (rs.next()) {
             T object = clazz.newInstance();
-            for(int i=1;i<=fieldCount;i++){
-                if(fields[i]!=null) {
+            for (int i = 1; i <= fieldCount; i++) {
+                if (fields[i] != null) {
                     putResultSetObjectToField(object, mapInfo, fields[i], rs.getObject(i));
                 }
             }

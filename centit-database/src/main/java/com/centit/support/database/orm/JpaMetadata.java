@@ -23,31 +23,28 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unused")
 public abstract class JpaMetadata {
 
+    private static final Logger logger = LoggerFactory.getLogger(JpaMetadata.class);
+    private static final ConcurrentHashMap<String, TableMapInfo> ORM_JPA_METADATA_CLASSPATH =
+        new ConcurrentHashMap<>(100);
+    private static final ConcurrentHashMap<String, TableMapInfo> ORM_JPA_METADATA_CLASSNAME =
+        new ConcurrentHashMap<>(100);
+    private static final ConcurrentHashMap<String, TableMapInfo> ORM_JPA_METADATA_TABLENAME =
+        new ConcurrentHashMap<>(100);
+
     private JpaMetadata() {
         throw new IllegalAccessError("Utility class");
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(JpaMetadata.class);
-
-    private static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA_CLASSPATH =
-            new ConcurrentHashMap<>(100);
-
-    private static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA_CLASSNAME =
-            new ConcurrentHashMap<>(100);
-
-    private static final ConcurrentHashMap<String , TableMapInfo> ORM_JPA_METADATA_TABLENAME =
-            new ConcurrentHashMap<>(100);
-
-    public static TableMapInfo fetchTableMapInfo(Class<?> type){
+    public static TableMapInfo fetchTableMapInfo(Class<?> type) {
         String className = type.getName();
         TableMapInfo mapInfo = ORM_JPA_METADATA_CLASSPATH.get(className);
-        if(mapInfo == null){
+        if (mapInfo == null) {
             mapInfo = obtainMapInfoFromClass(type);
-            if(mapInfo!=null){
-                ORM_JPA_METADATA_CLASSPATH.put(className,mapInfo);
-                ORM_JPA_METADATA_TABLENAME.put(mapInfo.getTableName(),mapInfo);
+            if (mapInfo != null) {
+                ORM_JPA_METADATA_CLASSPATH.put(className, mapInfo);
+                ORM_JPA_METADATA_TABLENAME.put(mapInfo.getTableName(), mapInfo);
                 ORM_JPA_METADATA_CLASSNAME.put(/*type.getSimpleName()*/
-                        className.substring(className.lastIndexOf(".")+1),mapInfo);
+                    className.substring(className.lastIndexOf(".") + 1), mapInfo);
             }
         }
         return mapInfo;
@@ -55,39 +52,41 @@ public abstract class JpaMetadata {
 
     /**
      * 将属性名称转换为字段名称
-     * @param type 类型
+     *
+     * @param type         类型
      * @param propertyName 属性名称
      * @return 字段名称
      */
-    public static String translatePropertyNameToColumnName(Class<?> type, String propertyName ){
+    public static String translatePropertyNameToColumnName(Class<?> type, String propertyName) {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
-        if(mapInfo == null){
+        if (mapInfo == null) {
             return propertyName;
         }
         SimpleTableField field = mapInfo.findFieldByName(propertyName);
-        return field==null?propertyName:field.getColumnName();
+        return field == null ? propertyName : field.getColumnName();
     }
 
     /**
      * 将属性名称转换为字段名称;
      * 这里有一个问题就是这个类一定是已经扫描过得，不然会找不到这个对象
-     * @param propertyName  表名或者类名.属性名称
-     * @param tableAlias  表的笔名
+     *
+     * @param propertyName 表名或者类名.属性名称
+     * @param tableAlias   表的笔名
      * @return 字段名称
      */
-    public static String translatePropertyNameToColumnName(String propertyName , String tableAlias){
+    public static String translatePropertyNameToColumnName(String propertyName, String tableAlias) {
         int n = propertyName.indexOf('.');
-        if(n<0) {
+        if (n < 0) {
             return propertyName;
         }
-        String tableName =   propertyName.substring(0,n);
-        String fieldName =   propertyName.substring(n+1);
+        String tableName = propertyName.substring(0, n);
+        String fieldName = propertyName.substring(n + 1);
 
         TableMapInfo mapInfo = ORM_JPA_METADATA_CLASSNAME.get(tableName);
-        if(mapInfo ==null){
+        if (mapInfo == null) {
             mapInfo = ORM_JPA_METADATA_TABLENAME.get(tableName);
         }
-        if(mapInfo ==null){
+        if (mapInfo == null) {
             return propertyName;
         }
 
@@ -95,25 +94,26 @@ public abstract class JpaMetadata {
 
         SimpleTableField field = mapInfo.findFieldByName(propertyName);
 
-        if(field!=null){
+        if (field != null) {
             fieldName = field.getColumnName();
         }
 
-        if(StringUtils.isNotBlank(tableAlias)){
-            return tableAlias +"."+fieldName;
+        if (StringUtils.isNotBlank(tableAlias)) {
+            return tableAlias + "." + fieldName;
         }
 
-        return tableName +"."+fieldName;
+        return tableName + "." + fieldName;
     }
 
 
     /**
      * 将属性名称转换为字段名称;
      * 这里有一个问题就是这个类一定是已经扫描过得，不然会找不到这个对象
-     * @param propertyName  表名或者类名.属性名称
+     *
+     * @param propertyName 表名或者类名.属性名称
      * @return 字段名称
      */
-    public static String translatePropertyNameToColumnName(String propertyName ){
+    public static String translatePropertyNameToColumnName(String propertyName) {
         return translatePropertyNameToColumnName(propertyName, null);
     }
 
@@ -141,43 +141,43 @@ public abstract class JpaMetadata {
         return column;
     }
 
-    public static TableMapInfo obtainMapInfoFromClass(Class<?> objType){
+    public static TableMapInfo obtainMapInfoFromClass(Class<?> objType) {
 
-        if(!objType.isAnnotationPresent(Table.class ))
+        if (!objType.isAnnotationPresent(Table.class))
             return null;
         Table tableInfo = objType.getAnnotation(Table.class);
         TableMapInfo mapInfo = new TableMapInfo();
-        mapInfo.setTableName( tableInfo.name() );
-        mapInfo.setSchema( tableInfo.schema());
+        mapInfo.setTableName(tableInfo.name());
+        mapInfo.setSchema(tableInfo.schema());
 
         Field[] objFields = objType.getDeclaredFields();
-        for(Field field :objFields){
-            if(field.isAnnotationPresent(Column.class)){
+        for (Field field : objFields) {
+            if (field.isAnnotationPresent(Column.class)) {
                 SimpleTableField column = obtainColumnFromField(objType, field);
 
                 boolean isPK = field.isAnnotationPresent(Id.class);
                 column.setPrimaryKey(isPK);
                 boolean isLazy = false;
-                if(!isPK && field.isAnnotationPresent(Basic.class)) {
+                if (!isPK && field.isAnnotationPresent(Basic.class)) {
                     Basic colBasic = field.getAnnotation(Basic.class);
                     isLazy = colBasic.fetch() == FetchType.LAZY;
                 }
                 column.setLazyFetch(isLazy);
                 mapInfo.addColumn(column);
 
-                if(field.isAnnotationPresent(ValueGenerator.class) ){
+                if (field.isAnnotationPresent(ValueGenerator.class)) {
                     ValueGenerator valueGenerator = field.getAnnotation(ValueGenerator.class);
                     mapInfo.addValueGenerator(
-                            column.getPropertyName(),
-                            valueGenerator);
+                        column.getPropertyName(),
+                        valueGenerator);
                 }
 
-                if(field.isAnnotationPresent(OrderBy.class) ){
+                if (field.isAnnotationPresent(OrderBy.class)) {
                     OrderBy orderBy = field.getAnnotation(OrderBy.class);
                     mapInfo.appendOrderBy(column, orderBy.value());
                 }
 
-            } else if(field.isAnnotationPresent(EmbeddedId.class)){
+            } else if (field.isAnnotationPresent(EmbeddedId.class)) {
                 EmbeddedId embeddedId = field.getAnnotation(EmbeddedId.class);
                 mapInfo.setEmbeddedId(true);
                 mapInfo.setPkName(field.getName());
@@ -185,21 +185,21 @@ public abstract class JpaMetadata {
                 obtainField(pkColumn, objType, field);
                 mapInfo.setEmbeddedIdField(pkColumn);
 
-                for(Field idField : field.getType().getDeclaredFields()){
+                for (Field idField : field.getType().getDeclaredFields()) {
 
-                    if(idField.isAnnotationPresent(Column.class)) {
+                    if (idField.isAnnotationPresent(Column.class)) {
                         SimpleTableField column = obtainColumnFromField(field.getType(), idField);
                         column.setPrimaryKey(true);
                         mapInfo.addColumn(column);
 
-                        if(idField.isAnnotationPresent(ValueGenerator.class) ){
+                        if (idField.isAnnotationPresent(ValueGenerator.class)) {
                             ValueGenerator valueGenerator = idField.getAnnotation(ValueGenerator.class);
                             mapInfo.addValueGenerator(
-                                    column.getPropertyName(),
-                                    valueGenerator);
+                                column.getPropertyName(),
+                                valueGenerator);
                         }
 
-                        if(idField.isAnnotationPresent(OrderBy.class) ){
+                        if (idField.isAnnotationPresent(OrderBy.class)) {
                             OrderBy orderBy = idField.getAnnotation(OrderBy.class);
                             mapInfo.appendOrderBy(column, orderBy.value());
                         }
@@ -214,36 +214,36 @@ public abstract class JpaMetadata {
                 if (field.isAnnotationPresent(OneToOne.class)) {
                     OneToOne oneToOne = field.getAnnotation(OneToOne.class);
                     targetClass = oneToOne.targetEntity();
-                    if(/*targetClass ==null || */targetClass.equals(void.class) ) {
+                    if (/*targetClass ==null || */targetClass.equals(void.class)) {
                         targetClass = field.getType();
                     }
-                }else if (field.isAnnotationPresent(ManyToOne.class)) {
+                } else if (field.isAnnotationPresent(ManyToOne.class)) {
                     ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
                     targetClass = manyToOne.targetEntity();
-                    if(/*targetClass ==null || */targetClass.equals(void.class)) {
+                    if (/*targetClass ==null || */targetClass.equals(void.class)) {
                         targetClass = field.getType();
                     }
-                }else if (field.isAnnotationPresent(OneToMany.class)) {
+                } else if (field.isAnnotationPresent(OneToMany.class)) {
                     OneToMany oneToMany = field.getAnnotation(OneToMany.class);
                     targetClass = oneToMany.targetEntity();
-                    if(/*targetClass ==null || */targetClass.equals(void.class) ) {
-                        Type t = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
-                        if(t instanceof Class){
-                            targetClass = (Class<?>)t;
+                    if (/*targetClass ==null || */targetClass.equals(void.class)) {
+                        Type t = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                        if (t instanceof Class) {
+                            targetClass = (Class<?>) t;
                         }
                     }
-                }else if (field.isAnnotationPresent(ManyToMany.class)) {
+                } else if (field.isAnnotationPresent(ManyToMany.class)) {
                     ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
                     targetClass = manyToMany.targetEntity();
-                    if(/*targetClass ==null ||*/ targetClass.equals(void.class) ) {
-                        Type t = ((ParameterizedType)field.getGenericType()).getActualTypeArguments()[0];
-                        if(t instanceof Class){
+                    if (/*targetClass ==null ||*/ targetClass.equals(void.class)) {
+                        Type t = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                        if (t instanceof Class) {
                             targetClass = (Class<?>) t;
                         }
                     }
                 }
 
-                if(targetClass !=null && !targetClass.equals(void.class)) {
+                if (targetClass != null && !targetClass.equals(void.class)) {
                     SimpleTableReference reference = new SimpleTableReference();
                     reference.setTargetEntityType(targetClass);
                     boolean haveJoinColumns = false;
@@ -263,7 +263,7 @@ public abstract class JpaMetadata {
                         haveJoinColumns = true;
                     }
 
-                    if(haveJoinColumns) {
+                    if (haveJoinColumns) {
                         reference.setObjectField(field);
                         reference.setObjectGetFieldValueFunc(ReflectionOpt.getGetterMethod(objType, field.getType(), field.getName()));
                         reference.setObjectSetFieldValueFunc(ReflectionOpt.getSetterMethod(objType, field.getType(), field.getName()));
@@ -275,7 +275,7 @@ public abstract class JpaMetadata {
         //先 注册一下，避免 交叉引用时 死循环
         ORM_JPA_METADATA_CLASSPATH.put(objType.getName(), mapInfo);
         // 整理 引用字段 ; 如果引用是字段名 就整理为 属性名
-        if(mapInfo.getReferences() != null && mapInfo.getReferences().size()>0) {
+        if (mapInfo.getReferences() != null && mapInfo.getReferences().size() > 0) {
             Set<SimpleTableReference> errorRef = new HashSet<>(mapInfo.getReferences().size());
             for (SimpleTableReference reference : mapInfo.getReferences()) {
                 TableMapInfo refTalbeInfo = fetchTableMapInfo(reference.getTargetEntityType());
@@ -299,7 +299,7 @@ public abstract class JpaMetadata {
                 }
             }
 
-            if(errorRef.size()>0) {
+            if (errorRef.size() > 0) {
                 mapInfo.getReferences().removeAll(errorRef);
             }
         }
@@ -308,9 +308,10 @@ public abstract class JpaMetadata {
 
     /**
      * 将sql语句中的属性名 替换为 数据库中表的字段名
+     *
      * @param mapInfo 数据库表和对象的映射关系信息
-     * @param sql 带有属性名的sql语句
-     * @param alias 表的别名
+     * @param sql     带有属性名的sql语句
+     * @param alias   表的别名
      * @return 转换后的 sql语句
      */
     public static String translateSqlPropertyToColumn(TableMapInfo mapInfo, String sql, String alias) {

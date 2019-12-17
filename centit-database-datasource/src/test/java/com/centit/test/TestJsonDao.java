@@ -15,17 +15,17 @@ import java.sql.SQLException;
 
 public class TestJsonDao {
 
-    public  static void  main(String[] args)   {
-         testJDBCMetadata();
+    public static void main(String[] args) {
+        testJDBCMetadata();
     }
 
-    public  static void testJDBCMetadata(){
+    public static void testJDBCMetadata() {
         DataSourceDescription dbc = new DataSourceDescription();
         dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
         dbc.setUsername("metaform");
         dbc.setPassword("metaform");
         try {
-            Connection conn= DbcpConnectPools.getDbcpConnect(dbc);
+            Connection conn = DbcpConnectPools.getDbcpConnect(dbc);
             SimpleTableInfo tableInfo = new SimpleTableInfo("TEST_TABLE");
             SimpleTableField field = new SimpleTableField();
             field.setColumnName("ID");
@@ -60,7 +60,7 @@ public class TestJsonDao {
             object.put("userName", "codefan");
             //object.put("userPhone", "18602554255");
 
-            JsonObjectDao dao = new OracleJsonObjectDao(conn,tableInfo);
+            JsonObjectDao dao = new OracleJsonObjectDao(conn, tableInfo);
             dao.saveNewObject(object);
             conn.commit();
             conn.close();

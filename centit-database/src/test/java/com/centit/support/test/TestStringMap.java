@@ -11,14 +11,14 @@ import java.util.Map;
 public class TestStringMap {
 
     public static void main(String[] args) {
-        byte[] bytes =new byte[]{'1','2'};
+        byte[] bytes = new byte[]{'1', '2'};
         System.out.println(bytes.getClass().isPrimitive());
         System.out.println(JSON.class.isAssignableFrom(JSONObject.class));
         System.out.println(JSON.class.isAssignableFrom(JSONArray.class));
         System.out.println(Map.class.isAssignableFrom(JSONObject.class));
         System.out.println(JSON.class.isAssignableFrom(Map.class));
 
-        byte[] a= new byte[23];
+        byte[] a = new byte[23];
         System.out.println(FieldType.mapToFieldType(a.getClass()));
 
         System.out.println(DBType.valueOf("Oracle"));

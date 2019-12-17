@@ -16,25 +16,24 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class IniReader {
 
+    protected Map<String, Map<String, String>> sections = new HashMap<String, Map<String, String>>();
+    private transient String currentSecion = null;
+    private transient Map<String, String> current = null;
     private IniReader() {
         throw new IllegalAccessError("Utility class");
     }
 
-    protected Map<String,Map<String,String> > sections = new HashMap<String,Map<String,String> >();
-    private transient String currentSecion = null;
-    private transient Map<String,String> current=null;
-
     public IniReader(String filename) throws IOException {
         //modifyed by brmrk
-        try(BufferedReader reader = new BufferedReader(new InputStreamReader(
-                new FileInputStream(filename), "GBK"))){
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+            new FileInputStream(filename), "GBK"))) {
             read(reader);
         }
     }
 
     protected void read(BufferedReader reader) throws IOException {
         String line;
-        while ((line = reader.readLine())!=null ) {
+        while ((line = reader.readLine()) != null) {
             parseLine(line);
         }
 
@@ -43,15 +42,15 @@ public class IniReader {
     protected void parseLine(String line) {
         line = line.trim();
         if (line.startsWith("[") && line.endsWith("]")) {
-             if (current != null && currentSecion != null) {
+            if (current != null && currentSecion != null) {
                 sections.put(currentSecion, current);
-             }
+            }
             currentSecion = line.substring(1, line.length() - 1);
             current = sections.get(currentSecion);
-            if(current==null)
-                current = new HashMap<String,String> ();
-        }else if (current != null && currentSecion != null &&
-                 ! line.startsWith(";") && (line.indexOf('=') >= 0)) {
+            if (current == null)
+                current = new HashMap<String, String>();
+        } else if (current != null && currentSecion != null &&
+            !line.startsWith(";") && (line.indexOf('=') >= 0)) {
             int i = line.indexOf('=');
             String name = line.substring(0, i).trim();
             String value = line.substring(i + 1).trim();
@@ -61,7 +60,7 @@ public class IniReader {
     }
 
     public String getValue(String section, String name) {
-        Map<String,String> p = sections.get(section);
+        Map<String, String> p = sections.get(section);
 
         if (p == null) {
             return null;

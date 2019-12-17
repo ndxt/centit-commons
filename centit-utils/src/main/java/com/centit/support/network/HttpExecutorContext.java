@@ -11,55 +11,55 @@ import java.util.Map;
 public class HttpExecutorContext {
     private CloseableHttpClient httpclient;
     private HttpContext httpContext;
-    private Map<String,String> httpHeaders;
+    private Map<String, String> httpHeaders;
     private HttpHost httpProxy;
 
-    public HttpExecutorContext(){
+    public HttpExecutorContext() {
         httpHeaders = null;
         httpContext = null;
         httpclient = null;
         httpProxy = null;
     }
-    
-    public static HttpExecutorContext create(){
+
+    public static HttpExecutorContext create() {
         return new HttpExecutorContext();
     }
 
-    public static HttpExecutorContext empty(){
+    public static HttpExecutorContext empty() {
         return new HttpExecutorContext();
     }
 
-    public static HttpExecutorContext create(CloseableHttpClient httpclient){
+    public static HttpExecutorContext create(CloseableHttpClient httpclient) {
         HttpExecutorContext executorContext = new HttpExecutorContext();
         executorContext.httpclient = httpclient;
         return executorContext;
     }
-    
-    public HttpExecutorContext client(CloseableHttpClient httpclient){
+
+    public HttpExecutorContext client(CloseableHttpClient httpclient) {
         this.httpclient = httpclient;
         return this;
     }
 
-    public HttpExecutorContext context(HttpContext httpContext){
+    public HttpExecutorContext context(HttpContext httpContext) {
         this.httpContext = httpContext;
         return this;
     }
 
-    public HttpExecutorContext proxy(HttpHost httpProxy){
+    public HttpExecutorContext proxy(HttpHost httpProxy) {
         this.httpProxy = httpProxy;
         return this;
     }
 
-    public HttpExecutorContext headers(Map<String,String> httpHeaders){
+    public HttpExecutorContext headers(Map<String, String> httpHeaders) {
         this.httpHeaders = httpHeaders;
         return this;
     }
 
-    public HttpExecutorContext header(String name, String value){
-        if(this.httpHeaders == null){
+    public HttpExecutorContext header(String name, String value) {
+        if (this.httpHeaders == null) {
             this.httpHeaders = new HashMap<>(6);
         }
-        httpHeaders.put(name,value);
+        httpHeaders.put(name, value);
         return this;
     }
 

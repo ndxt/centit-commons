@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SimpleTableReference implements TableReference{
+public class SimpleTableReference implements TableReference {
 
     private String parentTableName;
     private String tableName;
@@ -51,38 +51,42 @@ public class SimpleTableReference implements TableReference{
         return referenceName;
     }
 
-    public void setReferenceCode(String referenceCode) {
-        this.referenceCode = referenceCode;
+    public void setReferenceName(String referenceName) {
+        this.referenceName = referenceName;
     }
 
     public String getReferenceCode() {
         return referenceCode;
     }
 
-    public void setReferenceName(String referenceName) {
-        this.referenceName = referenceName;
+    public void setReferenceCode(String referenceCode) {
+        this.referenceCode = referenceCode;
     }
 
     public boolean containColumn(String sCol) {
-        if(sCol==null || referenceColumns==null || referenceColumns.size() == 0)
+        if (sCol == null || referenceColumns == null || referenceColumns.size() == 0)
             return false;
         return referenceColumns.containsKey(sCol);
     }
 
     public String getClassName() {
-        if(tableName==null)
+        if (tableName == null)
             return null;
         String sClassName = FieldType.mapPropName(tableName);
-        return sClassName.substring(0,1).toUpperCase() +
-                sClassName.substring(1);
+        return sClassName.substring(0, 1).toUpperCase() +
+            sClassName.substring(1);
     }
 
     @Override
     public Map<String, String> getReferenceColumns() {
-        if(this.referenceColumns==null) {
+        if (this.referenceColumns == null) {
             this.referenceColumns = new HashMap<>(6);
         }
         return this.referenceColumns;
+    }
+
+    public void setReferenceColumns(Map<String, String> referenceColumns) {
+        this.referenceColumns = referenceColumns;
     }
 
     @Override
@@ -94,20 +98,16 @@ public class SimpleTableReference implements TableReference{
         this.parentTableName = parentTableName;
     }
 
-    public void setReferenceColumns(Map<String, String> referenceColumns) {
-        this.referenceColumns = referenceColumns;
-    }
-
     /**
-     * @param column 父表字段
+     * @param column           父表字段
      * @param referencedColumn 子表字段
      */
     public void addReferenceColumn(String column, String referencedColumn) {
-        if(this.referenceColumns==null) {
+        if (this.referenceColumns == null) {
             this.referenceColumns = new HashMap<>(6);
         }
         this.referenceColumns.put(column,
-                StringUtils.isBlank(referencedColumn) ? column : referencedColumn);
+            StringUtils.isBlank(referencedColumn) ? column : referencedColumn);
     }
 
     public Class<?> getReferenceFieldType() {
@@ -127,32 +127,32 @@ public class SimpleTableReference implements TableReference{
     }
 
     public void setObjectField(Field objectField) {
-        if(beanField==null)
+        if (beanField == null)
             beanField = new JavaBeanField();
         beanField.setObjectField(objectField);
     }
 
     public void setObjectSetFieldValueFunc(Method objectSetFieldValueFunc) {
-        if(beanField==null)
+        if (beanField == null)
             beanField = new JavaBeanField();
         beanField.setSetFieldValueFunc(objectSetFieldValueFunc);
     }
 
     public void setObjectGetFieldValueFunc(Method objectGetFieldValueFunc) {
-        if(beanField==null)
+        if (beanField == null)
             beanField = new JavaBeanField();
         beanField.setGetFieldValueFunc(objectGetFieldValueFunc);
     }
 
     public void setObjectFieldValue(Object obj, Object fieldValue) {
-        beanField.setObjectFieldValue(obj,fieldValue);
+        beanField.setObjectFieldValue(obj, fieldValue);
     }
 
     public Object getObjectFieldValue(Object obj) {
         return beanField.getObjectFieldValue(obj);
     }
 
-    public Map<String, Object> fetchChildFk(Object parentObject){
+    public Map<String, Object> fetchChildFk(Object parentObject) {
         /*if(referenceColumns == null){
             return null;
         }*/
@@ -160,7 +160,7 @@ public class SimpleTableReference implements TableReference{
         Map<String, Object> fk = new HashMap<>(8);
         for (Map.Entry<String, String> end : referenceColumns.entrySet()) {
             Object fkValue = mapInfo.getObjectFieldValue(parentObject, end.getKey());
-            if(fkValue == null){
+            if (fkValue == null) {
                 return null;
             }
             fk.put(end.getValue(), fkValue);
@@ -168,12 +168,12 @@ public class SimpleTableReference implements TableReference{
         return fk;
     }
 
-    public Map<String, Object> fetchParentPk(Object childObject){
+    public Map<String, Object> fetchParentPk(Object childObject) {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(childObject.getClass());
         Map<String, Object> pk = new HashMap<>(8);
         for (Map.Entry<String, String> end : referenceColumns.entrySet()) {
             Object fkValue = mapInfo.getObjectFieldValue(childObject, end.getValue());
-            if(fkValue == null){
+            if (fkValue == null) {
                 return null;
             }
             pk.put(end.getKey(), fkValue);

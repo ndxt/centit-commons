@@ -12,10 +12,6 @@ public class PageDesc {
      */
     private int pageNo;
 
-    public static PageDesc createNotPaging(){
-        return new PageDesc(-1,-1,-1);
-    }
-
     public PageDesc() {
         totalRows = 0;
         pageSize = 20;
@@ -34,20 +30,26 @@ public class PageDesc {
         pageNo = pn;
     }
 
+    public static PageDesc createNotPaging() {
+        return new PageDesc(-1, -1, -1);
+    }
+
     public int getTotalRows() {
         return totalRows;
     }
 
     /**
      * 设置条目总数
+     *
      * @param totalRows Integer 用这个类型主要是为了应对查询总数的语句返回null的情况
      */
     public void setTotalRows(Integer totalRows) {
-        this.totalRows = totalRows==null ? 0 : totalRows;
+        this.totalRows = totalRows == null ? 0 : totalRows;
     }
 
     /**
      * 获取每页最大条目数
+     *
      * @return 每页最大条目数
      */
     public int getPageSize() {
@@ -56,6 +58,7 @@ public class PageDesc {
 
     /**
      * 设置每页最大条目数
+     *
      * @param pageSize 每页最大条目数
      */
     public void setPageSize(int pageSize) {
@@ -64,6 +67,7 @@ public class PageDesc {
 
     /**
      * 应对遗留系统命名不一致的情况
+     *
      * @param pageSize 每页数量
      */
     public void setRows(int pageSize) {
@@ -72,6 +76,7 @@ public class PageDesc {
 
     /**
      * 获取当前页码
+     *
      * @return 当前页码 base 1
      */
     public int getPageNo() {
@@ -80,6 +85,7 @@ public class PageDesc {
 
     /**
      * 设置当前页码
+     *
      * @param pageNo 当前页码 base 1
      */
     public void setPageNo(int pageNo) {
@@ -88,6 +94,7 @@ public class PageDesc {
 
     /**
      * 应对遗留系统命名不一致的情况
+     *
      * @param pageNo 当前页码 base 1
      */
     public void setPage(int pageNo) {
@@ -96,25 +103,28 @@ public class PageDesc {
 
     /**
      * pageNo Base 1
+     *
      * @return 当前页第一条记录index
      */
     public int getRowStart() {
-        return ( pageNo > 1 ? pageNo - 1 : 0 ) * pageSize;
+        return (pageNo > 1 ? pageNo - 1 : 0) * pageSize;
     }
 
     /**
      * pageNo Base 1
+     *
      * @return 当前页最后一条记录index （不包含这条记录）
      */
     public int getRowEnd() {
-        return ( pageNo > 1 ? pageNo : 1 ) * pageSize;
+        return (pageNo > 1 ? pageNo : 1) * pageSize;
     }
 
     /**
      * 没有分页，仅仅返回 条目总数
+     *
      * @param totalRows 条目总数
      */
-    public void noPaging(int totalRows){
+    public void noPaging(int totalRows) {
         this.totalRows = totalRows;
         this.pageSize = totalRows;
         this.pageNo = 1;
@@ -122,10 +132,11 @@ public class PageDesc {
 
     /**
      * 复制 另外一个对象的结果，用于深度复制
+     *
      * @param other 另外一个对象
      */
-    public void copy(PageDesc other){
-        if(other!=null) {
+    public void copy(PageDesc other) {
+        if (other != null) {
             this.totalRows = other.getTotalRows();
             this.pageSize = other.getPageSize();
             this.pageNo = other.getPageNo();

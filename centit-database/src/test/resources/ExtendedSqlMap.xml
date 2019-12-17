@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE sqlMap [
-        <!ELEMENT sqlMap (sql*)>
-        <!ELEMENT sql (#PCDATA)>
-        <!ATTLIST sql id  CDATA #REQUIRED>
-        <!ATTLIST sql dbtype  (Oracle|SqlServer|DB2|MySql) #IMPLIED>
-        ]>
+    <!ELEMENT sqlMap (sql*)>
+    <!ELEMENT sql (#PCDATA)>
+    <!ATTLIST sql id  CDATA #REQUIRED>
+    <!ATTLIST sql dbtype  (Oracle|SqlServer|DB2|MySql) #IMPLIED>
+    ]>
 <sqlMap>
     <!-- xml 中不判断id的唯一性，后面的语句会覆盖前面的，所以一般将通用的语句放在前面，数据库特有的语句放在后面。 -->
     <sql id="QUERY_ID_TEST1" dbtype="Oracle">
@@ -19,7 +19,7 @@
 				 order by b.name ]]>
     </sql>
 
-    <sql id="QUERY_ID_TEST2" >
+    <sql id="QUERY_ID_TEST2">
         <![CDATA[select a.userCode,a.uintCode,b.projectID,
 				b.name as projectName,b.projectType,b.totalPoeples
 				from projectInfo b join projectOwner a  on a.projectID=b.projectID
