@@ -122,22 +122,13 @@ public class TestQueryUtils {
 
         String queryStatement = "select [(${p1.1}>2 && p2>2)|t1.a,] t2.b,t3.c "+
                 "from [(${p1.1}>2  && p2>2)| table1 t1,] table2 t2,table3 t3 "+
-                "where 1=1 [(${p1.1}>2  && p2>2)(p1.1:ps)| and t1.a=:ps][(isNotEmpty(${p1.1})&&isNotEmpty(p2)&&isNotEmpty(p3))(p2,p3:px)"
+                "where 1=1 [(${p1.1}>2  && p2>2)(p1.1:ps)| and t1.a=:ps]" +
+            "[(isNotEmpty(${p1.1})&&isNotEmpty(p2)&&isNotEmpty(p3))(p2,p3:px)"
                 + "| and (t2.b> :p2 or t3.c >:px)] order by 1,2";
         System.out.println(QueryUtils.transNamedParamSqlToParamSql(queryStatement).getLeft());
     }
 
     public static void testTranslateQuery() {
-        List<String> filters = new ArrayList<String> ();
-        filters.add("[table1.c] like { p1.1: ( datetime ) ps}");
-        filters.add("[table1.b] = {( like )p2}");
-        filters.add("[table1.c] = {:(like )p2}");
-        filters.add("[table4.b] = {p4}");
-        filters.add("([table2.f]={p2} and [table3.f]={p3})");
-
-        Map<String,Object> paramsMap = new HashMap<String,Object>();
-        paramsMap.put("p1.1", "1212年5月6日 下午 5点 25分33秒");
-        paramsMap.put("p2", "h w word hello");
 
         /*String queryStatement = "select t1.a,t2.b,t3.c "+
             "from table1 t1,table2 t2,table3 t3 "+
@@ -146,16 +137,27 @@ public class TestQueryUtils {
         printQueryAndNamedParams(QueryUtils.translateQuery(
                  queryStatement, filters,
                   paramsMap, true));*/
+        List<String> filters = new ArrayList<String> ();
 
-        String queryStatement = "select t1.a,t2.b,t3.c "
-                    + "from table1 t1,table2 t2,table3 t3 "
-                    //+ "where 1=1 {table1:t1}{table9:t1}"
-                    //+ "{table2:t2,table3:t3}"
-                    + "[(count(p1.1,p2)>1)((like )p1.1,p2 : (like )pw)| and tw.a=:p3] "
-                    //+ " [ p1.1 :()  p4, : ( like )p2  | and tw.a=:p3 ]"
-                    + " order by 1,2";
+        Map<String,Object> paramsMap = new HashMap<String,Object>();
+        paramsMap.put("p1.1", "1212年5月6日 下午 5点 25分33秒");
+        paramsMap.put("p2", "h w word hello");
         paramsMap.put("p3", "5");
         paramsMap.put("p4", "7");
+        filters.add("[table1.c] like { p1.1: ( datetime ) ps}");
+        filters.add("[table1.b] = {( like )p2}");
+        filters.add("[table1.c] = {:(like )p2}");
+        filters.add("[table4.b] = {p4}");
+        filters.add("([table2.f]={p2} and [table3.f]={p3})");
+        String queryStatement = "select t1.a,t2.b,t3.c "
+                    + "from table1 t1,table2 t2,table3 t3 "
+                    + "where 1=1 {table1:t1}{table9:t9}"
+                    + "{table2:t2,table3:t3}"
+                    + "[(count(p1.1,p2)>1)((like )p1.1,p2:(like )pw) " +
+                        "| and tw.a=:p3] "
+                    //+ " [ p1.1 :()  p4, : ( like )p2  | and tw.a=:p3 ]"
+                    + " order by 1,2";
+
         printQueryAndNamedParams(QueryUtils.translateQuery(
                  queryStatement, filters,
                   paramsMap, true));
