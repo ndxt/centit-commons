@@ -12,7 +12,7 @@ public enum GeneratorType {
      * 数据库序列, 序列名称保存在value中, 形式可以为：
      * 1, SEQ_NAME  , 序列名称
      * 2, SEQ_NAME:PREFIX  , 序列名称+ 前缀
-     * 3, SEQ_NAME:PREFIX:LEN:PAD_STRING , 序列名称 + 前缀 + 长度 + 中间不空字符串
+     * 3, SEQ_NAME:PREFIX:LEN:PAD_STRING , 序列名称 + 前缀 + 长度 + 中间补空字符串
      */
     SEQUENCE,
     /**

@@ -88,22 +88,21 @@ public abstract class OrmUtils {
                         case UUID22:
                             mapInfo.setObjectFieldValue(object, field, UuidOpt.getUuidAsString22());
                             break;
-                        case SEQUENCE:
+                        case SEQUENCE: //序列名称 + 前缀 + 长度 + 中间补空字符串
                             //GeneratorTime.READ 读取数据时不能用 SEQUENCE 生成值
                             if (sqlDialect != null) {
                                 String genValue = valueGenerator.value();
                                 String[] params = genValue.split(":");
+                                Long seqNo = sqlDialect.getSequenceNextValue(params[0]);
                                 if (params.length == 1) {
-                                    mapInfo.setObjectFieldValue(object, field,
-                                        sqlDialect.getSequenceNextValue(params[0]));
+                                    mapInfo.setObjectFieldValue(object, field, seqNo);
                                 } else {
-                                    Long seqNo = sqlDialect.getSequenceNextValue(params[0]);
                                     if (params.length > 3) {
                                         mapInfo.setObjectFieldValue(object, field, StringBaseOpt.midPad(seqNo.toString(),
                                             NumberBaseOpt.castObjectToInteger(params[2], 1),
                                             params[1], params[3]));
-                                    } else if (params.length > 1) {
-                                        mapInfo.setObjectFieldValue(object, field, params[1] + seqNo);
+                                    } else /*if (params.length > 1)*/ {
+                                        mapInfo.setObjectFieldValue(object, field, params[1] + /*String.valueOf*/seqNo);
                                     }
                                 }
                             }
@@ -138,13 +137,13 @@ public abstract class OrmUtils {
                                 if (len > 22) {
                                     mapInfo.setObjectFieldValue(object, field, prefix + UuidOpt.getUuidAsString22());
                                 } else /*if (sqlDialect!=null)*/ {
-                                    if (mapInfo.countPkColumn() != 1 || !field.isPrimaryKey()) {
+                                    /*if (mapInfo.countPkColumn() != 1 || !field.isPrimaryKey()) {
                                         throw new ObjectException(PersistenceException.ORM_METADATA_EXCEPTION,
                                             "主键生成规则RANDOM_ID只能用于单主键表中！");
-                                    }
+                                    }*/
                                     for (int i = 0; i < 100; i++) {
                                         String no = prefix + UuidOpt.getUuidAsString22().substring(0, len);
-                                        //检查主键是否冲突
+                                        //检查唯一属性是否冲突
                                         int nHasId = NumberBaseOpt.castObjectToInteger(
                                             DatabaseAccess.fetchScalarObject(
                                                 sqlDialect.findObjectsBySql("select count(*) hasId from " + mapInfo.getTableName()
@@ -156,9 +155,9 @@ public abstract class OrmUtils {
                                     }
                                 }
                             }
-                            break;// case
-                        }
 
+                        }
+                        break;// case
                         case SUB_ORDER: {
                             int pkCount = mapInfo.countPkColumn();
                             if (pkCount < 2 || !field.isPrimaryKey() /*|| filed.getFieldType()*/) {
@@ -187,12 +186,12 @@ public abstract class OrmUtils {
                                 DatabaseAccess.fetchScalarObject(
                                     sqlDialect.findObjectsBySql(sqlBuilder.toString(), pkValues)), 0L);
                             mapInfo.setObjectFieldValue(object, field, pkSubOrder + 1);
-                            break;
                         }
-                    }
-                }
-            }
-        }
+                        break;
+                    }// switch
+                } // if
+            } // if
+        } // for
         return object;
     }
 
