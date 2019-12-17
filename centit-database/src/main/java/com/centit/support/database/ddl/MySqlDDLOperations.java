@@ -35,8 +35,8 @@ public class MySqlDDLOperations extends GeneralDDLOperations {
         sbsql.append(tableCode);
         sbsql.append(" MODIFY COLUMN  ").append(column.getColumnName()).append(" ");
         if(! StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
-                || oldColumn.getMaxLength() != column.getMaxLength()
-                || oldColumn.getPrecision() != column.getPrecision() ){
+                || !oldColumn.getMaxLength().equals(column.getMaxLength())
+                || !oldColumn.getPrecision().equals(column.getPrecision()) ){
             appendColumnTypeSQL(column, sbsql);
         }
 
