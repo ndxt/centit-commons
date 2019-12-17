@@ -139,7 +139,7 @@ public abstract class OrmUtils {
                                 if(len>22){
                                     mapInfo.setObjectFieldValue(object, filed, prefix + UuidOpt.getUuidAsString22());
                                 } else /*if (sqlDialect!=null)*/{
-                                    if(mapInfo.countPkColumn() != 1){
+                                    if(mapInfo.countPkColumn() != 1 || !filed.isPrimaryKey()){
                                         throw new ObjectException(PersistenceException.ORM_METADATA_EXCEPTION,
                                             "主键生成规则RANDOM_ID只能用于单主键表中！");
                                     }
@@ -162,7 +162,7 @@ public abstract class OrmUtils {
 
                         case SUB_ORDER:{
                             int pkCount = mapInfo.countPkColumn();
-                            if(pkCount < 2 /*|| filed.getFieldType()*/){
+                            if(pkCount < 2 || !filed.isPrimaryKey() /*|| filed.getFieldType()*/){
                                 throw new ObjectException(PersistenceException.ORM_METADATA_EXCEPTION,
                                     "主键生成规则SUB_ORDER必须用于符合主键表中，并且只能用于整型字段！");
                             }
