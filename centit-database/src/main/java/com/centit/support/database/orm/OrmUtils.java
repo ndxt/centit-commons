@@ -37,7 +37,6 @@ public abstract class OrmUtils {
     private static void putResultSetObjectToField(Object object, TableMapInfo mapInfo, SimpleTableField field,
                                                   Object newValue)
         throws IOException {
-
         if (newValue instanceof Clob) {
             String sValue = DatabaseAccess.fetchClobString((Clob) newValue);
             if (FieldType.JSON_OBJECT.equals(field.getFieldType())) {
@@ -230,7 +229,6 @@ public abstract class OrmUtils {
         }
         return fields;
     }
-
 
     public static Map<String, Object> fetchObjectDatabaseField(Object object, TableMapInfo tableInfo) {
         List<SimpleTableField> tableFields = tableInfo.getColumns();
