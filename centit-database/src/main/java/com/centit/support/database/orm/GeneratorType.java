@@ -34,11 +34,15 @@ public enum GeneratorType {
     FUNCTION,
     /**
      * 流水号； 代码（sequence）：模板 function  seqNo:序列号
-     * LSH 和 FUNCTION 一样，只是多了一个 序列变量可以使用
+     * serial number 和 FUNCTION 一样，只是多了一个 序列变量可以使用
      */
-    LSH,
+    SERIAL_NO,
     /**
-     * 表的主键，随机生成;  表：字段：长度(长度不包括前缀)：前缀(可以为空)
+     * 表的主键,只能是单主键，随机生成;  长度(长度不包括前缀)：前缀(可以为空)
      */
-    TABLE_ID
+    RANDOM_ID,
+    /**
+     * 符合主键，一个表中只能有一个这个字段, 并且只能用于 整型（int、long） 类型字段
+     */
+    SUB_ORDER
 }

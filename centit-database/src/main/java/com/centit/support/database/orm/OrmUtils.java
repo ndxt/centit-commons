@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.database.jsonmaptable.GeneralJsonObjectDao;
 import com.centit.support.database.jsonmaptable.JsonObjectDao;
@@ -11,6 +12,8 @@ import com.centit.support.database.metadata.SimpleTableField;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.FieldType;
+import com.centit.support.database.utils.PersistenceException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -112,7 +115,7 @@ public abstract class OrmUtils {
                             mapInfo.setObjectFieldValue(object, filed,
                                     VariableFormula.calculate(valueGenerator.value(), object));
                             break;
-                        case LSH:
+                        case SERIAL_NO:
                             {
                                 String genValue = valueGenerator.value();
                                 int n = genValue.indexOf(':');
@@ -127,22 +130,26 @@ public abstract class OrmUtils {
                                 }
                             }
                         break;
-                        case TABLE_ID:{
+                        case RANDOM_ID:{
                             String genValue = valueGenerator.value();
                             String [] params = genValue.split(":");
-                            if(params.length>=3 && sqlDialect!=null) {
-                                String prefix = params.length>3 ? params[3] : "";
-                                int len = NumberBaseOpt.castObjectToInteger(params[2],23);
+                            if(params.length>0 && sqlDialect!=null) {
+                                String prefix = params.length>1 ? params[1] : "";
+                                int len = NumberBaseOpt.castObjectToInteger(params[0],23);
                                 if(len>22){
                                     mapInfo.setObjectFieldValue(object, filed, prefix + UuidOpt.getUuidAsString22());
                                 } else /*if (sqlDialect!=null)*/{
+                                    if(mapInfo.countPkColumn() != 1){
+                                        throw new ObjectException(PersistenceException.ORM_METADATA_EXCEPTION,
+                                            "主键生成规则RANDOM_ID只能用于单主键表中！");
+                                    }
                                     for(int i=0; i<100; i++) {
                                         String no = prefix + UuidOpt.getUuidAsString22().substring(0,len);
                                         //检查主键是否冲突
                                         int nHasId = NumberBaseOpt.castObjectToInteger(
                                                         DatabaseAccess.fetchScalarObject(
-                                                            sqlDialect.findObjectsBySql("select count(*) hasId from "+params[0]
-                                                                + " where " + params[1] +" = ?", new Object[] {no})),0);
+                                                            sqlDialect.findObjectsBySql("select count(*) hasId from " + mapInfo.getTableName()
+                                                                + " where " + filed.getColumnName() +" = ?", new Object[] {no})),0);
                                         if(nHasId==0) {
                                             mapInfo.setObjectFieldValue(object, filed, no);
                                             break;// for
@@ -151,6 +158,37 @@ public abstract class OrmUtils {
                                 }
                             }
                             break;// case
+                        }
+
+                        case SUB_ORDER:{
+                            int pkCount = mapInfo.countPkColumn();
+                            if(pkCount < 2 /*|| filed.getFieldType()*/){
+                                throw new ObjectException(PersistenceException.ORM_METADATA_EXCEPTION,
+                                    "主键生成规则SUB_ORDER必须用于符合主键表中，并且只能用于整型字段！");
+                            }
+                            StringBuilder sqlBuilder = new StringBuilder("select max(" );
+                            sqlBuilder.append(filed.getColumnName())
+                                .append(" ) as maxOrder from ")
+                                .append(mapInfo.getTableName())
+                                .append(" where ");
+                            int pki = 0;
+                            Object[] pkValues = new Object[pkCount-1];
+                            for(SimpleTableField col : mapInfo.getColumns()){
+                                if(col.isPrimaryKey() &&
+                                    ! StringUtils.equals(col.getPropertyName(), filed.getPropertyName())){
+                                    if(pki>0){
+                                        sqlBuilder.append(" and ");
+                                    }
+                                    sqlBuilder.append(col.getColumnName()).append(" = ?");
+                                    pkValues[pki] = mapInfo.getObjectFieldValue(object, col);
+                                    pki++;
+                                }
+                            }
+                            Long pkSubOrder = NumberBaseOpt.castObjectToLong(
+                                DatabaseAccess.fetchScalarObject(
+                                    sqlDialect.findObjectsBySql(sqlBuilder.toString(), pkValues)) , 0L);
+                            mapInfo.setObjectFieldValue(object, filed, pkSubOrder+1);
+                            break;
                         }
                     }
                 }
