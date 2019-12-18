@@ -160,17 +160,25 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
      * @param alias  String
      * @return Pair String String []
      */
-    public static String buildPartFieldSql(TableInfo ti, Collection<String> fields, String alias) {
+    public static String buildPartFieldSql(TableInfo ti, Collection<String> fields, String alias, boolean withPk) {
         StringBuilder sBuilder = new StringBuilder();
         boolean addAlias = StringUtils.isNotBlank(alias);
         String aliasName = alias + ".";
         int i = 0;
+        if(withPk){
+            for(TableField col : ti.getPkFields()){
+                sBuilder.append(i > 0 ? ", " : " ");
+                if (addAlias) sBuilder.append(aliasName);
+                sBuilder.append(col.getColumnName());
+                i++;
+            }
+        }
+
         for (String colName : fields) {
             TableField col = ti.findFieldByName(colName);
-            if (col != null) {
+            if (col != null && (!withPk || !col.isPrimaryKey()) ) {
                 sBuilder.append(i > 0 ? ", " : " ");
-                if (addAlias)
-                    sBuilder.append(aliasName);
+                if (addAlias) sBuilder.append(aliasName);
                 sBuilder.append(col.getColumnName());
                 i++;
             }
@@ -189,7 +197,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
      * @param orderSql    String 排序语句
      * @return Pair String String []
      */
-    public static Pair<String, TableField[]> buildFieldSqlWithFields(
+    public static Pair<String, TableField[]> buildSelectSqlWithFields(
         TableInfo mapInfo, String alias, boolean excludeLazy, String filterSql,
         boolean withOrderBy, String orderSql) {
         StringBuilder sBuilder = new StringBuilder("select");
@@ -243,18 +251,26 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
      * @return Pair String String []
      */
     public static Pair<String, TableField[]> buildPartFieldSqlWithFields(
-        TableInfo ti, Collection<String> fields, String alias) {
+        TableInfo ti, Collection<String> fields, String alias, boolean withPk) {
         StringBuilder sBuilder = new StringBuilder();
         boolean addAlias = StringUtils.isNotBlank(alias);
         String aliasName = alias + ".";
         TableField[] selectFields = new TableField[fields.size()];
         int i = 0;
+        if(withPk){
+            for(TableField col : ti.getPkFields()){
+                sBuilder.append(i > 0 ? ", " : " ");
+                if (addAlias) sBuilder.append(aliasName);
+                sBuilder.append(col.getColumnName());
+                selectFields[i] = col;
+                i++;
+            }
+        }
         for (String colName : fields) {
             TableField col = ti.findFieldByName(colName);
-            if (col != null) {
+            if (col != null && (!withPk || !col.isPrimaryKey())) {
                 sBuilder.append(i > 0 ? ", " : " ");
-                if (addAlias)
-                    sBuilder.append(aliasName);
+                if (addAlias) sBuilder.append(aliasName);
                 sBuilder.append(col.getColumnName());
                 selectFields[i] = col;//.getPropertyName();
                 i++;
@@ -651,7 +667,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     @Override
     public JSONObject getObjectById(final Object keyValue) throws SQLException, IOException {
         Map<String, Object> keyValues = makePkFieldMap(keyValue);
-        Pair<String, TableField[]> q = buildFieldSqlWithFields(tableInfo, null, false,
+        Pair<String, TableField[]> q = buildSelectSqlWithFields(tableInfo, null, false,
             buildFilterSqlByPk(tableInfo, null), false, null);
 
         JSONArray ja = findObjectsByNamedSql(
@@ -664,7 +680,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     @Override
     public JSONObject getObjectByProperties(final Map<String, Object> properties) throws SQLException, IOException {
 
-        Pair<String, TableField[]> q = buildFieldSqlWithFields(tableInfo, null, false,
+        Pair<String, TableField[]> q = buildSelectSqlWithFields(tableInfo, null, false,
             GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties.keySet()),
             false, null);
         JSONArray ja = findObjectsByNamedSql(
@@ -682,7 +698,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
      */
     @Override
     public JSONArray listObjectsByProperties(final Map<String, Object> properties) throws SQLException, IOException {
-        Pair<String, TableField[]> q = buildFieldSqlWithFields(tableInfo, null, true,
+        Pair<String, TableField[]> q = buildSelectSqlWithFields(tableInfo, null, true,
             GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties.keySet()),
             true, GeneralJsonObjectDao.fetchSelfOrderSql(tableInfo, properties));
         return findObjectsByNamedSql(
@@ -974,7 +990,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                                              final int startPos, final int maxSize)
         throws SQLException, IOException {
         TableInfo tableInfo = this.getTableInfo();
-        Pair<String, TableField[]> q = buildFieldSqlWithFields(tableInfo, null, true,
+        Pair<String, TableField[]> q = buildSelectSqlWithFields(tableInfo, null, true,
             GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties.keySet()),
             true, GeneralJsonObjectDao.fetchSelfOrderSql(tableInfo, properties));
         return GeneralJsonObjectDao.findObjectsByNamedSql(

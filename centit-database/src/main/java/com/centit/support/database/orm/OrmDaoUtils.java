@@ -250,7 +250,7 @@ public abstract class OrmDaoUtils {
         throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String, TableField[]> q =
-            GeneralJsonObjectDao.buildFieldSqlWithFields(mapInfo, null, false,
+            GeneralJsonObjectDao.buildSelectSqlWithFields(mapInfo, null, false,
                 GeneralJsonObjectDao.buildFilterSql(mapInfo, null, properties.keySet()), false, null);
 
         return queryNamedParamsSql(
@@ -265,7 +265,7 @@ public abstract class OrmDaoUtils {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         //Pair<String,String[]> q = GeneralJsonObjectDao.buildGetObjectSqlByPk(mapInfo, false);
         Pair<String, TableField[]> q =
-            GeneralJsonObjectDao.buildFieldSqlWithFields(mapInfo, null, false,
+            GeneralJsonObjectDao.buildSelectSqlWithFields(mapInfo, null, false,
                 GeneralJsonObjectDao.buildFilterSqlByPk(mapInfo, null), false, null);
 
         if (ReflectionOpt.isScalarType(id.getClass())) {
@@ -371,7 +371,7 @@ public abstract class OrmDaoUtils {
         throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String, TableField[]> q =
-            GeneralJsonObjectDao.buildFieldSqlWithFields(mapInfo, null, true,
+            GeneralJsonObjectDao.buildSelectSqlWithFields(mapInfo, null, true,
                 null, true, null);
         return queryNamedParamsSql(
             connection, new QueryAndNamedParams(q.getLeft(),
@@ -383,7 +383,7 @@ public abstract class OrmDaoUtils {
         throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String, TableField[]> q =
-            GeneralJsonObjectDao.buildFieldSqlWithFields(mapInfo, null, true,
+            GeneralJsonObjectDao.buildSelectSqlWithFields(mapInfo, null, true,
                 GeneralJsonObjectDao.buildFilterSql(mapInfo, null, properties.keySet()),
                 true, GeneralJsonObjectDao.fetchSelfOrderSql(mapInfo, properties));
         return queryNamedParamsSql(
@@ -411,7 +411,7 @@ public abstract class OrmDaoUtils {
         throws PersistenceException {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String, TableField[]> q =
-            GeneralJsonObjectDao.buildFieldSqlWithFields(mapInfo, null, true,
+            GeneralJsonObjectDao.buildSelectSqlWithFields(mapInfo, null, true,
                 GeneralJsonObjectDao.buildFilterSql(mapInfo, null, properties.keySet())
                 , true, GeneralJsonObjectDao.fetchSelfOrderSql(mapInfo, properties));
         return queryNamedParamsSql(
