@@ -868,12 +868,23 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         }
         if (comRes.getRight() != null) {
             for (Object obj : comRes.getRight()) {
-                resN += deleteObjectById((JSONObject) obj);
+                resN += deleteObjectById(obj);
             }
         }
         if (comRes.getMiddle() != null) {
             for (Pair<Map<String, Object>, Map<String, Object>> pobj : comRes.getMiddle()) {
-                resN += updateObject(pobj.getRight());
+                //对比减少不必要的更新
+                boolean needUpdated = false;
+                for(Map.Entry<String, Object> ent : pobj.getRight().entrySet()){
+                    Object oldValue = pobj.getLeft().get(ent.getKey());
+                    if(oldValue == null || !oldValue.equals(ent.getValue())){
+                        needUpdated = true;
+                        break;
+                    }
+                }
+                if(needUpdated) {
+                    resN += updateObject(pobj.getRight());
+                }
             }
         }
         return resN;
