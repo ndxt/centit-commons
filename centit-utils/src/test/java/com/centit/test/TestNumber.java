@@ -21,12 +21,15 @@ public class TestNumber {
 
 
     public static void main(String[] args) {
+        System.out.println(EnumBaseOpt.stringToEnum(DoubleAspect.class,"negative", true));
+
         DoubleAspect yes = DoubleAspect.YES;
         DoubleAspect on = DoubleAspect.ON;
         System.out.println(DoubleAspect.class.isPrimitive());
         System.out.println(EnumBaseOpt.ordinalToEnum(DoubleAspect.class, 5));
         System.out.println(yes);
         System.out.println(EnumBaseOpt.enumToOrdinal(yes));
+
         System.out.println(yes.equals(on));
         System.out.println(yes.sameAspect(on));
         System.out.println(yes.matchAspect(on));
