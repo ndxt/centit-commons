@@ -607,6 +607,38 @@ public abstract class CollectionsOpt {
         return Arrays.asList(objs);
     }
 
+    /**
+     * 这个按道理可以同 stream来处理
+     * 获取一个list中的所有对象的一个属性，并组成一个新的数组
+     * @param list 数组
+     * @param propExtractor 对象方法
+     * @param <T> 数组类型
+     * @param <U> 属性类型
+     * @return 属性列表
+     */
+    public static <T, U> List<U> extraListProperties(List<T> list, Function<T,U> propExtractor) {
+        if(list == null){
+            return null;
+        }
+        List<U> uList = new ArrayList<>(list.size());
+        for(T t : list){
+            uList.add(propExtractor.apply(t));
+        }
+        return uList;
+    }
+
+    /*public static <T, U> U[] extraArrayProperties(T [] array, Function<T,U> propExtractor) {
+        if(array == null){
+            return null;
+        }
+        U[] uList = (U[]) Array.newInstance(Object.class, array.length);
+        int i=0;
+        for(T t : array){
+            uList[i++] = propExtractor.apply(t);
+        }
+        return uList;
+    }*/
+
     public static <T> HashSet<T> cloneSet(Collection<T> souCollection) {
         if (souCollection == null) {
             return null;
