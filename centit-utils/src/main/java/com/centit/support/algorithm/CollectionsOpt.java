@@ -608,7 +608,7 @@ public abstract class CollectionsOpt {
     }
 
     /**
-     * 这个按道理可以同 stream来处理
+     * 这个按道理可以同 stream来处理, 但是类型转换不太好弄
      * 获取一个list中的所有对象的一个属性，并组成一个新的数组
      * @param list 数组
      * @param propExtractor 对象方法
@@ -620,6 +620,7 @@ public abstract class CollectionsOpt {
         if(list == null){
             return null;
         }
+        //list.stream().map(propExtractor).toArray() object[]
         List<U> uList = new ArrayList<>(list.size());
         for(T t : list){
             uList.add(propExtractor.apply(t));

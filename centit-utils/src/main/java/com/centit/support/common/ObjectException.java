@@ -17,6 +17,13 @@ public class ObjectException extends RuntimeException {
     public static final int FORMAT_DATE_EXCEPTION = 606;
     public static final int FORMAT_NUMBER_EXCEPTION = 607;
     public static final int FORMULA_GRAMMAR_ERROE = 608;
+    //业务逻辑错误
+    public static final int LOGICAL_RULE_ERROE = 609;
+    //数据不完整
+    public static final int DATA_NOT_INTEGRATED = 610;
+    //数据校验不通过，不合法
+    public static final int DATA_VALIDATE_ERROR = 611;
+
     private static final long serialVersionUID = 4050482305178810162L;
     protected int exceptionCode;
     private Object objectData;
