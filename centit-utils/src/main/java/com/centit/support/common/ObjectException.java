@@ -23,7 +23,8 @@ public class ObjectException extends RuntimeException {
     public static final int DATA_NOT_INTEGRATED = 610;
     //数据校验不通过，不合法
     public static final int DATA_VALIDATE_ERROR = 611;
-
+    //系统配置错误
+    public static final int SYSTEM_CONFIG_ERROR = 612;
     private static final long serialVersionUID = 4050482305178810162L;
     protected int exceptionCode;
     private Object objectData;
