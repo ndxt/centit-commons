@@ -852,6 +852,23 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return deleteObjectsByProperties(properties);
     }
 
+    /**
+     * 比较两个对象，判断是否需要更新，这个仅用于只更新有值的字段
+     * @param oldObject 就对象，一般指数据库中的对象
+     * @param newObject 新对象，一般指待更新的对象
+     * @return 是否需要更新
+     */
+    public static boolean checkNeedUpdate(Map<String, Object> oldObject, Map<String, Object> newObject){
+        for(Map.Entry<String, Object> ent : newObject.entrySet()){
+            Object oldValue = oldObject.get(ent.getKey());
+            Object newValue = ent.getValue();
+            if(newValue!=null && !newValue.equals(oldValue)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public int replaceObjectsAsTabulation(final List<Map<String, Object>> newObjects, final List<Map<String, Object>> dbObjects)
         throws SQLException {
@@ -874,15 +891,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         if (comRes.getMiddle() != null) {
             for (Pair<Map<String, Object>, Map<String, Object>> pobj : comRes.getMiddle()) {
                 //对比减少不必要的更新
-                boolean needUpdated = false;
-                for(Map.Entry<String, Object> ent : pobj.getRight().entrySet()){
-                    Object oldValue = pobj.getLeft().get(ent.getKey());
-                    if(oldValue == null || !oldValue.equals(ent.getValue())){
-                        needUpdated = true;
-                        break;
-                    }
-                }
-                if(needUpdated) {
+                if(checkNeedUpdate(pobj.getLeft(), pobj.getRight())) {
                     resN += updateObject(pobj.getRight());
                 }
             }

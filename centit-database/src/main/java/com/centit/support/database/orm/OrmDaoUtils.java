@@ -692,7 +692,11 @@ public abstract class OrmDaoUtils {
         }
         if (comRes.getMiddle() != null) {
             for (Pair<T, T> pobj : comRes.getMiddle()) {
-                resN += updateObject(connection, pobj.getRight());
+                if(GeneralJsonObjectDao.checkNeedUpdate(
+                    CollectionsOpt.objectToMap(pobj.getLeft()),
+                    CollectionsOpt.objectToMap(pobj.getRight()))) {
+                    resN += updateObject(connection, pobj.getRight());
+                }
             }
         }
         return resN;
@@ -877,7 +881,11 @@ public abstract class OrmDaoUtils {
         }
         if (comRes.getMiddle() != null) {
             for (Pair<T, T> pobj : comRes.getMiddle()) {
-                resN += updateObjectCascade(connection, pobj.getRight(), depth - 1);
+                if(GeneralJsonObjectDao.checkNeedUpdate(
+                    CollectionsOpt.objectToMap(pobj.getLeft()),
+                    CollectionsOpt.objectToMap(pobj.getRight()))) {
+                    resN += updateObjectCascade(connection, pobj.getRight(), depth - 1);
+                }
             }
         }
         return resN;
