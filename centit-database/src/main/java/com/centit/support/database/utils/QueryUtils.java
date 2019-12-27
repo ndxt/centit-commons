@@ -1450,6 +1450,43 @@ public abstract class QueryUtils {
     }
 
     /**
+     * 整理sql的标识符，避免sql注入， 只保留 数字，字母，下划线和 小数点
+     * @param identifier 标识符
+     * @return 标识符
+     */
+    public static String trimSqlIdentifier(String identifier) {
+        if (StringUtils.isBlank(identifier))
+            return "";
+        StringBuilder sbNew = new StringBuilder(identifier.length());
+        for(int i=0; i<identifier.length(); i++){
+            char c = identifier.charAt(i);
+            if( (c>='a' && c <='z') || (c>='A' && c <='Z')
+                || (c>='0' && c <= '9')
+                || c=='_' || c == '.' || c=='#' || c == '@'){
+                sbNew.append(c);
+            }
+        }
+        return sbNew.toString();
+    }
+    /**
+     * 判断是否sql的标识符，避免sql注入， 只保留 数字，字母，下划线和 小数点
+     * @param identifier 标识符
+     * @return 是否是标识符
+     */
+    public static boolean checkSqlIdentifier(String identifier) {
+        if (StringUtils.isBlank(identifier))
+            return false;
+        for(int i=0; i<identifier.length(); i++){
+            char c = identifier.charAt(i);
+            if( (c<'a' || c >'z') && (c<'A' || c >'Z')
+                && (c<'0' || c >'9')
+                && c!='_' && c != '.' && c!='#' && c != '@' ){
+                return false;
+            }
+        }
+        return true;
+    }
+    /**
      * 去掉 分号 ； 和  单行注释   / * 注释保留 * /
      *
      * @param fieldsSql paramString
@@ -1480,24 +1517,6 @@ public abstract class QueryUtils {
             aWord = lex.getARegularWord();
         }
         return fieldsSql.substring(0, prePos);
-
-        /*char [] ch = fieldsSql.toCharArray();
-
-        for(char c :ch){
-            if ( (c>='a' && c<='z')
-                    || (c>='A' && c<='Z')
-                    || (c>='0' && c<='9')
-                    || c==':' || c=='.'
-                    || c=='\'' || c=='\"'
-                    || c=='|' || c=='+'
-                    || c=='-' || c=='*'
-                    || c=='/' || c=='%'
-                    || c=='_' || c=='>'
-                    || c=='<' || c=='!' )
-                sBuilder.append(c);
-        }
-        return sBuilder.toString();
-*/
     }
 
     public static String replaceParamAsSqlString(String sql, String paramAlias, String paramSqlString) {

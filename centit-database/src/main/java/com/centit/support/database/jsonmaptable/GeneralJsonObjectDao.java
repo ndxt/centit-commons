@@ -431,39 +431,52 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         StringBuilder sBuilder = new StringBuilder();
         int i = 0;
         for (String plCol : properties) {
+            //不会有 sql 注入风险
+            //if(QueryUtils.checkSqlIdentifier(plCol)) {
             int opt = 0;// 0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne
             TableField col = ti.findFieldByName(plCol);
             if (col == null && plCol.length() > 3) {
                 col = ti.findFieldByName(plCol.substring(0, plCol.length() - 3));
-                if (col != null) {
-                    String lowPlCol = plCol.toLowerCase();
-                    if (lowPlCol.endsWith("_gt")) {
-                        opt = 1;
-                    } else if (lowPlCol.endsWith("_ge")) {
-                        opt = 2;
-                    } else if (lowPlCol.endsWith("_lt")) {
-                        opt = 3;
-                    } else if (lowPlCol.endsWith("_le")) {
-                        opt = 4;
-                    } else if (lowPlCol.endsWith("_lk")) {
-                        opt = 5;
-                    } else if (lowPlCol.endsWith("_in")) {
-                        opt = 6;
-                    } else if (lowPlCol.endsWith("_ne")) {
-                        opt = 7;
-                    } /*else if(lowPlCol.endsWith("_eq")){
-                    opt = 0;} */ else if (lowPlCol.charAt(lowPlCol.length() - 3) != '_') {
-                        col = null;
-                    }
+                if(col!=null) {
+                    String suffix = plCol.substring(plCol.length() - 3).toLowerCase();
+                    switch (suffix) {
+                        case "_gt":
+                            opt = 1;
+                            break;
+                        case "_ge":
+                            opt = 2;
+                            break;
+                        case "_lt":
+                            opt = 3;
+                            break;
+                        case "_le":
+                            opt = 4;
+                            break;
+                        case "_lk":
+                            opt = 5;
+                            break;
+                        case "_in":
+                            opt = 6;
+                            break;
+                        case "_ne":
+                            opt = 7;
+                            break;
+                        case "_eq":
+                            break;
+                        default:
+                            col = null;
+                            break;
+                    } // switch
                 }
             }
-
+            // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne
             if (col != null) {
                 if (i > 0) {
                     sBuilder.append(" and ");
                 }
-                if (StringUtils.isNotBlank(alias))
+                if (StringUtils.isNotBlank(alias)) {
                     sBuilder.append(alias).append('.');
+                }
                 sBuilder.append(col.getColumnName());
                 switch (opt) {
                     case 1:
@@ -492,8 +505,9 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                         break;
                 }
                 i++;
-            }
-        }
+            } // col not null
+            //}// 合法的标识符
+        }// for
         return sBuilder.toString();
     }
 
