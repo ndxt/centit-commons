@@ -117,6 +117,9 @@ public abstract class PropertiesReader {
     }
 
     private static String getPropertyValue(InputStream resource, String key) throws IOException {
+        if(resource==null){
+            return null;
+        }
         Properties prop = new Properties();
         prop.load(resource);
         return prop.getProperty(key);
@@ -124,7 +127,9 @@ public abstract class PropertiesReader {
 
     private static Properties loadProperties(InputStream resource) throws IOException {
         Properties prop = new Properties();
-        prop.load(resource);
+        if(resource != null) {
+            prop.load(resource);
+        }
         return prop;
     }
 
