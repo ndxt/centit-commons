@@ -714,12 +714,12 @@ public abstract class CollectionsOpt {
         return CollectionsOpt.createHashMap("data", object);
     }
 
-    public static Map<String, String> objectMapToStringMap(Map<Object, Object> objectMap) {
+    public static Map<String, String> objectMapToStringMap(Map<? extends Object, ? extends Object> objectMap) {
         if(objectMap==null){
             return null;
         }
         Map<String, String> stringMap = new HashMap<>(objectMap.size());
-        for(Map.Entry<Object, Object> ent : objectMap.entrySet()){
+        for(Map.Entry<? extends Object, ? extends Object> ent : objectMap.entrySet()){
             stringMap.put(StringBaseOpt.objectToString(ent.getKey()),
                 StringBaseOpt.objectToString(ent.getValue()));
         }
