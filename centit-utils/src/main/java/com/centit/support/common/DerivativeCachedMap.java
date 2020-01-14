@@ -48,7 +48,7 @@ public class DerivativeCachedMap<K, D, T> extends AbstractCachedObject<Map<K, T>
         this.refresher = refresher;
     }
 
-    public void setFreshPeriod(int freshPeriod) {
+    public void setFreshPeriod(long freshPeriod) {
         this.freshPeriod = freshPeriod;
     }
 
