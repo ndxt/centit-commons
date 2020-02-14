@@ -283,7 +283,37 @@ public abstract class FieldType {
     }
 
     public static String mapToPostgreSqlColumnType(String ft) {
-        return mapToMySqlColumnType(ft);
+        switch (ft) {
+            case STRING:
+                return "varchar";
+            case INTEGER:
+                return "integer";
+            case LONG:
+                return "bigint";
+            case MONEY:
+                return "money";
+            case FLOAT:
+            case DOUBLE:
+                return "decimal";
+            case BOOLEAN:
+                return "char(1)";
+            case DATE:
+                return "Date";
+            case DATETIME:
+            case TIMESTAMP:
+                return "TimeStamp";
+            case TEXT:
+            case JSON_OBJECT:
+                return "TEXT";//长文本
+            case FILE_ID:
+                return "varchar(64)";//默认记录文件的ID号
+            case BYTE_ARRAY:
+                return "character";
+            case ENUM_ORDINAL:
+                return "smallint";//
+            default:
+                return ft;
+        }
     }
 
     /**
