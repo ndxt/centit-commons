@@ -645,7 +645,7 @@ public abstract class QueryUtils {
                         sqlLexer.getAWord(); // 获取数字 忽略
                         sw2 = sqlLexer.getAWord();
                     }
-                    sqlStr.append("top ").append(maxsize).append(" ").append(sw2);
+                    sqlStr.append("top ").append(maxsize).append(" ").append(sw2).append(" ");
                 } else {
                     sqlStr.append(sw).append(" ");
                 }
