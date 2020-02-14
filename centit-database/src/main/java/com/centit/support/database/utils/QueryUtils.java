@@ -592,48 +592,66 @@ public abstract class QueryUtils {
                 + offset + " order by rownumber_";
     }
 
+
     /**
      * 生成SqlServer分页查询语句
-     * @param sql sql
-     * @param offset offset
+     *
+     * @param sql     sql
+     * @param offset  offset
      * @param maxsize maxsize
      * @return String
      */
-    public static String buildSqlServerLimitQuerySQL(String sql,int offset,int maxsize/*,boolean asParameter*/)
-            /*throws SQLException*/{
-        /*if(asParameter)
-            throw new SQLException("SQL Server unsupported parameter in fetch statement.");
-         */
-        if ( offset > 0 ) {
-            // SQL SERVER 2012  才支持
-            /*return sql + "offset "+String.valueOf(offset)
-                    + " rows fetch next "+String.valueOf(maxsize)+" rows only";*/
-            /* <pre>
-             * WITH query AS (
-             *   SELECT inner_query.*
-             *        , ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP) as __row_nr__
-             *     FROM ( original_query ) inner_query
-             * )
-             * SELECT alias_list FROM query WHERE __row_nr__ >= offset AND __row_nr__ < offset + maxsize
-             * </pre>
-            */
-            String alias_list = StringBaseOpt.objectToString( getSqlFiledNames(sql));
-            return "WITH query AS ("
-                     +"SELECT inner_query.* "
-                     +", ROW_NUMBER() OVER (ORDER BY CURRENT_TIMESTAMP) as __row_nr__ "
-                     +" FROM ( " + sql + ") inner_query"
-                     +" ) "
-                     +" SELECT "+ alias_list +" FROM query WHERE __row_nr__ >=" + String.valueOf(offset)
-                     + " AND __row_nr__ < " + String.valueOf(offset + maxsize);
+    public static String buildSqlServerLimitQuerySQL(String sql, int offset, int maxsize/*,boolean asParameter*/){
+        if (offset > 0) {
 
-        }else{
-               int selectIndex = sql.toLowerCase(Locale.ROOT).indexOf( "select" );
-            int selectDistinctIndex = sql.toLowerCase(Locale.ROOT).indexOf( "select distinct" );
-            selectIndex =  selectIndex + (selectDistinctIndex == selectIndex ? 15 : 6);
-            return new StringBuilder( sql.length() + 8 )
-                    .append( sql )
-                    .insert( selectIndex, " top " + maxsize )
-                    .toString();
+            List<String> sqlPieces = splitSqlByFields(sql);
+            if (sqlPieces == null || sqlPieces.size() < 3)
+                return sql;
+            String alias_list = StringBaseOpt.objectToString(splitSqlFieldNames(sqlPieces.get(1)));
+            String whereSql = QueryUtils.removeOrderBy(sqlPieces.get(2));
+            String oderbySql = sqlPieces.get(2).substring(whereSql.length());
+            if(StringUtils.isBlank(oderbySql)){
+                oderbySql = "ORDER BY CURRENT_TIMESTAMP";
+            } else {
+                oderbySql = oderbySql.trim();
+            }
+            StringBuilder sqlStr = new StringBuilder(sql.length() * 2);
+            sqlStr.append("WITH query AS (SELECT inner_query.* , ROW_NUMBER() OVER ( ")
+                .append(oderbySql).append(" ) as __row_nr__ FROM ( ")
+                .append(sqlPieces.get(0)).append(sqlPieces.get(1))
+                .append(whereSql).append(") inner_query ) SELECT ")
+                .append(alias_list).append( " FROM query WHERE __row_nr__ >")
+                .append(offset).append(" AND __row_nr__ <= ").append(offset + maxsize);
+            return sqlStr.toString();
+
+        } else {
+            Lexer sqlLexer = new Lexer(sql, Lexer.LANG_TYPE_SQL);
+            StringBuilder sqlStr = new StringBuilder(sql.length() + 20);
+            String sw = sqlLexer.getAWord();
+            while(StringUtils.isNotBlank(sw)){
+                if(sw.equals("(")){
+                    int pos = sqlLexer.getCurrPos();
+                    sqlLexer.seekToRightBracket();
+                    int endPos = sqlLexer.getCurrPos();
+                    sqlStr.append(" ").append(sql.substring(pos, endPos)).append(" ");
+                } else if(sw.equalsIgnoreCase("select")){
+                    sqlStr.append(sw).append(" ");
+                    String sw2 = sqlLexer.getAWord();
+                    if(sw2.equalsIgnoreCase("distinct")){
+                        sqlStr.append(sw2).append(" ");
+                        sw2 = sqlLexer.getAWord();
+                    }
+                    if(sw2.equalsIgnoreCase("top")){
+                        sqlLexer.getAWord(); // 获取数字 忽略
+                        sw2 = sqlLexer.getAWord();
+                    }
+                    sqlStr.append("top ").append(maxsize).append(" ").append(sw2);
+                } else {
+                    sqlStr.append(sw).append(" ");
+                }
+                sw = sqlLexer.getAWord();
+            }
+            return sqlStr.toString();
         }
     }
 
