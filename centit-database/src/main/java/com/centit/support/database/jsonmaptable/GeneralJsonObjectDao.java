@@ -427,87 +427,122 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return sBuilder.toString();
     }
 
+    /*
+     * 重构; 添加分组的概念， 同一分组用 or 连接， 不同分组或者没有分组的用 and 连接
+     */
     public static String buildFilterSql(TableInfo ti, String alias, Collection<String> properties) {
         StringBuilder sBuilder = new StringBuilder();
         int i = 0;
+        Map<String, StringBuilder> filterGroup = null;
         for (String plCol : properties) {
-            //不会有 sql 注入风险
-            //if(QueryUtils.checkSqlIdentifier(plCol)) {
-            int opt = 0;// 0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne
-            TableField col = ti.findFieldByName(plCol);
-            if (col == null && plCol.length() > 3) {
-                col = ti.findFieldByName(plCol.substring(0, plCol.length() - 3));
-                if(col!=null) {
-                    String suffix = plCol.substring(plCol.length() - 3).toLowerCase();
-                    switch (suffix) {
-                        case "_gt":
-                            opt = 1;
-                            break;
-                        case "_ge":
-                            opt = 2;
-                            break;
-                        case "_lt":
-                            opt = 3;
-                            break;
-                        case "_le":
-                            opt = 4;
-                            break;
-                        case "_lk":
-                            opt = 5;
-                            break;
-                        case "_in":
-                            opt = 6;
-                            break;
-                        case "_ne":
-                            opt = 7;
-                            break;
-                        case "_eq":
-                            break;
-                        default:
-                            col = null;
-                            break;
-                    } // switch
+            int strlen = plCol.length();
+            boolean beGroup = false;
+            String groupName="nog";
+            int opt = -1;
+            if(strlen>3) {
+                if ((plCol.charAt(0) == 'g' || plCol.charAt(0) == 'G') &&
+                    plCol.charAt(1) >= '0' && plCol.charAt(1) <= '9' && plCol.charAt(2) == '_') {
+                    groupName = "g" + plCol.charAt(1);
+                    beGroup = true;
+                }
+                String suffix = plCol.substring(strlen - 3).toLowerCase();
+                switch (suffix) {
+                    case "_gt":
+                        opt = 1;
+                        break;
+                    case "_ge":
+                        opt = 2;
+                        break;
+                    case "_lt":
+                        opt = 3;
+                        break;
+                    case "_le":
+                        opt = 4;
+                        break;
+                    case "_lk":
+                        opt = 5;
+                        break;
+                    case "_in":
+                        opt = 6;
+                        break;
+                    case "_ne":
+                        opt = 7;
+                        break;
+                    case "_eq":
+                        opt = 0;
+                    default:
+                        break;
                 }
             }
-            // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne
-            if (col != null) {
+            String propName = beGroup ?
+                (opt>=0? plCol.substring(3,strlen- 3) : plCol.substring(3)) :
+                (opt>=0? plCol.substring(3) : plCol);
+            TableField col = ti.findFieldByName(propName);
+            if(col != null){
+                StringBuilder currentBuild = null;
+                if(beGroup){
+                    if(filterGroup == null){
+                        filterGroup = new HashMap<>(4);
+                    } else {
+                        currentBuild = filterGroup.get(groupName);
+                    }
+
+                    if(currentBuild==null){
+                        currentBuild = new StringBuilder();
+                        filterGroup.put(groupName, currentBuild);
+                    } else {
+                        currentBuild.append(" or ");
+                    }
+                } else {
+                    currentBuild = sBuilder;
+                    if (i > 0) {
+                        sBuilder.append(" and ");
+                    }
+                    i++;
+                }
+                if (StringUtils.isNotBlank(alias)) {
+                    currentBuild.append(alias).append('.');
+                }
+                currentBuild.append(col.getColumnName());
+                // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne
+                switch (opt) {
+                    case 1:
+                        currentBuild.append(" > :").append(plCol);
+                        break;
+                    case 2:
+                        currentBuild.append(" >= :").append(plCol);
+                        break;
+                    case 3:
+                        currentBuild.append(" < :").append(plCol);
+                        break;
+                    case 4:
+                        currentBuild.append(" <= :").append(plCol);
+                        break;
+                    case 5:
+                        currentBuild.append(" like :").append(plCol);
+                        break;
+                    case 6:
+                        currentBuild.append(" in (:").append(plCol).append(")");
+                        break;
+                    case 7:
+                        currentBuild.append(" <> :").append(plCol);
+                        break;
+                    default:
+                        currentBuild.append(" = :").append(plCol);
+                        break;
+                }
+            }
+        }// for
+        if(filterGroup != null){
+            for(Map.Entry<String, StringBuilder> ent : filterGroup.entrySet()){
                 if (i > 0) {
                     sBuilder.append(" and ");
                 }
-                if (StringUtils.isNotBlank(alias)) {
-                    sBuilder.append(alias).append('.');
-                }
-                sBuilder.append(col.getColumnName());
-                switch (opt) {
-                    case 1:
-                        sBuilder.append(" > :").append(plCol);
-                        break;
-                    case 2:
-                        sBuilder.append(" >= :").append(plCol);
-                        break;
-                    case 3:
-                        sBuilder.append(" < :").append(plCol);
-                        break;
-                    case 4:
-                        sBuilder.append(" <= :").append(plCol);
-                        break;
-                    case 5:
-                        sBuilder.append(" like :").append(plCol);
-                        break;
-                    case 6:
-                        sBuilder.append(" in (:").append(plCol).append(")");
-                        break;
-                    case 7:
-                        sBuilder.append(" <> :").append(plCol);
-                        break;
-                    default:
-                        sBuilder.append(" = :").append(plCol);
-                        break;
-                }
                 i++;
-            } // col not null
-            //}// 合法的标识符
-        }// for
+                sBuilder.append(" ( ").append(ent.getValue()).append(" )");
+
+            }
+        }
         return sBuilder.toString();
     }
 
