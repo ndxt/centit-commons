@@ -161,8 +161,8 @@ public abstract class OrmUtils {
                         // 1577808000000L 2020-1-1 00:00:00
                         case TIME_SEQUENCE:
                             mapInfo.setObjectFieldValue(object, field,
-                                ((System.currentTimeMillis() - 1577808000000L) * 1000)
-                                + Math.round(Math.random() * 1000));
+                                ((System.currentTimeMillis() - 1577808000000L) * 10000)
+                                + Math.round(Math.random() * 10000));
                             break;
                         case SUB_ORDER: {
                             int pkCount = mapInfo.countPkColumn();

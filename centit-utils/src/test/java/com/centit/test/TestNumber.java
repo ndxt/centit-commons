@@ -22,12 +22,12 @@ public class TestNumber {
         //System.out.println(System.currentTimeMillis() - START_STMP);
         System.out.println(System.currentTimeMillis());
         System.out.println(System.currentTimeMillis() - START_STMP);
-        long serial =  ((System.currentTimeMillis() - START_STMP)  * 1000)
-            + Math.round( Math.random() * 1000);
+        long serial =  ((System.currentTimeMillis() - START_STMP)  * 10000)
+            + Math.round( Math.random() * 10000);
         System.out.println(serial);
         for(int i=0;i<100;i++) {
-            serial = ((System.currentTimeMillis() - START_STMP) * 1000)
-                + Math.round(Math.random() * 1000);
+            serial = ((System.currentTimeMillis() - START_STMP) * 10000)
+                + Math.round(Math.random() * 10000);
             System.out.println(serial);
         }
     }
