@@ -1,9 +1,6 @@
 package com.centit.test;
 
-import com.centit.support.algorithm.ByteBaseOpt;
-import com.centit.support.algorithm.EnumBaseOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.common.DoubleAspect;
 
 import java.math.BigDecimal;
@@ -19,8 +16,24 @@ public class TestNumber {
             String.valueOf(NumberBaseOpt.getNumByte(f, -2))) + "分";
     }
 
-
     public static void main(String[] args) {
+        long START_STMP = DatetimeOpt.createUtilDate(2020,1,1).getTime();//1480166465631L;
+        System.out.println(START_STMP);
+        //System.out.println(System.currentTimeMillis() - START_STMP);
+        System.out.println(System.currentTimeMillis());
+        System.out.println(System.currentTimeMillis() - START_STMP);
+        long serial =  ((System.currentTimeMillis() - START_STMP)  * 1000)
+            + Math.round( Math.random() * 1000);
+        System.out.println(serial);
+        for(int i=0;i<100;i++) {
+            serial = ((System.currentTimeMillis() - START_STMP) * 1000)
+                + Math.round(Math.random() * 1000);
+            System.out.println(serial);
+        }
+    }
+
+
+    public static void lastmain(String[] args) {
         System.out.println(EnumBaseOpt.stringToEnum(DoubleAspect.class,"negative", true));
 
         DoubleAspect yes = DoubleAspect.YES;
