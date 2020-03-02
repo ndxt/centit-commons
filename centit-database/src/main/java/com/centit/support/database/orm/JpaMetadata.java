@@ -141,136 +141,135 @@ public abstract class JpaMetadata {
         return column;
     }
 
-    public static TableMapInfo obtainMapInfoFromClass(Class<?> objType) {
+    public static TableMapInfo obtainMapInfoFromClass(Class<?> objClass) {
 
-        if (!objType.isAnnotationPresent(Table.class))
+        if (!objClass.isAnnotationPresent(Table.class))
             return null;
-        Table tableInfo = objType.getAnnotation(Table.class);
+        Table tableInfo = objClass.getAnnotation(Table.class);
         TableMapInfo mapInfo = new TableMapInfo();
         mapInfo.setTableName(tableInfo.name());
         mapInfo.setSchema(tableInfo.schema());
+        Class<?> objType = objClass;
+        while(objType != Object.class) {
+            Field[] objFields = objType.getDeclaredFields();
+            for (Field field : objFields) {
+                if (field.isAnnotationPresent(Column.class)) {
+                    SimpleTableField column = obtainColumnFromField(objType, field);
 
-        Field[] objFields = objType.getDeclaredFields();
-        for (Field field : objFields) {
-            if (field.isAnnotationPresent(Column.class)) {
-                SimpleTableField column = obtainColumnFromField(objType, field);
+                    boolean isPK = field.isAnnotationPresent(Id.class);
+                    column.setPrimaryKey(isPK);
+                    boolean isLazy = false;
+                    if (!isPK && field.isAnnotationPresent(Basic.class)) {
+                        Basic colBasic = field.getAnnotation(Basic.class);
+                        isLazy = colBasic.fetch() == FetchType.LAZY;
+                    }
+                    column.setLazyFetch(isLazy);
+                    mapInfo.addColumn(column);
+                    if (field.isAnnotationPresent(ValueGenerator.class)) {
+                        ValueGenerator valueGenerator = field.getAnnotation(ValueGenerator.class);
+                        mapInfo.addValueGenerator(
+                            column.getPropertyName(),
+                            valueGenerator);
+                    }
+                    if (field.isAnnotationPresent(OrderBy.class)) {
+                        OrderBy orderBy = field.getAnnotation(OrderBy.class);
+                        mapInfo.appendOrderBy(column, orderBy.value());
+                    }
+                } else if (field.isAnnotationPresent(EmbeddedId.class)) {
+                    EmbeddedId embeddedId = field.getAnnotation(EmbeddedId.class);
+                    mapInfo.setEmbeddedId(true);
+                    mapInfo.setPkName(field.getName());
+                    SimpleTableField pkColumn = new SimpleTableField();
+                    obtainField(pkColumn, objType, field);
+                    mapInfo.setEmbeddedIdField(pkColumn);
 
-                boolean isPK = field.isAnnotationPresent(Id.class);
-                column.setPrimaryKey(isPK);
-                boolean isLazy = false;
-                if (!isPK && field.isAnnotationPresent(Basic.class)) {
-                    Basic colBasic = field.getAnnotation(Basic.class);
-                    isLazy = colBasic.fetch() == FetchType.LAZY;
-                }
-                column.setLazyFetch(isLazy);
-                mapInfo.addColumn(column);
+                    for (Field idField : field.getType().getDeclaredFields()) {
 
-                if (field.isAnnotationPresent(ValueGenerator.class)) {
-                    ValueGenerator valueGenerator = field.getAnnotation(ValueGenerator.class);
-                    mapInfo.addValueGenerator(
-                        column.getPropertyName(),
-                        valueGenerator);
-                }
-
-                if (field.isAnnotationPresent(OrderBy.class)) {
-                    OrderBy orderBy = field.getAnnotation(OrderBy.class);
-                    mapInfo.appendOrderBy(column, orderBy.value());
-                }
-
-            } else if (field.isAnnotationPresent(EmbeddedId.class)) {
-                EmbeddedId embeddedId = field.getAnnotation(EmbeddedId.class);
-                mapInfo.setEmbeddedId(true);
-                mapInfo.setPkName(field.getName());
-                SimpleTableField pkColumn = new SimpleTableField();
-                obtainField(pkColumn, objType, field);
-                mapInfo.setEmbeddedIdField(pkColumn);
-
-                for (Field idField : field.getType().getDeclaredFields()) {
-
-                    if (idField.isAnnotationPresent(Column.class)) {
-                        SimpleTableField column = obtainColumnFromField(field.getType(), idField);
-                        column.setPrimaryKey(true);
-                        mapInfo.addColumn(column);
-
-                        if (idField.isAnnotationPresent(ValueGenerator.class)) {
-                            ValueGenerator valueGenerator = idField.getAnnotation(ValueGenerator.class);
-                            mapInfo.addValueGenerator(
-                                column.getPropertyName(),
-                                valueGenerator);
-                        }
-
-                        if (idField.isAnnotationPresent(OrderBy.class)) {
-                            OrderBy orderBy = idField.getAnnotation(OrderBy.class);
-                            mapInfo.appendOrderBy(column, orderBy.value());
+                        if (idField.isAnnotationPresent(Column.class)) {
+                            SimpleTableField column = obtainColumnFromField(field.getType(), idField);
+                            column.setPrimaryKey(true);
+                            mapInfo.addColumn(column);
+                            if (idField.isAnnotationPresent(ValueGenerator.class)) {
+                                ValueGenerator valueGenerator = idField.getAnnotation(ValueGenerator.class);
+                                mapInfo.addValueGenerator(
+                                    column.getPropertyName(),
+                                    valueGenerator);
+                            }
+                            if (idField.isAnnotationPresent(OrderBy.class)) {
+                                OrderBy orderBy = idField.getAnnotation(OrderBy.class);
+                                mapInfo.appendOrderBy(column, orderBy.value());
+                            }
                         }
                     }
-                }
-            } else { /*if ( field.isAnnotationPresent(OneToOne.class)
+                } else { /*if ( field.isAnnotationPresent(OneToOne.class)
                     || field.isAnnotationPresent(OneToMany.class)
                     || field.isAnnotationPresent(ManyToOne.class)
                     || field.isAnnotationPresent(ManyToMany.class))*/
-                Class targetClass = null;
+                    Class targetClass = null;
 
-                if (field.isAnnotationPresent(OneToOne.class)) {
-                    OneToOne oneToOne = field.getAnnotation(OneToOne.class);
-                    targetClass = oneToOne.targetEntity();
-                    if (/*targetClass ==null || */targetClass.equals(void.class)) {
-                        targetClass = field.getType();
-                    }
-                } else if (field.isAnnotationPresent(ManyToOne.class)) {
-                    ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
-                    targetClass = manyToOne.targetEntity();
-                    if (/*targetClass ==null || */targetClass.equals(void.class)) {
-                        targetClass = field.getType();
-                    }
-                } else if (field.isAnnotationPresent(OneToMany.class)) {
-                    OneToMany oneToMany = field.getAnnotation(OneToMany.class);
-                    targetClass = oneToMany.targetEntity();
-                    if (/*targetClass ==null || */targetClass.equals(void.class)) {
-                        Type t = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-                        if (t instanceof Class) {
-                            targetClass = (Class<?>) t;
+                    if (field.isAnnotationPresent(OneToOne.class)) {
+                        OneToOne oneToOne = field.getAnnotation(OneToOne.class);
+                        targetClass = oneToOne.targetEntity();
+                        if (/*targetClass ==null || */targetClass.equals(void.class)) {
+                            targetClass = field.getType();
+                        }
+                    } else if (field.isAnnotationPresent(ManyToOne.class)) {
+                        ManyToOne manyToOne = field.getAnnotation(ManyToOne.class);
+                        targetClass = manyToOne.targetEntity();
+                        if (/*targetClass ==null || */targetClass.equals(void.class)) {
+                            targetClass = field.getType();
+                        }
+                    } else if (field.isAnnotationPresent(OneToMany.class)) {
+                        OneToMany oneToMany = field.getAnnotation(OneToMany.class);
+                        targetClass = oneToMany.targetEntity();
+                        if (/*targetClass ==null || */targetClass.equals(void.class)) {
+                            Type t = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                            if (t instanceof Class) {
+                                targetClass = (Class<?>) t;
+                            }
+                        }
+                    } else if (field.isAnnotationPresent(ManyToMany.class)) {
+                        ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
+                        targetClass = manyToMany.targetEntity();
+                        if (/*targetClass ==null ||*/ targetClass.equals(void.class)) {
+                            Type t = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                            if (t instanceof Class) {
+                                targetClass = (Class<?>) t;
+                            }
                         }
                     }
-                } else if (field.isAnnotationPresent(ManyToMany.class)) {
-                    ManyToMany manyToMany = field.getAnnotation(ManyToMany.class);
-                    targetClass = manyToMany.targetEntity();
-                    if (/*targetClass ==null ||*/ targetClass.equals(void.class)) {
-                        Type t = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-                        if (t instanceof Class) {
-                            targetClass = (Class<?>) t;
-                        }
-                    }
-                }
 
-                if (targetClass != null && !targetClass.equals(void.class)) {
-                    SimpleTableReference reference = new SimpleTableReference();
-                    reference.setTargetEntityType(targetClass);
-                    boolean haveJoinColumns = false;
-                    if (field.isAnnotationPresent(JoinColumn.class)) {
-                        JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
-                        reference.setReferenceName(field.getName());
-                        reference.setReferenceFieldType(field.getType());
-                        reference.addReferenceColumn(joinColumn.name(), joinColumn.referencedColumnName());
-                        haveJoinColumns = true;
-                    } else if (field.isAnnotationPresent(JoinColumns.class)) {
-                        JoinColumns joinColumns = field.getAnnotation(JoinColumns.class);
-                        reference.setReferenceName(field.getName());
-                        reference.setReferenceFieldType(field.getType());
-                        for (JoinColumn joinColumn : joinColumns.value()) {
+                    if (targetClass != null && !targetClass.equals(void.class)) {
+                        SimpleTableReference reference = new SimpleTableReference();
+                        reference.setTargetEntityType(targetClass);
+                        boolean haveJoinColumns = false;
+                        if (field.isAnnotationPresent(JoinColumn.class)) {
+                            JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
+                            reference.setReferenceName(field.getName());
+                            reference.setReferenceFieldType(field.getType());
                             reference.addReferenceColumn(joinColumn.name(), joinColumn.referencedColumnName());
+                            haveJoinColumns = true;
+                        } else if (field.isAnnotationPresent(JoinColumns.class)) {
+                            JoinColumns joinColumns = field.getAnnotation(JoinColumns.class);
+                            reference.setReferenceName(field.getName());
+                            reference.setReferenceFieldType(field.getType());
+                            for (JoinColumn joinColumn : joinColumns.value()) {
+                                reference.addReferenceColumn(joinColumn.name(), joinColumn.referencedColumnName());
+                            }
+                            haveJoinColumns = true;
                         }
-                        haveJoinColumns = true;
-                    }
 
-                    if (haveJoinColumns) {
-                        reference.setObjectField(field);
-                        reference.setObjectGetFieldValueFunc(ReflectionOpt.getGetterMethod(objType, field.getType(), field.getName()));
-                        reference.setObjectSetFieldValueFunc(ReflectionOpt.getSetterMethod(objType, field.getType(), field.getName()));
-                        mapInfo.addReference(reference);
+                        if (haveJoinColumns) {
+                            reference.setObjectField(field);
+                            reference.setObjectGetFieldValueFunc(ReflectionOpt.getGetterMethod(objType, field.getType(), field.getName()));
+                            reference.setObjectSetFieldValueFunc(ReflectionOpt.getSetterMethod(objType, field.getType(), field.getName()));
+                            mapInfo.addReference(reference);
+                        }
                     }
                 }
             }
+            //获取父类
+            objType = objType.getSuperclass();
         }
         //先 注册一下，避免 交叉引用时 死循环
         ORM_JPA_METADATA_CLASSPATH.put(objType.getName(), mapInfo);
