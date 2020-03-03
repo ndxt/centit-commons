@@ -1077,9 +1077,10 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     }
 
     private JSONArray transObjectList(JSONArray ja, String[] fieldnames) {
-        if (ja == null || ja.size() == 0) {
+        if (ja == null || ja.size() == 0 || fieldnames == null) {
             return ja;
         }
+
         List<TableField> fields = new ArrayList<>(5);
         for (String fieldName : fieldnames) {
             TableField field = tableInfo.findFieldByName(fieldName);
@@ -1089,6 +1090,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 fields.add(field);
             }
         }
+
         if (fields.size() > 0) {
             for (Object jo : ja) {
                 Map<String, Object> json = (Map<String, Object>) jo;
