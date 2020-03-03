@@ -150,12 +150,13 @@ public abstract class JpaMetadata {
         mapInfo.setTableName(tableInfo.name());
         mapInfo.setSchema(tableInfo.schema());
         Class<?> objType = objClass;
-        while(objType != Object.class) {
+        int nCascade = 0;
+        while(nCascade< 5 && objType != Object.class) {
+            nCascade ++;
             Field[] objFields = objType.getDeclaredFields();
             for (Field field : objFields) {
                 if (field.isAnnotationPresent(Column.class)) {
                     SimpleTableField column = obtainColumnFromField(objType, field);
-
                     boolean isPK = field.isAnnotationPresent(Id.class);
                     column.setPrimaryKey(isPK);
                     boolean isLazy = false;
@@ -272,7 +273,7 @@ public abstract class JpaMetadata {
             objType = objType.getSuperclass();
         }
         //先 注册一下，避免 交叉引用时 死循环
-        ORM_JPA_METADATA_CLASSPATH.put(objType.getName(), mapInfo);
+        ORM_JPA_METADATA_CLASSPATH.put(objClass.getName(), mapInfo);
         // 整理 引用字段 ; 如果引用是字段名 就整理为 属性名
         if (mapInfo.getReferences() != null && mapInfo.getReferences().size() > 0) {
             Set<SimpleTableReference> errorRef = new HashSet<>(mapInfo.getReferences().size());
