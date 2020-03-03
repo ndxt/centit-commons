@@ -438,45 +438,19 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             int strlen = plCol.length();
             boolean beGroup = false;
             String groupName="nog";
-            int opt = -1;
+            String optSuffix = "none";
             if(strlen>3) {
                 if ((plCol.charAt(0) == 'g' || plCol.charAt(0) == 'G') &&
                     plCol.charAt(1) >= '0' && plCol.charAt(1) <= '9' && plCol.charAt(2) == '_') {
                     groupName = "g" + plCol.charAt(1);
                     beGroup = true;
                 }
-                String suffix = plCol.substring(strlen - 3).toLowerCase();
-                switch (suffix) {
-                    case "_gt":
-                        opt = 1;
-                        break;
-                    case "_ge":
-                        opt = 2;
-                        break;
-                    case "_lt":
-                        opt = 3;
-                        break;
-                    case "_le":
-                        opt = 4;
-                        break;
-                    case "_lk":
-                        opt = 5;
-                        break;
-                    case "_in":
-                        opt = 6;
-                        break;
-                    case "_ne":
-                        opt = 7;
-                        break;
-                    case "_eq":
-                        opt = 0;
-                    default:
-                        break;
-                }
+                optSuffix = plCol.substring(strlen - 3).toLowerCase();
             }
             String propName = beGroup ?
-                (opt>=0? plCol.substring(3,strlen- 3) : plCol.substring(3)) :
-                (opt>=0? plCol.substring(3) : plCol);
+                (optSuffix.charAt(0)=='_'? plCol.substring(3,strlen- 3) : plCol.substring(3)) :
+                (optSuffix.charAt(0)=='_'? plCol.substring(3) : plCol);
+
             TableField col = ti.findFieldByName(propName);
             if(col != null){
                 StringBuilder currentBuild = null;
@@ -505,27 +479,33 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 }
                 currentBuild.append(col.getColumnName());
                 // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne
-                switch (opt) {
-                    case 1:
+                switch (optSuffix) {
+                    case "_gt":
                         currentBuild.append(" > :").append(plCol);
                         break;
-                    case 2:
+                    case "_ge":
                         currentBuild.append(" >= :").append(plCol);
                         break;
-                    case 3:
+                    case "_lt":
                         currentBuild.append(" < :").append(plCol);
                         break;
-                    case 4:
+                    case "_le":
                         currentBuild.append(" <= :").append(plCol);
                         break;
-                    case 5:
+                    case "_lk":
                         currentBuild.append(" like :").append(plCol);
                         break;
-                    case 6:
+                    case "_in":
                         currentBuild.append(" in (:").append(plCol).append(")");
                         break;
-                    case 7:
+                    case "_ne":
                         currentBuild.append(" <> :").append(plCol);
+                        break;
+                    case "_nv":
+                        currentBuild.append(" is null");
+                        break;
+                    case "_nn":
+                        currentBuild.append(" is not null");
                         break;
                     default:
                         currentBuild.append(" = :").append(plCol);
