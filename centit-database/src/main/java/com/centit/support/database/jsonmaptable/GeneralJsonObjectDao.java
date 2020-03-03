@@ -1077,17 +1077,25 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     }
 
     private JSONArray transObjectList(JSONArray ja, String[] fieldnames) {
-        if (ja == null || ja.size() == 0 || fieldnames == null) {
+        if (ja == null || ja.size() == 0 ) {
             return ja;
         }
-
         List<TableField> fields = new ArrayList<>(5);
-        for (String fieldName : fieldnames) {
-            TableField field = tableInfo.findFieldByName(fieldName);
-            if (field != null && (
-                FieldType.BOOLEAN.equals(field.getFieldType())
-                    || FieldType.JSON_OBJECT.equals(field.getFieldType()))) {
-                fields.add(field);
+        if(fieldnames==null) {
+            for (TableField field  : tableInfo.getColumns()) {
+                if (FieldType.BOOLEAN.equals(field.getFieldType())
+                        || FieldType.JSON_OBJECT.equals(field.getFieldType())) {
+                    fields.add(field);
+                }
+            }
+        } else {
+            for (String fieldName : fieldnames) {
+                TableField field = tableInfo.findFieldByName(fieldName);
+                if (field != null && (
+                    FieldType.BOOLEAN.equals(field.getFieldType())
+                        || FieldType.JSON_OBJECT.equals(field.getFieldType()))) {
+                    fields.add(field);
+                }
             }
         }
 
