@@ -449,7 +449,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             }
             String propName = beGroup ?
                 (optSuffix.charAt(0)=='_'? plCol.substring(3,strlen- 3) : plCol.substring(3)) :
-                (optSuffix.charAt(0)=='_'? plCol.substring(3) : plCol);
+                (optSuffix.charAt(0)=='_'? plCol.substring(0,strlen- 3) : plCol);
 
             TableField col = ti.findFieldByName(propName);
             if(col != null){
