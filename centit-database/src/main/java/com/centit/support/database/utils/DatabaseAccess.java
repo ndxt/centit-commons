@@ -336,7 +336,9 @@ public abstract class DatabaseAccess {
                 String[] fns = fieldnames;
                 if (ArrayUtils.isEmpty(fns)) {
                     List<String> fields = QueryUtils.getSqlFiledNames(sSql);
-                    fns = mapColumnsNameToFields(fields);
+                    if (fields!=null) {
+                        fns = mapColumnsNameToFields(fields);
+                    }
                 }
                 return fetchResultSetToJSONArray(rs, fns);
                 //rs.close();
