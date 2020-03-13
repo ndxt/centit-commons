@@ -36,6 +36,8 @@ public abstract class DatetimeOpt {
     private static String defaultDatePattern = "yyyy-MM-dd";
     private static String timePattern = "HH:mm";
     private static String timeWithSecondPattern = "HH:mm:ss";
+    //private static String datetimeWithoutYearPattern = "MM-dd HH:mm";
+    //private static String datetimePattern = "yyyy-MM-dd HH:mm";
     private static String datetimePattern = "yyyy-MM-dd HH:mm:ss";
     private static String timestampPattern = "yyyy-MM-dd HH:mm:ss.SSS";
     private static String gmtDatePattern = "d MMM yyyy HH:mm:ss 'GMT'";
@@ -216,7 +218,6 @@ public abstract class DatetimeOpt {
      */
     public static Calendar currentCalendarDate() {
         java.util.Date today = currentUtilDate();
-        ;
         Calendar cal = new GregorianCalendar();
         cal.setTime(today);
         return cal;
@@ -304,6 +305,47 @@ public abstract class DatetimeOpt {
         return convertDateToString(aDate, defaultDatePattern);
     }
 
+    public static String convertDateToSmartString(Date aDate) {
+        return convertDateToSmartString(aDate, false);
+    }
+
+    public static String convertDateToSmartString(Date aDate, boolean withSecond) {
+        Date currentDay = currentUtilDate();
+        long today = currentDay.getTime() / 86400000L;
+        long compareDay = aDate.getTime() / 86400000L;
+        if(today == compareDay){
+            return "今天 " + convertDateToString(aDate,
+                withSecond? timeWithSecondPattern : timePattern);
+        }
+
+        if(today == compareDay+1){
+            return "昨天 " + convertDateToString(aDate,
+                withSecond? timeWithSecondPattern : timePattern);
+        }
+
+        if(today == compareDay+2){
+            return "前天 " + convertDateToString(aDate,
+                withSecond? timeWithSecondPattern : timePattern);
+        }
+
+        if(today +1 == compareDay){
+            return "明天 " + convertDateToString(aDate,
+                withSecond? timeWithSecondPattern : timePattern);
+        }
+
+        if(today +2 == compareDay){
+            return "后天 " + convertDateToString(aDate,
+                withSecond ? timeWithSecondPattern : timePattern);
+        }
+
+        if( getYear(aDate) == getYear(currentDay)){
+            return convertDateToString(aDate,
+                withSecond ? "MM-dd HH:mm:ss" : "MM-dd HH:mm");
+        } else {
+            return convertDateToString(aDate,
+                withSecond ? datetimePattern : "yyyy-MM-dd HH:mm");
+        }
+    }
     /**
      * 返回日期字符串  toUTCString( ) 和 javaScript 一致
      * // d MMM yyyy HH:mm:ss 'GMT'

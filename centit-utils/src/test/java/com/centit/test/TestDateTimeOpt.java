@@ -10,7 +10,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TestDateTimeOpt {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+
+        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.currentUtilDate()));
+
+        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
+            DatetimeOpt.currentUtilDate(),1)));
+
+        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
+            DatetimeOpt.currentUtilDate(),2)));
+
+        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
+            DatetimeOpt.currentUtilDate(),3)));
+        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
+            DatetimeOpt.currentUtilDate(),-1)));
+
+        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
+            DatetimeOpt.currentUtilDate(),-2)));
+        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
+            DatetimeOpt.currentUtilDate(),-3)));
+
+        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
+            DatetimeOpt.currentUtilDate(),-50)));
+        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
+            DatetimeOpt.currentUtilDate(),-500)));
 
         System.out.println(DatetimeOpt.truncateToWeek(DatetimeOpt.currentUtilDate()));
 
