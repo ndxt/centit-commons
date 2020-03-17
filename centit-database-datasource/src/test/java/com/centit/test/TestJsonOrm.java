@@ -1,6 +1,7 @@
 package com.centit.test;
 
 import com.alibaba.fastjson.JSON;
+import com.centit.support.database.orm.GeneratorCondition;
 import com.centit.support.database.orm.GeneratorType;
 import com.centit.support.database.orm.OrmDaoUtils;
 import com.centit.support.database.orm.ValueGenerator;
@@ -49,14 +50,15 @@ public class TestJsonOrm {
     @Table(name = "F_USERINFO")
     public static class UserInfo implements java.io.Serializable {
         private static final long serialVersionUID = -1753127177790732963L;
-        @Column(name = "CREATE_DATE")
-        @ValueGenerator(strategy = GeneratorType.FUNCTION, value = "today()")
-        protected Date createDate;
         @Id
         @Column(name = "USER_CODE")
         @ValueGenerator(strategy = GeneratorType.RANDOM_ID, value = "7:U")
         private String userCode; // 用户代码
         @Column(name = "USER_NAME")
         private String userName; // 用户姓名
+        @Column(name = "LAST_UPDATE_DATE")
+        @ValueGenerator(strategy = GeneratorType.FUNCTION, value = "today()",
+            condition = GeneratorCondition.ALWAYS)
+        protected Date lastUpdateDate;
     }
 }

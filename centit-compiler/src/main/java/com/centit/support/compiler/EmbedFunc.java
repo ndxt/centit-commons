@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 65;
+    public static final int functionsSum = 66;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -48,14 +48,16 @@ public abstract class EmbedFunc {
         new FunctionInfo("ctan", 1, ConstDefine.FUNC_CTAN, ConstDefine.TYPE_NUM),    // 求余切
         new FunctionInfo("exp", 1, ConstDefine.FUNC_EXP, ConstDefine.TYPE_NUM),    // 求以e为底的指数
         new FunctionInfo("sqrt", 1, ConstDefine.FUNC_SQRT, ConstDefine.TYPE_NUM),    // 求平方根
+        //字符串函数
         new FunctionInfo("upcase", 1, ConstDefine.FUNC_UPCASE, ConstDefine.TYPE_STR), // 字符串大写
         new FunctionInfo("lowcase", 1, ConstDefine.FUNC_LOWCASE, ConstDefine.TYPE_STR), // 字符串小写
         new FunctionInfo("substr", 2, ConstDefine.FUNC_SUBSTR, ConstDefine.TYPE_STR), // 求字符串子串 substr ("123456",2,3)="345"
         new FunctionInfo("lpad", 1, ConstDefine.FUNC_LPAD, ConstDefine.TYPE_STR), // 左侧补充字符串
         new FunctionInfo("rpad", 1, ConstDefine.FUNC_RPAD, ConstDefine.TYPE_STR), // 右侧补充字符串
-
         new FunctionInfo("find", 2, ConstDefine.FUNC_FIND, ConstDefine.TYPE_NUM),  //求子串位置 find ("123456","34")=2  find ("123456","35")=-1
         new FunctionInfo("frequence", 2, ConstDefine.FUNC_FREQUENCE, ConstDefine.TYPE_NUM), // 求子串个数 find ("12345236","23")=2
+        new FunctionInfo("split", 2, ConstDefine.FUNC_SPLIT_STR, ConstDefine.TYPE_STR),
+
         new FunctionInfo("int", 1, ConstDefine.FUNC_INT, ConstDefine.TYPE_NUM), // 求整数部分 int (12.34)=12 int -12.34)=-12
         new FunctionInfo("integer", 1, ConstDefine.FUNC_INT, ConstDefine.TYPE_NUM), // 求整数部分 integer (12.34)=12 int (-12.34)=-12
         new FunctionInfo("frac", 1, ConstDefine.FUNC_FRAC, ConstDefine.TYPE_NUM), // 求小数部分 frac (12.34)=0.34 frac (-12.34)=-0.34
@@ -71,7 +73,6 @@ public abstract class EmbedFunc {
         new FunctionInfo("weekday", -1, ConstDefine.FUNC_WEEK_DAY, ConstDefine.TYPE_STR),// 星期几， 取日期的星期几，周日为0，周一~六为1~6
         new FunctionInfo("formatdate", -1, ConstDefine.FUNC_FORMAT_DATE, ConstDefine.TYPE_STR),// 格式化日期
         new FunctionInfo("dateinfo", -1, ConstDefine.FUNC_DATE_INFO, ConstDefine.TYPE_STR),// 日期信息
-
 
         new FunctionInfo("dayspan", -1, ConstDefine.FUNC_DAY_SPAN, ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
         new FunctionInfo("datespan", -1, ConstDefine.FUNC_DATE_SPAN, ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
@@ -431,7 +432,15 @@ public abstract class EmbedFunc {
                 }
                 return nC;
             }
-            case ConstDefine.FUNC_INT: {//取整
+
+            case ConstDefine.FUNC_SPLIT_STR:{ // 分割字符串
+                if (nOpSum < 1) return null;
+                String str = StringBaseOpt.castObjectToString(slOperand.get(0));
+                String splitStr = nOpSum > 1 ? StringBaseOpt.castObjectToString(slOperand.get(0)," "):",";
+                return str.split(splitStr);
+            }
+
+            case ConstDefine.FUNC_INT: { //取整
                 if (nOpSum < 1)
                     return null;
                 if (!NumberBaseOpt.isNumber(slOperand.get(0)))

@@ -32,6 +32,7 @@ public abstract class ConstDefine {
     public static final int FUNC_CTAN = 121;
     public static final int FUNC_FIND = 122;
     public static final int FUNC_FREQUENCE = 123;
+
     public static final int FUNC_INT = 124;
     public static final int FUNC_FRAC = 125;
     public static final int FUNC_DAY = 126;
@@ -73,6 +74,8 @@ public abstract class ConstDefine {
     public static final int FUNC_DATE_INFO = 164;
     public static final int FUNC_FLOOR = 165;
     public static final int FUNC_CEIL = 166;
+    public static final int FUNC_SPLIT_STR = 167;
+
     public static final int OP_BASE = 30;    // +
     public static final int OP_ADD = 30;    // +
     public static final int OP_SUB = 31;  // -

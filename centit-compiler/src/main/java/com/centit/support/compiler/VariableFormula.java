@@ -367,6 +367,10 @@ public class VariableFormula {
 
         return null;
     }
+    //用于跳过个分隔符比如“，”
+    public String skipAWord(){
+        return lex.getAWord();
+    }
 
     public Object calcFormula() {
         List<Object> slOperand = new ArrayList<>();
