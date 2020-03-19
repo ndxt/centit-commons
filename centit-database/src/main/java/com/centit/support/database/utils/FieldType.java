@@ -58,7 +58,11 @@ public abstract class FieldType {
                 }
             } else {
                 if (upCase) {
-                    sClassName.append((char) (sTempName.charAt(i) - 32));
+                    if(Character.isLowerCase(sTempName.charAt(i))) {
+                        sClassName.append((char) (sTempName.charAt(i) - 32));
+                    } else{
+                        sClassName.append(sTempName.charAt(i));
+                    }
                     upCase = false;
                 } else {
                     sClassName.append(sTempName.charAt(i));
