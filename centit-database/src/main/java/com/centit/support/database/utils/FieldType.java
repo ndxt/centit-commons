@@ -61,7 +61,7 @@ public abstract class FieldType {
             }
             if (upCase && currChar>='a' && currChar<='z') {
                 sClassName.append((char) (currChar - 32));
-            } else if (currChar>='A' && currChar<='Z' ) {
+            } else if (!upCase && currChar>='A' && currChar<='Z' ) {
                 sClassName.append((char) (currChar + 32));
             } else {
                 sClassName.append(currChar);
