@@ -41,30 +41,32 @@ public abstract class FieldType {
         return st;
     }
 
+    //单字母_ 前缀忽略
     public static String mapToHumpName(String columnName, boolean firstUpCase) {
-        String sTempName = columnName.toLowerCase();
         int nl = columnName.length();
         int i = 0;
+        //忽略 单字母加下划线的前缀
+        if(nl>2 && columnName.charAt(1) == '_'){
+            i=2;
+        }
 
         StringBuilder sClassName = new StringBuilder();
         boolean upCase = firstUpCase;
         while (i < nl) {
-            if (sTempName.charAt(i) == '_') {
-                if (sClassName.length() == 1) {
-                    sClassName.delete(0, 1);
-                    upCase = firstUpCase;
-                } else {
-                    upCase = true;
-                }
-            } else {
-                if (upCase) {
-                    sClassName.append((char) (sTempName.charAt(i) - 32));
-                    upCase = false;
-                } else {
-                    sClassName.append(sTempName.charAt(i));
-                }
-            }
+            char currChar = columnName.charAt(i);
             i++;
+            if (currChar == '_') {
+                upCase = true;
+                continue;
+            }
+            if (upCase && currChar>='a' && currChar<='z') {
+                sClassName.append((char) (currChar - 32));
+            } else if (currChar>='A' && currChar<='Z' ) {
+                sClassName.append((char) (currChar + 32));
+            } else {
+                sClassName.append(currChar);
+            }
+            upCase = false;
         }
         return sClassName.toString();
     }

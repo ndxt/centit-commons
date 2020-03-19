@@ -14,9 +14,7 @@ import java.util.Map;
 public class TestFromPost {
 
     public static void main(String[] args) {
-
         testUploadFile();
-
     }
 
     public static void testUploadFile() {
