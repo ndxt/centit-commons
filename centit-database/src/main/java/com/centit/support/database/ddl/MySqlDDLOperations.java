@@ -30,18 +30,39 @@ public class MySqlDDLOperations extends GeneralDDLOperations {
     }
 
     @Override
+    protected void appendColumnSQL(final TableField field, StringBuilder sbCreate) {
+        sbCreate.append(field.getColumnName())
+            .append(" ");
+        appendColumnTypeSQL(field, sbCreate);
+        if (field.isMandatory()) {
+            sbCreate.append(" not null");
+        }
+        sbCreate.append(" comment \'"+ field.getFieldLabelName()+"\'");
+    }
+    @Override
     public String makeModifyColumnSql(final String tableCode, final TableField oldColumn, final TableField column) {
         StringBuilder sbsql = new StringBuilder("alter table ");
         sbsql.append(tableCode);
+        Boolean modify=false;
         sbsql.append(" MODIFY COLUMN  ").append(column.getColumnName()).append(" ");
         if (!StringUtils.equalsIgnoreCase(oldColumn.getColumnType(), column.getColumnType())
             || !oldColumn.getMaxLength().equals(column.getMaxLength())
             || !oldColumn.getPrecision().equals(column.getPrecision())) {
             appendColumnTypeSQL(column, sbsql);
+            modify=true;
         }
 
         if (oldColumn.isMandatory() != column.isMandatory()) {
+            if (!modify) {
+                appendColumnTypeSQL(column, sbsql);
+            }
             sbsql.append(column.isMandatory() ? " not null" : " null");
+        }
+        if (oldColumn.getFieldLabelName() != column.getFieldLabelName()) {
+            if (!modify) {
+                appendColumnTypeSQL(column, sbsql);
+            }
+            sbsql.append(" comment \'"+ column.getFieldLabelName()+"\'");
         }
         return sbsql.toString();
     }
