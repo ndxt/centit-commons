@@ -17,7 +17,7 @@ public class TestReflectionOpt {
         Object[] objects = new Object[]{map, map, map};
         System.out.println(
             JSON.toJSONString(ReflectionOpt.attainExpressionValue(objects,
-                ".b")));
+                "[1]b")));
 
 
         //System.out.println(ReflectionOpt.isScalarType(strings.getClass()));

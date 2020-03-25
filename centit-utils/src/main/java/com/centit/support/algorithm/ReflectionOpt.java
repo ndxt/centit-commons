@@ -384,6 +384,19 @@ public abstract class ReflectionOpt {
         return mp;
     }
 
+    private static void innerAddListItem(List<Object> objList, Object obj) {
+        if (obj instanceof Collection) {
+            Collection<?> templist = (Collection<?>) obj;
+            objList.addAll(templist);
+        } else if (obj instanceof Object[]) {
+            Object[] objs = (Object[]) obj;
+            for (Object tobj : objs) {
+                objList.add(tobj);
+            }
+        } else {
+            objList.add(obj);
+        }
+    }
     /**
      * 获得 对象的 属性; 目前只能支持一维数组的获取，多维数据暂时不支持，目前看也没有这个需要
      *
@@ -433,6 +446,23 @@ public abstract class ReflectionOpt {
             //如果是一个标量则不应该再有属性，所以统一返回null
             if (ReflectionOpt.isScalarType(sourceObj.getClass())) {
                 return null;
+            } else if(sourceObj instanceof Collection){
+                Collection<?> objlist = (Collection<?>) sourceObj;
+                int objSize = objlist.size();
+                List<Object> retList = new ArrayList<>(objSize+1);
+                for (Object obj : objlist) {
+                    Object tempObj = attainExpressionValue(obj, fieldValue);
+                    innerAddListItem(retList, tempObj);
+                }
+                retObj = retList;
+            } else if(sourceObj instanceof Object[]){
+                Object[] objs = (Object[]) sourceObj;
+                List<Object> retList = new ArrayList<>(objs.length+1);
+                for (Object obj : objs) {
+                    Object tempObj = attainExpressionValue(obj, fieldValue);
+                    innerAddListItem(retList, tempObj);
+                }
+                retObj = retList;
             } else {
                 retObj = ReflectionOpt.getFieldValue(sourceObj, fieldValue);
             }
@@ -440,55 +470,28 @@ public abstract class ReflectionOpt {
         if (retObj == null)
             return null;
 
-        if (retObj instanceof Collection) {
+        if (nAarrayInd >= 0 && retObj instanceof Collection) {
             Collection<?> objlist = (Collection<?>) retObj;
             int objSize = objlist.size();
-            if (objSize < 1)
+            if (objSize < 1 || nAarrayInd >= objSize) {
                 return null;
-
-            if (nAarrayInd >= 0) {
-                if (nAarrayInd < objSize) {
-                    int i = 0;
-                    for (Object obj : objlist) {
-                        if (nAarrayInd == i) {
-                            return attainExpressionValue(obj, restExpression);
-                        }
-                        i++;
-                    }
-                }
-                return null;
-            } else {
-                Object[] retObjArray = new Object[objSize];
-                int i = 0;
-                for (Object obj : objlist) {
-                    retObjArray[i] = attainExpressionValue(obj, restExpression);
-                    i++;
-                }
-                return retObjArray;
             }
-        } else if (retObj instanceof Object[]) {
+            int i = 0;
+            for (Object obj : objlist) {
+                if (nAarrayInd == i) {
+                    retObj = obj;
+                }
+                i++;
+            }
+        } else if (nAarrayInd >= 0 && retObj instanceof Object[]) {
             Object[] objs = (Object[]) retObj;
             int objSize = objs.length;
-            if (objSize < 1) {
+            if (objSize < 1 || nAarrayInd >= objSize) {
                 return null;
             }
-            if (nAarrayInd >= 0) {
-                if (nAarrayInd < objSize) {
-                    return attainExpressionValue(objs[nAarrayInd], restExpression);
-                }
-                return null;
-            } else {
-                Object[] retObjArray = new Object[objSize];
-                int i = 0;
-                for (Object obj : objs) {
-                    retObjArray[i] = attainExpressionValue(obj, restExpression);
-                    i++;
-                }
-                return retObjArray;
-            }
-        } else {
-            return attainExpressionValue(retObj, restExpression);
+            retObj = objs[nAarrayInd];
         }
+        return attainExpressionValue(retObj, restExpression);
     }
 
     /*
