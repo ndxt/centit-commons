@@ -1,19 +1,26 @@
 package com.centit.test;
 
+import com.alibaba.fastjson.JSON;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.Lunar;
 import com.centit.support.algorithm.ReflectionOpt;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Map;
 
 public class TestReflectionOpt {
     public static void main(String arg[]) {
 
-        String[] strings = new String[]{"1", "2", "3", "5"};
-        Object[] objects = new Object[]{"1", strings, 3};
-        System.out.println(ReflectionOpt.attainExpressionValue(objects, "..."));
-        System.out.println(ReflectionOpt.isScalarType(strings.getClass()));
+        Map<String, Object> map = CollectionsOpt.createHashMap("adb",1,"b",2);
+        Object[] objects = new Object[]{map, map, map};
+        System.out.println(
+            JSON.toJSONString(ReflectionOpt.attainExpressionValue(objects,
+                ".b")));
+
+
+        //System.out.println(ReflectionOpt.isScalarType(strings.getClass()));
         System.out.println(String.class.getPackage().getName());
 
         for (Field field : Lunar.class.getDeclaredFields()) {

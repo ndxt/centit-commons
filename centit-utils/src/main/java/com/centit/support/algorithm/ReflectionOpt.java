@@ -406,7 +406,8 @@ public abstract class ReflectionOpt {
                 restExpression = expression.substring(nPos + 1);
             }
         } else if (nPos == 0) {
-            return attainExpressionValue(sourceObj, expression.substring(1));
+            fieldValue = "";
+            restExpression = expression.substring(1);
         } else {
             fieldValue = expression.trim();
         }
