@@ -251,7 +251,7 @@ public abstract class FieldType {
             case INTEGER:
                 return "INT";
             case LONG:
-                return "BIG INT";
+                return "BIGINT";
             case MONEY:
                 return "DECIMAL(30,4)";
             case FLOAT:
@@ -408,7 +408,7 @@ public abstract class FieldType {
             return Integer.class;
         } else if (FieldType.DOUBLE.equalsIgnoreCase(columnType)) {
             return Double.class;
-        } else if ("BIG INT".equalsIgnoreCase(columnType) ||
+        } else if ("BIGINT".equalsIgnoreCase(columnType) ||
             FieldType.LONG.equalsIgnoreCase(columnType)) {
             return Long.class;
         } else if (FieldType.JSON_OBJECT.equalsIgnoreCase(columnType)) {
@@ -543,7 +543,7 @@ public abstract class FieldType {
         } else if ("DOUBLE".equalsIgnoreCase(columnType)) {
             return FieldType.DOUBLE;
         }
-        if ("BIG INT".equalsIgnoreCase(columnType)) {
+        if ("BIGINT".equalsIgnoreCase(columnType)) {
             return FieldType.LONG;
         }
         if ("INT".equalsIgnoreCase(columnType)) {
