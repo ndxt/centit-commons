@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * 提供一些反射方面缺失功能的封装.
@@ -442,6 +443,9 @@ public abstract class ReflectionOpt {
             @SuppressWarnings("unchecked")
             Map<String, Object> objMap = (Map<String, Object>) sourceObj;
             retObj = objMap.get(fieldValue);
+            if(retObj instanceof Supplier){
+                retObj = ((Supplier)retObj).get();
+            }
         } else {
             //如果是一个标量则不应该再有属性，所以统一返回null
             if (ReflectionOpt.isScalarType(sourceObj.getClass())) {
@@ -465,6 +469,9 @@ public abstract class ReflectionOpt {
                 retObj = retList;
             } else {
                 retObj = ReflectionOpt.getFieldValue(sourceObj, fieldValue);
+                if(retObj instanceof Supplier){
+                    retObj = ((Supplier)retObj).get();
+                }
             }
         }
         if (retObj == null)

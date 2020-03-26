@@ -9,15 +9,30 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class TestReflectionOpt {
+
+    public static class MapSupplier implements Supplier<Map<String, Object>> {
+
+        /**
+         * Gets a result.
+         *
+         * @return a result
+         */
+        @Override
+        public Map<String, Object> get() {
+            return CollectionsOpt.createHashMap("a",1,"b",2,"c","hello world");
+        }
+    }
+
     public static void main(String arg[]) {
 
-        Map<String, Object> map = CollectionsOpt.createHashMap("adb",1,"b",2);
+        Map<String, Object> map = CollectionsOpt.createHashMap("adb",1,"b",2, "d", new MapSupplier());
         Object[] objects = new Object[]{map, map, map};
         System.out.println(
             JSON.toJSONString(ReflectionOpt.attainExpressionValue(objects,
-                "[1]b")));
+                ".[1].d.c")));
 
 
         //System.out.println(ReflectionOpt.isScalarType(strings.getClass()));
