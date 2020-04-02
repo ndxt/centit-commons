@@ -45,6 +45,8 @@ public abstract class JpaMetadata {
                 ORM_JPA_METADATA_TABLENAME.put(mapInfo.getTableName(), mapInfo);
                 ORM_JPA_METADATA_CLASSNAME.put(/*type.getSimpleName()*/
                     className.substring(className.lastIndexOf(".") + 1), mapInfo);
+            } else {
+                logger.error("类："+className + "中没有对应的数据库映射关系信息。");
             }
         }
         return mapInfo;
