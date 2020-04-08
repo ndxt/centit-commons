@@ -31,6 +31,14 @@ public abstract class GeneralAlgorithm {
         return obj == null ? obj3 : obj2;
     }
 
+    /**
+     * return (a == b) || (a != null && a.equals(b));
+     * @see java.util.Objects equals
+     * @param operand an object
+     * @param operand2 an object to be compared with {@code a} for equality
+     * @return {@code true} if the arguments are equal to each other
+     * and {@code false} otherwise
+     */
     public static boolean equals(Object operand, Object operand2) {
         if (operand == operand2) {
             return true;
