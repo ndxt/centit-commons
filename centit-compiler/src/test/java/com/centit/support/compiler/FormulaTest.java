@@ -1,5 +1,6 @@
 package com.centit.support.compiler;
 
+import com.alibaba.fastjson.JSON;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -10,6 +11,7 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
+        System.out.println(JSON.toJSON(null));
         //testFormula();
         //testFormula2();
         testFormula4();
