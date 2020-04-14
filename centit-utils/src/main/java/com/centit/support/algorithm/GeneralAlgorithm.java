@@ -32,7 +32,7 @@ public abstract class GeneralAlgorithm {
     }
 
     /**
-     * return (a == b) || (a != null && a.equals(b));
+     * return (a == b) or (a != null and a.equals(b));
      * @see java.util.Objects equals
      * @param operand an object
      * @param operand2 an object to be compared with {@code a} for equality

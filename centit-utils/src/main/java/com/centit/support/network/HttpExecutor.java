@@ -540,7 +540,6 @@ public abstract class HttpExecutor {
         return httpExecute(executorContext, httpPost);
     }
 
-
     public static String rawPost(HttpExecutorContext executorContext,
                                  String uri, byte[] bytes, final boolean asPutMethod)
         throws IOException {
@@ -557,20 +556,28 @@ public abstract class HttpExecutor {
         return httpExecute(executorContext, httpPost);
     }
 
-
     public static String rawPost(HttpExecutorContext executorContext,
                                  String uri, byte[] bytes)
         throws IOException {
         return rawPost(executorContext, uri, bytes, false);
     }
 
+
     public static String jsonPost(HttpExecutorContext executorContext,
-                                  String uri, String jsonString, final boolean asPutMethod)
+                                  String uri, Object jsonObj, final boolean asPutMethod)
         throws IOException {
+        String jsonString = null;
+        if (jsonObj != null) {
+            if (jsonObj instanceof String) {
+                jsonString = (String) jsonObj;
+            } else {
+                jsonString = JSON.toJSONString(jsonObj);
+            }
+        }
 
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
         httpPost.setHeader("Content-Type", applicationJSONHead);
-        if (jsonString != null && !"".equals(jsonString)) {
+        if (jsonString != null && ! "".equals(jsonString)) {
             StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
             httpPost.setEntity(entity);
         }
@@ -579,54 +586,23 @@ public abstract class HttpExecutor {
     }
 
     public static String jsonPost(HttpExecutorContext executorContext,
-                                  String uri, JSON jsonEntity, final boolean asPutMethod)
-        throws IOException {
-
-        return jsonPost(executorContext,
-            uri, jsonEntity == null ? null : jsonEntity.toJSONString(), asPutMethod);
-    }
-
-    public static String jsonPost(HttpExecutorContext executorContext,
-                                  String uri, Object obj, final boolean asPutMethod)
-        throws IOException {
-        String jsonString = null;
-        if (obj != null) {
-            if (obj instanceof String) {
-                jsonString = (String) obj;
-            } else {
-                jsonString = JSON.toJSONString(obj);
-            }
-        }
-        return jsonPost(executorContext,
-            uri, jsonString, asPutMethod);
-    }
-
-
-    public static String jsonPost(HttpExecutorContext executorContext,
-                                  String uri, String jsonString)
-        throws IOException {
-        return jsonPost(executorContext, uri, jsonString, false);
-    }
-
-
-    public static String jsonPost(HttpExecutorContext executorContext,
                                   String uri, Object obj)
         throws IOException {
         return jsonPost(executorContext, uri, obj, false);
     }
 
 
-    public static String jsonPost(HttpExecutorContext executorContext,
-                                  String uri, JSON jsonEntity)
-        throws IOException {
-        return jsonPost(executorContext, uri, jsonEntity, false);
-    }
-
-
     public static String jsonPut(HttpExecutorContext executorContext,
-                                 String uri, String jsonString)
+                                 String uri, Object jsonObj)
         throws IOException {
-
+        String jsonString = null;
+        if (jsonObj != null) {
+            if (jsonObj instanceof String) {
+                jsonString = (String) jsonObj;
+            } else {
+                jsonString = JSON.toJSONString(jsonObj);
+            }
+        }
         HttpPut httpPut = new HttpPut(uri);
         httpPut.setHeader("Content-Type", applicationJSONHead);
         if (jsonString != null && !"".equals(jsonString)) {
