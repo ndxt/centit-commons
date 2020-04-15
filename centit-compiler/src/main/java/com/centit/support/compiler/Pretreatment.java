@@ -1,9 +1,6 @@
 package com.centit.support.compiler;
 
-import com.alibaba.fastjson.JSON;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.algorithm.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
@@ -166,14 +163,8 @@ public abstract class Pretreatment {
             bp = varTemplate.getCurrPos();
             if (bp - 1 > ep) {
                 String valueName = template.substring(ep, bp - 1);
-                Object obj = varTrans.getVarValue(valueName);
-                if(obj!=null) {
-                    mapString.append(JSON.toJSONString(obj));
-                } else {
-                    if(nullValue!=null){
-                        mapString.append(nullValue);
-                    }
-                }
+                mapString.append( StringBaseOpt.castObjectToString(
+                        varTrans.getVarValue(valueName), nullValue));
                 /*ReflectionOpt.attainExpressionValue(object,valueName)*/
             }
         }

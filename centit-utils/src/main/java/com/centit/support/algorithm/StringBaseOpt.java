@@ -1,5 +1,6 @@
 package com.centit.support.algorithm;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -493,18 +494,27 @@ public abstract class StringBaseOpt {
         if (objValue instanceof byte[]) {
             return new String((byte[]) objValue);
         }
-        if (objValue.getClass().isArray()) {
+        if (objValue instanceof java.util.Date){
+            return DatetimeOpt.convertDatetimeToString((java.util.Date) objValue);
+        }
+        Class<?> clazz = objValue.getClass();
+
+        if (clazz.isEnum()) {
+            return ((Enum<?>) objValue).name();
+        }
+
+        if (ReflectionOpt.isScalarType(clazz)){
+            return objValue.toString();
+        }
+
+        if (clazz.isArray()) {
             int len = Array.getLength(objValue);
             StringBuilder sb = new StringBuilder();
             if (len > 0) {
                 for (int i = 0; i < len; i++) {
                     if (i > 0)
                         sb.append(',');
-                    Object obj = Array.get(objValue, i);
-                    if (obj instanceof java.util.Date)
-                        sb.append(DatetimeOpt.convertDatetimeToString((java.util.Date) obj));
-                    else
-                        sb.append(obj.toString());
+                    sb.append(objectToString(Array.get(objValue, i)));
                 }
                 return sb.toString();
             } else {
@@ -518,18 +528,14 @@ public abstract class StringBaseOpt {
                 if (ov != null) {
                     if (vc > 0)
                         sb.append(",");
-                    if (ov instanceof java.util.Date)
-                        sb.append(DatetimeOpt.convertDatetimeToString((java.util.Date) ov));
-                    else
-                        sb.append(ov.toString());
+                    sb.append(objectToString(ov));
                     vc++;
                 }
             }
             return sb.toString();
-        } else if (objValue instanceof java.util.Date) {
-            return DatetimeOpt.convertDatetimeToString((java.util.Date) objValue);
-        } else
-            return objValue.toString();
+        } else {
+            return JSON.toJSONString(objValue);
+        }
     }
 
     public static String[] objectToStringArray(Object object) {
