@@ -81,7 +81,7 @@ public class JavaBeanField {
         try {
             if (setFieldValueFunc != null) {
                 setFieldValueFunc.invoke(obj, fieldValue);
-            } else {
+            } else if(objectField!=null){
 
                 boolean accessible = objectField.isAccessible();
                 if (!accessible) {
