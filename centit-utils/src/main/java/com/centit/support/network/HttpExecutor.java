@@ -779,22 +779,19 @@ public abstract class HttpExecutor {
     public static String formPostWithFileUpload(HttpExecutorContext executorContext,
                                                 String uri, Map<String, Object> formObjects, Map<String, File> files)
         throws IOException {
-
-
         HttpPost httpPost = new HttpPost(uri);
         httpPost.setHeader("Content-Type", multiPartTypeHead);
-        ContentType contentType = ContentType.create("text/plain",Consts.UTF_8) ;
-
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(BOUNDARY);
+        builder.setMode(HttpMultipartMode.RFC6532);
+
         if (formObjects != null) {
+            ContentType contentType = ContentType.create("text/plain",Consts.UTF_8);
             for (Map.Entry<String, Object> param : formObjects.entrySet()) {
                 builder.addTextBody(param.getKey(),
                     JSONOpt.objectToJSONString(param.getValue()),contentType);
             }
         }
-
-        builder.setMode(HttpMultipartMode.RFC6532);
         if (files != null) {
             for (Map.Entry<String, File> file : files.entrySet()) {
                 builder.addBinaryBody(file.getKey(), file.getValue());
@@ -804,14 +801,11 @@ public abstract class HttpExecutor {
         return httpExecute(executorContext, httpPost);
     }
 
-
     public static String fileUpload(HttpExecutorContext executorContext,
                                     String uri, File file)
         throws IOException {
-
         HttpPost httpPost = new HttpPost(uri);
         httpPost.setHeader("Content-Type", applicationOctetStream);
-
         /*httpPost.setHeader("Content-Type",
                 //ContentType.MULTIPART_FORM_DATA.toString());
                 "multipart/form-data; boundary=" + BOUNDARY);
@@ -824,7 +818,6 @@ public abstract class HttpExecutor {
     public static String fileUpload(HttpExecutorContext executorContext,
                                     String uri, Map<String, Object> formObjects, File file)
         throws IOException {
-
         String paramsUrl = null;
         if (formObjects != null) {
             List<NameValuePair> params = makeRequectParams(formObjects, "");
@@ -850,7 +843,6 @@ public abstract class HttpExecutor {
                                               DoOperateInputStream<T> operate) throws IOException {
 
         HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamToUrl(uri, queryParam));
-
         CloseableHttpClient httpClient = null;
         boolean createSelfClient = executorContext.getHttpclient() == null;
         if (createSelfClient) {
