@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 /**
  * Created by codefan on 17-9-22.
  */
+@SuppressWarnings("unused")
 public class JavaBeanField {
 
     private static final Logger logger = LoggerFactory.getLogger(JavaBeanField.class);
@@ -81,16 +82,17 @@ public class JavaBeanField {
         try {
             if (setFieldValueFunc != null) {
                 setFieldValueFunc.invoke(obj, fieldValue);
-            } else if(objectField!=null){
-
+            } else if(objectField!=null) {
                 boolean accessible = objectField.isAccessible();
                 if (!accessible) {
                     objectField.setAccessible(true);
                 }
                 objectField.set(obj, fieldValue);
                 if (!accessible) {
-                    objectField.setAccessible(accessible);
+                    objectField.setAccessible(false);
                 }
+            } else {
+                logger.error(Object.class.getName() + "没有对应的属性。");
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
             logger.error(e.getMessage(), e);
@@ -183,7 +185,7 @@ public class JavaBeanField {
         try {
             if (getFieldValueFunc != null) {
                 return getFieldValueFunc.invoke(obj);
-            } else {
+            } else if(objectField!=null){
                 boolean accessible = objectField.isAccessible();
                 if (!accessible) {
                     objectField.setAccessible(true);
@@ -193,6 +195,9 @@ public class JavaBeanField {
                     objectField.setAccessible(accessible);
                 }
                 return result;
+            } else {
+                logger.error(Object.class.getName() + "没有对应的属性。");
+                return null;
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
             logger.error(e.getMessage(), e);
