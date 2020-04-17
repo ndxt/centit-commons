@@ -26,6 +26,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -782,16 +783,18 @@ public abstract class HttpExecutor {
 
         HttpPost httpPost = new HttpPost(uri);
         httpPost.setHeader("Content-Type", multiPartTypeHead);
+        ContentType contentType = ContentType.create("text/plain",Consts.UTF_8) ;
 
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(BOUNDARY);
         if (formObjects != null) {
             for (Map.Entry<String, Object> param : formObjects.entrySet()) {
                 builder.addTextBody(param.getKey(),
-                    JSONOpt.objectToJSONString(param.getValue()));
+                    JSONOpt.objectToJSONString(param.getValue()),contentType);
             }
         }
 
+        builder.setMode(HttpMultipartMode.RFC6532);
         if (files != null) {
             for (Map.Entry<String, File> file : files.entrySet()) {
                 builder.addBinaryBody(file.getKey(), file.getValue());
