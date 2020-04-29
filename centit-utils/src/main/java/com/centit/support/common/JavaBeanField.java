@@ -1,5 +1,7 @@
 package com.centit.support.common;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -118,9 +120,11 @@ public class JavaBeanField {
         }
         // 这个专门针对数据库中 保存的 枚举型数据类型
         if (this.fieldType.isEnum()) {
-            this.innerSetObjectFieldValue(object,
-                EnumBaseOpt.ordinalToEnum(this.fieldType,
-                    NumberBaseOpt.castObjectToInteger(newValue)));
+            if(NumberBaseOpt.castObjectToInteger(newValue)!=null) {
+                this.innerSetObjectFieldValue(object,
+                    EnumBaseOpt.ordinalToEnum(this.fieldType,
+                        NumberBaseOpt.castObjectToInteger(newValue)));
+            }
             return;
         }
 
@@ -175,8 +179,15 @@ public class JavaBeanField {
                 this.innerSetObjectFieldValue(object,
                     BooleanBaseOpt.castObjectToBoolean(newValue, false));
                 break;
+            /*case "com.alibaba.fastjson.JSONObject":
+                this.innerSetObjectFieldValue(object,
+                    JSONObject.parseObject((String) newValue));
+                break;*/
             default:
-                this.innerSetObjectFieldValue(object, newValue);
+                this.innerSetObjectFieldValue(object,
+                    JSONObject.toJavaObject(
+                        JSONObject.parseObject(
+                            StringBaseOpt.castObjectToString(newValue)), this.fieldType));
                 break;
         }
     }
