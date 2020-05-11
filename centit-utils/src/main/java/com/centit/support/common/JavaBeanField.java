@@ -1,6 +1,5 @@
 package com.centit.support.common;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.*;
 import org.apache.commons.lang3.StringUtils;
