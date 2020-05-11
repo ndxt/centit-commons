@@ -1,5 +1,6 @@
 package com.centit.test;
 
+import com.centit.support.image.CaptchaImageUtil;
 import com.centit.support.image.ImageOpt;
 
 import javax.imageio.ImageIO;
@@ -10,6 +11,13 @@ import java.util.List;
 
 public class TestImage {
     public static void main(String arg[]) {
+        System.out.println(CaptchaImageUtil.checkcodeMatch("",null));
+        System.out.println(CaptchaImageUtil.checkcodeMatch("hello","hello "));
+        System.out.println(CaptchaImageUtil.checkcodeMatch("hello","Hello"));
+        System.out.println(CaptchaImageUtil.checkcodeMatch("heIL0","Heilo"));
+    }
+
+    public static void testCreateIcon() {
         try {
             BufferedImage image = ImageOpt.createIdIcon("codefan@centit.com", 64, 8);
             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan5.png"));

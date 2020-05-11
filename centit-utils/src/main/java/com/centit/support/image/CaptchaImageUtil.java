@@ -59,15 +59,28 @@ public abstract class CaptchaImageUtil {
         return getRandomString(4);
     }
 
-    public static boolean checkcodeMatch(String session_checkcode, String request_checkcode) {
-        if (request_checkcode == null || session_checkcode == null
-            || "".equals(request_checkcode))
+    public static boolean checkcodeMatch(String sessionCheckcode, String requestCheckcode) {
+        if (requestCheckcode == null || sessionCheckcode == null
+            || "".equals(requestCheckcode)
+            || sessionCheckcode.length() != requestCheckcode.length())
             return false;
-        return session_checkcode.equalsIgnoreCase(
-            request_checkcode.replaceAll("O", "0").replaceAll("o", "0")
+        for (int i = 0; i < sessionCheckcode.length(); i++) {
+            char s = Character.toUpperCase(sessionCheckcode.charAt(i));
+            char r = Character.toUpperCase(requestCheckcode.charAt(i));
+            if (s == r || (r == 'O' && s == '0')
+                || ((r == 'I' || r == 'L') && s == '1')) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+        /*return sessionCheckcode.equalsIgnoreCase(
+            requestCheckcode.replaceAll("O", "0").replaceAll("o", "0")
                 .replaceAll("I", "1").replaceAll("i", "1")
                 .replaceAll("L", "1").replaceAll("l", "1"));
+        */
     }
+
     /*    public static BufferedImage generateCaptchaImage(String captchaKey){
         DefaultKaptcha producer = new DefaultKaptcha();
         producer.setConfig(new Config(new Properties()));
