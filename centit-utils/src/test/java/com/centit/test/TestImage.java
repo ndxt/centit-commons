@@ -13,8 +13,11 @@ public class TestImage {
     public static void main(String arg[]) {
         System.out.println(CaptchaImageUtil.checkcodeMatch("",null));
         System.out.println(CaptchaImageUtil.checkcodeMatch("hello","hello "));
-        System.out.println(CaptchaImageUtil.checkcodeMatch("hello","Hello"));
-        System.out.println(CaptchaImageUtil.checkcodeMatch("heIL0","Heilo"));
+        System.out.println(CaptchaImageUtil.checkcodeMatch("hello","HeL1o"));
+        System.out.println(CaptchaImageUtil.checkcodeMatch("he1lo","HeLLo"));
+        System.out.println(CaptchaImageUtil.checkcodeMatch("he110","Heilo"));
+        System.out.println(CaptchaImageUtil.checkcodeMatch("heIL0","Heil2"));
+        System.out.println(CaptchaImageUtil.checkcodeMatch("heI20","Heilo"));
     }
 
     public static void testCreateIcon() {

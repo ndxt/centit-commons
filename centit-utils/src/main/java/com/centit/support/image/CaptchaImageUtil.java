@@ -67,11 +67,10 @@ public abstract class CaptchaImageUtil {
         for (int i = 0; i < sessionCheckcode.length(); i++) {
             char s = Character.toUpperCase(sessionCheckcode.charAt(i));
             char r = Character.toUpperCase(requestCheckcode.charAt(i));
-            if (s == r || (r == 'O' && s == '0')
-                || ((r == 'I' || r == 'L') && s == '1')) {
-                continue;
+            if (s != r && (r != 'O' || s != '0')
+                 && ((r != 'I' && r != 'L') || s != '1')){
+                return false;
             }
-            return false;
         }
         return true;
         /*return sessionCheckcode.equalsIgnoreCase(
