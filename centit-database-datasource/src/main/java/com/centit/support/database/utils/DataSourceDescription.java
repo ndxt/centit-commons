@@ -37,10 +37,10 @@ public final class DataSourceDescription implements Serializable {
     private String databaseCode;
 
     public DataSourceDescription() {
-        this.maxTotal = 10;
+        this.maxTotal = 20;
         this.maxIdle = 5;
-        this.minIdle = 1;
-        this.initialSize = 3;
+        this.minIdle = 2;
+        this.initialSize = 5;
         this.maxWaitMillis = 10000;
     }
 
@@ -77,9 +77,11 @@ public final class DataSourceDescription implements Serializable {
         desc.setUsername(dbinfo.getUsername());
         desc.setPassword(dbinfo.getClearPassword());
         desc.setDatabaseCode(dbinfo.getDatabaseCode());
-        desc.setMaxIdle(10);
-        desc.setMaxTotal(20);
-        desc.setMaxWaitMillis(20000);
+        desc.setMaxIdle(50);
+        desc.setMaxTotal(100);
+        desc.setMinIdle(5);
+        desc.setInitialSize(10);
+        desc.setMaxWaitMillis(10000);
         return desc;
     }
 
