@@ -780,15 +780,9 @@ public abstract class DatetimeOpt {
     public static java.util.Date smartPraseDate(String sDate) {
         if (sDate == null || "".equals(sDate))
             return null;
-        /*if(StringRegularOpt.isNumber(sDate)){
-            //Pattern.matches("\\d+", sDate)) {
-            return new java.util.Date(NumberBaseOpt.castObjectToLong(
-                StringRegularOpt.trimNumber(sDate)));
-        }*/
-        if(Pattern.matches("\\d+", sDate)) {
+        if(sDate.length()>8 && sDate.length()<14 && Pattern.matches("\\d+", sDate)) {
             return new java.util.Date(Long.parseLong(sDate));
         }
-
         String sTD = StringRegularOpt.trimDateString(sDate);
         int sl = sTD.length();
         switch (sl) {

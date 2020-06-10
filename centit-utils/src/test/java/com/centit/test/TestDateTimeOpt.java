@@ -13,10 +13,15 @@ import java.util.Map;
 
 public class TestDateTimeOpt {
     public static void main(String[] args) {
+        System.out.println(DatetimeOpt.createUtilDate(1980,2,1).getTime());
+        System.out.println(DatetimeOpt.createUtilDate(2200,1,1).getTime());
+        System.out.println(System.currentTimeMillis());
         System.out.println(StringRegularOpt.trimDateString("2020-06-09T09:34:05.790Z"));
-        System.out.println(StringRegularOpt.trimDateString("201906090934051234567"));
-        System.out.println(StringRegularOpt.trimDateString("20190609"));
-        System.out.println(StringRegularOpt.trimDateString("20190609093405"));
+        System.out.println(DatetimeOpt.smartPraseDate("201906090934051234567"));
+        System.out.println(DatetimeOpt.smartPraseDate("20190609"));
+        System.out.println(DatetimeOpt.smartPraseDate("1591772196532"));
+
+        System.out.println(DatetimeOpt.smartPraseDate("20190609093405"));
         System.out.println(DatetimeOpt.smartPraseDate("2020-06-09T09:34:05.790Z"));
 
     }
