@@ -818,7 +818,7 @@ public abstract class DatetimeOpt {
             case 23:
                 java.util.Date date = convertStringToDate(sTD, "yyyy-MM-dd HH:mm:ss.SSS");
                 //加上时区
-                if(sDate.charAt(10)=='T'){
+                if(date !=null && sDate.charAt(10)=='T'){
                     date.setTime(date.getTime() + TimeZone.getDefault().getRawOffset() );
                 }
                 return date;
