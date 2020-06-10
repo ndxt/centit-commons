@@ -834,8 +834,6 @@ public abstract class DatetimeOpt {
         String str = StringBaseOpt.objectToString(obj);
         if (StringUtils.isBlank(str)) {
             return null;
-        } else if (Pattern.matches("\\d+", str)) {
-            return new Date(Long.parseLong(str));
         } else {
             return DatetimeOpt.smartPraseDate(str);
         }
