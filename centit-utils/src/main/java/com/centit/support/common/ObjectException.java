@@ -1,6 +1,8 @@
 package com.centit.support.common;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * An exception that is thrown by classes wanting to trap unique
  * constraint violations.  This is used to wrap Spring's
@@ -120,7 +122,8 @@ public class ObjectException extends RuntimeException {
 
     public static String extortExceptionMessage(Throwable ex) {
         String originErrMessage = ex.getMessage();
-        StringBuilder errorMsg = new StringBuilder(originErrMessage==null?"未知错误("+ex.getClass().getName()+")":originErrMessage);
+        StringBuilder errorMsg = new StringBuilder(StringUtils.isBlank(originErrMessage) ?
+                    "未知错误("+ex.getClass().getName()+")":originErrMessage);
         StackTraceElement[] traces = ex.getStackTrace();
         if (traces != null) {
             int len = traces.length > 15 ? 15 : traces.length;
