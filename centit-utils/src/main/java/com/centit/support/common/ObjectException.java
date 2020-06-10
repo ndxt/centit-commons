@@ -119,7 +119,8 @@ public class ObjectException extends RuntimeException {
     }
 
     public static String extortExceptionMessage(Throwable ex) {
-        StringBuilder errorMsg = new StringBuilder(ex.getMessage());
+        String originErrMessage = ex.getMessage();
+        StringBuilder errorMsg = new StringBuilder(originErrMessage==null?"未知错误(猜测：null point exception)":originErrMessage);
         StackTraceElement[] traces = ex.getStackTrace();
         if (traces != null) {
             int len = traces.length > 15 ? 15 : traces.length;
