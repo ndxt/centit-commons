@@ -6,55 +6,18 @@ import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.UrlOptUtils;
 
 import java.time.Instant;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TestDateTimeOpt {
     public static void main(String[] args) {
-
-        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.currentUtilDate()));
-
-        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
-            DatetimeOpt.currentUtilDate(),1)));
-
-        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
-            DatetimeOpt.currentUtilDate(),2)));
-
-        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
-            DatetimeOpt.currentUtilDate(),3)));
-        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
-            DatetimeOpt.currentUtilDate(),-1)));
-
-        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
-            DatetimeOpt.currentUtilDate(),-2)));
-        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
-            DatetimeOpt.currentUtilDate(),-3)));
-
-        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
-            DatetimeOpt.currentUtilDate(),-50)));
-        System.out.println(DatetimeOpt.convertDateToSmartString(DatetimeOpt.addDays(
-            DatetimeOpt.currentUtilDate(),-500)));
-
-        System.out.println(DatetimeOpt.truncateToWeek(DatetimeOpt.currentUtilDate()));
-
-        System.out.println(DatetimeOpt.seekEndOfWeek(DatetimeOpt.currentUtilDate()));
-        System.out.println(DatetimeOpt.seekEndOfWeek(DatetimeOpt.createUtilDate(2019, 4, 7)));
-        System.out.println(DatetimeOpt.truncateToWeek(DatetimeOpt.createUtilDate(2019, 4, 8)));
-        System.out.println(DatetimeOpt.seekEndOfWeek(DatetimeOpt.createUtilDate(2019, 4, 12)));
-        System.out.println(DatetimeOpt.truncateToWeek(DatetimeOpt.createUtilDate(2019, 4, 13)));
-        System.out.println(DatetimeOpt.seekEndOfWeek(DatetimeOpt.createUtilDate(2019, 4, 14)));
-        System.out.println(DatetimeOpt.seekEndOfMonth(DatetimeOpt.currentUtilDate()));
-        System.out.println(DatetimeOpt.seekEndOfYear(DatetimeOpt.currentUtilDate()));
-
-        System.out.println(DatetimeOpt.calcSpanDays(
-            DatetimeOpt.smartPraseDate("2018-6-1"), DatetimeOpt.smartPraseDate("2018-6-2")));
-        System.out.println(DatetimeOpt.calcSpanDays(
-            DatetimeOpt.createUtilDate(2018, 6, 1), DatetimeOpt.createUtilDate(2018, 6, 2)));
-
-
-        //return addDays(truncateToMonth( addMonths(date,1) ),-1);
-        System.out.println(DatetimeOpt.convertDateToString(
-            DatetimeOpt.seekEndOfYear(DatetimeOpt.createUtilDate(2018, 7, 1))));
+        System.out.println(StringRegularOpt.trimDateString("2020-06-09T09:34:05.790Z"));
+        System.out.println(StringRegularOpt.trimDateString("201906090934051234567"));
+        System.out.println(StringRegularOpt.trimDateString("20190609"));
+        System.out.println(StringRegularOpt.trimDateString("20190609093405"));
+        System.out.println(DatetimeOpt.smartPraseDate("2020-06-09T09:34:05.790Z"));
 
     }
 

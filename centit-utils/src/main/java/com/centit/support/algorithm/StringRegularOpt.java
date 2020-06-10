@@ -400,61 +400,61 @@ public abstract class StringRegularOpt {
         return b;
     }
 
+    private static boolean appendDatePart(StringBuilder sDate, StringBuilder sDatePart, int part){
+        if(sDatePart.length()<1) {
+            return false;
+        }
+        if (part > 0 && part < 3)
+            sDate.append('-');
+        else if (part == 3)
+            sDate.append(' ');
+        else if (part > 3 && part < 6)
+            sDate.append(':');
+        else if (part == 6)
+            sDate.append('.');
+
+        if (sDatePart.length() == 1) {
+            sDate.append('0');
+        }
+        sDate.append(sDatePart);
+        return true;
+    }
     public static String trimDateString(String szDateStr) {
         if (szDateStr == null)
             return null;
         int sl = szDateStr.length();
-        StringBuilder sB = new StringBuilder();
-        String sTmp2 = "";
+        StringBuilder sB = new StringBuilder(25);
+        StringBuilder datePart = new StringBuilder(5);
         int nPart = 0;
         boolean bDot = false;
         boolean hasYearPart = false;
         for (int j = 0; j < sl; j++) {
             if (szDateStr.charAt(j) >= '0' && szDateStr.charAt(j) <= '9') {
                 if (bDot) {
-                    if (!"".equals(sTmp2)) {
-                        if (nPart > 0 && nPart < 3)
-                            sB.append('-');
-                        else if (nPart == 3)
-                            sB.append(' ');
-                        else if (nPart > 3 && nPart < 6)
-                            sB.append(':');
+                    if (appendDatePart(sB, datePart, nPart)) {
                         nPart++;
-                        if (sTmp2.length() == 1) {
-                            sB.append('0');
-                        }
-                        if (sTmp2.length() > 0)
-                            sB.append(sTmp2);
-                        sTmp2 = "";
                     }
                     bDot = false;
+                    datePart.setLength(0);
                 }
-                if (nPart >= 6)
+                if (nPart > 6)
                     break;
-                sTmp2 = sTmp2 + szDateStr.charAt(j);
-                if ((hasYearPart || nPart > 3) && (sTmp2.length() == 2 || sTmp2.charAt(0) > '5')) {
-                    bDot = true;
-                } else if ((nPart < 3 && sTmp2.length() == 4)) {
+                datePart.append(szDateStr.charAt(j));
+                int partLen = datePart.length();
+                if( ! hasYearPart && nPart <= 3 && partLen == 4){
                     hasYearPart = true;
+                    bDot = true;
+                } else if( (hasYearPart || nPart>3) && nPart <6 && partLen == 2){
+                    bDot = true;
+                } else if( nPart ==6 && partLen == 3){
                     bDot = true;
                 }
             } else { //if(! sTmp2.equals(""))
                 bDot = true;
             }
         }
-        if (!"".equals(sTmp2)) {
-            if (nPart > 0 && nPart < 3)
-                sB.append('-');
-            else if (nPart == 3)
-                sB.append(' ');
-            else if (nPart > 3 && nPart < 6)
-                sB.append(':');
-            if (sTmp2.length() == 1) {
-                sB.append('0');
-            }
-            if (sTmp2.length() > 0)
-                sB.append(sTmp2);
-        }
+        appendDatePart(sB, datePart, nPart);
+
         return sB.toString();
     }
 
