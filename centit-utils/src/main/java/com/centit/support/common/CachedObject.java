@@ -12,7 +12,7 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
     private static Log logger = LogFactory.getLog(CachedObject.class);
 
     private Supplier<T> refresher;
-    private long freshPeriod;
+    protected long freshPeriod;
 
     public CachedObject() {
     }
@@ -61,7 +61,7 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
         this.freshPeriod = freshPeriod;
     }
 
-    private synchronized void refreshData() {
+    protected synchronized void refreshData() {
         //刷新派生缓存
         evictDerivativeCahce();
         T tempTarget = null;
