@@ -84,7 +84,7 @@ public class QueryAndParams {
     public static QueryAndParams createFromQueryAndNamedParams(String sql, Map<String, Object> namedParams) {
 
         StringBuilder sqlb = new StringBuilder();
-        List<Object> params = new ArrayList<Object>(namedParams.size() + 5);
+        List<Object> params = new ArrayList<>(namedParams.size() + 5);
         Lexer lex = new Lexer(sql, Lexer.LANG_TYPE_SQL);
 
         int prePos = 0;
