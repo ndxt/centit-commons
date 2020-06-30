@@ -22,10 +22,6 @@ public class ConnectThreadHolder {
         return wrapper;
     }
 
-    public static void setConnectThreadWrapper(ConnectThreadWrapper wrapper) {
-        threadLocal.set(wrapper);
-    }
-
     public static Connection fetchConnect(DataSourceDescription description) throws SQLException {
         ConnectThreadWrapper wrapper = getConnectThreadWrapper();
         return wrapper.fetchConnect(description);
@@ -33,22 +29,6 @@ public class ConnectThreadHolder {
 
     public static Connection fetchConnect(IDatabaseInfo description) throws SQLException {
         return fetchConnect(DataSourceDescription.valueOf(description));
-    }
-
-    public static void commit() throws SQLException {
-        ConnectThreadWrapper wrapper = getConnectThreadWrapper();
-        wrapper.commitAllWork();
-    }
-
-    public static void rollback() throws SQLException {
-        ConnectThreadWrapper wrapper = getConnectThreadWrapper();
-        wrapper.rollbackAllWork();
-    }
-
-    public static void release() {
-        ConnectThreadWrapper wrapper = getConnectThreadWrapper();
-        wrapper.releaseAllConnect();
-        threadLocal.superRemove();
     }
 
     public static void commitAndRelease() throws SQLException {
