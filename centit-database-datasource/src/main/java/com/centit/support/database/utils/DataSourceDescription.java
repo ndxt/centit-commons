@@ -1,5 +1,6 @@
 package com.centit.support.database.utils;
 
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.database.metadata.IDatabaseInfo;
 import com.centit.support.xml.IgnoreDTDEntityResolver;
@@ -22,7 +23,7 @@ import java.sql.SQLException;
  * @author codefan
  */
 public final class DataSourceDescription implements Serializable {
-    protected static final Logger logger = LoggerFactory.getLogger(DataSourceDescription.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataSourceDescription.class);
     private static final long serialVersionUID = 1L;
     private String connUrl;
     private String username;
@@ -77,11 +78,17 @@ public final class DataSourceDescription implements Serializable {
         desc.setUsername(dbinfo.getUsername());
         desc.setPassword(dbinfo.getClearPassword());
         desc.setDatabaseCode(dbinfo.getDatabaseCode());
-        desc.setMaxIdle(50);
-        desc.setMaxTotal(100);
-        desc.setMinIdle(5);
-        desc.setInitialSize(10);
-        desc.setMaxWaitMillis(10000);
+
+        desc.setMaxIdle(NumberBaseOpt.castObjectToInteger(
+            dbinfo.getExtProp("maxIdle"),50));
+        desc.setMaxTotal(NumberBaseOpt.castObjectToInteger(
+            dbinfo.getExtProp("maxTotal"),100));
+        desc.setMinIdle(NumberBaseOpt.castObjectToInteger(
+            dbinfo.getExtProp("minIdle"),5));
+        desc.setInitialSize(NumberBaseOpt.castObjectToInteger(
+            dbinfo.getExtProp("initialSize"),10));
+        desc.setMaxWaitMillis(NumberBaseOpt.castObjectToInteger(
+            dbinfo.getExtProp("maxWaitMillis"),10000));
         return desc;
     }
 
@@ -201,10 +208,8 @@ public final class DataSourceDescription implements Serializable {
         SAXReader builder = new SAXReader(false);
         builder.setValidation(false);
         builder.setEntityResolver(new IgnoreDTDEntityResolver());
-
         Document doc;
         Element bean;
-
         try {
             if (sConfFile.indexOf(':') >= 0) {
                 if (sConfFile.startsWith("classpath:")) {

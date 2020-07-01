@@ -10,8 +10,34 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum DBType {
-    Unknown, SqlServer, Oracle, DB2, Access, MySql, H2, PostgreSql, DM, KingBase, GBase, Oscar;
+    Unknown(false), SqlServer(true),Oracle(true),
+    DB2(true), Access(true),MySql(true),
+    H2(true), PostgreSql(true),DM(true),
+    KingBase(true), GBase(true), Oscar(true);
+
+
     protected static final Logger logger = LoggerFactory.getLogger(DBType.class);
+    private boolean isRelationalDatabase;
+    DBType(boolean isRmdb){
+        this.isRelationalDatabase = isRmdb;
+    }
+
+    public boolean isRmdb(){
+        return isRelationalDatabase;
+    }
+
+    @Override
+    public String toString() {
+        return DBType.getDBTypeName(this);
+    }
+
+    public boolean isMadeInChina() {
+        return DBType.DM.equals(this)
+            || DBType.KingBase.equals(this)
+            || DBType.GBase.equals(this)
+            || DBType.Oscar.equals(this);
+    }
+
     private static HashMap<DBType, String> dbDrivers = new HashMap<DBType, String>() {
         {
             put(Oracle, "oracle.jdbc.driver.OracleDriver");
@@ -212,17 +238,5 @@ public enum DBType {
             default:
                 return "unknown";
         }
-    }
-
-    @Override
-    public String toString() {
-        return DBType.getDBTypeName(this);
-    }
-
-    public boolean isMadeInChina() {
-        return DBType.DM.equals(this)
-            || DBType.KingBase.equals(this)
-            || DBType.GBase.equals(this)
-            || DBType.Oscar.equals(this);
     }
 }
