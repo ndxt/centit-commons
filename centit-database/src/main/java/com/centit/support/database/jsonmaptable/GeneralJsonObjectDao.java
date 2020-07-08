@@ -439,16 +439,21 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             boolean beGroup = false;
             String groupName="nog";
             String optSuffix = "none";
+            int pos = 3;
             if(strlen>3) {
                 if ((plCol.charAt(0) == 'g' || plCol.charAt(0) == 'G') &&
-                    plCol.charAt(1) >= '0' && plCol.charAt(1) <= '9' && plCol.charAt(2) == '_') {
+                    plCol.charAt(1) >= '0' && plCol.charAt(1) <= '9' &&
+                    (plCol.charAt(2) == '_' || plCol.charAt(3) == '_')) {
                     groupName = "g" + plCol.charAt(1);
                     beGroup = true;
+                    if (plCol.charAt(3) == '_') {
+                        pos = 4;
+                    }
                 }
                 optSuffix = plCol.substring(strlen - 3).toLowerCase();
             }
             String propName = beGroup ?
-                (optSuffix.charAt(0)=='_'? plCol.substring(3,strlen- 3) : plCol.substring(3)) :
+                (optSuffix.charAt(0)=='_'? plCol.substring(pos,strlen- 3) : plCol.substring(pos)) :
                 (optSuffix.charAt(0)=='_'? plCol.substring(0,strlen- 3) : plCol);
 
             TableField col = ti.findFieldByName(propName);
