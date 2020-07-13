@@ -158,6 +158,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
      * @param ti     TableInfo
      * @param fields String 值返回对应的字段
      * @param alias  String
+     * @param withPk 是否添加主键
      * @return Pair String String []
      */
     public static String buildPartFieldSql(TableInfo ti, Collection<String> fields, String alias, boolean withPk) {
@@ -248,6 +249,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
      * @param ti     TableInfo
      * @param fields String 值返回对应的字段
      * @param alias  String
+     * @param withPk 是否添加主键
      * @return Pair String String []
      */
     public static Pair<String, TableField[]> buildPartFieldSqlWithFields(
