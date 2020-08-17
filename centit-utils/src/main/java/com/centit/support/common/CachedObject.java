@@ -14,9 +14,9 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
 
     private Supplier<T> refresher;
     protected long freshPeriod;
-    private ReentrantLock freshLock;
+    private ReentrantLock freshLock=new ReentrantLock();
     public CachedObject() {
-        freshLock = new ReentrantLock();
+
     }
 
     public CachedObject(Supplier<T> refresher) {
