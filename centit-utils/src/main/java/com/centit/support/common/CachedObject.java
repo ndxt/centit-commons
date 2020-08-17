@@ -5,6 +5,7 @@ import com.centit.support.algorithm.DatetimeOpt;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 public class CachedObject<T> extends AbstractCachedObject<T> {
@@ -13,8 +14,9 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
 
     private Supplier<T> refresher;
     protected long freshPeriod;
-
+    private ReentrantLock freshLock;
     public CachedObject() {
+        freshLock = new ReentrantLock();
     }
 
     public CachedObject(Supplier<T> refresher) {
@@ -61,7 +63,10 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
         this.freshPeriod = freshPeriod;
     }
 
-    protected synchronized void refreshData() {
+    protected void refreshData() {
+        if(freshLock.isLocked())
+            return;
+        freshLock.lock();
         //刷新派生缓存
         evictDerivativeCahce();
         T tempTarget = null;
@@ -71,6 +76,7 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
             logger.error(re.getMessage(), re);
         }
         setRefreshDataAndState(tempTarget, freshPeriod, true);
+        freshLock.unlock();
     }
 
     public T getCachedTarget() {

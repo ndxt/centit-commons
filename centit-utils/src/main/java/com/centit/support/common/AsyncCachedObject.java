@@ -19,7 +19,7 @@ public class  AsyncCachedObject<T> extends CachedObject<T>  {
         super(refresher, freshPeriod);
         //asyncRefreshData();
     }
-
+    // 这个地方可能有锁定的问题
     private void asyncRefreshData(){
         this.evicted = false;
         this.refreshTime =
@@ -30,11 +30,19 @@ public class  AsyncCachedObject<T> extends CachedObject<T>  {
         t.start();
     }
 
-    @Override
-    public T getCachedTarget(){
+    public T ensureGetCachedTarget(){
         if(this.target == null){// || isTargetOutOfDate(freshPeriod)){
             refreshData();
         } else if(isTargetOutOfDate(freshPeriod)){
+            asyncRefreshData();
+        }
+        return target;
+    }
+
+
+    @Override
+    public T getCachedTarget(){
+        if(this.target == null || isTargetOutOfDate(freshPeriod)){
             asyncRefreshData();
         }
         return target;
