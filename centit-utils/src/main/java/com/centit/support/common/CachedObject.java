@@ -14,17 +14,7 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
 
     private Supplier<T> refresher;
     protected long freshPeriod;
-    private ReentrantLock freshLock=new ReentrantLock();
-    public CachedObject() {
-
-    }
-
-    public CachedObject(Supplier<T> refresher) {
-        this.target = null;
-        this.evicted = true;
-        this.refresher = refresher;
-        this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
-    }
+    private ReentrantLock freshLock;
 
     /**
      * @param refresher   重新获取代码的接口
@@ -33,27 +23,31 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
     public CachedObject(Supplier<T> refresher, long freshPeriod) {
         this.target = null;
         this.evicted = true;
+        this.freshLock=new ReentrantLock();
+
         this.refresher = refresher;
         this.freshPeriod = freshPeriod;
     }
 
+    public CachedObject() {
+        this(null, ICachedObject.NOT_REFRESH_PERIOD);
+    }
+
+
+    public CachedObject(Supplier<T> refresher) {
+        this(refresher, ICachedObject.NOT_REFRESH_PERIOD);
+    }
 
     public CachedObject(Supplier<T> refresher, AbstractCachedObject<?> parentCache) {
-        this.target = null;
-        this.evicted = true;
-        this.refresher = refresher;
+        this(refresher, ICachedObject.NOT_REFRESH_PERIOD);
         parentCache.addDeriveCache(this);
-        this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
     }
 
     public CachedObject(Supplier<T> refresher, AbstractCachedObject<?>[] parentCaches) {
-        this.target = null;
-        this.evicted = true;
-        this.refresher = refresher;
+        this(refresher, ICachedObject.NOT_REFRESH_PERIOD);
         for (AbstractCachedObject<?> parentCache : parentCaches) {
             parentCache.addDeriveCache(this);
         }
-        this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
     }
 
     /**

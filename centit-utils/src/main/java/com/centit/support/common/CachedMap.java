@@ -23,13 +23,6 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     private long freshPeriod;
     private Function<K, T> refresher;
 
-    public CachedMap() {
-        this.targetMap = new ConcurrentHashMap<>(16);
-        this.refresher = null;
-        this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
-    }
-
-
     /**
      * 构造函数
      *
@@ -45,11 +38,13 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
         this.freshPeriod = freshPeriod;
     }
 
+    public CachedMap() {
+        this(null,  ICachedObject.NOT_REFRESH_PERIOD, 16);
+    }
+
     public CachedMap(Function<K, T> refresher, AbstractCachedObject<?> parentCache, int initialCapacity) {
-        this.targetMap = new ConcurrentHashMap<>(initialCapacity);
-        this.refresher = refresher;
+        this(refresher,  ICachedObject.NOT_REFRESH_PERIOD, initialCapacity);
         parentCache.addDeriveCache(this);
-        this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
     }
 
     /**
