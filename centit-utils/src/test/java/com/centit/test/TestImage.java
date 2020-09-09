@@ -1,9 +1,9 @@
 package com.centit.test;
 
-import com.centit.support.image.CaptchaImageUtil;
 import com.centit.support.image.ImageOpt;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,25 +11,29 @@ import java.util.List;
 
 public class TestImage {
     public static void main(String arg[]) {
-        System.out.println(CaptchaImageUtil.checkcodeMatch("",null));
+        testCreateIcon();
+        /*System.out.println(CaptchaImageUtil.checkcodeMatch("",null));
         System.out.println(CaptchaImageUtil.checkcodeMatch("hello","hello "));
         System.out.println(CaptchaImageUtil.checkcodeMatch("hello","HeL1o"));
         System.out.println(CaptchaImageUtil.checkcodeMatch("he1lo","HeLLo"));
         System.out.println(CaptchaImageUtil.checkcodeMatch("he110","Heilo"));
         System.out.println(CaptchaImageUtil.checkcodeMatch("heIL0","Heil2"));
         System.out.println(CaptchaImageUtil.checkcodeMatch("heI20","Heilo"));
-    }
+*/    }
 
     public static void testCreateIcon() {
         try {
-            BufferedImage image = ImageOpt.createIdIcon("codefan@centit.com", 64, 8);
-            ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan5.png"));
+            BufferedImage image = ImageOpt.createNameIcon("杨淮生印", 64, new Color(0,0,255), true);
+            ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/杨.png"));
 
-            image = ImageOpt.createIdIcon("codefan@centit.com", 60, 12);
-            ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan6.png"));
+            image = ImageOpt.createNameIcon("杨淮生", 64, new Color(0,0,255), true);
+            ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/杨2.png"));
 
-            image = ImageOpt.createIdIcon("codefan@centit.com", 80, 8);
-            ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/codefan7.png"));
+            image = ImageOpt.createNameIcon("杨淮生印", 32, new Color(0,0,255), true);
+            ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/杨3.png"));
+
+            image = ImageOpt.createNameIcon("杨淮生", 32, new Color(0,0,255), true);
+            ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/杨4.png"));
 
         } catch (IOException e) {
             //e.printStackTrace();
