@@ -233,8 +233,8 @@ public abstract class ImageOpt {
         g.setColor(wordColor);
         int strLen = word.length()>=4 ? 4 : 1;
         int edgeWidth = withEdge?imageSize / 20:0;
-        int fontSize = strLen>1 ? imageSize / 2 - edgeWidth - imageSize / 8
-             : imageSize - edgeWidth * 2 - imageSize / 8 ;
+        int fontSize = strLen>1 ? (imageSize / 2 - edgeWidth) * 15/ 16
+             : (imageSize - edgeWidth * 2) * 15/ 16 ;
         g.setFont(new Font("楷体", Font.BOLD, fontSize));
         if(withEdge){
             g.setStroke(new BasicStroke(edgeWidth));
@@ -243,12 +243,12 @@ public abstract class ImageOpt {
                 imageSize / 3, imageSize / 3);
         }
         if(strLen<4) {
-            g.drawString(word.substring(0,1), edgeWidth + imageSize / 16, (imageSize - 2* edgeWidth) * 5 / 6 + edgeWidth);
+            g.drawString(word.substring(0,1), edgeWidth, imageSize * 15/16 - edgeWidth * 2);
         } else {
-            g.drawString(word.substring(0,1), edgeWidth + imageSize /16 , imageSize / 2 - edgeWidth);
-            g.drawString(word.substring(1,2), edgeWidth + imageSize / 20 + (imageSize - edgeWidth * 2) / 2, imageSize / 2 - edgeWidth);
-            g.drawString(word.substring(2,3), edgeWidth + imageSize / 16, imageSize * 15/16 - edgeWidth * 2);
-            g.drawString(word.substring(3,4), edgeWidth + imageSize / 20 + (imageSize - edgeWidth * 2) / 2, imageSize * 15/16 - edgeWidth * 2);
+            g.drawString(word.substring(0,1), edgeWidth, imageSize / 2 - edgeWidth);
+            g.drawString(word.substring(1,2), imageSize / 2, imageSize / 2 - edgeWidth);
+            g.drawString(word.substring(2,3), edgeWidth, imageSize * 15/16 - edgeWidth * 2);
+            g.drawString(word.substring(3,4), imageSize / 2, imageSize * 15/16 - edgeWidth * 2);
         }
 
         return image;
