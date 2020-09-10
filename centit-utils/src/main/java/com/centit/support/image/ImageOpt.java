@@ -221,9 +221,13 @@ public abstract class ImageOpt {
     }
 
     public static BufferedImage createNameIcon(String word, int imageSize, Color wordColor, boolean withEdge) {
+
         BufferedImage image = new BufferedImage(imageSize, imageSize,
-            BufferedImage.TYPE_INT_RGB);
+            BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D graphics2d = image.createGraphics();
+        image = graphics2d.getDeviceConfiguration().createCompatibleImage(imageSize, imageSize, Transparency.TRANSLUCENT);
         Graphics2D g = image.createGraphics();
+        //这段代码觉得怪怪的
         g.setColor(wordColor);
         int strLen = word.length()>=4 ? 4 : 1;
         int edgeWidth = withEdge?imageSize / 20:0;
@@ -242,6 +246,7 @@ public abstract class ImageOpt {
             g.drawString(word.substring(2,3), edgeWidth + imageSize / 16, imageSize * 15/16 - edgeWidth * 2);
             g.drawString(word.substring(3,4), edgeWidth + imageSize / 20 + (imageSize - edgeWidth * 2) / 2, imageSize * 15/16 - edgeWidth * 2);
         }
+
         return image;
     }
 }
