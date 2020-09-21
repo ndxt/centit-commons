@@ -684,6 +684,10 @@ public abstract class CollectionsOpt {
         return obj;
     }
 
+    /**
+     * @param object map的key必须是string类型否则会报错
+     * @return 返回map
+     */
     public static Map<String, Object> objectToMap(Object object) {
         if (object instanceof Map) {
             return (Map<String, Object>) object;
@@ -712,6 +716,31 @@ public abstract class CollectionsOpt {
             return (JSONObject) obj;
         }
         return CollectionsOpt.createHashMap("data", object);
+    }
+
+    public static List<Object> objectToList(Object object) {
+        if(object instanceof List){
+            return (List<Object>)object;
+        } else if(object instanceof Collection){
+            Collection<?> collection = (Collection<?>)object;
+            List<Object> objlist = new ArrayList<>(collection.size());
+            objlist.addAll(collection);
+            return objlist;
+        } else {
+            Class<?> clazz = object.getClass();
+            if (clazz.isArray()) {
+                int len = Array.getLength(object);
+                List<Object> objlist = new ArrayList<>(len);
+                if (len > 0) {
+                    for (int i = 0; i < len; i++) {
+                        objlist.add(Array.get(object, i));
+                    }
+                }
+                return objlist;
+            } else {
+                return createList(object);
+            }
+        }
     }
 
     public static Map<String, String> objectMapToStringMap(Map<? extends Object, ? extends Object> objectMap) {
