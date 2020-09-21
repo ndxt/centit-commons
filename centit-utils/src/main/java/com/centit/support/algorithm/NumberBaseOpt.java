@@ -21,6 +21,7 @@ public abstract class NumberBaseOpt {
     final static private String CNum[] = {"零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"};
     final static private String CNum2[] = {"〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"};
     final static private String CBit[] = {"", "拾", "佰", "仟"};
+    final static private String CBit2[] = {"", "十", "百", "千"};
     private NumberBaseOpt() {
         throw new IllegalAccessError("Utility class");
     }
@@ -44,7 +45,7 @@ public abstract class NumberBaseOpt {
     /*
      * 将数值大写
      */
-    public static String capitalization(String szNum) {
+    static String capitalization(String szNum, String cnNum[], String cnBit[]) {
         StringBuilder resstr = new StringBuilder();
         String tmpstr = szNum.trim();
         int sl = tmpstr.length();
@@ -57,7 +58,7 @@ public abstract class NumberBaseOpt {
                 tmpstr = tmpstr.substring(0, sl);
             }
         } else dotpos = sl;
-        if (sl < 1) return CNum[0];
+        if (sl < 1) return cnNum[0];
         if (tmpstr.charAt(0) == '-') {
             resstr.append("负");
             sp = 1;
@@ -89,7 +90,7 @@ public abstract class NumberBaseOpt {
                         if (preiszero)
                             resstr.append("零");
                         preiszero = false;
-                        resstr.append(CNum[(byte) (integerNum.charAt(sp)) - 48]).append(CBit[k]);
+                        resstr.append(cnNum[(byte) (integerNum.charAt(sp)) - 48]).append(cnBit[k]);
                     }
                 }// end for k
                 if (/*j!=0 &&*/ j % 2 == 0) {
@@ -111,12 +112,23 @@ public abstract class NumberBaseOpt {
         if (dnl > 0) {
             resstr.append("点");
             for (int i = 0; i < dnl; i++) {
-                resstr.append(CNum[(byte) (decimalNum.charAt(i)) - 48]);
+                resstr.append(cnNum[(byte) (decimalNum.charAt(i)) - 48]);
             }
         }
         return resstr.toString();
     }
 
+    public static String capitalization(String szNum) {
+        return capitalization(szNum, CNum, CBit);
+    }
+
+    public static String capitalizationCN(String szNum) {
+        String sValue = capitalization(szNum, CNum2, CBit2);
+        if(sValue.startsWith("一十") && sValue.length()==3){
+            return sValue.substring(1);
+        }
+        return sValue;
+    }
     /*
      * 仅仅是把 0~9 转换为 "〇","一","二","三","四","五","六","七","八","九"
      */
@@ -140,7 +152,7 @@ public abstract class NumberBaseOpt {
         if (isSimple) {
             return uppercaseCN(szNum);
         }
-        return capitalization(szNum);
+        return capitalization(szNum, CNum, CBit);
     }
 
     static public boolean isNumber(Object obj) {

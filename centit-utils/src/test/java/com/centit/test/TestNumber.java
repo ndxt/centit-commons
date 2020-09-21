@@ -16,7 +16,26 @@ public class TestNumber {
             String.valueOf(NumberBaseOpt.getNumByte(f, -2))) + "分";
     }
 
+    public static void chengfakoujue() {
+        for(int j=1;j<10;j++){
+            for(int i=1;i<10;i++){
+                System.out.print(NumberBaseOpt.capitalization(String.valueOf(i), true));
+                System.out.print(NumberBaseOpt.capitalization(String.valueOf(j), true));
+                if(i*j<10) {
+                    System.out.print("得");
+                }
+                System.out.print(NumberBaseOpt.capitalizationCN(String.valueOf(i*j)));
+                System.out.print("\t");
+            }
+            System.out.println();
+        }
+    }
+
     public static void main(String[] args) {
+        chengfakoujue();
+    }
+
+    public static void lastmain(String[] args) {
         long START_STMP = DatetimeOpt.createUtilDate(2020,1,1).getTime();//1480166465631L;
         System.out.println(START_STMP);
         //System.out.println(System.currentTimeMillis() - START_STMP);
@@ -33,7 +52,7 @@ public class TestNumber {
     }
 
 
-    public static void lastmain(String[] args) {
+    public static void lastmain2(String[] args) {
         System.out.println(EnumBaseOpt.stringToEnum(DoubleAspect.class,"negative", true));
 
         DoubleAspect yes = DoubleAspect.YES;
