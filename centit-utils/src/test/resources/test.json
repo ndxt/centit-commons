@@ -7,7 +7,7 @@
       },
       "osid": {
         "type": "string",
-        "index": "analyzed"
+        "index": "osidIndex"
       },
       "array" :[
         {
