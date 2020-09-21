@@ -1,0 +1,11 @@
+{
+  "userName": "object.properties.osid.index",
+  "data": {
+    "#object.properties.array": {
+      "b": "a",
+      "a": "b",
+      "c": 5
+    }
+  },
+  "@p": "object.properties"
+}

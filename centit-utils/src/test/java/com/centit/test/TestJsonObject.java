@@ -3,14 +3,27 @@ package com.centit.test;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.json.JSONOpt;
+import com.centit.support.json.JSONTransformer;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 public class TestJsonObject {
 
-    public static void main(String arg[]) {
+    public static void main(String arg[]) throws IOException {
+        InputStream in = TestJsonObject.class
+            .getResourceAsStream("/test.json");
+        Object object = JSON.parse(FileIOOpt.readStringFromInputStream(in));
+        in = TestJsonObject.class
+            .getResourceAsStream("/template.json");
+        Object template  = JSON.parse(FileIOOpt.readStringFromInputStream(in));
+        System.out.println(JSON.toJSONString(JSONTransformer.transformer(template, object)));
+    }
 
+    public static void testObjectToJson() {
         System.out.println(JSON.toJSONString(new Object[]{5, 6, "hello"}));
 
         Map<String, Object> mp = CollectionsOpt.createHashMap("osid",
@@ -21,11 +34,8 @@ public class TestJsonObject {
         JSONOpt.setAttribute(jo, "object.properties", mp);
         System.out.println(jo.toString());
 
-        testObjectToJson();
 
-    }
 
-    public static void testObjectToJson() {
       /*    B b = new B();
           A a = new A();
 
