@@ -20,7 +20,7 @@ public class  AsyncCachedObject<T> extends CachedObject<T>  {
         //asyncRefreshData();
     }
     // 这个地方可能有锁定的问题
-    private void asyncRefreshData(){
+    public void asyncRefreshData(){
         this.evicted = false;
         this.refreshTime =
             new Date(System.currentTimeMillis()

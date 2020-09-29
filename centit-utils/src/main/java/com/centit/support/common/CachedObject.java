@@ -57,7 +57,7 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
         this.freshPeriod = freshPeriod;
     }
 
-    protected void refreshData() {
+    public void refreshData() {
         if(freshLock.isLocked())
             return;
         freshLock.lock();
