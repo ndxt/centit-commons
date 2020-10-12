@@ -190,19 +190,20 @@ public abstract class DatabaseAccess {
         if (paramObjs != null) {
             for (int i = 0; i < paramsName.size(); i++) {
                 Object pobj = paramObjs.get(paramsName.get(i));
-                TableField col = tableInfo.findFieldByName(paramsName.get(i));
-                if(col!=null &&
-                    (FieldType.BYTE_ARRAY.equals(col.getColumnType()) ||
-                        //这个地方不应该有 blob , 并且这个地方应该在前马就处理好，也不应该有sring 需要转 byte[] 的情况
-                    "blob".equalsIgnoreCase(col.getColumnType())) ){
-                    stmt.setObject(i + 1,new ByteArrayInputStream(((String)pobj).getBytes()));
-                    continue;
-                }
                 if (pobj == null) {
                     stmt.setNull(i + 1, Types.NULL);
                 } else {
-                    stmt.setObject(i + 1,
-                        transObjectForSqlParam(pobj));
+                    TableField col = tableInfo.findFieldByName(paramsName.get(i));
+                    if(col!=null &&
+                        (FieldType.BYTE_ARRAY.equals(col.getColumnType()) ||
+                            //这个地方不应该有 blob , 并且这个地方应该在前马就处理好，也不应该有sring 需要转 byte[] 的情况
+                            "blob".equalsIgnoreCase(col.getColumnType())) ){
+                               stmt.setObject(i + 1,
+                                    new ByteArrayInputStream(ByteBaseOpt.castObjectToBytes(pobj)));
+                    } else{
+                        stmt.setObject(i + 1,
+                            transObjectForSqlParam(pobj));
+                    }
                 }
             }
         }
