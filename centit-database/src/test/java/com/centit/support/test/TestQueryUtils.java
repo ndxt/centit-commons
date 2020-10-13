@@ -3,11 +3,14 @@ package com.centit.support.test;
 import com.centit.support.database.utils.FieldType;
 import com.centit.support.database.utils.QueryUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestQueryUtils {
     public static void main(String[] args) {
+        InputStream s=new ByteArrayInputStream("ss".getBytes());
         List<Object> params = new ArrayList<>();
         System.out.println(params.toArray());
         System.out.println(FieldType.mapToHumpName("F_Bc_2014_AAe", false) );
