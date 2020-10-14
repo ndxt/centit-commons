@@ -120,21 +120,26 @@ public class ObjectException extends RuntimeException {
         this.objectData = obj;
     }
 
-    public static String extortExceptionMessage(Throwable ex) {
+    public static String extortExceptionMessage(Throwable ex, int maxStacks) {
         String originErrMessage = ex.getMessage();
         StringBuilder errorMsg = new StringBuilder(StringUtils.isBlank(originErrMessage) ?
                     "未知错误("+ex.getClass().getName()+")":originErrMessage);
         StackTraceElement[] traces = ex.getStackTrace();
         if (traces != null) {
-            int len = traces.length > 15 ? 15 : traces.length;
+            int len = traces.length > maxStacks ? maxStacks : traces.length;
             for (int i = 0; i < len; i++) {
                 errorMsg.append("\r\n")
-                    .append("class: ").append(traces[i].getClassName()).append(",")
-                    .append("method: ").append(traces[i].getMethodName()).append(",")
-                    .append("line: ").append(traces[i].getLineNumber()).append(".");
+                    .append(traces[i].toString());
+                /*.append("class: ").append(traces[i].getClassName()).append(",")
+                .append("method: ").append(traces[i].getMethodName()).append(",")
+                .append("line: ").append(traces[i].getLineNumber()).append(".");*/
+
             }
         }
         return errorMsg.toString();
+    }
+    public static String extortExceptionMessage(Throwable ex) {
+        return extortExceptionMessage(ex, 15);
     }
 
     public int getExceptionCode() {
