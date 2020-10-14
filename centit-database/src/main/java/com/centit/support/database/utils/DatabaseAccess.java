@@ -194,10 +194,7 @@ public abstract class DatabaseAccess {
                     stmt.setNull(i + 1, Types.NULL);
                 } else {
                     TableField col = tableInfo.findFieldByName(paramsName.get(i));
-                    if(col!=null &&
-                        (FieldType.BYTE_ARRAY.equals(col.getColumnType()) ||
-                            //这个地方不应该有 blob , 并且这个地方应该在前马就处理好，也不应该有sring 需要转 byte[] 的情况
-                            "blob".equalsIgnoreCase(col.getColumnType())) ){
+                    if(col!=null && FieldType.BYTE_ARRAY.equals(col.getFieldType())){
                                stmt.setObject(i + 1,
                                     new ByteArrayInputStream(ByteBaseOpt.castObjectToBytes(pobj)));
                     } else{
