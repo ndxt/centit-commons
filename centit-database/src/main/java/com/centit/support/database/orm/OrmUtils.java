@@ -13,6 +13,7 @@ import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.FieldType;
 import com.centit.support.database.utils.PersistenceException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 public abstract class OrmUtils {
+    private static final String DNS1123 = "0123456789qwertyuiopasdfghjklzxcvbnm";
     private OrmUtils() {
         throw new IllegalAccessError("Utility class");
     }
@@ -145,11 +147,10 @@ public abstract class OrmUtils {
                                     for (int i = 0; i < 100; i++) {
                                         String no = prefix + UuidOpt.getUuidAsString22().substring(0, len);
                                         //检查唯一属性是否冲突
-                                        int nHasId = NumberBaseOpt.castObjectToInteger(
+                                        if(NumberBaseOpt.castObjectToInteger(
                                             DatabaseAccess.fetchScalarObject(
                                                 sqlDialect.findObjectsBySql("select count(*) hasId from " + mapInfo.getTableName()
-                                                    + " where " + field.getColumnName() + " = ?", new Object[]{no})), 0);
-                                        if (nHasId == 0) {
+                                                    + " where " + field.getColumnName() + " = ?", new Object[]{no})), 0) == 0) {
                                             mapInfo.setObjectFieldValue(object, field, no);
                                             break;// for
                                         }
@@ -157,6 +158,26 @@ public abstract class OrmUtils {
                                 }
                             }
 
+                        }
+                        case RANDOM_LOW_STRING_ID: {
+                            String genValue = valueGenerator.value();
+                            String[] params = genValue.split(":");
+                            if (params.length > 0 && sqlDialect != null) {
+                                String prefix = params.length > 1 ? params[1] : "";
+                                int len = NumberBaseOpt.castObjectToInteger(params[0], 10);
+                                for (int i = 0; i < 100; i++) {
+                                    String no = prefix + RandomStringUtils.random(len, DNS1123);
+                                    //检查唯一属性是否冲突
+                                    int nHasId = NumberBaseOpt.castObjectToInteger(
+                                        DatabaseAccess.fetchScalarObject(
+                                            sqlDialect.findObjectsBySql("select count(*) hasId from " + mapInfo.getTableName()
+                                                + " where " + field.getColumnName() + " = ?", new Object[]{no})), 0);
+                                    if (nHasId == 0) {
+                                        mapInfo.setObjectFieldValue(object, field, no);
+                                        break;// for
+                                    }
+                                }
+                            }
                         }
                         break;// case
                         // 1577808000000L 2020-1-1 00:00:00
