@@ -225,9 +225,7 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_REG_MATCH:
                 if (nOpSum < 2)
                     return false;
-                return Pattern.matches(
-                    StringBaseOpt.objectToString(slOperand.get(0)),
-                    StringBaseOpt.objectToString(slOperand.get(1)));
+                return Pattern.compile(StringBaseOpt.objectToString(slOperand.get(0))).matcher(StringBaseOpt.objectToString(slOperand.get(1))).find();
             case ConstDefine.FUNC_REG_MATCH_VALUES: {
                 if (nOpSum < 2)
                     return false;
