@@ -184,6 +184,7 @@ public abstract class DatabaseAccess {
             }
         }
     }
+
     public static void setQueryStmtParameters(PreparedStatement stmt, List<String> paramsName,
                                               Map<String, Object> paramObjs, TableInfo tableInfo) throws SQLException {
         //query.getParameterMetadata().isOrdinalParametersZeroBased()?0:1;
@@ -194,10 +195,20 @@ public abstract class DatabaseAccess {
                     stmt.setNull(i + 1, Types.NULL);
                 } else {
                     TableField col = tableInfo.findFieldByName(paramsName.get(i));
-                    if(col!=null && FieldType.BYTE_ARRAY.equals(col.getFieldType())){
-                               stmt.setObject(i + 1,
+                    if (col != null && FieldType.BYTE_ARRAY.equals(col.getFieldType())) {
+                        DBType dbType = DBType.mapDBType(stmt.getConnection().getMetaData().getURL());
+                        switch (dbType) {
+                            case DM:
+                                stmt.setObject(i + 1,
                                     new ByteArrayInputStream(ByteBaseOpt.castObjectToBytes(pobj)));
-                    } else{
+                                break;
+                            case Oracle:
+                                stmt.setBinaryStream(i + 1, new ByteArrayInputStream(ByteBaseOpt.castObjectToBytes(pobj)));
+                                break;
+                            default:
+                                stmt.setObject(i + 1, pobj);
+                        }
+                    } else {
                         stmt.setObject(i + 1,
                             transObjectForSqlParam(pobj));
                     }
@@ -205,6 +216,7 @@ public abstract class DatabaseAccess {
             }
         }
     }
+
     /*
      * 直接运行行带参数的 SQL,update delete insert
      */
@@ -404,7 +416,8 @@ public abstract class DatabaseAccess {
         return getObjectAsJSON(conn, sSql, (Object[]) null, null);
     }
 
-    public static JSONObject getObjectAsJSON(Connection conn, String sSql, Map<String, Object> values, String[] fieldnames)
+    public static JSONObject getObjectAsJSON(Connection conn, String sSql, Map<String, Object> values, String[]
+        fieldnames)
         throws SQLException, IOException {
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
         return getObjectAsJSON(conn, qap.getQuery(), qap.getParams(), fieldnames);
@@ -446,7 +459,8 @@ public abstract class DatabaseAccess {
      * @throws SQLException SQLException
      * @throws IOException  IOException
      */
-    public static JSONArray findObjectsByNamedSqlAsJSON(Connection conn, String sSql, Map<String, Object> values,
+    public static JSONArray findObjectsByNamedSqlAsJSON(Connection conn, String
+        sSql, Map<String, Object> values,
                                                         String[] fieldnames) throws SQLException, IOException {
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sSql, values));
         return findObjectsAsJSON(conn, qap.getQuery(), qap.getParams(), fieldnames);

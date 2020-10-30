@@ -4,6 +4,7 @@ import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -71,7 +72,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("year", -1, ConstDefine.FUNC_YEAR, ConstDefine.TYPE_STR),//日期函数
         new FunctionInfo("week", -1, ConstDefine.FUNC_WEEK, ConstDefine.TYPE_STR),// 第几周
         new FunctionInfo("weekday", -1, ConstDefine.FUNC_WEEK_DAY, ConstDefine.TYPE_STR),// 星期几， 取日期的星期几，周日为0，周一~六为1~6
-        new FunctionInfo("formatdate", -1, ConstDefine.FUNC_FORMAT_DATE, ConstDefine.TYPE_STR),// 格式化日期
+        new FunctionInfo("formatdate", 1, ConstDefine.FUNC_FORMAT_DATE, ConstDefine.TYPE_STR),// 格式化日期
         new FunctionInfo("dateinfo", -1, ConstDefine.FUNC_DATE_INFO, ConstDefine.TYPE_STR),// 日期信息
 
         new FunctionInfo("dayspan", -1, ConstDefine.FUNC_DAY_SPAN, ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
@@ -225,9 +226,7 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_REG_MATCH:
                 if (nOpSum < 2)
                     return false;
-                return Pattern.matches(
-                    StringBaseOpt.objectToString(slOperand.get(0)),
-                    StringBaseOpt.objectToString(slOperand.get(1)));
+                return Pattern.compile(StringBaseOpt.objectToString(slOperand.get(0))).matcher(StringBaseOpt.objectToString(slOperand.get(1))).find();
             case ConstDefine.FUNC_REG_MATCH_VALUES: {
                 if (nOpSum < 2)
                     return false;
@@ -436,7 +435,7 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_SPLIT_STR:{ // 分割字符串
                 if (nOpSum < 1) return null;
                 String str = StringBaseOpt.castObjectToString(slOperand.get(0));
-                String splitStr = nOpSum > 1 ? StringBaseOpt.castObjectToString(slOperand.get(0)," "):",";
+                String splitStr = nOpSum > 1 ? StringBaseOpt.castObjectToString(slOperand.get(1)," "):",";
                 return str.split(splitStr);
             }
 
@@ -544,7 +543,7 @@ public abstract class EmbedFunc {
                 if (nOpSum < 1) return null;
                 if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
                 Double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
-                return af - af.intValue();
+                return new BigDecimal(af.toString()).subtract(new BigDecimal(af.intValue())).doubleValue();
             }
             case ConstDefine.FUNC_EXP: {
                 if (nOpSum < 1) return null;
