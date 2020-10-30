@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.SecureRandom;
@@ -92,14 +93,17 @@ public abstract class AESSecurityUtils {
      */
 
     public static String encryptAndBase64(String str, String keyValue) {
+        return encryptAndBase64(str, keyValue, "UTF-8");
+    }
+
+    public static String encryptAndBase64(String str, String keyValue, String charsetName) {
         try {
-            return new String(Base64.encodeBase64(encrypt(str.getBytes(), keyValue)));
-        } catch (GeneralSecurityException e) {
+            return new String(Base64.encodeBase64(encrypt(str.getBytes(charsetName), keyValue)));
+        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
             logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
         }
     }
-
 
     /**
      * 用base64解码再用Aes解密
@@ -109,9 +113,13 @@ public abstract class AESSecurityUtils {
      * @return 明文
      */
     public static String decryptBase64String(String str, String keyValue) {
+        return decryptBase64String(str, keyValue, "UTF-8");
+    }
+
+    public static String decryptBase64String(String str, String keyValue, String charsetName) {
         try {
-            return new String(decrypt(Base64.decodeBase64(str.getBytes()), keyValue));
-        } catch (GeneralSecurityException e) {
+            return new String(decrypt(Base64.decodeBase64(str.getBytes()), keyValue), charsetName);
+        } catch (GeneralSecurityException | UnsupportedEncodingException e) {
             logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
         }
