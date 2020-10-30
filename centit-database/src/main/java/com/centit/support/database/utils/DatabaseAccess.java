@@ -203,7 +203,8 @@ public abstract class DatabaseAccess {
                                     new ByteArrayInputStream(ByteBaseOpt.castObjectToBytes(pobj)));
                                 break;
                             case Oracle:
-                                stmt.setBinaryStream(i + 1, new ByteArrayInputStream(ByteBaseOpt.castObjectToBytes(pobj)));
+                                stmt.setBinaryStream(i + 1,
+                                    new ByteArrayInputStream(ByteBaseOpt.castObjectToBytes(pobj)));
                                 break;
                             default:
                                 stmt.setObject(i + 1, pobj);
@@ -246,9 +247,10 @@ public abstract class DatabaseAccess {
             Object obj = rs.getObject(i + 1);
             if (obj != null) {
                 if (obj instanceof Clob) {
-                    jo.put(fieldNames[i], fetchClobString((Clob) obj));
+                    jo.put(fieldNames[i], DatabaseAccess.fetchClobString((Clob) obj));
                 } else if (obj instanceof Blob) {
-                    jo.put(fieldNames[i], fetchBlobAsBase64((Blob) obj));
+                    jo.put(fieldNames[i], DatabaseAccess.fetchBlobBytes((Blob) obj));
+                    //fetchBlobAsBase64((Blob) obj));
                 } else {
                     jo.put(fieldNames[i], obj);
                 }
@@ -563,7 +565,8 @@ public abstract class DatabaseAccess {
             if (obj instanceof Clob) {
                 objs[i - 1] = fetchClobString((Clob) obj);
             } else if (obj instanceof Blob) {
-                objs[i - 1] = fetchBlobAsBase64((Blob) obj);
+                objs[i - 1] = DatabaseAccess.fetchBlobBytes((Blob) obj);
+                //fetchBlobAsBase64((Blob) obj);
             } else {
                 objs[i - 1] = obj;
             }
