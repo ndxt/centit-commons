@@ -1,10 +1,14 @@
 package com.centit.test;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.DbcpConnectPools;
+import com.centit.support.database.utils.TransactionHandler;
+import com.centit.support.file.FileIOOpt;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.*;
 
 public class TestOraClob {
@@ -15,26 +19,29 @@ public class TestOraClob {
 
     public static void testFetchClob() {
         DataSourceDescription dbc = new DataSourceDescription();
-        dbc.setConnUrl("jdbc:oracle:thin:@192.168.131.81:1521:orcl");
-        dbc.setUsername("fdemo2");
-        dbc.setPassword("fdemo2");
+        dbc.setConnUrl("jdbc:oracle:thin:@192.168.137.95:1521:orcl");
+        dbc.setUsername("framework");
+        dbc.setPassword("framework");
 
         try {
-            Connection conn = DbcpConnectPools.getDbcpConnect(dbc);
-            String sSql =
-                "select T.VC_ID as id, T.VC_DUETYPE as vcDuetype, T.VC_OPINION as vcOpinion " +
-                    "from WP_REQUEST_DEP T " +
-                    "where T.VC_ID in (select min(B.VC_ID) " +
-                    " FROM WP_REQUEST A " +
-                    "INNER JOIN WP_REQUEST_DEP B " +
-                    "ON B.VC_REQUEST_ID = A.VC_REQUEST_ID " +
-                    "WHERE A.VC_PROJECT_ID = '402808ec535fda5a0153600660950004' " +
-                    "group by B.VC_DUETYPE)";
-            JSONArray ja = DatabaseAccess.findObjectsAsJSON(conn, sSql, null, null);
-            conn.close();
-            System.out.println(ja.toJSONString());
+            /*byte [] lobData = FileIOOpt.readBytesFromFile(
+                new File("/D/Projects/RunData/demo_home/temp/XDocReport2.docx")
+            );*/
+            TransactionHandler.executeInTransaction(dbc, (conn) -> {
+                JSONObject json = null;
+                try {
+                    json = DatabaseAccess.getObjectAsJSON(conn,
+                        "select ID, NAME, LOBCOL from apprflow.TEST_LOB where id='OB'" );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return DatabaseAccess.doExecuteSql(conn,
+                    "insert into apprflow.TEST_LOB ( ID, NAME, LOBCOL) values(?,?,?)",
+                    new Object[]{"02","second", json.get("lobcol")});
+            });
+            System.out.println("down");
         } catch (Exception e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
 
     }
