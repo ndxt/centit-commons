@@ -84,7 +84,7 @@ public abstract class AESSecurityUtils {
 
 
     /**
-     * 用Des加密再用base64编码
+     * 用Aes加密再用base64编码
      *
      * @param str      需加密的字节数组
      * @param keyValue 密码
@@ -102,7 +102,7 @@ public abstract class AESSecurityUtils {
 
 
     /**
-     * 用base64解码再用Des解密
+     * 用base64解码再用Aes解密
      *
      * @param str      需解密的字节数组
      * @param keyValue 密码
