@@ -185,6 +185,8 @@ public abstract class DatabaseAccess {
         }
     }
 
+    //在调用这个方法前将类型转换好，blob字段需要的是byte[]类型
+    @Deprecated
     public static void setQueryStmtParameters(PreparedStatement stmt, List<String> paramsName,
                                               Map<String, Object> paramObjs, TableInfo tableInfo) throws SQLException {
         //query.getParameterMetadata().isOrdinalParametersZeroBased()?0:1;
