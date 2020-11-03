@@ -63,7 +63,7 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
         if(freshLock.isLocked()) {
             try {
                 //等待其他县城同步好，直接退出
-                while (freshLock.isLocked()) {
+                while (freshLock.isLocked() && this.target == null) {
                     sleep(50);
                 }
             }catch (InterruptedException e){
