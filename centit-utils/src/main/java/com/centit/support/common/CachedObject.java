@@ -8,6 +8,8 @@ import org.apache.commons.logging.LogFactory;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
+import static java.lang.Thread.sleep;
+
 public class CachedObject<T> extends AbstractCachedObject<T> {
 
     private static Log logger = LogFactory.getLog(CachedObject.class);
@@ -58,8 +60,17 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
     }
 
     public void refreshData() {
-        if(freshLock.isLocked())
+        if(freshLock.isLocked()) {
+            try {
+                //等待其他县城同步好，直接退出
+                while (freshLock.isLocked()) {
+                    sleep(50);
+                }
+            }catch (InterruptedException e){
+                logger.error(e.getMessage());
+            }
             return;
+        }
         freshLock.lock();
         //刷新派生缓存
         evictDerivativeCahce();
