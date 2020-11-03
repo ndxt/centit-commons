@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.*;
-import com.centit.support.database.metadata.TableField;
-import com.centit.support.database.metadata.TableInfo;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -180,41 +178,6 @@ public abstract class DatabaseAccess {
                 } else {
                     stmt.setObject(i + 1,
                         transObjectForSqlParam(pobj));
-                }
-            }
-        }
-    }
-
-    //在调用这个方法前将类型转换好，blob字段需要的是byte[]类型
-    @Deprecated
-    public static void setQueryStmtParameters(PreparedStatement stmt, List<String> paramsName,
-                                              Map<String, Object> paramObjs, TableInfo tableInfo) throws SQLException {
-        //query.getParameterMetadata().isOrdinalParametersZeroBased()?0:1;
-        if (paramObjs != null) {
-            for (int i = 0; i < paramsName.size(); i++) {
-                Object pobj = paramObjs.get(paramsName.get(i));
-                if (pobj == null) {
-                    stmt.setNull(i + 1, Types.NULL);
-                } else {
-                    TableField col = tableInfo.findFieldByName(paramsName.get(i));
-                    if (col != null && FieldType.BYTE_ARRAY.equals(col.getFieldType())) {
-                        DBType dbType = DBType.mapDBType(stmt.getConnection().getMetaData().getURL());
-                        switch (dbType) {
-                            case DM:
-                                stmt.setObject(i + 1,
-                                    new ByteArrayInputStream(ByteBaseOpt.castObjectToBytes(pobj)));
-                                break;
-                            case Oracle:
-                                stmt.setBinaryStream(i + 1,
-                                    new ByteArrayInputStream(ByteBaseOpt.castObjectToBytes(pobj)));
-                                break;
-                            default:
-                                stmt.setObject(i + 1, pobj);
-                        }
-                    } else {
-                        stmt.setObject(i + 1,
-                            transObjectForSqlParam(pobj));
-                    }
                 }
             }
         }
