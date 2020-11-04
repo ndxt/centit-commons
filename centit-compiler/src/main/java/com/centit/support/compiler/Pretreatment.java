@@ -135,12 +135,12 @@ public abstract class Pretreatment {
         int nlen = template.length();
         int bp = 0;
         while (true) {
-            String aword = varTemplate.getAWord();
+            String aword = varTemplate.getARawWord();
             while (true) {
                 // 检查转义符
                 if ("\\".equals(aword)) {
                     int ep = varTemplate.getCurrPos();
-                    mapString.append(template.substring(bp, ep - 1));
+                    mapString.append(template, bp, ep - 1);
                     //获取 \\ 后面的一个字符
                     mapString.append(template.charAt(ep));
                     varTemplate.setPosition(ep + 1);
@@ -149,7 +149,7 @@ public abstract class Pretreatment {
                 } else if ("{".equals(aword) || aword == null || "".equals(aword)) {
                     break;
                 }
-                aword = varTemplate.getAWord();
+                aword = varTemplate.getARawWord();
             }
             if (!"{".equals(aword))
                 break;
