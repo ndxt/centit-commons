@@ -521,10 +521,17 @@ public class Lexer {
         return -1;
     }
 
+    /**
+     * @return 注释类别
+     */
     public int getNoteType() {
         return languageType;
     }
 
+    /**
+     * 设置注释类别
+     * @param noteType 0 无 1 java 2 sql
+     */
     public void setNoteType(int noteType) {
         this.languageType = noteType;
     }
