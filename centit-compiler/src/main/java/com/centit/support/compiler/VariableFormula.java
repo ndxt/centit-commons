@@ -1,6 +1,7 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -245,6 +246,10 @@ public class VariableFormula {
             lex.writeBackAWord(nextWord);
         }
 
+        if(StringUtils.equalsAnyIgnoreCase(str, "true", "false")){
+            return BooleanBaseOpt.castObjectToBoolean(str);
+        }
+
         if (trans != null && Lexer.isLabel(str)) {
             return trans.getVarValue(str);
         }
@@ -252,6 +257,7 @@ public class VariableFormula {
         if (StringRegularOpt.isNumber(str)) {
             return NumberBaseOpt.castObjectToNumber(str);
         }
+
         return StringRegularOpt.trimString(str);
     }
 
