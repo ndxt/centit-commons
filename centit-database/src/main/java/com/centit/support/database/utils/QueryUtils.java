@@ -651,7 +651,7 @@ public abstract class QueryUtils {
                     int pos = sqlLexer.getCurrPos();
                     sqlLexer.seekToRightBracket();
                     int endPos = sqlLexer.getCurrPos();
-                    sqlStr.append(" ").append(sql.substring(pos, endPos)).append(" ");
+                    sqlStr.append(" ").append(sql.substring(pos-1, endPos)).append(" ");
                 } else if(sw.equalsIgnoreCase("select")){
                     sqlStr.append(sw).append(" ");
                     String sw2 = sqlLexer.getAWord();
