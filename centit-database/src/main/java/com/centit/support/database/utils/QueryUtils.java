@@ -2019,15 +2019,17 @@ public abstract class QueryUtils {
         LeftRightPair<String, Object> translateParam(String paramName);
     }
 
-    public static class SimpleFilterTranslater implements IFilterTranslater {
-        private Map<String, Object> paramsMap;
-        private Map<String, String> tableAlias;
-        private ObjectTranslate mapTranslate;
+    public static SimpleFilterTranslater createFilterTranslater(Object objOrVariableTranslate){
+        return new SimpleFilterTranslater(objOrVariableTranslate);
+    }
 
-        public SimpleFilterTranslater(Map<String, Object> paramsMap) {
+    public static class SimpleFilterTranslater implements IFilterTranslater {
+        private Object object;
+        private Map<String, String> tableAlias;
+
+        public SimpleFilterTranslater(Object paramsMap) {
             this.tableAlias = null;
-            this.paramsMap = paramsMap;
-            this.mapTranslate = new ObjectTranslate(paramsMap);
+            this.object = paramsMap;
         }
 
         @Override
@@ -2059,9 +2061,7 @@ public abstract class QueryUtils {
 
         @Override
         public LeftRightPair<String, Object> translateParam(String paramName) {
-            if (paramsMap == null)
-                return null;
-            Object obj = ReflectionOpt.attainExpressionValue(paramsMap, paramName);
+            Object obj = getVarValue(paramName);
             if (obj == null)
                 return null;
             if (obj instanceof String) {
@@ -2073,7 +2073,12 @@ public abstract class QueryUtils {
 
         @Override
         public Object getVarValue(String varName) {
-            return mapTranslate.getVarValue(varName);
+            if (object == null)
+                return null;
+            if(object instanceof VariableTranslate){
+                return ((VariableTranslate)object).getVarValue(varName);
+            }
+            return ReflectionOpt.attainExpressionValue(object, varName);
         }
 
     }
