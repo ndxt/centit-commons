@@ -1967,7 +1967,7 @@ public abstract class QueryUtils {
      */
     public static QueryAndNamedParams translateQuery(
         String queryStatement, Collection<String> filters,
-        Map<String, Object> paramsMap, boolean isUnion) {
+        Object paramsMap, boolean isUnion) {
 
         return translateQuery(queryStatement, filters,
             isUnion, new SimpleFilterTranslater(paramsMap));
@@ -1985,7 +1985,7 @@ public abstract class QueryUtils {
      * @return QueryAndNamedParams
      */
     public static QueryAndNamedParams translateQuery(
-        String queryStatement, Map<String, Object> paramsMap) {
+        String queryStatement, Object paramsMap) {
 
         return translateQuery(queryStatement, null,
             false, new SimpleFilterTranslater(paramsMap));
@@ -2002,7 +2002,7 @@ public abstract class QueryUtils {
      */
     public static QueryAndNamedParams translateQuery(
         Map<String, String> tableMap, Collection<String> filters,
-        Map<String, Object> paramsMap, boolean isUnion) {
+        Object paramsMap, boolean isUnion) {
 
         SimpleFilterTranslater translater = new SimpleFilterTranslater(paramsMap);
         translater.setTableAlias(tableMap);
@@ -2019,9 +2019,9 @@ public abstract class QueryUtils {
         LeftRightPair<String, Object> translateParam(String paramName);
     }
 
-    public static SimpleFilterTranslater createFilterTranslater(Object objOrVariableTranslate){
+    /*public static SimpleFilterTranslater createFilterTranslater(Object objOrVariableTranslate){
         return new SimpleFilterTranslater(objOrVariableTranslate);
-    }
+    }*/
 
     public static class SimpleFilterTranslater implements IFilterTranslater {
         private Object object;
