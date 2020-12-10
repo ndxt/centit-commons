@@ -2,8 +2,8 @@
   "userName": "object.properties.osid.index",
   "data": {
     "#object.properties.array": {
-      "b": "/object.properties.osid.index",
-      "a": ".b",
+      "b": "count(/object.properties.array)",
+      "a": "b",
       "c": 5
     }
   },
