@@ -16,6 +16,7 @@ public class TestDateTimeOpt {
         System.out.println(System.currentTimeMillis());
         System.out.println(StringRegularOpt.trimDateString("2020-06-09T09:34:05.790Z"));
         System.out.println(DatetimeOpt.smartPraseDate("201906090934051234567"));
+        System.out.println(StringRegularOpt.trimDateString("20190609"));
         System.out.println(DatetimeOpt.smartPraseDate("20190609"));
         System.out.println(DatetimeOpt.smartPraseDate("1591772196532"));
 
