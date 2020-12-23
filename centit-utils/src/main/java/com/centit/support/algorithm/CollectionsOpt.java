@@ -589,6 +589,12 @@ public abstract class CollectionsOpt {
     }
 
     public static <K, V> Map<K, V> unionTwoMap(Map<K, V> map1, Map<K, V> map2) {
+        if(map1 == null){
+            return map2;
+        }
+        if(map2 == null){
+            return map1;
+        }
         Map<K, V> paramsMap = new HashMap<>(map1.size() + map2.size() + 2);
         paramsMap.putAll(map2);
         paramsMap.putAll(map1);
