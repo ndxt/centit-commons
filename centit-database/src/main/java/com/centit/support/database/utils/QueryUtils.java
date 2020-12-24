@@ -530,7 +530,7 @@ public abstract class QueryUtils {
      */
     public static String buildPostgreSqlLimitQuerySQL(String sql, int offset, int maxsize, boolean asParameter) {
         if (asParameter)
-            return sql + (offset > 0 ? " limit ? offset ?" : " limit ?");
+            return "select * from ("+sql+") a " + (offset > 0 ? " limit ? offset ?" : " limit ?");
         else
             return "select * from ("+sql+") a " + (offset > 0 ? " limit " + maxsize + " offset " + offset :
                 " limit " + maxsize);
@@ -538,7 +538,7 @@ public abstract class QueryUtils {
 
     public static String buildMySqlLimitQuerySQL(String sql, int offset, int maxsize, boolean asParameter) {
         if (asParameter)
-            return sql + (offset > 0 ? " limit ?, ?" : " limit ?");
+            return "select * from ("+sql+") a " + (offset > 0 ? " limit ?, ?" : " limit ?");
         else
             return "select * from ("+sql+") a " + (offset > 0 ? " limit " + offset+ "," + maxsize:
                 " limit " + maxsize);
