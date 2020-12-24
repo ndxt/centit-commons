@@ -53,6 +53,9 @@ public abstract class StringRegularOpt {
     }
 
     public static boolean isNumber(String szNum) {
+        if(szNum == null){
+            return false;
+        }
         //String szNum = trimString(pszNum);
         int sl = szNum.length();
         if (sl < 1) return false;
