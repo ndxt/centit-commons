@@ -532,16 +532,16 @@ public abstract class QueryUtils {
         if (asParameter)
             return sql + (offset > 0 ? " limit ? offset ?" : " limit ?");
         else
-            return sql + (offset > 0 ? " limit " + String.valueOf(maxsize) + " offset " + String.valueOf(offset) :
-                " limit " + String.valueOf(maxsize));
+            return "select * from ("+sql+") a " + (offset > 0 ? " limit " + maxsize + " offset " + offset :
+                " limit " + maxsize);
     }
 
     public static String buildMySqlLimitQuerySQL(String sql, int offset, int maxsize, boolean asParameter) {
         if (asParameter)
             return sql + (offset > 0 ? " limit ?, ?" : " limit ?");
         else
-            return sql + (offset > 0 ? " limit " + String.valueOf(offset) + "," + String.valueOf(maxsize) :
-                " limit " + String.valueOf(maxsize));
+            return "select * from ("+sql+") a " + (offset > 0 ? " limit " + offset+ "," + maxsize:
+                " limit " + maxsize);
     }
 
     /**
