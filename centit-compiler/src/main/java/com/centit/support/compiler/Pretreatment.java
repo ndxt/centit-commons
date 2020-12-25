@@ -195,6 +195,9 @@ public abstract class Pretreatment {
      * @return 新的表达式
      */
     public static String mapTemplateString(String template, Object object) {
+        if(object instanceof VariableTranslate){
+            return mapTemplateString(template, (VariableTranslate) object, "");
+        }
         return mapTemplateString(template, new ObjectTranslate(object), "");
     }
 }
