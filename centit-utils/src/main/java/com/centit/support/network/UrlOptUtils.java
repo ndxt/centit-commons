@@ -3,6 +3,7 @@ package com.centit.support.network;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.security.Md5Encoder;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +122,7 @@ public abstract class UrlOptUtils {
     }
 
     public static String appendParamToUrl(String uri, String queryUrl) {
-        if (queryUrl == null || "".equals(queryUrl))
+        if (StringUtils.isBlank(queryUrl))
             return uri;
         return (uri.endsWith("?") || uri.endsWith("&")) ? uri + queryUrl :
             (uri.indexOf('?') == -1 ? uri + '?' + queryUrl : uri + '&' + queryUrl);

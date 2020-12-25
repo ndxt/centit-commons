@@ -231,8 +231,13 @@ public abstract class HttpExecutor {
 
     public static String simpleDelete(HttpExecutorContext executorContext, String uri, String queryParam)
         throws IOException {
-
         HttpDelete httpDelete = new HttpDelete(UrlOptUtils.appendParamToUrl(uri, queryParam));
+        return httpExecute(executorContext, httpDelete);
+    }
+
+    public static String simpleDelete(HttpExecutorContext executorContext, String uri)
+        throws IOException {
+        HttpDelete httpDelete = new HttpDelete(uri);
         return httpExecute(executorContext, httpDelete);
     }
 
