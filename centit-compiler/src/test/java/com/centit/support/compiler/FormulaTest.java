@@ -1,6 +1,5 @@
 package com.centit.support.compiler;
 
-import com.alibaba.fastjson.JSON;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -11,10 +10,11 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
-        System.out.println(JSON.toJSON(null));
+        testStringTemplate();
+        //System.out.println(JSON.toJSON(null));
         //testFormula();
         //testFormula2();
-        testFormula4();
+        //testFormula4();
     }
 
     public static void testFormula4() {
@@ -149,9 +149,9 @@ public class FormulaTest {
         usreInfo.put("userName", "管理员");
         map.put("userInfo", usreInfo);
         String str = Pretreatment.mapTemplateString(
-            "转义符\\\\又一个转义符\\{ {无法找到的变量} " +
-                "\"引号中的\\和{都不会被处理}\" 你的姓名是{userInfo.userName}",
-            map, "[没有赋值]");
+            "转义符\\\\又一个转义符\\{ ${无法找到的变量} " +
+                "\"引号中的\\和${都不会被处理}\" 你的姓名是${userInfo.userName}",
+            map,"[没有赋值]", false);
         System.out.println(str);
         str = Pretreatment.mapTemplateString("", map, "{没有赋值}");
         System.out.println(str);

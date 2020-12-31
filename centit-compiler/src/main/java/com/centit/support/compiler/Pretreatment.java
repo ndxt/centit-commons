@@ -115,7 +115,6 @@ public abstract class Pretreatment {
         return sDesFormula.toString();
     }
 
-
     /**
      * mapTemplateString
      * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
@@ -123,9 +122,10 @@ public abstract class Pretreatment {
      * @param template  模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
      * @param varTrans  变量解释其
      * @param nullValue 找不到变量时的值
+     * @param canOmitDollar 是否可以忽略 { 前面的 $ 符号
      * @return 新的表达式
      */
-    public static String mapTemplateString(String template, VariableTranslate varTrans, String nullValue) {
+    private static String innerMapTemplateString(String template, VariableTranslate varTrans, String nullValue, boolean canOmitDollar) {
         if (StringUtils.isBlank(template)) {
             return nullValue;
         }
@@ -134,6 +134,7 @@ public abstract class Pretreatment {
         StringBuilder mapString = new StringBuilder();
         int nlen = template.length();
         int bp = 0;
+        int prePos = 0;
         while (true) {
             String aword = varTemplate.getARawWord();
             while (true) {
@@ -146,17 +147,23 @@ public abstract class Pretreatment {
                     varTemplate.setPosition(ep + 1);
                     bp = varTemplate.getCurrPos();
                     //aword = varTemplate.getAWord();
-                } else if ("{".equals(aword) || aword == null || "".equals(aword)) {
+                }  else if("$".equals(aword)){
+                    aword = varTemplate.getARawWord();
+                    if ("{".equals(aword) || StringUtils.isBlank(aword)) {
+                        break;
+                    }
+                } else if ((canOmitDollar && "{".equals(aword)) || StringUtils.isBlank(aword)) {
                     break;
                 }
+                prePos = varTemplate.getCurrPos();
                 aword = varTemplate.getARawWord();
             }
             if (!"{".equals(aword))
                 break;
 
             int ep = varTemplate.getCurrPos();
-            if (ep - 1 > bp) {
-                mapString.append(template.substring(bp, ep - 1));
+            if (prePos > bp) {
+                mapString.append(template, bp, prePos);
             }
 
             varTemplate.seekToRightBrace();
@@ -168,10 +175,29 @@ public abstract class Pretreatment {
                 /*ReflectionOpt.attainExpressionValue(object,valueName)*/
             }
         }
-        if (bp < nlen)
+        if (bp < nlen) {
             mapString.append(template.substring(bp));
+        }
         return mapString.toString();
     }
+
+    /**
+     * mapTemplateString
+     * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
+     *
+     * @param template  模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
+     * @param object  变量解释其
+     * @param nullValue 找不到变量时的值
+     * @param canOmitDollar 是否可以忽略 { 前面的 $ 符号
+     * @return 新的表达式
+     */
+    public static String mapTemplateString(String template, Object object, String nullValue, boolean canOmitDollar) {
+        if(object instanceof VariableTranslate){
+            return innerMapTemplateString(template, (VariableTranslate) object, nullValue, canOmitDollar);
+        }
+        return innerMapTemplateString(template, new ObjectTranslate(object), nullValue, canOmitDollar);
+    }
+
 
     /**
      * mapTemplateString
@@ -183,8 +209,22 @@ public abstract class Pretreatment {
      * @return 新的表达式
      */
     public static String mapTemplateString(String template, Object object, String nullValue) {
-        return mapTemplateString(template, new ObjectTranslate(object), nullValue);
+        return mapTemplateString(template, object, nullValue, true);
     }
+
+    /**
+     * mapTemplateString
+     * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
+     *
+     * @param template 模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
+     * @param object   传入的对象，可以是一个Map 、JSON 或者Pojo
+     * @param canOmitDollar 是否可以忽略 { 前面的 $ 符号
+     * @return 新的表达式
+     */
+    public static String mapTemplateString(String template, Object object, boolean canOmitDollar) {
+        return mapTemplateString(template, object, "", canOmitDollar);
+    }
+
 
     /**
      * mapTemplateString
@@ -195,9 +235,6 @@ public abstract class Pretreatment {
      * @return 新的表达式
      */
     public static String mapTemplateString(String template, Object object) {
-        if(object instanceof VariableTranslate){
-            return mapTemplateString(template, (VariableTranslate) object, "");
-        }
-        return mapTemplateString(template, new ObjectTranslate(object), "");
+        return mapTemplateString(template, object, "", true);
     }
 }
