@@ -16,7 +16,7 @@ import java.security.SecureRandom;
 public abstract class AESSecurityUtils {
 
     protected static final Logger logger = LoggerFactory.getLogger(AESSecurityUtils.class);
-    private static final String AES_DEFAULT_KEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
+    public static final String AES_DEFAULT_KEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
 
     private AESSecurityUtils() {
         throw new IllegalAccessError("Utility class");
