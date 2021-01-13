@@ -61,13 +61,11 @@ public final class DataSourceDescription implements Serializable {
     public static boolean testConntect(DataSourceDescription dsDesc) {
         boolean connOk = false;
         try {
-            Class.forName(dsDesc.getDriver());//.newInstance();
-            Connection conn = DriverManager.getConnection(dsDesc.getConnUrl(),
-                dsDesc.getUsername(), dsDesc.getPassword());
+            Connection conn = DbcpConnectPools.getDbcpConnect(dsDesc);
             connOk = true;
             conn.close();
-        } catch (ReflectiveOperationException | SQLException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
         }
         return connOk;
     }
