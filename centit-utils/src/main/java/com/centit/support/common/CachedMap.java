@@ -39,11 +39,11 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     }
 
     public CachedMap() {
-        this(null,  ICachedObject.DEFALUT_FRESH_PERIOD, 16);
+        this(null,  ICachedObject.DEFAULT_REFRESH_PERIOD, 16);
     }
 
     public CachedMap(Function<K, T> refresher, AbstractCachedObject<?> parentCache, int initialCapacity) {
-        this(refresher,  ICachedObject.DEFALUT_FRESH_PERIOD, initialCapacity);
+        this(refresher,  ICachedObject.DEFAULT_REFRESH_PERIOD, initialCapacity);
         parentCache.addDeriveCache(this);
     }
 

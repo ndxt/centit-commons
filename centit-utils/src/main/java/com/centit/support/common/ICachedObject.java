@@ -10,7 +10,7 @@ public interface ICachedObject<T> {
     /**
      * 默认15分钟，900秒
      */
-    long DEFALUT_FRESH_PERIOD = 900L;
+    long DEFAULT_REFRESH_PERIOD = 900L;
 
     void evictCahce();
 
