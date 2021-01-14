@@ -32,21 +32,21 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
     }
 
     public CachedObject() {
-        this(null, ICachedObject.NOT_REFRESH_PERIOD);
+        this(null, ICachedObject.DEFALUT_FRESH_PERIOD_SECONDS);
     }
 
 
     public CachedObject(Supplier<T> refresher) {
-        this(refresher, ICachedObject.NOT_REFRESH_PERIOD);
+        this(refresher, ICachedObject.DEFALUT_FRESH_PERIOD_SECONDS);
     }
 
     public CachedObject(Supplier<T> refresher, AbstractCachedObject<?> parentCache) {
-        this(refresher, ICachedObject.NOT_REFRESH_PERIOD);
+        this(refresher, ICachedObject.DEFALUT_FRESH_PERIOD_SECONDS);
         parentCache.addDeriveCache(this);
     }
 
     public CachedObject(Supplier<T> refresher, AbstractCachedObject<?>[] parentCaches) {
-        this(refresher, ICachedObject.NOT_REFRESH_PERIOD);
+        this(refresher, ICachedObject.DEFALUT_FRESH_PERIOD_SECONDS);
         for (AbstractCachedObject<?> parentCache : parentCaches) {
             parentCache.addDeriveCache(this);
         }

@@ -37,7 +37,7 @@ public class DerivativeCachedMap<K, D, T> extends AbstractCachedObject<Map<K, T>
         this.refresher = refresher;
         this.parentCachedMap = parentCache;
         parentCache.addDeriveCache(this);
-        this.freshPeriod = ICachedObject.NOT_REFRESH_PERIOD;
+        this.freshPeriod = ICachedObject.DEFALUT_FRESH_PERIOD_SECONDS;
     }
 
     public DerivativeCachedMap(Function<D, T> refresher, CachedMap<K, D> parentCache) {
