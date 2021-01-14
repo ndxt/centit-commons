@@ -2042,19 +2042,17 @@ public abstract class QueryUtils {
             if (tableAlias == null || columnDesc == null || tableAlias.size() == 0)
                 return null;
             int n = columnDesc.indexOf('.');
-            if (n < 0) {
-                return null;
-            }
 
-            String poClassName = columnDesc.substring(0, n);
+            String poClassName = n < 0? "*" : columnDesc.substring(0, n);
+            String columnName = n < 0? columnDesc : columnDesc.substring(n + 1);
             if (tableAlias.containsKey(poClassName)) {
                 String alias = tableAlias.get(poClassName);
-                return StringUtils.isBlank(alias) ? columnDesc.substring(n + 1) : alias + '.' + columnDesc.substring(n + 1);
+                return StringUtils.isBlank(alias) ? columnName : alias + '.' + columnName;
             } /** 这个地方无法获取 表相关的元数据信息，如果可以校验一下字段中是否有对应的字段 就完美了；、
              所以目前只能由于仅有一个表的过滤中 */
             else if ("*".equals(poClassName) && tableAlias.size() == 1) {
                 String alias = tableAlias.values().iterator().next();
-                return StringUtils.isBlank(alias) ? columnDesc.substring(n + 1) : alias + '.' + columnDesc.substring(n + 1);
+                return StringUtils.isBlank(alias) ? columnName : alias + '.' + columnName;
             }
             return null;
         }
