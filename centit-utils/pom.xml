@@ -46,22 +46,10 @@
         </dependency>
 
         <!-- test -->
-        <!--获取OutLook的日程信息 OutlookMeetingUtils -->
-        <dependency>
-            <groupId>org.mnode.ical4j</groupId>
-            <artifactId>ical4j</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- 获取汉字首字母的类库  -->
         <dependency>
             <groupId>com.belerweb</groupId>
             <artifactId>pinyin4j</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-email</artifactId>
             <scope>test</scope>
         </dependency>
 
