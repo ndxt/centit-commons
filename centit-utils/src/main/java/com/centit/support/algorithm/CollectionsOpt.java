@@ -773,6 +773,49 @@ public abstract class CollectionsOpt {
         return array[0];
     }
 
+    public static <T, R> Set<R> mapArrayToSet(T[] array, Function<T, R> func){
+        if(array == null){
+            return null;
+        }
+        Set<R> retSet = new HashSet<>();
+        for(T obj : array){
+            retSet.add(func.apply(obj));
+        }
+        return retSet;
+    }
+
+    public static <T, R> Set<R> mapCollectionToSet(Collection<T> array, Function<T, R> func){
+        if(array == null){
+            return null;
+        }
+        Set<R> retSet = new HashSet<>();
+        for(T obj : array){
+            retSet.add(func.apply(obj));
+        }
+        return retSet;
+    }
+
+    public static <T, R> List<R> mapArrayToList(T[] array, Function<T, R> func){
+        if(array == null){
+            return null;
+        }
+        List<R> retList = new ArrayList<>();
+        for(T obj : array){
+            retList.add(func.apply(obj));
+        }
+        return retList;
+    }
+
+    public static <T, R> List<R> mapCollectionToList(Collection<T> array, Function<T, R> func){
+        if(array == null){
+            return null;
+        }
+        List<R> retList = new ArrayList<>();
+        for(T obj : array){
+            retList.add(func.apply(obj));
+        }
+        return retList;
+    }
     /**
      * 判断两个对象是否是父子关系，用于针对树形展示的数据结构进行排序
      *
