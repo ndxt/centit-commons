@@ -127,6 +127,18 @@ public class Lexer {
         return new Lexer(str).getAWord();
     }
 
+    public static boolean isSingleWord(String str) {
+        Lexer lexer =  new Lexer(str);
+        String firstWord = lexer.getAWord();
+        //第一个单词不能为空
+        if(StringUtils.isBlank(firstWord)){
+            return false;
+        }
+        //第二个单词一定要为空
+        return StringUtils.isBlank(lexer.getAWord());
+    }
+
+
     public void writeBackAWord(String preWord) {
         curWord = preWord;
         isBack = true;
