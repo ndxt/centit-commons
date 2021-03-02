@@ -1,8 +1,6 @@
 package com.centit.support.common;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class ListAppendMap<T> {
@@ -18,6 +16,9 @@ public class ListAppendMap<T> {
                 this.appendMap.put(func.apply(d), d);
             }
             //this.appendMap = Collections.unmodifiableMap(this.appendMap);
+        } else {
+            this.listData = Collections.emptyList();
+            this.appendMap = Collections.emptyMap();
         }
     }
 
