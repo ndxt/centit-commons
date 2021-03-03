@@ -11,13 +11,14 @@ public abstract class Pretreatment {
     private Pretreatment() {
         throw new IllegalAccessError("Utility class");
     }
+
     /**
      * mapTemplateString
      * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
      *
-     * @param template  模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
-     * @param varTrans  变量解释其
-     * @param nullValue 找不到变量时的值
+     * @param template      模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
+     * @param varTrans      变量解释其
+     * @param nullValue     找不到变量时的值
      * @param canOmitDollar 是否可以忽略 { 前面的 $ 符号
      * @return 新的表达式
      */
@@ -44,7 +45,7 @@ public abstract class Pretreatment {
                     varTemplate.setPosition(ep + 1);
                     bp = varTemplate.getCurrPos();
                     //aword = varTemplate.getAWord();
-                }  else if("$".equals(aword)){
+                } else if ("$".equals(aword)) {
                     aword = varTemplate.getARawWord();
                     if ("{".equals(aword) || StringUtils.isBlank(aword)) {
                         break;
@@ -67,9 +68,9 @@ public abstract class Pretreatment {
             bp = varTemplate.getCurrPos();
             if (bp - 1 > ep) {
                 String valueName = template.substring(ep, bp - 1);
-                if(asFormula){
+                if (asFormula) {
                     mapString.append(StringBaseOpt.castObjectToString(
-                        VariableFormula.calculate(valueName,varTrans), nullValue));
+                        VariableFormula.calculate(valueName, varTrans), nullValue));
                 } else {
                     mapString.append(StringBaseOpt.castObjectToString(
                         varTrans.getVarValue(valueName), nullValue));
@@ -87,14 +88,14 @@ public abstract class Pretreatment {
      * mapTemplateString
      * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
      *
-     * @param template  模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
-     * @param object  变量解释其
-     * @param nullValue 找不到变量时的值
+     * @param template      模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
+     * @param object        变量解释其
+     * @param nullValue     找不到变量时的值
      * @param canOmitDollar 是否可以忽略 { 前面的 $ 符号
      * @return 新的表达式
      */
     public static String mapTemplateString(String template, Object object, String nullValue, boolean canOmitDollar) {
-        if(object instanceof VariableTranslate){
+        if (object instanceof VariableTranslate) {
             return innerMapTemplateString(template, (VariableTranslate) object, nullValue, canOmitDollar, false);
         }
         return innerMapTemplateString(template, new ObjectTranslate(object), nullValue, canOmitDollar, false);
@@ -118,8 +119,8 @@ public abstract class Pretreatment {
      * mapTemplateString
      * 变量 形式如 {变量名} 注意这个和上面的不一，变量必须放在{}中
      *
-     * @param template 模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
-     * @param object   传入的对象，可以是一个Map 、JSON 或者Pojo
+     * @param template      模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
+     * @param object        传入的对象，可以是一个Map 、JSON 或者Pojo
      * @param canOmitDollar 是否可以忽略 { 前面的 $ 符号
      * @return 新的表达式
      */
@@ -144,14 +145,14 @@ public abstract class Pretreatment {
      * mapTemplateStringAsFormula
      * 表达式 形式如 {表达式} 注意这个和上面的不一，表达式必须放在{}中
      *
-     * @param template  模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
-     * @param object  变量解释其
-     * @param nullValue 找不到变量时的值
+     * @param template      模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
+     * @param object        变量解释其
+     * @param nullValue     找不到变量时的值
      * @param canOmitDollar 是否可以忽略 { 前面的 $ 符号
      * @return 新的表达式
      */
     public static String mapTemplateStringAsFormula(String template, Object object, String nullValue, boolean canOmitDollar) {
-        if(object instanceof VariableTranslate){
+        if (object instanceof VariableTranslate) {
             return innerMapTemplateString(template, (VariableTranslate) object, nullValue, canOmitDollar, true);
         }
         return innerMapTemplateString(template, new ObjectTranslate(object), nullValue, canOmitDollar, true);
@@ -168,20 +169,20 @@ public abstract class Pretreatment {
      * @return 新的表达式
      */
     public static String mapTemplateStringAsFormula(String template, Object object, String nullValue) {
-        return mapTemplateString(template, object, nullValue, true);
+        return mapTemplateStringAsFormula(template, object, nullValue, true);
     }
 
     /**
      * mapTemplateStringAsFormula
      * 表达式 形式如 {表达式} 注意这个和上面的不一，表达式必须放在{}中
      *
-     * @param template 模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
-     * @param object   传入的对象，可以是一个Map 、JSON 或者Pojo
+     * @param template      模板，比如： 你的姓名是{usreCode} , 传入有userCode建的map或者有userCode属性的对象
+     * @param object        传入的对象，可以是一个Map 、JSON 或者Pojo
      * @param canOmitDollar 是否可以忽略 { 前面的 $ 符号
      * @return 新的表达式
      */
     public static String mapTemplateStringAsFormula(String template, Object object, boolean canOmitDollar) {
-        return mapTemplateString(template, object, "", canOmitDollar);
+        return mapTemplateStringAsFormula(template, object, "", canOmitDollar);
     }
 
 
@@ -194,6 +195,6 @@ public abstract class Pretreatment {
      * @return 新的表达式
      */
     public static String mapTemplateStringAsFormula(String template, Object object) {
-        return mapTemplateString(template, object, "", true);
+        return mapTemplateStringAsFormula(template, object, "", true);
     }
 }
