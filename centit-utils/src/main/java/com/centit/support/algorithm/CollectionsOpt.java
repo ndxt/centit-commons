@@ -567,6 +567,17 @@ public abstract class CollectionsOpt {
         return paramsMap;
     }
 
+    public static <T> Map<String, T> createHashMap(List<T> listData, Function<T, String> func){
+        if(listData==null) {
+            return null;
+        }
+        Map<String, T> appendMap = new HashMap<>(listData.size());
+        for(T d : listData){
+            appendMap.put(func.apply(d), d);
+        }
+        return appendMap;
+    }
+
     public static <T> Map<String, T> createHashMap(String[] keys, T[] values) {
         if (keys == null || values == null)
             return null;
