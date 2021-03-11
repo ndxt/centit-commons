@@ -11,7 +11,9 @@ import java.security.KeyPair;
 public class TestRSA {
 
     public static void main(String[] args) throws Exception {
-        testAes();
+        String sec = AESSecurityUtils.encryptAndBase64("131511.cn","");
+        System.out.println(sec);
+//        testAes();
         //testDes();
         //testCreateKey();
         //testRsa();
