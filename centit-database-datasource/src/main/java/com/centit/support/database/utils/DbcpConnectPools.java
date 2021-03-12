@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 public abstract class DbcpConnectPools {
     private static final Logger logger = LoggerFactory.getLogger(DbcpConnectPools.class);
     private static final
@@ -26,7 +27,7 @@ public abstract class DbcpConnectPools {
         ds.setUsername(dsDesc.getUsername());
         ds.setPassword(dsDesc.getPassword());
         ds.setUrl(dsDesc.getConnUrl());
-        ds.setInitialSize(dsDesc.getInitialSize()); // 初始的连接数；
+        ds.setInitialSize(dsDesc.getInitialSize());
         ds.setMaxTotal(dsDesc.getMaxTotal());
         ds.setMaxIdle(dsDesc.getMaxIdle());
         ds.setMaxWaitMillis(dsDesc.getMaxWaitMillis());
@@ -34,9 +35,10 @@ public abstract class DbcpConnectPools {
         ds.setValidationQuery("SELECT COUNT(*) FROM DUAL");
         ds.setTestOnBorrow(true);
         ds.setTestWhileIdle(true);
-        ds.setTestOnReturn(true);
-        ds.setMinEvictableIdleTimeMillis(0);
-        ds.setTimeBetweenEvictionRunsMillis(0);
+        ds.setTestOnReturn(false);
+        ds.setValidationQueryTimeout(1);
+        ds.setTimeBetweenEvictionRunsMillis(60000);
+        ds.setNumTestsPerEvictionRun(8);
         return ds;
     }
 
@@ -68,8 +70,9 @@ public abstract class DbcpConnectPools {
     /* 获得数据源连接状态 */
     public static Map<String, Integer> getDataSourceStats(DataSourceDescription dsDesc) {
         BasicDataSource bds = dbcpDataSourcePools.get(dsDesc);
-        if (bds == null)
+        if (bds == null) {
             return null;
+        }
         Map<String, Integer> map = new HashMap<>(2);
         map.put("active_number", bds.getNumActive());
         map.put("idle_number", bds.getNumIdle());

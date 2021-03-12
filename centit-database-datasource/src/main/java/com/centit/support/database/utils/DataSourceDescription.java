@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * 数据源描述信息，这些信息和参数是创建连接池的参数
@@ -36,6 +36,22 @@ public final class DataSourceDescription implements Serializable {
     private int maxWaitMillis;
     private int initialSize;
     private String databaseCode;
+    private String sourceType;
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+    private Map<String,Object> extProps;
+    public Map<String, Object> getExtProps() {
+        return extProps;
+    }
+
+    public void setExtProps(Map<String, Object> extProps) {
+        this.extProps = extProps;
+    }
 
     public DataSourceDescription() {
         this.maxTotal = 20;
@@ -87,6 +103,8 @@ public final class DataSourceDescription implements Serializable {
             dbinfo.getExtProp("initialSize"),10));
         desc.setMaxWaitMillis(NumberBaseOpt.castObjectToInteger(
             dbinfo.getExtProp("maxWaitMillis"),10000));
+        desc.setExtProps(dbinfo.getExtProps());
+        desc.setSourceType(dbinfo.getSourceType());
         return desc;
     }
 

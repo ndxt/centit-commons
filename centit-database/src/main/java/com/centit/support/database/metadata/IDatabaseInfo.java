@@ -1,5 +1,6 @@
 package com.centit.support.database.metadata;
 
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import com.centit.support.database.utils.DBType;
 
@@ -23,6 +24,7 @@ public interface IDatabaseInfo {
     String getPassword();
 
     String getDatabaseDesc();
+    String getSourceType();
 
     @JSONField(serialize = false)
     String getClearPassword();
