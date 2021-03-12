@@ -10,7 +10,10 @@ import java.util.Map;
  * 数据库基本信息
  */
 public interface IDatabaseInfo {
-
+    String DATABASE="D";
+    String NO_SQL="N";
+    String KEY_VALUE="K";
+    String MQ="M";
     String getDatabaseCode();
 
     String getDatabaseName();
