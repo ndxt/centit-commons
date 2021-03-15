@@ -11,9 +11,11 @@ import java.util.Map;
  */
 public interface IDatabaseInfo {
     String DATABASE="D";
-    String NO_SQL="N";
-    String KEY_VALUE="K";
-    String MQ="M";
+    String MONGO_DB="M";
+    String REDIS="R";
+    String ELS="E";
+    String KAFKA="K";
+    String RABBIT_MQ="B";
     String getDatabaseCode();
 
     String getDatabaseName();
