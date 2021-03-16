@@ -32,13 +32,6 @@ public abstract class DbcpConnectPools {
         ds.setMaxIdle(dsDesc.getMaxIdle());
         ds.setMaxWaitMillis(dsDesc.getMaxWaitMillis());
         ds.setMinIdle(dsDesc.getMinIdle());
-        ds.setValidationQuery("SELECT COUNT(*) FROM DUAL");
-        ds.setTestOnBorrow(true);
-        ds.setTestWhileIdle(true);
-        ds.setTestOnReturn(false);
-        ds.setValidationQueryTimeout(1);
-        ds.setTimeBetweenEvictionRunsMillis(60000);
-        ds.setNumTestsPerEvictionRun(8);
         return ds;
     }
 
