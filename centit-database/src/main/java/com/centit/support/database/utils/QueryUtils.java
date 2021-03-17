@@ -2,7 +2,10 @@ package com.centit.support.database.utils;
 
 import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
-import com.centit.support.compiler.*;
+import com.centit.support.compiler.EmbedFunc;
+import com.centit.support.compiler.Lexer;
+import com.centit.support.compiler.VariableFormula;
+import com.centit.support.compiler.VariableTranslate;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;

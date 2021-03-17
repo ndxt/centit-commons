@@ -5,9 +5,7 @@ import com.centit.support.database.utils.DataSourceDescription;
 import com.centit.support.database.utils.DatabaseAccess;
 import com.centit.support.database.utils.DbcpConnectPools;
 import com.centit.support.database.utils.TransactionHandler;
-import com.centit.support.file.FileIOOpt;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 

@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Map;
 
 /**
  * 数据源描述信息，这些信息和参数是创建连接池的参数
