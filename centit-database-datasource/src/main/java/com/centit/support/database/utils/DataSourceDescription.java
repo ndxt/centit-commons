@@ -36,22 +36,6 @@ public final class DataSourceDescription implements Serializable {
     private int maxWaitMillis;
     private int initialSize;
     private String databaseCode;
-    private String sourceType;
-    public String getSourceType() {
-        return sourceType;
-    }
-
-    public void setSourceType(String sourceType) {
-        this.sourceType = sourceType;
-    }
-    private Map<String,Object> extProps;
-    public Map<String, Object> getExtProps() {
-        return extProps;
-    }
-
-    public void setExtProps(Map<String, Object> extProps) {
-        this.extProps = extProps;
-    }
 
     public DataSourceDescription() {
         this.maxTotal = 20;
@@ -103,8 +87,6 @@ public final class DataSourceDescription implements Serializable {
             dbinfo.getExtProp("initialSize"),10));
         desc.setMaxWaitMillis(NumberBaseOpt.castObjectToInteger(
             dbinfo.getExtProp("maxWaitMillis"),10000));
-        desc.setExtProps(dbinfo.getExtProps());
-        desc.setSourceType(dbinfo.getSourceType());
         return desc;
     }
 
