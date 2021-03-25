@@ -1,7 +1,10 @@
 package com.centit.support.compiler;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
+import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -10,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 67;
+    public static final int functionsSum = 68;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -93,7 +96,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("singleton", -1, ConstDefine.FUNC_SINGLETON, ConstDefine.TYPE_ANY),//返回集合，去重
 
         new FunctionInfo("attr", 2, ConstDefine.FUNC_GET_ATTR, ConstDefine.TYPE_ANY),//获取对象属性
-
+        new FunctionInfo("setAttr", 3, ConstDefine.FUNC_SET_ATTR, ConstDefine.TYPE_ANY),//设置对象属性
         //new FunctionInfo("getsysstr",1,ConstDefine.FUNC_GET_STR,ConstDefine.TYPE_STR),//取系统字符串
         new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR)//取汉字拼音
     };
@@ -792,6 +795,21 @@ public abstract class EmbedFunc {
                 if (nOpSum < 2) return null;
                 return ReflectionOpt.attainExpressionValue(slOperand.get(0),
                     StringBaseOpt.castObjectToString(slOperand.get(1)));
+            }
+
+            case ConstDefine.FUNC_SET_ATTR:{
+                if (nOpSum < 1) return null;
+                if (nOpSum < 3) return slOperand.get(0);
+                Object object = JSON.toJSON(slOperand.get(0));
+                if(object instanceof JSONObject){
+                    JSONObject json = (JSONObject) object;
+                    JSONOpt.setAttribute(json,
+                        StringBaseOpt.castObjectToString(slOperand.get(1)),
+                        slOperand.get(2));
+                    return json;
+                }
+                return slOperand.get(0);
+
             }
             default:
                 break;
