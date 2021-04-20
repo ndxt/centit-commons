@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 68;
+    public static final int functionsSum = 69;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -92,6 +92,7 @@ public abstract class EmbedFunc {
 
         new FunctionInfo("toDate", 1, ConstDefine.FUNC_TO_DATE, ConstDefine.TYPE_DATE),// 转换为日期
         new FunctionInfo("toString", 1, ConstDefine.FUNC_TO_STRING, ConstDefine.TYPE_STR),//转换为String
+        new FunctionInfo("toObject", 1, ConstDefine.FUNC_TO_OBJECT, ConstDefine.TYPE_ANY),//转换为json 对象
         new FunctionInfo("toNumber", 1, ConstDefine.FUNC_TO_NUMBER, ConstDefine.TYPE_NUM),//转换为数字
         new FunctionInfo("singleton", -1, ConstDefine.FUNC_SINGLETON, ConstDefine.TYPE_ANY),//返回集合，去重
 
@@ -774,6 +775,16 @@ public abstract class EmbedFunc {
                 return svalue;
             }
 
+            case ConstDefine.FUNC_TO_OBJECT: {//
+                if (nOpSum < 1 || slOperand.get(0) == null) {
+                    return null;
+                }
+                if(slOperand.get(0) instanceof String){
+                    return JSON.parse((String) slOperand.get(0));
+                }
+                return slOperand.get(0);
+            }
+
             case ConstDefine.FUNC_TO_NUMBER: {//
                 if (nOpSum < 1) {
                     return null;
@@ -809,7 +820,6 @@ public abstract class EmbedFunc {
                     return json;
                 }
                 return slOperand.get(0);
-
             }
             default:
                 break;
