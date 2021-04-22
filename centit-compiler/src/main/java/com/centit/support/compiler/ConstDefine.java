@@ -106,6 +106,7 @@ public abstract class ConstDefine {
     public static final int OP_LOGICAND = 49;  // and
     public static final int OP_MOD = 50;  // mod % 取整后取模
     public static final int OP_DBMOD = 51;  // dbmod 取模
+    public static final int OP_XOR = 52;  // xor 异或
     private ConstDefine() {
         throw new IllegalAccessError("Utility class");
     }

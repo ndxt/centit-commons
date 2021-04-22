@@ -26,12 +26,14 @@ public class OptStack {
     public static final int   OP_LOGICAND    = 49;  // and
     public static final int   OP_MOD         = 50;  // mod % 取整后取模
     public static final int   OP_DBMOD       = 51;  // dbmod 取模
+    public static final int   OP_XOR         = 52;  // xor 异或
     */
     /**
      * @param args 数值越小优先级越低
      */
-    final static private int optsPri[] = {5, 5, 6, 6, 4, 4, 4, 4, 4, 4, 2, 3, 9, 8, 5, 5, 4, 7, 2, 3, 6, 6, 4, 4, 4};
-    //+ - * / == > < <= >= != | & ! ^ >> << like in or and % dbmod
+    final static private int optsPri[] =
+        {5, 5, 6, 6, 4, 4, 4, 4, 4, 4, 2, 3, 9, 8, 5, 5, 4,   7, 2, 3,  6, 6,   4, 4, 4, 4};
+        //+ -  *  /  == >  < <=  >= != |  &  !  ^  >> << like in or and % dbmod xor
     //5 is normal
     private int sourceLen;
     private int optsStack[];

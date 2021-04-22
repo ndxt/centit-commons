@@ -100,6 +100,8 @@ public class VariableFormula {
             return (ConstDefine.OP_MOD);
         if (sOptName.equalsIgnoreCase("DBMOD"))
             return (ConstDefine.OP_DBMOD);
+        if (sOptName.equalsIgnoreCase("XOR"))
+            return (ConstDefine.OP_XOR);
         return -1;
     }
 
@@ -278,6 +280,15 @@ public class VariableFormula {
                     && (BooleanBaseOpt.isBoolean(operand2) || NumberBaseOpt.isNumber(operand2))) {
                     return BooleanBaseOpt.castObjectToBoolean(operand) ||
                         BooleanBaseOpt.castObjectToBoolean(operand2);
+                }
+                return StringBaseOpt.concat(operand, operand2);
+            }
+
+            case ConstDefine.OP_XOR: {
+                if ((BooleanBaseOpt.isBoolean(operand) || NumberBaseOpt.isNumber(operand))
+                    && (BooleanBaseOpt.isBoolean(operand2) || NumberBaseOpt.isNumber(operand2))) {
+                    return ! (BooleanBaseOpt.castObjectToBoolean(operand).equals(
+                        BooleanBaseOpt.castObjectToBoolean(operand2)));
                 }
                 return StringBaseOpt.concat(operand, operand2);
             }
