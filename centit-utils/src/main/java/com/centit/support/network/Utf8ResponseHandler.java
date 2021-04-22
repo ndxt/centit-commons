@@ -23,10 +23,10 @@ public class Utf8ResponseHandler implements ResponseHandler<String> {
     public String handleResponse(final HttpResponse response) throws IOException {
         final StatusLine statusLine = response.getStatusLine();
         final HttpEntity entity = response.getEntity();
-        if (statusLine.getStatusCode() >= 300) {
+        if (statusLine.getStatusCode() >= 400) {
             EntityUtils.consume(entity);
             throw new HttpResponseException(statusLine.getStatusCode(), "Error Code : " +
-                String.valueOf(statusLine.getStatusCode()) + ", " + statusLine.getReasonPhrase() + "。");
+                statusLine.getStatusCode() + ", " + statusLine.getReasonPhrase() + "。");
         }
         return entity == null ? null : EntityUtils.toString(entity, Consts.UTF_8);
     }
