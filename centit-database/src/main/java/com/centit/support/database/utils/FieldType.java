@@ -23,12 +23,18 @@ public abstract class FieldType {
     public static final String DATE = "date";
     public static final String DATETIME = "datetime";
     public static final String TIMESTAMP = "timestamp";
-    public static final String TEXT = "text"; // CLOB
     public static final String FILE_ID = "fileId";
-    public static final String BYTE_ARRAY = "bytes"; // BLOB
     public static final String ENUM_ORDINAL = "enum";
+
+    public static final String TEXT = "text"; // CLOB
+    public static final String BYTE_ARRAY = "bytes"; // BLOB
+    public static final String BYTE_STREAM = BYTE_ARRAY;
+    public static final String TEXT_STREAM = TEXT;
+
+    public static final String FILE = "file";
     // 对象以JSON 格式 保存在 数据库中
     public static final String JSON_OBJECT = "object";
+    public static final String OBJECT_LIST = "list";
 
     /**
      * @param st java类 名称
@@ -117,6 +123,7 @@ public abstract class FieldType {
             case JSON_OBJECT:
                 return "clob";//长文本
             case BYTE_ARRAY:
+            case FILE:
                 return "blob";//大字段
             case FILE_ID:
                 return "varchar2(64)";//默认记录文件的ID号
@@ -150,6 +157,7 @@ public abstract class FieldType {
             case JSON_OBJECT:
                 return "clob";//长文本
             case BYTE_ARRAY:
+            case FILE:
                 return "blob";//大字段
             case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
@@ -189,6 +197,7 @@ public abstract class FieldType {
             case JSON_OBJECT:
                 return "text";//长文本
             case BYTE_ARRAY:
+            case FILE:
                 return "VarBinary(MAX)";
             case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
@@ -228,6 +237,7 @@ public abstract class FieldType {
             case JSON_OBJECT:
                 return "clob(52428800)";//长文本
             case BYTE_ARRAY:
+            case FILE:
                 return "BLOB";
             case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
@@ -272,6 +282,7 @@ public abstract class FieldType {
             case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
             case BYTE_ARRAY:
+            case FILE:
                 return "VARBINARY";
             case ENUM_ORDINAL:
                 return "smallint";//
@@ -310,6 +321,7 @@ public abstract class FieldType {
             case FILE_ID:
                 return "varchar(64)";//默认记录文件的ID号
             case BYTE_ARRAY:
+            case FILE:
                 return "character";
             case ENUM_ORDINAL:
                 return "smallint";//
@@ -365,7 +377,9 @@ public abstract class FieldType {
         fts.put(FieldType.TEXT, "大文本");
         fts.put(FieldType.FILE_ID, "文件ID");
         fts.put(FieldType.BYTE_ARRAY, "大字段");
+        fts.put(FieldType.FILE, "文件");
         fts.put(FieldType.JSON_OBJECT, "JSON对象");
+        //fts.put(FieldType.OBJECT_LIST, "数据列表");
         return fts;
     }
 
