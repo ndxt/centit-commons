@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class FieldType {
+    public static final String VOID = "void";
+
     public static final String STRING = "string";
     public static final String INTEGER = "integer";
     public static final String FLOAT = "float";
