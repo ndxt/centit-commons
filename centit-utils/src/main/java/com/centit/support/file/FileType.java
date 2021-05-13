@@ -51,6 +51,9 @@ public abstract class FileType {
             put("3026B2758E66CF11", "asf");
             put("4D546864", "mid");
             put("1F8B08", "gz");
+            put("6D6F7669","csv");
+            put("7B226461","json");
+
         }};
     protected static final HashMap<String, String> extMimeTypeMap
         = new HashMap<String, String>(1200) {{
