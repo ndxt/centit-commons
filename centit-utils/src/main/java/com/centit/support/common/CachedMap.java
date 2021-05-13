@@ -9,7 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
+
+import static java.lang.Thread.sleep;
 
 /**
  * 用 ConcurrentHashMap 缓存对象，每个对象 自己维护缓存策略
@@ -86,8 +89,8 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     public AbstractCachedObject<T> getCachedObject(K key) {
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject == null) {
-            identifiedObject = new CachedIdentifiedObject();
-            T target = identifiedObject.getFreshTarget(key);
+            identifiedObject = new CachedIdentifiedObject(key);
+            T target = identifiedObject.getFreshTarget();
             if (target != null) {
                 targetMap.put(key, identifiedObject);
             } else {
@@ -100,25 +103,31 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     public T getCachedValue(K key) {
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject != null) {
-            return identifiedObject.getCachedTarget(key);
+            return identifiedObject.getCachedTarget();
         }
 
-        identifiedObject = new CachedIdentifiedObject();
-        T target = identifiedObject.getFreshTarget(key);
+        identifiedObject = new CachedIdentifiedObject(key);
+        T target = identifiedObject.getFreshTarget();
         if (target != null) {
             targetMap.put(key, identifiedObject);
         }
         return target;
     }
 
+    @Override
+    public Map<K, T> getCachedTarget() {
+        throw new ObjectException("CachedMap 不支持这个方法");
+        //return null;
+    }
+
     public T getFreshValue(K key) {
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject != null) {
-            return identifiedObject.getFreshTarget(key);
+            return identifiedObject.getFreshTarget();
         }
 
-        identifiedObject = new CachedIdentifiedObject();
-        T target = identifiedObject.getFreshTarget(key);
+        identifiedObject = new CachedIdentifiedObject(key);
+        T target = identifiedObject.getFreshTarget();
         if (target != null) {
             targetMap.put(key, identifiedObject);
         }
@@ -151,48 +160,65 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
             identifiedObject.setFreshData(freshData);
         } else {
             targetMap.put(key,
-                new CachedIdentifiedObject(freshData));
+                new CachedIdentifiedObject(key, freshData));
         }
     }
 
     class CachedIdentifiedObject extends AbstractCachedObject<T> {
-
-        CachedIdentifiedObject(T target) {
+        private K key;
+        private ReentrantLock freshLock;
+        CachedIdentifiedObject(K key, T target) {
+            this.key = key;
             this.target = CollectionsOpt.unmodifiableObject(target);
-            this.evicted = false;
             this.refreshTime = DatetimeOpt.currentUtilDate();
+            this.freshLock = new ReentrantLock();
+            this.evicted = target == null;
         }
 
-        /**
-         *
-         */
-        CachedIdentifiedObject() {
-            this.target = null;
-            this.evicted = true;
+        CachedIdentifiedObject(K key) {
+            this(key, null);
         }
 
-        synchronized void refreshData(K key) {
+        /*synchronized*/ void refreshData() {
             //刷新派生缓存
-            evictDerivativeCahce();
-
-            T tempTarget = null;
-            try {
-                tempTarget = refresher.apply(key);
-            } catch (RuntimeException re) {
-                logger.error(re.getLocalizedMessage());
+            if(freshLock.isLocked()) {
+                try {
+                    //等待其他县城同步好，直接退出
+                    while (freshLock.isLocked() && this.target == null) {
+                        sleep(15);
+                    }
+                }catch (InterruptedException e){
+                    logger.error(e.getMessage());
+                }
+                return;
             }
-            setRefreshDataAndState(tempTarget, freshPeriod, true);
+
+            try {
+                freshLock.lock();
+                //刷新派生缓存
+                evictDerivativeCahce();
+                T tempTarget = null;
+                try {
+                    tempTarget = refresher.apply(this.key);
+                } catch (RuntimeException re) {
+                    logger.error(re.getLocalizedMessage());
+                }
+                setRefreshDataAndState(tempTarget, freshPeriod, true);
+            } finally {
+                freshLock.unlock();
+            }
         }
 
-        T getCachedTarget(K key) {
+        @Override
+        public T getCachedTarget() {
             if (this.target == null || isTargetOutOfDate(freshPeriod)) {
-                refreshData(key);
+                refreshData();
             }
             return target;
         }
 
-        T getFreshTarget(K key) {
-            refreshData(key);
+        T getFreshTarget() {
+            refreshData();
             return target;
         }
 

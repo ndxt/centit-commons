@@ -68,15 +68,20 @@ public class DerivativeCachedMap<K, D, T> extends AbstractCachedObject<Map<K, T>
     public T getCachedValue(K key) {
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject != null) {
-            return identifiedObject.getCachedTarget(key);
+            return identifiedObject.getCachedTarget();
         }
 
-        identifiedObject = new CachedIdentifiedObject();
-        T target = identifiedObject.getFreshTarget(key);
+        identifiedObject = new CachedIdentifiedObject(key);
+        T target = identifiedObject.getFreshTarget();
         if (target != null) {
             targetMap.put(key, identifiedObject);
         }
         return target;
+    }
+
+    @Override
+    public Map<K, T> getCachedTarget() {
+        throw new ObjectException("DerivativeCachedMap 不支持这个方法");
     }
 
     public Map<K, T> getRawTarget() {
@@ -92,16 +97,19 @@ public class DerivativeCachedMap<K, D, T> extends AbstractCachedObject<Map<K, T>
 
     class CachedIdentifiedObject extends AbstractCachedObject<T> {
         private AbstractCachedObject<D> parentCache;
-
-        CachedIdentifiedObject() {
+        private K key;
+        //private ReentrantLock freshLock;
+        CachedIdentifiedObject(K key) {
             this.target = null;
             this.evicted = true;
             this.parentCache = null;
+            this.key = key;
+            // this.freshLock = new ReentrantLock();
         }
 
-        synchronized void refreshData(K key) {
+        /*synchronized*/ void refreshData() {
             if (this.parentCache == null) {
-                this.parentCache = parentCachedMap.getCachedObject(key);
+                this.parentCache = parentCachedMap.getCachedObject(this.key);
                 if (this.parentCache != null) {
                     this.parentCache.addDeriveCache(this);
                 } else {
@@ -111,22 +119,24 @@ public class DerivativeCachedMap<K, D, T> extends AbstractCachedObject<Map<K, T>
 
             T tempTarget = null;
             try {
-                tempTarget = refresher.apply(parentCachedMap.getCachedValue(key));
+                //parentCachedMap.getCachedValue(this.key)
+                tempTarget = refresher.apply(parentCache.getCachedTarget());
             } catch (RuntimeException re) {
                 logger.error(re.getLocalizedMessage());
             }
             setRefreshDataAndState(tempTarget, freshPeriod, false);
         }
 
-        T getCachedTarget(K key) {
+        @Override
+        public T getCachedTarget() {
             if (this.target == null || isTargetOutOfDate(freshPeriod)) {
-                refreshData(key);
+                refreshData();
             }
             return target;
         }
 
-        T getFreshTarget(K key) {
-            refreshData(key);
+        T getFreshTarget() {
+            refreshData();
             return target;
         }
 

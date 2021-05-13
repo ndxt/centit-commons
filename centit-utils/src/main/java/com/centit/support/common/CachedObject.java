@@ -64,26 +64,31 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
             try {
                 //等待其他县城同步好，直接退出
                 while (freshLock.isLocked() && this.target == null) {
-                    sleep(50);
+                    sleep(20);
                 }
             }catch (InterruptedException e){
                 logger.error(e.getMessage());
             }
             return;
         }
-        freshLock.lock();
-        //刷新派生缓存
-        evictDerivativeCahce();
-        T tempTarget = null;
+
         try {
-            tempTarget = refresher.get();
-        } catch (RuntimeException re) {
-            logger.error(re.getMessage(), re);
+            freshLock.lock();
+            //刷新派生缓存
+            evictDerivativeCahce();
+            T tempTarget = null;
+            try {
+                tempTarget = refresher.get();
+            } catch (RuntimeException re) {
+                logger.error(re.getMessage(), re);
+            }
+            setRefreshDataAndState(tempTarget, freshPeriod, true);
+        } finally {
+            freshLock.unlock();
         }
-        setRefreshDataAndState(tempTarget, freshPeriod, true);
-        freshLock.unlock();
     }
 
+    @Override
     public T getCachedTarget() {
         if (this.target == null || isTargetOutOfDate(freshPeriod)) {
             refreshData();

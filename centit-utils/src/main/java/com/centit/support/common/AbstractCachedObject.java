@@ -59,4 +59,6 @@ public abstract class AbstractCachedObject<T> implements ICachedObject<T> {
         deriveCaches.add(eriveCache);
     }
 
+    public abstract T getCachedTarget();
+
 }
