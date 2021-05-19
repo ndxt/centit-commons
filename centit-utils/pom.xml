@@ -69,21 +69,21 @@
             <artifactId>tools</artifactId>
             <version>${jdk.version}</version>
             <scope>system</scope>
-            <systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>
+            <systemPath>${java.home}/../lib/tools.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sun</groupId>
             <artifactId>rt</artifactId>
             <version>${jdk.version}</version>
             <scope>system</scope>
-            <systemPath>${env.JAVA_HOME}/jre/lib/rt.jar</systemPath>
+            <systemPath>${java.home}/lib/rt.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.sun</groupId>
             <artifactId>jce</artifactId>
             <version>${jdk.version}</version>
             <scope>system</scope>
-            <systemPath>${env.JAVA_HOME}/jre/lib/jce.jar</systemPath>
+            <systemPath>${java.home}/lib/jce.jar</systemPath>
         </dependency>
     </dependencies>
 </project>
