@@ -558,7 +558,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                     JSONObject jo = new JSONObject();
                     for (int i = 0; i < colCount; i++) {
                         Object obj = rs.getObject(i + 1);
-                        if (obj != null) {
+                        if (obj != null && fields[i]!=null) {
                             if (obj instanceof Clob) {
                                 String fieldValue = DatabaseAccess.fetchClobString((Clob) obj);
                                 if (FieldType.JSON_OBJECT.equals(fields[i].getFieldType())) {
