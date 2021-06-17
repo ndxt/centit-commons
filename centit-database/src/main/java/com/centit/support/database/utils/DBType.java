@@ -41,7 +41,7 @@ public enum DBType {
     private static HashMap<DBType, String> dbDrivers = new HashMap<DBType, String>() {
         {
             put(Oracle, "oracle.jdbc.driver.OracleDriver");
-            put(DB2, "com.ibm.db2.jdbc.app.DB2Driver");
+            put(DB2, "com.ibm.db2.jcc.DB2Driver");
             put(SqlServer, "com.microsoft.sqlserver.jdbc.SQLServerDriver");
             put(Access, "net.ucanaccess.jdbc.UcanaccessDriver");
             put(MySql, "com.mysql.jdbc.Driver");
