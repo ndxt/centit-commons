@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 69;
+    public static final int functionsSum = 70;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -34,6 +34,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("countnull", -1, ConstDefine.FUNC_COUNTNULL, ConstDefine.TYPE_NUM),    // 计数空参数  countnull(1,,"2",,,,1,1,4) = 4
         new FunctionInfo("sum", -1, ConstDefine.FUNC_SUM, ConstDefine.TYPE_NUM),    // 求和 sum (1,2,3,4,5) = 15
         new FunctionInfo("stddev", -1, ConstDefine.FUNC_STDDEV, ConstDefine.TYPE_NUM),    // 求标准偏差
+        new FunctionInfo("distinct", -1, ConstDefine.FUNC_DISTINCT, ConstDefine.TYPE_ANY),    // 去重
 
         new FunctionInfo("round", -1, ConstDefine.FUNC_ROUND, ConstDefine.TYPE_NUM),    // 四舍五入
         new FunctionInfo("floor", -1, ConstDefine.FUNC_FLOOR, ConstDefine.TYPE_NUM),    // 四舍五入
@@ -42,7 +43,6 @@ public abstract class EmbedFunc {
         new FunctionInfo("strcat", -1, ConstDefine.FUNC_STRCAT, ConstDefine.TYPE_STR),    // 连接字符串 strcat ("12","34","56")="123456"
         new FunctionInfo("isempty", 1, ConstDefine.FUNC_ISEMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 isempty("")=1
         new FunctionInfo("isnotempty", 1, ConstDefine.FUNC_NOTEMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 notempty("")=0
-
 
         new FunctionInfo("log", 1, ConstDefine.FUNC_LOG, ConstDefine.TYPE_NUM),    // 求以10为底的对数
         new FunctionInfo("ln", 1, ConstDefine.FUNC_LN, ConstDefine.TYPE_NUM),        // 求自然对数
@@ -783,6 +783,16 @@ public abstract class EmbedFunc {
                     return JSON.parse((String) slOperand.get(0));
                 }
                 return slOperand.get(0);
+            }
+
+            case ConstDefine.FUNC_DISTINCT: {// 去重
+                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
+                if(opt.getLeft() < 2){
+                    return opt.getRight();
+                }
+                Set<Object> retSet = new HashSet<>(opt.getLeft());
+                retSet.addAll(opt.getRight());
+                return retSet;
             }
 
             case ConstDefine.FUNC_TO_NUMBER: {//
