@@ -558,7 +558,7 @@ public class VariableFormula {
         if (!")".equals(str)) {
             return null;
         }
-        return func.apply(CollectionsOpt.listToArray(slOperand));
+        return func.apply(CollectionsOpt.listToArray(slOperand, Object.class));
     }
 
     public Object calcFormula(String szExpress) {
