@@ -3,6 +3,7 @@ package com.centit.support.json;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,11 @@ public class JSONTransformer {
                     List<Object> loopData = CollectionsOpt.objectToList(obj);
                     for(Object ld : loopData){
                         dataSupport.pushStackValue(ld);
-                        array.add(transformer(ent.getValue(), dataSupport));
+                        if(StringBaseOpt.isNvl(String.valueOf(ent.getValue()))){
+                            array.add(ld);
+                        }else {
+                            array.add(transformer(ent.getValue(), dataSupport));
+                        }
                         dataSupport.popStackValue();
                     }
                     return array;
