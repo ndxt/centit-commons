@@ -196,9 +196,22 @@ public class VariableFormula {
         } else*/
         if (str.charAt(0) == '(') {
             Object resStr = calcFormula();
+            // 添加集合属性 （,,)
             str = lex.getAWord();
-            if (str == null || str.length() == 0 || str.charAt(0) != ')') return null;
-            return resStr;
+            if(",".equals(str)) {
+                List<Object> retSet = new ArrayList<>();
+                retSet.add(resStr);
+                while (",".equals(str)) {
+                    Object nextObj = calcFormula();
+                    retSet.add(nextObj);
+                    str = lex.getAWord();
+                }
+                if (str == null || str.length() == 0 || str.charAt(0) != ')') return null;
+                return retSet;
+            }  else {
+                if (str == null || str.length() == 0 || str.charAt(0) != ')') return null;
+                return resStr;
+            }
         } else if ((str.charAt(0) == '!') || str.equalsIgnoreCase("NOT")) {
             Object obj = calcItem();
             return !BooleanBaseOpt.castObjectToBoolean(obj, false);
@@ -545,7 +558,7 @@ public class VariableFormula {
         if (!")".equals(str)) {
             return null;
         }
-        return func.apply(CollectionsOpt.listToArray(slOperand));
+        return func.apply(CollectionsOpt.listToArray(slOperand, Object.class));
     }
 
     public Object calcFormula(String szExpress) {

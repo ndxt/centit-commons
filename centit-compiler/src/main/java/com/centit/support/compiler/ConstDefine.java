@@ -79,6 +79,7 @@ public abstract class ConstDefine {
     public static final int FUNC_GET_ATTR = 168;
     public static final int FUNC_SET_ATTR = 169;
     public static final int FUNC_TO_OBJECT = 170;
+    public static final int FUNC_DISTINCT = 171;
 
     public static final int OP_BASE = 30;    // +
     public static final int OP_ADD = 30;    // +
