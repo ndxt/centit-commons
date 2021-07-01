@@ -124,7 +124,7 @@ public abstract class RSASecurityUtils {
     public static KeyPair keyPairFromJson(String keyJsonString) throws InvalidKeyException {
         JSONObject keyJson = JSON.parseObject(keyJsonString);
         return new KeyPair(
-            RSAPublicKeyImpl.newKey(Base64.decodeBase64(keyJson.getString("public"))),
+            new RSAPublicKeyImpl(Base64.decodeBase64(keyJson.getString("public"))),
             RSAPrivateCrtKeyImpl.newKey(
                 Base64.decodeBase64(keyJson.getString("private"))));
     }
