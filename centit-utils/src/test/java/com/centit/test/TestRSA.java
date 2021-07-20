@@ -64,9 +64,9 @@ public class TestRSA {
         /*Map<String,KeyRep> keyPair = FileIOOpt.readObjectAsJsonFromFile(
                 "D:/Projects/RunData/temp/keyPair.json", HashMap<String,KeyRep>.);
         */
-        KeyPair keyPair = RSASecurityUtils.keyPairFromJson(sjson);
+        //KeyPair keyPair = RSASecurityUtils.keyPairFromJson(sjson);
 
-        String cryptograph = RSASecurityUtils.encrypt(source, keyPair.getPublic());// 生成的密文
+        /*String cryptograph = RSASecurityUtils.encrypt(source, keyPair.getPublic());// 生成的密文
         System.out.print("用公钥加密后的结果为:" + cryptograph);
         System.out.println();
 
@@ -80,6 +80,6 @@ public class TestRSA {
 
         target = RSASecurityUtils.decrypt(cryptograph, keyPair.getPublic());// 解密密文
         System.out.println("用公钥解密后的字符串为：" + target);
-        System.out.println();
+        System.out.println();*/
     }
 }

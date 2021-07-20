@@ -10,7 +10,8 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
-        testStringTemplate();
+        System.out.println(VariableFormula.calculate("2*3, 15+7"));
+        //testStringTemplate();
         //System.out.println(JSON.toJSON(null));
         //testFormula();
         //testFormula2();
