@@ -485,7 +485,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                     currentBuild.append(alias).append('.');
                 }
                 currentBuild.append(col.getColumnName());
-                // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne
+                // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne 8:ni
                 switch (optSuffix) {
                     case "_gt":
                         currentBuild.append(" > :").append(plCol);
