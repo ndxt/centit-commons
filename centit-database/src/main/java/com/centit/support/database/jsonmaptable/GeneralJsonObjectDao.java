@@ -505,6 +505,9 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                     case "_in":
                         currentBuild.append(" in (:").append(plCol).append(")");
                         break;
+                    case "_ni":
+                        currentBuild.append(" not in (:").append(plCol).append(")");
+                        break;
                     case "_ne":
                         currentBuild.append(" <> :").append(plCol);
                         break;
