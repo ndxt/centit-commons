@@ -39,6 +39,7 @@ public class TimeInterval implements Serializable {
         final long now = getTime();
         if(startTime==null){
             startTime = now;
+            return 0L;
         }
         long inter = now - startTime;
         startTime = now;
