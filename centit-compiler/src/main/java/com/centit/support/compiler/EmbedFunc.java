@@ -17,13 +17,10 @@ public abstract class EmbedFunc {
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
-        //          byte (4321.789,-2)=8
-        //          byte ("4321.789",2)=3
         new FunctionInfo("capital", 1, ConstDefine.FUNC_CAPITAL, ConstDefine.TYPE_STR),  // capital (123.45)="一百二十三点四五"
         new FunctionInfo("if", 3, ConstDefine.FUNC_IF, ConstDefine.TYPE_ANY),      // if (1,2,3)= 2  if (0,"2","3")= "3"
         new FunctionInfo("case", 2, ConstDefine.FUNC_CASE, ConstDefine.TYPE_ANY),      // case(1,2,3)= null  case(1,2,3,1,"5")= "5"  case(0,1,"2","3")= "3"
         new FunctionInfo("match", 2, ConstDefine.FUNC_MATCH, ConstDefine.TYPE_NUM), //匹配*?为通配符 match ("abcd","a??d")=1
-        //             match ("abcd","a*d")=1
         new FunctionInfo("regexmatch", 2, ConstDefine.FUNC_REG_MATCH, ConstDefine.TYPE_NUM), //正则表达式 regexMatch
         new FunctionInfo("regexmatchvalue", 2, ConstDefine.FUNC_REG_MATCH_VALUES, ConstDefine.TYPE_ANY), //正则表达式匹配部分
         new FunctionInfo("max", -1, ConstDefine.FUNC_MAX, ConstDefine.TYPE_ANY),   // 求最大值 max (1,2,3,5,4) = 5
@@ -35,7 +32,6 @@ public abstract class EmbedFunc {
         new FunctionInfo("sum", -1, ConstDefine.FUNC_SUM, ConstDefine.TYPE_NUM),    // 求和 sum (1,2,3,4,5) = 15
         new FunctionInfo("stddev", -1, ConstDefine.FUNC_STDDEV, ConstDefine.TYPE_NUM),    // 求标准偏差
         new FunctionInfo("distinct", -1, ConstDefine.FUNC_DISTINCT, ConstDefine.TYPE_ANY),    // 去重
-
         new FunctionInfo("round", -1, ConstDefine.FUNC_ROUND, ConstDefine.TYPE_NUM),    // 四舍五入
         new FunctionInfo("floor", -1, ConstDefine.FUNC_FLOOR, ConstDefine.TYPE_NUM),    // 四舍五入
         new FunctionInfo("ceil", -1, ConstDefine.FUNC_CEIL, ConstDefine.TYPE_NUM),    // 四舍五入
@@ -43,7 +39,6 @@ public abstract class EmbedFunc {
         new FunctionInfo("strcat", -1, ConstDefine.FUNC_STRCAT, ConstDefine.TYPE_STR),    // 连接字符串 strcat ("12","34","56")="123456"
         new FunctionInfo("isempty", 1, ConstDefine.FUNC_ISEMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 isempty("")=1
         new FunctionInfo("isnotempty", 1, ConstDefine.FUNC_NOTEMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 notempty("")=0
-
         new FunctionInfo("log", 1, ConstDefine.FUNC_LOG, ConstDefine.TYPE_NUM),    // 求以10为底的对数
         new FunctionInfo("ln", 1, ConstDefine.FUNC_LN, ConstDefine.TYPE_NUM),        // 求自然对数
         new FunctionInfo("sin", 1, ConstDefine.FUNC_SIN, ConstDefine.TYPE_NUM),    // 求正弦
@@ -52,7 +47,6 @@ public abstract class EmbedFunc {
         new FunctionInfo("ctan", 1, ConstDefine.FUNC_CTAN, ConstDefine.TYPE_NUM),    // 求余切
         new FunctionInfo("exp", 1, ConstDefine.FUNC_EXP, ConstDefine.TYPE_NUM),    // 求以e为底的指数
         new FunctionInfo("sqrt", 1, ConstDefine.FUNC_SQRT, ConstDefine.TYPE_NUM),    // 求平方根
-        //字符串函数
         new FunctionInfo("upcase", 1, ConstDefine.FUNC_UPCASE, ConstDefine.TYPE_STR), // 字符串大写
         new FunctionInfo("lowcase", 1, ConstDefine.FUNC_LOWCASE, ConstDefine.TYPE_STR), // 字符串小写
         new FunctionInfo("substr", 2, ConstDefine.FUNC_SUBSTR, ConstDefine.TYPE_STR), // 求字符串子串 substr ("123456",2,3)="345"
@@ -61,11 +55,9 @@ public abstract class EmbedFunc {
         new FunctionInfo("find", 2, ConstDefine.FUNC_FIND, ConstDefine.TYPE_NUM),  //求子串位置 find ("123456","34")=2  find ("123456","35")=-1
         new FunctionInfo("frequence", 2, ConstDefine.FUNC_FREQUENCE, ConstDefine.TYPE_NUM), // 求子串个数 find ("12345236","23")=2
         new FunctionInfo("split", 2, ConstDefine.FUNC_SPLIT_STR, ConstDefine.TYPE_STR),
-
         new FunctionInfo("int", 1, ConstDefine.FUNC_INT, ConstDefine.TYPE_NUM), // 求整数部分 int (12.34)=12 int -12.34)=-12
         new FunctionInfo("integer", 1, ConstDefine.FUNC_INT, ConstDefine.TYPE_NUM), // 求整数部分 integer (12.34)=12 int (-12.34)=-12
         new FunctionInfo("frac", 1, ConstDefine.FUNC_FRAC, ConstDefine.TYPE_NUM), // 求小数部分 frac (12.34)=0.34 frac (-12.34)=-0.34
-
         new FunctionInfo("today", -1, ConstDefine.FUNC_CURRENT_DATETIME, ConstDefine.TYPE_DATE),//当前日期
         new FunctionInfo("currentDate", -1, ConstDefine.FUNC_CURRENT_DATE, ConstDefine.TYPE_DATE),//当前日期
         new FunctionInfo("currentDatetime", -1, ConstDefine.FUNC_CURRENT_DATETIME, ConstDefine.TYPE_DATE),//当前时间
@@ -77,28 +69,21 @@ public abstract class EmbedFunc {
         new FunctionInfo("weekday", -1, ConstDefine.FUNC_WEEK_DAY, ConstDefine.TYPE_STR),// 星期几， 取日期的星期几，周日为0，周一~六为1~6
         new FunctionInfo("formatdate", 1, ConstDefine.FUNC_FORMAT_DATE, ConstDefine.TYPE_STR),// 格式化日期
         new FunctionInfo("dateinfo", -1, ConstDefine.FUNC_DATE_INFO, ConstDefine.TYPE_STR),// 日期信息
-
         new FunctionInfo("dayspan", -1, ConstDefine.FUNC_DAY_SPAN, ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
         new FunctionInfo("datespan", -1, ConstDefine.FUNC_DATE_SPAN, ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
-        //new FunctionInfo("monthspan",-1,ConstDefine.FUNC_MONTH_SPAN,ConstDefine.TYPE_NUM),//日期函数   求两日期之间的月数
-        //new FunctionInfo("yearspan",-1,ConstDefine.FUNC_YEAR_SPAN,ConstDefine.TYPE_NUM),//日期函数   求两日期之间的年数
-
         new FunctionInfo("adddate", 2, ConstDefine.FUNC_ADD_DATE, ConstDefine.TYPE_ANY),//日期函数  加天数
         new FunctionInfo("adddays", 2, ConstDefine.FUNC_ADD_DAYS, ConstDefine.TYPE_ANY),//日期函数  加天数
         new FunctionInfo("addmonths", 2, ConstDefine.FUNC_ADD_MONTHS, ConstDefine.TYPE_ANY),//日期函数  加月数
         new FunctionInfo("addyears", 2, ConstDefine.FUNC_ADD_YEARS, ConstDefine.TYPE_ANY),//日期函数   加年数
         new FunctionInfo("truncdate", -1, ConstDefine.FUNC_TRUNC_DATE, ConstDefine.TYPE_ANY),//日期函数   截断日期  第二个参数  Y ，M , D 分别返回一年、月的第一天 ，或者一日的零点
         new FunctionInfo("lastofmonth", -1, ConstDefine.FUNC_LAST_OF_MONTH, ConstDefine.TYPE_ANY),//日期函数   求这个月的第一天
-
         new FunctionInfo("toDate", 1, ConstDefine.FUNC_TO_DATE, ConstDefine.TYPE_DATE),// 转换为日期
         new FunctionInfo("toString", 1, ConstDefine.FUNC_TO_STRING, ConstDefine.TYPE_STR),//转换为String
         new FunctionInfo("toObject", 1, ConstDefine.FUNC_TO_OBJECT, ConstDefine.TYPE_ANY),//转换为json 对象
         new FunctionInfo("toNumber", 1, ConstDefine.FUNC_TO_NUMBER, ConstDefine.TYPE_NUM),//转换为数字
         new FunctionInfo("singleton", -1, ConstDefine.FUNC_SINGLETON, ConstDefine.TYPE_ANY),//返回集合，去重
-
         new FunctionInfo("attr", 2, ConstDefine.FUNC_GET_ATTR, ConstDefine.TYPE_ANY),//获取对象属性
         new FunctionInfo("setAttr", 3, ConstDefine.FUNC_SET_ATTR, ConstDefine.TYPE_ANY),//设置对象属性
-        //new FunctionInfo("getsysstr",1,ConstDefine.FUNC_GET_STR,ConstDefine.TYPE_STR),//取系统字符串
         new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR)//取汉字拼音
     };
     private static double COMPARE_MIN_DOUBLE = 0.0000001;
