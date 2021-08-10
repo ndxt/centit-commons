@@ -171,10 +171,16 @@ public abstract class HttpExecutor {
             for (Map.Entry<String, String> entHeader : executorContext.getHttpHeaders().entrySet())
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
         }
-        if (executorContext.getHttpProxy() != null) {
-            RequestConfig config = RequestConfig.custom().setProxy(executorContext.getHttpProxy())
-                .build();
-            httpRequest.setConfig(config);
+        if(executorContext.getHttpProxy() != null || executorContext.getTimeout() != -1) {
+            RequestConfig.Builder builder = RequestConfig.custom();
+            if (executorContext.getHttpProxy() != null) {
+                builder.setProxy(executorContext.getHttpProxy());
+            }
+            if(executorContext.getTimeout()!=-1){
+                builder.setConnectionRequestTimeout(executorContext.getTimeout())
+                    .setSocketTimeout(executorContext.getTimeout()).setConnectTimeout(executorContext.getTimeout());
+            }
+            httpRequest.setConfig(builder.build());
         }
         //}
         CloseableHttpClient httpClient = null;
@@ -214,16 +220,6 @@ public abstract class HttpExecutor {
         HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamsToUrl(uri, queryParam));
         return httpExecute(executorContext, httpGet);
     }
-    public static String simpleGetWithClose(HttpExecutorContext executorContext, String uri, Map<String, Object> queryParam)
-        throws IOException {
-        HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamsToUrl(uri, queryParam));
-        httpGet.addHeader("Connection", "close");
-        RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(5000)
-            .setSocketTimeout(5000).setConnectTimeout(5000).build();
-        httpGet.setConfig(requestConfig);
-        return httpExecute(executorContext, httpGet);
-    }
-
 
     public static String simpleGet(HttpExecutorContext executorContext, String uri)
         throws IOException {
@@ -249,15 +245,7 @@ public abstract class HttpExecutor {
         HttpDelete httpDelete = new HttpDelete(UrlOptUtils.appendParamsToUrl(uri, queryParam));
         return httpExecute(executorContext, httpDelete);
     }
-    public static String simpleDeleteWithClose(HttpExecutorContext executorContext, String uri, Map<String, Object> queryParam)
-        throws IOException {
-        HttpDelete httpDelete = new HttpDelete(UrlOptUtils.appendParamsToUrl(uri, queryParam));
-        httpDelete.setHeader("Connection", "close");
-        RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(5000)
-            .setSocketTimeout(5000).setConnectTimeout(5000).build();
-        httpDelete.setConfig(requestConfig);
-        return httpExecute(executorContext, httpDelete);
-    }
+
 
     public static String simplePut(HttpExecutorContext executorContext,
                                    String uri, String putEntity)
@@ -602,31 +590,6 @@ public abstract class HttpExecutor {
 
         return httpExecute(executorContext, httpPost);
     }
-    public static String jsonPostWithClose(HttpExecutorContext executorContext,
-                                  String uri, Object jsonObj, final boolean asPutMethod)
-        throws IOException {
-        String jsonString = null;
-        if (jsonObj != null) {
-            if (jsonObj instanceof String) {
-                jsonString = (String) jsonObj;
-            } else {
-                jsonString = JSON.toJSONString(jsonObj);
-            }
-        }
-
-        HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-        httpPost.setHeader("Content-Type", applicationJSONHead);
-        httpPost.setHeader("Connection", "close");
-        RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(5000)
-            .setSocketTimeout(5000).setConnectTimeout(5000).build();
-        httpPost.setConfig(requestConfig);
-        if (jsonString != null && ! "".equals(jsonString)) {
-            StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
-            httpPost.setEntity(entity);
-        }
-
-        return httpExecute(executorContext, httpPost);
-    }
 
     public static String jsonPost(HttpExecutorContext executorContext,
                                   String uri, Object obj)
@@ -654,31 +617,6 @@ public abstract class HttpExecutor {
         }
         return httpExecute(executorContext, httpPut);
     }
-    public static String jsonPutWithClose(HttpExecutorContext executorContext,
-                                 String uri, Object jsonObj)
-        throws IOException {
-        String jsonString = null;
-        if (jsonObj != null) {
-            if (jsonObj instanceof String) {
-                jsonString = (String) jsonObj;
-            } else {
-                jsonString = JSON.toJSONString(jsonObj);
-            }
-        }
-        HttpPut httpPut = new HttpPut(uri);
-        httpPut.setHeader("Content-Type", applicationJSONHead);
-        httpPut.setHeader("Connection", "close");
-        RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(5000)
-            .setSocketTimeout(5000).setConnectTimeout(5000).build();
-        httpPut.setConfig(requestConfig);
-        if (jsonString != null && !"".equals(jsonString)) {
-            StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
-            httpPut.setEntity(entity);
-        }
-        return httpExecute(executorContext, httpPut);
-    }
-
-
 
     public static String xmlPost(HttpExecutorContext executorContext,
                                  String uri, String xmlEntity, final boolean asPutMethod)
