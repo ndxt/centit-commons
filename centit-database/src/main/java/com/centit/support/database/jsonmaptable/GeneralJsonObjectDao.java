@@ -570,7 +570,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                                     jo.put(fields[i].getPropertyName(), fieldValue);
                                 }
                             } else if (obj instanceof Blob) {
-                                jo.put(fields[i].getPropertyName(), DatabaseAccess.fetchBlobAsBase64((Blob) obj));
+                                jo.put(fields[i].getPropertyName(), DatabaseAccess.fetchBlobBytes((Blob) obj));
                             } else {
                                 if (FieldType.BOOLEAN.equals(fields[i].getFieldType())) {
                                     jo.put(fields[i].getPropertyName(),
