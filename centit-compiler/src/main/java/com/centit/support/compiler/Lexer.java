@@ -171,12 +171,9 @@ public class Lexer {
             startPos++;
         if (startPos >= sl) return "";
 
-
         int bp = startPos;
-        // 数字
-        if ((formulaSen.charAt(startPos) >= '0' && formulaSen.charAt(startPos) <= '9') ||
-            //m_Formula.charAt(m_iStart)== '.' ||
-            (!canAcceptOpt && (formulaSen.charAt(startPos) == '-' || formulaSen.charAt(startPos) == '+'))) {
+        // + - 符合开头的数字
+        if (!canAcceptOpt && (formulaSen.charAt(startPos) == '-' || formulaSen.charAt(startPos) == '+')) {
             startPos++;
             int nPoints = 0;
             while (startPos < sl && (
@@ -190,19 +187,20 @@ public class Lexer {
                 startPos++;
             }
             canAcceptOpt = true;
-            // 标识符
-        } else if ((formulaSen.charAt(startPos) >= 'a' && formulaSen.charAt(startPos) <= 'z') ||
+            // 数值开头的 数字，或者uuid  标识符
+        } else if ((formulaSen.charAt(startPos) >= '0' && formulaSen.charAt(startPos) <= '9') ||
+            (formulaSen.charAt(startPos) >= 'a' && formulaSen.charAt(startPos) <= 'z') ||
             (formulaSen.charAt(startPos) >= 'A' && formulaSen.charAt(startPos) <= 'Z') ||
-            formulaSen.charAt(startPos) == '_' /*||
-            formulaSen.charAt(startPos)=='@' */) {
+            formulaSen.charAt(startPos) == '_' /*|| formulaSen.charAt(startPos)=='@' */) {
             startPos++;
             while (startPos < sl && (
                 (formulaSen.charAt(startPos) >= '0' && formulaSen.charAt(startPos) <= '9') ||
                     (formulaSen.charAt(startPos) >= 'a' && formulaSen.charAt(startPos) <= 'z') ||
                     (formulaSen.charAt(startPos) >= 'A' && formulaSen.charAt(startPos) <= 'Z') ||
                     formulaSen.charAt(startPos) == '_' || formulaSen.charAt(startPos) == '.' /*||
-                      formulaSen.charAt(startPos)=='@'*/))
+                      formulaSen.charAt(startPos)=='@'*/)) {
                 startPos++;
+            }
             canAcceptOpt = true;
         } else {
             canAcceptOpt = false;
@@ -280,7 +278,32 @@ public class Lexer {
                     break;
             }
         }
+        return formulaSen.substring(bp, startPos);
+    }
 
+    public String getAString() {
+        int sl = formulaSen.length();
+        while ((startPos < sl) && (formulaSen.charAt(startPos) == ' ' || formulaSen.charAt(startPos) == 9 || formulaSen.charAt(startPos) == 10 || formulaSen.charAt(startPos) == 13))
+            startPos++;
+        if (startPos >= sl) return "";
+        int bp = startPos;
+        if ((formulaSen.charAt(startPos) >= '0' && formulaSen.charAt(startPos) <= '9') ||
+            (formulaSen.charAt(startPos) >= 'a' && formulaSen.charAt(startPos) <= 'z') ||
+            (formulaSen.charAt(startPos) >= 'A' && formulaSen.charAt(startPos) <= 'Z') ||
+            formulaSen.charAt(startPos) == '_' || formulaSen.charAt(startPos) == '.' /*||
+            formulaSen.charAt(startPos)=='@' */) {
+            startPos++;
+            while (startPos < sl && (
+                (formulaSen.charAt(startPos) >= '0' && formulaSen.charAt(startPos) <= '9') ||
+                    (formulaSen.charAt(startPos) >= 'a' && formulaSen.charAt(startPos) <= 'z') ||
+                    (formulaSen.charAt(startPos) >= 'A' && formulaSen.charAt(startPos) <= 'Z') ||
+                    formulaSen.charAt(startPos) == '_' || formulaSen.charAt(startPos) == '.' /*||
+                      formulaSen.charAt(startPos)=='@'*/)) {
+                startPos++;
+            }
+        } else {
+            startPos++;
+        }
         return formulaSen.substring(bp, startPos);
     }
 
