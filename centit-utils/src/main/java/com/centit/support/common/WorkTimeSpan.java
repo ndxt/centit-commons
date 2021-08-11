@@ -224,7 +224,7 @@ public class WorkTimeSpan implements java.io.Serializable {
         this.setTimeSpan(beginDate.getTime() - endDate.getTime());
         return this;
     }
-
+    //默认值为 分钟
     public void fromString(String sTimeSpan) {
         int sign = 1;
         long nDays = 0;
@@ -284,6 +284,7 @@ public class WorkTimeSpan implements java.io.Serializable {
                     break;
             }
         }
+
         timeSpan = sign * (
             nDays * DAY_MILLISECONDS +
                 nHours * HOUR_MILLISECONDS +
@@ -361,7 +362,7 @@ public class WorkTimeSpan implements java.io.Serializable {
      *
      * @return 分钟
      */
-    public long toNumber() {
+    public long toNumberAsMinute() {
         return this.getSign() * (toAbsNumberAsMillisecond() / MINUTE_MILLISECONDS);
     }
 
@@ -372,7 +373,7 @@ public class WorkTimeSpan implements java.io.Serializable {
     /*
      * 默认单位分钟
      */
-    public void fromNumber(long lSpan) {
+    public void fromNumberAsMinute(long lSpan) {
         fromNumberAsMillisecond(lSpan * MINUTE_MILLISECONDS);
     }
 
