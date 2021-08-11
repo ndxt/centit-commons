@@ -13,12 +13,14 @@ public class HttpExecutorContext {
     private HttpContext httpContext;
     private Map<String, String> httpHeaders;
     private HttpHost httpProxy;
+    private int timeout;
 
     public HttpExecutorContext() {
         httpHeaders = null;
         httpContext = null;
         httpclient = null;
         httpProxy = null;
+        timeout=-1;
     }
 
     public static HttpExecutorContext create() {
@@ -61,6 +63,13 @@ public class HttpExecutorContext {
         }
         httpHeaders.put(name, value);
         return this;
+    }
+    public HttpExecutorContext timout(int timeout){
+        this.timeout=timeout;
+        return  this;
+    }
+    public int getTimeout(){
+        return this.timeout;
     }
 
 
