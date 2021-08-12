@@ -325,6 +325,10 @@ public class WorkTimeSpan implements java.io.Serializable {
      */
     @Override
     public String toString() {
+        return toStringAsMinute();
+    }
+
+    public String toStringAsMinute() {
         return getSignString() + (getDays() != 0 ? getDays() + "D" : "") +
             (getHours() != 0 ? getHours() + "H" : "") +
             (getMinutes() != 0 ? getMinutes() + "M" : "");
