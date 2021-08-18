@@ -14,6 +14,9 @@ public abstract class BooleanBaseOpt {
     public static final String STRING_YES = "yes";
     public static final String STRING_NO = "no";
 
+    public static final String STRING_ON = "on";
+    public static final String STRING_OFF = "off";
+
     private BooleanBaseOpt() {
         throw new IllegalAccessError("Utility class");
     }
