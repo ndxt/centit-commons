@@ -117,11 +117,7 @@ public class JdbcMetadata implements DatabaseMetadata {
         try {
             String dbSechema = this.getDBSchema();
             String dbCatalog = this.getDBCatalog();
-            if (dbSechema != null) {
-                tab.setSchema(dbc.getSchema().toUpperCase());
-            }
             DatabaseMetaData dbmd = dbc.getMetaData();
-
             ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, tabName, null);
             if (rs.next()) {
                 tab.setTableLabelName(rs.getString("REMARKS"));
