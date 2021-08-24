@@ -9,6 +9,14 @@ public abstract class BooleanBaseOpt {
     public static final String STRING_TRUE = "true";
     public static final String STRING_FALSE = "false";
 
+    public static final String ONE_CHAR_YES = "Y";
+    public static final String ONE_CHAR_NO = "N";
+    public static final String STRING_YES = "yes";
+    public static final String STRING_NO = "no";
+
+    public static final String STRING_ON = "on";
+    public static final String STRING_OFF = "off";
+
     private BooleanBaseOpt() {
         throw new IllegalAccessError("Utility class");
     }
