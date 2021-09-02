@@ -171,8 +171,8 @@ public abstract class HttpExecutor {
             for (Map.Entry<String, String> entHeader : executorContext.getHttpHeaders().entrySet())
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
         }
+        RequestConfig.Builder builder = RequestConfig.custom().setRedirectsEnabled(false);
         if(executorContext.getHttpProxy() != null || executorContext.getTimeout() != -1) {
-            RequestConfig.Builder builder = RequestConfig.custom();
             if (executorContext.getHttpProxy() != null) {
                 builder.setProxy(executorContext.getHttpProxy());
             }
@@ -180,6 +180,8 @@ public abstract class HttpExecutor {
                 builder.setConnectionRequestTimeout(executorContext.getTimeout())
                     .setSocketTimeout(executorContext.getTimeout()).setConnectTimeout(executorContext.getTimeout());
             }
+            httpRequest.setConfig(builder.build());
+        }else {
             httpRequest.setConfig(builder.build());
         }
         //}
