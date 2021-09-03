@@ -472,7 +472,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                         currentBuild = new StringBuilder();
                         filterGroup.put(groupName, currentBuild);
                     } else {
-                        currentBuild.append(" or ");
+                        currentBuild.append(" and ");
                     }
                 } else {
                     currentBuild = sBuilder;
@@ -524,13 +524,13 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             }
         }// for
         if(filterGroup != null){
+            i=0;
             for(Map.Entry<String, StringBuilder> ent : filterGroup.entrySet()){
                 if (i > 0) {
-                    sBuilder.append(" and ");
+                    sBuilder.append(" or ");
                 }
                 i++;
                 sBuilder.append(" ( ").append(ent.getValue()).append(" )");
-
             }
         }
         return sBuilder.toString();
