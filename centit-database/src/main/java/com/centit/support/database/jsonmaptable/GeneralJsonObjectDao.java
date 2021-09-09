@@ -429,35 +429,32 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return sBuilder.toString();
     }
 
-    /*
-     * 重构; 添加分组的概念， 同一分组用 or 连接， 不同分组或者没有分组的用 and 连接
-     */
     public static String buildFilterSql(TableInfo ti, String alias, Collection<String> properties) {
         StringBuilder sBuilder = new StringBuilder();
-        int i = 0;
+        boolean needAppendAndSign = false;
         Map<String, StringBuilder> filterGroup = null;
         for (String plCol : properties) {
-            int strlen = plCol.length();
+            int plColLength = plCol.length();
             boolean beGroup = false;
             String groupName="nog";
             String optSuffix = "none";
             int pos = 3;
-            if(strlen>3) {
-                if ((plCol.charAt(0) == 'g' || plCol.charAt(0) == 'G') &&
+            if(plColLength>3) {
+                boolean haveGroupSign=(plCol.charAt(0) == 'g' || plCol.charAt(0) == 'G') &&
                     plCol.charAt(1) >= '0' && plCol.charAt(1) <= '9' &&
-                    (plCol.charAt(2) == '_' || plCol.charAt(3) == '_')) {
+                    (plCol.charAt(2) == '_' || plCol.charAt(3) == '_');
+                if (haveGroupSign) {
                     groupName = "g" + plCol.charAt(1);
                     beGroup = true;
                     if (plCol.charAt(3) == '_') {
                         pos = 4;
                     }
                 }
-                optSuffix = plCol.substring(strlen - 3).toLowerCase();
+                optSuffix = plCol.substring(plColLength - 3).toLowerCase();
             }
             String propName = beGroup ?
-                (optSuffix.charAt(0)=='_'? plCol.substring(pos,strlen- 3) : plCol.substring(pos)) :
-                (optSuffix.charAt(0)=='_'? plCol.substring(0,strlen- 3) : plCol);
-
+                (optSuffix.charAt(0)=='_'? plCol.substring(pos,plColLength- 3) : plCol.substring(pos)) :
+                (optSuffix.charAt(0)=='_'? plCol.substring(0,plColLength- 3) : plCol);
             TableField col = ti.findFieldByName(propName);
             if(col != null){
                 StringBuilder currentBuild = null;
@@ -476,64 +473,74 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                     }
                 } else {
                     currentBuild = sBuilder;
-                    if (i > 0) {
+                    if (needAppendAndSign) {
                         sBuilder.append(" and ");
                     }
-                    i++;
+                    needAppendAndSign=true;
                 }
                 if (StringUtils.isNotBlank(alias)) {
                     currentBuild.append(alias).append('.');
                 }
                 currentBuild.append(col.getColumnName());
                 // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne 8:ni
-                switch (optSuffix) {
-                    case "_gt":
-                        currentBuild.append(" > :").append(plCol);
-                        break;
-                    case "_ge":
-                        currentBuild.append(" >= :").append(plCol);
-                        break;
-                    case "_lt":
-                        currentBuild.append(" < :").append(plCol);
-                        break;
-                    case "_le":
-                        currentBuild.append(" <= :").append(plCol);
-                        break;
-                    case "_lk":
-                        currentBuild.append(" like :").append(plCol);
-                        break;
-                    case "_in":
-                        currentBuild.append(" in (:").append(plCol).append(")");
-                        break;
-                    case "_ni":
-                        currentBuild.append(" not in (:").append(plCol).append(")");
-                        break;
-                    case "_ne":
-                        currentBuild.append(" <> :").append(plCol);
-                        break;
-                    case "_nv":
-                        currentBuild.append(" is null");
-                        break;
-                    case "_nn":
-                        currentBuild.append(" is not null");
-                        break;
-                    default:
-                        currentBuild.append(" = :").append(plCol);
-                        break;
-                }
+                dealSuffixSql(plCol, optSuffix, currentBuild);
             }
-        }// for
+        }
         if(filterGroup != null){
-            i=0;
+            if (needAppendAndSign) {
+                sBuilder.append(" and (");
+            }
+            boolean needAppendOrSign=false;
             for(Map.Entry<String, StringBuilder> ent : filterGroup.entrySet()){
-                if (i > 0) {
+                if (needAppendOrSign) {
                     sBuilder.append(" or ");
                 }
-                i++;
+                needAppendOrSign = true;
                 sBuilder.append(" ( ").append(ent.getValue()).append(" )");
+            }
+            if (needAppendAndSign) {
+                sBuilder.append(" )");
             }
         }
         return sBuilder.toString();
+    }
+
+    private static void dealSuffixSql(String plCol, String optSuffix, StringBuilder currentBuild) {
+        switch (optSuffix) {
+            case "_gt":
+                currentBuild.append(" > :").append(plCol);
+                break;
+            case "_ge":
+                currentBuild.append(" >= :").append(plCol);
+                break;
+            case "_lt":
+                currentBuild.append(" < :").append(plCol);
+                break;
+            case "_le":
+                currentBuild.append(" <= :").append(plCol);
+                break;
+            case "_lk":
+                currentBuild.append(" like :").append(plCol);
+                break;
+            case "_in":
+                currentBuild.append(" in (:").append(plCol).append(")");
+                break;
+            case "_ni":
+                currentBuild.append(" not in (:").append(plCol).append(")");
+                break;
+            case "_ne":
+                currentBuild.append(" <> :").append(plCol);
+                break;
+            case "_nv":
+                currentBuild.append(" is null");
+                break;
+            case "_nn":
+                currentBuild.append(" is not null");
+                break;
+            default:
+                currentBuild.append(" = :").append(plCol);
+                break;
+        }
     }
 
     public static JSONArray findObjectsByNamedSql(Connection conn, String sSql, Map<String, Object> values,

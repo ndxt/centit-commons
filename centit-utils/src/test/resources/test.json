@@ -2,7 +2,7 @@
   "object": {
     "properties": {
       "optid": {
-        "type": "string",
+        "type": "调度",
         "index": "analyzed"
       },
       "osid": {
