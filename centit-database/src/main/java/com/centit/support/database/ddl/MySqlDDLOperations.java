@@ -58,7 +58,7 @@ public class MySqlDDLOperations extends GeneralDDLOperations {
             }
             sbsql.append(column.isMandatory() ? " not null" : " null");
         }
-        if (oldColumn.getFieldLabelName() != column.getFieldLabelName()) {
+        if (!oldColumn.getFieldLabelName().equals(column.getFieldLabelName())) {
             if (!modify) {
                 appendColumnTypeSQL(column, sbsql);
             }
