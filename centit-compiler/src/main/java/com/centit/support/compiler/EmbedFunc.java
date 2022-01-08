@@ -869,6 +869,7 @@ public abstract class EmbedFunc {
             //hash(object)
             //hash(object, "md5/sha", base64)
             //hash(object, "hmac-sha1", "secret-key")
+            //hash(object, "hmac-sha1", "secret-key"，'base64')
             case ConstDefine.FUNC_HASH:{
                 if (nOpSum < 1) return null;
                 if (nOpSum < 2) {
