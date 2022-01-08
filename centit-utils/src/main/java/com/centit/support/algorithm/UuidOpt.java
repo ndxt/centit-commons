@@ -1,5 +1,6 @@
 package com.centit.support.algorithm;
 
+import com.centit.support.security.Md5Encoder;
 import org.apache.commons.codec.binary.Base64;
 
 import java.util.UUID;
@@ -61,5 +62,25 @@ public abstract class UuidOpt {
 
     public static String getUuidAsString() {
         return uuidToString32(UUID.randomUUID());
+    }
+
+    public static String randomString(int length){
+        if (length < 1) {
+            length = 8;// defalut length
+        }
+        StringBuilder sbBuilder = new StringBuilder(length + 2);
+        String md5Hex = "";
+        int nLen = 0;
+        while (nLen < length) {
+            md5Hex = getUuidAsString22();
+            int md5Len = md5Hex.length();
+            int copylen = md5Len < length - nLen ? md5Len : length - nLen;
+            sbBuilder.append(md5Hex, 0, copylen);
+            nLen += copylen;
+            if (nLen == length) {
+                break;
+            }
+        }
+        return sbBuilder.toString();
     }
 }

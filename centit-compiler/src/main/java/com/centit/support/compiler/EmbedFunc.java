@@ -5,6 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.json.JSONOpt;
+import com.centit.support.security.HmacSha1Encoder;
+import com.centit.support.security.Md5Encoder;
+import com.centit.support.security.Sha1Encoder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -13,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 70;
+    public static final int functionsSum = 72;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -84,7 +87,9 @@ public abstract class EmbedFunc {
         new FunctionInfo("singleton", -1, ConstDefine.FUNC_SINGLETON, ConstDefine.TYPE_ANY),//返回集合，去重
         new FunctionInfo("attr", 2, ConstDefine.FUNC_GET_ATTR, ConstDefine.TYPE_ANY),//获取对象属性
         new FunctionInfo("setAttr", 3, ConstDefine.FUNC_SET_ATTR, ConstDefine.TYPE_ANY),//设置对象属性
-        new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR)//取汉字拼音
+        new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR),//取汉字拼音
+        new FunctionInfo("random", -1, ConstDefine.FUNC_RANDOM, ConstDefine.TYPE_ANY), // 取随机数
+        new FunctionInfo("hash", 1, ConstDefine.FUNC_HASH, ConstDefine.TYPE_STR) // 计算hash值
     };
     private static double COMPARE_MIN_DOUBLE = 0.0000001;
     private EmbedFunc() {
@@ -560,7 +565,10 @@ public abstract class EmbedFunc {
                         return null;
                 }
             }
-
+            // case(condition, candidate1, value1, candidate2, value2, defaultValue)
+            //    condition 为 true时 candidate1 为bool表达式
+            //    否则 用condition和candidate 对比 匹配就返回后面的值
+            //    defaultValue 并不是必须的，如果后面的参数不成对，最后一个就是默认值。此时参数个数为偶数
             case ConstDefine.FUNC_CASE: {// 116
                 if (nOpSum < 2) return null;
                 String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
@@ -816,6 +824,109 @@ public abstract class EmbedFunc {
                 }
                 return slOperand.get(0);
             }
+
+            //random()
+            //random(5)
+            //random(1, 5)
+            //random(String, 20)
+            //random(String, uuid/uuid32/uuid22/uuid36)
+            case ConstDefine.FUNC_RANDOM:{
+                if (nOpSum < 1){
+                    return Math.random();
+                }
+                if (nOpSum < 2) {
+                    Random rand = new Random();
+                    int nInd = NumberBaseOpt.castObjectToInteger(slOperand.get(0), 10000);
+                    return rand.nextInt(nInd);
+                }
+                if(StringUtils.equalsAnyIgnoreCase(StringBaseOpt.castObjectToString(slOperand.get(0)),"str","string")){
+                    if(StringUtils.equalsAnyIgnoreCase(StringBaseOpt.castObjectToString(slOperand.get(1)),"uuid","uuid32")){
+                        return UuidOpt.getUuidAsString32();
+                    } else if(StringUtils.equalsIgnoreCase(StringBaseOpt.castObjectToString(slOperand.get(1)),"uuid22")){
+                        return UuidOpt.getUuidAsString22();
+                    } else if(StringUtils.equalsIgnoreCase(StringBaseOpt.castObjectToString(slOperand.get(1)),"uuid36")){
+                        return UuidOpt.getUuidAsString36();
+                    } else {
+                        int nInd = NumberBaseOpt.castObjectToInteger(slOperand.get(1), 20);
+                        return UuidOpt.randomString(nInd);
+                    }
+                } else {
+                    int nMin = NumberBaseOpt.castObjectToInteger(slOperand.get(0), 1);
+                    int nMax = NumberBaseOpt.castObjectToInteger(slOperand.get(1), 10000);
+                    if(nMin > nMax){
+                        int a = nMin;
+                        nMin = nMax;
+                        nMax = a;
+                    }
+                    if(nMin == nMax){
+                        nMax = nMax + 1;
+                    }
+                    Random rand = new Random();
+                    return rand.nextInt(nMax-nMin) + nMin;
+                }
+            }
+
+            //hash(object)
+            //hash(object, "md5/sha", base64)
+            //hash(object, "hmac-sha1", "secret-key")
+            case ConstDefine.FUNC_HASH:{
+                if (nOpSum < 1) return null;
+                if (nOpSum < 2) {
+                    return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                }
+                if (nOpSum < 3) {
+                    String encodeType = StringBaseOpt.castObjectToString(slOperand.get(1));
+                    if(StringUtils.equalsAnyIgnoreCase(encodeType, "sha","sha1","sha-1")){
+                        return Sha1Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                    } else {
+                        if(StringUtils.equalsAnyIgnoreCase(encodeType, "base64urlsafe","urlsafe")){
+                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), true);
+                        } else if(StringUtils.equalsIgnoreCase(encodeType,"base64")){
+                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), false);
+                        } else {
+                            return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                        }
+                    }
+                }
+                if(nOpSum < 4) {
+                    String encodeType = StringBaseOpt.castObjectToString(slOperand.get(1));
+                    String param = StringBaseOpt.castObjectToString(slOperand.get(2));
+                    if(StringUtils.equalsAnyIgnoreCase(encodeType, "sha","sha1","sha-1")){
+                        if(StringUtils.equalsAnyIgnoreCase(param, "base64urlsafe","urlsafe")){
+                            return Sha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), true);
+                        } else if(StringUtils.equalsIgnoreCase(param,"base64")){
+                            return Sha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), false);
+                        } else {
+                            return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                        }
+                    } else if(StringUtils.equalsAnyIgnoreCase(encodeType, "hmac-sha1","macsha","hmacsha","hmacsha1")){
+                        return HmacSha1Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)), param);
+                    } else { //md5
+                        if (StringUtils.equalsAnyIgnoreCase(param, "base64urlsafe", "urlsafe")) {
+                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), true);
+                        } else if (StringUtils.equalsIgnoreCase(param, "base64")) {
+                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), false);
+                        } else {
+                            return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                        }
+                    }
+                }
+
+                String encodeType = StringBaseOpt.castObjectToString(slOperand.get(1));
+                String secretKey = StringBaseOpt.castObjectToString(slOperand.get(2));
+                String param = StringBaseOpt.castObjectToString(slOperand.get(3));
+                if(StringUtils.equalsAnyIgnoreCase(encodeType, "hmac-sha1","macsha","hmacsha","hmacsha1")){
+                    if (StringUtils.equalsAnyIgnoreCase(param, "base64urlsafe", "urlsafe")) {
+                        return HmacSha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), secretKey,  true);
+                    } else if (StringUtils.equalsIgnoreCase(param, "base64")) {
+                        return HmacSha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), secretKey, false);
+                    } else {
+                        return HmacSha1Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)), secretKey);
+                    }
+                }
+                return null;
+            }
+
             default:
                 break;
         }

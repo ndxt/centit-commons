@@ -5,7 +5,11 @@ import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -17,46 +21,45 @@ import java.security.NoSuchAlgorithmException;
  * @author codefan
  */
 @SuppressWarnings("unused")
-public abstract class Sha1Encoder {
+public abstract class HmacSha1Encoder {
 
-    protected static final Logger logger = LoggerFactory.getLogger(Sha1Encoder.class);
+    protected static final Logger logger = LoggerFactory.getLogger(HmacSha1Encoder.class);
 
-    private Sha1Encoder() {
+    private HmacSha1Encoder() {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static byte[] rawEncode(byte[] data) {
-        MessageDigest SHA1;
+    public static byte[] rawEncode(byte[] data, String secret) {
         try {
-            SHA1 = MessageDigest.getInstance("SHA-1");
-            SHA1.update(data, 0, data.length);
-            return SHA1.digest();
-        } catch (NoSuchAlgorithmException e) {
+            SecretKey secretKey = new SecretKeySpec(secret.getBytes("US-ASCII"), "HmacSHA1");
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(secretKey);
+            return mac.doFinal(data);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | UnsupportedEncodingException e) {
             logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
         }
     }
 
-    public static String encode(byte[] data) {
-        byte[] md5Code = rawEncode(data);
-        if (md5Code != null) {
-            return new String(Hex.encodeHex(md5Code));
-        } else {
+    public static String encode(byte[] data, String secret) {
+        byte[] finalText = rawEncode(data, secret);
+        if(finalText == null){
             return null;
         }
+        return new String(Hex.encodeHex(finalText));
     }
 
-    public static String encode(String data) {
+    public static String encode(String data, String secret) {
         try {
-            return encode(data.getBytes("utf8"));
+            return encode(data.getBytes("utf8"), secret);
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
         }
     }
 
-    public static String encodeBase64(byte[] data, boolean urlSafe) {
-        byte[] md5Code = rawEncode(data);
+    public static String encodeBase64(byte[] data, String secret, boolean urlSafe) {
+        byte[] md5Code = rawEncode(data, secret);
         if (md5Code != null) {
             return new String(
                 urlSafe ? Base64.encodeBase64URLSafe(md5Code) : Base64.encodeBase64(md5Code));
@@ -65,12 +68,13 @@ public abstract class Sha1Encoder {
         }
     }
 
-    public static String encodeBase64(String data, boolean urlSafe) {
+    public static String encodeBase64(String data, String secret, boolean urlSafe) {
         try {
-            return encodeBase64(data.getBytes("utf8"), urlSafe);
+            return encodeBase64(data.getBytes("utf8"), secret, urlSafe);
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
         }
     }
+
 }

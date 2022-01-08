@@ -10,12 +10,28 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
-        System.out.println(VariableFormula.calculate("2*3, 15+7"));
+        //System.out.println(VariableFormula.calculate("2*3, 15+7"));
         //testStringTemplate();
         //System.out.println(JSON.toJSON(null));
         //testFormula();
         //testFormula2();
         //testFormula4();
+        testRandomHash();
+    }
+
+    public static void testRandomHash() {
+        System.out.println(VariableFormula.calculate("random()"));
+        System.out.println(VariableFormula.calculate("random(100)"));
+        System.out.println(VariableFormula.calculate("random(5, 100)"));
+        System.out.println(VariableFormula.calculate("random('string', 38)"));
+        System.out.println(VariableFormula.calculate("random('string', 'uuid')"));
+        System.out.println(VariableFormula.calculate("hash('hello world')"));
+        System.out.println(VariableFormula.calculate("hash('hello world','sha')"));
+        System.out.println(VariableFormula.calculate("hash('hello world','macsha','nihao')"));
+
+        System.out.println(VariableFormula.calculate("hash('hello world','sha','base64')"));
+        System.out.println(VariableFormula.calculate("hash('hello world','macsha','nihao', 'base64')"));
+        System.out.println("Done!");
     }
 
     public static void testFormula4() {

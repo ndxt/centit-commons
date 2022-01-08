@@ -53,17 +53,17 @@ public abstract class Md5Encoder {
     }
 
     /**
-     * 将md5 编码进行base64编码，去掉最后的两个==，16为的md5码base64后最后两位肯定是==
+     * 将md5 编码进行base64编码
      *
      * @param data    需要编码的 数据
      * @param urlSafe 返回url合法字符
-     * @return 将md5 编码进行base64编码，去掉最后的两个==
+     * @return 将md5 编码进行base64编码
      */
     public static String encodeBase64(byte[] data, boolean urlSafe) {
         byte[] md5Code = rawEncode(data);
         if (md5Code != null) {
             return new String(
-                urlSafe ? Base64.encodeBase64URLSafe(md5Code) : Base64.encodeBase64(md5Code), 0, 22);
+                urlSafe ? Base64.encodeBase64URLSafe(md5Code) : Base64.encodeBase64(md5Code));
         } else {
             return null;
         }
