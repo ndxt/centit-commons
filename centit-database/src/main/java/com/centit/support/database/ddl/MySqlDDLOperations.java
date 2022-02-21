@@ -85,6 +85,9 @@ public class MySqlDDLOperations extends GeneralDDLOperations {
         List<String> sqls = new ArrayList<>();
         SimpleTableField tempColumn = new SimpleTableField();
         tempColumn.setColumnName(columnCode + "_1");
+        tempColumn.setColumnType(column.getColumnType());
+        tempColumn.setMaxLength(column.getMaxLength());
+        tempColumn.setScale(column.getScale());
         sqls.add(makeRenameColumnSql(tableCode, columnCode, tempColumn));
         sqls.add(makeAddColumnSql(tableCode, column));
 

@@ -172,6 +172,12 @@ public abstract class GeneralDDLOperations implements DDLOperations {
                 sbCreate.append(",").append(field.getScale());
             }
             sbCreate.append(")");
+        }else if ("char".equalsIgnoreCase(field.getColumnType())){
+            if (field.getMaxLength() > 0) {
+                sbCreate.append("(").append(field.getMaxLength()).append(")");
+            } else {
+                sbCreate.append("(1)");
+            }
         }
     }
 
