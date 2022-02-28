@@ -514,7 +514,7 @@ public abstract class StringRegularOpt {
         szTempl = trimString(szTempl);
         //return Pattern.matches(sqlMatchToRegex(szTempl), szValue);//
         //Pattern.compile(sqlMatchToRegex(szTempl)).matcher(szValue).find()
-        return Pattern.matches(sqlMatchToRegex(szTempl), szValue);
+        return Pattern.matches(sqlMatchToRegex(szValue), szTempl);
     }
 
     /**
