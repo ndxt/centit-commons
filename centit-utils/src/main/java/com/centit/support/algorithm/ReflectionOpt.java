@@ -402,7 +402,9 @@ public abstract class ReflectionOpt {
      * 获得 对象的 属性; 目前只能支持一维数组的获取，多维数据暂时不支持，目前看也没有这个需要
      *
      * @param sourceObj  可以是 任意对象
-     * @param expression 表达式 a.b[1].c 也可以 a.b[1].[2].c 间接实现二维数组
+     * @param expression 表达式 a.b.[1].c 也可以 a.b.[1].[2].c 间接实现二维数组
+     *                   这个地方没有引入词法分析器，是用"."来分割的，每一段可以理解为一个操作
+     *                   如果是一个字符串就是找对应的属性，如果是"[数字]"就是针对数组找对应的元素
      * @return 返回结果
      */
     public static Object attainExpressionValue(Object sourceObj, String expression) {
