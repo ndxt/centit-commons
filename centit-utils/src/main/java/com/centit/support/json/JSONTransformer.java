@@ -21,8 +21,8 @@ public class JSONTransformer {
      * ref : /rootPath | .currentPath | ..ParentPath | path == currentPath
      *      ref是一个对应的表达式，用于指向原始json中的具体的属性，或者多个属性计算值
      * key : @ noKey | # loop | key 常量
-     *      @ 开头的key表示要用value中的值替换当前的 key内容，不保留key，所以后面的名称没有实际意义
-     *      # 开头表示根据引用的数据进行循环，重复生成数组
+     *      '@' 开头的key表示要用value中的值替换当前的 key内容，不保留key，所以后面的名称没有实际意义
+     *      '#' 开头表示根据引用的数据进行循环，重复生成数组
      *      普通的key就是在目标json中保留对应的key
      *
      * @param templateObj 模板
