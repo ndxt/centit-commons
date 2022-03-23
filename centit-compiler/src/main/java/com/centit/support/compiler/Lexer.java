@@ -57,7 +57,7 @@ public class Lexer {
         char b = seq.charAt(0);
         //判断是否是数值
         if (b == '.' || b == '+' || b == '-' ||
-            (b >= '0' || b <= '9')
+            (b >= '0' && b <= '9')
         ) {
             return true;
         }
