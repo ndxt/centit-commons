@@ -48,12 +48,20 @@ public class Lexer {
         setFormula(sFormula);
     }
 
-    public static boolean isConstString(final CharSequence seq) {
+    public static boolean isConstValue(final CharSequence seq) {
+        // null 也是为常量
         if (seq == null || seq.length() == 0) {
-            return false;
+            return true;
         }
         final int strLen = seq.length();
         char b = seq.charAt(0);
+        //判断是否是数值
+        if (b == '.' || b == '+' || b == '-' ||
+            (b >= '0' || b <= '9')
+        ) {
+            return true;
+        }
+        //判断是否是字符串
         char e = seq.charAt(strLen-1);
         return strLen>1 && b == e && (b == '\'' || b=='"');
     }
