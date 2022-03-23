@@ -72,10 +72,9 @@ public class TimeInterval implements Serializable {
 
     /**
      * 从开始到当前的间隔时间（毫秒数）
-
      * @return 从开始到当前的间隔时间（毫秒数）
      */
-    public long intervalMs(String id) {
+    public long intervalMs() {
         return interval();
     }
 
