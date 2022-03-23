@@ -2,6 +2,7 @@ package com.centit.test;
 
 import com.alibaba.fastjson.JSON;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.StringRegularOpt;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,6 +10,14 @@ import java.util.regex.Pattern;
 public class TestStringBuilder {
 
     public static void main(String[] args) {
+        String chineseStr = "123你好！杨淮生324";
+        System.out.println( chineseStr.length());
+        for(int i=0; i<chineseStr.length(); i++){
+            System.out.println( StringRegularOpt.isChineseEscapeSymbol(chineseStr.charAt(i)));
+        }
+    }
+
+    public static void testString2() {
         System.out.println(StringBaseOpt.castObjectToString(null,""));
         System.out.println(StringBaseOpt.objectToString(100));
         System.out.println(StringBaseOpt.objectToString("hello world!"));

@@ -10,13 +10,10 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
-        //System.out.println(VariableFormula.calculate("2*3, 15+7"));
-        //testStringTemplate();
-        //System.out.println(JSON.toJSON(null));
-        //testFormula();
-        //testFormula2();
-        //testFormula4();
-        testRandomHash();
+        System.out.println(VariableFormula.calculate("你好 + 地球.海洋",
+            CollectionsOpt.createHashMap("你好","我的世界","地球",
+                CollectionsOpt.createHashMap("陆地","七大洲","海洋","四大洋"))));
+
     }
 
     public static void testRandomHash() {

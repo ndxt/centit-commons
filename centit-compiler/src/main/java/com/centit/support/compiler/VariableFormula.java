@@ -265,7 +265,7 @@ public class VariableFormula {
             return BooleanBaseOpt.castObjectToBoolean(str);
         }
 
-        if (trans != null && Lexer.isLabel(str)) {
+        if (trans != null && StringUtils.isNotBlank(str) && ! Lexer.isConstString(str)) {
             return trans.getVarValue(str);
         }
 

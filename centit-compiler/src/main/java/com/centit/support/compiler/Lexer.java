@@ -1,6 +1,7 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.StringRegularOpt;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -47,6 +48,15 @@ public class Lexer {
         setFormula(sFormula);
     }
 
+    public static boolean isConstString(final CharSequence seq) {
+        if (seq == null || seq.length() == 0) {
+            return false;
+        }
+        final int strLen = seq.length();
+        char b = seq.charAt(0);
+        char e = seq.charAt(strLen-1);
+        return strLen>1 && b == e && (b == '\'' || b=='"');
+    }
     /**
      * isLabel 判断一个字符串是否符合标识符，是否可以作为字段名或者表名
      *
@@ -191,16 +201,18 @@ public class Lexer {
             }
             canAcceptOpt = true;
             // 标识符
+            // 添加中文支持 StringRegularOpt.isChineseEscapeSymbol
         } else if ((formulaSen.charAt(startPos) >= 'a' && formulaSen.charAt(startPos) <= 'z') ||
             (formulaSen.charAt(startPos) >= 'A' && formulaSen.charAt(startPos) <= 'Z') ||
-            formulaSen.charAt(startPos) == '_' /*||
+            formulaSen.charAt(startPos) == '_' || StringRegularOpt.isChineseEscapeSymbol(formulaSen.charAt(startPos)) /*||
             formulaSen.charAt(startPos)=='@' */) {
             startPos++;
             while (startPos < sl && (
                 (formulaSen.charAt(startPos) >= '0' && formulaSen.charAt(startPos) <= '9') ||
                     (formulaSen.charAt(startPos) >= 'a' && formulaSen.charAt(startPos) <= 'z') ||
                     (formulaSen.charAt(startPos) >= 'A' && formulaSen.charAt(startPos) <= 'Z') ||
-                    formulaSen.charAt(startPos) == '_' || formulaSen.charAt(startPos) == '.' /*||
+                    formulaSen.charAt(startPos) == '_' || formulaSen.charAt(startPos) == '.' ||
+                    StringRegularOpt.isChineseEscapeSymbol(formulaSen.charAt(startPos)) /*||
                       formulaSen.charAt(startPos)=='@'*/))
                 startPos++;
             canAcceptOpt = true;
