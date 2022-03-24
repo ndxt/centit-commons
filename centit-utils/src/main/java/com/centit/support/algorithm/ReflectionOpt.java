@@ -398,6 +398,44 @@ public abstract class ReflectionOpt {
             objList.add(obj);
         }
     }
+
+    private static LeftRightPair<String, String> splitLabel(String labelStr){
+        int bPos = 0;
+        int len = labelStr.length();
+        while(bPos < len && (labelStr.charAt(bPos) == ' ' || labelStr.charAt(bPos) == '.')){
+            bPos ++;
+        }
+        String currentLabel = ".", restLabel = ".";
+        if(bPos < len) {
+            if (labelStr.charAt(bPos) == '[') {
+                bPos++;
+                int ePos = bPos;
+                while (ePos < len && labelStr.charAt(ePos) != ']') {
+                    ePos++;
+                }
+                if (ePos > bPos) {
+                    currentLabel = labelStr.substring(bPos, ePos).trim();
+                }
+                if (ePos + 1 < len) {
+                    restLabel = labelStr.substring(ePos + 1);
+                }
+            } else {
+                int ePos = bPos;
+                while (ePos < len && labelStr.charAt(ePos) != '.' && labelStr.charAt(ePos) != '[' && labelStr.charAt(ePos) != ' ') {
+                    ePos++;
+                }
+                if (ePos > bPos) {
+                    currentLabel = labelStr.substring(bPos, ePos).trim();
+                }
+                if (ePos  < len) {
+                    restLabel = labelStr.substring(ePos);
+                }
+            }
+        }
+
+        return new LeftRightPair<>(currentLabel, restLabel);
+    }
+
     /**
      * 获得 对象的 属性; 目前只能支持一维数组的获取，多维数据暂时不支持，目前看也没有这个需要
      *
@@ -408,98 +446,77 @@ public abstract class ReflectionOpt {
      * @return 返回结果
      */
     public static Object attainExpressionValue(Object sourceObj, String expression) {
-        if (sourceObj == null || StringUtils.isBlank(expression))
-            return null;
-        if (".".equals(expression)) {
+        if (sourceObj == null || StringUtils.isBlank(expression) || ".".equals(expression)) {
             return sourceObj;
         }
-        int nPos = expression.indexOf('.');
-        String fieldValue;
-        String restExpression = ".";
-        if (nPos > 0) {
-            fieldValue = expression.substring(0, nPos).trim();
-            if (expression.length() > nPos + 1) {
-                restExpression = expression.substring(nPos + 1);
-            }
-        } else if (nPos == 0) {
-            fieldValue = "";
-            restExpression = expression.substring(1);
-        } else {
-            fieldValue = expression.trim();
+        //如果是一个标量则不应该再有属性，所以统一返回null
+        if (ReflectionOpt.isScalarType(sourceObj.getClass())) {
+            return null;
         }
+        LeftRightPair<String, String> labels = splitLabel(expression);
+        String fieldValue = labels.getLeft();
+        String restExpression = labels.getRight();
 
-        int nAarrayInd = -1;
-        nPos = fieldValue.indexOf('[');
-        if (nPos >= 0) {
-            String sArrayInd = fieldValue.substring(nPos + 1, fieldValue.length() - 1);
-            if (StringRegularOpt.isNumber(sArrayInd)) {
-                nAarrayInd = NumberBaseOpt.castObjectToInteger(sArrayInd, 0);
-            }
-            fieldValue = fieldValue.substring(0, nPos);
-        }
-
-        Object retObj;
+        Object retObj = null;
         if (StringUtils.isBlank(fieldValue)) {
             retObj = sourceObj;
         } else if (sourceObj instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<String, Object> objMap = (Map<String, Object>) sourceObj;
             retObj = objMap.get(fieldValue);
-            if(retObj instanceof Supplier){
-                retObj = ((Supplier)retObj).get();
-            }
         } else {
-            //如果是一个标量则不应该再有属性，所以统一返回null
-            if (ReflectionOpt.isScalarType(sourceObj.getClass())) {
-                return null;
-            } else if(sourceObj instanceof Collection){
+             if(sourceObj instanceof Collection){
                 Collection<?> objlist = (Collection<?>) sourceObj;
                 int objSize = objlist.size();
-                List<Object> retList = new ArrayList<>(objSize+1);
-                for (Object obj : objlist) {
-                    Object tempObj = attainExpressionValue(obj, fieldValue);
-                    innerAddListItem(retList, tempObj);
+                if(StringRegularOpt.isDigit(fieldValue)){
+                    int index = NumberBaseOpt.castObjectToInteger(fieldValue);
+                    if(index>=objSize){
+                        return null;
+                    }
+                    int i=0;
+                    for (Object obj : objlist) {
+                        if(i == index){
+                            retObj = obj;
+                            break;
+                        }
+                        i++;
+                    }
+                } else {
+                    List<Object> retList = new ArrayList<>(objSize + 1);
+                    for (Object obj : objlist) {
+                        Object tempObj = attainExpressionValue(obj, fieldValue);
+                        innerAddListItem(retList, tempObj);
+                    }
+                    retObj = retList;
                 }
-                retObj = retList;
             } else if(sourceObj instanceof Object[]){
                 Object[] objs = (Object[]) sourceObj;
-                List<Object> retList = new ArrayList<>(objs.length+1);
-                for (Object obj : objs) {
-                    Object tempObj = attainExpressionValue(obj, fieldValue);
-                    innerAddListItem(retList, tempObj);
-                }
-                retObj = retList;
+                 if(StringRegularOpt.isDigit(fieldValue)){
+                     int index = NumberBaseOpt.castObjectToInteger(fieldValue);
+                     if(index >= objs.length){
+                         return null;
+                     }
+                     retObj = objs[index];
+                 } else {
+                     List<Object> retList = new ArrayList<>(objs.length + 1);
+                     for (Object obj : objs) {
+                         Object tempObj = attainExpressionValue(obj, fieldValue);
+                         innerAddListItem(retList, tempObj);
+                     }
+                     retObj = retList;
+                 }
             } else {
                 retObj = ReflectionOpt.getFieldValue(sourceObj, fieldValue);
-                if(retObj instanceof Supplier){
-                    retObj = ((Supplier)retObj).get();
-                }
             }
         }
-        if (retObj == null)
-            return null;
 
-        if (nAarrayInd >= 0 && retObj instanceof Collection) {
-            Collection<?> objlist = (Collection<?>) retObj;
-            int objSize = objlist.size();
-            if (objSize < 1 || nAarrayInd >= objSize) {
-                return null;
-            }
-            int i = 0;
-            for (Object obj : objlist) {
-                if (nAarrayInd == i) {
-                    retObj = obj;
-                }
-                i++;
-            }
-        } else if (nAarrayInd >= 0 && retObj instanceof Object[]) {
-            Object[] objs = (Object[]) retObj;
-            int objSize = objs.length;
-            if (objSize < 1 || nAarrayInd >= objSize) {
-                return null;
-            }
-            retObj = objs[nAarrayInd];
+        if(retObj instanceof Supplier){
+            retObj = ((Supplier)retObj).get();
         }
+        /* if (retObj == null || StringUtils.isBlank(restExpression)) {
+            return retObj;
+        }*/
+
         return attainExpressionValue(retObj, restExpression);
     }
 
