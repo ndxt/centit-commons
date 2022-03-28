@@ -457,7 +457,11 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 (optSuffix.charAt(0)=='_'? plCol.substring(0,plColLength- 3) : plCol);
             if(ti!=null) {
                 TableField col = ti.findFieldByName(propName);
-                propName=col.getColumnName();
+                if(col==null){
+                    propName=null;
+                }else {
+                    propName = col.getColumnName();
+                }
             }
             if(propName != null){
                 StringBuilder currentBuild = null;
