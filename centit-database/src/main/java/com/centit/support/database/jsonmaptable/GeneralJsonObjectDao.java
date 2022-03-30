@@ -455,8 +455,15 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             String propName = beGroup ?
                 (optSuffix.charAt(0)=='_'? plCol.substring(pos,plColLength- 3) : plCol.substring(pos)) :
                 (optSuffix.charAt(0)=='_'? plCol.substring(0,plColLength- 3) : plCol);
-            TableField col = ti.findFieldByName(propName);
-            if(col != null){
+            if(ti!=null) {
+                TableField col = ti.findFieldByName(propName);
+                if(col==null){
+                    propName=null;
+                }else {
+                    propName = col.getColumnName();
+                }
+            }
+            if(propName != null){
                 StringBuilder currentBuild = null;
                 if(beGroup){
                     if(filterGroup == null){
@@ -481,7 +488,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 if (StringUtils.isNotBlank(alias)) {
                     currentBuild.append(alias).append('.');
                 }
-                currentBuild.append(col.getColumnName());
+                currentBuild.append(propName);
                 // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne 8:ni
                 dealSuffixSql(plCol, optSuffix, currentBuild);
             }
