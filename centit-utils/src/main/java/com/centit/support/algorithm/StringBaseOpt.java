@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Array;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -495,8 +496,9 @@ public abstract class StringBaseOpt {
             return new String((byte[]) objValue);
         }
         if (objValue instanceof java.util.Date){
-            return DatetimeOpt.convertDatetimeToString((java.util.Date) objValue);
+            return DatetimeOpt.convertTimestampToString((java.util.Date) objValue);
         }
+
         Class<?> clazz = objValue.getClass();
 
         if (clazz.isEnum()) {

@@ -61,6 +61,11 @@ public abstract class GeneralAlgorithm {
         if (operand2 == null) {
             return nullAsFirst ? 1 : -1;
         }
+        //operand.getClass().getComponentType().isAssignableFrom(operand.getClass())
+        if(operand instanceof Comparable && operand2 instanceof Comparable &&
+            operand.getClass().equals(operand2.getClass())){
+            return ObjectUtils.compare((Comparable)operand , (Comparable)operand2);
+        }
 
         if (NumberBaseOpt.isNumber(operand)
             && NumberBaseOpt.isNumber(operand2)) {
