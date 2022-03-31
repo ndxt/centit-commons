@@ -1,6 +1,5 @@
 package com.centit.support.algorithm;
 
-import com.centit.support.security.Md5Encoder;
 import org.apache.commons.codec.binary.Base64;
 
 import java.util.UUID;

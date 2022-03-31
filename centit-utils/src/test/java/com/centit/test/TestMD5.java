@@ -2,16 +2,9 @@ package com.centit.test;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import com.centit.support.network.UrlOptUtils;
 import com.centit.support.security.HmacSha1Encoder;
-import com.centit.support.security.Md5Encoder;
-import com.centit.support.security.Sha1Encoder;
-import junit.framework.ComparisonCompactor;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.*;
 
 public class TestMD5 {
 

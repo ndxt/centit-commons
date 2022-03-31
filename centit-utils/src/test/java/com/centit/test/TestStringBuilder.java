@@ -1,12 +1,9 @@
 package com.centit.test;
 
 import com.alibaba.fastjson.JSON;
-import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.GeneralAlgorithm;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.algorithm.StringRegularOpt;
 
-import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,8 +11,8 @@ public class TestStringBuilder {
 
     public static void main(String[] args) {
 
-        System.out.println(GeneralAlgorithm.compareTwoObject("曹操", "冯胜"));
-        System.out.println(GeneralAlgorithm.compareTwoComparableObject("曹操", "冯胜"));
+        System.out.println(GeneralAlgorithm.compareTwoObject("曹操", "曹睿"));
+        System.out.println(GeneralAlgorithm.compareTwoComparableObject("曹操", "曹阿斗"));
     }
 
     public static void testString2() {
