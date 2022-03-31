@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.Collator;
 import java.util.*;
 import java.util.function.Function;
 
@@ -64,6 +65,10 @@ public abstract class GeneralAlgorithm {
         //operand.getClass().getComponentType().isAssignableFrom(operand.getClass())
         if(operand instanceof Comparable && operand2 instanceof Comparable &&
             operand.getClass().equals(operand2.getClass())){
+            if(operand instanceof String) {
+                Comparator<Object> compare = Collator.getInstance(java.util.Locale.CHINA);
+                return compare.compare(operand, operand2);
+            }
             return ObjectUtils.compare((Comparable)operand , (Comparable)operand2);
         }
 
@@ -74,7 +79,8 @@ public abstract class GeneralAlgorithm {
                 NumberBaseOpt.castObjectToDouble(operand2));
         }
 
-        return ObjectUtils.compare(
+        Comparator<Object> compare = Collator.getInstance(java.util.Locale.CHINA);
+        return compare.compare(
             StringBaseOpt.objectToString(operand),
             StringBaseOpt.objectToString(operand2));
     }

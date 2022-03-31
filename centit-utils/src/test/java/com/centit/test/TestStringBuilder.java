@@ -1,20 +1,21 @@
 package com.centit.test;
 
 import com.alibaba.fastjson.JSON;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.GeneralAlgorithm;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 
+import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TestStringBuilder {
 
     public static void main(String[] args) {
-        String chineseStr = "123你好！杨淮生324";
-        System.out.println( chineseStr.length());
-        for(int i=0; i<chineseStr.length(); i++){
-            System.out.println( StringRegularOpt.isChineseEscapeSymbol(chineseStr.charAt(i)));
-        }
+
+        System.out.println(GeneralAlgorithm.compareTwoObject("曹操", "冯胜"));
+        System.out.println(GeneralAlgorithm.compareTwoComparableObject("曹操", "冯胜"));
     }
 
     public static void testString2() {
