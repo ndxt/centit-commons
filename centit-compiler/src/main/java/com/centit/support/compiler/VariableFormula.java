@@ -181,7 +181,8 @@ public class VariableFormula {
     private Object calcItem() {
         String str = lex.getAWord();
         if (str == null || str.length() == 0) return null;
-        if (str.charAt(0) == ')' || str.charAt(0) == ',') {
+        // 表达式结束
+        if (str.charAt(0) == ')' || str.charAt(0) == ',' || str.charAt(0) == ';') {
             lex.writeBackAWord(str);
             return null;
         }
@@ -489,7 +490,10 @@ public class VariableFormula {
             if (sCondition == null) return null;
 
             str = lex.getAWord();
-            if (str == null || str.length() == 0 || !str.equals(",")) return null;
+
+            if(",".equals(str)){
+                return null;
+            }
 
             if (BooleanBaseOpt.castObjectToBoolean(sCondition, false)) {
                 Object objRes = calcFormula();
@@ -500,17 +504,26 @@ public class VariableFormula {
                 // 特殊处理的地方就在这儿
                 lex.skipAOperand();
                 str = lex.getAWord();
-                if (str == null || str.length() == 0 || !str.equals(")")) return null;
+                if(")".equals(str)){
+                    return null;
+                }
+                //if (str == null || str.length() == 0 || !str.equals(")")) return null;
                 return objRes;
             } else {
                 // 特殊处理的地方就在这儿
                 lex.skipAOperand();
                 str = lex.getAWord();
-                if (str == null || str.length() == 0 || !str.equals(",") && !str.equals(")")) return null;
-                if (str.equals(")")) return null;
+                if(",".equals(str)){
+                    return null;
+                }
+                //if (str == null || str.length() == 0 || !str.equals(",") /*&& !str.equals(")")*/) return null;
+                //if (str.equals(")")) return null;
                 Object objRes = calcFormula();
                 str = lex.getAWord();
-                if (str == null || str.length() == 0 || !str.equals(")")) return null;
+                if(")".equals(str)){
+                    return null;
+                }
+                //if (str == null || str.length() == 0 || !str.equals(")")) return null;
                 return objRes;
             }
             //return sRes;
@@ -612,4 +625,5 @@ public class VariableFormula {
         else
             return lex.getCurrPos() + 1;
     }
+
 }
