@@ -157,11 +157,11 @@ public abstract class Pretreatment {
             return innerMapTemplateString(template, (VariableTranslate) object, nullValue, canOmitDollar, true);
         }
 
-        if (object instanceof JSONTransformDataSupport) {
+        /*if (object instanceof JSONTransformDataSupport) {
             return innerMapTemplateString(template, JSONTransformTranslate.create(
                 (JSONTransformDataSupport)object), nullValue, canOmitDollar, true);
         }
-
+        */
         return innerMapTemplateString(template,
             new ObjectTranslate(object), nullValue, canOmitDollar, true);
     }
