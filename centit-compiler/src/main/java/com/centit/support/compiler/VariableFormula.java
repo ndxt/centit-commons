@@ -631,7 +631,7 @@ public class VariableFormula {
     }
 
 
-    public static List<Object> rumMultiFormula(String szExpress, VariableTranslate varTrans,
+    public static List<Object> calcMultiFormula(String szExpress, VariableTranslate varTrans,
                                                Map<String, Function<Object[], Object>> extendFuncMap) {
         VariableFormula formula = new VariableFormula();
         formula.setExtendFuncMap(extendFuncMap);
