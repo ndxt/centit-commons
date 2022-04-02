@@ -398,6 +398,11 @@ public class VariableFormula {
 
         return null;
     }
+
+    /**
+     * 暴露Lexer的 四个基础方法
+     * @return 当前单词
+     */
     //用于跳过个分隔符比如“，”
     public String skipAWord(){
         return lex.getAWord();
@@ -405,6 +410,14 @@ public class VariableFormula {
 
     public void writeBackAWord(String preWord) {
         lex.writeBackAWord(preWord);
+    }
+
+    public void skipAOperand() {
+        lex.skipAOperand();
+    }
+
+    public boolean seekToRightBracket(){
+        return lex.seekToRightBracket();
     }
 
     public Object calcFormula() {
