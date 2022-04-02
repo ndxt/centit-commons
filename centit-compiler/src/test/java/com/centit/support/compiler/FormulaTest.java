@@ -10,11 +10,8 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
-        System.out.println(VariableFormula.calculate("你好 + ${地球[1].海洋}",
-            CollectionsOpt.createHashMap("你好","我的世界","地球",
-                CollectionsOpt.createList(
-                CollectionsOpt.createHashMap("陆地","七大洲","海洋","四大洋2"),
-                    CollectionsOpt.createHashMap("陆地","七大洲","海洋","四大洋3")    ))));
+        System.out.println(VariableFormula.rumMultiFormula("1+2 3+'sdf'",
+            new ObjectTranslate(CollectionsOpt.createHashMap() ), null));
 
     }
 

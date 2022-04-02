@@ -403,6 +403,10 @@ public class VariableFormula {
         return lex.getAWord();
     }
 
+    public void writeBackAWord(String preWord) {
+        lex.writeBackAWord(preWord);
+    }
+
     public Object calcFormula() {
         List<Object> slOperand = new ArrayList<>();
         OptStack optStack = new OptStack();
@@ -626,4 +630,26 @@ public class VariableFormula {
             return lex.getCurrPos() + 1;
     }
 
+
+    public static List<Object> rumMultiFormula(String szExpress, VariableTranslate varTrans,
+                                               Map<String, Function<Object[], Object>> extendFuncMap) {
+        VariableFormula formula = new VariableFormula();
+        formula.setExtendFuncMap(extendFuncMap);
+        formula.setFormula(szExpress);
+        formula.setTrans(varTrans);
+        List<Object> objects = new ArrayList<>();
+        while(true) {
+            Object obj = formula.calcFormula();
+            objects.add(obj);
+            String separatorString = formula.skipAWord();
+            while(StringUtils.equalsAny(separatorString, ",",";",")")){
+                separatorString = formula.skipAWord();
+            }
+            if(StringUtils.isBlank(separatorString)){
+                break;
+            }
+            formula.writeBackAWord(separatorString);
+        }
+        return objects;
+    }
 }
