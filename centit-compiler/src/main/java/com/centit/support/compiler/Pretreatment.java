@@ -1,6 +1,7 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.json.JSONTransformDataSupport;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -155,7 +156,14 @@ public abstract class Pretreatment {
         if (object instanceof VariableTranslate) {
             return innerMapTemplateString(template, (VariableTranslate) object, nullValue, canOmitDollar, true);
         }
-        return innerMapTemplateString(template, new ObjectTranslate(object), nullValue, canOmitDollar, true);
+
+        if (object instanceof JSONTransformDataSupport) {
+            return innerMapTemplateString(template, JSONTransformTranslate.create(
+                (JSONTransformDataSupport)object), nullValue, canOmitDollar, true);
+        }
+
+        return innerMapTemplateString(template,
+            new ObjectTranslate(object), nullValue, canOmitDollar, true);
     }
 
 
@@ -197,4 +205,5 @@ public abstract class Pretreatment {
     public static String mapTemplateStringAsFormula(String template, Object object) {
         return mapTemplateStringAsFormula(template, object, "", true);
     }
+
 }
