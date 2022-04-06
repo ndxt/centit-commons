@@ -508,36 +508,37 @@ public class VariableFormula {
 
             str = lex.getAWord();
 
-            if(",".equals(str)){
+            if(!",".equals(str)){
                 return null;
             }
 
             if (BooleanBaseOpt.castObjectToBoolean(sCondition, false)) {
                 Object objRes = calcFormula();
-                str = lex.getAWord();
+                /*str = lex.getAWord();
                 if (str == null || str.length() == 0 || (!str.equals(",") && !str.equals(")"))) return null;
                 if (str.equals(")"))
-                    return objRes;
+                    return objRes;*/
                 // 特殊处理的地方就在这儿
-                lex.skipAOperand();
+                lex.seekToRightBracket();
+                /*lex.skipAOperand();
                 str = lex.getAWord();
-                if(")".equals(str)){
+                if(!")".equals(str)){
                     return null;
-                }
+                }*/
                 //if (str == null || str.length() == 0 || !str.equals(")")) return null;
                 return objRes;
             } else {
                 // 特殊处理的地方就在这儿
                 lex.skipAOperand();
                 str = lex.getAWord();
-                if(",".equals(str)){
+                if(!",".equals(str)){
                     return null;
                 }
                 //if (str == null || str.length() == 0 || !str.equals(",") /*&& !str.equals(")")*/) return null;
                 //if (str.equals(")")) return null;
                 Object objRes = calcFormula();
                 str = lex.getAWord();
-                if(")".equals(str)){
+                if(!")".equals(str)){
                     return null;
                 }
                 //if (str == null || str.length() == 0 || !str.equals(")")) return null;
