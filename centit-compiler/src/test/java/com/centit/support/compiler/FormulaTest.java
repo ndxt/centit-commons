@@ -10,6 +10,12 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
+        System.out.println(VariableFormula.calculate("if(false, 'error','ok')",
+            new ObjectTranslate(CollectionsOpt.createHashMap() ), null));
+        System.out.println(VariableFormula.calculate("if(false, 'error')",
+            new ObjectTranslate(CollectionsOpt.createHashMap() ), null));
+        System.out.println(VariableFormula.calculate("if('true', 'error','ok')",
+            new ObjectTranslate(CollectionsOpt.createHashMap() ), null));
         System.out.println(VariableFormula.calcMultiFormula("(1+2, 3+'sdf')",
             new ObjectTranslate(CollectionsOpt.createHashMap() ), null));
 
