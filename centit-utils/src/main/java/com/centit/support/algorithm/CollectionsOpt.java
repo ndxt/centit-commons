@@ -710,6 +710,16 @@ public abstract class CollectionsOpt {
             return (Map<String, Object>) object;
         }
         if (ReflectionOpt.isScalarType(object.getClass())) {
+            if(object instanceof String){
+                String objStr = (String) object;
+                if(objStr.startsWith("{") && objStr.endsWith("}")){
+                    //JSONObject
+                    Object mapObj = JSON.parse(objStr);
+                    if(mapObj instanceof Map){
+                        return (Map<String, Object>) mapObj;
+                    }
+                }
+            }
             return CollectionsOpt.createHashMap("scalar", object);
         }
         if (object.getClass().isArray()) {
