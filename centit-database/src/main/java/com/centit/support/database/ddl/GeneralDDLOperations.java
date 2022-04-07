@@ -271,11 +271,17 @@ public abstract class GeneralDDLOperations implements DDLOperations {
     @Override
     public void reconfigurationColumn(String tableCode, String columnCode, TableField column) throws SQLException {
         List<String> sqList = makeReconfigurationColumnSqls(tableCode, columnCode, column);
-        if (sqList == null)
+        if (sqList == null) {
             return;
+        }
         for (String sql : sqList) {
             DatabaseAccess.doExecuteSql(conn, sql);
         }
+    }
+    @Override
+    public String makeViewSql(final String selectSql,final String viewName){
+        return "create or replace view " + viewName + " as " +
+            selectSql;
     }
 
 }
