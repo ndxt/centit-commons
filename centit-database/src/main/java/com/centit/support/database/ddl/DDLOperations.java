@@ -88,6 +88,15 @@ public interface DDLOperations {
     void createSequence(final String sequenceName) throws SQLException;
 
     /**
+     * 创建视图
+     *
+     * @param selectSql select语句
+     * @param viewName 视图名称
+     * @return 创建视图语句
+     */
+    String makeViewSql(final String selectSql,final String viewName);
+
+    /**
      * 创建表
      *
      * @param tableInfo 表

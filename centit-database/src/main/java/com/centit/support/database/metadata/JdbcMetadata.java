@@ -24,8 +24,10 @@ public class JdbcMetadata implements DatabaseMetadata {
         this.dbc = dbc;
     }
 
-
     public List<SimpleTableInfo> listAllTable() {
+       return listAllTable(true);
+    }
+    public List<SimpleTableInfo> listAllTable(boolean withColumn) {
         List<SimpleTableInfo> tables = new ArrayList<>(100);
         try {
             String dbSechema = this.getDBSchema();
@@ -43,14 +45,16 @@ public class JdbcMetadata implements DatabaseMetadata {
                 tab.setTableLabelName(rs.getString("REMARKS"));
                 String tt = rs.getString("TABLE_TYPE");
                 if ("view".equalsIgnoreCase(tt) || "table".equalsIgnoreCase(tt)) {
-                    fetchTableDetail(tab, dbmd);
+                    if(withColumn) {
+                        fetchTableDetail(tab, dbmd);
+                    }
                     tab.setTableType("view".equalsIgnoreCase(tt) ? "V" : "T");
                     tables.add(tab);
                 }
             }
             rs.close();
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return tables;
     }
