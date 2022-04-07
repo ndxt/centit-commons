@@ -94,7 +94,7 @@ public interface DDLOperations {
      * @param viewName 视图名称
      * @return 创建视图语句
      */
-    String makeViewSql(final String selectSql,final String viewName);
+    String makeCreateViewSql(final String selectSql, final String viewName);
 
     /**
      * 创建表

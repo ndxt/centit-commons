@@ -279,7 +279,7 @@ public abstract class GeneralDDLOperations implements DDLOperations {
         }
     }
     @Override
-    public String makeViewSql(final String selectSql,final String viewName){
+    public String makeCreateViewSql(final String selectSql, final String viewName){
         return "create or replace view " + viewName + " as " +
             selectSql;
     }
