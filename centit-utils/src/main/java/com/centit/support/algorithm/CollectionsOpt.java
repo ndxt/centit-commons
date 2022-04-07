@@ -772,6 +772,20 @@ public abstract class CollectionsOpt {
         return stringMap;
     }
 
+    public static <K,V> Map<K,V> translateMapType(Map<? extends Object, ? extends Object> objectMap,
+                                                  Function<Object, K> transKey , Function<Object, V> transValue) {
+        if(objectMap==null){
+            return null;
+        }
+        Map<K, V> stringMap = new HashMap<>(objectMap.size());
+        for(Map.Entry<? extends Object, ? extends Object> ent : objectMap.entrySet()){
+            stringMap.put(transKey.apply(ent.getKey()),
+                transValue.apply(ent.getValue()));
+        }
+        return stringMap;
+    }
+
+
     public static <T> T fetchFirstItem(Collection<T> collection) {
         if (collection == null || collection.isEmpty())
             return null;
