@@ -429,11 +429,12 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return sBuilder.toString();
     }
 
-    public static String buildFilterSql(TableInfo ti, String alias, Collection<String> properties) {
+    public static String buildFilterSql(TableInfo ti, String alias, Map<String, Object> filterMap) {
         StringBuilder sBuilder = new StringBuilder();
         boolean needAppendAndSign = false;
         Map<String, StringBuilder> filterGroup = null;
-        for (String plCol : properties) {
+        for (Map.Entry<String, Object> filterEnt : filterMap.entrySet()) {
+            String plCol = filterEnt.getKey();
             int plColLength = plCol.length();
             boolean beGroup = false;
             String groupName="nog";
@@ -490,7 +491,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 }
                 currentBuild.append(propName);
                 // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne 8:ni
-                dealSuffixSql(plCol, optSuffix, currentBuild);
+                dealSuffixSql(filterEnt, optSuffix, currentBuild);
             }
         }
         if(filterGroup != null){
@@ -506,7 +507,8 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return sBuilder.toString();
     }
 
-    private static void dealSuffixSql(String plCol, String optSuffix, StringBuilder currentBuild) {
+    private static void dealSuffixSql(Map.Entry<String, Object> filterEnt, String optSuffix, StringBuilder currentBuild) {
+        String plCol = filterEnt.getKey();
         switch (optSuffix) {
             case "_gt":
                 currentBuild.append(" > :").append(plCol);
@@ -523,9 +525,6 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             case "_lk":
                 currentBuild.append(" like :").append(plCol);
                 break;
-            case "_in":
-                currentBuild.append(" in (:").append(plCol).append(")");
-                break;
             case "_ni":
                 currentBuild.append(" not in (:").append(plCol).append(")");
                 break;
@@ -538,8 +537,15 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             case "_nn":
                 currentBuild.append(" is not null");
                 break;
+            case "_in":
             default:
-                currentBuild.append(" = :").append(plCol);
+                //ReflectionOpt.isArray()
+                if(filterEnt.getValue() instanceof Collection ||
+                    filterEnt.getValue() instanceof Object[]) {
+                    currentBuild.append(" in (:").append(plCol).append(")");
+                } else {
+                    currentBuild.append(" = :").append(plCol);
+                }
                 break;
         }
     }
@@ -603,7 +609,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     }
 
     public static String buildCountSqlByProperties(TableInfo tableInfo, final Map<String, Object> properties) {
-        String filter = GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties.keySet());
+        String filter = GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties);
         String sql = "select count(*) as row_sum from " + tableInfo.getTableName();
         if (StringUtils.isNotBlank(filter)) {
             sql = sql + " where " + filter;
@@ -728,7 +734,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public JSONObject getObjectByProperties(final Map<String, Object> properties) throws SQLException, IOException {
 
         Pair<String, TableField[]> q = buildSelectSqlWithFields(tableInfo, null, false,
-            GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties.keySet()),
+            GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties),
             false, null);
         JSONArray ja = findObjectsByNamedSql(
             conn, q.getLeft(),
@@ -746,7 +752,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     @Override
     public JSONArray listObjectsByProperties(final Map<String, Object> properties) throws SQLException, IOException {
         Pair<String, TableField[]> q = buildSelectSqlWithFields(tableInfo, null, true,
-            GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties.keySet()),
+            GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties),
             true, GeneralJsonObjectDao.fetchSelfOrderSql(tableInfo, properties));
         return findObjectsByNamedSql(
             conn,
@@ -758,7 +764,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     @Override
     public Long fetchObjectsCount(final Map<String, Object> properties)
         throws SQLException, IOException {
-        String filter = buildFilterSql(tableInfo, null, properties.keySet());
+        String filter = buildFilterSql(tableInfo, null, properties);
         String sql = "select count(*) as rs from " + tableInfo.getTableName();
         if (StringUtils.isNotBlank(filter))
             sql = sql + " where " + filter;
@@ -837,7 +843,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         if (sql == null) {
             return 0;
         }
-        sql = sql + " where " + buildFilterSql(tableInfo, null, properties.keySet());
+        sql = sql + " where " + buildFilterSql(tableInfo, null, properties);
 
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.putAll(fieldValues);
@@ -865,7 +871,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
     public int deleteObjectsByProperties(final Map<String, Object> properties)
         throws SQLException {
         String sql = "delete from " + tableInfo.getTableName() +
-            " where " + buildFilterSql(tableInfo, null, properties.keySet());
+            " where " + buildFilterSql(tableInfo, null, properties);
         return DatabaseAccess.doExecuteNamedSql(conn, sql, properties);
 
     }
@@ -1058,7 +1064,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         throws SQLException, IOException {
         TableInfo tableInfo = this.getTableInfo();
         Pair<String, TableField[]> q = buildSelectSqlWithFields(tableInfo, null, true,
-            GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties.keySet()),
+            GeneralJsonObjectDao.buildFilterSql(tableInfo, null, properties),
             true, GeneralJsonObjectDao.fetchSelfOrderSql(tableInfo, properties));
         return GeneralJsonObjectDao.findObjectsByNamedSql(
             conn,

@@ -251,7 +251,7 @@ public abstract class OrmDaoUtils {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String, TableField[]> q =
             GeneralJsonObjectDao.buildSelectSqlWithFields(mapInfo, null, false,
-                GeneralJsonObjectDao.buildFilterSql(mapInfo, null, properties.keySet()), false, null);
+                GeneralJsonObjectDao.buildFilterSql(mapInfo, null, properties), false, null);
 
         return queryNamedParamsSql(
             connection, new QueryAndNamedParams(q.getLeft(),
@@ -384,7 +384,7 @@ public abstract class OrmDaoUtils {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String, TableField[]> q =
             GeneralJsonObjectDao.buildSelectSqlWithFields(mapInfo, null, true,
-                GeneralJsonObjectDao.buildFilterSql(mapInfo, null, properties.keySet()),
+                GeneralJsonObjectDao.buildFilterSql(mapInfo, null, properties),
                 true, GeneralJsonObjectDao.fetchSelfOrderSql(mapInfo, properties));
         return queryNamedParamsSql(
             connection, new QueryAndNamedParams(q.getLeft(),
@@ -412,7 +412,7 @@ public abstract class OrmDaoUtils {
         TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(type);
         Pair<String, TableField[]> q =
             GeneralJsonObjectDao.buildSelectSqlWithFields(mapInfo, null, true,
-                GeneralJsonObjectDao.buildFilterSql(mapInfo, null, properties.keySet())
+                GeneralJsonObjectDao.buildFilterSql(mapInfo, null, properties)
                 , true, GeneralJsonObjectDao.fetchSelfOrderSql(mapInfo, properties));
         return queryNamedParamsSql(
             connection, new QueryAndNamedParams(q.getLeft(),
