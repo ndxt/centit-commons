@@ -72,6 +72,9 @@ public abstract class GeneralDDLOperations implements DDLOperations {
         if (!Lexer.isLabel(tableInfo.getTableName())) {
             return new ImmutablePair<>(-1, "表名" + tableInfo.getTableName() + "格式不正确！");
         }
+        if (tableInfo.getColumns() == null) {
+            return new ImmutablePair<>(-5, "没有定义字段！");
+        }
         for (TableField field : tableInfo.getColumns()) {
             if (!Lexer.isLabel(field.getColumnName())) {
                 return new ImmutablePair<>(-2, "字段名" + field.getColumnName() + "格式不正确！");
@@ -85,6 +88,13 @@ public abstract class GeneralDDLOperations implements DDLOperations {
             return new ImmutablePair<>(-4, "没有定义主键！");
         }
 
+        return new ImmutablePair<>(0, "ok！");
+    }
+
+    public static final Pair<Integer, String> checkViewWellDefined(final TableInfo tableInfo) {
+        if (!Lexer.isLabel(tableInfo.getTableName())) {
+            return new ImmutablePair<>(-1, "视图名" + tableInfo.getTableName() + "格式不正确！");
+        }
         return new ImmutablePair<>(0, "ok！");
     }
 
@@ -172,7 +182,7 @@ public abstract class GeneralDDLOperations implements DDLOperations {
                 sbCreate.append(",").append(field.getScale());
             }
             sbCreate.append(")");
-        }else if ("char".equalsIgnoreCase(field.getColumnType())){
+        } else if ("char".equalsIgnoreCase(field.getColumnType())) {
             if (field.getMaxLength() > 0) {
                 sbCreate.append("(").append(field.getMaxLength()).append(")");
             } else {
@@ -278,8 +288,9 @@ public abstract class GeneralDDLOperations implements DDLOperations {
             DatabaseAccess.doExecuteSql(conn, sql);
         }
     }
+
     @Override
-    public String makeCreateViewSql(final String selectSql, final String viewName){
+    public String makeCreateViewSql(final String selectSql, final String viewName) {
         return "create or replace view " + viewName + " as " +
             selectSql;
     }
