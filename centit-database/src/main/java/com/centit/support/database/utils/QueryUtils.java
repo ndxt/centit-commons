@@ -1348,6 +1348,24 @@ public abstract class QueryUtils {
         //return String.valueOf(paramValue).split(",");
     }
 
+    public static Map<String, Object> pretreatParameters(Map<String, Object> filterMap) {
+        Map<String, Object> map = new HashMap<>();
+        for (Map.Entry<String, Object> ent : filterMap.entrySet()) {
+            String key = ent.getKey();
+            Object value = ent.getValue();
+            String paramAlias = key;
+            int nPos = key.indexOf('(');
+            int nRevPos = key.lastIndexOf(')');
+            if(nPos>=0 && nRevPos>=0){
+                String pretreatment = key.substring(nPos+1, nRevPos).trim();
+                paramAlias = nPos > 1 ? key.substring(0,nPos).trim()
+                    :key.substring(nRevPos+1).trim();
+                value = QueryUtils.pretreatParameter(pretreatment, value);
+            }
+            map.put(paramAlias, value);
+        }
+        return map;
+    }
     /**
      * 对参数进行预处理
      *
@@ -1356,10 +1374,11 @@ public abstract class QueryUtils {
      * @return Object
      */
     public static Object pretreatParameter(String pretreatment, Object paramValue) {
-        if (StringUtils.isBlank(pretreatment))
+        if (StringUtils.isBlank(pretreatment) || paramValue==null)
             return paramValue;
-        if (pretreatment.indexOf(',') < 0)
+        if (pretreatment.indexOf(',') < 0) {
             return onePretreatParameter(pretreatment, paramValue);
+        }
         String[] pretreats = pretreatment.split(",");
         Object paramObj = paramValue;
         for (String p : pretreats) {
