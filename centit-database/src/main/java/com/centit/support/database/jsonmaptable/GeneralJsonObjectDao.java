@@ -538,6 +538,9 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 currentBuild.append(" is not null");
                 break;
             case "_in":
+                currentBuild.append(" in (:").append(plCol).append(")");
+                break;
+            //case "_eq":
             default:
                 //ReflectionOpt.isArray()
                 if(filterEnt.getValue() instanceof Collection ||
