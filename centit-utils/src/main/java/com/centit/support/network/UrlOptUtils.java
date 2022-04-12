@@ -112,7 +112,7 @@ public abstract class UrlOptUtils {
                 urlBuilder.append('&');
             n++;
             urlBuilder.append(ent.getKey()).append('=').append(
-                urlEncode(
+                urlEncodeShareNotDuplicate(
                     StringBaseOpt.objectToString(ent.getValue()))
             );
         }
@@ -139,10 +139,18 @@ public abstract class UrlOptUtils {
         }
     }
 
-    public static String urlEncode(String urlParam){
+    public static String urlEncodeShareNotDuplicate(String urlParam){
         try {
             //避免重复encode
             return URLEncoder.encode(urlDecode(urlParam),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return urlParam;
+        }
+    }
+
+    public static String urlEncode(String urlParam){
+        try {
+            return URLEncoder.encode(urlParam,"UTF-8");
         } catch (UnsupportedEncodingException e) {
             return urlParam;
         }
@@ -152,7 +160,7 @@ public abstract class UrlOptUtils {
         return (uri.endsWith("?") || uri.endsWith("&")) ?
             uri + paramName + "=" + StringBaseOpt.objectToString(paramValue) :
             uri + (uri.indexOf('?') == -1 ? '?' : '&')
-                + paramName + "=" +urlEncode(//StringEscapeUtils.escapeHtml4(
+                + paramName + "=" +urlEncodeShareNotDuplicate(//StringEscapeUtils.escapeHtml4(
                 StringBaseOpt.objectToString(paramValue));
     }
 
