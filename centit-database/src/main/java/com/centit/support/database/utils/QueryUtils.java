@@ -1055,27 +1055,20 @@ public abstract class QueryUtils {
         String filedName = aWord;
         int nFiledNo = 0;
         while (aWord != null && !"".equals(aWord) && !"from".equalsIgnoreCase(aWord)) {
-            boolean prewordIsOpt = false;
             while (!"".equals(aWord) && !",".equals(aWord)
                 && !"from".equalsIgnoreCase(aWord)) {
                 if ("(".equals(aWord)) {
                     lex.seekToRightBracket();
-                    prewordIsOpt = false;
+                    filedName = null;
                 } else {
                     // 如果有 * 则不能解析 字段名
                     if ("*".equals(aWord)) {
                         return null;
                     }
-                    if (Lexer.isLabel(aWord)) {
-                        if (!prewordIsOpt) {
-                            filedName = aWord;
-                        }
-                        prewordIsOpt = false;
+                    if (VariableFormula.getOptID(aWord) > 0) {
+                        filedName = null;
                     } else {
-                        prewordIsOpt = VariableFormula.getOptID(aWord) > 0;
-                        if (prewordIsOpt) {
-                            filedName = null;
-                        }
+                        filedName = StringRegularOpt.trimString(aWord);
                     }
                 }
                 aWord = lex.getAWord();
