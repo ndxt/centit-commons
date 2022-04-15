@@ -5,18 +5,16 @@ import java.util.Date;
 /**
  * 工作时间差值，
  * dayWorkHours 每日工作时间，如果这个值为24就是自然时间
- *
- * @author codefan
+ * @author codefan@sina.com
  */
 @SuppressWarnings("unused")
-public class WorkTimeSpan implements java.io.Serializable {
+public class WorkTimeSpan extends Number implements java.io.Serializable {
 
     /**
      * 默认每日工作时间
      */
-
     public static final long DEFAULT_DAY_WORK_MILLISECONDS = 28800000;
-    public static final long DEFAULT_DAY_WORK_MINUTES = 480;
+    public static final long DEFAULT_DAY_WORK_MINUTES = 480;// 八小时
     public static final long DAY_MILLISECONDS = 86400000;
     public static final long HOUR_MILLISECONDS = 3600000;
     public static final long MINUTE_MILLISECONDS = 60000;
@@ -32,10 +30,31 @@ public class WorkTimeSpan implements java.io.Serializable {
      */
     private long timeSpan;
 
+    private Long timeSpan2;
 
     public WorkTimeSpan() {
         dayWorkMilliseconds = DEFAULT_DAY_WORK_MILLISECONDS;
         timeSpan = 0;
+    }
+
+    @Override
+    public int intValue() {
+        return Long.valueOf(timeSpan).intValue() ;
+    }
+
+    @Override
+    public long longValue() {
+        return timeSpan;
+    }
+
+    @Override
+    public float floatValue() {
+        return (float)timeSpan;
+    }
+
+    @Override
+    public double doubleValue() {
+        return (double)timeSpan;
     }
 
     public WorkTimeSpan(Date beginDate, Date endDate, long dayWorkMinutes) {
