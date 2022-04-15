@@ -2,7 +2,6 @@ package com.centit.support.network;
 
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.security.Md5Encoder;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

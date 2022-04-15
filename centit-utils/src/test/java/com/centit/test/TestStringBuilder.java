@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.centit.support.algorithm.GeneralAlgorithm;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.network.UrlOptUtils;
-import org.apache.commons.text.StringEscapeUtils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

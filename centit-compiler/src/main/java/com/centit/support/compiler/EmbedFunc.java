@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 72;
+    public static final int functionsSum = 71;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -38,7 +38,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("round", -1, ConstDefine.FUNC_ROUND, ConstDefine.TYPE_NUM),    // 四舍五入
         new FunctionInfo("floor", -1, ConstDefine.FUNC_FLOOR, ConstDefine.TYPE_NUM),    // 四舍五入
         new FunctionInfo("ceil", -1, ConstDefine.FUNC_CEIL, ConstDefine.TYPE_NUM),    // 四舍五入
-        new FunctionInfo("concat", -1, ConstDefine.FUNC_STRCAT, ConstDefine.TYPE_STR),    // 连接字符串 concat ("12","34","56")="123456"
+        new FunctionInfo("strlen", -1, ConstDefine.FUNC_STRLEN, ConstDefine.TYPE_NUM),    // 求字符串长度 strlen ("123456")=6
         new FunctionInfo("strcat", -1, ConstDefine.FUNC_STRCAT, ConstDefine.TYPE_STR),    // 连接字符串 strcat ("12","34","56")="123456"
         new FunctionInfo("isempty", 1, ConstDefine.FUNC_ISEMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 isempty("")=1
         new FunctionInfo("isnotempty", 1, ConstDefine.FUNC_NOTEMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 notempty("")=0
@@ -84,7 +84,6 @@ public abstract class EmbedFunc {
         new FunctionInfo("toString", 1, ConstDefine.FUNC_TO_STRING, ConstDefine.TYPE_STR),//转换为String
         new FunctionInfo("toObject", 1, ConstDefine.FUNC_TO_OBJECT, ConstDefine.TYPE_ANY),//转换为json 对象
         new FunctionInfo("toNumber", 1, ConstDefine.FUNC_TO_NUMBER, ConstDefine.TYPE_NUM),//转换为数字
-        new FunctionInfo("singleton", -1, ConstDefine.FUNC_SINGLETON, ConstDefine.TYPE_ANY),//返回集合，去重
         new FunctionInfo("attr", 2, ConstDefine.FUNC_GET_ATTR, ConstDefine.TYPE_ANY),//获取对象属性
         new FunctionInfo("setAttr", 3, ConstDefine.FUNC_SET_ATTR, ConstDefine.TYPE_ANY),//设置对象属性
         new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR),//取汉字拼音
@@ -165,8 +164,12 @@ public abstract class EmbedFunc {
                 else
                     return null;
             }
-            case ConstDefine.FUNC_SINGLETON: {
+
+            case ConstDefine.FUNC_DISTINCT: {// 去重
                 LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
+                if(opt.getLeft() < 2){
+                    return opt.getRight();
+                }
                 List<Object> retObjs = new ArrayList<>();
                 for (Object obj : opt.getRight()) {
                     if (obj == null || retObjs.contains(obj)) {
@@ -176,6 +179,7 @@ public abstract class EmbedFunc {
                 }
                 return retObjs;
             }
+
             case ConstDefine.FUNC_GET_AT: {//148
                 if (nOpSum < 2)
                     return null;
@@ -331,6 +335,15 @@ public abstract class EmbedFunc {
                 }
                 return sb.toString();
             }
+
+            case ConstDefine.FUNC_STRLEN:// 156
+            {
+                if (nOpSum < 1)
+                    return null;
+                String checkValue = StringBaseOpt.castObjectToString(slOperand.get(0),"");
+                return checkValue.length();
+            }
+
             case ConstDefine.FUNC_SUBSTR: {
                 if (nOpSum < 1)
                     return null;
@@ -776,16 +789,6 @@ public abstract class EmbedFunc {
                     return JSON.parse((String) slOperand.get(0));
                 }
                 return slOperand.get(0);
-            }
-
-            case ConstDefine.FUNC_DISTINCT: {// 去重
-                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
-                if(opt.getLeft() < 2){
-                    return opt.getRight();
-                }
-                Set<Object> retSet = new HashSet<>(opt.getLeft());
-                retSet.addAll(opt.getRight());
-                return retSet;
             }
 
             case ConstDefine.FUNC_TO_NUMBER: {//
