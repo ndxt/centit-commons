@@ -185,10 +185,10 @@ public class Lexer {
     public String getARawWord() {
         int sl = formulaSen.length();
 
-        while ((startPos < sl) && (formulaSen.charAt(startPos) == ' ' || formulaSen.charAt(startPos) == 9 || formulaSen.charAt(startPos) == 10 || formulaSen.charAt(startPos) == 13))
+        while ((startPos < sl) && (formulaSen.charAt(startPos) == ' ' || formulaSen.charAt(startPos) == 9 ||
+            formulaSen.charAt(startPos) == 10 || formulaSen.charAt(startPos) == 13))
             startPos++;
         if (startPos >= sl) return "";
-
 
         int bp = startPos;
         // 数字
@@ -220,6 +220,7 @@ public class Lexer {
                     (formulaSen.charAt(startPos) >= 'a' && formulaSen.charAt(startPos) <= 'z') ||
                     (formulaSen.charAt(startPos) >= 'A' && formulaSen.charAt(startPos) <= 'Z') ||
                     formulaSen.charAt(startPos) == '_' || formulaSen.charAt(startPos) == '.' ||
+                    formulaSen.charAt(startPos) == ':' || // 添加冒号
                     StringRegularOpt.isChineseEscapeSymbol(formulaSen.charAt(startPos)) /*||
                       formulaSen.charAt(startPos)=='@'*/))
                 startPos++;
