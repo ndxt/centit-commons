@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.Collator;
 import java.util.*;
@@ -498,37 +499,46 @@ public abstract class GeneralAlgorithm {
         if (ar.size() < 1)
             return null;
         Iterator<Object> ari = ar.iterator();
-        Object sumObj = ar.iterator().next();
-        if (ar.size() == 1)
-            return sumObj;
+
+        Object sumObj = null;
+        while(sumObj==null  && ari.hasNext()){
+            sumObj = ari.next();
+        }
+        if (sumObj == null) {
+            return null;
+        }
         int retType = getJavaTypeOrder(sumObj);
+
         while (ari.hasNext()) {
             Object anOther = ari.next();
+            if(anOther == null){
+                continue;
+            }
             retType = Math.max(retType, getJavaTypeOrder(anOther));
             switch (retType) {
                 case 1:
-                    sumObj = NumberBaseOpt.castObjectToInteger(sumObj) +
-                        NumberBaseOpt.castObjectToInteger(anOther);
+                    sumObj = NumberBaseOpt.castObjectToInteger(sumObj,0) +
+                        NumberBaseOpt.castObjectToInteger(anOther,0);
                     break;
                 case 2:
-                    sumObj = NumberBaseOpt.castObjectToLong(sumObj) +
-                        NumberBaseOpt.castObjectToLong(anOther);
+                    sumObj = NumberBaseOpt.castObjectToLong(sumObj,0l) +
+                        NumberBaseOpt.castObjectToLong(anOther,0l);
                     break;
                 case 3:
-                    sumObj = NumberBaseOpt.castObjectToFloat(sumObj) +
-                        NumberBaseOpt.castObjectToFloat(anOther);
+                    sumObj = NumberBaseOpt.castObjectToFloat(sumObj,0f) +
+                        NumberBaseOpt.castObjectToFloat(anOther,0f);
                     break;
                 case 5:
-                    sumObj = NumberBaseOpt.castObjectToBigInteger(sumObj).add(
-                        NumberBaseOpt.castObjectToBigInteger(anOther));
+                    sumObj = NumberBaseOpt.castObjectToBigInteger(sumObj, BigInteger.ZERO).add(
+                        NumberBaseOpt.castObjectToBigInteger(anOther, BigInteger.ZERO));
                     break;
                 case 6:
-                    sumObj = NumberBaseOpt.castObjectToBigDecimal(sumObj).add(
-                        NumberBaseOpt.castObjectToBigDecimal(anOther));
+                    sumObj = NumberBaseOpt.castObjectToBigDecimal(sumObj, BigDecimal.ZERO).add(
+                        NumberBaseOpt.castObjectToBigDecimal(anOther, BigDecimal.ZERO));
                     break;
                 case 4:
-                    sumObj = NumberBaseOpt.castObjectToDouble(sumObj) +
-                        NumberBaseOpt.castObjectToDouble(anOther);
+                    sumObj = NumberBaseOpt.castObjectToDouble(sumObj, 0d) +
+                        NumberBaseOpt.castObjectToDouble(anOther,0d);
                     break;
                 case 10:
                 default:

@@ -82,6 +82,7 @@ public abstract class ConstDefine {
     public static final int FUNC_DISTINCT = 171;
     public static final int FUNC_RANDOM = 172;
     public static final int FUNC_HASH = 173;
+    public static final int FUNC_NVL = 174;
 
     public static final int OP_BASE = 30;    // +
     public static final int OP_ADD = 30;    // +

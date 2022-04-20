@@ -10,14 +10,20 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
-        System.out.println(VariableFormula.calculate("if(false, 'error','ok')",
-            new ObjectTranslate(CollectionsOpt.createHashMap() ), null));
-        System.out.println(VariableFormula.calculate("if(false, 'error')",
+        System.out.println(VariableFormula.calculate("nvl(你2好,'我不好')",
+            CollectionsOpt.createHashMap("你好","我的世界","地球",
+                CollectionsOpt.createList(
+                    CollectionsOpt.createHashMap("陆地","七大洲","海洋","四大洋2"),
+                    CollectionsOpt.createHashMap("陆地","七大洲","海洋","四大洋3") ))));
+
+        //System.out.println(VariableFormula.calculate(" regexMatch('^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$','codefan@sina.com')",
+        //    new ObjectTranslate(CollectionsOpt.createHashMap() ), null));
+        /*System.out.println(VariableFormula.calculate("if(false, 'error')",
             new ObjectTranslate(CollectionsOpt.createHashMap() ), null));
         System.out.println(VariableFormula.calculate("if('true', 'error','ok')",
             new ObjectTranslate(CollectionsOpt.createHashMap() ), null));
         System.out.println(VariableFormula.calcMultiFormula("(1+2, 3+'sdf')",
-            new ObjectTranslate(CollectionsOpt.createHashMap() ), null));
+            new ObjectTranslate(CollectionsOpt.createHashMap() ), null));*/
 
     }
 

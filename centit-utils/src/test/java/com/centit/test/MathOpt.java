@@ -1,8 +1,6 @@
 package com.centit.test;
 
-import com.centit.support.algorithm.Mathematics;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.algorithm.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -31,7 +29,11 @@ public class MathOpt {
 
     public static void main(String arg[]) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println(GeneralAlgorithm.sumObjects(CollectionsOpt.<Object>createList(
+            2, null, null, 1, null, 2, 0.3f, "hello"
+        )));
+
+        /*BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
             System.out.println("输入用空格隔开整数，推出输入exit");
             String s = br.readLine().trim();
@@ -61,7 +63,7 @@ public class MathOpt {
             Mathematics.permutationAndCombination(
                 alist, nSelect, Integer::compare, MathOpt::sortFormulaOpt
             );
-        }
+        }*/
     }
 }
 

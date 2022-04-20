@@ -16,12 +16,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 72;
+    public static final int functionsSum = 73;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
         new FunctionInfo("capital", 1, ConstDefine.FUNC_CAPITAL, ConstDefine.TYPE_STR),  // capital (123.45)="一百二十三点四五"
-        new FunctionInfo("if", 3, ConstDefine.FUNC_IF, ConstDefine.TYPE_ANY),      // if (1,2,3)= 2  if (0,"2","3")= "3"
+        new FunctionInfo("if", 2, ConstDefine.FUNC_IF, ConstDefine.TYPE_ANY),      // if (1,2,3)= 2  if (0,"2","3")= "3"
+        new FunctionInfo("nvl", 1, ConstDefine.FUNC_NVL, ConstDefine.TYPE_ANY),      // nvl (null,2)= 2  nvl(5,3) =5
         new FunctionInfo("case", 2, ConstDefine.FUNC_CASE, ConstDefine.TYPE_ANY),      // case(1,2,3)= null  case(1,2,3,1,"5")= "5"  case(0,1,"2","3")= "3"
         new FunctionInfo("match", 2, ConstDefine.FUNC_MATCH, ConstDefine.TYPE_NUM), //匹配*?为通配符 match ("abcd","a??d")=1
         new FunctionInfo("regexmatch", 2, ConstDefine.FUNC_REG_MATCH, ConstDefine.TYPE_NUM), //正则表达式 regexMatch
@@ -579,6 +580,15 @@ public abstract class EmbedFunc {
                         return null;
                 }
             }
+            case ConstDefine.FUNC_NVL: {// 174
+                if (nOpSum < 1) return null;
+                if (nOpSum == 1 || slOperand.get(0) != null) {
+                    return slOperand.get(0);
+                } else {
+                    return slOperand.get(1);
+                }
+            }
+
             // case(condition, candidate1, value1, candidate2, value2, defaultValue)
             //    condition 为 true时 candidate1 为bool表达式
             //    否则 用condition和candidate 对比 匹配就返回后面的值
