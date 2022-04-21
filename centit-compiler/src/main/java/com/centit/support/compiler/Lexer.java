@@ -28,24 +28,34 @@ public class Lexer {
     private int startPos;
     private int languageType;
 
+    private boolean colonInLable;
+
     public Lexer() {
         languageType = LANG_TYPE_JAVA;
+        colonInLable = true;
         setFormula(null);
     }
 
     public Lexer(String sFormula) {
         languageType = LANG_TYPE_JAVA;
+        colonInLable = true;
         setFormula(sFormula);
     }
 
     public Lexer(int langType) {
         this.languageType = langType;
+        colonInLable = this.languageType != LANG_TYPE_SQL;
         setFormula(null);
     }
 
     public Lexer(String sFormula, int langType) {
         this.languageType = langType;
+        colonInLable = this.languageType != LANG_TYPE_SQL;
         setFormula(sFormula);
+    }
+
+    public void setColonInLable(boolean colonInLable) {
+        this.colonInLable = colonInLable;
     }
 
     public static boolean isConstValue(final CharSequence seq) {
@@ -220,7 +230,7 @@ public class Lexer {
                     (formulaSen.charAt(startPos) >= 'a' && formulaSen.charAt(startPos) <= 'z') ||
                     (formulaSen.charAt(startPos) >= 'A' && formulaSen.charAt(startPos) <= 'Z') ||
                     formulaSen.charAt(startPos) == '_' || formulaSen.charAt(startPos) == '.' ||
-                    formulaSen.charAt(startPos) == ':' || // 添加冒号
+                    (this.colonInLable && formulaSen.charAt(startPos) == ':') || // 添加冒号
                     StringRegularOpt.isChineseEscapeSymbol(formulaSen.charAt(startPos)) /*||
                       formulaSen.charAt(startPos)=='@'*/))
                 startPos++;

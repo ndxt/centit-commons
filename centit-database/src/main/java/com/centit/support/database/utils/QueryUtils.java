@@ -1823,7 +1823,7 @@ public abstract class QueryUtils {
                 String[] tables = tablesDesc.split(",");
                 Map<String, String> tableMap = new HashMap<>();
                 for (String tableDesc : tables) {
-                    Lexer tableLexer = new Lexer(tableDesc);
+                    Lexer tableLexer = new Lexer(tableDesc, Lexer.LANG_TYPE_SQL);
                     String tableName = tableLexer.getAWord();
                     String aliasName = tableLexer.getAWord();
                     if (":".equals(aliasName)) {
