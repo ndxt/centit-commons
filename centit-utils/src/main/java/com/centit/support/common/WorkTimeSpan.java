@@ -377,6 +377,10 @@ public class WorkTimeSpan implements java.io.Serializable {
     /*
      * 默认单位分钟
      */
+    public void fromNumber(long lSpan) {
+        fromNumberAsMillisecond(lSpan * MINUTE_MILLISECONDS);
+    }
+
     public void fromNumberAsMinute(long lSpan) {
         fromNumberAsMillisecond(lSpan * MINUTE_MILLISECONDS);
     }
