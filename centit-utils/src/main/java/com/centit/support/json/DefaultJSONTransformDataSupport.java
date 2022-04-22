@@ -36,6 +36,11 @@ public class DefaultJSONTransformDataSupport implements  JSONTransformDataSuppor
         }
     }
 
+    @Override
+    public String mapTemplateString(String templateString) {
+        return templateString;
+    }
+
     private Object currentValue(){
         return stackLength>0? stack.get(stackLength-1): data;
     }

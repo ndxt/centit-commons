@@ -34,7 +34,7 @@ public class JSONTransformer {
         if(templateObj instanceof String){
             String value = (String)templateObj;
             if(value.startsWith("@")){
-                return value.substring(1);
+                return dataSupport.mapTemplateString(value.substring(1));
             } else {
                 return dataSupport.attainExpressionValue(value);
             }

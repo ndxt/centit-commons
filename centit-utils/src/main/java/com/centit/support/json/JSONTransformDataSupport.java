@@ -4,6 +4,8 @@ public interface JSONTransformDataSupport {
 
     Object attainExpressionValue(String labelName);
 
+    String mapTemplateString(String templateString);
+
     default void pushStackValue(Object value){
 
     }
