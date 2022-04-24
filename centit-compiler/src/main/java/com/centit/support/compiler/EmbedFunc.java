@@ -219,12 +219,20 @@ public abstract class EmbedFunc {
                 }
                 return null;
 
-            case ConstDefine.FUNC_MATCH:
+            case ConstDefine.FUNC_MATCH: {
                 if (nOpSum < 2)
                     return false;
+                int wildcardType = 2;
+                if(nOpSum>2){
+                    wildcardType = NumberBaseOpt.castObjectToInteger(slOperand.get(2), 2);
+                    if(wildcardType<0 || wildcardType>2){
+                        wildcardType = 2;
+                    }
+                }
                 return StringRegularOpt.isMatch(
                     StringBaseOpt.objectToString(slOperand.get(0)),
-                    StringBaseOpt.objectToString(slOperand.get(1)), 2);
+                    StringBaseOpt.objectToString(slOperand.get(1)), wildcardType);
+            }
             case ConstDefine.FUNC_REG_MATCH:
                 if (nOpSum < 2)
                     return false;
