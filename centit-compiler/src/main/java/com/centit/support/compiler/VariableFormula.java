@@ -364,8 +364,8 @@ public class VariableFormula {
                 }
                 return null;
             case ConstDefine.OP_LIKE:
-                return StringRegularOpt.isMatch(StringBaseOpt.objectToString(operand),
-                    StringBaseOpt.objectToString(operand2));
+                return StringRegularOpt.isMatch(StringBaseOpt.objectToString(operand2),
+                    StringBaseOpt.objectToString(operand), 2);
             case ConstDefine.OP_SUB:
                 return GeneralAlgorithm.subtractTwoObject(operand, operand2);
             case ConstDefine.OP_DIV: {

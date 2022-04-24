@@ -1,9 +1,8 @@
 package com.centit.test;
 
 import com.alibaba.fastjson.JSON;
-import com.centit.support.algorithm.GeneralAlgorithm;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.network.UrlOptUtils;
+import com.centit.support.algorithm.StringRegularOpt;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,12 +11,12 @@ public class TestStringBuilder {
 
     public static void main(String[] args) {
 
-        System.out.println(UrlOptUtils.urlDecode("hello > < world"));
-        System.out.println(UrlOptUtils.urlEncode("hello > < world"));
-        System.out.println(UrlOptUtils.urlEncode(UrlOptUtils.urlDecode("hello > < world")));
+        System.out.println(StringRegularOpt.isMatch("a??d","abcd"));
+        //System.out.println(UrlOptUtils.urlEncode("hello > < world"));
+        //System.out.println(UrlOptUtils.urlEncode(UrlOptUtils.urlDecode("hello > < world")));
 
-        System.out.println(GeneralAlgorithm.compareTwoObject("曹操", "曹睿"));
-        System.out.println(GeneralAlgorithm.compareTwoComparableObject("曹操", "曹阿斗"));
+        //System.out.println(GeneralAlgorithm.compareTwoObject("曹操", "曹睿"));
+        //System.out.println(GeneralAlgorithm.compareTwoComparableObject("曹操", "曹阿斗"));
     }
 
     public static void testString2() {

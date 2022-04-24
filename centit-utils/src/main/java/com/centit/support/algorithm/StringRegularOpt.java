@@ -497,24 +497,44 @@ public abstract class StringRegularOpt {
         return sTmp2.toString();
     }
 
-    public static String sqlMatchToRegex(String sTempl) {
-        return "^" + sTempl.replaceAll("%", "\\\\S*")
-            .replaceAll("_", "\\\\S") + "$";
-    }
-
-    // ?_  *% 是通配符
-    public static boolean isMatch(String szValue, String szTempl) {
+    /**
+     * 字符串模式匹配
+     * @param szTempl 模式
+     * @param szValue 字符串
+     * @param wildcardType 通配符类型  0 windowsType * ？ 1 sqlType % _  2 both
+     * @return 是否匹配
+     */
+    public static boolean isMatch(String szTempl, String szValue, int wildcardType) {
         if (szValue == null || szTempl == null) return false;
-        if (szValue.equals(szTempl)) return true;
         int nLV = szValue.length();
         int nLT = szTempl.length();
         if (nLV == 0 && nLT == 0) return true;
-
+        if (szValue.equals(szTempl)) return true;
         szValue = trimString(szValue);
         szTempl = trimString(szTempl);
-        //return Pattern.matches(sqlMatchToRegex(szTempl), szValue);//
-        //Pattern.compile(sqlMatchToRegex(szTempl)).matcher(szValue).find()
-        return Pattern.matches(sqlMatchToRegex(szValue), szTempl);
+        if(wildcardType == 0 || wildcardType == 2){
+            String tpl = "^" + szTempl.replaceAll("\\*", "\\\\S*")
+                .replaceAll("\\?", "\\\\S") + "$";
+            boolean isMath = Pattern.matches(tpl, szValue);
+            if(isMath || wildcardType == 0){
+                return isMath;
+            }
+        }
+        //if(wildcardType == 1 || wildcardType == 2){
+        String tpl = "^" + szTempl.replaceAll("%", "\\\\S*")
+            .replaceAll("_", "\\\\S") + "$";
+        return Pattern.matches(tpl, szValue);
+        //}
+    }
+
+    // _  % 是通配符
+    public static boolean isSqlMatch(String szTempl, String szValue) {
+        return isMatch(szTempl, szValue, 1);
+    }
+
+    // ?  * 是通配符
+    public static boolean isMatch(String szTempl, String szValue) {
+        return isMatch(szTempl, szValue, 0);
     }
 
     /**

@@ -10,6 +10,8 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
+        System.out.println(VariableFormula.calculate(
+            "match('abcd','a*b')"));
         System.out.println(VariableFormula.calculate("nvl(你2好,'我不好')",
             CollectionsOpt.createHashMap("你好","我的世界","地球",
                 CollectionsOpt.createList(

@@ -224,7 +224,7 @@ public abstract class EmbedFunc {
                     return false;
                 return StringRegularOpt.isMatch(
                     StringBaseOpt.objectToString(slOperand.get(0)),
-                    StringBaseOpt.objectToString(slOperand.get(1)));
+                    StringBaseOpt.objectToString(slOperand.get(1)), 2);
             case ConstDefine.FUNC_REG_MATCH:
                 if (nOpSum < 2)
                     return false;
