@@ -24,9 +24,9 @@ public abstract class EmbedFunc {
         new FunctionInfo("if", 2, ConstDefine.FUNC_IF, ConstDefine.TYPE_ANY),      // if (1,2,3)= 2  if (0,"2","3")= "3"
         new FunctionInfo("nvl", 1, ConstDefine.FUNC_NVL, ConstDefine.TYPE_ANY),      // nvl (null,2)= 2  nvl(5,3) =5
         new FunctionInfo("case", 2, ConstDefine.FUNC_CASE, ConstDefine.TYPE_ANY),      // case(1,2,3)= null  case(1,2,3,1,"5")= "5"  case(0,1,"2","3")= "3"
-        new FunctionInfo("match", 2, ConstDefine.FUNC_MATCH, ConstDefine.TYPE_NUM), //匹配*?为通配符 match ("abcd","a??d")=1
-        new FunctionInfo("regexmatch", 2, ConstDefine.FUNC_REG_MATCH, ConstDefine.TYPE_NUM), //正则表达式 regexMatch
-        new FunctionInfo("regexmatchvalue", 2, ConstDefine.FUNC_REG_MATCH_VALUES, ConstDefine.TYPE_ANY), //正则表达式匹配部分
+        new FunctionInfo("match", 2, ConstDefine.FUNC_MATCH, ConstDefine.TYPE_NUM), //匹配*?为通配符 match ("a??d","abcd")=1
+        new FunctionInfo("regexmatch", 2, ConstDefine.FUNC_REG_MATCH, ConstDefine.TYPE_NUM), //正则表达式 regexMatch("^1[3-9]\\d(9)$"，"13901390139"）= true
+        new FunctionInfo("regexmatchvalue", 2, ConstDefine.FUNC_REG_MATCH_VALUES, ConstDefine.TYPE_ANY), //正则表达式匹配部分 regexMatchValue('a\\S','abcdacda2ef') = ['ab', 'ac', 'a2']
         new FunctionInfo("max", -1, ConstDefine.FUNC_MAX, ConstDefine.TYPE_ANY),   // 求最大值 max (1,2,3,5,4) = 5
         new FunctionInfo("min", -1, ConstDefine.FUNC_MIN, ConstDefine.TYPE_ANY),    // 求最小值 min (1,2,3,5,4) = 1
         new FunctionInfo("ave", -1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
