@@ -53,7 +53,6 @@ public class JdbcMetadata implements DatabaseMetadata {
                 }
             }
             rs.close();
-            dbc.close();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         }
@@ -134,7 +133,6 @@ public class JdbcMetadata implements DatabaseMetadata {
             rs.close();
 
             fetchTableDetail(tab, dbmd);
-            dbc.close();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);//e.printStackTrace();
         }
