@@ -159,6 +159,15 @@ public class VariableFormula {
         return formula.checkFormula();
     }
 
+    public static Set<String> attainFormulaVariable(String szExpress) {
+        VariableFormula formula = new VariableFormula();
+        formula.setFormula(szExpress);
+        DummyTranslate translate = new DummyTranslate();
+        formula.setTrans(translate);
+        formula.checkFormula();
+        return translate.getVariableSet();
+    }
+
     public void setTrans(VariableTranslate trans) {
         this.trans = trans;
     }

@@ -1,12 +1,9 @@
 package com.centit.test;
 
-import com.centit.support.algorithm.*;
-import org.apache.commons.lang3.StringUtils;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.GeneralAlgorithm;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
