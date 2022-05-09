@@ -164,7 +164,7 @@ public class VariableFormula {
         formula.setFormula(szExpress);
         DummyTranslate translate = new DummyTranslate();
         formula.setTrans(translate);
-        formula.checkFormula();
+        formula.calcFormula();
         return translate.getVariableSet();
     }
 
