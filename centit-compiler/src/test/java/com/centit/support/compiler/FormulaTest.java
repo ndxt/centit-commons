@@ -10,6 +10,12 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
+
+        System.out.println(VariableFormula.calculate("strcat(capital(floor(a)),'元'," +
+                "if(byte(a,-1)=0 and byte(a,-2)=0, '整', if(byte(a,-2)=0, strcat(capital(byte(a,-1)),'角')," +
+                " strcat( capital(byte(a,-1)),'角',capital(byte(a,-2)),'分') ) ) )",
+            CollectionsOpt.createHashMap("a",100032.01f)));
+
         System.out.println(VariableFormula.calculate(
             "match('a*d','aadbd')"));
         System.out.println(VariableFormula.calculate(
