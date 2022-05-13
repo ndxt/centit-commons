@@ -24,10 +24,8 @@ public class JdbcMetadata implements DatabaseMetadata {
         this.dbc = dbc;
     }
 
-    public List<SimpleTableInfo> listAllTable() {
-       return listAllTable(true);
-    }
-    public List<SimpleTableInfo> listAllTable(boolean withColumn) {
+
+    public List<SimpleTableInfo> listAllTable(boolean withColumn, String[] tableNames) {
         List<SimpleTableInfo> tables = new ArrayList<>(100);
         try {
             String dbSechema = this.getDBSchema();
@@ -36,7 +34,22 @@ public class JdbcMetadata implements DatabaseMetadata {
             DatabaseMetaData dbmd = dbc.getMetaData();
 
             ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, null, null);
+            boolean canAddTable;
             while (rs.next()) {
+                canAddTable = false;
+                if (tableNames == null) {
+                    canAddTable = true;
+                } else {
+                    for (String tabName : tableNames) {
+                        if (tabName.equalsIgnoreCase(rs.getString("TABLE_NAME"))) {
+                            canAddTable = true;
+                            break;
+                        }
+                    }
+                }
+                if (!canAddTable) {
+                    continue;
+                }
                 SimpleTableInfo tab = new SimpleTableInfo();
                 if (dbSechema != null) {
                     tab.setSchema(dbSechema.toUpperCase());
@@ -45,7 +58,7 @@ public class JdbcMetadata implements DatabaseMetadata {
                 tab.setTableLabelName(rs.getString("REMARKS"));
                 String tt = rs.getString("TABLE_TYPE");
                 if ("view".equalsIgnoreCase(tt) || "table".equalsIgnoreCase(tt)) {
-                    if(withColumn) {
+                    if (withColumn) {
                         fetchTableDetail(tab, dbmd);
                     }
                     tab.setTableType("view".equalsIgnoreCase(tt) ? "V" : "T");
