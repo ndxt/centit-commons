@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @SuppressWarnings("unused")
 public abstract class FileIOOpt {
@@ -187,6 +189,28 @@ public abstract class FileIOOpt {
         return JSON.parseObject(sjson, clazz);
     }
 
+    public static InputStream castObjectToInputStream(Object data){
+        if(data == null) {
+            return null;
+        }
+        if (data instanceof InputStream) {
+            return (InputStream)data;
+        }
+        if (data instanceof OutputStream) {
+            ByteArrayOutputStream outputStream = (ByteArrayOutputStream) data;
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        }
+
+        if(data instanceof byte[]) {
+            return new ByteArrayInputStream((byte[]) data);
+        }
+
+        if(data instanceof String){
+            return new ByteArrayInputStream(((String) data).getBytes(StandardCharsets.UTF_8));
+        }
+        String dataStr = JSON.toJSONString(data);
+        return new ByteArrayInputStream(dataStr.getBytes(StandardCharsets.UTF_8));
+    }
     /**
      * close the IO stream.
      *
