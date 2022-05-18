@@ -297,7 +297,7 @@ public abstract class CollectionsOpt {
     (List<T> treeList, ParentChild<? super T> c, String childrenPropertyName) {
         JSONArray jsonTree = new JSONArray();
         Stack<T> treePath = new Stack<T>();
-        Stack<JSONObject> jsonPath = new Stack<JSONObject>();
+        Stack<JSONObject> jsonPath = new Stack<>();
         int pathSum = 0;
         for (T treeNode : treeList) {
             JSONObject jsonNode;
@@ -344,7 +344,7 @@ public abstract class CollectionsOpt {
      * @param childrenPropertyName 为孩子的 属性名
      * @return JSONArray
      */
-    public static <T> JSONArray srotAsTreeAndToJSON
+    public static <T> JSONArray sortAsTreeAndToJSON
     (List<T> treeList, ParentChild<? super T> c, String childrenPropertyName) {
         sortAsTree(treeList, c);
         return treeToJSONArray(treeList, c, childrenPropertyName);
@@ -361,9 +361,9 @@ public abstract class CollectionsOpt {
      */
     public static <T> List<TreeNode<T>> storedAsTree(List<T> list, ParentChild<? super T> c) {
 
-        List<TreeNode<T>> treeList = new ArrayList<TreeNode<T>>();
+        List<TreeNode<T>> treeList = new ArrayList<>();
         for (T m : list) {
-            treeList.add(new TreeNode<T>(m));
+            treeList.add(new TreeNode<>(m));
         }
         for (TreeNode<T> cNode : treeList) {
             for (TreeNode<T> pNode : treeList) {
@@ -373,7 +373,7 @@ public abstract class CollectionsOpt {
                 }
             }
         }
-        List<TreeNode<T>> resList = new ArrayList<TreeNode<T>>();
+        List<TreeNode<T>> resList = new ArrayList<>();
         for (TreeNode<T> node : treeList) {
             if (node.isRoot())
                 resList.add(node);
@@ -403,7 +403,7 @@ public abstract class CollectionsOpt {
 
     /**
      * 将列表转换为tree结构的json
-     * 和 srotAsTreeAndToJSON 用不同的算法实现，这个需要额外的空间，用递归实现。
+     * 和 sortAsTreeAndToJSON2 用不同的算法实现，这个需要额外的空间，用递归实现。
      *
      * @param <T>                  泛型类型
      * @param treeList             待排序的List
@@ -411,7 +411,7 @@ public abstract class CollectionsOpt {
      * @param childrenPropertyName 为孩子的 属性名
      * @return JSONArray
      */
-    public static <T> JSONArray srotAsTreeAndToJSON2
+    public static <T> JSONArray sortAsTreeAndToJSON2
     (List<T> treeList, ParentChild<? super T> c, String childrenPropertyName) {
 
         List<TreeNode<T>> sortTree = storedAsTree(treeList, c);

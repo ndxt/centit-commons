@@ -24,15 +24,14 @@ public class JdbcMetadata implements DatabaseMetadata {
         this.dbc = dbc;
     }
 
-
-    public List<SimpleTableInfo> listAllTable(boolean withColumn, String[] tableNames) {
+    public List<SimpleTableInfo> listTables(boolean withColumn, String[] tableNames) {
         List<SimpleTableInfo> tables = new ArrayList<>(100);
         try {
             String dbSechema = this.getDBSchema();
             String dbCatalog = this.getDBCatalog();
 
             DatabaseMetaData dbmd = dbc.getMetaData();
-
+            //dbmd.getTables()
             ResultSet rs = dbmd.getTables(dbCatalog, dbSechema, null, null);
             boolean canAddTable;
             while (rs.next()) {
@@ -71,7 +70,6 @@ public class JdbcMetadata implements DatabaseMetadata {
         }
         return tables;
     }
-
 
     private void fetchTableDetail(SimpleTableInfo tab, DatabaseMetaData dbmd) {
         String tabName = tab.getTableName();
