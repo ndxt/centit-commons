@@ -33,22 +33,38 @@ public abstract class GeneralAlgorithm {
         return obj == null ? obj3 : obj2;
     }
 
+
     /**
      * return (a == b) or (a != null and a.equals(b));
      * @see java.util.Objects equals
      * @param operand an object
      * @param operand2 an object to be compared with {@code a} for equality
+     * @param allNullAsTrue 两个参数都是null时返回 true
      * @return {@code true} if the arguments are equal to each other
      * and {@code false} otherwise
      */
-    public static boolean equals(Object operand, Object operand2) {
-        if (operand == operand2) {
-            return true;
-        }
-        if (operand == null || operand2 == null) {
-            return false;
+    public static boolean equals(Object operand, Object operand2, boolean allNullAsTrue) {
+        if(allNullAsTrue) {
+            if (operand == operand2) {
+                return true;
+            }
+            if (operand == null || operand2 == null) {
+                return false;
+            }
+        } else {
+            if (operand == null || operand2 == null) {
+                return false;
+            }
+            if (operand == operand2) {
+                return true;
+            }
         }
         return operand.equals(operand2);
+    }
+
+    public static boolean equals(Object operand, Object operand2) {
+
+        return equals(operand, operand2, true);
     }
 
     public static int compareTwoObject(Object operand, Object operand2, boolean nullAsFirst) {

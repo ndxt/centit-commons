@@ -841,15 +841,22 @@ public abstract class CollectionsOpt {
         return retList;
     }
 
-    public static <T, R> List<R> mapCollectionToList(Collection<T> array, Function<T, R> func){
+    public static <T, R> List<R> mapCollectionToList(Collection<T> array, Function<T, R> func, boolean ignoreNull){
         if(array == null){
             return null;
         }
         List<R> retList = new ArrayList<>();
         for(T obj : array){
-            retList.add(func.apply(obj));
+            R v = func.apply(obj);
+            if(!ignoreNull || v !=null) {
+                retList.add(func.apply(obj));
+            }
         }
         return retList;
+    }
+
+    public static <T, R> List<R> mapCollectionToList(Collection<T> array, Function<T, R> func){
+       return mapCollectionToList(array, func, false);
     }
     /**
      * 判断两个对象是否是父子关系，用于针对树形展示的数据结构进行排序
