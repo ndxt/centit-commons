@@ -16,6 +16,7 @@ public class VariableFormula {
 
     public VariableFormula() {
         lex = new Lexer();
+        extendFuncMap = null;
         //m_preTreat.setVariableTranslate(new SimpleTranslate("1"));
     }
 
@@ -159,13 +160,18 @@ public class VariableFormula {
         return formula.checkFormula();
     }
 
-    public static Set<String> attainFormulaVariable(String szExpress) {
+    public static Set<String> attainFormulaVariable(String szExpress, Map<String, Function<Object[], Object>> extendFuncMap) {
         VariableFormula formula = new VariableFormula();
+        formula.setExtendFuncMap(extendFuncMap);
         formula.setFormula(szExpress);
         DummyTranslate translate = new DummyTranslate();
         formula.setTrans(translate);
         formula.calcFormula();
         return translate.getVariableSet();
+    }
+
+    public static Set<String> attainFormulaVariable(String szExpress) {
+        return attainFormulaVariable(szExpress , null);
     }
 
     public void setTrans(VariableTranslate trans) {
