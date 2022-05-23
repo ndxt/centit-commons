@@ -858,6 +858,24 @@ public abstract class CollectionsOpt {
     public static <T, R> List<R> mapCollectionToList(Collection<T> array, Function<T, R> func){
        return mapCollectionToList(array, func, false);
     }
+
+    public static <D, K, V> Map<K,V> mapCollectionToMap(Collection<D> array,
+                                                        Function<D, K> keyFunc, Function<D, V> valueFunc){
+        if (array == null) {
+            return null;// Collections.EMPTY_MAP;
+        }
+        //保持顺序
+        LinkedHashMap<K,V> map = new LinkedHashMap<>();
+        for (D obj : array) {
+            K k = keyFunc.apply(obj);
+            V v = valueFunc.apply(obj);
+            if(k!=null && v!=null){
+                map.put(k, v);
+            }
+        }
+        return map;
+    }
+
     /**
      * 判断两个对象是否是父子关系，用于针对树形展示的数据结构进行排序
      *
