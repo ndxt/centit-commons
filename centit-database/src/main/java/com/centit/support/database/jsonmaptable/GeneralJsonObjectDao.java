@@ -410,8 +410,13 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         }
         return ti.getOrderBy();
     }
-
     public static String buildFilterSqlByPk(TableInfo ti, String alias) {
+        return buildFilterSqlByPk(ti,alias,true);
+    }
+    public static String buildFilterSqlByPkUseColumnName(TableInfo ti, String alias) {
+        return buildFilterSqlByPk(ti,alias,false);
+    }
+    private static String buildFilterSqlByPk(TableInfo ti, String alias,boolean usePropertyName) {
         StringBuilder sBuilder = new StringBuilder();
         int i = 0;
         List<? extends TableField> pkColumns = ti.getPkFields();
@@ -423,7 +428,11 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 sBuilder.append(" and ");
             if (StringUtils.isNotBlank(alias))
                 sBuilder.append(alias).append('.');
-            sBuilder.append(col.getColumnName()).append(" = :").append(col.getPropertyName());
+            if(usePropertyName) {
+                sBuilder.append(col.getColumnName()).append(" = :").append(col.getPropertyName());
+            }else{
+                sBuilder.append(col.getColumnName()).append(" = :").append(col.getColumnName());
+            }
             i++;
         }
         return sBuilder.toString();
