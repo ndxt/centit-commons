@@ -178,15 +178,15 @@ public abstract class GeneralAlgorithm {
      * @param b object2
      * @return 相加结果
      */
-    public static Object addTwoObject(Object a, Object b) {
+    public static Object addTwoObject(Object a, Object b, boolean ignoreNull) {
         if (a == null) {
-            if (b == null || b instanceof java.lang.Number) {
+            if (ignoreNull && (b == null || b instanceof java.lang.Number)) {
                 return null;
             }
             return b;
         }
         if (b == null) {
-            if (a instanceof java.lang.Number) {
+            if (ignoreNull && a instanceof java.lang.Number) {
                 return null;
             }
             return a;
@@ -233,6 +233,10 @@ public abstract class GeneralAlgorithm {
         return StringBaseOpt.concat(
             StringBaseOpt.castObjectToString(a),
             StringBaseOpt.castObjectToString(b));
+    }
+
+    public static Object addTwoObject(Object a, Object b) {
+        return addTwoObject(a, b, false);
     }
 
     public static Object subtractTwoObject(Object a, Object b) {

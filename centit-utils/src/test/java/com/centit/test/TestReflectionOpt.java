@@ -32,9 +32,8 @@ public class TestReflectionOpt {
             "adb",1,"b",2, "d", new MapSupplier(), "f",(Supplier<String>)()->"hello");
         Object[] objects = new Object[]{map, map, map};
         System.out.println(
-            JSON.toJSONString(ReflectionOpt.attainExpressionValue(objects,
-                ".[1].f")));
-
+            JSON.toJSONString(ReflectionOpt.attainExpressionValue(CollectionsOpt.createHashMap("abc", objects),
+                "abc[1].b")));
 
         //System.out.println(ReflectionOpt.isScalarType(strings.getClass()));
         System.out.println(String.class.getPackage().getName());
