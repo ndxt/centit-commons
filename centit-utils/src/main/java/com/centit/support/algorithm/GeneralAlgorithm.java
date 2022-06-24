@@ -176,17 +176,18 @@ public abstract class GeneralAlgorithm {
      *
      * @param a object1
      * @param b object2
+     * @param nullSensitive  在数字计算是null敏感，就是有一个数为null则结果为null
      * @return 相加结果
      */
-    public static Object addTwoObject(Object a, Object b, boolean ignoreNull) {
+    public static Object addTwoObject(Object a, Object b, boolean nullSensitive) {
         if (a == null) {
-            if (ignoreNull && (b == null || b instanceof java.lang.Number)) {
+            if (nullSensitive && (b == null || b instanceof java.lang.Number)) {
                 return null;
             }
             return b;
         }
         if (b == null) {
-            if (ignoreNull && a instanceof java.lang.Number) {
+            if (nullSensitive && a instanceof java.lang.Number) {
                 return null;
             }
             return a;
@@ -225,7 +226,7 @@ public abstract class GeneralAlgorithm {
                 objs.addAll((Collection<Object>) b);
             } else {
                 for (Object obj : (Collection<Object>) a) {
-                    objs.add(addTwoObject(obj, b));
+                    objs.add(addTwoObject(obj, b, nullSensitive));
                 }
             }
             return objs;
@@ -236,7 +237,7 @@ public abstract class GeneralAlgorithm {
     }
 
     public static Object addTwoObject(Object a, Object b) {
-        return addTwoObject(a, b, false);
+        return addTwoObject(a, b, true);
     }
 
     public static Object subtractTwoObject(Object a, Object b) {
@@ -424,42 +425,50 @@ public abstract class GeneralAlgorithm {
         if (ar.size() == 1)
             return maxObject;
 
-        int retType = getJavaTypeOrder(maxObject);
+        int retType = maxObject==null?-1:getJavaTypeOrder(maxObject);;
         while (ari.hasNext()) {
             Object anOther = ari.next();
-            retType = Math.max(retType, getJavaTypeOrder(anOther));
-            switch (retType) {
-                case 1:
-                    maxObject = Math.max(NumberBaseOpt.castObjectToInteger(maxObject),
-                        NumberBaseOpt.castObjectToInteger(anOther));
-                    break;
-                case 2:
-                    maxObject = Math.max(NumberBaseOpt.castObjectToLong(maxObject),
-                        NumberBaseOpt.castObjectToLong(anOther));
-                    break;
-                case 3:
-                    maxObject = Math.max(NumberBaseOpt.castObjectToFloat(maxObject),
-                        NumberBaseOpt.castObjectToFloat(anOther));
-                    break;
-                case 5:
-                    maxObject = NumberBaseOpt.castObjectToBigInteger(maxObject).max(
-                        NumberBaseOpt.castObjectToBigInteger(anOther));
-                    break;
+            if(anOther == null){
+                continue;
+            }
+            if(maxObject==null){
+                maxObject = anOther;
+                retType = getJavaTypeOrder(maxObject);
+            }  else {
+                retType = Math.max(retType, getJavaTypeOrder(anOther));
+                switch (retType) {
+                    case 1:
+                        maxObject = Math.max(NumberBaseOpt.castObjectToInteger(maxObject),
+                            NumberBaseOpt.castObjectToInteger(anOther));
+                        break;
+                    case 2:
+                        maxObject = Math.max(NumberBaseOpt.castObjectToLong(maxObject),
+                            NumberBaseOpt.castObjectToLong(anOther));
+                        break;
+                    case 3:
+                        maxObject = Math.max(NumberBaseOpt.castObjectToFloat(maxObject),
+                            NumberBaseOpt.castObjectToFloat(anOther));
+                        break;
+                    case 5:
+                        maxObject = NumberBaseOpt.castObjectToBigInteger(maxObject).max(
+                            NumberBaseOpt.castObjectToBigInteger(anOther));
+                        break;
 
-                case 6:
-                    maxObject = NumberBaseOpt.castObjectToBigDecimal(maxObject).max(
-                        NumberBaseOpt.castObjectToBigDecimal(anOther));
-                    break;
-                case 4:
-                    maxObject = Math.max(NumberBaseOpt.castObjectToDouble(maxObject),
-                        NumberBaseOpt.castObjectToDouble(anOther));
-                    break;
-                case 10:
-                default:
-                    String str1 = StringBaseOpt.castObjectToString(maxObject);
-                    String str2 = StringBaseOpt.castObjectToString(anOther);
-                    maxObject = str1.compareTo(str2) > 0 ? str1 : str2;
-                    break;
+                    case 6:
+                        maxObject = NumberBaseOpt.castObjectToBigDecimal(maxObject).max(
+                            NumberBaseOpt.castObjectToBigDecimal(anOther));
+                        break;
+                    case 4:
+                        maxObject = Math.max(NumberBaseOpt.castObjectToDouble(maxObject),
+                            NumberBaseOpt.castObjectToDouble(anOther));
+                        break;
+                    case 10:
+                    default:
+                        String str1 = StringBaseOpt.castObjectToString(maxObject);
+                        String str2 = StringBaseOpt.castObjectToString(anOther);
+                        maxObject = str1.compareTo(str2) > 0 ? str1 : str2;
+                        break;
+                }
             }
         }
         return maxObject;
@@ -473,42 +482,50 @@ public abstract class GeneralAlgorithm {
         if (ar.size() == 1)
             return minObject;
 
-        int retType = getJavaTypeOrder(minObject);
+        int retType = minObject==null?-1:getJavaTypeOrder(minObject);;
         while (ari.hasNext()) {
             Object anOther = ari.next();
-            retType = Math.max(retType, getJavaTypeOrder(anOther));
-            switch (retType) {
-                case 1:
-                    minObject = Math.min(NumberBaseOpt.castObjectToInteger(minObject),
-                        NumberBaseOpt.castObjectToInteger(anOther));
-                    break;
-                case 2:
-                    minObject = Math.min(NumberBaseOpt.castObjectToLong(minObject),
-                        NumberBaseOpt.castObjectToLong(anOther));
-                    break;
-                case 3:
-                    minObject = Math.min(NumberBaseOpt.castObjectToFloat(minObject),
-                        NumberBaseOpt.castObjectToFloat(anOther));
-                    break;
-                case 5:
-                    minObject = NumberBaseOpt.castObjectToBigInteger(minObject).min(
-                        NumberBaseOpt.castObjectToBigInteger(anOther));
-                    break;
+            if(anOther == null){
+                continue;
+            }
+            if(minObject==null){
+                minObject = anOther;
+                retType = getJavaTypeOrder(minObject);
+            }  else {
+                retType = Math.max(retType, getJavaTypeOrder(anOther));
+                switch (retType) {
+                    case 1:
+                        minObject = Math.min(NumberBaseOpt.castObjectToInteger(minObject),
+                            NumberBaseOpt.castObjectToInteger(anOther));
+                        break;
+                    case 2:
+                        minObject = Math.min(NumberBaseOpt.castObjectToLong(minObject),
+                            NumberBaseOpt.castObjectToLong(anOther));
+                        break;
+                    case 3:
+                        minObject = Math.min(NumberBaseOpt.castObjectToFloat(minObject),
+                            NumberBaseOpt.castObjectToFloat(anOther));
+                        break;
+                    case 5:
+                        minObject = NumberBaseOpt.castObjectToBigInteger(minObject).min(
+                            NumberBaseOpt.castObjectToBigInteger(anOther));
+                        break;
 
-                case 6:
-                    minObject = NumberBaseOpt.castObjectToBigDecimal(minObject).min(
-                        NumberBaseOpt.castObjectToBigDecimal(anOther));
-                    break;
-                case 4:
-                    minObject = Math.min(NumberBaseOpt.castObjectToDouble(minObject),
-                        NumberBaseOpt.castObjectToDouble(anOther));
-                    break;
-                case 10:
-                default:
-                    String str1 = StringBaseOpt.castObjectToString(minObject);
-                    String str2 = StringBaseOpt.castObjectToString(anOther);
-                    minObject = str1.compareTo(str2) < 0 ? str1 : str2;
-                    break;
+                    case 6:
+                        minObject = NumberBaseOpt.castObjectToBigDecimal(minObject).min(
+                            NumberBaseOpt.castObjectToBigDecimal(anOther));
+                        break;
+                    case 4:
+                        minObject = Math.min(NumberBaseOpt.castObjectToDouble(minObject),
+                            NumberBaseOpt.castObjectToDouble(anOther));
+                        break;
+                    case 10:
+                    default:
+                        String str1 = StringBaseOpt.castObjectToString(minObject);
+                        String str2 = StringBaseOpt.castObjectToString(anOther);
+                        minObject = str1.compareTo(str2) < 0 ? str1 : str2;
+                        break;
+                }
             }
         }
         return minObject;
