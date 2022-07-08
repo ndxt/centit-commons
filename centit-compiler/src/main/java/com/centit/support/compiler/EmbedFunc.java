@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
+import com.centit.support.image.CaptchaImageUtil;
 import com.centit.support.json.JSONOpt;
 import com.centit.support.security.HmacSha1Encoder;
 import com.centit.support.security.Md5Encoder;
@@ -868,8 +869,8 @@ public abstract class EmbedFunc {
             //random()
             //random(5)
             //random(1, 5)
-            //random(String, 20)
-            //random(String, uuid/uuid32/uuid22/uuid36)
+            //random('Str/string', 20)
+            //random('str/String', 'uuid'/'uuid32'/'uuid22'/'uuid36')
             case ConstDefine.FUNC_RANDOM:{
                 if (nOpSum < 1){
                     return Math.random();
@@ -888,7 +889,7 @@ public abstract class EmbedFunc {
                         return UuidOpt.getUuidAsString36();
                     } else {
                         int nInd = NumberBaseOpt.castObjectToInteger(slOperand.get(1), 20);
-                        return UuidOpt.randomString(nInd);
+                        return CaptchaImageUtil.getRandomString(nInd);
                     }
                 } else {
                     int nMin = NumberBaseOpt.castObjectToInteger(slOperand.get(0), 1);
