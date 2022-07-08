@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 73;
+    public static final int functionsSum = 75;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -60,6 +60,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("find", 2, ConstDefine.FUNC_FIND, ConstDefine.TYPE_NUM),  //求子串位置 find ("123456","34")=2  find ("123456","35")=-1
         new FunctionInfo("frequence", 2, ConstDefine.FUNC_FREQUENCE, ConstDefine.TYPE_NUM), // 求子串个数 find ("12345236","23")=2
         new FunctionInfo("split", 2, ConstDefine.FUNC_SPLIT_STR, ConstDefine.TYPE_STR),
+        new FunctionInfo("replace", 3, ConstDefine.FUNC_REPLACE, ConstDefine.TYPE_STR), // 字符串替换
         new FunctionInfo("int", 1, ConstDefine.FUNC_INT, ConstDefine.TYPE_NUM), // 求整数部分 int (12.34)=12 int -12.34)=-12
         new FunctionInfo("integer", 1, ConstDefine.FUNC_INT, ConstDefine.TYPE_NUM), // 求整数部分 integer (12.34)=12 int (-12.34)=-12
         new FunctionInfo("frac", 1, ConstDefine.FUNC_FRAC, ConstDefine.TYPE_NUM), // 求小数部分 frac (12.34)=0.34 frac (-12.34)=-0.34
@@ -86,6 +87,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("toString", 1, ConstDefine.FUNC_TO_STRING, ConstDefine.TYPE_STR),//转换为String
         new FunctionInfo("toObject", 1, ConstDefine.FUNC_TO_OBJECT, ConstDefine.TYPE_ANY),//转换为json 对象
         new FunctionInfo("toNumber", 1, ConstDefine.FUNC_TO_NUMBER, ConstDefine.TYPE_NUM),//转换为数字
+        new FunctionInfo("toByteArray", 1, ConstDefine.FUNC_TOBYTEARRAY, ConstDefine.TYPE_ANY),//转换为数字
         new FunctionInfo("attr", 2, ConstDefine.FUNC_GET_ATTR, ConstDefine.TYPE_ANY),//获取对象属性
         new FunctionInfo("setAttr", 3, ConstDefine.FUNC_SET_ATTR, ConstDefine.TYPE_ANY),//设置对象属性
         new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR),//取汉字拼音
@@ -458,6 +460,15 @@ public abstract class EmbedFunc {
                 return str.split(splitStr);
             }
 
+            case ConstDefine.FUNC_REPLACE:{ // 字符串替换
+                if (nOpSum < 3) {
+                    return nOpSum>0? slOperand.get(0) : null;
+                }
+                return StringUtils.replace(StringBaseOpt.castObjectToString(slOperand.get(0)),
+                        StringBaseOpt.castObjectToString(slOperand.get(1)),
+                        StringBaseOpt.castObjectToString(slOperand.get(2)));
+            }
+
             case ConstDefine.FUNC_INT: { //取整
                 if (nOpSum < 1)
                     return null;
@@ -798,6 +809,13 @@ public abstract class EmbedFunc {
                     return slOperand.get(1);
                 }
                 return svalue;
+            }
+
+            case ConstDefine.FUNC_TOBYTEARRAY:{
+                if (nOpSum < 1) {
+                    return null;
+                }
+                return ByteBaseOpt.castObjectToBytes(slOperand.get(0));
             }
 
             case ConstDefine.FUNC_TO_OBJECT: {//

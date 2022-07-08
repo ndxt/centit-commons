@@ -1,6 +1,7 @@
 package com.centit.support.algorithm;
 
 import com.alibaba.fastjson.JSON;
+import com.centit.support.file.FileIOOpt;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -497,7 +498,13 @@ public abstract class StringBaseOpt {
         if (objValue instanceof java.util.Date){
             return DatetimeOpt.convertTimestampToString((java.util.Date) objValue);
         }
-
+        if (objValue instanceof InputStream){
+            try {
+                return FileIOOpt.readStringFromInputStream((InputStream)objValue);
+            } catch (IOException e) {
+                return "";
+            }
+        }
         Class<?> clazz = objValue.getClass();
 
         if (clazz.isEnum()) {

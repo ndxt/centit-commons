@@ -1,5 +1,9 @@
 package com.centit.support.algorithm;
 
+import com.centit.support.file.FileIOOpt;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.Date;
 
@@ -69,6 +73,13 @@ public abstract class ByteBaseOpt {
             return buf;
         }
 
+        if (obj instanceof InputStream){
+            try {
+                return FileIOOpt.readBytesFromInputStream((InputStream)obj);
+            } catch (IOException e) {
+                return null;
+            }
+        }
         return StringBaseOpt.objectToString(obj).getBytes();
     }
 
