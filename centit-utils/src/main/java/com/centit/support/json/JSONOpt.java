@@ -313,10 +313,10 @@ public abstract class JSONOpt {
             return obj.toString();
         }
         if (obj instanceof JSON)
-            return ((JSON) obj).toJSONString();
+            return JSON.toJSONString(obj);
 
         if (ReflectionOpt.isArray(obj))
-            return arrayToJSONArray(obj, methodOnly, fieldOnly, includePrivateField).toJSONString();
+            return  JSON.toJSONString(arrayToJSONArray(obj, methodOnly, fieldOnly, includePrivateField));
 
         return objectToJSONObject(obj, methodOnly, fieldOnly, includePrivateField).toJSONString();
     }

@@ -3,10 +3,7 @@ package com.centit.support.json;
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.PropertyPreFilter;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,11 +22,8 @@ public class JsonPropertyPreFilters implements PropertyPreFilter {
 
     public JsonPropertyPreFilters(Class<?>[] clazzs) {
         super();
-        this.clazzs = new HashSet<Class<?>>();
-
-        for (Class<?> clazz : clazzs) {
-            this.clazzs.add(clazz);
-        }
+        this.clazzs = new HashSet<>();
+        this.clazzs.addAll(Arrays.asList(clazzs));
     }
 
     public JsonPropertyPreFilters() {
