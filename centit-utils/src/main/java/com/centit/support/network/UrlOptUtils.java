@@ -58,7 +58,7 @@ public abstract class UrlOptUtils {
             if (n2 < 0) {
                 String value = szUrlParameter.substring(n + 1);
                 try {
-                    value = java.net.URLDecoder.decode(value, "utf-8");
+                    value = URLDecoder.decode(value, "utf-8");
                 } catch (UnsupportedEncodingException e) {
                     logger.error(e.getMessage(), e);//e.printStackTrace();
                 }
@@ -67,7 +67,7 @@ public abstract class UrlOptUtils {
             } else {
                 String value = szUrlParameter.substring(n + 1, n2);
                 try {
-                    value = java.net.URLDecoder.decode(value, "utf-8");
+                    value = URLDecoder.decode(value, "utf-8");
                 } catch (UnsupportedEncodingException e) {
                     logger.error(e.getMessage(), e);//e.printStackTrace();
                 }
