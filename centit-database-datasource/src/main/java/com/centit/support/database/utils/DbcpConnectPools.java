@@ -2,6 +2,7 @@ package com.centit.support.database.utils;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.centit.support.database.metadata.IDatabaseInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +33,11 @@ public abstract class DbcpConnectPools {
         //ds.setMaxIdle(dsDesc.getMaxIdle());
         ds.setMaxWait(dsDesc.getMaxWaitMillis());
         ds.setMinIdle(dsDesc.getMinIdle());
-        ds.setValidationQuery(DBType.getDBValidationQuery(dsDesc.getDbType()));
-        ds.setTestWhileIdle(true);
+        String validationQuery = DBType.getDBValidationQuery(dsDesc.getDbType());
+        if(StringUtils.isNotBlank(validationQuery)) {
+            ds.setValidationQuery(validationQuery);
+            ds.setTestWhileIdle(true);
+        }
         return ds;
     }
 
