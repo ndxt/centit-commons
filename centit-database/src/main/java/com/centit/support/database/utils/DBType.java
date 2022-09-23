@@ -239,4 +239,26 @@ public enum DBType {
                 return "unknown";
         }
     }
+
+    public static String getDBValidationQuery(DBType type) {
+        switch (type) {
+            case KingBase:
+            case Oracle:
+            case GBase:
+            case DM:
+            case Oscar:
+                return "select 1 from dual";
+            case DB2:
+                return "select 1 from SYSIBM.SYSDUMMY1";
+            case MySql:
+            case H2:
+            case SqlServer:
+                return "select 1";
+            case PostgreSql:
+                return "select version()";
+            case Access:
+                default:
+                return null;
+        }
+    }
 }

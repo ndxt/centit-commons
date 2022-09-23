@@ -1,7 +1,7 @@
 package com.centit.support.database.utils;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.centit.support.database.metadata.IDatabaseInfo;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,28 +15,30 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class DbcpConnectPools {
     private static final Logger logger = LoggerFactory.getLogger(DbcpConnectPools.class);
     private static final
-    Map<DataSourceDescription, BasicDataSource> dbcpDataSourcePools
+    ConcurrentHashMap<DataSourceDescription, DruidDataSource> dbcpDataSourcePools
         = new ConcurrentHashMap<>();
     private DbcpConnectPools() {
         throw new IllegalAccessError("Utility class");
     }
 
-    private static BasicDataSource mapDataSource(DataSourceDescription dsDesc) {
-        BasicDataSource ds = new BasicDataSource();
+    private static DruidDataSource mapDataSource(DataSourceDescription dsDesc) {
+        DruidDataSource ds = new DruidDataSource();
         ds.setDriverClassName(dsDesc.getDriver());
         ds.setUsername(dsDesc.getUsername());
         ds.setPassword(dsDesc.getPassword());
         ds.setUrl(dsDesc.getConnUrl());
         ds.setInitialSize(dsDesc.getInitialSize());
-        ds.setMaxTotal(dsDesc.getMaxTotal());
-        ds.setMaxIdle(dsDesc.getMaxIdle());
-        ds.setMaxWaitMillis(dsDesc.getMaxWaitMillis());
+        ds.setMaxActive(dsDesc.getMaxTotal());
+        //ds.setMaxIdle(dsDesc.getMaxIdle());
+        ds.setMaxWait(dsDesc.getMaxWaitMillis());
         ds.setMinIdle(dsDesc.getMinIdle());
+        ds.setValidationQuery(DBType.getDBValidationQuery(dsDesc.getDbType()));
+        ds.setTestWhileIdle(true);
         return ds;
     }
 
-    public static synchronized BasicDataSource getDataSource(DataSourceDescription dsDesc) {
-        BasicDataSource ds = dbcpDataSourcePools.get(dsDesc);
+    public static synchronized DruidDataSource getDataSource(DataSourceDescription dsDesc) {
+        DruidDataSource ds = dbcpDataSourcePools.get(dsDesc);
         if (ds == null) {
             ds = mapDataSource(dsDesc);
             dbcpDataSourcePools.put(dsDesc, ds);
@@ -45,14 +47,14 @@ public abstract class DbcpConnectPools {
     }
 
     public static synchronized Connection getDbcpConnect(DataSourceDescription dsDesc) throws SQLException {
-        BasicDataSource ds = getDataSource(dsDesc);
+        DruidDataSource ds = getDataSource(dsDesc);
         Connection conn = ds.getConnection();
         conn.setAutoCommit(false);
         ///*dsDesc.getUsername(),dsDesc.getDbType(),*/
         return conn;
     }
 
-    public static BasicDataSource getDataSource(IDatabaseInfo dbinfo) {
+    public static DruidDataSource getDataSource(IDatabaseInfo dbinfo) {
         return DbcpConnectPools.getDataSource(DataSourceDescription.valueOf(dbinfo));
     }
 
@@ -61,14 +63,17 @@ public abstract class DbcpConnectPools {
     }
 
     /* 获得数据源连接状态 */
-    public static Map<String, Integer> getDataSourceStats(DataSourceDescription dsDesc) {
-        BasicDataSource bds = dbcpDataSourcePools.get(dsDesc);
+    public static Map<String, Object> getDataSourceStats(DataSourceDescription dsDesc) {
+        DruidDataSource bds = dbcpDataSourcePools.get(dsDesc);
         if (bds == null) {
             return null;
         }
-        Map<String, Integer> map = new HashMap<>(2);
-        map.put("active_number", bds.getNumActive());
-        map.put("idle_number", bds.getNumIdle());
+        Map<String, Object> map = new HashMap<>(2);
+        map.put("activeCount", bds.getActiveCount());
+        map.put("poolingCount", bds.getPoolingCount());
+        map.put("resetCount", bds.getResetCount());
+        map.put("errorCount", bds.getErrorCount());
+        map.put("discardCount", bds.getDiscardCount());
         return map;
     }
 
@@ -76,18 +81,14 @@ public abstract class DbcpConnectPools {
      * 关闭数据源
      */
     public static synchronized void shutdownDataSource() {
-        for (Map.Entry<DataSourceDescription, BasicDataSource> dbs : dbcpDataSourcePools.entrySet()) {
-            try {
-                dbs.getValue().close();
-            } catch (SQLException e) {
-                logger.error(e.getMessage(), e);//e.printStackTrace();
-            }
+        for (Map.Entry<DataSourceDescription, DruidDataSource> dbs : dbcpDataSourcePools.entrySet()) {
+            dbs.getValue().close();
         }
         //dbcpDataSourcePools.clear();
     }
 
     public static synchronized boolean testDataSource(DataSourceDescription dsDesc) {
-        BasicDataSource ds = mapDataSource(dsDesc);
+        DruidDataSource ds = mapDataSource(dsDesc);
         boolean connOk = false;
         try {
             //Class.forName(dsDesc.getDriver());
@@ -102,11 +103,7 @@ public abstract class DbcpConnectPools {
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);//e.printStackTrace();
         } finally {
-            try {
-                ds.close();
-            } catch (SQLException e1) {
-                logger.error(e1.getMessage(), e1);//e1.printStackTrace();
-            }
+            ds.close();
         }
         return connOk;
     }
