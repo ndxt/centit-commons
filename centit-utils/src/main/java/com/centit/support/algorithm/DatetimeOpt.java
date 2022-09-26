@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -831,6 +834,17 @@ public abstract class DatetimeOpt {
             return (java.util.Date) obj;
         if (obj instanceof Long)
             return new java.util.Date((Long) obj);
+
+        if (obj instanceof LocalDateTime){
+            LocalDateTime ldt = (LocalDateTime)obj;
+            return java.util.Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+        }
+
+        if (obj instanceof LocalDate){
+            LocalDate ldt = (LocalDate)obj;
+            return Date.from(ldt.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        }
+
         String str = StringBaseOpt.objectToString(obj);
         if (StringUtils.isBlank(str)) {
             return null;

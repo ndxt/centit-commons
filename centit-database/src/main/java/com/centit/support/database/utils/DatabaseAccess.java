@@ -36,9 +36,12 @@ public abstract class DatabaseAccess {
         // 避免重复转换
         if (param instanceof java.sql.Date) {
             return param;
-        } else if (param instanceof java.util.Date) {
-            return DatetimeOpt.convertToSqlTimestamp((java.util.Date) param);
+        } else if (param instanceof java.util.Date ||
+            param instanceof java.time.LocalDate || param instanceof java.time.LocalDateTime) {
+            return DatetimeOpt.convertToSqlTimestamp(
+                DatetimeOpt.castObjectToDate(param));
         }
+
         Class<?> paramClass = param.getClass();
         if (Boolean.class.isAssignableFrom(paramClass)) {
             return BooleanBaseOpt.castObjectToBoolean(param, false) ?
