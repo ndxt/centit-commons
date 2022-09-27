@@ -11,7 +11,8 @@ public abstract class HtmlFormUtils {
     }
 
     /**
-     * 请调用直接 org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4
+     * @see org.apache.commons.text.StringEscapeUtils
+     * 直接调用 StringEscapeUtils.escapeHtml4()
      * 或者 org.springframework.web.util.HtmlUtils.htmlEscape
      *
      * @param value 文本
@@ -19,6 +20,7 @@ public abstract class HtmlFormUtils {
      */
     public static String htmlValue(String value) {
         return StringEscapeUtils.escapeHtml4(value);
+     }
  /*          if (value == null) {
                return null;
            }
@@ -62,10 +64,11 @@ public abstract class HtmlFormUtils {
            }
            return result.toString();
       */
-    }
+
 
     /**
-     * 直接 org.apache.commons.lang3.StringEscapeUtils.unescapeHtml4
+     * @see org.apache.commons.text.StringEscapeUtils
+     * 直接调用 StringEscapeUtils.unescapeHtml4()
      * 或者调用 org.springframework.web.util.HtmlUtils.htmlUnescape
      *
      * @param value html文本
