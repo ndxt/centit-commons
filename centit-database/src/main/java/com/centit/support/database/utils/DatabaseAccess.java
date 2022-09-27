@@ -220,7 +220,12 @@ public abstract class DatabaseAccess {
                     jo.put(fieldNames[i], DatabaseAccess.fetchBlobBytes((Blob) obj));
                     //fetchBlobAsBase64((Blob) obj));
                 } else {
-                    jo.put(fieldNames[i], obj);
+                    // 适配mysql 最新版本驱动 日期返回格式
+                    if(obj instanceof java.time.LocalDateTime || obj instanceof java.time.LocalDate){
+                        jo.put(fieldNames[i], DatetimeOpt.castObjectToDate(obj));
+                    } else {
+                        jo.put(fieldNames[i], obj);
+                    }
                 }
             }
         }
@@ -536,7 +541,11 @@ public abstract class DatabaseAccess {
                 objs[i - 1] = DatabaseAccess.fetchBlobBytes((Blob) obj);
                 //fetchBlobAsBase64((Blob) obj);
             } else {
-                objs[i - 1] = obj;
+                if(obj instanceof java.time.LocalDateTime || obj instanceof java.time.LocalDate){
+                    objs[i - 1] = DatetimeOpt.castObjectToDate(obj);
+                } else {
+                    objs[i - 1] = obj;
+                }
             }
         }
         return objs;

@@ -601,10 +601,12 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                                 if (FieldType.BOOLEAN.equals(fields[i].getFieldType())) {
                                     jo.put(fields[i].getPropertyName(),
                                         BooleanBaseOpt.castObjectToBoolean(obj, false));
-                                }
-                                if (FieldType.JSON_OBJECT.equals(fields[i].getFieldType())) {
-                                    jo.put(fields[i].getPropertyName(), JSON.parse(
-                                        StringBaseOpt.castObjectToString(obj)));
+                                } // 修复bug，适配mysql最新驱动返回的日期类型
+                                else if (FieldType.DATETIME.equals(fields[i].getFieldType())) {
+                                    jo.put(fields[i].getPropertyName(), DatetimeOpt.castObjectToDate(obj));
+                                } else if (FieldType.JSON_OBJECT.equals(fields[i].getFieldType())) {
+                                        jo.put(fields[i].getPropertyName(), JSON.parse(
+                                            StringBaseOpt.castObjectToString(obj)));
                                 } else {
                                     jo.put(fields[i].getPropertyName(), obj);
                                 }
