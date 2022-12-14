@@ -1,5 +1,7 @@
 package com.centit.support.common;
 
+import java.io.Serializable;
+
 /**
  * left right 数值对; 我们经常想在一个方法中返回多个值，比如返回错误编号和错误文字说明，有 KeyValuePair 就很方便
  * return new KeyValuePair(Integer,String)(5,"error message");
@@ -18,7 +20,7 @@ package com.centit.support.common;
  * 这个键值用于返回多个值，这样的变量一般都是不可变的在这种情况下可以使用 ImmutablePair类
  */
 @SuppressWarnings("unused")
-public class LeftRightPair<L, R> {
+public class LeftRightPair<L, R> implements Serializable {
     private L left;
     private R right;
 
