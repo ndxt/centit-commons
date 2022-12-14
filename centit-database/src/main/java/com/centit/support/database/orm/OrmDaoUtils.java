@@ -70,6 +70,18 @@ public abstract class OrmDaoUtils {
         }
     }
 
+    public static <T>  Map<String, Object> saveNewObjectAndFetchGeneratedKeys(Connection connection, T object)
+        throws PersistenceException {
+        try {
+            TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());
+            JsonObjectDao sqlDialect = GeneralJsonObjectDao.createJsonObjectDao(connection, mapInfo);
+            object = OrmUtils.prepareObjectForInsert(object, mapInfo, sqlDialect);
+            return sqlDialect.saveNewObjectAndFetchGeneratedKeys(OrmUtils.fetchObjectDatabaseField(object, mapInfo));
+        } catch (IOException | SQLException e) {
+            throw new PersistenceException(e);
+        }
+    }
+
     public static <T> int updateObject(Connection connection, T object) throws PersistenceException {
         try {
             TableMapInfo mapInfo = JpaMetadata.fetchTableMapInfo(object.getClass());

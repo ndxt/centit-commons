@@ -6,6 +6,7 @@ package com.centit.support.database.orm;
 public enum GeneratorType {
     /**
      * 这个其实什么都不做，就是依赖数据库自动增长；程序中什么也不做
+     * 但是在保存新对象时，根据这个标记获取自动增长主键 getGeneratedKeys
      */
     AUTO,
     /**

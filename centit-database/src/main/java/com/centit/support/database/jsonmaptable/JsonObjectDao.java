@@ -82,6 +82,10 @@ public interface JsonObjectDao {
      */
     int saveNewObject(final Map<String, Object> object) throws SQLException;
 
+
+    Map<String, Object> saveNewObjectAndFetchGeneratedKeys(final Map<String, Object> object)
+        throws SQLException, IOException;
+
     /**
      * 更改部分属性
      *

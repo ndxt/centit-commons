@@ -798,6 +798,24 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return DatabaseAccess.doExecuteNamedSql(conn, sql, object);
     }
 
+    @Override
+    public Map<String, Object> saveNewObjectAndFetchGeneratedKeys(final Map<String, Object> object)
+        throws SQLException, IOException{
+        String sql = buildInsertSql(tableInfo, object.keySet());
+        QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sql, object));
+
+        try (PreparedStatement stmt = conn.prepareStatement(qap.getQuery())) {
+            DatabaseAccess.setQueryStmtParameters(stmt, qap.getParams());
+            stmt.executeUpdate();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if(rs!=null){
+                return DatabaseAccess.fetchResultSetRowToJSONObject(rs);
+            }
+        } catch (SQLException e) {
+            throw DatabaseAccess.createAccessException(qap.getQuery(), e);
+        }
+        return null;
+    }
     /**
      * 更改部分属性
      *

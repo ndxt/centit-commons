@@ -37,6 +37,16 @@ public class TableMapInfo extends SimpleTableInfo {
         return this;
     }
 
+    public boolean hasGeneratedKeys(){
+        for (LeftRightPair<String, ValueGenerator> ent : valueGenerators) {
+            ValueGenerator valueGenerator = ent.getRight();
+            if(GeneratorType.AUTO.equals(valueGenerator.strategy())){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void appendOrderBy(SimpleTableField column, String orderBy) {
         String orderBySql;
         if (StringUtils.isBlank(orderBy) || "ASC".equalsIgnoreCase(orderBy)) {

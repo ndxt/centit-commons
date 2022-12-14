@@ -254,6 +254,11 @@ public abstract class DatabaseAccess {
         return null;
     }
 
+    public static JSONObject fetchResultSetRowToJSONObject(ResultSet rs)
+        throws SQLException, IOException {
+        return fetchResultSetRowToJSONObject(rs, null);
+    }
+
     public static JSONArray fetchResultSetToJSONArray(ResultSet rs, String[] fieldnames)
         throws SQLException, IOException {
         JSONArray ja = new JSONArray();
