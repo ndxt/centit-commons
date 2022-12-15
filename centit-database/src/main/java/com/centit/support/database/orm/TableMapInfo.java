@@ -38,6 +38,7 @@ public class TableMapInfo extends SimpleTableInfo {
     }
 
     public boolean hasGeneratedKeys(){
+        if(valueGenerators == null) return false;
         for (LeftRightPair<String, ValueGenerator> ent : valueGenerators) {
             ValueGenerator valueGenerator = ent.getRight();
             if(GeneratorType.AUTO.equals(valueGenerator.strategy())){
