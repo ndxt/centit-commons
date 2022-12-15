@@ -804,7 +804,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         String sql = buildInsertSql(tableInfo, object.keySet());
         QueryAndParams qap = QueryAndParams.createFromQueryAndNamedParams(new QueryAndNamedParams(sql, object));
 
-        try (PreparedStatement stmt = conn.prepareStatement(qap.getQuery())) {
+        try (PreparedStatement stmt = conn.prepareStatement(qap.getQuery(),PreparedStatement.RETURN_GENERATED_KEYS)) {
             DatabaseAccess.setQueryStmtParameters(stmt, qap.getParams());
             stmt.executeUpdate();
             ResultSet rs = stmt.getGeneratedKeys();
