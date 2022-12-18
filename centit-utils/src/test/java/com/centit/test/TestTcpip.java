@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.centit.support.network.HtmlFormUtils;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
-import com.centit.support.network.UrlOptUtils;
 
 import java.io.IOException;
 import java.util.HashMap;

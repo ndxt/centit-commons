@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 @SuppressWarnings("unused")
 public abstract class FileIOOpt {

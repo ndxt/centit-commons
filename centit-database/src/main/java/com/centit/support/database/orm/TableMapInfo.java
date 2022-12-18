@@ -38,7 +38,9 @@ public class TableMapInfo extends SimpleTableInfo {
     }
 
     public boolean hasGeneratedKeys(){
-        if(valueGenerators == null) return false;
+        if (valueGenerators == null) {
+            return false;
+        }
         for (LeftRightPair<String, ValueGenerator> ent : valueGenerators) {
             ValueGenerator valueGenerator = ent.getRight();
             if(GeneratorType.AUTO.equals(valueGenerator.strategy())){
@@ -46,6 +48,19 @@ public class TableMapInfo extends SimpleTableInfo {
             }
         }
         return false;
+    }
+
+    public SimpleTableField fetchGeneratedKey(){
+        if (valueGenerators == null) {
+            return null;
+        }
+        for (LeftRightPair<String, ValueGenerator> ent : valueGenerators) {
+            ValueGenerator valueGenerator = ent.getRight();
+            if(GeneratorType.AUTO.equals(valueGenerator.strategy())){
+                return this.findFieldByName(ent.getLeft());
+            }
+        }
+        return null;
     }
 
     public void appendOrderBy(SimpleTableField column, String orderBy) {
