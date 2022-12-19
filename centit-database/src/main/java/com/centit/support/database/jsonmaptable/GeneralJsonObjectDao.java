@@ -1203,7 +1203,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             values, fieldnames), fieldnames);
     }
 
-    public class JSONObjectComparator implements Comparator<Map<String, Object>> {
+    public static class JSONObjectComparator implements Comparator<Map<String, Object>> {
         private TableInfo tableInfo;
 
         public JSONObjectComparator(TableInfo tableInfo) {
