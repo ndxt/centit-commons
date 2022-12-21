@@ -951,6 +951,15 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                 return true;
             }
         }
+        /*
+        for(Map.Entry<String, Object> ent : oldObject.entrySet()){
+            Object newValue = oldObject.get(ent.getKey());
+            Object oldValue = ent.getValue();
+            if(oldValue!=null && !oldValue.equals(newValue)) {
+                return true;
+            }
+        }
+        */
         return false;
     }
 
