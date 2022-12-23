@@ -807,9 +807,10 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         try (PreparedStatement stmt = conn.prepareStatement(qap.getQuery(), Statement.RETURN_GENERATED_KEYS)) {
             DatabaseAccess.setQueryStmtParameters(stmt, qap.getParams());
             stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if(rs!=null){
-                return DatabaseAccess.fetchResultSetRowToJSONObject(rs);
+            try(ResultSet rs = stmt.getGeneratedKeys()){
+                if (rs != null) {
+                    return DatabaseAccess.fetchResultSetRowToJSONObject(rs);
+                }
             }
         } catch (SQLException e) {
             throw DatabaseAccess.createAccessException(qap.getQuery(), e);
