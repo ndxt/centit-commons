@@ -706,6 +706,9 @@ public abstract class CollectionsOpt {
      * @return 返回map
      */
     public static Map<String, Object> objectToMap(Object object) {
+        if (object == null) {
+            return null;
+        }
         if (object instanceof Map) {
             return (Map<String, Object>) object;
         }
