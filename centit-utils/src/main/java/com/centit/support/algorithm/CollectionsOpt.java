@@ -723,9 +723,10 @@ public abstract class CollectionsOpt {
                     }
                 }
             }
-            return CollectionsOpt.createHashMap("scalar", object);
+            return CollectionsOpt.createHashMap("data", object);
         }
-        if (object.getClass().isArray()) {
+
+        /*if (object.getClass().isArray()) {
             int len = Array.getLength(object);
             HashMap<String, Object> map = new HashMap<>(len * 5 / 4 + 1);
             for (int i = 0; i < len; i++) {
@@ -740,7 +741,8 @@ public abstract class CollectionsOpt {
                 map.put(String.valueOf(i++), po);
             }
             return map;
-        }
+        }*/
+
         Object obj = JSON.toJSON(object);
         if (obj instanceof JSONObject) {
             return (JSONObject) obj;
