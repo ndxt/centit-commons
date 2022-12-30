@@ -11,7 +11,11 @@ import java.util.Map;
 
 public abstract class FieldType {
     public static final String VOID = "void";
-
+    /**
+     * 这个是 Sql Server 和 MySql 特有的自增id类型， 起始值和增加幅度（这个一旦确定不好修改，默认1，1);
+     * 并且这个字段必须是 主键； 目前还没有实现
+     */
+    public static final String IDENTITY = "identity";
     public static final String STRING = "string";
     public static final String INTEGER = "integer";
     public static final String FLOAT = "float";
