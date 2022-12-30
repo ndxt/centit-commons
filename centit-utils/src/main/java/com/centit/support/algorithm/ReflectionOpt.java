@@ -464,6 +464,10 @@ public abstract class ReflectionOpt {
             @SuppressWarnings("unchecked")
             Map<String, Object> objMap = (Map<String, Object>) sourceObj;
             retObj = objMap.get(fieldValue);
+            //兼容 object[0] 的情况
+            if(retObj == null && "0".equals(fieldValue)){
+                retObj =  sourceObj;
+            }
         } else {
              if(sourceObj instanceof Collection){
                 Collection<?> objlist = (Collection<?>) sourceObj;
@@ -506,7 +510,12 @@ public abstract class ReflectionOpt {
                      retObj = retList;
                  }
             } else {
-                retObj = ReflectionOpt.getFieldValue(sourceObj, fieldValue);
+                 //兼容 object[0] 的情况
+                 if("0".equals(fieldValue)) {
+                     retObj = sourceObj;
+                 } else {
+                     retObj = ReflectionOpt.getFieldValue(sourceObj, fieldValue);
+                 }
             }
         }
 
