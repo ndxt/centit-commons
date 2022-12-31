@@ -579,6 +579,18 @@ public class VariableFormula {
         if (!")".equals(str)) {
             return null;
         }
+
+        if (EmbedFunc.functionsList[nFuncNo].nFuncID == ConstDefine.FUNC_VALUE) {
+            if(slOperand.size()<1){
+                return null;
+            }
+            String valuePath = StringBaseOpt.castObjectToString(slOperand.get(0));
+            if(StringUtils.isBlank(valuePath)){
+                return null;
+            }
+            return this.trans.getVarValue(valuePath);
+        }
+
         if (EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
             //&& prmNo != m_sFunctionList[nFuncNo].nPrmSum) return null;
             && prmNo < EmbedFunc.functionsList[nFuncNo].nPrmSum) return null;

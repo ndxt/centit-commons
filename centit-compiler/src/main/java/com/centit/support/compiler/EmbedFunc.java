@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 75;
+    public static final int functionsSum = 76;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -93,7 +93,8 @@ public abstract class EmbedFunc {
         new FunctionInfo("setAttr", 3, ConstDefine.FUNC_SET_ATTR, ConstDefine.TYPE_ANY),//设置对象属性
         new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR),//取汉字拼音
         new FunctionInfo("random", -1, ConstDefine.FUNC_RANDOM, ConstDefine.TYPE_ANY), // 取随机数
-        new FunctionInfo("hash", 1, ConstDefine.FUNC_HASH, ConstDefine.TYPE_STR) // 计算hash值
+        new FunctionInfo("hash", 1, ConstDefine.FUNC_HASH, ConstDefine.TYPE_STR), // 计算hash值
+        new FunctionInfo("value", -1, ConstDefine.FUNC_VALUE, ConstDefine.TYPE_ANY) // 和 FUNC_IF 在外层运行
     };
     private static double COMPARE_MIN_DOUBLE = 0.0000001;
     private EmbedFunc() {
@@ -589,7 +590,7 @@ public abstract class EmbedFunc {
                 return Math.sqrt(af);
             }
 
-            case ConstDefine.FUNC_IF: {// 108
+            case ConstDefine.FUNC_IF: {// 108 不会运行到这儿
                 if (nOpSum < 2) return null;
                 if (BooleanBaseOpt.castObjectToBoolean(slOperand.get(0), false)) {
                     return slOperand.get(1);

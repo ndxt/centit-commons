@@ -10,7 +10,9 @@ import java.util.Map;
 public class FormulaTest {
 
     public static void main(String[] args) {
-
+        testFormula2();
+    }
+    public static void testFormula5(){
         System.out.println(VariableFormula.calculate("strcat(capital(floor(a)),'元'," +
                 "if(byte(a,-1)=0 and byte(a,-2)=0, '整', if(byte(a,-2)=0, strcat(capital(byte(a,-1)),'角')," +
                 " strcat( capital(byte(a,-1)),'角',capital(byte(a,-2)),'分') ) ) )",
@@ -124,9 +126,9 @@ public class FormulaTest {
         varMap.put("c", null);
         varMap.put("ideaCode", "T");
         //System.out.println(f.checkFormula("a.aa[1]+a.aa[2]"));
-        //String s = f.calculate("${a.aa[0]}+ ${a.aa[2]}",varMap);
+        //String s = f.calculate("${a.aa[0]}+ ${a.aa[2]}",varMap);gei
         //System.out.println(s);
-        String formula = "getpy(depart ) + rpad(lpad(ideaCode,9,'abcd'),20,'def') + a.aa ";
+        String formula = "value('a.aa[0]') + value('a.aa[2]')" ;//"getpy(depart ) + rpad(lpad(ideaCode,9,'abcd'),20,'def') + a.aa ";
         System.out.println(formula);
         Object s = VariableFormula.calculate(formula, varMap);
         System.out.println(StringBaseOpt.castObjectToString(s));
