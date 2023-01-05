@@ -421,7 +421,7 @@ public abstract class ReflectionOpt {
                 }
             } else {
                 int ePos = bPos;
-                while (ePos < len && labelStr.charAt(ePos) != '.' && labelStr.charAt(ePos) != '[' && labelStr.charAt(ePos) != ' ') {
+                while (ePos < len && labelStr.charAt(ePos) != '.' && labelStr.charAt(ePos) != '[' /*&& labelStr.charAt(ePos) != ' '*/) {
                     ePos++;
                 }
                 if (ePos > bPos) {
@@ -432,7 +432,6 @@ public abstract class ReflectionOpt {
                 }
             }
         }
-
         return new LeftRightPair<>(currentLabel, restLabel);
     }
 
