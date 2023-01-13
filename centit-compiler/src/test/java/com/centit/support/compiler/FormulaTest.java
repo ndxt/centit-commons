@@ -13,12 +13,27 @@ public class FormulaTest {
     public static void main(String[] args) throws ParseException {
 
         Object strDate = VariableFormula.calculate(
+            "formatdate('zone:en:PST MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
+        System.out.println("zone:en:PST -> " + strDate);
+
+        strDate = VariableFormula.calculate(
+            "formatdate('zone:en:CST MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
+        System.out.println("zone:en:CST -> " + strDate);
+
+        strDate = VariableFormula.calculate(
+            "formatdate('zone:en:PDT MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
+        System.out.println("zone:en:PDT -> " + strDate);
+
+        strDate = VariableFormula.calculate(
+            "formatdate('zone:en:GMT MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
+        System.out.println("zone:en:GMT -> " + strDate);
+        strDate = VariableFormula.calculate(
             "formatdate('lang:en MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
-        System.out.println(strDate);
+        System.out.println("lang:en -> " + strDate);
 
         Object date =  VariableFormula.calculate(
             "toDate('Oct 1, 2022 4:01:52 AM (PDT)','lang:en MMM d, yyyy h:m:s aa (zzz)')");
-        System.out.println(date.toString());
+        System.out.println("toDate en -> " + date.toString());
         //testFormula2();
     }
     public static void testFormula5(){

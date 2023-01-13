@@ -306,6 +306,12 @@ public abstract class DatetimeOpt {
         if(aMask.startsWith("lang")){
             Locale local = fetchLangLocal(aMask.substring(5,7));
             df = new SimpleDateFormat(aMask.substring(7).trim(), local);
+        } else if(aMask.startsWith("zone")){
+            Locale local = fetchLangLocal(aMask.substring(5,7));
+            String zone = aMask.substring(8,11);
+            df = new SimpleDateFormat(aMask.substring(11).trim(), local);
+
+            df.setTimeZone(new SimpleTimeZone(TimeZone.getDefault().getRawOffset(), zone));
         } else {
             df = new SimpleDateFormat(sMask);
         }
