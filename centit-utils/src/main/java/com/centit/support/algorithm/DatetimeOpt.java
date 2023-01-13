@@ -253,10 +253,35 @@ public abstract class DatetimeOpt {
                 return Locale.GERMAN;
             case "it":
                 return Locale.ITALIAN;
+            case "ja":
+                return Locale.JAPANESE;
             case "ko":
                 return Locale.KOREAN;
-            default:
+            case "zh":
                 return Locale.CHINESE;
+            case "TW":
+                return Locale.TRADITIONAL_CHINESE;
+            case "FR":
+                return Locale.FRANCE;
+            case "DE":
+                return Locale.GERMANY;
+            case "IT":
+                return Locale.ITALY;
+            case "JP":
+                return Locale.JAPAN;
+            case "KR":
+                return Locale.KOREA;
+            case "GB":
+                return Locale.UK;
+            case "US":
+                return Locale.US;
+            case "CA":
+                return Locale.CANADA;
+            case "FC": // fr-CA
+                return Locale.CANADA_FRENCH;
+            case "CN":
+            default:
+                return Locale.SIMPLIFIED_CHINESE;
         }
     }
 
