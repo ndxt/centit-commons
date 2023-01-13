@@ -1,6 +1,7 @@
 package com.centit.support.algorithm;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -260,6 +261,106 @@ public abstract class DatetimeOpt {
     }
 
     /**
+     * 时区转换
+     * Pacific/Midway:-11
+     *         Pacific/Honolulu:-10
+     *         America/Anchorage:-9
+     *         America/Los_Angeles:-8
+     *         America/Denver:-7
+     *         America/Chicago:-6
+     *         America/New_York:-5
+     *         America/Barbados:-4
+     *         America/Montevideo:-3
+     *         Atlantic/South_Georgia:-2
+     *         Atlantic/Azores:-1
+     *         Europe/London:0
+     *         Europe/Amsterdam:1
+     *         Europe/Athens:2
+     *         Europe/Moscow:3
+     *         Asia/Yerevan:4
+     *         Asia/Karachi:5
+     *         Asia/Rangoon:6
+     *         Asia/Bangkok:7
+     *         Asia/Shanghai:8
+     *         Asia/Tokyo:9
+     *         Australia/Sydney:10
+     *         Asia/Magadan:11
+     *         Pacific/Majuro:12
+     *
+     *         SimpleTimeZone
+     * @param zone 长度为3的时区
+     * @return TimeZone Zone offect
+     */
+    public static TimeZone fetchTimeZone(String zone) {
+        switch (zone) {
+            case "HST": return new SimpleTimeZone( -10 * 3600000, "HST");
+            case "AST": return new SimpleTimeZone( -9 * 3600000, "AST");
+            case "PST": return new SimpleTimeZone( -8 * 3600000, "PST");
+            case "PDT": return new SimpleTimeZone( -8 * 3600000, "PDT");
+            case "PNT": return new SimpleTimeZone( -7 * 3600000, "PNT");
+            case "MST": return new SimpleTimeZone( -7 * 3600000, "MST");
+            case "CST": return new SimpleTimeZone( -6 * 3600000, "CST");
+            case "IET": return new SimpleTimeZone( -5 * 3600000, "IET");
+            case "EST": return new SimpleTimeZone( -5 * 3600000, "EST");
+            case "PRT": return new SimpleTimeZone( -4 * 3600000, "PRT");
+            case "AGT": return new SimpleTimeZone( -3 * 3600000, "AGT");
+            case "CNT": return new SimpleTimeZone( -3 * 3600000, "CNT");
+            case "BET": return new SimpleTimeZone( -3 * 3600000, "BET");
+            case "UCT": return new SimpleTimeZone( 0 , "UCT");
+            case "UTC": return new SimpleTimeZone( 0 , "UTC");
+            case "GMT": return new SimpleTimeZone( 0 , "GMT");
+            case "WET": return new SimpleTimeZone( 0 , "WET");
+            case "MET": return new SimpleTimeZone( 3600000, "MET");
+            case "ECT": return new SimpleTimeZone( 3600000, "ECT");
+            case "CET": return new SimpleTimeZone( 3600000, "CET");
+            case "EET": return new SimpleTimeZone( 2 * 3600000, "EET");
+            case "CAT": return new SimpleTimeZone( 2 * 3600000, "CAT");
+            case "ART": return new SimpleTimeZone( 2 * 3600000, "ART");
+            case "EAT": return new SimpleTimeZone( 3 * 3600000, "EAT");
+            case "NET": return new SimpleTimeZone( 4 * 3600000, "NET");
+            case "PLT": return new SimpleTimeZone( 5 * 3600000, "PLT");
+            case "IST": return new SimpleTimeZone( 5 * 3600000, "IST");
+            case "BST": return new SimpleTimeZone( 6 * 3600000, "BST");
+            case "VST": return new SimpleTimeZone( 7 * 3600000, "VST");
+            case "JST": return new SimpleTimeZone( 9 * 3600000, "JST");
+            case "PRC": return new SimpleTimeZone( 8 * 3600000, "PRC");
+            case "ACT": return new SimpleTimeZone( 9 * 3600000, "ACT");
+            case "ROK": return new SimpleTimeZone( 9 * 3600000, "ROK");
+            case "CTT": return new SimpleTimeZone( 8 * 3600000, "CTT");
+            case "AET": return new SimpleTimeZone( 10 * 3600000, "AET");
+            case "SST": return new SimpleTimeZone( 11 * 3600000, "SST");
+            case "NST": return new SimpleTimeZone( 12 * 3600000, "NST");
+            case "MIT": return new SimpleTimeZone( 13 * 3600000, "MIT");
+            //-------------------------------------------------------------
+            case "-11": return TimeZone.getTimeZone("Pacific/Midway");
+            case "-10": return TimeZone.getTimeZone("Pacific/Honolulu");
+            case "-09": return TimeZone.getTimeZone("America/Anchorage");
+            case "-08": return TimeZone.getTimeZone("America/Los_Angeles");
+            case "-07": return TimeZone.getTimeZone("America/Denver");
+            case "-06": return TimeZone.getTimeZone("America/Chicago");
+            case "-05": return TimeZone.getTimeZone("America/New_York");
+            case "-04": return TimeZone.getTimeZone("America/Barbados");
+            case "-03": return TimeZone.getTimeZone("America/Montevideo");
+            case "-02": return TimeZone.getTimeZone("Atlantic/South_Georgia");
+            case "-01": return TimeZone.getTimeZone("Atlantic/Azores");
+            case "+00": return TimeZone.getTimeZone("Europe/London");
+            case "+01": return TimeZone.getTimeZone("Europe/Amsterdam");
+            case "+02": return TimeZone.getTimeZone("Europe/Athens");
+            case "+03": return TimeZone.getTimeZone("Europe/Moscow");
+            case "+04": return TimeZone.getTimeZone("Asia/Yerevan");
+            case "+05": return TimeZone.getTimeZone("Asia/Karachi");
+            case "+06": return TimeZone.getTimeZone("Asia/Rangoon");
+            case "+07": return TimeZone.getTimeZone("Asia/Bangkok");
+            case "+08": return TimeZone.getTimeZone("Asia/Shanghai");
+            case "+09": return TimeZone.getTimeZone("Asia/Tokyo");
+            case "+10": return TimeZone.getTimeZone("Australia/Sydney");
+            case "+11": return TimeZone.getTimeZone("Asia/Magadan");
+            case "+12": return TimeZone.getTimeZone("Pacific/Majuro");
+        }
+        return TimeZone.getTimeZone("Asia/Shanghai");
+    }
+
+    /**
      * This method generates a string representation of a date/time in the
      * format you specify on input
      *
@@ -310,8 +411,7 @@ public abstract class DatetimeOpt {
             Locale local = fetchLangLocal(aMask.substring(5,7));
             String zone = aMask.substring(8,11);
             df = new SimpleDateFormat(aMask.substring(11).trim(), local);
-
-            df.setTimeZone(new SimpleTimeZone(TimeZone.getDefault().getRawOffset(), zone));
+            df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
         } else {
             df = new SimpleDateFormat(sMask);
         }
