@@ -1,27 +1,23 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class FormulaTest {
 
     public static void main(String[] args) throws ParseException {
-        System.out.println(DatetimeOpt.convertDateToString(new Date(),
-            "lang:en MMM d, yyyy h:m:s aa (zzz)"));
 
-        Date date = DatetimeOpt.convertStringToDate(
-            "Oct 1, 2022 4:01:52 AM (PDT)", "lang:en MMM d, yyyy h:m:s aa (zzz)");
+        Object strDate = VariableFormula.calculate(
+            "formatdate('lang:en MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
+        System.out.println(strDate);
+
+        Object date =  VariableFormula.calculate(
+            "toDate('Oct 1, 2022 4:01:52 AM (PDT)','lang:en MMM d, yyyy h:m:s aa (zzz)')");
         System.out.println(date.toString());
         //testFormula2();
     }
