@@ -287,32 +287,6 @@ public abstract class DatetimeOpt {
 
     /**
      * 时区转换
-     * Pacific/Midway:-11
-     *         Pacific/Honolulu:-10
-     *         America/Anchorage:-9
-     *         America/Los_Angeles:-8
-     *         America/Denver:-7
-     *         America/Chicago:-6
-     *         America/New_York:-5
-     *         America/Barbados:-4
-     *         America/Montevideo:-3
-     *         Atlantic/South_Georgia:-2
-     *         Atlantic/Azores:-1
-     *         Europe/London:0
-     *         Europe/Amsterdam:1
-     *         Europe/Athens:2
-     *         Europe/Moscow:3
-     *         Asia/Yerevan:4
-     *         Asia/Karachi:5
-     *         Asia/Rangoon:6
-     *         Asia/Bangkok:7
-     *         Asia/Shanghai:8
-     *         Asia/Tokyo:9
-     *         Australia/Sydney:10
-     *         Asia/Magadan:11
-     *         Pacific/Majuro:12
-     *
-     *         SimpleTimeZone
      * @param zone 长度为3的时区
      * @return TimeZone Zone offect
      */
@@ -347,11 +321,11 @@ public abstract class DatetimeOpt {
             case "IST": return new SimpleTimeZone( 5 * 3600000, "IST");
             case "BST": return new SimpleTimeZone( 6 * 3600000, "BST");
             case "VST": return new SimpleTimeZone( 7 * 3600000, "VST");
-            case "JST": return new SimpleTimeZone( 9 * 3600000, "JST");
+            case "CTT": return new SimpleTimeZone( 8 * 3600000, "CTT");
             case "PRC": return new SimpleTimeZone( 8 * 3600000, "PRC");
             case "ACT": return new SimpleTimeZone( 9 * 3600000, "ACT");
             case "ROK": return new SimpleTimeZone( 9 * 3600000, "ROK");
-            case "CTT": return new SimpleTimeZone( 8 * 3600000, "CTT");
+            case "JST": return new SimpleTimeZone( 9 * 3600000, "JST");
             case "AET": return new SimpleTimeZone( 10 * 3600000, "AET");
             case "SST": return new SimpleTimeZone( 11 * 3600000, "SST");
             case "NST": return new SimpleTimeZone( 12 * 3600000, "NST");
