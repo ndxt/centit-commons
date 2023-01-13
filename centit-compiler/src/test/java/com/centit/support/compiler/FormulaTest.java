@@ -6,6 +6,7 @@ import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -61,8 +62,10 @@ public class FormulaTest {
         System.out.println("lang:en -> " + strDate);
 
         Object date =  VariableFormula.calculate(
-            "toDate('Oct 1, 2022 4:01:52 AM (PDT)','lang:en MMM d, yyyy h:m:s aa (zzz)')");
+            "toDate('Oct 1, 2022 4:01:52 AM (CST)','zone:en:CST MMM d, yyyy h:m:s aa (zzz)')");
         System.out.println("toDate en -> " + date.toString());
+        System.out.println("toDate en -> " + DatetimeOpt.convertDateToString((Date) date,
+            "zone:en:CST MMM d, yyyy h:m:s aa (zzz)"));
         //testFormula2();
     }
     public static void testFormula5(){
