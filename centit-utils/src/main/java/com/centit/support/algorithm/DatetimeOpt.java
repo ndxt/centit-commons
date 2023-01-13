@@ -10,10 +10,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -243,6 +242,23 @@ public abstract class DatetimeOpt {
         return datetimePattern;
     }
 
+    public static Locale fetchLangLocal(String lang) {
+        switch (lang) {
+            case "en":
+                return Locale.ENGLISH;
+            case "fr":
+                return Locale.FRENCH;
+            case "de":
+                return Locale.GERMAN;
+            case "it":
+                return Locale.ITALIAN;
+            case "ko":
+                return Locale.KOREAN;
+            default:
+                return Locale.CHINESE;
+        }
+    }
+
     /**
      * This method generates a string representation of a date/time in the
      * format you specify on input
@@ -254,9 +270,17 @@ public abstract class DatetimeOpt {
      */
     public static Date convertStringToDate(String strDate, String aMask) {
         try {
-            SimpleDateFormat df = new SimpleDateFormat(aMask);
             if (strDate == null || strDate.equals(""))
                 return null;
+
+            String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
+            SimpleDateFormat df;
+            if(aMask.startsWith("lang")){
+                Locale local = fetchLangLocal(aMask.substring(5,7));
+                df = new SimpleDateFormat(aMask.substring(7).trim(), local);
+            } else {
+                df = new SimpleDateFormat(sMask);
+            }
             return df.parse(strDate);
         } catch (ParseException pe) {
             log.error("converting '" + strDate + "' to date with mask '"
@@ -276,8 +300,15 @@ public abstract class DatetimeOpt {
      * @see java.text.SimpleDateFormat 的说明
      */
     public static String convertDateToString(Date aDate, String aMask) {
+
         String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
-        SimpleDateFormat df = new SimpleDateFormat(sMask);
+        SimpleDateFormat df;
+        if(aMask.startsWith("lang")){
+            Locale local = fetchLangLocal(aMask.substring(5,7));
+            df = new SimpleDateFormat(aMask.substring(7).trim(), local);
+        } else {
+            df = new SimpleDateFormat(sMask);
+        }
         return df.format(aDate);
     }
 

@@ -695,9 +695,7 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_FORMAT_DATE: {//
                 if (nOpSum < 1) return null;
                 String dateFormat = StringBaseOpt.castObjectToString(slOperand.get(0));
-                Date dt = (nOpSum > 1) ? DatetimeOpt.castObjectToDate(slOperand.get(1)) : null;
-                if (dt == null)
-                    dt = DatetimeOpt.currentUtilDate();
+                Date dt = (nOpSum > 1) ? DatetimeOpt.castObjectToDate(slOperand.get(1)) : DatetimeOpt.currentUtilDate();
 
                 return DatetimeOpt.convertDateToString(dt, dateFormat);
             }
