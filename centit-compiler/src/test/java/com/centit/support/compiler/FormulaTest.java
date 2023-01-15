@@ -40,7 +40,7 @@ public class FormulaTest {
         for(String s : timeZones){
             TimeZone tz = TimeZone.getTimeZone(s);
             System.out.println(s + ":" + tz.getRawOffset() / 3600000 + " : " + tz.getDisplayName());
-        }*/
+        }
 
         Object strDate = VariableFormula.calculate(
             "formatdate('zone:en:PST MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
@@ -60,12 +60,12 @@ public class FormulaTest {
         strDate = VariableFormula.calculate(
             "formatdate('lang:en MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
         System.out.println("lang:en -> " + strDate);
-
+        */
         Object date =  VariableFormula.calculate(
-            "toDate('Oct 1, 2022 4:01:52 AM (CST)','zone:en:CST MMM d, yyyy h:m:s aa (zzz)')");
+            "toDate('Oct 1, 2022 10:13:52 PM (PDT)','zone:en:+08 MMM d, yyyy h:m:s aa (zzz)')");
         System.out.println("toDate en -> " + date.toString());
         System.out.println("toDate en -> " + DatetimeOpt.convertDateToString((Date) date,
-            "zone:en:CST MMM d, yyyy h:m:s aa (zzz)"));
+            "zone:en:+08 MMM d, yyyy h:m:s aa (zzz)"));
         //testFormula2();
     }
     public static void testFormula5(){
