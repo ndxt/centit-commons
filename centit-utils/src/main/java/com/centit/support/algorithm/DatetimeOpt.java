@@ -10,10 +10,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -243,6 +240,191 @@ public abstract class DatetimeOpt {
         return datetimePattern;
     }
 
+    public static Locale fetchLangLocal(String lang) {
+        switch (lang) {
+            case "en":
+                return Locale.ENGLISH;
+            case "fr":
+                return Locale.FRENCH;
+            case "de":
+                return Locale.GERMAN;
+            case "it":
+                return Locale.ITALIAN;
+            case "ja":
+                return Locale.JAPANESE;
+            case "ko":
+                return Locale.KOREAN;
+            case "zh":
+                return Locale.CHINESE;
+            case "TW":
+                return Locale.TRADITIONAL_CHINESE;
+            case "FR":
+                return Locale.FRANCE;
+            case "DE":
+                return Locale.GERMANY;
+            case "IT":
+                return Locale.ITALY;
+            case "JP":
+                return Locale.JAPAN;
+            case "KR":
+                return Locale.KOREA;
+            case "GB":
+                return Locale.UK;
+            case "US":
+                return Locale.US;
+            case "CA":
+                return Locale.CANADA;
+            case "FC": // fr-CA
+                return Locale.CANADA_FRENCH;
+            case "CN":
+            default:
+                return Locale.SIMPLIFIED_CHINESE;
+        }
+    }
+
+    /**
+     * 时区转换
+     * @param zone 长度为3的时区
+     * @return TimeZone Zone offect
+     */
+    public static TimeZone fetchTimeZone(String zone) {
+        switch (zone) {
+            case "ACT": return new SimpleTimeZone(-5 * 3600000, "ACT"); //亚马逊标准时间
+            case "ADT": return new SimpleTimeZone(-3 * 3600000, "ADT"); //大西洋夏令时间
+            case "AFT": return new SimpleTimeZone(+45 * 360000, "AFT"); //阿富汗时间 +4:30
+            //case "AMT": return new SimpleTimeZone(-4 * 3600000, "AMT"); //亚马逊标准时间
+            case "AMT": return new SimpleTimeZone(+4 * 3600000, "AMT"); //亚美尼亚标准时间
+            case "ART": return new SimpleTimeZone(-3 * 3600000, "ART"); //阿根廷标准时间
+            //case "AST": return new SimpleTimeZone(-4 * 3600000, "AST"); //大西洋标准时间
+            case "AST": return new SimpleTimeZone(+3 * 3600000, "AST"); //阿拉伯标准时间
+            case "AZT": return new SimpleTimeZone(+4 * 3600000, "AZT"); //阿塞拜疆标准时间
+            case "BDT": return new SimpleTimeZone(+8 * 3600000, "BDT"); //文莱达鲁萨兰时间
+            case "BNT": return new SimpleTimeZone(+8 * 3600000, "BNT"); //文莱达鲁萨兰时间
+            case "BOT": return new SimpleTimeZone(-4 * 3600000, "BOT"); //玻利维亚时间
+            case "BRT": return new SimpleTimeZone(-3 * 3600000, "BRT"); //巴西利亚标准时间
+            case "BST": return new SimpleTimeZone(+1 * 3600000, "BST"); //英国夏令时间
+            //case "BST": return new SimpleTimeZone(+6 * 3600000, "BST"); //孟加拉标准时间
+            case "BTT": return new SimpleTimeZone(+6 * 3600000, "BTT"); //不丹时间
+            case "CAT": return new SimpleTimeZone(+2 * 3600000, "CAT"); //东部非洲时间
+            case "CCT": return new SimpleTimeZone(+65 * 360000, "CCT"); //科科斯群岛时间 +6:30
+            case "CDT": return new SimpleTimeZone(-5 * 3600000, "CDT"); //北美中部夏令时间
+            //case "CDT": return new SimpleTimeZone(-4 * 3600000, "CDT"); //古巴夏令时间
+            case "CET": return new SimpleTimeZone(+1 * 3600000, "CET"); //中欧标准时间
+            case "CIT": return new SimpleTimeZone(+8 * 3600000, "CIT"); //印度尼西亚中部时间
+            case "CKT": return new SimpleTimeZone(-10 * 3600000, "CKT"); //库克群岛标准时间
+            case "CLT": return new SimpleTimeZone(-4 * 3600000, "CLT"); //智利标准时间
+            case "COT": return new SimpleTimeZone(-5 * 3600000, "COT"); //哥伦比亚标准时间
+            //case "CST": return new SimpleTimeZone(-6 * 3600000, "CST"); //北美中部标准时间
+            case "CST": return new SimpleTimeZone(-5 * 3600000, "CST"); //古巴标准时间
+            //case "CST": return new SimpleTimeZone(+8 * 3600000, "CST"); //中国标准时间
+            case "CVT": return new SimpleTimeZone(-1 * 3600000, "CVT"); //佛得角标准时间
+            case "CXT": return new SimpleTimeZone(+7 * 3600000, "CXT"); //圣诞岛时间
+            case "EAT": return new SimpleTimeZone(+3 * 3600000, "EAT"); //东部非洲时间
+            case "ECT": return new SimpleTimeZone(-5 * 3600000, "ECT"); //厄瓜多尔时间
+            case "EDT": return new SimpleTimeZone(-4 * 3600000, "EDT"); //北美东部夏令时间
+            case "EET": return new SimpleTimeZone(+2 * 3600000, "EET"); //东欧标准时间
+            case "EGT": return new SimpleTimeZone(-1 * 3600000, "EGT"); //格陵兰岛东部标准时间
+            case "EIT": return new SimpleTimeZone(+9 * 3600000, "EIT"); //印度尼西亚东部时间
+            case "EST": return new SimpleTimeZone(-5 * 3600000, "EST"); //北美东部标准时间
+            case "FET": return new SimpleTimeZone(+3 * 3600000, "FET"); //远东标准时间
+            case "FJT": return new SimpleTimeZone(+12 * 3600000, "FJT"); //斐济夏令时间
+            case "FKT": return new SimpleTimeZone(-4 * 3600000, "FKT"); //福克兰群岛标准时间
+            case "FNT": return new SimpleTimeZone(-2 * 3600000, "FNT"); //费尔南多-迪诺罗尼亚岛标准时间
+            case "GET": return new SimpleTimeZone(+4 * 3600000, "GET"); //格鲁吉亚标准时间
+            case "GFT": return new SimpleTimeZone(-3 * 3600000, "GFT"); //法属圭亚那时间
+            case "GIT": return new SimpleTimeZone(-9 * 3600000, "GIT"); //甘比尔时间
+            case "GMT": return new SimpleTimeZone(+0 * 3600000, "GMT"); //格林尼治标准时间
+            //case "GST": return new SimpleTimeZone(+4 * 3600000, "GST"); //海湾时间
+            case "GST": return new SimpleTimeZone(-2 * 3600000, "GST"); //南乔治亚岛时间
+            case "GYT": return new SimpleTimeZone(-4 * 3600000, "GYT"); //圭亚那时间
+            case "HKT": return new SimpleTimeZone(+8 * 3600000, "HKT"); //香港标准时间
+            case "ICT": return new SimpleTimeZone(+7 * 3600000, "ICT"); //印度支那时间
+            case "IDT": return new SimpleTimeZone(+3 * 3600000, "IDT"); //以色列夏令时间
+            case "IST": return new SimpleTimeZone(+55 * 360000, "IST"); //印度时间 +5:30
+            //case "IST": return new SimpleTimeZone(+1 * 3600000, "IST"); //爱尔兰夏令时间
+            //case "IST": return new SimpleTimeZone(+2 * 3600000, "IST"); //以色列标准时间
+            case "JST": return new SimpleTimeZone(+9 * 3600000, "JST"); //日本标准时间
+            case "KGT": return new SimpleTimeZone(+6 * 3600000, "KGT"); //吉尔吉斯斯坦时间
+            case "KST": return new SimpleTimeZone(+9 * 3600000, "KST"); //韩国标准时间
+            case "MDT": return new SimpleTimeZone(-6 * 3600000, "MDT"); //北美山区夏令时间
+            case "MHT": return new SimpleTimeZone(+12 * 3600000, "MHT"); //马绍尔群岛时间
+            case "MIT": return new SimpleTimeZone(-95 * 360000, "MIT"); //马克萨斯群岛时间 +9:30
+            case "MMT": return new SimpleTimeZone(+65 * 360000, "MMT"); //缅甸时间 +6:30
+            case "MSK": return new SimpleTimeZone(+3 * 3600000, "MSK"); //莫斯科标准时间
+            //case "MST": return new SimpleTimeZone(-7 * 3600000, "MST"); //北美山区标准时间
+            case "MST": return new SimpleTimeZone(+8 * 3600000, "MST"); //马来西亚时间
+            case "MUT": return new SimpleTimeZone(+4 * 3600000, "MUT"); //毛里求斯标准时间
+            case "MVT": return new SimpleTimeZone(+5 * 3600000, "MVT"); //马尔代夫时间
+            case "MYT": return new SimpleTimeZone(+8 * 3600000, "MYT"); //马来西亚时间
+            case "NCT": return new SimpleTimeZone(+11 * 3600000, "NCT"); //新喀里多尼亚标准时间
+            case "NDT": return new SimpleTimeZone(-25 * 360000, "NDT"); //纽芬兰夏令时间 -2:30
+            case "NFT": return new SimpleTimeZone(+11 * 3600000, "NFT"); //诺福克岛时间
+            case "NPT": return new SimpleTimeZone(+575 * 36000, "NPT"); //尼泊尔时间 +5:45
+            case "NRT": return new SimpleTimeZone(+12 * 3600000, "NRT"); //瑙鲁时间
+            case "NST": return new SimpleTimeZone(-35 * 360000, "NST"); //纽芬兰标准时间 (-3:30
+            case "NUT": return new SimpleTimeZone(-11 * 3600000, "NUT"); //纽埃时间
+            case "PDT": return new SimpleTimeZone(-7 * 3600000, "PDT"); //北美太平洋夏令时间
+            case "PET": return new SimpleTimeZone(-5 * 3600000, "PET"); //秘鲁标准时间
+            case "PGT": return new SimpleTimeZone(+10 * 3600000, "PGT"); //巴布亚新几内亚时间
+            case "PHT": return new SimpleTimeZone(+8 * 3600000, "PHT"); //菲律宾标准时间
+            case "PKT": return new SimpleTimeZone(+5 * 3600000, "PKT"); //巴基斯坦标准时间
+            case "PST": return new SimpleTimeZone(-8 * 3600000, "PST"); //北美太平洋标准时间
+            case "PWT": return new SimpleTimeZone(+9 * 3600000, "PWT"); //帕劳时间
+            case "PYT": return new SimpleTimeZone(-4 * 3600000, "PYT"); //巴拉圭标准时间
+            case "RET": return new SimpleTimeZone(+4 * 3600000, "RET"); //留尼汪时间
+            case "SBT": return new SimpleTimeZone(+11 * 3600000, "SBT"); //所罗门群岛时间
+            case "SCT": return new SimpleTimeZone(+4 * 3600000, "SCT"); //塞舌尔时间
+            case "SGT": return new SimpleTimeZone(+8 * 3600000, "SGT"); //新加坡时间
+            case "SRT": return new SimpleTimeZone(-3 * 3600000, "SRT"); //苏里南时间
+            case "SST": return new SimpleTimeZone(-11 * 3600000, "SST"); //萨摩亚标准时间
+            case "TFT": return new SimpleTimeZone(+5 * 3600000, "TFT"); //法属南方和南极领地时间
+            case "THA": return new SimpleTimeZone(+7 * 3600000, "THA"); //泰国时间
+            case "TJT": return new SimpleTimeZone(+5 * 3600000, "TJT"); //塔吉克斯坦时间
+            case "TKT": return new SimpleTimeZone(+13 * 3600000, "TKT"); //托克劳时间
+            case "TLT": return new SimpleTimeZone(+9 * 3600000, "TLT"); //东帝汶时间
+            case "TMT": return new SimpleTimeZone(+5 * 3600000, "TMT"); //土库曼斯坦标准时间
+            case "TOT": return new SimpleTimeZone(+13 * 3600000, "TOT"); //汤加标准时间
+            case "TRT": return new SimpleTimeZone(+3 * 3600000, "TRT"); //土耳其时间
+            case "TVT": return new SimpleTimeZone(+12 * 3600000, "TVT"); //图瓦卢时间
+            case "UTC": return new SimpleTimeZone( 0, "UTC"); //协调世界时
+            case "UYT": return new SimpleTimeZone(-3 * 3600000, "UYT"); //乌拉圭夏令时间
+            case "UZT": return new SimpleTimeZone(+5 * 3600000, "UZT"); //乌兹别克斯坦标准时间
+            case "VET": return new SimpleTimeZone(-4 * 3600000, "VET"); //委内瑞拉时间
+            case "VUT": return new SimpleTimeZone(+11 * 3600000, "VUT"); //瓦努阿图标准时间
+            case "WAT": return new SimpleTimeZone(+1 * 3600000, "WAT"); //西部非洲标准时间
+            case "WET": return new SimpleTimeZone(+0 * 3600000, "WET"); //西欧标准时间
+            case "WFT": return new SimpleTimeZone(+12 * 3600000, "WFT"); //瓦利斯和富图纳时间
+            case "WIB": return new SimpleTimeZone(+7 * 3600000, "WIB"); //印度尼西亚西部时间
+            case "WIT": return new SimpleTimeZone(+9 * 3600000, "WIT"); //印度尼西亚东部时间
+            //-------------------------------------------------------------
+            case "-11": return TimeZone.getTimeZone("Pacific/Midway");
+            case "-10": return TimeZone.getTimeZone("Pacific/Honolulu");
+            case "-09": return TimeZone.getTimeZone("America/Anchorage");
+            case "-08": return TimeZone.getTimeZone("America/Los_Angeles");
+            case "-07": return TimeZone.getTimeZone("America/Denver");
+            case "-06": return TimeZone.getTimeZone("America/Chicago");
+            case "-05": return TimeZone.getTimeZone("America/New_York");
+            case "-04": return TimeZone.getTimeZone("America/Barbados");
+            case "-03": return TimeZone.getTimeZone("America/Montevideo");
+            case "-02": return TimeZone.getTimeZone("Atlantic/South_Georgia");
+            case "-01": return TimeZone.getTimeZone("Atlantic/Azores");
+            case "+00": return TimeZone.getTimeZone("Europe/London");
+            case "+01": return TimeZone.getTimeZone("Europe/Amsterdam");
+            case "+02": return TimeZone.getTimeZone("Europe/Athens");
+            case "+03": return TimeZone.getTimeZone("Europe/Moscow");
+            case "+04": return TimeZone.getTimeZone("Asia/Yerevan");
+            case "+05": return TimeZone.getTimeZone("Asia/Karachi");
+            case "+06": return TimeZone.getTimeZone("Asia/Rangoon");
+            case "+07": return TimeZone.getTimeZone("Asia/Bangkok");
+            case "+08": return TimeZone.getTimeZone("Asia/Shanghai");
+            case "+09": return TimeZone.getTimeZone("Asia/Tokyo");
+            case "+10": return TimeZone.getTimeZone("Australia/Sydney");
+            case "+11": return TimeZone.getTimeZone("Asia/Magadan");
+            case "+12": return TimeZone.getTimeZone("Pacific/Majuro");
+        }
+        return TimeZone.getTimeZone("Asia/Shanghai");
+    }
+
     /**
      * This method generates a string representation of a date/time in the
      * format you specify on input
@@ -254,9 +436,22 @@ public abstract class DatetimeOpt {
      */
     public static Date convertStringToDate(String strDate, String aMask) {
         try {
-            SimpleDateFormat df = new SimpleDateFormat(aMask);
             if (strDate == null || strDate.equals(""))
                 return null;
+
+            String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
+            SimpleDateFormat df;
+            if(aMask.startsWith("lang")){
+                Locale local = fetchLangLocal(aMask.substring(5,7));
+                df = new SimpleDateFormat(aMask.substring(7).trim(), local);
+            } else if(aMask.startsWith("zone")){
+                Locale local = fetchLangLocal(aMask.substring(5,7));
+                String zone = aMask.substring(8,11);
+                df = new SimpleDateFormat(aMask.substring(11).trim(), local);
+                df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
+            }  else {
+                df = new SimpleDateFormat(sMask);
+            }
             return df.parse(strDate);
         } catch (ParseException pe) {
             log.error("converting '" + strDate + "' to date with mask '"
@@ -276,8 +471,20 @@ public abstract class DatetimeOpt {
      * @see java.text.SimpleDateFormat 的说明
      */
     public static String convertDateToString(Date aDate, String aMask) {
+
         String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
-        SimpleDateFormat df = new SimpleDateFormat(sMask);
+        SimpleDateFormat df;
+        if(aMask.startsWith("lang")){
+            Locale local = fetchLangLocal(aMask.substring(5,7));
+            df = new SimpleDateFormat(aMask.substring(7).trim(), local);
+        } else if(aMask.startsWith("zone")){
+            Locale local = fetchLangLocal(aMask.substring(5,7));
+            String zone = aMask.substring(8,11);
+            df = new SimpleDateFormat(aMask.substring(11).trim(), local);
+            df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
+        } else {
+            df = new SimpleDateFormat(sMask);
+        }
         return df.format(aDate);
     }
 

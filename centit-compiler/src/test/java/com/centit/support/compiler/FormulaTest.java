@@ -1,16 +1,72 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class FormulaTest {
+    public static final String [] timeZones = {"Asia/Shanghai","Asia/Hong_Kong","Asia/Taipei",
+	"Asia/Seoul","Asia/Tokyo","America/New_York","America/Denver",
+	"America/Costa_Rica","America/Chicago","America/Mexico_City",
+    "America/Regina","America/Los_Angeles","Pacific/Majuro","Pacific/Midway",
+    "Pacific/Honolulu","America/Anchorage","America/Tijuana","America/Phoenix",
+    "America/Chihuahua","America/Bogota","America/Caracas","America/Barbados",
+    "America/Manaus","America/St_Johns","America/Santiago","America/Argentina/Buenos_Aires",
+    "America/Godthab","America/Montevideo","America/Sao_Paulo","Atlantic/South_Georgia",
+    "Atlantic/Azores","Atlantic/Cape_Verde","Africa/Casablanca",
+    "Europe/London","Europe/Amsterdam","Europe/Belgrade","Europe/Brussels",
+    "Europe/Sarajevo","Africa/Brazzaville","Africa/Windhoek","Asia/Amman",
+    "Europe/Athens","Asia/Beirut","Africa/Cairo","Europe/Helsinki","Asia/Jerusalem",
+    "Africa/Harare","Europe/Minsk","Asia/Baghdad","Europe/Moscow","Asia/Kuwait",
+    "Africa/Nairobi","Asia/Tehran","Asia/Baku","Asia/Tbilisi","Asia/Yerevan",
+    "Asia/Dubai","Asia/Kabul","Asia/Karachi","Asia/Oral","Asia/Yekaterinburg",
+    "Asia/Calcutta","Asia/Colombo","Asia/Katmandu","Asia/Almaty","Asia/Rangoon",
+    "Asia/Krasnoyarsk","Asia/Bangkok","Asia/Irkutsk","Asia/Kuala_Lumpur",
+    "Australia/Perth","Asia/Yakutsk","Australia/Darwin","Australia/Brisbane",
+    "Asia/Vladivostok","Pacific/Guam","Australia/Adelaide","Australia/Hobart",
+    "Australia/Sydney","Asia/Magadan","Pacific/Auckland","Pacific/Fiji","Pacific/Tongatapu"};
+    public static void main(String[] args) throws ParseException {
 
-    public static void main(String[] args) {
-        testFormula2();
+        /*TimeZone pdt = DatetimeOpt.fetchTimeZone("PDT");
+        System.out.println( pdt.getRawOffset() + " : " + pdt.getDisplayName());
+
+        for(String s : timeZones){
+            TimeZone tz = TimeZone.getTimeZone(s);
+            System.out.println(s + ":" + tz.getRawOffset() / 3600000 + " : " + tz.getDisplayName());
+        }*/
+
+        Object strDate = VariableFormula.calculate(
+            "formatdate('zone:en:PST MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
+        System.out.println("zone:en:PST -> " + strDate);
+
+        strDate = VariableFormula.calculate(
+            "formatdate('zone:en:CST MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
+        System.out.println("zone:en:CST -> " + strDate);
+
+        strDate = VariableFormula.calculate(
+            "formatdate('zone:en:PDT MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
+        System.out.println("zone:en:PDT -> " + strDate);
+
+        strDate = VariableFormula.calculate(
+            "formatdate('zone:en:-08 MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
+        System.out.println("zone:en:-08 -> " + strDate);
+        strDate = VariableFormula.calculate(
+            "formatdate('lang:en MMM d, yyyy h:m:s aa (zzz)',currentDatetime())");
+        System.out.println("lang:en -> " + strDate);
+
+        Object date =  VariableFormula.calculate(
+            "toDate('Oct 1, 2022 4:01:52 AM (CST)','zone:en:CST MMM d, yyyy h:m:s aa (zzz)')");
+        System.out.println("toDate en -> " + date.toString());
+        System.out.println("toDate en -> " + DatetimeOpt.convertDateToString((Date) date,
+            "zone:en:CST MMM d, yyyy h:m:s aa (zzz)"));
+        //testFormula2();
     }
     public static void testFormula5(){
         System.out.println(VariableFormula.calculate("strcat(capital(floor(a)),'元'," +
