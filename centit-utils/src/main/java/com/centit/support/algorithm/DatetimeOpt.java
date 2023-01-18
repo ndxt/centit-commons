@@ -832,8 +832,12 @@ public abstract class DatetimeOpt {
             return null;
         if (obj instanceof java.util.Date)
             return (java.util.Date) obj;
-        if (obj instanceof Long)
-            return new java.util.Date((Long) obj);
+
+        //if (obj instanceof Long)
+        //    return new java.util.Date((Long) obj);
+
+        if (obj instanceof Number)
+            return new java.util.Date(((Number) obj).longValue());
 
         if (obj instanceof LocalDateTime){
             LocalDateTime ldt = (LocalDateTime)obj;
