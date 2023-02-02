@@ -1,7 +1,9 @@
 package com.centit.support.test;
 
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.database.utils.FieldType;
+import com.centit.support.database.utils.QueryAndNamedParams;
 import com.centit.support.database.utils.QueryUtils;
 
 import java.io.ByteArrayInputStream;
@@ -11,7 +13,16 @@ import java.util.List;
 
 public class TestQueryUtils {
     public static void main(String[] args) {
-        InputStream s=new ByteArrayInputStream("ss".getBytes());
+        String sql = "select USER_CODE, LAST_UPDATE_TIME, LAST_UPDATE_USER, IS_TIMER " +
+            "from WF_FLOW_INSTANCE where 1=1 " +
+            "[ :(splitForIn, loop)pt | and PROMISE_TIME =:pt ] order by CREATE_TIME DESC";
+        QueryAndNamedParams query =  QueryUtils.translateQuery(sql,
+            CollectionsOpt.createHashMap("pt", "1,2,3,4"));
+        System.out.println(query.getQuery());
+    }
+
+    public static void testSqlBuilder1() {
+        InputStream s =new ByteArrayInputStream("ss".getBytes());
         List<Object> params = new ArrayList<>();
         System.out.println(params.toArray());
         System.out.println(FieldType.mapToHumpName("F_Bc_2014_AAe", false) );
