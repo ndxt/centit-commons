@@ -15,8 +15,15 @@ public class TestQueryUtils {
     public static void main(String[] args) {
         String sql = "select USER_CODE, LAST_UPDATE_TIME, LAST_UPDATE_USER, IS_TIMER " +
             "from WF_FLOW_INSTANCE where 1=1 " +
-            "[ :(splitForIn, loop)pt | and PROMISE_TIME =:pt ] order by CREATE_TIME DESC";
+            "[ :(splitForIn, loop)pt |and PROMISE_TIME =:pt] order by CREATE_TIME DESC";
         QueryAndNamedParams query =  QueryUtils.translateQuery(sql,
+            CollectionsOpt.createHashMap("pt", "1,2,3,4"));
+        System.out.println(query.getQuery());
+
+        sql = "select USER_CODE, LAST_UPDATE_TIME, LAST_UPDATE_USER, IS_TIMER " +
+            "from WF_FLOW_INSTANCE where 1=1 " +
+            "[ :(splitForIn, loopWithOr)pt |PROMISE_TIME =:pt] order by CREATE_TIME DESC";
+        query =  QueryUtils.translateQuery(sql,
             CollectionsOpt.createHashMap("pt", "1,2,3,4"));
         System.out.println(query.getQuery());
     }
