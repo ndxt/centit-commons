@@ -495,12 +495,9 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                     }
                     needAppendAndSign=true;
                 }
-                if (StringUtils.isNotBlank(alias)) {
-                    currentBuild.append(alias).append('.');
-                }
-                currentBuild.append(propName);
                 // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne 8:ni
-                dealSuffixSql(filterEnt, optSuffix, currentBuild);
+                dealSuffixSql(filterEnt, StringUtils.isBlank(alias) ? propName : alias+"."+propName,
+                    optSuffix, currentBuild);
             }
         }
         if(filterGroup != null){
@@ -516,47 +513,51 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return sBuilder.toString();
     }
 
-    private static void dealSuffixSql(Map.Entry<String, Object> filterEnt, String optSuffix, StringBuilder currentBuild) {
+    private static void dealSuffixSql(Map.Entry<String, Object> filterEnt, String fieldName,
+                                      String optSuffix, StringBuilder currentBuild) {
         String plCol = filterEnt.getKey();
         switch (optSuffix) {
             case "_gt":
-                currentBuild.append(" > :").append(plCol);
+                currentBuild.append(fieldName).append(" > :").append(plCol);
                 break;
             case "_ge":
-                currentBuild.append(" >= :").append(plCol);
+                currentBuild.append(fieldName).append(" >= :").append(plCol);
                 break;
             case "_lt":
-                currentBuild.append(" < :").append(plCol);
+                currentBuild.append(fieldName).append(" < :").append(plCol);
                 break;
             case "_le":
-                currentBuild.append(" <= :").append(plCol);
+                currentBuild.append(fieldName).append(" <= :").append(plCol);
                 break;
             case "_lk":
-                currentBuild.append(" like :").append(plCol);
+                currentBuild.append(fieldName).append(" like :").append(plCol);
                 break;
             case "_ni":
-                currentBuild.append(" not in (:").append(plCol).append(")");
+                currentBuild.append(fieldName).append(" not in (:").append(plCol).append(")");
                 break;
             case "_ne":
-                currentBuild.append(" <> :").append(plCol);
+                currentBuild.append(fieldName).append(" <> :").append(plCol);
                 break;
             case "_nv":
-                currentBuild.append(" is null");
+                currentBuild.append(fieldName).append(" is null");
                 break;
             case "_nn":
-                currentBuild.append(" is not null");
+                currentBuild.append(fieldName).append(" is not null");
                 break;
             case "_in":
-                currentBuild.append(" in (:").append(plCol).append(")");
+                currentBuild.append(fieldName).append(" in (:").append(plCol).append(")");
+                break;
+            case "_ft": //full_text 只有mysql可以用
+                currentBuild.append(" match(").append(fieldName).append(") against(:").append(plCol).append(")");
                 break;
             //case "_eq":
             default:
                 //ReflectionOpt.isArray()
                 if(filterEnt.getValue() instanceof Collection ||
                     filterEnt.getValue() instanceof Object[]) {
-                    currentBuild.append(" in (:").append(plCol).append(")");
+                    currentBuild.append(fieldName).append(" in (:").append(plCol).append(")");
                 } else {
-                    currentBuild.append(" = :").append(plCol);
+                    currentBuild.append(fieldName).append(" = :").append(plCol);
                 }
                 break;
         }

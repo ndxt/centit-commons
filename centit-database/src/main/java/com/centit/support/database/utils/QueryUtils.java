@@ -8,6 +8,7 @@ import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -1443,13 +1444,17 @@ public abstract class QueryUtils {
             } else
                 paramName = paramAlias;
         } else {
-            if (paramString.charAt(0) == '(') {
-                int e = paramString.indexOf(')');
-                if (e > 0) {
-                    paramPretreatment = paramString.substring(1, e).trim();
-                    paramAlias = paramString.substring(e + 1).trim();
+            int e = paramString.indexOf(')');
+            if (e > 0) {
+                int b = paramString.indexOf('(') + 1;
+                paramPretreatment = paramString.substring(b, e).trim();
+                if(paramString.length() > e)
+                    paramName = paramString.substring(e + 1).trim();
+                else if(b>1){
+                    paramName = paramString.substring(0, b).trim();
+                } else {
+                    paramName = null;
                 }
-                paramName = paramAlias;
             } else
                 paramName = paramString;
         }
