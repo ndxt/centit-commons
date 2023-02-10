@@ -59,7 +59,17 @@ public abstract class GeneralAlgorithm {
                 return true;
             }
         }
-        return operand.equals(operand2);
+        if(operand.getClass().equals(operand2.getClass())){
+            return operand.equals(operand2);
+        }
+
+        if ( operand instanceof Number && operand2 instanceof Number) {
+            return NumberBaseOpt.castObjectToDouble(operand).compareTo(
+                NumberBaseOpt.castObjectToDouble(operand2)) == 0;
+        }
+
+        return StringBaseOpt.objectToString(operand).compareTo(
+            StringBaseOpt.objectToString(operand2)) == 0;
     }
 
     public static boolean equals(Object operand, Object operand2) {
