@@ -152,42 +152,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return sBuilder.toString();
     }
 
-    /**
-     * 返回 sql 语句 和 属性名数组
-     *
-     * @param ti     TableInfo
-     * @param fields String 值返回对应的字段
-     * @param alias  String
-     * @param withPk 是否添加主键
-     * @return Pair String String []
-     */
-    public static String buildPartFieldSql(TableInfo ti, Collection<String> fields, String alias, boolean withPk) {
-        StringBuilder sBuilder = new StringBuilder();
-        boolean addAlias = StringUtils.isNotBlank(alias);
-        String aliasName = alias + ".";
-        int i = 0;
-        if(withPk){
-            for(TableField col : ti.getPkFields()){
-                sBuilder.append(i > 0 ? ", " : " ");
-                if (addAlias) sBuilder.append(aliasName);
-                sBuilder.append(col.getColumnName());
-                i++;
-            }
-        }
-
-        for (String colName : fields) {
-            TableField col = ti.findFieldByName(colName);
-            if (col != null && (!withPk || !col.isPrimaryKey()) ) {
-                sBuilder.append(i > 0 ? ", " : " ");
-                if (addAlias) sBuilder.append(aliasName);
-                sBuilder.append(col.getColumnName());
-                i++;
-            }
-        }
-        return sBuilder.toString();
-    }
-
-    /**
+     /**
      * 返回 sql 语句 和 属性名数组
      *
      * @param mapInfo     TableInfo 表信息
@@ -252,33 +217,74 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
      * @param withPk 是否添加主键
      * @return Pair String String []
      */
-    public static Pair<String, TableField[]> buildPartFieldSqlWithFields(
-        TableInfo ti, Collection<String> fields, String alias, boolean withPk) {
+    public static String buildPartFieldSql(TableInfo ti, Collection<String> fields, String alias, boolean withPk) {
         StringBuilder sBuilder = new StringBuilder();
         boolean addAlias = StringUtils.isNotBlank(alias);
+        Set<String> hasAddedFiled = new HashSet<>(fields.size()+2);
         String aliasName = alias + ".";
-        TableField[] selectFields = new TableField[fields.size()];
         int i = 0;
         if(withPk){
             for(TableField col : ti.getPkFields()){
                 sBuilder.append(i > 0 ? ", " : " ");
                 if (addAlias) sBuilder.append(aliasName);
                 sBuilder.append(col.getColumnName());
-                selectFields[i] = col;
+                hasAddedFiled.add(col.getColumnName());
+                i++;
+            }
+        }
+
+        for (String colName : fields) {
+            TableField col = ti.findFieldByName(colName);
+            if (col != null && ! hasAddedFiled.contains(col.getColumnName())) {
+                sBuilder.append(i > 0 ? ", " : " ");
+                if (addAlias) sBuilder.append(aliasName);
+                sBuilder.append(col.getColumnName());
+                hasAddedFiled.add(col.getColumnName());
+                i++;
+            }
+        }
+        return sBuilder.toString();
+    }
+
+    /**
+     * 返回 sql 语句 和 属性名数组
+     *
+     * @param ti     TableInfo
+     * @param fields String 值返回对应的字段
+     * @param alias  String
+     * @param withPk 是否添加主键
+     * @return Pair String String []
+     */
+    public static Pair<String, TableField[]> buildPartFieldSqlWithFields(
+        TableInfo ti, Collection<String> fields, String alias, boolean withPk) {
+        StringBuilder sBuilder = new StringBuilder();
+        boolean addAlias = StringUtils.isNotBlank(alias);
+        String aliasName = alias + ".";
+        List<TableField> selectFields = new ArrayList<>(fields.size()+2);
+        Set<String> hasAddedFiled = new HashSet<>(fields.size()+2);
+        int i = 0;
+        if(withPk){
+            for(TableField col : ti.getPkFields()){
+                sBuilder.append(i > 0 ? ", " : " ");
+                if (addAlias) sBuilder.append(aliasName);
+                sBuilder.append(col.getColumnName());
+                selectFields.add(col);
+                hasAddedFiled.add(col.getColumnName());
                 i++;
             }
         }
         for (String colName : fields) {
             TableField col = ti.findFieldByName(colName);
-            if (col != null && (!withPk || !col.isPrimaryKey())) {
+            if (col != null && ! hasAddedFiled.contains(col.getColumnName())) {
                 sBuilder.append(i > 0 ? ", " : " ");
                 if (addAlias) sBuilder.append(aliasName);
                 sBuilder.append(col.getColumnName());
-                selectFields[i] = col;//.getPropertyName();
+                selectFields.add(col);
+                hasAddedFiled.add(col.getColumnName());
                 i++;
             }
         }
-        return new ImmutablePair<>(sBuilder.toString(), selectFields);
+        return new ImmutablePair<>(sBuilder.toString(), selectFields.toArray(new TableField[selectFields.size()]));
     }
 
     public static boolean checkHasAllPkColumns(TableInfo tableInfo, Map<String, Object> properties) {
@@ -495,12 +501,9 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                     }
                     needAppendAndSign=true;
                 }
-                if (StringUtils.isNotBlank(alias)) {
-                    currentBuild.append(alias).append('.');
-                }
-                currentBuild.append(propName);
                 // opt ==  0:eq 1:gt 2:ge 3:lt 4:le 5: lk 6:in 7:ne 8:ni
-                dealSuffixSql(filterEnt, optSuffix, currentBuild);
+                dealSuffixSql(filterEnt, StringUtils.isBlank(alias) ? propName : alias+"."+propName,
+                    optSuffix, currentBuild);
             }
         }
         if(filterGroup != null){
@@ -516,47 +519,51 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
         return sBuilder.toString();
     }
 
-    private static void dealSuffixSql(Map.Entry<String, Object> filterEnt, String optSuffix, StringBuilder currentBuild) {
+    private static void dealSuffixSql(Map.Entry<String, Object> filterEnt, String fieldName,
+                                      String optSuffix, StringBuilder currentBuild) {
         String plCol = filterEnt.getKey();
         switch (optSuffix) {
             case "_gt":
-                currentBuild.append(" > :").append(plCol);
+                currentBuild.append(fieldName).append(" > :").append(plCol);
                 break;
             case "_ge":
-                currentBuild.append(" >= :").append(plCol);
+                currentBuild.append(fieldName).append(" >= :").append(plCol);
                 break;
             case "_lt":
-                currentBuild.append(" < :").append(plCol);
+                currentBuild.append(fieldName).append(" < :").append(plCol);
                 break;
             case "_le":
-                currentBuild.append(" <= :").append(plCol);
+                currentBuild.append(fieldName).append(" <= :").append(plCol);
                 break;
             case "_lk":
-                currentBuild.append(" like :").append(plCol);
+                currentBuild.append(fieldName).append(" like :").append(plCol);
                 break;
             case "_ni":
-                currentBuild.append(" not in (:").append(plCol).append(")");
+                currentBuild.append(fieldName).append(" not in (:").append(plCol).append(")");
                 break;
             case "_ne":
-                currentBuild.append(" <> :").append(plCol);
+                currentBuild.append(fieldName).append(" <> :").append(plCol);
                 break;
             case "_nv":
-                currentBuild.append(" is null");
+                currentBuild.append(fieldName).append(" is null");
                 break;
             case "_nn":
-                currentBuild.append(" is not null");
+                currentBuild.append(fieldName).append(" is not null");
                 break;
             case "_in":
-                currentBuild.append(" in (:").append(plCol).append(")");
+                currentBuild.append(fieldName).append(" in (:").append(plCol).append(")");
+                break;
+            case "_ft": //full_text 只有mysql可以用
+                currentBuild.append(" match(").append(fieldName).append(") against(:").append(plCol).append(")");
                 break;
             //case "_eq":
             default:
                 //ReflectionOpt.isArray()
                 if(filterEnt.getValue() instanceof Collection ||
                     filterEnt.getValue() instanceof Object[]) {
-                    currentBuild.append(" in (:").append(plCol).append(")");
+                    currentBuild.append(fieldName).append(" in (:").append(plCol).append(")");
                 } else {
-                    currentBuild.append(" = :").append(plCol);
+                    currentBuild.append(fieldName).append(" = :").append(plCol);
                 }
                 break;
         }
