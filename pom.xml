@@ -2,17 +2,16 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <parent>
         <artifactId>centit-framework-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>5.2-SNAPSHOT</version>
+        <version>5.3-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.support</groupId>
     <artifactId>centit-commons</artifactId>
-    <version>5.2-SNAPSHOT</version>
+    <version>5.3-SNAPSHOT</version>
     <name>com.centit.support:centit-commons</name>
     <packaging>pom</packaging>
     <description>java 常用工具类,作为 apache-commons的补充</description>
@@ -51,10 +50,9 @@
 
     <modules>
         <module>centit-utils</module>
-        <module>centit-compiler</module>
-        <module>centit-database</module>
-        <module>centit-database-datasource</module>
-        <module>centit-database-transaction</module>
+        <module>centit-es-client</module>
+        <module>centit-office-utils</module>
+        <module>centit-report-utils</module>
     </modules>
 
     <build>

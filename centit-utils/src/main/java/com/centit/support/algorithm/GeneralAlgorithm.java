@@ -63,7 +63,7 @@ public abstract class GeneralAlgorithm {
             return operand.equals(operand2);
         }
 
-        if ( operand instanceof Number && operand2 instanceof Number) {
+        if(operand instanceof Number && operand2 instanceof Number) {
             return NumberBaseOpt.castObjectToDouble(operand).compareTo(
                 NumberBaseOpt.castObjectToDouble(operand2)) == 0;
         }
