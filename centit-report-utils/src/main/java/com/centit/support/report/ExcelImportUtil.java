@@ -936,9 +936,8 @@ public abstract class ExcelImportUtil {
         }
     }
 
-    /**
+    /*
      * 获取excl第一行列
-     *
      * @param filePath
      * @param sheetIndex
      * @return
