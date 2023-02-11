@@ -171,7 +171,7 @@ public abstract class CollectionsOpt {
      * @return 排序号的树的索引
      */
     public static <T> List<Integer> makeJqueryTreeIndex(List<T> list, ParentChild<? super T> c) {
-        List<Integer> indexes = new ArrayList<Integer>();
+        List<Integer> indexes = new ArrayList<>();
         int n = list.size();
         for (int i = 0; i < n; i++) {
             int ind = 0;
@@ -228,9 +228,9 @@ public abstract class CollectionsOpt {
         @SuppressWarnings("unchecked")
         T[] ta = (T[]) Array.newInstance(list[notNullItemPos].getClass(), size);
         size = 0;
-        for (int i = 0; i < list.length; i++) {
-            if (list[i] != null) {
-                ta[size] = list[i];
+        for (T t : list) {
+            if (t != null) {
+                ta[size] = t;
                 size++;
             }
         }
@@ -246,7 +246,7 @@ public abstract class CollectionsOpt {
     public static List<String> removeBlankString(List<String> list) {
         if (list == null || list.size() < 1)
             return null;
-        List<String> retList = new ArrayList<String>();
+        List<String> retList = new ArrayList<>();
         for (String t : list) {
             if (StringUtils.isNoneBlank(t))
                 retList.add(t);
@@ -263,21 +263,20 @@ public abstract class CollectionsOpt {
     public static String[] removeBlankString(String[] list) {
         if (list == null || list.length < 1)
             return null;
-        int notNullItemPos = -1, size = 0;
-        for (int i = 0; i < list.length; i++) {
-            if (StringUtils.isNoneBlank(list[i])) {
+        int size = 0;
+        for (String s : list) {
+            if (StringUtils.isNotBlank(s)) {
                 size++;
-                notNullItemPos = i;
             }
         }
-        if (notNullItemPos < 0) {
+        if (size == 0) {
             return null;
         }
         String[] ta = new String[size];
         size = 0;
-        for (int i = 0; i < list.length; i++) {
-            if (StringUtils.isNoneBlank(list[i])) {
-                ta[size] = list[i];
+        for (String s : list) {
+            if (StringUtils.isNotBlank(s)) {
+                ta[size] = s;
                 size++;
             }
         }
@@ -296,7 +295,7 @@ public abstract class CollectionsOpt {
     public static <T> JSONArray treeToJSONArray
     (List<T> treeList, ParentChild<? super T> c, String childrenPropertyName) {
         JSONArray jsonTree = new JSONArray();
-        Stack<T> treePath = new Stack<T>();
+        Stack<T> treePath = new Stack<>();
         Stack<JSONObject> jsonPath = new Stack<>();
         int pathSum = 0;
         for (T treeNode : treeList) {
@@ -468,8 +467,8 @@ public abstract class CollectionsOpt {
                 null, null, oldList);
         List<T> souList = cloneList(oldList);
         List<T> desList = cloneList(newList);
-        Collections.sort(souList, compare);
-        Collections.sort(desList, compare);
+        souList.sort(compare);
+        desList.sort(compare);
         //---------------------------------------
         int i = 0;
         int sl = souList.size();
