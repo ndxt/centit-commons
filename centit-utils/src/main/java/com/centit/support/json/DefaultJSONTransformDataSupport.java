@@ -1,11 +1,14 @@
 package com.centit.support.json;
 
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.compiler.VariableFormula;
+import com.centit.support.compiler.VariableTranslate;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultJSONTransformDataSupport implements  JSONTransformDataSupport{
+public class DefaultJSONTransformDataSupport
+    implements VariableTranslate, JSONTransformDataSupport{
     private Object data;
     private int stackLength;
     private List<Object> stack;
@@ -17,7 +20,18 @@ public class DefaultJSONTransformDataSupport implements  JSONTransformDataSuppor
     }
 
     @Override
-    public Object attainExpressionValue(String labelName){
+    public Object attainExpressionValue(String expression) {
+        if (expression == null) {
+            return null;
+        }
+        VariableFormula variableFormula = new VariableFormula();
+        variableFormula.setTrans(this);
+        variableFormula.setFormula(expression);
+        return variableFormula.calcFormula();
+    }
+
+    @Override
+    public Object getVarValue(String labelName) {
         if(labelName.startsWith("/")){
             return ReflectionOpt.attainExpressionValue(data,
                 labelName.substring(1));
