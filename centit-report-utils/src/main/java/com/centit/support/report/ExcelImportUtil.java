@@ -627,6 +627,7 @@ public abstract class ExcelImportUtil {
      *
      * @param input excelStreamInput
      * @return excel 类型 和 inputStream
+     * @throws IOException IO异常
      */
     public static LeftRightPair<ExcelTypeEnum, InputStream> checkExcelInputStreamType(InputStream input) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
