@@ -858,7 +858,7 @@ public abstract class ExcelImportUtil {
      */
 
     private static List<Map<String, Object>> loadMapFromExcelSheet(Sheet sheet, int headerRow, int beginRow, int endRow,
-                                                                   int beginColumn, int endColumn, boolean userUpMergeCell ) {
+                                                                   int beginColumn, int endColumn, boolean userUpMergeCell) {
 
 
         if (beginColumn < 0) {
@@ -1187,13 +1187,19 @@ public abstract class ExcelImportUtil {
         return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, beginColumn, endColumn, true);
     }
 
+    public static List<Map<String, Object>> loadMapFromExcelSheetUseMergeCell(InputStream excelFile, String sheetName, int headerRow, int beginRow, int endRow, int beginColumn, int endColumn)
+        throws IOException {
+        Sheet sheet = loadExcelFileSheet(excelFile, sheetName);
+        return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, beginColumn, endColumn, true);
+    }
 
     private static List<Map<String, Object>> loadMapFromExcelSheet(Sheet sheet,
-                                                                   Map<Integer, String> fieldDesc, int beginRow, int endRow) {
+                                      Map<Integer, String> fieldDesc, int beginRow, int endRow, boolean userUpMergeCell) {
         if (sheet == null)
             return null;
         int columns = fieldDesc.size();
         List<Map<String, Object>> datas = new ArrayList<>(endRow - beginRow + 1);
+        Map<String, Object> preRowObj = null;
         for (int row = beginRow; row < endRow; row++) {
             Row excelRow = sheet.getRow(row);
             if (excelRow == null)
@@ -1207,11 +1213,15 @@ public abstract class ExcelImportUtil {
                 if (cell != null && StringUtils.isNotBlank(cell.toString())) {
                     hasValue = true;
                     rowObj.put(ent.getValue(), getCellValue(cell));
+                } else if(userUpMergeCell && preRowObj!=null){
+                    rowObj.put(ent.getValue(), preRowObj.get(ent.getValue()));
                 }
             }
             if (hasValue) {
                 datas.add(rowObj);
+                preRowObj = rowObj;
             }
+
         }
         return datas;
     }
@@ -1228,7 +1238,7 @@ public abstract class ExcelImportUtil {
     public static List<Map<String, Object>> loadMapFromExcelSheet(InputStream excelFile, int sheetIndex, Map<Integer, String> fieldDesc, int beginRow, int endRow)
         throws IOException {
         Sheet sheet = loadExcelFileSheet(excelFile, sheetIndex);
-        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, endRow);
+        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, endRow, false);
     }
 
     /**
@@ -1243,9 +1253,20 @@ public abstract class ExcelImportUtil {
     public static List<Map<String, Object>> loadMapFromExcelSheet(InputStream excelFile, String sheetName, Map<Integer, String> fieldDesc, int beginRow, int endRow)
         throws IOException {
         Sheet sheet = loadExcelFileSheet(excelFile, sheetName);
-        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, endRow);
+        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, endRow, false);
     }
 
+    public static List<Map<String, Object>> loadMapFromExcelSheetUseMergeCell(InputStream excelFile, int sheetIndex, Map<Integer, String> fieldDesc, int beginRow, int endRow)
+        throws IOException {
+        Sheet sheet = loadExcelFileSheet(excelFile, sheetIndex);
+        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, endRow, true);
+    }
+
+    public static List<Map<String, Object>> loadMapFromExcelSheetUseMergeCell(InputStream excelFile, String sheetName, Map<Integer, String> fieldDesc, int beginRow, int endRow)
+        throws IOException {
+        Sheet sheet = loadExcelFileSheet(excelFile, sheetName);
+        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, endRow, true);
+    }
 
     /**
      * @param excelFile 文件流
@@ -1261,7 +1282,7 @@ public abstract class ExcelImportUtil {
                                                              Map<Integer, String> fieldDesc, int beginRow, int endRow)
         throws IOException {
         Sheet sheet = loadExcelFileSheet(excelFile, excelType, sheetName);
-        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, endRow);
+        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, endRow, false);
     }
 
     /**
@@ -1297,7 +1318,7 @@ public abstract class ExcelImportUtil {
                                                              Map<Integer, String> fieldDesc, int beginRow)
         throws IOException {
         Sheet sheet = loadExcelFileSheet(excelFile, excelType, sheetName);
-        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, sheet.getLastRowNum() + 1);
+        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, sheet.getLastRowNum() + 1, false);
     }
 
     /**
@@ -1332,7 +1353,7 @@ public abstract class ExcelImportUtil {
                                                              Map<Integer, String> fieldDesc, int beginRow, int endRow)
         throws IOException {
         Sheet sheet = loadExcelFileSheet(excelFile, excelType, sheetIndex);
-        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, endRow);
+        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, endRow, false);
     }
 
     /**
@@ -1371,7 +1392,7 @@ public abstract class ExcelImportUtil {
             new HSSFWorkbook(excelFile) :  /*new SXSSFWorkbook(*/new XSSFWorkbook(excelFile);
         Sheet sheet = wb.getSheetAt(sheetIndex);
 
-        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, sheet.getLastRowNum() + 1);
+        return loadMapFromExcelSheet(sheet, fieldDesc, beginRow, sheet.getLastRowNum() + 1, false);
     }
 
     /**
