@@ -857,19 +857,51 @@ public abstract class ExcelImportUtil {
      * throws IOException  异常
      */
 
-    private static List<Map<String, Object>> loadMapFromExcelSheet(Sheet sheet, int headerRow, int beginRow, int endRow, int beginColumn, int endColumn) {
-        Row headRow = sheet.getRow(headerRow);
-        List<String> header = new ArrayList<>();
-        if (endColumn <= 0) {
-            endColumn = headRow.getLastCellNum() + 1;
-        }
+    private static List<Map<String, Object>> loadMapFromExcelSheet(Sheet sheet, int headerRow, int beginRow, int endRow,
+                                                                   int beginColumn, int endColumn, boolean userUpMergeCell ) {
+
+
         if (beginColumn < 0) {
             beginColumn = 0;
         }
-        for (int i = beginColumn; i < endColumn; i++) {
-            Cell cell = headRow.getCell(i);
-            header.add(cell == null ? "column" + i : cell.toString());
+        List<String> header = new ArrayList<>(60);
+        int lastColumnIndex = 0;
+        if(userUpMergeCell){
+            for(int i=0; i<=headerRow; i++) {
+                Row headRow = sheet.getRow(i);
+                int rowColSum = headRow.getLastCellNum() + 1;
+                if(lastColumnIndex<rowColSum){
+                    lastColumnIndex = rowColSum;
+                }
+                for(int j=beginColumn; j<rowColSum; j++){
+                    Cell cell = headRow.getCell(j);
+                    if(cell == null || StringUtils.isBlank(cell.toString())){
+                        if(header.size() == j - beginColumn ){
+                            header.add("column" + j);
+                        }
+                    } else {
+                        String headerName = cell.toString();
+                        if(header.size() == j - beginColumn ){
+                            header.add(headerName);
+                        } else {
+                            header.set(j - beginColumn, headerName);
+                        }
+                    }
+                }
+            }
+        } else {
+            Row headRow = sheet.getRow(headerRow);
+            lastColumnIndex  = headRow.getLastCellNum() + 1;
+            for (int i = beginColumn; i < lastColumnIndex; i++) {
+                Cell cell = headRow.getCell(i);
+                header.add(cell == null || StringUtils.isBlank(cell.toString()) ? "column" + i : cell.toString());
+            }
         }
+
+        if (endColumn <= 0) {
+            endColumn = lastColumnIndex;
+        }
+
         if (endRow <= 0) {
             endRow = sheet.getLastRowNum() + 1;
         }
@@ -878,6 +910,7 @@ public abstract class ExcelImportUtil {
         }
         List<Map<String, Object>> datas = new ArrayList<>();
         // 遍历当前sheet中的所有行
+        Map<String, Object> preRowData = null;
         for (int row = beginRow; row < endRow; row++) {
             Row dataRow = sheet.getRow(row);
             if (dataRow == null) {
@@ -888,21 +921,25 @@ public abstract class ExcelImportUtil {
             for (int column = beginColumn; column <= dataRow.getLastCellNum(); column++) {
                 Object cellValue = ExcelImportUtil.getCellValue(dataRow.getCell(column));
                 if (cellValue != null) {
-                    String key = column <= endColumn ? header.get(column) : "column" + column;
+                    String key = column <= endColumn ? header.get(column-beginColumn) : "column" + column;
                     rowData.put(key, cellValue);
+                } else if(userUpMergeCell && preRowData!=null) {
+                    String key = column <= endColumn ? header.get(column-beginColumn) : "column" + column;
+                    rowData.put(key, preRowData.get(key));
                 }
             }
             // while
             if (!rowData.isEmpty()) {
                 datas.add(rowData);
             }
+            preRowData = rowData;
         }
         return datas;
     }
 
 
     private static List<Map<String, Object>> loadMapFromExcelSheet(Sheet sheet, int headerRow, int beginRow, int endRow) {
-        return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, 0, -1);
+        return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, 0, -1, false);
     }
 
     /**
@@ -1124,7 +1161,7 @@ public abstract class ExcelImportUtil {
     public static List<Map<String, Object>> loadMapFromExcelSheet(InputStream excelFile, String sheetName, int headerRow, int beginRow, int endRow, int beginColumn, int endColumn)
         throws IOException {
         Sheet sheet = loadExcelFileSheet(excelFile, sheetName);
-        return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, beginColumn, endColumn);
+        return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, beginColumn, endColumn, false);
     }
 
     /**
@@ -1141,7 +1178,13 @@ public abstract class ExcelImportUtil {
     public static List<Map<String, Object>> loadMapFromExcelSheet(InputStream excelFile, int sheetIndex, int headerRow, int beginRow, int endRow, int beginColumn, int endColumn)
         throws IOException {
         Sheet sheet = loadExcelFileSheet(excelFile, sheetIndex);
-        return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, beginColumn, endColumn);
+        return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, beginColumn, endColumn, false);
+    }
+
+    public static List<Map<String, Object>> loadMapFromExcelSheetUseMergeCell(InputStream excelFile, int sheetIndex, int headerRow, int beginRow, int endRow, int beginColumn, int endColumn)
+        throws IOException {
+        Sheet sheet = loadExcelFileSheet(excelFile, sheetIndex);
+        return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, beginColumn, endColumn, true);
     }
 
 
