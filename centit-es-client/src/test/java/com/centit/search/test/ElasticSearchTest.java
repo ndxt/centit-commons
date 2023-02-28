@@ -1,7 +1,7 @@
 package com.centit.search.test;
 
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.document.ObjectDocument;
 import com.centit.search.utils.TikaTextExtractor;
 import org.apache.http.HttpHost;

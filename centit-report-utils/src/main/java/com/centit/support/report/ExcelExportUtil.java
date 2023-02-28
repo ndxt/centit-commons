@@ -1,6 +1,6 @@
 package com.centit.support.report;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
@@ -426,14 +426,15 @@ public abstract class ExcelExportUtil {
         CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
         for (int i = 0; i < objLists.size(); i++) {
             Row textRow = sheet.createRow(i + beginRow);
+            JSONObject obj = JSONObject.from(objLists.get(i));
             for (int j = 0; j < property.length; j++) {
                 if (StringUtils.isNotBlank(property[j])) {
 //                    CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
                     Cell cell = textRow.createCell(j);
 //                  setCellStyle(cell, cellStyle);
 //                  cell.setCellValue( StringBaseOpt.objectToString(
-//                  ReflectionOpt.attainExpressionValue( objLists.get(i) , property[j] )));
-                    JSONObject obj = (JSONObject) JSONObject.toJSON(objLists.get(i));
+//                  ReflectionOpt.attainExpressionValue(objLists.get(i), property[j])));
+
                     Object objectValue = obj.get(property[j]);
                     String type = objectValue != null ? objectValue.getClass().getSimpleName() : "String";
                     setCellStyle(sheet, cell, cellStyle, type);

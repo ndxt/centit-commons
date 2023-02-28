@@ -1,6 +1,7 @@
 package com.centit.support.common;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -178,15 +179,13 @@ public class JavaBeanField {
                 this.innerSetObjectFieldValue(object,
                     BooleanBaseOpt.castObjectToBoolean(newValue, false));
                 break;
-            /*case "com.alibaba.fastjson.JSONObject":
+            /*case "com.alibaba.fastjson2.JSONObject":
                 this.innerSetObjectFieldValue(object,
                     JSONObject.parseObject((String) newValue));
                 break;*/
             default:
                 this.innerSetObjectFieldValue(object,
-                    JSONObject.toJavaObject(
-                        JSONObject.parseObject(
-                            StringBaseOpt.castObjectToString(newValue)), this.fieldType));
+                     GeneralAlgorithm.castObjectToType(newValue, this.fieldType));
                 break;
         }
     }

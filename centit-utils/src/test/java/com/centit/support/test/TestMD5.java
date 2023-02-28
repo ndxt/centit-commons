@@ -1,7 +1,7 @@
 package com.centit.support.test;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.centit.support.security.HmacSha1Encoder;
 
 import java.io.UnsupportedEncodingException;

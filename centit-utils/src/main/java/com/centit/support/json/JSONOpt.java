@@ -1,8 +1,8 @@
 package com.centit.support.json;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import org.slf4j.Logger;
@@ -89,36 +89,7 @@ public abstract class JSONOpt {
         return p;
     }
 
-    /**
-     * 获取一个json对象的属性，skeys是json属性数组，a.b 这样的属性对应的数组为{'a','b'}
-     *
-     * @param objJson objJson
-     * @param skeys   json属性数组，a.b 这样的属性对应的数组为{'a','b'}
-     * @return 获取一个json对象的属性
-     */
-    private static JSONObject findJsonObject(JSONObject objJson, String[] skeys) {
-        int depth = skeys.length;
-        if (depth < 1)
-            return null;
-        JSONPath path = findJsonObject(objJson, depth, skeys);
-        if (path.pathPos != depth)
-            return null;
-        return path.objJson;
-    }
 
-    /**
-     * 获取一个json对象的属性，path是json属性 可以有多层，用'.' 分隔 ，比如 a.b
-     *
-     * @param objJson objJson
-     * @param path    json属性 可以有多层，用'.' 分隔 ，比如 a.b
-     * @return 获取一个json对象的属性
-     */
-    public static JSONObject findJsonObject(JSONObject objJson, String path) {
-        String[] skeys = path.split("\\x2E");
-/*        if(skeys==null)
-            return null;*/
-        return findJsonObject(objJson, skeys);
-    }
 
     private static JSONObject innerCreateJsonObject(String[] skeys, int beginPos, Object value) {
         int depth = skeys.length;
@@ -337,7 +308,7 @@ public abstract class JSONOpt {
      * @param obj 将一个对象转换为JSON
      * @return 转换为 JSONArray否则转换为JSONObject
      */
-    public static JSON objectToJSON(Object obj) {
+    public static Object objectToJSON(Object obj) {
         return objectToJSON(obj, false, false);
     }
 
@@ -349,7 +320,7 @@ public abstract class JSONOpt {
      * @param includePrivateField 包括私有属性，methodOnly 为true是这个参数无效
      * @return
      */
-    public static JSON objectToJSON(Object obj, boolean methodOnly, boolean fieldOnly, boolean includePrivateField) {
+    public static Object objectToJSON(Object obj, boolean methodOnly, boolean fieldOnly, boolean includePrivateField) {
 
         if (obj instanceof JSON)
             return (JSON) obj;
@@ -367,7 +338,7 @@ public abstract class JSONOpt {
      * @param fieldOnly
      * @return
      */
-    public static JSON objectToJSON(Object obj, boolean methodOnly, boolean fieldOnly) {
+    public static Object objectToJSON(Object obj, boolean methodOnly, boolean fieldOnly) {
         return objectToJSON(obj, methodOnly, fieldOnly, false);
     }
 
@@ -428,7 +399,7 @@ public abstract class JSONOpt {
             return jObj;
         }
 
-        List<String> methodNames = new ArrayList<String>();
+        List<String> methodNames = new ArrayList<>();
         List<Method> getMethods = ReflectionOpt.getAllGetterMethod(obj.getClass());
         if (!fieldOnly && getMethods != null) {
             for (Method m : getMethods) {
@@ -544,54 +515,6 @@ public abstract class JSONOpt {
         return arrayToJSONArray(objArray, methodOnly, fieldOnly, false);
     }
 
-    /**
-     * @param objs 参数必须是 string object string object ....
-     * @return Map &lt; String,Object &gt;
-     * @see com.centit.support.algorithm.CollectionsOpt  createHashMap
-     * 参数必须是 string object string object ....
-     */
-    @Deprecated
-    public static Map<String, Object> createHashMap(Object... objs) {
-        return CollectionsOpt.createHashMap(objs);
-    }
-
-    /*
-     * 参数必须是 string object string object ....
-     * @param objs
-     * @return
-     */
-    public static JSONObject createJSONObject(Object... objs) {
-        if (objs == null || objs.length < 2)
-            return null;
-        JSONObject paramsMap = new JSONObject(objs.length);
-        for (int i = 0; i < objs.length / 2; i++) {
-            paramsMap.put(String.valueOf(objs[i * 2]), objs[i * 2 + 1]);
-        }
-        return paramsMap;
-    }
-
-    public static JSONArray createJSONOArray(Object... objs) {
-        if (objs == null || objs.length < 1)
-            return null;
-        JSONArray ja = new JSONArray(objs.length);
-        for (int i = 0; i < objs.length; i++) {
-            ja.add(objectToJSON(objs[i]));
-        }
-        return ja;
-    }
-
-    /*
-     * 合并两个json 如果有相同属性，以json2 为准
-     * @param json1
-     * @param json2
-     * @return
-     */
-    public static JSONObject mergeJSONObjectt(final JSONObject json1, final JSONObject json2) {
-        JSONObject json = new JSONObject();
-        json.putAll(json1);
-        json.putAll(json2);
-        return json;
-    }
 
     static class JSONPath {
         JSONObject objJson;

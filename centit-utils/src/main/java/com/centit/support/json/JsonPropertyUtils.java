@@ -1,7 +1,7 @@
 package com.centit.support.json;
 
-import com.alibaba.fastjson.serializer.SerializeFilter;
-import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.alibaba.fastjson2.filter.PropertyPreFilter;
+import com.alibaba.fastjson2.filter.SimplePropertyPreFilter;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Map;
@@ -20,7 +20,7 @@ public abstract class JsonPropertyUtils {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static SerializeFilter getIncludePropPreFilter(Class<?> clazz, String... field) {
+    public static PropertyPreFilter getIncludePropPreFilter(Class<?> clazz, String... field) {
         if (ArrayUtils.isNotEmpty(field) && null != clazz) {
             return new SimplePropertyPreFilter(clazz, field);
         }
@@ -28,7 +28,7 @@ public abstract class JsonPropertyUtils {
         return null;
     }
 
-    public static SerializeFilter getIncludePropPreFilter(String[] field) {
+    public static PropertyPreFilter getIncludePropPreFilter(String[] field) {
         if (ArrayUtils.isNotEmpty(field)) {
             return new SimplePropertyPreFilter(field);
         }
@@ -36,7 +36,7 @@ public abstract class JsonPropertyUtils {
         return null;
     }
 
-    public static SerializeFilter getExcludePropPreFilter(Class<?> clazz, String... field) {
+    public static PropertyPreFilter getExcludePropPreFilter(Class<?> clazz, String... field) {
         if (ArrayUtils.isNotEmpty(field) && null != clazz) {
             SimplePropertyPreFilter jsonPropertyPreFilter = new SimplePropertyPreFilter(clazz);
             for (String s : field) {
@@ -48,7 +48,7 @@ public abstract class JsonPropertyUtils {
         return null;
     }
 
-    public static SerializeFilter getExcludePropPreFilter(Map<Class<?>, String[]> excludes) {
+    public static PropertyPreFilter getExcludePropPreFilter(Map<Class<?>, String[]> excludes) {
         if (excludes == null || excludes.isEmpty()) {
             return null;
         }
@@ -63,7 +63,7 @@ public abstract class JsonPropertyUtils {
 
     }
 
-    public static SerializeFilter getExcludePropPreFilter(String[] field) {
+    public static PropertyPreFilter getExcludePropPreFilter(String[] field) {
         if (ArrayUtils.isNotEmpty(field)) {
             SimplePropertyPreFilter jsonPropertyPreFilter = new SimplePropertyPreFilter();
             for (String s : field) {

@@ -1,6 +1,6 @@
 package com.centit.support.test;
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson2.JSON;
 import com.centit.support.network.HtmlFormUtils;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
@@ -27,10 +27,10 @@ public class TestTcpip {
 
 
         try {
-            JSON json = (JSON) JSON.toJSON(formData);
+            Object json = JSON.toJSON(formData);
             String uri = "http://192.168.133.11:8180/centit/service/sys/testText";
             String sRet = HttpExecutor.simplePost(HttpExecutorContext.create(), uri,
-                json.toJSONString(), false);
+                json.toString(), false);
             System.out.println(sRet);
         } catch (IOException e) {
 

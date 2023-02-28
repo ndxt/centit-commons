@@ -1,7 +1,7 @@
 package com.centit.support.json;
 
-import com.alibaba.fastjson.serializer.JSONSerializer;
-import com.alibaba.fastjson.serializer.PropertyPreFilter;
+import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.filter.PropertyPreFilter;
 
 import java.util.*;
 
@@ -30,7 +30,7 @@ public class JsonPropertyPreFilters implements PropertyPreFilter {
     }
 
     @Override
-    public boolean apply(JSONSerializer serializer, Object object, String name) {
+    public boolean process(JSONWriter writer, Object object, String name) {
         if (object == null) {
             return true;
         }

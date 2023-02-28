@@ -1,7 +1,7 @@
 package com.centit.search.document;
 
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 
 /**
  * Created by codefan on 17-6-27.
