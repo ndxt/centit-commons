@@ -3,6 +3,7 @@ package com.centit.support.json;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.util.JdbcSupport;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
@@ -39,6 +40,8 @@ public abstract class JSONOpt {
     }
 
     public static void fastjsonGlobalConfig(){
+
+        JSON.config(JSONReader.Feature.AllowUnQuotedFieldNames);
         JSON.register(java.util.Date.class, UtilDateDeserializer.instance);
         JSON.register(java.sql.Date.class, SqlDateDeserializer.instance);
         JSON.register(java.sql.Timestamp.class, SqlTimestampDeserializer.instance);
