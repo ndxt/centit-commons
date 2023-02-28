@@ -2,8 +2,9 @@
   "userName": "object.properties.osid.index",
   "data": {
     "#object.properties.array": {
-      "b": "count(/object.properties.array)",
+      "b": "count(${/object.properties.array})",
       "a": "b",
+      "date" : "formatDate('yyyy-MM-dd',订单日期)",
       "c": 5
     }
   },

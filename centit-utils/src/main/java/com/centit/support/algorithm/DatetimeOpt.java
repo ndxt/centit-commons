@@ -436,7 +436,7 @@ public abstract class DatetimeOpt {
      */
     public static Date convertStringToDate(String strDate, String aMask) {
         try {
-            if (strDate == null || strDate.equals(""))
+            if (StringUtils.isBlank(strDate))
                 return null;
 
             String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
@@ -471,7 +471,9 @@ public abstract class DatetimeOpt {
      * @see java.text.SimpleDateFormat 的说明
      */
     public static String convertDateToString(Date aDate, String aMask) {
-
+        if(aDate==null){
+            return null;
+        }
         String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
         SimpleDateFormat df;
         if(aMask.startsWith("lang")){
@@ -521,6 +523,9 @@ public abstract class DatetimeOpt {
     }
 
     public static String convertDateToSmartString(Date aDate, boolean withSecond) {
+        if(aDate==null){
+            return null;
+        }
         Date currentDay = currentUtilDate();
         long today = currentDay.getTime() / 86400000L;
         long compareDay = aDate.getTime() / 86400000L;
@@ -596,11 +601,8 @@ public abstract class DatetimeOpt {
      *
      * @param strDate the date to convert (in format yyyy-mm-dd)
      * @return a date object
-     * @throws ParseException 异常
      */
-    public static Date convertStringToDate(String strDate)
-        throws ParseException {
-
+    public static Date convertStringToDate(String strDate){
         return convertStringToDate(strDate, getDatePattern());
     }
 

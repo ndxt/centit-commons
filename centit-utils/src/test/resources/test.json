@@ -1,5 +1,5 @@
 {
-  "object": {
+  object: {
     "properties": {
       "optid": {
         "type": "调度",
@@ -9,10 +9,11 @@
         "type": "string",
         "index": "osidIndex"
       },
-      "array" :[
+      array :[
         {
           "a": 2,
-          "b": 3
+          "b": 3,
+          "订单日期": "2022-12-31"
         },
         {
           "a": 4,

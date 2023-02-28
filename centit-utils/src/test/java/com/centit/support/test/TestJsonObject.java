@@ -14,6 +14,7 @@ import java.util.Map;
 public class TestJsonObject {
 
     public static void main(String arg[]) throws IOException {
+        JSONOpt.fastjsonGlobalConfig();
         InputStream in = TestJsonObject.class
             .getResourceAsStream("/test.json");
         Object object = JSON.parse(FileIOOpt.readStringFromInputStream(in));
