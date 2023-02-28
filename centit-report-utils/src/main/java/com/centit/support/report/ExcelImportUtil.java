@@ -7,6 +7,7 @@ import com.centit.support.common.LeftRightPair;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -846,6 +847,17 @@ public abstract class ExcelImportUtil {
         }
     }
 
+    private static boolean isMergedRegion(List<CellRangeAddress> cellRanges, int row , int column) {
+        if(cellRanges==null || cellRanges.size()==0){
+            return false;
+        }
+        for(CellRangeAddress range : cellRanges){
+            if(range.containsColumn(column) && range.containsRow(row)) {
+                return range.getFirstRow() != row || range.getFirstColumn() != column;
+            }
+        }
+        return false;
+    }
     /**
      * @param sheet     excel sheet对象类型
      * @param headerRow 属性名行 0 base
@@ -859,55 +871,57 @@ public abstract class ExcelImportUtil {
 
     private static List<Map<String, Object>> loadMapFromExcelSheet(Sheet sheet, int headerRow, int beginRow, int endRow,
                                                                    int beginColumn, int endColumn, boolean userUpMergeCell) {
-
-
         if (beginColumn < 0) {
             beginColumn = 0;
         }
+
+        Row headRow = sheet.getRow(headerRow);
+        int lastColumnIndex  = headRow.getLastCellNum();
+        if (endColumn <= 0) {
+            endColumn = lastColumnIndex;
+        }
+        boolean existNoHeader = false;
         List<String> header = new ArrayList<>(60);
-        int lastColumnIndex = 0;
-        if(userUpMergeCell){
-            for(int i=0; i<=headerRow; i++) {
-                Row headRow = sheet.getRow(i);
-                int rowColSum = headRow.getLastCellNum() + 1;
-                if(lastColumnIndex<rowColSum){
-                    lastColumnIndex = rowColSum;
-                }
-                for(int j=beginColumn; j<rowColSum; j++){
-                    Cell cell = headRow.getCell(j);
-                    if(cell == null || StringUtils.isBlank(cell.toString())){
-                        if(header.size() == j - beginColumn ){
-                            header.add("column" + j);
-                        }
-                    } else {
-                        String headerName = cell.toString();
-                        if(header.size() == j - beginColumn ){
-                            header.add(headerName);
+        for (int i = beginColumn; i <= endColumn; i++) {
+            Cell cell = headRow.getCell(i);
+            if(cell == null || StringUtils.isBlank(cell.toString())){
+                header.add("column" + i );
+                existNoHeader = true;
+            } else {
+                header.add(cell.toString());
+            }
+        }
+
+        List<CellRangeAddress> cellRanges = userUpMergeCell? sheet.getMergedRegions():null;
+
+        if(userUpMergeCell && existNoHeader){
+            for(int i=headerRow-1; i>=0;  i--) {
+                headRow = sheet.getRow(i);
+                existNoHeader = false;
+                for(int j=beginColumn; j<=endColumn; j++){
+                    if(StringUtils.equals("column" + j, header.get(j - beginColumn))) {
+                        Cell cell = headRow.getCell(j);
+                        if (cell == null || StringUtils.isBlank(cell.toString())) {
+                            existNoHeader = true;
                         } else {
+                            String headerName = cell.toString();
                             header.set(j - beginColumn, headerName);
                         }
                     }
                 }
+                if(!existNoHeader)
+                    break;
             }
-        } else {
-            Row headRow = sheet.getRow(headerRow);
-            lastColumnIndex  = headRow.getLastCellNum() + 1;
-            for (int i = beginColumn; i < lastColumnIndex; i++) {
-                Cell cell = headRow.getCell(i);
-                header.add(cell == null || StringUtils.isBlank(cell.toString()) ? "column" + i : cell.toString());
-            }
-        }
-
-        if (endColumn <= 0) {
-            endColumn = lastColumnIndex;
         }
 
         if (endRow <= 0) {
             endRow = sheet.getLastRowNum() + 1;
         }
+
         if (beginRow <= headerRow) {
             beginRow = headerRow + 1;
         }
+
         List<Map<String, Object>> datas = new ArrayList<>();
         // 遍历当前sheet中的所有行
         Map<String, Object> preRowData = null;
@@ -917,22 +931,24 @@ public abstract class ExcelImportUtil {
                 continue;
             }
             Map<String, Object> rowData = new LinkedHashMap<>();
+            boolean hasValue = false;
             // 遍历所有的列
             for (int column = beginColumn; column <= dataRow.getLastCellNum(); column++) {
                 Object cellValue = ExcelImportUtil.getCellValue(dataRow.getCell(column));
                 if (cellValue != null) {
                     String key = column <= endColumn ? header.get(column-beginColumn) : "column" + column;
+                    hasValue = true;
                     rowData.put(key, cellValue);
-                } else if(userUpMergeCell && preRowData!=null) {
-                    String key = column <= endColumn ? header.get(column-beginColumn) : "column" + column;
+                } else if(userUpMergeCell && preRowData!=null && isMergedRegion(cellRanges, row,  column )) {
+                    String key = column <= endColumn ? header.get(column - beginColumn) : "column" + column;
                     rowData.put(key, preRowData.get(key));
                 }
             }
             // while
-            if (!rowData.isEmpty()) {
+            if (hasValue) {
                 datas.add(rowData);
+                preRowData = rowData;
             }
-            preRowData = rowData;
         }
         return datas;
     }
@@ -1199,6 +1215,7 @@ public abstract class ExcelImportUtil {
             return null;
         int columns = fieldDesc.size();
         List<Map<String, Object>> datas = new ArrayList<>(endRow - beginRow + 1);
+        List<CellRangeAddress> cellRanges = userUpMergeCell? sheet.getMergedRegions():null;
         Map<String, Object> preRowObj = null;
         for (int row = beginRow; row < endRow; row++) {
             Row excelRow = sheet.getRow(row);
@@ -1209,11 +1226,13 @@ public abstract class ExcelImportUtil {
             boolean hasValue = false;
             //excelRow.getFirstCellNum()
             for (Map.Entry<Integer, String> ent : fieldDesc.entrySet()) {
-                Cell cell = excelRow.getCell(ent.getKey());
-                if (cell != null && StringUtils.isNotBlank(cell.toString())) {
+
+                Object cellValue = ExcelImportUtil.getCellValue(excelRow.getCell(ent.getKey()));
+                if (cellValue != null) {
                     hasValue = true;
-                    rowObj.put(ent.getValue(), getCellValue(cell));
-                } else if(userUpMergeCell && preRowObj!=null){
+                    rowObj.put(ent.getValue(), cellValue);
+                } else if(userUpMergeCell && preRowObj!=null && isMergedRegion(cellRanges, row, ent.getKey() )) {
+                    // 判断是否在合并单元格中
                     rowObj.put(ent.getValue(), preRowObj.get(ent.getValue()));
                 }
             }
