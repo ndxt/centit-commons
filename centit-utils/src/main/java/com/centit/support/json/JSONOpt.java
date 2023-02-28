@@ -3,8 +3,14 @@ package com.centit.support.json;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.util.JdbcSupport;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.json.config.LobSerializer;
+import com.centit.support.json.config.SqlDateDeserializer;
+import com.centit.support.json.config.SqlTimestampDeserializer;
+import com.centit.support.json.config.UtilDateDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +36,21 @@ public abstract class JSONOpt {
 
     private JSONOpt() {
         throw new IllegalAccessError("Utility class");
+    }
+
+    public static void fastjsonGlobalConfig(){
+        JSON.register(java.util.Date.class, UtilDateDeserializer.instance);
+        JSON.register(java.sql.Date.class, SqlDateDeserializer.instance);
+        JSON.register(java.sql.Timestamp.class, SqlTimestampDeserializer.instance);
+
+       /* JSON.register(java.util.Date.class, );
+        JSON.register(java.sql.Date.class, );*/
+
+        JSON.register(java.sql.Timestamp.class, JdbcSupport.createTimestampWriter(
+            java.sql.Timestamp.class, DatetimeOpt.timestampPattern));
+
+        JSON.register(java.sql.Blob.class, LobSerializer.instance);
+        JSON.register(java.sql.Clob.class, JdbcSupport.createClobWriter(java.sql.Clob.class));
     }
 
     /* 目前只支持一维数值

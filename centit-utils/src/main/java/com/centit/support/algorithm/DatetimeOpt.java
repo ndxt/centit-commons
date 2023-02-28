@@ -36,12 +36,12 @@ public abstract class DatetimeOpt {
     private static Logger log = LoggerFactory.getLogger(DatetimeOpt.class);
     private static String defaultDatePattern = "yyyy-MM-dd";
     private static String timePattern = "HH:mm";
-    private static String timeWithSecondPattern = "HH:mm:ss";
+    public final static String timeWithSecondPattern = "HH:mm:ss";
     //private static String datetimeWithoutYearPattern = "MM-dd HH:mm";
     //private static String datetimePattern = "yyyy-MM-dd HH:mm";
-    private static String datetimePattern = "yyyy-MM-dd HH:mm:ss";
-    private static String timestampPattern = "yyyy-MM-dd HH:mm:ss.SSS";
-    private static String gmtDatePattern = "d MMM yyyy HH:mm:ss 'GMT'";
+    public final static String datetimePattern = "yyyy-MM-dd HH:mm:ss";
+    public final static String timestampPattern = "yyyy-MM-dd HH:mm:ss.SSS";
+    public final static String gmtDatePattern = "d MMM yyyy HH:mm:ss 'GMT'";
     private DatetimeOpt() {
         throw new IllegalAccessError("Utility class");
     }
