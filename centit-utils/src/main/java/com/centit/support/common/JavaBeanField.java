@@ -118,7 +118,11 @@ public class JavaBeanField {
         }
         // 这个专门针对数据库中 保存的 枚举型数据类型
         if (this.fieldType.isEnum()) {
-            if(NumberBaseOpt.castObjectToInteger(newValue)!=null) {
+            String enumStr = StringBaseOpt.objectToString(newValue);
+            Object enumObj =  EnumBaseOpt.stringToEnum(this.fieldType, enumStr, true);
+            if(enumObj!=null){
+                this.innerSetObjectFieldValue(object, enumObj);
+            } else  if(NumberBaseOpt.castObjectToInteger(newValue)!=null) {
                 this.innerSetObjectFieldValue(object,
                     EnumBaseOpt.ordinalToEnum(this.fieldType,
                         NumberBaseOpt.castObjectToInteger(newValue)));
