@@ -1,2965 +1,2698 @@
-[
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.paramsConfigs.Param_1640865185828.code[5]",
-		"newData": "    $data.info.endtime = current.format('YYYY-MM-DD') + ' 17:30:00'"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.paramsConfigs.Param_1655716567113",
-		"newData": {
-			"code": "function watchType(type, oldType) {\n  $run('onChangeType', type)\n}",
-			"immediate": true,
-			"name": "type",
-			"id": "Param_1655716567113"
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[0].$group",
-		"newData": "FormItem_1639030306559"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[1].options[1]",
-		"newData": {
-			"label": "出差",
-			"value": "C"
-		}
-	},
-	{
+{
+	"diffType": "*",
+	"formTemplate": {
 		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[1].label",
-		"newData": "申请类别",
-		"oldData": "类别"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[1]",
-		"oldData": "  // 在下面开始编写改变事件"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[1]",
-		"newData": "  $run('onChangeType', $data.bigtype)"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[2]",
-		"oldData": "  const { value } = e.target"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[3]",
-		"oldData": "  if (value === 'Q') {"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[4]",
-		"oldData": "    $data.leavetype = 'S'"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[5]",
-		"oldData": "  } else if (value === 'W') {"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[6]",
-		"oldData": "    $data.leavetype = 'SN'"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[7]",
-		"oldData": "    $data.isdanger = 'L'"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[8]",
-		"oldData": "  } else {"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[9]",
-		"oldData": "    $data.leavetype = 'BD'"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[10]",
-		"oldData": "  }"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[11]",
-		"oldData": "  $run('clearValidate')"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[1].$group",
-		"newData": "FormItem_1639030306559"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[1].required",
-		"newData": false
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[2].rulesConfig[2]",
-		"newData": {
-			"isUse": true,
-			"name": "1",
-			"id": "Rule_1665733458044",
-			"message": ""
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[2].options[6]",
-		"oldData": {
-			"label": "护产假",
-			"value": "P"
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[2].options[10]",
-		"newData": {
-			"label": "育儿假",
-			"value": "YE"
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[2].defaultRules",
-		"newData": {
-			"min": {
-				"use": false,
-				"message": "该选项值/长度不能小于{{$1}}",
-				"value": [
-					16
-				]
+		"paramsConfigs": {
+			"diffType": "*",
+			"Param_1640865185828.code[5]": {
+				"diffType": "+",
+				"newData": "多行字符串对比没有差异，应该是行的顺序不一致！"
 			},
-			"max": {
-				"use": false,
-				"message": "该选项值/长度不能大于{{$1}}",
-				"value": [
-					16
-				]
-			},
-			"phone": {
-				"use": false,
-				"message": "该选项不是一个合法的电话号码"
-			},
-			"ip": {
-				"use": false,
-				"message": "该选项不是一个合法的IP地址"
-			},
-			"length": {
-				"use": false,
-				"message": "该选项值/长度必须等于{{$1}}",
-				"value": [
-					16
-				]
-			},
-			"mobile": {
-				"use": false,
-				"message": "该选项不是一个合法的手机号"
-			},
-			"id": {
-				"use": false,
-				"message": "该选项不是一个合法的身份证号码"
-			},
-			"required": {
-				"use": false,
-				"message": "该选项必填"
-			},
-			"email": {
-				"use": false,
-				"message": "该选项不是一个合法的邮箱地址"
-			},
-			"url": {
-				"use": false,
-				"message": "该选项不是一个合法的网址"
-			}
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[2].isButton",
-		"newData": false
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[3].set$$ifCode[2]",
-		"oldData": "  return $data.bigtype === 'W'"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[3].set$$ifCode[2]",
-		"newData": "  return false // $data.bigtype === 'W'"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[3].options[0]",
-		"oldData": {
-			"label": "出差",
-			"value": "CC"
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[3].options[1]",
-		"oldData": {
-			"label": "长期驻外",
-			"value": "CQ"
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[3].defaultRules",
-		"newData": {
-			"min": {
-				"use": false,
-				"message": "该选项值/长度不能小于{{$1}}",
-				"value": [
-					16
-				]
-			},
-			"max": {
-				"use": false,
-				"message": "该选项值/长度不能大于{{$1}}",
-				"value": [
-					16
-				]
-			},
-			"phone": {
-				"use": false,
-				"message": "该选项不是一个合法的电话号码"
-			},
-			"ip": {
-				"use": false,
-				"message": "该选项不是一个合法的IP地址"
-			},
-			"length": {
-				"use": false,
-				"message": "该选项值/长度必须等于{{$1}}",
-				"value": [
-					16
-				]
-			},
-			"mobile": {
-				"use": false,
-				"message": "该选项不是一个合法的手机号"
-			},
-			"id": {
-				"use": false,
-				"message": "该选项不是一个合法的身份证号码"
-			},
-			"required": {
-				"use": false,
-				"message": "该选项必填"
-			},
-			"email": {
-				"use": false,
-				"message": "该选项不是一个合法的邮箱地址"
-			},
-			"url": {
-				"use": false,
-				"message": "该选项不是一个合法的网址"
-			}
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[3].isButton",
-		"newData": false
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[4].set$$ifCode[2]",
-		"oldData": "  const { bigtype: t, leavetype: lt } = $data"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[4].set$$ifCode[2]",
-		"newData": "  return $data.bigtype === 'C'"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[4].set$$ifCode[3]",
-		"oldData": "  return t === 'W' &&  (lt === 'CC' || lt === 'CQ')"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[4].children",
-		"oldData": [
-			{
-				"notShowItem": false,
-				"readonly": false,
-				"useStyleText": true,
-				"styleText": "flex: auto;\nmargin-right: 12px;",
-				"$parent": {
-					"name": "FormItem",
-					"label": "表单项",
-					"id": "FormItem_1638870666701"
-				},
-				"rulesConfig": [
-					{
-						"isUse": false,
-						"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n  \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n    message: '外出地不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
-						"name": "必填",
-						"id": "Rule_1638953703682",
-						"message": ""
-					}
-				],
-				"disabled": false,
-				"$key": "leavecity",
-				"$item": {
-					"name": "InputText",
-					"label": "输入框",
-					"id": "InputText_1638870671385"
-				},
-				"label": "",
-				"allowClear": false,
-				"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
-			},
-			{
-				"set$$ifCode": "function set$$if() {\n  // 在下面返回$$if的值\n  return false\n}",
-				"notShowItem": false,
-				"useStyleText": true,
-				"styleText": "flex: auto;",
-				"$parent": {
-					"name": "FormItem",
-					"label": "表单项",
-					"id": "FormItem_1638870666701"
-				},
-				"use$$ifCode": false,
-				"$key": "isdanger",
-				"label": "",
-				"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}",
-				"size": "default",
-				"rulesConfig": [],
-				"options": [
-					{
-						"label": "低风险",
-						"value": "L"
-					},
-					{
-						"label": "中风险",
-						"value": "M"
-					},
-					{
-						"label": "高风险",
-						"value": "H"
-					}
-				],
-				"$item": {
-					"name": "RadioGroup",
-					"label": "单选框",
-					"id": "RadioGroup_1638870674737"
+			"Param_1655716567113": {
+				"diffType": "+",
+				"newData": {
+					"code": "function watchType(type, oldType) {\n  $run('onChangeType', type)\n}",
+					"immediate": true,
+					"name": "type",
+					"id": "Param_1655716567113"
 				}
 			}
-		]
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[4].rulesConfig[0]",
-		"oldData": {
-			"isUse": true,
-			"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n    required: true,\n    message: '外出地不能为空',\n  }\n}",
-			"name": "必填",
-			"id": "Rule_1638948205462",
-			"message": ""
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[4].rulesConfig[0]",
-		"newData": {
-			"isUse": true,
-			"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '请假类型不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
-			"name": "必填",
-			"id": "Rule_1638955882462",
-			"message": ""
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[4].name",
-		"oldData": "leavecity"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[4].rules",
-		"oldData": []
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[4].$item.name",
-		"newData": "RadioGroup",
-		"oldData": "FormItem"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[4].$item.label",
-		"newData": "单选框",
-		"oldData": "表单项"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[4].$item.id",
-		"newData": "RadioGroup_1655717316745_0.55183565568345",
-		"oldData": "FormItem_1638870666701"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[4].label",
-		"newData": "外出类型",
-		"oldData": "外出地"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[4].required",
-		"oldData": false
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[4].notShowItem",
-		"newData": false
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[4].$name",
-		"newData": "单选框"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[4].useChangeCode",
-		"newData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[4].$key",
-		"newData": "leavetype"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[4].isButton",
-		"newData": false
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[4].size",
-		"newData": "default"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[4].options",
-		"newData": [
-			{
-				"label": "出差",
-				"value": "CC"
-			},
-			{
-				"label": "长期驻外",
-				"value": "CQ"
-			}
-		]
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[4].onChangeCode",
-		"newData": "function onChange(e) {\n  // 在下面开始编写改变事件\n  $run('clearValidate')\n}"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[5].setShowTimeCode",
-		"oldData": "function setShowTime() {\n  // 在下面返回ShowTime的值\n  return {\n  \tminuteStep: 15,\n    format: 'HH:mm',\n  }\n}"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[5].useChangeCode",
-		"oldData": true
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[5].showTime",
-		"oldData": ""
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[5].format",
-		"oldData": "YYYY-MM-DD HH:mm"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[5].$key",
-		"oldData": "begintime"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[5].label",
-		"newData": "外出地点",
-		"oldData": "开始时间"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[5].hasFeedback",
-		"oldData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[5].rulesConfig[0]",
-		"newData": {
-			"isUse": true,
-			"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n    required: true,\n    message: '外出地不能为空',\n  }\n}",
-			"name": "必填",
-			"id": "Rule_1638948205462",
-			"message": ""
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[5].rulesConfig[0]",
-		"oldData": {
-			"isUse": true,
-			"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '开始时间不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
-			"name": "必填",
-			"id": "Rule_1638956319138",
-			"message": ""
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[5].disabled",
-		"oldData": false
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[5].useShowTimeCode",
-		"oldData": true
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[5].$item.name",
-		"newData": "FormItem",
-		"oldData": "DatePicker"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[5].$item.label",
-		"newData": "表单项",
-		"oldData": "日期选择"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[5].$item.id",
-		"newData": "FormItem_1638870666701",
-		"oldData": "DatePicker_1638863102942"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[5].onChangeCode",
-		"oldData": "function onChange(date, dateString) {\n  // 在下面开始编写改变事件\n  $run('diffTime')\n}"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[5].set$$ifCode",
-		"newData": "function set$$if() {\n  // 在下面返回$$if的值\n  const { bigtype: t, leavetype: lt } = $data\n  return t === 'W' || t === 'C'\n  //&&  (lt === 'CC' || lt === 'CQ')\n}"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[5].children",
-		"newData": [
-			{
-				"notShowItem": false,
-				"useStyleText": true,
-				"styleText": "flex: auto;",
-				"$parent": {
-					"name": "FormItem",
-					"label": "表单项",
-					"id": "FormItem_1638870666701"
+		},
+		"children": {
+			"diffType": "*",
+			"[0].children": {
+				"diffType": "*",
+				"[0].$group": {
+					"diffType": "+",
+					"newData": "FormItem_1639030306559"
 				},
-				"$key": "leavecity",
-				"label": "",
-				"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}",
-				"password": false,
-				"readonly": false,
-				"rulesConfig": [
-					{
-						"isUse": false,
-						"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n  \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n    message: '外出地不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
-						"name": "必填",
-						"id": "Rule_1638953703682",
-						"message": ""
-					}
-				],
-				"disabled": false,
-				"$item": {
-					"name": "InputText",
-					"label": "输入框",
-					"id": "InputText_1638870671385"
-				},
-				"allowClear": false
-			},
-			{
-				"set$$ifCode": "function set$$if() {\n  // 在下面返回$$if的值\n   const { bigtype: t, leavetype: lt } = $data\n  return (t === 'W' || t === 'C') &&  (lt === 'CC' || lt === 'CQ')\n}",
-				"notShowItem": false,
-				"useStyleText": true,
-				"styleText": "flex: 0 0 268px;\n\nmargin-left: 12px;",
-				"$parent": {
-					"name": "FormItem",
-					"label": "表单项",
-					"id": "FormItem_1638870666701"
-				},
-				"use$$ifCode": true,
-				"$key": "isdanger",
-				"label": "",
-				"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}",
-				"size": "default",
-				"rulesConfig": [],
-				"options": [
-					{
-						"label": "低风险",
-						"value": "L"
+				"[1]": {
+					"diffType": "*",
+					"options[1]": {
+						"diffType": "+",
+						"newData": {
+							"label": "出差",
+							"value": "C"
+						}
 					},
-					{
-						"label": "中风险",
-						"value": "M"
+					"label": {
+						"diffType": "*",
+						"newData": "申请类别",
+						"oldData": "类别"
 					},
-					{
-						"label": "高风险",
-						"value": "H"
+					"onChangeCode": {
+						"diffType": "*",
+						"[1]": {
+							"diffType": "+",
+							"newData": "  $run('onChangeType', $data.bigtype)"
+						},
+						"[2]": {
+							"diffType": "-",
+							"oldData": "  const { value } = e.target"
+						},
+						"[3]": {
+							"diffType": "-",
+							"oldData": "  if (value === 'Q') {"
+						},
+						"[4]": {
+							"diffType": "-",
+							"oldData": "    $data.leavetype = 'S'"
+						},
+						"[5]": {
+							"diffType": "-",
+							"oldData": "  } else if (value === 'W') {"
+						},
+						"[6]": {
+							"diffType": "-",
+							"oldData": "    $data.leavetype = 'SN'"
+						},
+						"[7]": {
+							"diffType": "-",
+							"oldData": "    $data.isdanger = 'L'"
+						},
+						"[8]": {
+							"diffType": "-",
+							"oldData": "  } else {"
+						},
+						"[9]": {
+							"diffType": "-",
+							"oldData": "    $data.leavetype = 'BD'"
+						},
+						"[10]": {
+							"diffType": "-",
+							"oldData": "  }"
+						},
+						"[11]": {
+							"diffType": "-",
+							"oldData": "  $run('clearValidate')"
+						}
+					},
+					"$group": {
+						"diffType": "+",
+						"newData": "FormItem_1639030306559"
+					},
+					"required": {
+						"diffType": "+",
+						"newData": false
 					}
-				],
-				"$item": {
-					"name": "RadioGroup",
-					"label": "单选框",
-					"id": "RadioGroup_1638870674737"
+				},
+				"[2]": {
+					"diffType": "*",
+					"rulesConfig[2]": {
+						"diffType": "+",
+						"newData": {
+							"isUse": true,
+							"name": "1",
+							"id": "Rule_1665733458044",
+							"message": ""
+						}
+					},
+					"options": {
+						"diffType": "*",
+						"[6]": {
+							"diffType": "-",
+							"oldData": {
+								"label": "护产假",
+								"value": "P"
+							}
+						},
+						"[10]": {
+							"diffType": "+",
+							"newData": {
+								"label": "育儿假",
+								"value": "YE"
+							}
+						}
+					},
+					"defaultRules": {
+						"diffType": "+",
+						"newData": {
+							"min": {
+								"use": false,
+								"message": "该选项值/长度不能小于{{$1}}",
+								"value": [
+									16
+								]
+							},
+							"max": {
+								"use": false,
+								"message": "该选项值/长度不能大于{{$1}}",
+								"value": [
+									16
+								]
+							},
+							"phone": {
+								"use": false,
+								"message": "该选项不是一个合法的电话号码"
+							},
+							"ip": {
+								"use": false,
+								"message": "该选项不是一个合法的IP地址"
+							},
+							"length": {
+								"use": false,
+								"message": "该选项值/长度必须等于{{$1}}",
+								"value": [
+									16
+								]
+							},
+							"mobile": {
+								"use": false,
+								"message": "该选项不是一个合法的手机号"
+							},
+							"id": {
+								"use": false,
+								"message": "该选项不是一个合法的身份证号码"
+							},
+							"required": {
+								"use": false,
+								"message": "该选项必填"
+							},
+							"email": {
+								"use": false,
+								"message": "该选项不是一个合法的邮箱地址"
+							},
+							"url": {
+								"use": false,
+								"message": "该选项不是一个合法的网址"
+							}
+						}
+					},
+					"isButton": {
+						"diffType": "+",
+						"newData": false
+					}
+				},
+				"[3]": {
+					"diffType": "*",
+					"set$$ifCode": {
+						"diffType": "*",
+						"[2]": {
+							"diffType": "+",
+							"newData": "  return false // $data.bigtype === 'W'"
+						}
+					},
+					"options": {
+						"diffType": "*",
+						"[0]": {
+							"diffType": "-",
+							"oldData": {
+								"label": "出差",
+								"value": "CC"
+							}
+						},
+						"[1]": {
+							"diffType": "-",
+							"oldData": {
+								"label": "长期驻外",
+								"value": "CQ"
+							}
+						}
+					},
+					"defaultRules": {
+						"diffType": "+",
+						"newData": {
+							"min": {
+								"use": false,
+								"message": "该选项值/长度不能小于{{$1}}",
+								"value": [
+									16
+								]
+							},
+							"max": {
+								"use": false,
+								"message": "该选项值/长度不能大于{{$1}}",
+								"value": [
+									16
+								]
+							},
+							"phone": {
+								"use": false,
+								"message": "该选项不是一个合法的电话号码"
+							},
+							"ip": {
+								"use": false,
+								"message": "该选项不是一个合法的IP地址"
+							},
+							"length": {
+								"use": false,
+								"message": "该选项值/长度必须等于{{$1}}",
+								"value": [
+									16
+								]
+							},
+							"mobile": {
+								"use": false,
+								"message": "该选项不是一个合法的手机号"
+							},
+							"id": {
+								"use": false,
+								"message": "该选项不是一个合法的身份证号码"
+							},
+							"required": {
+								"use": false,
+								"message": "该选项必填"
+							},
+							"email": {
+								"use": false,
+								"message": "该选项不是一个合法的邮箱地址"
+							},
+							"url": {
+								"use": false,
+								"message": "该选项不是一个合法的网址"
+							}
+						}
+					},
+					"isButton": {
+						"diffType": "+",
+						"newData": false
+					}
+				},
+				"[4]": {
+					"diffType": "*",
+					"set$$ifCode": {
+						"diffType": "*",
+						"[2]": {
+							"diffType": "+",
+							"newData": "  return $data.bigtype === 'C'"
+						},
+						"[3]": {
+							"diffType": "-",
+							"oldData": "  return t === 'W' &&  (lt === 'CC' || lt === 'CQ')"
+						}
+					},
+					"children": {
+						"diffType": "-",
+						"oldData": [
+							{
+								"notShowItem": false,
+								"readonly": false,
+								"useStyleText": true,
+								"styleText": "flex: auto;\nmargin-right: 12px;",
+								"$parent": {
+									"name": "FormItem",
+									"label": "表单项",
+									"id": "FormItem_1638870666701"
+								},
+								"rulesConfig": [
+									{
+										"isUse": false,
+										"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n  \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n    message: '外出地不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+										"name": "必填",
+										"id": "Rule_1638953703682",
+										"message": ""
+									}
+								],
+								"disabled": false,
+								"$key": "leavecity",
+								"$item": {
+									"name": "InputText",
+									"label": "输入框",
+									"id": "InputText_1638870671385"
+								},
+								"label": "",
+								"allowClear": false,
+								"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
+							},
+							{
+								"set$$ifCode": "function set$$if() {\n  // 在下面返回$$if的值\n  return false\n}",
+								"notShowItem": false,
+								"useStyleText": true,
+								"styleText": "flex: auto;",
+								"$parent": {
+									"name": "FormItem",
+									"label": "表单项",
+									"id": "FormItem_1638870666701"
+								},
+								"use$$ifCode": false,
+								"$key": "isdanger",
+								"label": "",
+								"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}",
+								"size": "default",
+								"rulesConfig": [],
+								"options": [
+									{
+										"label": "低风险",
+										"value": "L"
+									},
+									{
+										"label": "中风险",
+										"value": "M"
+									},
+									{
+										"label": "高风险",
+										"value": "H"
+									}
+								],
+								"$item": {
+									"name": "RadioGroup",
+									"label": "单选框",
+									"id": "RadioGroup_1638870674737"
+								}
+							}
+						]
+					},
+					"rulesConfig": {
+						"diffType": "*",
+						"[0]": {
+							"diffType": "+",
+							"newData": {
+								"isUse": true,
+								"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '请假类型不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+								"name": "必填",
+								"id": "Rule_1638955882462",
+								"message": ""
+							}
+						}
+					},
+					"name": {
+						"diffType": "-",
+						"oldData": "leavecity"
+					},
+					"rules": {
+						"diffType": "-",
+						"oldData": []
+					},
+					"$item": {
+						"diffType": "*",
+						"name": {
+							"diffType": "*",
+							"newData": "RadioGroup",
+							"oldData": "FormItem"
+						},
+						"label": {
+							"diffType": "*",
+							"newData": "单选框",
+							"oldData": "表单项"
+						},
+						"id": {
+							"diffType": "*",
+							"newData": "RadioGroup_1655717316745_0.55183565568345",
+							"oldData": "FormItem_1638870666701"
+						}
+					},
+					"label": {
+						"diffType": "*",
+						"newData": "外出类型",
+						"oldData": "外出地"
+					},
+					"required": {
+						"diffType": "-",
+						"oldData": false
+					},
+					"notShowItem": {
+						"diffType": "+",
+						"newData": false
+					},
+					"$name": {
+						"diffType": "+",
+						"newData": "单选框"
+					},
+					"useChangeCode": {
+						"diffType": "+",
+						"newData": true
+					},
+					"$key": {
+						"diffType": "+",
+						"newData": "leavetype"
+					},
+					"isButton": {
+						"diffType": "+",
+						"newData": false
+					},
+					"size": {
+						"diffType": "+",
+						"newData": "default"
+					},
+					"options": {
+						"diffType": "+",
+						"newData": [
+							{
+								"label": "出差",
+								"value": "CC"
+							},
+							{
+								"label": "长期驻外",
+								"value": "CQ"
+							}
+						]
+					},
+					"onChangeCode": {
+						"diffType": "+",
+						"newData": "function onChange(e) {\n  // 在下面开始编写改变事件\n  $run('clearValidate')\n}"
+					}
+				},
+				"[5]": {
+					"diffType": "*",
+					"setShowTimeCode": {
+						"diffType": "-",
+						"oldData": "function setShowTime() {\n  // 在下面返回ShowTime的值\n  return {\n  \tminuteStep: 15,\n    format: 'HH:mm',\n  }\n}"
+					},
+					"useChangeCode": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"showTime": {
+						"diffType": "-",
+						"oldData": ""
+					},
+					"format": {
+						"diffType": "-",
+						"oldData": "YYYY-MM-DD HH:mm"
+					},
+					"$key": {
+						"diffType": "-",
+						"oldData": "begintime"
+					},
+					"label": {
+						"diffType": "*",
+						"newData": "外出地点",
+						"oldData": "开始时间"
+					},
+					"hasFeedback": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"rulesConfig": {
+						"diffType": "*",
+						"[0]": {
+							"diffType": "-",
+							"oldData": {
+								"isUse": true,
+								"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '开始时间不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+								"name": "必填",
+								"id": "Rule_1638956319138",
+								"message": ""
+							}
+						}
+					},
+					"disabled": {
+						"diffType": "-",
+						"oldData": false
+					},
+					"useShowTimeCode": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"$item": {
+						"diffType": "*",
+						"name": {
+							"diffType": "*",
+							"newData": "FormItem",
+							"oldData": "DatePicker"
+						},
+						"label": {
+							"diffType": "*",
+							"newData": "表单项",
+							"oldData": "日期选择"
+						},
+						"id": {
+							"diffType": "*",
+							"newData": "FormItem_1638870666701",
+							"oldData": "DatePicker_1638863102942"
+						}
+					},
+					"onChangeCode": {
+						"diffType": "-",
+						"oldData": "function onChange(date, dateString) {\n  // 在下面开始编写改变事件\n  $run('diffTime')\n}"
+					},
+					"set$$ifCode": {
+						"diffType": "+",
+						"newData": "function set$$if() {\n  // 在下面返回$$if的值\n  const { bigtype: t, leavetype: lt } = $data\n  return t === 'W' || t === 'C'\n  //&&  (lt === 'CC' || lt === 'CQ')\n}"
+					},
+					"children": {
+						"diffType": "+",
+						"newData": [
+							{
+								"notShowItem": false,
+								"useStyleText": true,
+								"styleText": "flex: auto;",
+								"$parent": {
+									"name": "FormItem",
+									"label": "表单项",
+									"id": "FormItem_1638870666701"
+								},
+								"$key": "leavecity",
+								"label": "",
+								"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}",
+								"password": false,
+								"readonly": false,
+								"rulesConfig": [
+									{
+										"isUse": false,
+										"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n  \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n    message: '外出地不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+										"name": "必填",
+										"id": "Rule_1638953703682",
+										"message": ""
+									}
+								],
+								"disabled": false,
+								"$item": {
+									"name": "InputText",
+									"label": "输入框",
+									"id": "InputText_1638870671385"
+								},
+								"allowClear": false
+							},
+							{
+								"set$$ifCode": "function set$$if() {\n  // 在下面返回$$if的值\n   const { bigtype: t, leavetype: lt } = $data\n  return (t === 'W' || t === 'C') &&  (lt === 'CC' || lt === 'CQ')\n}",
+								"notShowItem": false,
+								"useStyleText": true,
+								"styleText": "flex: 0 0 268px;\n\nmargin-left: 12px;",
+								"$parent": {
+									"name": "FormItem",
+									"label": "表单项",
+									"id": "FormItem_1638870666701"
+								},
+								"use$$ifCode": true,
+								"$key": "isdanger",
+								"label": "",
+								"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}",
+								"size": "default",
+								"rulesConfig": [],
+								"options": [
+									{
+										"label": "低风险",
+										"value": "L"
+									},
+									{
+										"label": "中风险",
+										"value": "M"
+									},
+									{
+										"label": "高风险",
+										"value": "H"
+									}
+								],
+								"$item": {
+									"name": "RadioGroup",
+									"label": "单选框",
+									"id": "RadioGroup_1638870674737"
+								}
+							}
+						]
+					},
+					"name": {
+						"diffType": "+",
+						"newData": "leavecity"
+					},
+					"use$$ifCode": {
+						"diffType": "+",
+						"newData": true
+					},
+					"rules": {
+						"diffType": "+",
+						"newData": []
+					},
+					"required": {
+						"diffType": "+",
+						"newData": false
+					}
+				},
+				"[6]": {
+					"diffType": "*",
+					"$key": {
+						"diffType": "*",
+						"newData": "begintime",
+						"oldData": "endtime"
+					},
+					"label": {
+						"diffType": "*",
+						"newData": "开始时间",
+						"oldData": "结束时间"
+					},
+					"hasFeedback": {
+						"diffType": "*",
+						"newData": false,
+						"oldData": true
+					},
+					"rulesConfig": {
+						"diffType": "*",
+						"[0]": {
+							"diffType": "+",
+							"newData": {
+								"isUse": true,
+								"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '开始时间不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+								"name": "必填",
+								"id": "Rule_1638956319138",
+								"message": ""
+							}
+						}
+					},
+					"$item.id": {
+						"diffType": "*",
+						"newData": "DatePicker_1638863102942",
+						"oldData": "DatePicker_1638863112502"
+					},
+					"$group": {
+						"diffType": "+",
+						"newData": "DatePicker_1638863102942"
+					}
+				},
+				"[7]": {
+					"diffType": "*",
+					"children": {
+						"diffType": "-",
+						"oldData": [
+							{
+								"min": 0,
+								"useStyleText": true,
+								"styleText": "flex: auto;\nmargin-right: 20px;",
+								"$parent": {
+									"name": "FormItem",
+									"label": "表单项",
+									"id": "FormItem_1638863130692"
+								},
+								"precision": 1,
+								"rulesConfig": [
+									{
+										"isUse": false,
+										"name": "必填",
+										"id": "Rule_1638956579529",
+										"message": ""
+									}
+								],
+								"step": 1,
+								"$key": "leavedays",
+								"$item": {
+									"name": "InputNumber",
+									"label": "数字框",
+									"id": "InputNumber_1638863146958"
+								},
+								"label": "",
+								"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
+							},
+							{
+								"notShowItem": false,
+								"size": "default",
+								"useStyleText": true,
+								"styleText": "width: 200px;",
+								"$parent": {
+									"name": "FormItem",
+									"label": "表单项",
+									"id": "FormItem_1638863130692"
+								},
+								"rulesConfig": [],
+								"options": [
+									{
+										"label": "小时",
+										"value": "H"
+									},
+									{
+										"label": "天",
+										"value": "D"
+									}
+								],
+								"$key": "timetype",
+								"$item": {
+									"name": "RadioGroup",
+									"label": "单选框",
+									"id": "RadioGroup_1638863153831"
+								},
+								"label": "",
+								"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
+							}
+						]
+					},
+					"hasFeedback": {
+						"diffType": "*",
+						"newData": false,
+						"oldData": true
+					},
+					"rulesConfig": {
+						"diffType": "*",
+						"[0]": {
+							"diffType": "-",
+							"oldData": {
+								"isUse": true,
+								"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n\trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \t message: '时长不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+								"name": "必填",
+								"id": "Rule_1638957080371",
+								"message": ""
+							}
+						}
+					},
+					"name": {
+						"diffType": "-",
+						"oldData": "leavedays"
+					},
+					"$item": {
+						"diffType": "*",
+						"name": {
+							"diffType": "*",
+							"newData": "DatePicker",
+							"oldData": "FormItem"
+						},
+						"label": {
+							"diffType": "*",
+							"newData": "日期选择",
+							"oldData": "表单项"
+						},
+						"id": {
+							"diffType": "*",
+							"newData": "DatePicker_1638863112502",
+							"oldData": "FormItem_1638863130692"
+						}
+					},
+					"label": {
+						"diffType": "*",
+						"newData": "预计结束时间",
+						"oldData": "时长"
+					},
+					"setShowTimeCode": {
+						"diffType": "+",
+						"newData": "function setShowTime() {\n  // 在下面返回ShowTime的值\n  return {\n  \tminuteStep: 15,\n    format: 'HH:mm',\n  }\n}"
+					},
+					"set$$ifCode": {
+						"diffType": "+",
+						"newData": "function set$$if() {\n  // 在下面返回$$if的值\n   const { bigtype } = $data\n  return bigtype != 'B'\n}"
+					},
+					"useChangeCode": {
+						"diffType": "+",
+						"newData": true
+					},
+					"showTime": {
+						"diffType": "+",
+						"newData": ""
+					},
+					"format": {
+						"diffType": "+",
+						"newData": "YYYY-MM-DD HH:mm"
+					},
+					"use$$ifCode": {
+						"diffType": "+",
+						"newData": true
+					},
+					"$key": {
+						"diffType": "+",
+						"newData": "endtime"
+					},
+					"defaultRules": {
+						"diffType": "+",
+						"newData": {
+							"min": {
+								"use": false,
+								"message": "该选项值/长度不能小于{{$1}}",
+								"value": [
+									16
+								]
+							},
+							"max": {
+								"use": false,
+								"message": "该选项值/长度不能大于{{$1}}",
+								"value": [
+									16
+								]
+							},
+							"phone": {
+								"use": false,
+								"message": "该选项不是一个合法的电话号码"
+							},
+							"ip": {
+								"use": false,
+								"message": "该选项不是一个合法的IP地址"
+							},
+							"length": {
+								"use": false,
+								"message": "该选项值/长度必须等于{{$1}}",
+								"value": [
+									16
+								]
+							},
+							"mobile": {
+								"use": false,
+								"message": "该选项不是一个合法的手机号"
+							},
+							"id": {
+								"use": false,
+								"message": "该选项不是一个合法的身份证号码"
+							},
+							"required": {
+								"use": false,
+								"message": "该选项必填"
+							},
+							"email": {
+								"use": false,
+								"message": "该选项不是一个合法的邮箱地址"
+							},
+							"url": {
+								"use": false,
+								"message": "该选项不是一个合法的网址"
+							}
+						}
+					},
+					"$group": {
+						"diffType": "+",
+						"newData": "DatePicker_1638863102942"
+					},
+					"disabled": {
+						"diffType": "+",
+						"newData": false
+					},
+					"useShowTimeCode": {
+						"diffType": "+",
+						"newData": true
+					},
+					"onChangeCode": {
+						"diffType": "+",
+						"newData": "function onChange(date, dateString) {\n  // 在下面开始编写改变事件\n  $run('diffTime')\n}"
+					}
+				},
+				"[8]": {
+					"diffType": "*",
+					"autoSize": {
+						"diffType": "-",
+						"oldData": ""
+					},
+					"showCount": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"rulesConfig": {
+						"diffType": "+",
+						"newData": [
+							{
+								"isUse": true,
+								"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n\trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \t message: '时长不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+								"name": "必填",
+								"id": "Rule_1638957080371",
+								"message": ""
+							}
+						]
+					},
+					"useAutoSizeCode": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"$key": {
+						"diffType": "-",
+						"oldData": "leavereason"
+					},
+					"$item": {
+						"diffType": "*",
+						"name": {
+							"diffType": "*",
+							"newData": "FormItem",
+							"oldData": "Textarea"
+						},
+						"label": {
+							"diffType": "*",
+							"newData": "表单项",
+							"oldData": "文本域"
+						},
+						"id": {
+							"diffType": "*",
+							"newData": "FormItem_1638863130692",
+							"oldData": "Textarea_1638863237510"
+						}
+					},
+					"label": {
+						"diffType": "*",
+						"newData": "时长",
+						"oldData": "事由"
+					},
+					"setAutoSizeCode": {
+						"diffType": "-",
+						"oldData": "function setAutoSize() {\n  // 在下面返回AutoSize的值\n  return true\n}"
+					},
+					"set$$ifCode": {
+						"diffType": "+",
+						"newData": "function set$$if() {\n  // 在下面返回$$if的值\n   const { bigtype } = $data\n  return bigtype != 'B'\n}"
+					},
+					"children": {
+						"diffType": "+",
+						"newData": [
+							{
+								"notShowItem": false,
+								"min": 1,
+								"useStyleText": true,
+								"styleText": "flex: auto;\nmargin-right: 20px;",
+								"$parent": {
+									"name": "FormItem",
+									"label": "表单项",
+									"id": "FormItem_1638863130692"
+								},
+								"precision": 1,
+								"rulesConfig": [
+									{
+										"isUse": false,
+										"name": "必填",
+										"id": "Rule_1638956579529",
+										"message": ""
+									}
+								],
+								"step": 1,
+								"$key": "leavedays",
+								"$item": {
+									"name": "InputNumber",
+									"label": "数字框",
+									"id": "InputNumber_1638863146958"
+								},
+								"label": "",
+								"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
+							},
+							{
+								"notShowItem": false,
+								"size": "default",
+								"useStyleText": true,
+								"styleText": "width: 200px;",
+								"$parent": {
+									"name": "FormItem",
+									"label": "表单项",
+									"id": "FormItem_1638863130692"
+								},
+								"rulesConfig": [],
+								"options": [
+									{
+										"label": "小时",
+										"value": "H"
+									},
+									{
+										"label": "天",
+										"value": "D"
+									}
+								],
+								"$key": "timetype",
+								"$item": {
+									"name": "RadioGroup",
+									"label": "单选框",
+									"id": "RadioGroup_1638863153831"
+								},
+								"label": "",
+								"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
+							}
+						]
+					},
+					"hasFeedback": {
+						"diffType": "+",
+						"newData": true
+					},
+					"name": {
+						"diffType": "+",
+						"newData": "leavedays"
+					},
+					"use$$ifCode": {
+						"diffType": "+",
+						"newData": true
+					}
+				},
+				"[9]": {
+					"diffType": "*",
+					"notShowItem": {
+						"diffType": "-",
+						"oldData": false
+					},
+					"options": {
+						"diffType": "-",
+						"oldData": []
+					},
+					"setOptionsCode": {
+						"diffType": "-",
+						"oldData": "function setOptions() {\n  // 在下面返回Options的值\n  return $$data.userInfo;\n}"
+					},
+					"showArrow": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"$key": {
+						"diffType": "*",
+						"newData": "leavereason",
+						"oldData": "checkuser"
+					},
+					"$item": {
+						"diffType": "*",
+						"name": {
+							"diffType": "*",
+							"newData": "Textarea",
+							"oldData": "Select"
+						},
+						"label": {
+							"diffType": "*",
+							"newData": "文本域",
+							"oldData": "下拉框"
+						},
+						"id": {
+							"diffType": "*",
+							"newData": "Textarea_1660037241705_0.730499103386403",
+							"oldData": "Select_1645854624005_0.8925002477941295"
+						}
+					},
+					"label": {
+						"diffType": "*",
+						"newData": "事由",
+						"oldData": "预审人"
+					},
+					"bordered": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"useOptionsCode": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"$name": {
+						"diffType": "+",
+						"newData": "Textarea"
+					},
+					"showCount": {
+						"diffType": "+",
+						"newData": true
+					},
+					"hasFeedback": {
+						"diffType": "+",
+						"newData": true
+					},
+					"rulesConfig": {
+						"diffType": "+",
+						"newData": []
+					},
+					"useAutoSizeCode": {
+						"diffType": "+",
+						"newData": true
+					},
+					"setAutoSizeCode": {
+						"diffType": "+",
+						"newData": "function setAutoSize() {\n  // 在下面返回AutoSize的值\n  return {\n    minRows: 3,\n    maxRows: 5,\n  }\n}"
+					}
+				},
+				"[10]": {
+					"diffType": "*",
+					"mode": {
+						"diffType": "-",
+						"oldData": "multiple"
+					},
+					"notShowItem": {
+						"diffType": "-",
+						"oldData": false
+					},
+					"options": {
+						"diffType": "-",
+						"oldData": []
+					},
+					"setOptionsCode": {
+						"diffType": "-",
+						"oldData": "function setOptions() {\n  // 在下面返回Options的值\n  return $$data.userInfo;\n}"
+					},
+					"showArrow": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"$key": {
+						"diffType": "-",
+						"oldData": "users"
+					},
+					"$item": {
+						"diffType": "*",
+						"name": {
+							"diffType": "*",
+							"newData": "Col",
+							"oldData": "Select"
+						},
+						"label": {
+							"diffType": "*",
+							"newData": "列容器",
+							"oldData": "下拉框"
+						},
+						"id": {
+							"diffType": "*",
+							"newData": "Col_1655796955749_0.17437801519058094",
+							"oldData": "Select_1645856516346_0.6833342284509456"
+						}
+					},
+					"label": {
+						"diffType": "-",
+						"oldData": "抄送人"
+					},
+					"bordered": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"useOptionsCode": {
+						"diffType": "-",
+						"oldData": true
+					},
+					"$name": {
+						"diffType": "+",
+						"newData": "Col"
+					},
+					"set$$ifCode": {
+						"diffType": "+",
+						"newData": "function set$$if() {\n  // 在下面返回$$if的值\n  return !$run('isLD')\n}"
+					},
+					"children": {
+						"diffType": "+",
+						"newData": [
+							{
+								"notShowItem": false,
+								"isTree": true,
+								"$parent": {
+									"name": "Col",
+									"label": "列容器",
+									"id": "Col_1655796955749_0.17437801519058094"
+								},
+								"useChangeCode": true,
+								"setOptionsCode": "function setOptions() {\n  // 在下面返回Options的值\n  return $$data.userInfo;\n}",
+								"showArrow": true,
+								"$key": "checkuser",
+								"label": "预审人",
+								"bordered": true,
+								"defaultRules": {
+									"min": {
+										"use": false,
+										"message": "该选项值/长度不能小于{{$1}}",
+										"value": [
+											16
+										]
+									},
+									"max": {
+										"use": false,
+										"message": "该选项值/长度不能大于{{$1}}",
+										"value": [
+											16
+										]
+									},
+									"phone": {
+										"use": false,
+										"message": "该选项不是一个合法的电话号码"
+									},
+									"ip": {
+										"use": false,
+										"message": "该选项不是一个合法的IP地址"
+									},
+									"length": {
+										"use": false,
+										"message": "该选项值/长度必须等于{{$1}}",
+										"value": [
+											16
+										]
+									},
+									"mobile": {
+										"use": false,
+										"message": "该选项不是一个合法的手机号"
+									},
+									"id": {
+										"use": false,
+										"message": "该选项不是一个合法的身份证号码"
+									},
+									"required": {
+										"use": false,
+										"message": "该选项必填"
+									},
+									"email": {
+										"use": false,
+										"message": "该选项不是一个合法的邮箱地址"
+									},
+									"url": {
+										"use": false,
+										"message": "该选项不是一个合法的网址"
+									}
+								},
+								"dropdownMatchSelectWidth": true,
+								"setTreeDataCode": "function setTreeData() {\n  // 在下面返回TreeData的值\n  return $$data.userInfo\n}",
+								"rulesConfig": [],
+								"useTreeDataCode": true,
+								"options": [],
+								"$item": {
+									"name": "Select",
+									"label": "下拉框",
+									"id": "Select_1645854624005_0.8925002477941295"
+								},
+								"useOptionsCode": true,
+								"allowClear": true,
+								"onChangeCode": "function onChange(e, v) {\n  // 在下面开始编写选择事件\n  $$data.info.checkuser = e\n  $$data.info.checkuserDesc = v[0]\n}"
+							},
+							{
+								"notShowItem": false,
+								"isTree": true,
+								"labelInValue": true,
+								"$parent": {
+									"name": "Col",
+									"label": "列容器",
+									"id": "Col_1655796955749_0.17437801519058094"
+								},
+								"useChangeCode": true,
+								"setOptionsCode": "function setOptions() {\n  // 在下面返回Options的值\n  return $$data.userInfo;\n}",
+								"showArrow": true,
+								"$key": "users",
+								"label": "抄送人",
+								"bordered": true,
+								"mode": "multiple",
+								"defaultRules": {
+									"min": {
+										"use": false,
+										"message": "该选项值/长度不能小于{{$1}}",
+										"value": [
+											16
+										]
+									},
+									"max": {
+										"use": false,
+										"message": "该选项值/长度不能大于{{$1}}",
+										"value": [
+											16
+										]
+									},
+									"phone": {
+										"use": false,
+										"message": "该选项不是一个合法的电话号码"
+									},
+									"ip": {
+										"use": false,
+										"message": "该选项不是一个合法的IP地址"
+									},
+									"length": {
+										"use": false,
+										"message": "该选项值/长度必须等于{{$1}}",
+										"value": [
+											16
+										]
+									},
+									"mobile": {
+										"use": false,
+										"message": "该选项不是一个合法的手机号"
+									},
+									"id": {
+										"use": false,
+										"message": "该选项不是一个合法的身份证号码"
+									},
+									"required": {
+										"use": false,
+										"message": "该选项必填"
+									},
+									"email": {
+										"use": false,
+										"message": "该选项不是一个合法的邮箱地址"
+									},
+									"url": {
+										"use": false,
+										"message": "该选项不是一个合法的网址"
+									}
+								},
+								"dropdownMatchSelectWidth": true,
+								"setTreeDataCode": "function setTreeData() {\n  // 在下面返回TreeData的值\n  return $$data.userInfo\n}",
+								"rulesConfig": [],
+								"useTreeDataCode": true,
+								"options": [],
+								"$item": {
+									"name": "Select",
+									"label": "下拉框",
+									"id": "Select_1645856516346_0.6833342284509456"
+								},
+								"useOptionsCode": true,
+								"allowClear": true,
+								"onChangeCode": "function onChange(e,v) {\n  // 在下面开始编写选择事件\n  $$data.info.carbonuser = e.map(m => m.value)[0]\n  $$data.info.carbonuserDesc = e.map(m => m.label)[0]\n  $$data.info.cc = e.map(m => {\n    return {\n      usercode: m.value,\n      usercodeDesc: m.label,\n    }\n  })\n}"
+							}
+						]
+					},
+					"use$$ifCode": {
+						"diffType": "+",
+						"newData": true
+					}
+				}
+			},
+			"[1]": {
+				"diffType": "*",
+				"children[0]": {
+					"diffType": "*",
+					"setParamsCode": {
+						"diffType": "*",
+						"[3]": {
+							"diffType": "+",
+							"newData": "  // $data.info.checkuserDesc=$run('translateDicMaps',$data.userInfo,$data.info.checkuser)"
+						}
+					},
+					"$params": {
+						"diffType": "+",
+						"newData": {}
+					},
+					"customEvents": {
+						"diffType": "+",
+						"newData": []
+					},
+					"customParams": {
+						"diffType": "+",
+						"newData": [
+							{
+								"name": "leave",
+								"label": "leave",
+								"props": []
+							}
+						]
+					},
+					"modelId": {
+						"diffType": "+",
+						"newData": ""
+					},
+					"templateStyle": {
+						"diffType": "+",
+						"newData": {}
+					},
+					"modelName": {
+						"diffType": "+",
+						"newData": "展示申请信息"
+					},
+					"slots": {
+						"diffType": "+",
+						"newData": {}
+					},
+					"$events": {
+						"diffType": "+",
+						"newData": {}
+					},
+					"_loading": {
+						"diffType": "+",
+						"newData": false
+					}
+				},
+				"fullscreen": {
+					"diffType": "+",
+					"newData": false
+				},
+				"footerMode": {
+					"diffType": "+",
+					"newData": "default"
 				}
 			}
-		]
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[5].name",
-		"newData": "leavecity"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[5].use$$ifCode",
-		"newData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[5].rules",
-		"newData": []
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[5].required",
-		"newData": false
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[6].$key",
-		"newData": "begintime",
-		"oldData": "endtime"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[6].label",
-		"newData": "开始时间",
-		"oldData": "结束时间"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[6].hasFeedback",
-		"newData": false,
-		"oldData": true
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[6].rulesConfig[0]",
-		"oldData": {
-			"isUse": false,
-			"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '结束时间不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
-			"name": "必填",
-			"id": "Rule_1638956276698",
-			"message": ""
 		}
 	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[6].rulesConfig[0]",
-		"newData": {
-			"isUse": true,
-			"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '开始时间不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
-			"name": "必填",
-			"id": "Rule_1638956319138",
-			"message": ""
-		}
-	},
-	{
+	"recorder": {
 		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[6].$item.id",
-		"newData": "DatePicker_1638863102942",
-		"oldData": "DatePicker_1638863112502"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[6].$group",
-		"newData": "DatePicker_1638863102942"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[7].children",
-		"oldData": [
-			{
-				"min": 0,
-				"useStyleText": true,
-				"styleText": "flex: auto;\nmargin-right: 20px;",
-				"$parent": {
-					"name": "FormItem",
-					"label": "表单项",
-					"id": "FormItem_1638863130692"
-				},
-				"precision": 1,
-				"rulesConfig": [
-					{
-						"isUse": false,
-						"name": "必填",
-						"id": "Rule_1638956579529",
-						"message": ""
-					}
-				],
-				"step": 1,
-				"$key": "leavedays",
-				"$item": {
-					"name": "InputNumber",
-					"label": "数字框",
-					"id": "InputNumber_1638863146958"
-				},
-				"label": "",
-				"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
-			},
-			{
-				"notShowItem": false,
-				"size": "default",
-				"useStyleText": true,
-				"styleText": "width: 200px;",
-				"$parent": {
-					"name": "FormItem",
-					"label": "表单项",
-					"id": "FormItem_1638863130692"
-				},
-				"rulesConfig": [],
-				"options": [
-					{
-						"label": "小时",
-						"value": "H"
-					},
-					{
-						"label": "天",
-						"value": "D"
-					}
-				],
-				"$key": "timetype",
-				"$item": {
-					"name": "RadioGroup",
-					"label": "单选框",
-					"id": "RadioGroup_1638863153831"
-				},
-				"label": "",
-				"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
-			}
-		]
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[7].hasFeedback",
-		"newData": false,
-		"oldData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].rulesConfig[0]",
-		"newData": {
-			"isUse": true,
-			"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '预计结束时间不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
-			"name": "必填",
-			"id": "Rule_1638956276698",
-			"message": ""
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[7].rulesConfig[0]",
-		"oldData": {
-			"isUse": true,
-			"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n\trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \t message: '时长不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
-			"name": "必填",
-			"id": "Rule_1638957080371",
-			"message": ""
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[7].name",
-		"oldData": "leavedays"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[7].$item.name",
-		"newData": "DatePicker",
-		"oldData": "FormItem"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[7].$item.label",
-		"newData": "日期选择",
-		"oldData": "表单项"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[7].$item.id",
-		"newData": "DatePicker_1638863112502",
-		"oldData": "FormItem_1638863130692"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[7].label",
-		"newData": "预计结束时间",
-		"oldData": "时长"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].setShowTimeCode",
-		"newData": "function setShowTime() {\n  // 在下面返回ShowTime的值\n  return {\n  \tminuteStep: 15,\n    format: 'HH:mm',\n  }\n}"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].set$$ifCode",
-		"newData": "function set$$if() {\n  // 在下面返回$$if的值\n   const { bigtype } = $data\n  return bigtype != 'B'\n}"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].useChangeCode",
-		"newData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].showTime",
-		"newData": ""
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].format",
-		"newData": "YYYY-MM-DD HH:mm"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].use$$ifCode",
-		"newData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].$key",
-		"newData": "endtime"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].defaultRules",
-		"newData": {
-			"min": {
-				"use": false,
-				"message": "该选项值/长度不能小于{{$1}}",
-				"value": [
-					16
-				]
-			},
-			"max": {
-				"use": false,
-				"message": "该选项值/长度不能大于{{$1}}",
-				"value": [
-					16
-				]
-			},
-			"phone": {
-				"use": false,
-				"message": "该选项不是一个合法的电话号码"
-			},
-			"ip": {
-				"use": false,
-				"message": "该选项不是一个合法的IP地址"
-			},
-			"length": {
-				"use": false,
-				"message": "该选项值/长度必须等于{{$1}}",
-				"value": [
-					16
-				]
-			},
-			"mobile": {
-				"use": false,
-				"message": "该选项不是一个合法的手机号"
-			},
-			"id": {
-				"use": false,
-				"message": "该选项不是一个合法的身份证号码"
-			},
-			"required": {
-				"use": false,
-				"message": "该选项必填"
-			},
-			"email": {
-				"use": false,
-				"message": "该选项不是一个合法的邮箱地址"
-			},
-			"url": {
-				"use": false,
-				"message": "该选项不是一个合法的网址"
-			}
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].$group",
-		"newData": "DatePicker_1638863102942"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].disabled",
-		"newData": false
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].useShowTimeCode",
-		"newData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[7].onChangeCode",
-		"newData": "function onChange(date, dateString) {\n  // 在下面开始编写改变事件\n  $run('diffTime')\n}"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[8].autoSize",
-		"oldData": ""
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[8].showCount",
-		"oldData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[8].rulesConfig",
-		"newData": [
-			{
-				"isUse": true,
-				"code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n\trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \t message: '时长不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
-				"name": "必填",
-				"id": "Rule_1638957080371",
-				"message": ""
-			}
-		]
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[8].useAutoSizeCode",
-		"oldData": true
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[8].$key",
-		"oldData": "leavereason"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[8].$item.name",
-		"newData": "FormItem",
-		"oldData": "Textarea"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[8].$item.label",
-		"newData": "表单项",
-		"oldData": "文本域"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[8].$item.id",
-		"newData": "FormItem_1638863130692",
-		"oldData": "Textarea_1638863237510"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[8].label",
-		"newData": "时长",
-		"oldData": "事由"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[8].setAutoSizeCode",
-		"oldData": "function setAutoSize() {\n  // 在下面返回AutoSize的值\n  return true\n}"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[8].set$$ifCode",
-		"newData": "function set$$if() {\n  // 在下面返回$$if的值\n   const { bigtype } = $data\n  return bigtype != 'B'\n}"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[8].children",
-		"newData": [
-			{
-				"notShowItem": false,
-				"min": 1,
-				"useStyleText": true,
-				"styleText": "flex: auto;\nmargin-right: 20px;",
-				"$parent": {
-					"name": "FormItem",
-					"label": "表单项",
-					"id": "FormItem_1638863130692"
-				},
-				"precision": 1,
-				"rulesConfig": [
-					{
-						"isUse": false,
-						"name": "必填",
-						"id": "Rule_1638956579529",
-						"message": ""
-					}
-				],
-				"step": 1,
-				"$key": "leavedays",
-				"$item": {
-					"name": "InputNumber",
-					"label": "数字框",
-					"id": "InputNumber_1638863146958"
-				},
-				"label": "",
-				"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
-			},
-			{
-				"notShowItem": false,
-				"size": "default",
-				"useStyleText": true,
-				"styleText": "width: 200px;",
-				"$parent": {
-					"name": "FormItem",
-					"label": "表单项",
-					"id": "FormItem_1638863130692"
-				},
-				"rulesConfig": [],
-				"options": [
-					{
-						"label": "小时",
-						"value": "H"
-					},
-					{
-						"label": "天",
-						"value": "D"
-					}
-				],
-				"$key": "timetype",
-				"$item": {
-					"name": "RadioGroup",
-					"label": "单选框",
-					"id": "RadioGroup_1638863153831"
-				},
-				"label": "",
-				"styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
-			}
-		]
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[8].hasFeedback",
-		"newData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[8].name",
-		"newData": "leavedays"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[8].use$$ifCode",
-		"newData": true
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[9].notShowItem",
-		"oldData": false
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[9].options",
-		"oldData": []
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[9].setOptionsCode",
-		"oldData": "function setOptions() {\n  // 在下面返回Options的值\n  return $$data.userInfo;\n}"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[9].showArrow",
-		"oldData": true
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[9].$key",
-		"newData": "leavereason",
-		"oldData": "checkuser"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[9].$item.name",
-		"newData": "Textarea",
-		"oldData": "Select"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[9].$item.label",
-		"newData": "文本域",
-		"oldData": "下拉框"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[9].$item.id",
-		"newData": "Textarea_1660037241705_0.730499103386403",
-		"oldData": "Select_1645854624005_0.8925002477941295"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[9].label",
-		"newData": "事由",
-		"oldData": "预审人"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[9].bordered",
-		"oldData": true
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[9].useOptionsCode",
-		"oldData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[9].$name",
-		"newData": "Textarea"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[9].showCount",
-		"newData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[9].hasFeedback",
-		"newData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[9].rulesConfig",
-		"newData": []
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[9].useAutoSizeCode",
-		"newData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[9].setAutoSizeCode",
-		"newData": "function setAutoSize() {\n  // 在下面返回AutoSize的值\n  return {\n    minRows: 3,\n    maxRows: 5,\n  }\n}"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[10].mode",
-		"oldData": "multiple"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[10].notShowItem",
-		"oldData": false
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[10].options",
-		"oldData": []
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[10].setOptionsCode",
-		"oldData": "function setOptions() {\n  // 在下面返回Options的值\n  return $$data.userInfo;\n}"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[10].showArrow",
-		"oldData": true
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[10].$key",
-		"oldData": "users"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[10].$item.name",
-		"newData": "Col",
-		"oldData": "Select"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[10].$item.label",
-		"newData": "列容器",
-		"oldData": "下拉框"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[10].$item.id",
-		"newData": "Col_1655796955749_0.17437801519058094",
-		"oldData": "Select_1645856516346_0.6833342284509456"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[10].label",
-		"oldData": "抄送人"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[10].bordered",
-		"oldData": true
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[10].useOptionsCode",
-		"oldData": true
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[10].$name",
-		"newData": "Col"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[10].set$$ifCode",
-		"newData": "function set$$if() {\n  // 在下面返回$$if的值\n  return !$run('isLD')\n}"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[10].children",
-		"newData": [
-			{
-				"notShowItem": false,
-				"isTree": true,
-				"$parent": {
-					"name": "Col",
-					"label": "列容器",
-					"id": "Col_1655796955749_0.17437801519058094"
-				},
-				"useChangeCode": true,
-				"setOptionsCode": "function setOptions() {\n  // 在下面返回Options的值\n  return $$data.userInfo;\n}",
-				"showArrow": true,
-				"$key": "checkuser",
-				"label": "预审人",
-				"bordered": true,
-				"defaultRules": {
-					"min": {
-						"use": false,
-						"message": "该选项值/长度不能小于{{$1}}",
-						"value": [
-							16
-						]
-					},
-					"max": {
-						"use": false,
-						"message": "该选项值/长度不能大于{{$1}}",
-						"value": [
-							16
-						]
-					},
-					"phone": {
-						"use": false,
-						"message": "该选项不是一个合法的电话号码"
-					},
-					"ip": {
-						"use": false,
-						"message": "该选项不是一个合法的IP地址"
-					},
-					"length": {
-						"use": false,
-						"message": "该选项值/长度必须等于{{$1}}",
-						"value": [
-							16
-						]
-					},
-					"mobile": {
-						"use": false,
-						"message": "该选项不是一个合法的手机号"
-					},
-					"id": {
-						"use": false,
-						"message": "该选项不是一个合法的身份证号码"
-					},
-					"required": {
-						"use": false,
-						"message": "该选项必填"
-					},
-					"email": {
-						"use": false,
-						"message": "该选项不是一个合法的邮箱地址"
-					},
-					"url": {
-						"use": false,
-						"message": "该选项不是一个合法的网址"
-					}
-				},
-				"dropdownMatchSelectWidth": true,
-				"setTreeDataCode": "function setTreeData() {\n  // 在下面返回TreeData的值\n  return $$data.userInfo\n}",
-				"rulesConfig": [],
-				"useTreeDataCode": true,
-				"options": [],
-				"$item": {
-					"name": "Select",
-					"label": "下拉框",
-					"id": "Select_1645854624005_0.8925002477941295"
-				},
-				"useOptionsCode": true,
-				"allowClear": true,
-				"onChangeCode": "function onChange(e, v) {\n  // 在下面开始编写选择事件\n  $$data.info.checkuser = e\n  $$data.info.checkuserDesc = v[0]\n}"
-			},
-			{
-				"notShowItem": false,
-				"isTree": true,
-				"labelInValue": true,
-				"$parent": {
-					"name": "Col",
-					"label": "列容器",
-					"id": "Col_1655796955749_0.17437801519058094"
-				},
-				"useChangeCode": true,
-				"setOptionsCode": "function setOptions() {\n  // 在下面返回Options的值\n  return $$data.userInfo;\n}",
-				"showArrow": true,
-				"$key": "users",
-				"label": "抄送人",
-				"bordered": true,
-				"mode": "multiple",
-				"defaultRules": {
-					"min": {
-						"use": false,
-						"message": "该选项值/长度不能小于{{$1}}",
-						"value": [
-							16
-						]
-					},
-					"max": {
-						"use": false,
-						"message": "该选项值/长度不能大于{{$1}}",
-						"value": [
-							16
-						]
-					},
-					"phone": {
-						"use": false,
-						"message": "该选项不是一个合法的电话号码"
-					},
-					"ip": {
-						"use": false,
-						"message": "该选项不是一个合法的IP地址"
-					},
-					"length": {
-						"use": false,
-						"message": "该选项值/长度必须等于{{$1}}",
-						"value": [
-							16
-						]
-					},
-					"mobile": {
-						"use": false,
-						"message": "该选项不是一个合法的手机号"
-					},
-					"id": {
-						"use": false,
-						"message": "该选项不是一个合法的身份证号码"
-					},
-					"required": {
-						"use": false,
-						"message": "该选项必填"
-					},
-					"email": {
-						"use": false,
-						"message": "该选项不是一个合法的邮箱地址"
-					},
-					"url": {
-						"use": false,
-						"message": "该选项不是一个合法的网址"
-					}
-				},
-				"dropdownMatchSelectWidth": true,
-				"setTreeDataCode": "function setTreeData() {\n  // 在下面返回TreeData的值\n  return $$data.userInfo\n}",
-				"rulesConfig": [],
-				"useTreeDataCode": true,
-				"options": [],
-				"$item": {
-					"name": "Select",
-					"label": "下拉框",
-					"id": "Select_1645856516346_0.6833342284509456"
-				},
-				"useOptionsCode": true,
-				"allowClear": true,
-				"onChangeCode": "function onChange(e,v) {\n  // 在下面开始编写选择事件\n  $$data.info.carbonuser = e.map(m => m.value)[0]\n  $$data.info.carbonuserDesc = e.map(m => m.label)[0]\n  $$data.info.cc = e.map(m => {\n    return {\n      usercode: m.value,\n      usercodeDesc: m.label,\n    }\n  })\n}"
-			}
-		]
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[10].use$$ifCode",
-		"newData": true
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "formTemplate.children[1].children[0].setParamsCode[3]",
-		"oldData": "  $data.info.checkuserDesc=$run('translateDicMaps',$data.userInfo,$data.info.checkuser)"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].children[0].setParamsCode[3]",
-		"newData": "  // $data.info.checkuserDesc=$run('translateDicMaps',$data.userInfo,$data.info.checkuser)"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].children[0].$params",
-		"newData": {}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].children[0].customEvents",
-		"newData": []
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].children[0].customParams",
-		"newData": [
-			{
-				"name": "leave",
-				"label": "leave",
-				"props": []
-			}
-		]
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].children[0].modelId",
-		"newData": ""
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].children[0].templateStyle",
-		"newData": {}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].children[0].modelName",
-		"newData": "展示申请信息"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].children[0].slots",
-		"newData": {}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].children[0].$events",
-		"newData": {}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].children[0]._loading",
-		"newData": false
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].fullscreen",
-		"newData": false
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "formTemplate.children[1].footerMode",
-		"newData": "default"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "recorder",
 		"newData": "D6KibYwW",
 		"oldData": "D4BtpSxJ"
 	},
-	{
+	"mobileFormTemplate": {
 		"diffType": "*",
-		"jsonPath": "mobileFormTemplate.fit",
-		"newData": false,
-		"oldData": true
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "mobileFormTemplate.children",
-		"oldData": [
-			{
-				"$name": "MobileLayout",
-				"tabList": [
-					{
-						"name": "标签1",
-						"icon": "home-o"
-					}
-				],
-				"children": [
-					{
-						"$name": "MobileLayoutContent",
+		"fit": {
+			"diffType": "*",
+			"newData": false,
+			"oldData": true
+		},
+		"children": {
+			"diffType": "-",
+			"oldData": [
+				{
+					"$name": "MobileLayout",
+					"tabList": [
+						{
+							"name": "标签1",
+							"icon": "home-o"
+						}
+					],
+					"children": [
+						{
+							"$name": "MobileLayoutContent",
+							"children": [],
+							"$item": {
+								"name": "MobileLayoutContent",
+								"label": "内容",
+								"id": "MobileLayoutContent_1649658795811_0.9920892748194223"
+							}
+						}
+					],
+					"footer": {
+						"$name": "LayoutFooter",
 						"children": [],
 						"$item": {
-							"name": "MobileLayoutContent",
-							"label": "内容",
-							"id": "MobileLayoutContent_1649658795811_0.9920892748194223"
+							"name": "LayoutFooter",
+							"label": "移动端底部布局",
+							"id": "LayoutFooter_1649658795811_0.3964144351804102"
+						}
+					},
+					"$parent": {
+						"name": "Model",
+						"label": "模块",
+						"id": "Model_1649658789605_0.9390502326410599"
+					},
+					"showTabBar": false,
+					"showHeader": false,
+					"showNavBar": false,
+					"header": {
+						"$name": "LayoutHeader",
+						"children": [],
+						"$item": {
+							"name": "LayoutHeader",
+							"label": "移动端顶部布局",
+							"id": "LayoutHeader_1649658795811_0.8355007332303783"
+						}
+					},
+					"$item": {
+						"name": "MobileLayout",
+						"label": "布局",
+						"id": "MobileLayout_1649658795811_0.041437008699215516"
+					},
+					"showFooter": false
+				}
+			]
+		},
+		"paramsConfigs.Param_1655716567113": {
+			"diffType": "+",
+			"newData": {
+				"name": "type",
+				"id": "Param_1655716567113"
+			}
+		}
+	},
+	"publishDate": {
+		"diffType": "*",
+		"newData": "2023-02-23 09:18:39",
+		"oldData": "2022-04-11 14:33:19"
+	},
+	"structureFunction": {
+		"diffType": "*",
+		"dataConfigs": {
+			"diffType": "*",
+			"Data_1640225225034": {
+				"diffType": "*",
+				"title": {
+					"diffType": "-",
+					"oldData": "isConfirmOpen"
+				},
+				"type": {
+					"diffType": "*",
+					"newData": "data",
+					"oldData": "b"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Data_1640225225034"
+				},
+				"dataType": {
+					"diffType": "+",
+					"newData": "boolean"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "isConfirmOpen"
+				}
+			},
+			"Data_1638864239918": {
+				"diffType": "*",
+				"code": {
+					"diffType": "*",
+					"[5]": {
+						"diffType": "+",
+						"newData": "  endtime: $dayjs().format('YYYY-MM-DD') + ' 17:30:00',"
+					},
+					"[6]": {
+						"diffType": "-",
+						"oldData": "  leavetype: 'S',  "
+					},
+					"[7]": {
+						"diffType": "+",
+						"newData": "  leavetype: 'S', "
+					},
+					"[8]": {
+						"diffType": "-",
+						"oldData": "  leavedays: 0,"
+					},
+					"[9]": {
+						"diffType": "+",
+						"newData": "  leavedays: 1,"
+					}
+				},
+				"children": {
+					"diffType": "*",
+					"[1].label": {
+						"diffType": "*",
+						"newData": "申请类别",
+						"oldData": "类别"
+					},
+					"[2]": {
+						"diffType": "-",
+						"oldData": {
+							"isDefault": true,
+							"dataType": "string",
+							"name": "checkuser",
+							"id": "Data_1638864239918_checkuser",
+							"label": "预审人",
+							"type": "schema"
+						}
+					},
+					"[3].label": {
+						"diffType": "*",
+						"newData": "预计结束时间",
+						"oldData": "结束时间"
+					},
+					"[7]": {
+						"diffType": "+",
+						"newData": {
+							"isDefault": true,
+							"dataType": "string",
+							"name": "loginname",
+							"id": "Data_1638864239918_loginname",
+							"label": "loginname",
+							"type": "schema"
+						}
+					},
+					"[14]": {
+						"diffType": "-",
+						"oldData": {
+							"isDefault": true,
+							"dataType": "string",
+							"name": "users",
+							"id": "Data_1638864239918_users",
+							"label": "抄送人",
+							"type": "schema"
 						}
 					}
-				],
-				"footer": {
-					"$name": "LayoutFooter",
-					"children": [],
-					"$item": {
-						"name": "LayoutFooter",
-						"label": "移动端底部布局",
-						"id": "LayoutFooter_1649658795811_0.3964144351804102"
+				},
+				"componentSchemas": {
+					"diffType": "*",
+					"checkuser": {
+						"diffType": "-",
+						"oldData": {
+							"isDefault": true,
+							"propertyName": "checkuser",
+							"fieldLabelName": "预审人",
+							"$key": "checkuser",
+							"fieldType": "string"
+						}
+					},
+					"endtime.fieldLabelName": {
+						"diffType": "*",
+						"newData": "预计结束时间",
+						"oldData": "结束时间"
+					},
+					"bigtype.fieldLabelName": {
+						"diffType": "*",
+						"newData": "申请类别",
+						"oldData": "类别"
+					},
+					"users": {
+						"diffType": "-",
+						"oldData": {
+							"isDefault": true,
+							"propertyName": "users",
+							"fieldLabelName": "抄送人",
+							"$key": "users",
+							"fieldType": "string"
+						}
 					}
 				},
-				"$parent": {
-					"name": "Model",
-					"label": "模块",
-					"id": "Model_1649658789605_0.9390502326410599"
+				"columns": {
+					"diffType": "-",
+					"oldData": [
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 255,
+							"columnOrder": 99,
+							"precision": 255,
+							"columnComment": "大类型：QJ 请假 BK 补卡 CC 外出",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "VARCHAR",
+							"propertyName": "bigtype",
+							"fieldLabelName": "bigType",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "bigType",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 0,
+							"columnOrder": 99,
+							"autoCreateRule": "W",
+							"precision": 0,
+							"columnComment": "结束时间",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.sql.Date",
+							"accessType": "N",
+							"columnType": "DATETIME",
+							"propertyName": "endtime",
+							"fieldLabelName": "endTime",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "datetime",
+							"lastModifyDate": "2022-01-10 09:52:40",
+							"columnName": "endTime",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 32,
+							"columnOrder": 99,
+							"autoCreateRule": "U",
+							"precision": 32,
+							"columnComment": "流水号",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": true,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "VARCHAR",
+							"propertyName": "leaveno",
+							"fieldLabelName": "leaveNo",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "leaveNo",
+							"primaryKey": true
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 32,
+							"columnOrder": 99,
+							"precision": 32,
+							"columnComment": "所属部门",
+							"referenceType": "1",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"referenceData": "unitCode",
+							"columnType": "VARCHAR",
+							"propertyName": "ownunit",
+							"fieldLabelName": "ownunit",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "ownunit",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 8,
+							"columnOrder": 99,
+							"precision": 8,
+							"columnComment": "是否中高风险",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "VARCHAR",
+							"propertyName": "isdanger",
+							"fieldLabelName": "isDanger",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "isDanger",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 1,
+							"columnOrder": 99,
+							"precision": 1,
+							"columnComment": "时间单位",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "CHAR",
+							"propertyName": "timetype",
+							"fieldLabelName": "timeType",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "timeType",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 32,
+							"columnOrder": 99,
+							"precision": 32,
+							"columnComment": "用户号",
+							"referenceType": "1",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"referenceData": "userCode",
+							"columnType": "VARCHAR",
+							"propertyName": "usercode",
+							"fieldLabelName": "usercode",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "usercode",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 0,
+							"columnOrder": 99,
+							"precision": 0,
+							"columnComment": "开始时间",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.sql.Date",
+							"accessType": "N",
+							"columnType": "DATETIME",
+							"propertyName": "begintime",
+							"fieldLabelName": "beginTime",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "datetime",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "beginTime",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 32,
+							"columnOrder": 99,
+							"precision": 32,
+							"columnComment": "预审人",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "VARCHAR",
+							"propertyName": "checkuser",
+							"fieldLabelName": "checkUser",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "checkUser",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 255,
+							"columnOrder": 99,
+							"precision": 255,
+							"columnComment": "出差地",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "VARCHAR",
+							"propertyName": "leavecity",
+							"fieldLabelName": "leaveCity",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "leaveCity",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 22,
+							"columnOrder": 99,
+							"precision": 22,
+							"columnComment": "请假时间",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.Double",
+							"accessType": "N",
+							"columnType": "DOUBLE",
+							"propertyName": "leavedays",
+							"fieldLabelName": "leaveDays",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "double",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "leaveDays",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 2,
+							"columnOrder": 99,
+							"precision": 2,
+							"columnComment": "请假类型",
+							"referenceType": "1",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"referenceData": "gaVXuauTSiO1quaguCpAOA",
+							"columnType": "VARCHAR",
+							"propertyName": "leavetype",
+							"fieldLabelName": "leaveType",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "leaveType",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 32,
+							"columnOrder": 99,
+							"precision": 32,
+							"columnComment": "登录名",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "VARCHAR",
+							"propertyName": "loginname",
+							"fieldLabelName": "loginName",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "loginName",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 32,
+							"columnOrder": 99,
+							"precision": 32,
+							"columnComment": "交通方式",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "VARCHAR",
+							"propertyName": "transport",
+							"fieldLabelName": "transport",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "transport",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 8,
+							"columnOrder": 99,
+							"precision": 8,
+							"columnComment": "批准状态",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "VARCHAR",
+							"propertyName": "flowresult",
+							"fieldLabelName": "flowResult",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "flowResult",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 0,
+							"columnOrder": 99,
+							"precision": 0,
+							"columnComment": "请假录入时间",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.sql.Date",
+							"accessType": "N",
+							"columnType": "DATETIME",
+							"propertyName": "recorddate",
+							"fieldLabelName": "recorddate",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "datetime",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "recorddate",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 0,
+							"columnOrder": 99,
+							"precision": 0,
+							"columnComment": "更新时间",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.sql.Date",
+							"accessType": "N",
+							"columnType": "DATETIME",
+							"propertyName": "updatedate",
+							"fieldLabelName": "updatedate",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "datetime",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "updatedate",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 1024,
+							"columnOrder": 99,
+							"precision": 1024,
+							"columnComment": "请假原因",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "VARCHAR",
+							"propertyName": "leavereason",
+							"fieldLabelName": "leaveReason",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "leaveReason",
+							"primaryKey": false
+						},
+						{
+							"recorder": "UkBTbun7",
+							"columnLength": 32,
+							"columnOrder": 99,
+							"precision": 32,
+							"columnComment": "流程实例ID",
+							"scale": 0,
+							"lazyFetch": false,
+							"mandatory": false,
+							"javaType": "java.lang.String",
+							"accessType": "N",
+							"columnType": "VARCHAR",
+							"propertyName": "flowInstId",
+							"fieldLabelName": "FLOW_INST_ID",
+							"tableId": "aJLrc1TqT7as0NMu1vn41Q",
+							"fieldType": "string",
+							"lastModifyDate": "2022-01-06 19:13:41",
+							"columnName": "FLOW_INST_ID",
+							"primaryKey": false
+						}
+					]
 				},
-				"showTabBar": false,
-				"showHeader": false,
-				"showNavBar": false,
-				"header": {
-					"$name": "LayoutHeader",
-					"children": [],
-					"$item": {
-						"name": "LayoutHeader",
-						"label": "移动端顶部布局",
-						"id": "LayoutHeader_1649658795811_0.8355007332303783"
+				"hasSchema": {
+					"diffType": "-",
+					"oldData": true
+				},
+				"title": {
+					"diffType": "-",
+					"oldData": "info"
+				},
+				"type": {
+					"diffType": "*",
+					"newData": "data",
+					"oldData": "o"
+				},
+				"codeSchemas": {
+					"diffType": "*",
+					"loginname": {
+						"diffType": "+",
+						"newData": {
+							"isDefault": true,
+							"propertyName": "loginname",
+							"fieldLabelName": "loginname",
+							"fieldType": "string"
+						}
+					},
+					"endtime": {
+						"diffType": "+",
+						"newData": {
+							"isDefault": true,
+							"propertyName": "endtime",
+							"fieldLabelName": "endtime",
+							"fieldType": "string"
+						}
 					}
 				},
-				"$item": {
-					"name": "MobileLayout",
-					"label": "布局",
-					"id": "MobileLayout_1649658795811_0.041437008699215516"
+				"key": {
+					"diffType": "-",
+					"oldData": "Data_1638864239918"
 				},
-				"showFooter": false
+				"table": {
+					"diffType": "-",
+					"oldData": [
+						"qCkELaoFSTm2_AoREWrYGg",
+						"aJLrc1TqT7as0NMu1vn41Q"
+					]
+				},
+				"dataType": {
+					"diffType": "+",
+					"newData": "object"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "info"
+				}
+			},
+			"Data_1645855447118": {
+				"diffType": "*",
+				"title": {
+					"diffType": "-",
+					"oldData": "userInfo"
+				},
+				"type": {
+					"diffType": "*",
+					"newData": "data",
+					"oldData": "o"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Data_1645855447118"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "userInfo"
+				}
+			},
+			"Data_1638877568687": {
+				"diffType": "*",
+				"title": {
+					"diffType": "-",
+					"oldData": "loading"
+				},
+				"type": {
+					"diffType": "*",
+					"newData": "data",
+					"oldData": "b"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Data_1638877568687"
+				},
+				"dataType": {
+					"diffType": "+",
+					"newData": "boolean"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "loading"
+				}
+			},
+			"Data_1655796616909": {
+				"diffType": "+",
+				"newData": {
+					"code": "$info.userRoles.map(r => r.roleCode)",
+					"children": [
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "0",
+							"id": "Data_1655796616909_0",
+							"label": "0",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "1",
+							"id": "Data_1655796616909_1",
+							"label": "1",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "10",
+							"id": "Data_1655796616909_10",
+							"label": "10",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "11",
+							"id": "Data_1655796616909_11",
+							"label": "11",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "12",
+							"id": "Data_1655796616909_12",
+							"label": "12",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "13",
+							"id": "Data_1655796616909_13",
+							"label": "13",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "2",
+							"id": "Data_1655796616909_2",
+							"label": "2",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "3",
+							"id": "Data_1655796616909_3",
+							"label": "3",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "4",
+							"id": "Data_1655796616909_4",
+							"label": "4",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "5",
+							"id": "Data_1655796616909_5",
+							"label": "5",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "6",
+							"id": "Data_1655796616909_6",
+							"label": "6",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "7",
+							"id": "Data_1655796616909_7",
+							"label": "7",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "8",
+							"id": "Data_1655796616909_8",
+							"label": "8",
+							"type": "schema"
+						},
+						{
+							"isDefault": true,
+							"dataType": "string",
+							"name": "9",
+							"id": "Data_1655796616909_9",
+							"label": "9",
+							"type": "schema"
+						}
+					],
+					"dataType": "array",
+					"name": "roles",
+					"id": "Data_1655796616909",
+					"label": "roles",
+					"type": "data",
+					"codeSchemas": {
+						"0": {
+							"isDefault": true,
+							"propertyName": "0",
+							"fieldLabelName": "0",
+							"fieldType": "string"
+						},
+						"1": {
+							"isDefault": true,
+							"propertyName": "1",
+							"fieldLabelName": "1",
+							"fieldType": "string"
+						},
+						"2": {
+							"isDefault": true,
+							"propertyName": "2",
+							"fieldLabelName": "2",
+							"fieldType": "string"
+						},
+						"3": {
+							"isDefault": true,
+							"propertyName": "3",
+							"fieldLabelName": "3",
+							"fieldType": "string"
+						},
+						"4": {
+							"isDefault": true,
+							"propertyName": "4",
+							"fieldLabelName": "4",
+							"fieldType": "string"
+						},
+						"5": {
+							"isDefault": true,
+							"propertyName": "5",
+							"fieldLabelName": "5",
+							"fieldType": "string"
+						},
+						"6": {
+							"isDefault": true,
+							"propertyName": "6",
+							"fieldLabelName": "6",
+							"fieldType": "string"
+						},
+						"7": {
+							"isDefault": true,
+							"propertyName": "7",
+							"fieldLabelName": "7",
+							"fieldType": "string"
+						},
+						"8": {
+							"isDefault": true,
+							"propertyName": "8",
+							"fieldLabelName": "8",
+							"fieldType": "string"
+						},
+						"9": {
+							"isDefault": true,
+							"propertyName": "9",
+							"fieldLabelName": "9",
+							"fieldType": "string"
+						},
+						"10": {
+							"isDefault": true,
+							"propertyName": "10",
+							"fieldLabelName": "10",
+							"fieldType": "string"
+						},
+						"11": {
+							"isDefault": true,
+							"propertyName": "11",
+							"fieldLabelName": "11",
+							"fieldType": "string"
+						},
+						"12": {
+							"isDefault": true,
+							"propertyName": "12",
+							"fieldLabelName": "12",
+							"fieldType": "string"
+						},
+						"13": {
+							"isDefault": true,
+							"propertyName": "13",
+							"fieldLabelName": "13",
+							"fieldType": "string"
+						}
+					}
+				}
 			}
-		]
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "mobileFormTemplate.paramsConfigs.Param_1655716567113",
-		"newData": {
-			"name": "type",
-			"id": "Param_1655716567113"
+		},
+		"methodsConfigs": {
+			"diffType": "*",
+			"Method_1638864247803": {
+				"diffType": "*",
+				"code[5]": {
+					"diffType": "+",
+					"newData": "多行字符串对比没有差异，应该是行的顺序不一致！"
+				},
+				"title": {
+					"diffType": "-",
+					"oldData": "load"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1638864247803"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "load"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1638954980168": {
+				"diffType": "*",
+				"title": {
+					"diffType": "-",
+					"oldData": "clearValidate"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1638954980168"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "clearValidate"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1638874856696": {
+				"diffType": "*",
+				"code": {
+					"diffType": "*",
+					"[1]": {
+						"diffType": "+",
+						"newData": "  if($data.info.bigtype==='B'){"
+					},
+					"[2]": {
+						"diffType": "+",
+						"newData": "    $data.info.endtime=$data.info.begintime;"
+					},
+					"[12]": {
+						"diffType": "-",
+						"oldData": "    info.leavedays = parseFloat(diffD.toFixed(1))"
+					},
+					"[15]": {
+						"diffType": "+",
+						"newData": "    // info.leavedays = parseFloat(diffD.toFixed(1))"
+					},
+					"[16]": {
+						"diffType": "+",
+						"newData": "    info.leavedays = (Math.floor(diffH / 24) + Math.min(1, (diffH % 24) / 8)).toFixed(1) * 1.0"
+					}
+				},
+				"title": {
+					"diffType": "-",
+					"oldData": "diffTime"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1638874856696"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "diffTime"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1640225334569": {
+				"diffType": "*",
+				"title": {
+					"diffType": "-",
+					"oldData": "closeConfirm"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1640225334569"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "closeConfirm"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1640138240552": {
+				"diffType": "*",
+				"code[6]": {
+					"diffType": "+",
+					"newData": "多行字符串对比没有差异，应该是行的顺序不一致！"
+				},
+				"title": {
+					"diffType": "-",
+					"oldData": "createFlowName"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1640138240552"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "createFlowName"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1645855991274": {
+				"diffType": "*",
+				"code": {
+					"diffType": "*",
+					"[1]": {
+						"diffType": "+",
+						"newData": "  //const data = await $dde.get('1473565dee594ea698971bd2afda8966')"
+					},
+					"[2]": {
+						"diffType": "+",
+						"newData": "  // const data = await $api.System.get('/platform/allusers/'+$info.topUnitCode);"
+					},
+					"[3]": {
+						"diffType": "+",
+						"newData": "  // $data.userInfo = data.map(item=>("
+					},
+					"[4]": {
+						"diffType": "+",
+						"newData": "  //    {label:item.userName,value:item.userCode}"
+					},
+					"[5]": {
+						"diffType": "+",
+						"newData": "  //    ))"
+					},
+					"[6]": {
+						"diffType": "+",
+						"newData": "  $data.userInfo = await $api.queryUnitsUsers(true)"
+					}
+				},
+				"title": {
+					"diffType": "-",
+					"oldData": "getUserInfo"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1645855991274"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "getUserInfo"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1638961091182": {
+				"diffType": "*",
+				"code": {
+					"diffType": "*",
+					"[1]": {
+						"diffType": "+",
+						"newData": ""
+					},
+					"[2]": {
+						"diffType": "+",
+						"newData": "    const { info } = $data"
+					},
+					"[3]": {
+						"diffType": "+",
+						"newData": "    const { leaveno } = info"
+					},
+					"[4]": {
+						"diffType": "+",
+						"newData": "    if (info.bigtype === 'B') {"
+					},
+					"[5]": {
+						"diffType": "+",
+						"newData": "        info.endtime = info.begintime;"
+					},
+					"[6]": {
+						"diffType": "+",
+						"newData": "        info.leavedays = 0"
+					},
+					"[7]": {
+						"diffType": "+",
+						"newData": "    }"
+					},
+					"[8]": {
+						"diffType": "+",
+						"newData": ""
+					},
+					"[9]": {
+						"diffType": "+",
+						"newData": "    // 更新时间"
+					},
+					"[10]": {
+						"diffType": "+",
+						"newData": "    const now = $d().format('YYYY-MM-DD HH:mm:ss')"
+					},
+					"[11]": {
+						"diffType": "+",
+						"newData": "    info.updatedate = now"
+					},
+					"[12]": {
+						"diffType": "+",
+						"newData": "    console.log(leaveno)"
+					},
+					"[13]": {
+						"diffType": "+",
+						"newData": "    if (leaveno) {"
+					},
+					"[14]": {
+						"diffType": "+",
+						"newData": "        return $dde.put('121f2bd4cfca437ca14589e41bdf1c1d', info)"
+					},
+					"[15]": {
+						"diffType": "+",
+						"newData": "    } else {"
+					},
+					"[16]": {
+						"diffType": "+",
+						"newData": "        // 创建时间"
+					},
+					"[17]": {
+						"diffType": "+",
+						"newData": "        info.recorddate = now"
+					},
+					"[18]": {
+						"diffType": "+",
+						"newData": "        info.flowOptName = $run('createFlowName', info)"
+					},
+					"[19]": {
+						"diffType": "+",
+						"newData": "        // 提交工作流"
+					},
+					"[20]": {
+						"diffType": "+",
+						"newData": "        return $dde.post('78e93bd352ea4d7a829ae69241dc3cd5', info)"
+					},
+					"[21]": {
+						"diffType": "+",
+						"newData": "    }"
+					}
+				},
+				"title": {
+					"diffType": "-",
+					"oldData": "save"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1638961091182"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "save"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1640225567064": {
+				"diffType": "*",
+				"title": {
+					"diffType": "-",
+					"oldData": "okConfirm"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1640225567064"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "okConfirm"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1646726881030": {
+				"diffType": "*",
+				"title": {
+					"diffType": "-",
+					"oldData": "translateDicMaps"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1646726881030"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "translateDicMaps"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1638954895952": {
+				"diffType": "*",
+				"title": {
+					"diffType": "-",
+					"oldData": "validate"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1638954895952"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "validate"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1640225251401": {
+				"diffType": "*",
+				"title": {
+					"diffType": "-",
+					"oldData": "openConfirm"
+				},
+				"key": {
+					"diffType": "-",
+					"oldData": "Method_1640225251401"
+				},
+				"label": {
+					"diffType": "+",
+					"newData": "openConfirm"
+				},
+				"type": {
+					"diffType": "+",
+					"newData": "method"
+				}
+			},
+			"Method_1655796721556": {
+				"diffType": "+",
+				"newData": {
+					"code": "function isLD () {\n    // 我需要调试\n    if ($info.userInfo.loginName === 'zk'||$info.userInfo.loginName === 'zhf') return false\n\n    const LD = ['R0000001', 'R0000002']\n    const roles = $data.roles \n\n    return roles.some(r => LD.includes(r))\n}",
+					"name": "isLD",
+					"id": "Method_1655796721556",
+					"label": "isLD",
+					"type": "method"
+				}
+			},
+			"Method_1655717139357": {
+				"diffType": "+",
+				"newData": {
+					"code": "function onChangeType(type) {\n    if (!type) return\n    const info = $data.info\n    info.bigtype = type\n    // 在下面开始编写type监听\n    if (type === 'Q') {\n        info.leavetype = 'S'\n        info.leavetypeDesc = '事假'\n    } else if (type === 'W') {\n        info.leavetype = 'SN'\n        info.leavetypeDesc = '市内外出'\n        info.isdanger = 'L'\n    } else if (type === 'C') {\n        info.leavetype = 'CC'\n        info.leavetypeDesc = '出差'\n        info.isdanger = 'L'\n    } else if (type === 'B') {\n        info.leavetype = 'BD'\n        info.leavetypeDesc = '补打卡'\n        info.endtime=info.begintime\n        info.leavedays=0\n        info.timetype='H'\n    }\n\n    $run('clearValidate')\n}",
+					"name": "onChangeType",
+					"id": "Method_1655717139357",
+					"label": "onChangeType",
+					"type": "method"
+				}
+			}
+		},
+		"paramsConfigs": {
+			"diffType": "*",
+			"Param_1640865185828.code[5]": {
+				"diffType": "+",
+				"newData": "多行字符串对比没有差异，应该是行的顺序不一致！"
+			},
+			"Param_1655716567113": {
+				"diffType": "+",
+				"newData": {
+					"code": "function watchType(type, oldType) {\n  $run('onChangeType', type)\n}",
+					"immediate": true,
+					"name": "type",
+					"id": "Param_1655716567113"
+				}
+			}
 		}
 	},
-	{
+	"lastModifyDate": {
 		"diffType": "*",
-		"jsonPath": "publishDate",
 		"newData": "2023-02-23 09:18:39",
 		"oldData": "2022-04-11 14:33:19"
 	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1640225225034.title",
-		"oldData": "isConfirmOpen"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.dataConfigs.Data_1640225225034.type",
-		"newData": "data",
-		"oldData": "b"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1640225225034.key",
-		"oldData": "Data_1640225225034"
-	},
-	{
+	"isValid": {
 		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1640225225034.dataType",
-		"newData": "boolean"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1640225225034.label",
-		"newData": "isConfirmOpen"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code[5]",
-		"newData": "  endtime: $dayjs().format('YYYY-MM-DD') + ' 17:30:00',"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code[6]",
-		"oldData": "  leavetype: 'S',  "
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code[7]",
-		"newData": "  leavetype: 'S', "
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code[8]",
-		"oldData": "  leavedays: 0,"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code[9]",
-		"newData": "  leavedays: 1,"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.children[1].label",
-		"newData": "申请类别",
-		"oldData": "类别"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.children[2]",
-		"oldData": {
-			"isDefault": true,
-			"dataType": "string",
-			"name": "checkuser",
-			"id": "Data_1638864239918_checkuser",
-			"label": "预审人",
-			"type": "schema"
-		}
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.children[3].label",
-		"newData": "预计结束时间",
-		"oldData": "结束时间"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.children[7]",
-		"newData": {
-			"isDefault": true,
-			"dataType": "string",
-			"name": "loginname",
-			"id": "Data_1638864239918_loginname",
-			"label": "loginname",
-			"type": "schema"
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.children[14]",
-		"oldData": {
-			"isDefault": true,
-			"dataType": "string",
-			"name": "users",
-			"id": "Data_1638864239918_users",
-			"label": "抄送人",
-			"type": "schema"
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.componentSchemas.checkuser",
-		"oldData": {
-			"isDefault": true,
-			"propertyName": "checkuser",
-			"fieldLabelName": "预审人",
-			"$key": "checkuser",
-			"fieldType": "string"
-		}
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.componentSchemas.endtime.fieldLabelName",
-		"newData": "预计结束时间",
-		"oldData": "结束时间"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.componentSchemas.bigtype.fieldLabelName",
-		"newData": "申请类别",
-		"oldData": "类别"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.componentSchemas.users",
-		"oldData": {
-			"isDefault": true,
-			"propertyName": "users",
-			"fieldLabelName": "抄送人",
-			"$key": "users",
-			"fieldType": "string"
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.columns",
-		"oldData": [
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 255,
-				"columnOrder": 99,
-				"precision": 255,
-				"columnComment": "大类型：QJ 请假 BK 补卡 CC 外出",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "VARCHAR",
-				"propertyName": "bigtype",
-				"fieldLabelName": "bigType",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "bigType",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 0,
-				"columnOrder": 99,
-				"autoCreateRule": "W",
-				"precision": 0,
-				"columnComment": "结束时间",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.sql.Date",
-				"accessType": "N",
-				"columnType": "DATETIME",
-				"propertyName": "endtime",
-				"fieldLabelName": "endTime",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "datetime",
-				"lastModifyDate": "2022-01-10 09:52:40",
-				"columnName": "endTime",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 32,
-				"columnOrder": 99,
-				"autoCreateRule": "U",
-				"precision": 32,
-				"columnComment": "流水号",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": true,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "VARCHAR",
-				"propertyName": "leaveno",
-				"fieldLabelName": "leaveNo",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "leaveNo",
-				"primaryKey": true
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 32,
-				"columnOrder": 99,
-				"precision": 32,
-				"columnComment": "所属部门",
-				"referenceType": "1",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"referenceData": "unitCode",
-				"columnType": "VARCHAR",
-				"propertyName": "ownunit",
-				"fieldLabelName": "ownunit",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "ownunit",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 8,
-				"columnOrder": 99,
-				"precision": 8,
-				"columnComment": "是否中高风险",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "VARCHAR",
-				"propertyName": "isdanger",
-				"fieldLabelName": "isDanger",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "isDanger",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 1,
-				"columnOrder": 99,
-				"precision": 1,
-				"columnComment": "时间单位",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "CHAR",
-				"propertyName": "timetype",
-				"fieldLabelName": "timeType",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "timeType",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 32,
-				"columnOrder": 99,
-				"precision": 32,
-				"columnComment": "用户号",
-				"referenceType": "1",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"referenceData": "userCode",
-				"columnType": "VARCHAR",
-				"propertyName": "usercode",
-				"fieldLabelName": "usercode",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "usercode",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 0,
-				"columnOrder": 99,
-				"precision": 0,
-				"columnComment": "开始时间",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.sql.Date",
-				"accessType": "N",
-				"columnType": "DATETIME",
-				"propertyName": "begintime",
-				"fieldLabelName": "beginTime",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "datetime",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "beginTime",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 32,
-				"columnOrder": 99,
-				"precision": 32,
-				"columnComment": "预审人",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "VARCHAR",
-				"propertyName": "checkuser",
-				"fieldLabelName": "checkUser",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "checkUser",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 255,
-				"columnOrder": 99,
-				"precision": 255,
-				"columnComment": "出差地",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "VARCHAR",
-				"propertyName": "leavecity",
-				"fieldLabelName": "leaveCity",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "leaveCity",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 22,
-				"columnOrder": 99,
-				"precision": 22,
-				"columnComment": "请假时间",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.Double",
-				"accessType": "N",
-				"columnType": "DOUBLE",
-				"propertyName": "leavedays",
-				"fieldLabelName": "leaveDays",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "double",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "leaveDays",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 2,
-				"columnOrder": 99,
-				"precision": 2,
-				"columnComment": "请假类型",
-				"referenceType": "1",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"referenceData": "gaVXuauTSiO1quaguCpAOA",
-				"columnType": "VARCHAR",
-				"propertyName": "leavetype",
-				"fieldLabelName": "leaveType",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "leaveType",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 32,
-				"columnOrder": 99,
-				"precision": 32,
-				"columnComment": "登录名",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "VARCHAR",
-				"propertyName": "loginname",
-				"fieldLabelName": "loginName",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "loginName",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 32,
-				"columnOrder": 99,
-				"precision": 32,
-				"columnComment": "交通方式",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "VARCHAR",
-				"propertyName": "transport",
-				"fieldLabelName": "transport",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "transport",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 8,
-				"columnOrder": 99,
-				"precision": 8,
-				"columnComment": "批准状态",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "VARCHAR",
-				"propertyName": "flowresult",
-				"fieldLabelName": "flowResult",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "flowResult",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 0,
-				"columnOrder": 99,
-				"precision": 0,
-				"columnComment": "请假录入时间",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.sql.Date",
-				"accessType": "N",
-				"columnType": "DATETIME",
-				"propertyName": "recorddate",
-				"fieldLabelName": "recorddate",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "datetime",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "recorddate",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 0,
-				"columnOrder": 99,
-				"precision": 0,
-				"columnComment": "更新时间",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.sql.Date",
-				"accessType": "N",
-				"columnType": "DATETIME",
-				"propertyName": "updatedate",
-				"fieldLabelName": "updatedate",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "datetime",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "updatedate",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 1024,
-				"columnOrder": 99,
-				"precision": 1024,
-				"columnComment": "请假原因",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "VARCHAR",
-				"propertyName": "leavereason",
-				"fieldLabelName": "leaveReason",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "leaveReason",
-				"primaryKey": false
-			},
-			{
-				"recorder": "UkBTbun7",
-				"columnLength": 32,
-				"columnOrder": 99,
-				"precision": 32,
-				"columnComment": "流程实例ID",
-				"scale": 0,
-				"lazyFetch": false,
-				"mandatory": false,
-				"javaType": "java.lang.String",
-				"accessType": "N",
-				"columnType": "VARCHAR",
-				"propertyName": "flowInstId",
-				"fieldLabelName": "FLOW_INST_ID",
-				"tableId": "aJLrc1TqT7as0NMu1vn41Q",
-				"fieldType": "string",
-				"lastModifyDate": "2022-01-06 19:13:41",
-				"columnName": "FLOW_INST_ID",
-				"primaryKey": false
-			}
-		]
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.hasSchema",
-		"oldData": true
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.title",
-		"oldData": "info"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.type",
-		"newData": "data",
-		"oldData": "o"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.codeSchemas.loginname",
-		"newData": {
-			"isDefault": true,
-			"propertyName": "loginname",
-			"fieldLabelName": "loginname",
-			"fieldType": "string"
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.codeSchemas.endtime",
-		"newData": {
-			"isDefault": true,
-			"propertyName": "endtime",
-			"fieldLabelName": "endtime",
-			"fieldType": "string"
-		}
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.key",
-		"oldData": "Data_1638864239918"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.table",
-		"oldData": [
-			"qCkELaoFSTm2_AoREWrYGg",
-			"aJLrc1TqT7as0NMu1vn41Q"
-		]
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.dataType",
-		"newData": "object"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.label",
-		"newData": "info"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1645855447118.title",
-		"oldData": "userInfo"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.dataConfigs.Data_1645855447118.type",
-		"newData": "data",
-		"oldData": "o"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1645855447118.key",
-		"oldData": "Data_1645855447118"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1645855447118.label",
-		"newData": "userInfo"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638877568687.title",
-		"oldData": "loading"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638877568687.type",
-		"newData": "data",
-		"oldData": "b"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638877568687.key",
-		"oldData": "Data_1638877568687"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638877568687.dataType",
-		"newData": "boolean"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638877568687.label",
-		"newData": "loading"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.dataConfigs.Data_1655796616909",
-		"newData": {
-			"code": "$info.userRoles.map(r => r.roleCode)",
-			"children": [
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "0",
-					"id": "Data_1655796616909_0",
-					"label": "0",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "1",
-					"id": "Data_1655796616909_1",
-					"label": "1",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "10",
-					"id": "Data_1655796616909_10",
-					"label": "10",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "11",
-					"id": "Data_1655796616909_11",
-					"label": "11",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "12",
-					"id": "Data_1655796616909_12",
-					"label": "12",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "13",
-					"id": "Data_1655796616909_13",
-					"label": "13",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "2",
-					"id": "Data_1655796616909_2",
-					"label": "2",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "3",
-					"id": "Data_1655796616909_3",
-					"label": "3",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "4",
-					"id": "Data_1655796616909_4",
-					"label": "4",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "5",
-					"id": "Data_1655796616909_5",
-					"label": "5",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "6",
-					"id": "Data_1655796616909_6",
-					"label": "6",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "7",
-					"id": "Data_1655796616909_7",
-					"label": "7",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "8",
-					"id": "Data_1655796616909_8",
-					"label": "8",
-					"type": "schema"
-				},
-				{
-					"isDefault": true,
-					"dataType": "string",
-					"name": "9",
-					"id": "Data_1655796616909_9",
-					"label": "9",
-					"type": "schema"
-				}
-			],
-			"dataType": "array",
-			"name": "roles",
-			"id": "Data_1655796616909",
-			"label": "roles",
-			"type": "data",
-			"codeSchemas": {
-				"0": {
-					"isDefault": true,
-					"propertyName": "0",
-					"fieldLabelName": "0",
-					"fieldType": "string"
-				},
-				"1": {
-					"isDefault": true,
-					"propertyName": "1",
-					"fieldLabelName": "1",
-					"fieldType": "string"
-				},
-				"2": {
-					"isDefault": true,
-					"propertyName": "2",
-					"fieldLabelName": "2",
-					"fieldType": "string"
-				},
-				"3": {
-					"isDefault": true,
-					"propertyName": "3",
-					"fieldLabelName": "3",
-					"fieldType": "string"
-				},
-				"4": {
-					"isDefault": true,
-					"propertyName": "4",
-					"fieldLabelName": "4",
-					"fieldType": "string"
-				},
-				"5": {
-					"isDefault": true,
-					"propertyName": "5",
-					"fieldLabelName": "5",
-					"fieldType": "string"
-				},
-				"6": {
-					"isDefault": true,
-					"propertyName": "6",
-					"fieldLabelName": "6",
-					"fieldType": "string"
-				},
-				"7": {
-					"isDefault": true,
-					"propertyName": "7",
-					"fieldLabelName": "7",
-					"fieldType": "string"
-				},
-				"8": {
-					"isDefault": true,
-					"propertyName": "8",
-					"fieldLabelName": "8",
-					"fieldType": "string"
-				},
-				"9": {
-					"isDefault": true,
-					"propertyName": "9",
-					"fieldLabelName": "9",
-					"fieldType": "string"
-				},
-				"10": {
-					"isDefault": true,
-					"propertyName": "10",
-					"fieldLabelName": "10",
-					"fieldType": "string"
-				},
-				"11": {
-					"isDefault": true,
-					"propertyName": "11",
-					"fieldLabelName": "11",
-					"fieldType": "string"
-				},
-				"12": {
-					"isDefault": true,
-					"propertyName": "12",
-					"fieldLabelName": "12",
-					"fieldType": "string"
-				},
-				"13": {
-					"isDefault": true,
-					"propertyName": "13",
-					"fieldLabelName": "13",
-					"fieldType": "string"
-				}
-			}
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638864247803.code[5]",
-		"newData": "  debugger"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638864247803.title",
-		"oldData": "load"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638864247803.key",
-		"oldData": "Method_1638864247803"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638864247803.label",
-		"newData": "load"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638864247803.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638954980168.title",
-		"oldData": "clearValidate"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638954980168.key",
-		"oldData": "Method_1638954980168"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638954980168.label",
-		"newData": "clearValidate"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638954980168.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code[1]",
-		"newData": "  if($data.info.bigtype==='B'){"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code[2]",
-		"newData": "    $data.info.endtime=$data.info.begintime;"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code[12]",
-		"oldData": "    info.leavedays = parseFloat(diffD.toFixed(1))"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code[15]",
-		"newData": "    // info.leavedays = parseFloat(diffD.toFixed(1))"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code[16]",
-		"newData": "    info.leavedays = (Math.floor(diffH / 24) + Math.min(1, (diffH % 24) / 8)).toFixed(1) * 1.0"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.title",
-		"oldData": "diffTime"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.key",
-		"oldData": "Method_1638874856696"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.label",
-		"newData": "diffTime"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225334569.title",
-		"oldData": "closeConfirm"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225334569.key",
-		"oldData": "Method_1640225334569"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225334569.label",
-		"newData": "closeConfirm"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225334569.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640138240552.code[6]",
-		"newData": "    C: '出差',"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640138240552.title",
-		"oldData": "createFlowName"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640138240552.key",
-		"oldData": "Method_1640138240552"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640138240552.label",
-		"newData": "createFlowName"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640138240552.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[1]",
-		"oldData": "  const data = await $dde.get('1473565dee594ea698971bd2afda8966')"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[1]",
-		"newData": "  //const data = await $dde.get('1473565dee594ea698971bd2afda8966')"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[2]",
-		"oldData": "  $data.userInfo = data.map(item=>("
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[2]",
-		"newData": "  // const data = await $api.System.get('/platform/allusers/'+$info.topUnitCode);"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[3]",
-		"oldData": "     {label:item.userName,value:item.userCode}"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[3]",
-		"newData": "  // $data.userInfo = data.map(item=>("
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[4]",
-		"oldData": "     ))"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[4]",
-		"newData": "  //    {label:item.userName,value:item.userCode}"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[5]",
-		"newData": "  //    ))"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[6]",
-		"newData": "  $data.userInfo = await $api.queryUnitsUsers(true)"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.title",
-		"oldData": "getUserInfo"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.key",
-		"oldData": "Method_1645855991274"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.label",
-		"newData": "getUserInfo"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[1]",
-		"oldData": "  const { info } = $data"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[1]",
-		"newData": ""
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[2]",
-		"oldData": "  const { leaveno } = info"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[2]",
-		"newData": "    const { info } = $data"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[3]",
-		"oldData": "  "
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[3]",
-		"newData": "    const { leaveno } = info"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[4]",
-		"oldData": "  // 更新时间"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[4]",
-		"newData": "    if (info.bigtype === 'B') {"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[5]",
-		"oldData": "  const now = $d().format('YYYY-MM-DD HH:mm:ss')"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[5]",
-		"newData": "        info.endtime = info.begintime;"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[6]",
-		"oldData": "  info.updatedate = now"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[6]",
-		"newData": "        info.leavedays = 0"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[7]",
-		"oldData": "  console.log(leaveno)"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[7]",
-		"newData": "    }"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[8]",
-		"oldData": "  if (leaveno) {"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[8]",
-		"newData": ""
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[9]",
-		"oldData": "  \treturn $dde.put('121f2bd4cfca437ca14589e41bdf1c1d', info)"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[9]",
-		"newData": "    // 更新时间"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[10]",
-		"oldData": "  } else {"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[10]",
-		"newData": "    const now = $d().format('YYYY-MM-DD HH:mm:ss')"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[11]",
-		"oldData": "    // 创建时间"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[11]",
-		"newData": "    info.updatedate = now"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[12]",
-		"oldData": "    info.recorddate = now"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[12]",
-		"newData": "    console.log(leaveno)"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[13]",
-		"oldData": "    info.flowOptName = $run('createFlowName', info)"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[13]",
-		"newData": "    if (leaveno) {"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[14]",
-		"oldData": "    // 提交工作流"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[14]",
-		"newData": "        return $dde.put('121f2bd4cfca437ca14589e41bdf1c1d', info)"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[15]",
-		"oldData": "    return $dde.post('78e93bd352ea4d7a829ae69241dc3cd5', info)"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[15]",
-		"newData": "    } else {"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[16]",
-		"oldData": "  }"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[16]",
-		"newData": "        // 创建时间"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[17]",
-		"newData": "        info.recorddate = now"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[18]",
-		"newData": "        info.flowOptName = $run('createFlowName', info)"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[19]",
-		"newData": "        // 提交工作流"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[20]",
-		"newData": "        return $dde.post('78e93bd352ea4d7a829ae69241dc3cd5', info)"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[21]",
-		"newData": "    }"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.title",
-		"oldData": "save"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.key",
-		"oldData": "Method_1638961091182"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.label",
-		"newData": "save"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225567064.title",
-		"oldData": "okConfirm"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225567064.key",
-		"oldData": "Method_1640225567064"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225567064.label",
-		"newData": "okConfirm"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225567064.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1646726881030.title",
-		"oldData": "translateDicMaps"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1646726881030.key",
-		"oldData": "Method_1646726881030"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1646726881030.label",
-		"newData": "translateDicMaps"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1646726881030.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638954895952.title",
-		"oldData": "validate"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638954895952.key",
-		"oldData": "Method_1638954895952"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638954895952.label",
-		"newData": "validate"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638954895952.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225251401.title",
-		"oldData": "openConfirm"
-	},
-	{
-		"diffType": "-",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225251401.key",
-		"oldData": "Method_1640225251401"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225251401.label",
-		"newData": "openConfirm"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640225251401.type",
-		"newData": "method"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1655796721556",
-		"newData": {
-			"code": "function isLD () {\n    // 我需要调试\n    if ($info.userInfo.loginName === 'zk'||$info.userInfo.loginName === 'zhf') return false\n\n    const LD = ['R0000001', 'R0000002']\n    const roles = $data.roles \n\n    return roles.some(r => LD.includes(r))\n}",
-			"name": "isLD",
-			"id": "Method_1655796721556",
-			"label": "isLD",
-			"type": "method"
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1655717139357",
-		"newData": {
-			"code": "function onChangeType(type) {\n    if (!type) return\n    const info = $data.info\n    info.bigtype = type\n    // 在下面开始编写type监听\n    if (type === 'Q') {\n        info.leavetype = 'S'\n        info.leavetypeDesc = '事假'\n    } else if (type === 'W') {\n        info.leavetype = 'SN'\n        info.leavetypeDesc = '市内外出'\n        info.isdanger = 'L'\n    } else if (type === 'C') {\n        info.leavetype = 'CC'\n        info.leavetypeDesc = '出差'\n        info.isdanger = 'L'\n    } else if (type === 'B') {\n        info.leavetype = 'BD'\n        info.leavetypeDesc = '补打卡'\n        info.endtime=info.begintime\n        info.leavedays=0\n        info.timetype='H'\n    }\n\n    $run('clearValidate')\n}",
-			"name": "onChangeType",
-			"id": "Method_1655717139357",
-			"label": "onChangeType",
-			"type": "method"
-		}
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.paramsConfigs.Param_1640865185828.code[5]",
-		"newData": "    $data.info.endtime = current.format('YYYY-MM-DD') + ' 17:30:00'"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "structureFunction.paramsConfigs.Param_1655716567113",
-		"newData": {
-			"code": "function watchType(type, oldType) {\n  $run('onChangeType', type)\n}",
-			"immediate": true,
-			"name": "type",
-			"id": "Param_1655716567113"
-		}
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "lastModifyDate",
-		"newData": "2023-02-23 09:18:39",
-		"oldData": "2022-04-11 14:33:19"
-	},
-	{
-		"diffType": "+",
-		"jsonPath": "isValid",
 		"newData": false
 	}
-]
+}

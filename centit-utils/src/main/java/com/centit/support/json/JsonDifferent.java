@@ -1,6 +1,10 @@
 package com.centit.support.json;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
+
 import java.io.Serializable;
+import java.util.List;
 
 public class JsonDifferent implements Serializable {
     private static final long serialVersionUID = 20230301L;
@@ -18,7 +22,10 @@ public class JsonDifferent implements Serializable {
 
     private Object oldData;
 
+    private List<JsonDifferent> diffChildren;
+
     public JsonDifferent() {
+        this.diffChildren = null;
     }
 
     public JsonDifferent(String jsonPath, String diffType, Object oldData, Object newData) {
@@ -26,6 +33,7 @@ public class JsonDifferent implements Serializable {
         this.diffType = diffType;
         this.newData = newData;
         this.oldData = oldData;
+        this.diffChildren = null;
     }
 
     public String getJsonPath() {
@@ -58,5 +66,44 @@ public class JsonDifferent implements Serializable {
 
     public void setOldData(Object oldData) {
         this.oldData = oldData;
+    }
+
+    public List<JsonDifferent> getDiffChildren() {
+        return diffChildren;
+    }
+
+    public void setDiffChildren(List<JsonDifferent> diffChildren) {
+        this.diffChildren = diffChildren;
+    }
+
+    public JSONObject toJson(){
+        JSONObject jsonObj = new JSONObject();
+        jsonObj.put("diffType", this.diffType);
+        if(this.newData != null){
+            jsonObj.put("newData", this.newData);
+        }
+        if(this.oldData != null){
+            jsonObj.put("oldData", this.oldData);
+        }
+        if(this.diffChildren != null){
+            for(JsonDifferent childDiff : this.diffChildren){
+                jsonObj.put(childDiff.getJsonPath(), childDiff.toJson());
+            }
+        }
+        return jsonObj;
+    }
+
+    public static Object toJson(List<JsonDifferent> diffList){
+        if(diffList==null || diffList.size()==0){
+            return null;
+        }
+        if(diffList.size()==1){
+            return diffList.get(0).toJson();
+        }
+        JSONArray jsonArray = new JSONArray(diffList.size());
+        for(JsonDifferent childDiff : diffList){
+            jsonArray.add(childDiff.toJson());
+        }
+        return jsonArray;
     }
 }

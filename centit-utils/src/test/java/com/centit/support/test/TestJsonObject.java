@@ -6,6 +6,7 @@ import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.json.JSONOpt;
 import com.centit.support.json.JSONTransformer;
+import com.centit.support.json.JsonDifferent;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,8 +22,8 @@ public class TestJsonObject {
         in = TestJsonObject.class
             .getResourceAsStream("/page-v2.json");
         Object object2  = JSON.parse(FileIOOpt.readStringFromInputStream(in));
-
-        System.out.println(JSON.toJSONString(JSONOpt.diff(object, object2, "id", "value")));
+        JsonDifferent diff = JSONOpt.diff(object, object2, "id", "value");
+        System.out.println(JSON.toJSONString(diff.toJson()));
     }
 
     public static void testJsonTransform() throws IOException {
