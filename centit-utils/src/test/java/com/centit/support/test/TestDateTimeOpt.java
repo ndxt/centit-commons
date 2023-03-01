@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class TestDateTimeOpt {
     public static void main(String[] args) {
+        System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.castObjectToDate("10/16/2022")));
         System.out.println(DatetimeOpt.createUtilDate(1980,2,1).getTime());
         System.out.println(DatetimeOpt.createUtilDate(2200,1,1).getTime());
         System.out.println(System.currentTimeMillis());

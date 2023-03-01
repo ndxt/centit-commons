@@ -5,23 +5,19 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.util.JdbcSupport;
-import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.json.config.LobSerializer;
 import com.centit.support.json.config.SqlDateDeserializer;
 import com.centit.support.json.config.SqlTimestampDeserializer;
 import com.centit.support.json.config.UtilDateDeserializer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 对JSON对象进行操作，目前只能对一维数组进行操作，
@@ -53,6 +49,169 @@ public abstract class JSONOpt {
         JSON.register(java.sql.Clob.class, JdbcSupport.createClobWriter(java.sql.Clob.class));
     }
 
+    private static List<JsonDifferent> mapDiff(String jsonPath, Map<String, Object> mapA, Map<String, Object>  mapB, String ... arrayKeys){
+        List<JsonDifferent> differents = new ArrayList<>();
+        for(Map.Entry<String, Object> ent : mapA.entrySet()){
+            Object objA = ent.getValue();
+            Object objB = mapB.get(ent.getKey());
+            differents.addAll(objectDiff(StringUtils.isBlank(jsonPath)?ent.getKey():jsonPath+"."+ent.getKey(),
+                objA, objB, arrayKeys));
+        }
+
+        for(Map.Entry<String, Object> ent : mapB.entrySet()){
+            if(!mapA.containsKey(ent.getKey())){
+                differents.add(new JsonDifferent(StringUtils.isBlank(jsonPath)?ent.getKey():jsonPath+"."+ent.getKey(),
+                    JsonDifferent.JSON_DIFF_TYPE_ADD, null, ent.getValue()));
+            }
+         }
+
+        return differents;
+    }
+
+    private static int compareTwoRow(Map<String, Object> data1, Map<String, Object> data2, String[] fields) {
+        if ((data1 == null && data2 == null)|| (fields == null)) {
+            return 0;
+        }
+
+        if (data1 == null) {
+            return -1;
+        }
+
+        if (data2 == null) {
+            return 1;
+        }
+        for (String field : fields) {
+            Object idA = data1.get(field), idB = data2.get(field);
+            if(idA !=null && idB != null){
+                int cr = GeneralAlgorithm.compareTwoObject(idA, idB, true);
+                if (cr != 0) {
+                    return cr;
+                }
+            }
+        }
+        return 0;
+    }
+
+    private static List<JsonDifferent> listDiff(String jsonPath, List<Object> listA, List<Object> listB, String ... arrayKeys){
+        List<JsonDifferent> differents = new ArrayList<>();
+        int sizeA = listA.size(), sizeB = listB.size();
+        if(sizeA==0 && sizeB==0){
+            return differents;
+        }
+        if(sizeA==0){
+            differents.add(new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB));
+            return differents;
+        }
+
+        if(sizeB==0){
+            differents.add(new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_DELETE, listA, null));
+            return differents;
+        }
+
+        int minSize = sizeA>sizeB? sizeB : sizeA;
+        //通过ID排序; 对于数组中的Map来说 必须有id， id可以是多个字段， 如果不同的map id不一样，也可以同时提供
+        if(listA.get(0) instanceof Map && listB.get(0) instanceof Map && arrayKeys !=null && arrayKeys.length>0){
+            listA.sort( (o1, o2) -> compareTwoRow((Map)o1, (Map)o2, arrayKeys));
+            listB.sort( (o1, o2) -> compareTwoRow((Map)o1, (Map)o2, arrayKeys));
+            int i=0; int j=0;
+            while(i<sizeA && j<sizeB){
+                int c = compareTwoRow((Map)listA.get(i), (Map)listB.get(j), arrayKeys);
+                if(c<0){
+                    differents.add(new JsonDifferent(jsonPath+"["+i+"]", JsonDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
+                    i++;
+                } else if(c>0){
+                    differents.add(new JsonDifferent(jsonPath+"["+j+"]", JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(j)));
+                    j++;
+                } else {
+                    differents.addAll(objectDiff( jsonPath+"["+i+"]", listA.get(i), listB.get(j), arrayKeys));
+                    i++;
+                    j++;
+                }
+            }
+
+            while(i<sizeA){
+                differents.add(new JsonDifferent(jsonPath+"["+i+"]", JsonDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
+                i++;
+            }
+            while(j<sizeB){
+                differents.add(new JsonDifferent(jsonPath+"["+j+"]", JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(j)));
+                j++;
+            }
+
+        } //判断一下是否是多维数组，如果是多维数组只能按照序号对比
+        else if(listA.get(0) instanceof List && listB.get(0) instanceof List){
+            for(int i=0; i<minSize; i++){
+                differents.addAll(objectDiff( jsonPath+"["+i+"]", listA.get(i), listB.get(i), arrayKeys));
+            }
+            for(int i=minSize; i<sizeA; i++){
+                differents.add(new JsonDifferent(jsonPath+"["+i+"]", JsonDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
+            }
+            for(int i=minSize; i<sizeB; i++) {
+                differents.add(new JsonDifferent(jsonPath+"["+i+"]", JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(i)));
+            }
+        } // 作为标量处理； 全部用字符串对比的方式
+        else {
+            Set<String> stringsA = new HashSet<>(sizeA+2);
+            Set<String> stringsB = new HashSet<>(sizeB+2);
+            for(int i=0; i<sizeA; i++){
+                stringsA.add(StringBaseOpt.castObjectToString(listA.get(i)));
+            }
+            for(int i=0; i<sizeB; i++){
+                stringsB.add(StringBaseOpt.castObjectToString(listB.get(i)));
+            }
+            for(int i=0; i<minSize; i++){
+                String sA = StringBaseOpt.castObjectToString(listA.get(i));
+                if(!stringsB.contains(sA)){
+                    differents.add(new JsonDifferent(jsonPath+"["+i+"]", JsonDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
+                }
+                String sB = StringBaseOpt.castObjectToString(listB.get(i));
+                if(!stringsA.contains(sB)){
+                    differents.add(new JsonDifferent(jsonPath+"["+i+"]", JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(i)));
+                }
+            }
+            for(int i=minSize; i<sizeA; i++){
+                String sA = StringBaseOpt.castObjectToString(listA.get(i));
+                if(!stringsB.contains(sA)){
+                    differents.add(new JsonDifferent(jsonPath+"["+i+"]", JsonDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
+                }
+            }
+            for(int i=minSize; i<sizeB; i++) {
+                String sB = StringBaseOpt.castObjectToString(listB.get(i));
+                if(!stringsA.contains(sB)){
+                    differents.add(new JsonDifferent(jsonPath+"["+i+"]", JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(i)));
+                }
+            }
+        }
+        return differents;
+    }
+
+    public static List<JsonDifferent> objectDiff(String jsonPath, Object objectA, Object objectB, String ... arrayKeys){
+        if(objectA instanceof Map && objectB instanceof Map){
+            return mapDiff(jsonPath, (Map<String, Object>)objectA, (Map<String, Object>)objectB, arrayKeys);
+        }
+
+        if(objectA instanceof List && objectB instanceof List){
+            return listDiff(jsonPath, (List<Object>)objectA, (List<Object>)objectB, arrayKeys);
+        }
+
+        List<JsonDifferent> differents = new ArrayList<>();
+        if(GeneralAlgorithm.equals(objectA, objectB)) {
+            return differents;
+        }
+
+        String diffType = JsonDifferent.JSON_DIFF_TYPE_UPDATE;
+        if(objectA == null ){
+            diffType = JsonDifferent.JSON_DIFF_TYPE_ADD;
+        } else if(objectB == null ){
+            diffType = JsonDifferent.JSON_DIFF_TYPE_DELETE;
+        }
+        differents.add(new JsonDifferent(jsonPath, diffType, objectA, objectB));
+        return differents;
+    }
+
+    public static List<JsonDifferent> diff(Object objectA, Object objectB, String ... arrayKeys){
+        return objectDiff("", objectA, objectB, arrayKeys);
+    }
     /* 目前只支持一维数值
      * @return
      */
@@ -109,8 +268,6 @@ public abstract class JSONOpt {
         p.objJson = lastKeyJson;
         return p;
     }
-
-
 
     private static JSONObject innerCreateJsonObject(String[] skeys, int beginPos, Object value) {
         int depth = skeys.length;
@@ -304,13 +461,14 @@ public abstract class JSONOpt {
             //StringBaseOpt.objectToString(obj);
             return obj.toString();
         }
-        if (obj instanceof JSON)
-            return JSON.toJSONString(obj);
+
+        if (obj instanceof JSONObject || obj instanceof JSONArray)
+            return obj.toString();
 
         if (ReflectionOpt.isArray(obj))
-            return  JSON.toJSONString(arrayToJSONArray(obj, methodOnly, fieldOnly, includePrivateField));
+            return  arrayToJSONArray(obj, methodOnly, fieldOnly, includePrivateField).toString();
 
-        return objectToJSONObject(obj, methodOnly, fieldOnly, includePrivateField).toJSONString();
+        return objectToJSONObject(obj, methodOnly, fieldOnly, includePrivateField).toString();
     }
 
     /**
@@ -343,8 +501,8 @@ public abstract class JSONOpt {
      */
     public static Object objectToJSON(Object obj, boolean methodOnly, boolean fieldOnly, boolean includePrivateField) {
 
-        if (obj instanceof JSON)
-            return (JSON) obj;
+        if (obj instanceof JSONObject || obj instanceof JSONArray)
+            return obj;
 
         if (ReflectionOpt.isArray(obj))
             return arrayToJSONArray(obj, methodOnly, fieldOnly, includePrivateField);
@@ -535,7 +693,6 @@ public abstract class JSONOpt {
     public static JSONArray arrayToJSONArray(Object objArray, boolean methodOnly, boolean fieldOnly) {
         return arrayToJSONArray(objArray, methodOnly, fieldOnly, false);
     }
-
 
     static class JSONPath {
         JSONObject objJson;

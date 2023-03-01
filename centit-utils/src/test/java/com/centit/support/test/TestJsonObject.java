@@ -16,14 +16,26 @@ public class TestJsonObject {
     public static void main(String arg[]) throws IOException {
         JSONOpt.fastjsonGlobalConfig();
         InputStream in = TestJsonObject.class
+            .getResourceAsStream("/page-v1.json");
+        Object object = JSON.parse(FileIOOpt.readStringFromInputStream(in));
+        in = TestJsonObject.class
+            .getResourceAsStream("/page-v2.json");
+        Object object2  = JSON.parse(FileIOOpt.readStringFromInputStream(in));
+
+        System.out.println(JSON.toJSONString(JSONOpt.diff(object, object2, "id")));
+    }
+
+    public static void testJsonTransform() throws IOException {
+        JSONOpt.fastjsonGlobalConfig();
+        InputStream in = TestJsonObject.class
             .getResourceAsStream("/test.json");
         Object object = JSON.parse(FileIOOpt.readStringFromInputStream(in));
         in = TestJsonObject.class
             .getResourceAsStream("/template.json");
         Object template  = JSON.parse(FileIOOpt.readStringFromInputStream(in));
+
         System.out.println(JSON.toJSONString(JSONTransformer.transformer(template, object)));
     }
-
     public static void testObjectToJson() {
         System.out.println(JSON.toJSONString(new Object[]{5, 6, "hello"}));
 

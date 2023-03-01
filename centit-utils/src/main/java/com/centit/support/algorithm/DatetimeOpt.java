@@ -1005,7 +1005,10 @@ public abstract class DatetimeOpt {
             case 8:
                 return convertStringToDate(sTD, "yy-MM-dd");
             case 10:
-                return convertStringToDate(sTD, "yyyy-MM-dd");
+                if(sTD.indexOf('-')==2)
+                    return convertStringToDate(sTD, "MM-dd-yyyy");
+                else
+                    return convertStringToDate(sTD, "yyyy-MM-dd");
             case 11:
                 return convertStringToDate(sTD, "yy-MM-dd HH");
             case 13:

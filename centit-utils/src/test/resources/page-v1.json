@@ -1,0 +1,2328 @@
+{
+    "formTemplate": {
+        "dataConfigs": {
+            "Data_1640225225034": {
+                "code": "false",
+                "children": [],
+                "name": "isConfirmOpen",
+                "id": "Data_1640225225034",
+                "title": "isConfirmOpen",
+                "type": "b",
+                "key": "Data_1640225225034"
+            },
+            "Data_1638864239918": {
+                "code": "const { userInfo: $u } = $info;\n\nreturn {\n  recorddate: $dayjs().format('YYYY-MM-DD HH:mm:ss'),\n  begintime: $dayjs().format('YYYY-MM-DD') + ' 08:30:00',\n  bigtype: 'Q',\n  leavetype: 'S',  \n  timetype: 'D',  \n  leavedays: 0,\n  usercode: $u.userCode,\n  usercodeDesc: $u.userName,\n  loginname: $u.loginName,\n  ownunit: $u.primaryUnit,\n  ownunitDesc: $u.primaryUnitName,\n}",
+                "children": [
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "begintime",
+                        "id": "Data_1638864239918_begintime",
+                        "label": "begintime",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "bigtype",
+                        "id": "Data_1638864239918_bigtype",
+                        "label": "bigtype",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "checkuser",
+                        "id": "Data_1638864239918_checkuser",
+                        "label": "预审人",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "timestamp",
+                        "name": "endtime",
+                        "id": "Data_1638864239918_endtime",
+                        "label": "结束时间",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "files",
+                        "id": "Data_1638864239918_files",
+                        "label": "上传文件",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "number",
+                        "name": "leavedays",
+                        "id": "Data_1638864239918_leavedays",
+                        "label": "leavedays",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "leavereason",
+                        "id": "Data_1638864239918_leavereason",
+                        "label": "事由",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "leavetype",
+                        "id": "Data_1638864239918_leavetype",
+                        "label": "leavetype",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "ownunit",
+                        "id": "Data_1638864239918_ownunit",
+                        "label": "ownunit",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "ownunitDesc",
+                        "id": "Data_1638864239918_ownunitDesc",
+                        "label": "ownunitDesc",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "recorddate",
+                        "id": "Data_1638864239918_recorddate",
+                        "label": "recorddate",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "timetype",
+                        "id": "Data_1638864239918_timetype",
+                        "label": "timetype",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "usercode",
+                        "id": "Data_1638864239918_usercode",
+                        "label": "usercode",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "usercodeDesc",
+                        "id": "Data_1638864239918_usercodeDesc",
+                        "label": "usercodeDesc",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "users",
+                        "id": "Data_1638864239918_users",
+                        "label": "抄送人",
+                        "type": "schema"
+                    }
+                ],
+                "componentSchemas": {
+                    "leavetype": {
+                        "isDefault": true,
+                        "propertyName": "leavetype",
+                        "fieldLabelName": "外出类型",
+                        "$key": "leavetype",
+                        "fieldType": "string"
+                    },
+                    "checkuser": {
+                        "isDefault": true,
+                        "propertyName": "checkuser",
+                        "fieldLabelName": "预审人",
+                        "$key": "checkuser",
+                        "fieldType": "string"
+                    },
+                    "leavereason": {
+                        "isDefault": true,
+                        "propertyName": "leavereason",
+                        "fieldLabelName": "事由",
+                        "$key": "leavereason",
+                        "fieldType": "string"
+                    },
+                    "endtime": {
+                        "isDefault": true,
+                        "propertyName": "endtime",
+                        "fieldLabelName": "结束时间",
+                        "$key": "endtime",
+                        "fieldType": "timestamp"
+                    },
+                    "files": {
+                        "isDefault": true,
+                        "propertyName": "files",
+                        "fieldLabelName": "上传文件",
+                        "$key": "files",
+                        "fieldType": "string"
+                    },
+                    "begintime": {
+                        "isDefault": true,
+                        "propertyName": "begintime",
+                        "fieldLabelName": "开始时间",
+                        "$key": "begintime",
+                        "fieldType": "timestamp"
+                    },
+                    "bigtype": {
+                        "isDefault": true,
+                        "propertyName": "bigtype",
+                        "fieldLabelName": "类别",
+                        "$key": "bigtype",
+                        "fieldType": "string"
+                    },
+                    "users": {
+                        "isDefault": true,
+                        "propertyName": "users",
+                        "fieldLabelName": "抄送人",
+                        "$key": "users",
+                        "fieldType": "string"
+                    }
+                },
+                "columns": [
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 255,
+                        "columnOrder": 99,
+                        "precision": 255,
+                        "columnComment": "大类型：QJ 请假 BK 补卡 CC 外出",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "bigtype",
+                        "fieldLabelName": "bigType",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "bigType",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 0,
+                        "columnOrder": 99,
+                        "autoCreateRule": "W",
+                        "precision": 0,
+                        "columnComment": "结束时间",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.sql.Date",
+                        "accessType": "N",
+                        "columnType": "DATETIME",
+                        "propertyName": "endtime",
+                        "fieldLabelName": "endTime",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "datetime",
+                        "lastModifyDate": "2022-01-10 09:52:40",
+                        "columnName": "endTime",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "autoCreateRule": "U",
+                        "precision": 32,
+                        "columnComment": "流水号",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": true,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "leaveno",
+                        "fieldLabelName": "leaveNo",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "leaveNo",
+                        "primaryKey": true
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "所属部门",
+                        "referenceType": "1",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "referenceData": "unitCode",
+                        "columnType": "VARCHAR",
+                        "propertyName": "ownunit",
+                        "fieldLabelName": "ownunit",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "ownunit",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 8,
+                        "columnOrder": 99,
+                        "precision": 8,
+                        "columnComment": "是否中高风险",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "isdanger",
+                        "fieldLabelName": "isDanger",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "isDanger",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 1,
+                        "columnOrder": 99,
+                        "precision": 1,
+                        "columnComment": "时间单位",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "CHAR",
+                        "propertyName": "timetype",
+                        "fieldLabelName": "timeType",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "timeType",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "用户号",
+                        "referenceType": "1",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "referenceData": "userCode",
+                        "columnType": "VARCHAR",
+                        "propertyName": "usercode",
+                        "fieldLabelName": "usercode",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "usercode",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 0,
+                        "columnOrder": 99,
+                        "precision": 0,
+                        "columnComment": "开始时间",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.sql.Date",
+                        "accessType": "N",
+                        "columnType": "DATETIME",
+                        "propertyName": "begintime",
+                        "fieldLabelName": "beginTime",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "datetime",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "beginTime",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "预审人",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "checkuser",
+                        "fieldLabelName": "checkUser",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "checkUser",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 255,
+                        "columnOrder": 99,
+                        "precision": 255,
+                        "columnComment": "出差地",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "leavecity",
+                        "fieldLabelName": "leaveCity",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "leaveCity",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 22,
+                        "columnOrder": 99,
+                        "precision": 22,
+                        "columnComment": "请假时间",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.Double",
+                        "accessType": "N",
+                        "columnType": "DOUBLE",
+                        "propertyName": "leavedays",
+                        "fieldLabelName": "leaveDays",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "double",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "leaveDays",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 2,
+                        "columnOrder": 99,
+                        "precision": 2,
+                        "columnComment": "请假类型",
+                        "referenceType": "1",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "referenceData": "gaVXuauTSiO1quaguCpAOA",
+                        "columnType": "VARCHAR",
+                        "propertyName": "leavetype",
+                        "fieldLabelName": "leaveType",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "leaveType",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "登录名",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "loginname",
+                        "fieldLabelName": "loginName",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "loginName",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "交通方式",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "transport",
+                        "fieldLabelName": "transport",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "transport",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 8,
+                        "columnOrder": 99,
+                        "precision": 8,
+                        "columnComment": "批准状态",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "flowresult",
+                        "fieldLabelName": "flowResult",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "flowResult",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 0,
+                        "columnOrder": 99,
+                        "precision": 0,
+                        "columnComment": "请假录入时间",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.sql.Date",
+                        "accessType": "N",
+                        "columnType": "DATETIME",
+                        "propertyName": "recorddate",
+                        "fieldLabelName": "recorddate",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "datetime",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "recorddate",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 0,
+                        "columnOrder": 99,
+                        "precision": 0,
+                        "columnComment": "更新时间",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.sql.Date",
+                        "accessType": "N",
+                        "columnType": "DATETIME",
+                        "propertyName": "updatedate",
+                        "fieldLabelName": "updatedate",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "datetime",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "updatedate",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 1024,
+                        "columnOrder": 99,
+                        "precision": 1024,
+                        "columnComment": "请假原因",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "leavereason",
+                        "fieldLabelName": "leaveReason",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "leaveReason",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "流程实例ID",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "flowInstId",
+                        "fieldLabelName": "FLOW_INST_ID",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "FLOW_INST_ID",
+                        "primaryKey": false
+                    }
+                ],
+                "name": "info",
+                "hasSchema": true,
+                "id": "Data_1638864239918",
+                "title": "info",
+                "type": "o",
+                "codeSchemas": {
+                    "ownunitDesc": {
+                        "isDefault": true,
+                        "propertyName": "ownunitDesc",
+                        "fieldLabelName": "ownunitDesc",
+                        "fieldType": "string"
+                    },
+                    "leavetype": {
+                        "isDefault": true,
+                        "propertyName": "leavetype",
+                        "fieldLabelName": "leavetype",
+                        "fieldType": "string"
+                    },
+                    "leavedays": {
+                        "isDefault": true,
+                        "propertyName": "leavedays",
+                        "fieldLabelName": "leavedays",
+                        "fieldType": "number"
+                    },
+                    "ownunit": {
+                        "isDefault": true,
+                        "propertyName": "ownunit",
+                        "fieldLabelName": "ownunit",
+                        "fieldType": "string"
+                    },
+                    "usercodeDesc": {
+                        "isDefault": true,
+                        "propertyName": "usercodeDesc",
+                        "fieldLabelName": "usercodeDesc",
+                        "fieldType": "string"
+                    },
+                    "begintime": {
+                        "isDefault": true,
+                        "propertyName": "begintime",
+                        "fieldLabelName": "begintime",
+                        "fieldType": "string"
+                    },
+                    "recorddate": {
+                        "isDefault": true,
+                        "propertyName": "recorddate",
+                        "fieldLabelName": "recorddate",
+                        "fieldType": "string"
+                    },
+                    "bigtype": {
+                        "isDefault": true,
+                        "propertyName": "bigtype",
+                        "fieldLabelName": "bigtype",
+                        "fieldType": "string"
+                    },
+                    "timetype": {
+                        "isDefault": true,
+                        "propertyName": "timetype",
+                        "fieldLabelName": "timetype",
+                        "fieldType": "string"
+                    },
+                    "usercode": {
+                        "isDefault": true,
+                        "propertyName": "usercode",
+                        "fieldLabelName": "usercode",
+                        "fieldType": "string"
+                    }
+                },
+                "key": "Data_1638864239918",
+                "table": [
+                    "qCkELaoFSTm2_AoREWrYGg",
+                    "aJLrc1TqT7as0NMu1vn41Q"
+                ]
+            },
+            "Data_1645855447118": {
+                "code": "[]",
+                "children": [],
+                "dataType": "array",
+                "name": "userInfo",
+                "id": "Data_1645855447118",
+                "title": "userInfo",
+                "type": "o",
+                "codeSchemas": {},
+                "key": "Data_1645855447118"
+            },
+            "Data_1638877568687": {
+                "code": "false",
+                "children": [],
+                "name": "loading",
+                "id": "Data_1638877568687",
+                "title": "loading",
+                "type": "b",
+                "key": "Data_1638877568687"
+            },
+            "Data_1646792665104": {
+                "code": "[\r\n   {label:'事假',value:'S'},\r\n   {label:'婚假',value:'H'},\r\n   {label:'产假',value:'C'},\r\n   {label:'年假',value:'N'},\r\n   {label:'调休',value:'T'},\r\n   {label:'护产假',value:'P'},\r\n   {label:'非住院病假',value:'FB'},\r\n   {label:'住院病假',value:'ZB'},\r\n   {label:'探亲假',value:'TQ'},\r\n   {label:'产检假',value:'CJ'},\r\n   {label:'丧假',value:'SJ'},\r\n   {label:'市内外出',value:'SN'},\r\n   {label:'其他外出',value:'QW'},\r\n   {label:'出差',value:'CC'},\r\n   {label:'长期驻外',value:'CQ'},\r\n   {label:'补打卡',value:'BD'}\r\n]",
+                "children": [
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "label",
+                        "id": "Data_1646792665104_label",
+                        "label": "label",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "value",
+                        "id": "Data_1646792665104_value",
+                        "label": "value",
+                        "type": "schema"
+                    }
+                ],
+                "dataType": "array",
+                "name": "leavetypeDic",
+                "id": "Data_1646792665104",
+                "label": "leavetypeDic",
+                "type": "data",
+                "codeSchemas": {
+                    "label": {
+                        "isDefault": true,
+                        "propertyName": "label",
+                        "fieldLabelName": "label",
+                        "fieldType": "string"
+                    },
+                    "value": {
+                        "isDefault": true,
+                        "propertyName": "value",
+                        "fieldLabelName": "value",
+                        "fieldType": "string"
+                    }
+                }
+            }
+        },
+        "styleText": "",
+        "setLoadingCode": "function setLoading() {\n  // 在下面返回Loading的值\n  return $data.loading\n}",
+        "componentData": {},
+        "paramsConfigs": {
+            "Param_1638864376530": {
+                "code": "function watchId(id, oldId) {\n  // 在下面开始编写id监听\n  $run('load', id)\n}",
+                "immediate": true,
+                "name": "id",
+                "id": "Param_1638864376530"
+            },
+            "Param_1640865185828": {
+                "code": "function watchCurrent(current, oldCurrent) {\n  // 在下面开始编写current监听\n  if (current?.format instanceof Function) {\n  \t$data.info.recorddate = current.format('YYYY-MM-DD HH:mm:ss')\n    $data.info.begintime = current.format('YYYY-MM-DD') + ' 08:30:00'\n  }\n}",
+                "immediate": true,
+                "name": "current",
+                "id": "Param_1640865185828"
+            }
+        },
+        "methodsConfigs": {
+            "Method_1640225576969": {
+                "name": "cancelConfirm",
+                "id": "Method_1640225576969",
+                "title": "",
+                "key": "Method_1640225576969"
+            },
+            "Method_1638864247803": {
+                "code": "async function load(leaveno) {\n  if (!leaveno) return\n  const params = { leaveno }\n  $data.loading = true\n  $data.info = await $dde.get('e90824a4d1914eda906d79874182ef89', { params })\n  $data.loading = false\t\n}",
+                "name": "load",
+                "id": "Method_1638864247803",
+                "title": "load",
+                "key": "Method_1638864247803"
+            },
+            "Method_1638954980168": {
+                "code": "function clearValidate() {\n  const { ApplyForm } = $refs\n  return ApplyForm.clearValidate()\n}",
+                "name": "clearValidate",
+                "id": "Method_1638954980168",
+                "title": "clearValidate",
+                "key": "Method_1638954980168"
+            },
+            "Method_1638874856696": {
+                "code": "function diffTime() {\n  const { begintime: b, endtime: e } = $data.info\n  if (!b || !e) return\n  const d1 = $d(b)\n  const d2 = $d(e)\n  const diffH = d2.diff(d1, 'hour', true)\n  const diffD = d2.diff(d1, 'day', true)\n  const info = $data.info\n  if (diffD < 1) {\n    info.leavedays = parseFloat(diffH.toFixed(1))\n    info.timetype = 'H'\n  } else {\n    info.leavedays = parseFloat(diffD.toFixed(1))\n    info.timetype = 'D'\n  }\n}",
+                "name": "diffTime",
+                "id": "Method_1638874856696",
+                "title": "diffTime",
+                "key": "Method_1638874856696"
+            },
+            "Method_1640225334569": {
+                "code": "function closeConfirm() {\n\t$data.isConfirmOpen = false\n}",
+                "name": "closeConfirm",
+                "id": "Method_1640225334569",
+                "title": "closeConfirm",
+                "key": "Method_1640225334569"
+            },
+            "Method_1640138240552": {
+                "code": "function createFlowName(info) {\n  const { bigtype, usercodeDesc } = info\n  const map = {\n  \tW: '外出',\n    Q: '请假',\n    B: '补打卡',\n  } \t\n  if (!bigtype) return `${usercodeDesc}的申请`\n  return `${usercodeDesc}的${map[bigtype]}申请`\n}",
+                "name": "createFlowName",
+                "id": "Method_1640138240552",
+                "title": "createFlowName",
+                "key": "Method_1640138240552"
+            },
+            "Method_1645855991274": {
+                "code": "async function getUserInfo() {\n  const data = await $dde.get('1473565dee594ea698971bd2afda8966')\n  $data.userInfo = data.map(item=>(\n     {label:item.userName,value:item.userCode}\n     ))\n}",
+                "name": "getUserInfo",
+                "id": "Method_1645855991274",
+                "title": "getUserInfo",
+                "key": "Method_1645855991274"
+            },
+            "Method_1638961091182": {
+                "code": "function save() {\n  const { info } = $data\n  const { leaveno } = info\n  \n  // 更新时间\n  const now = $d().format('YYYY-MM-DD HH:mm:ss')\n  info.updatedate = now\n  console.log(leaveno)\n  if (leaveno) {\n  \treturn $dde.put('121f2bd4cfca437ca14589e41bdf1c1d', info)\n  } else {\n    // 创建时间\n    info.recorddate = now\n    info.flowOptName = $run('createFlowName', info)\n    // 提交工作流\n    return $dde.post('78e93bd352ea4d7a829ae69241dc3cd5', info)\n  }\n}",
+                "name": "save",
+                "id": "Method_1638961091182",
+                "title": "save",
+                "key": "Method_1638961091182"
+            },
+            "Method_1640225567064": {
+                "code": "function () {\n}",
+                "name": "okConfirm",
+                "id": "Method_1640225567064",
+                "title": "okConfirm",
+                "key": "Method_1640225567064"
+            },
+            "Method_1646726881030": {
+                "code": "function (dicMaps,lables) {\n  if(!(dicMaps && lables)) return\n  if( typeof lables ==='string') lables = lables.split(',')\n  return dicMaps.filter( dic =>lables.find((item)=>item===dic.value)).map(dic=>dic.label).join(',');\n}",
+                "name": "translateDicMaps",
+                "id": "Method_1646726881030",
+                "title": "translateDicMaps",
+                "key": "Method_1646726881030"
+            },
+            "Method_1638954895952": {
+                "code": "async function validate() {\n  const { ApplyForm } = $refs\n  return await ApplyForm.validate()\n}",
+                "name": "validate",
+                "id": "Method_1638954895952",
+                "title": "validate",
+                "key": "Method_1638954895952"
+            },
+            "Method_1640225251401": {
+                "code": "function openConfirm() {\n  $data.isConfirmOpen = true\n  return new Promise((ok, cancel) => {\n  \t$ctx.methods.okConfirm = () => {\n      console.log('同意提交')\n      ok('同意提交')\n      $run('closeConfirm')\n    }\n    $ctx.methods.cancelConfirm = () => {\n      console.log('取消提交')\n      cancel('取消提交')\n      $run('closeConfirm')\n    }\n  })\n}",
+                "name": "openConfirm",
+                "id": "Method_1640225251401",
+                "title": "openConfirm",
+                "key": "Method_1640225251401"
+            }
+        },
+        "children": [
+            {
+                "layout": "vertical",
+                "ref": "ApplyForm",
+                "children": [
+                    {
+                        "children": [
+                            {
+                                "useStyleText": true,
+                                "styleText": "color: #aaa;\nfont-size: 16px;",
+                                "$parent": {
+                                    "name": "FormItem",
+                                    "label": "表单项",
+                                    "id": "FormItem_1639030306559"
+                                },
+                                "setValueCode": "function setValue() {\n  // 在下面返回Value的值\n  const { usercodeDesc, ownunitDesc } = $data\n  return `${usercodeDesc} (${ownunitDesc})`\n}",
+                                "useValueCode": true,
+                                "$item": {
+                                    "name": "Html",
+                                    "label": "文字",
+                                    "id": "Html_1639030318309"
+                                },
+                                "styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
+                            }
+                        ],
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "rulesConfig": [],
+                        "$item": {
+                            "name": "FormItem",
+                            "label": "表单项",
+                            "id": "FormItem_1639030306559"
+                        },
+                        "label": "申请人"
+                    },
+                    {
+                        "notShowItem": false,
+                        "size": "default",
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "useChangeCode": true,
+                        "rulesConfig": [
+                            {
+                                "isUse": true,
+                                "code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '类别不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+                                "name": "必填",
+                                "id": "Rule_1638955829335",
+                                "message": ""
+                            }
+                        ],
+                        "options": [
+                            {
+                                "label": "请假",
+                                "value": "Q"
+                            },
+                            {
+                                "label": "外出",
+                                "value": "W"
+                            },
+                            {
+                                "label": "补打卡",
+                                "value": "B"
+                            }
+                        ],
+                        "$key": "bigtype",
+                        "label": "类别",
+                        "$item": {
+                            "name": "RadioGroup",
+                            "label": "单选框",
+                            "id": "RadioGroup_1638862965227"
+                        },
+                        "onChangeCode": "function onChange(e) {\n  // 在下面开始编写改变事件\n  const { value } = e.target\n  if (value === 'Q') {\n    $data.leavetype = 'S'\n  } else if (value === 'W') {\n    $data.leavetype = 'SN'\n    $data.isdanger = 'L'\n  } else {\n    $data.leavetype = 'BD'\n  }\n  $run('clearValidate')\n}"
+                    },
+                    {
+                        "set$$ifCode": "function set$$if() {\n  // 在下面返回$$if的值\n  return $data.bigtype === 'Q'\n}",
+                        "notShowItem": false,
+                        "size": "default",
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "$value": "",
+                        "rulesConfig": [
+                            {
+                                "isUse": true,
+                                "code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '请假类型不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+                                "name": "必填",
+                                "id": "Rule_1638955862694",
+                                "message": ""
+                            },
+                            {
+                                "isUse": false,
+                                "code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n//    required: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n    message: '您今年的年假已用完，如有疑问请联系人事。',\n    async validator(rule, value) {\n      if (value !== 'N') return Promise.resolve()\n      return new Promise((r, j) => {\n      \tsetTimeout(() => j('您今年的年假已用完，如有疑问请联系人事。'), 1000)\n      })\n    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+                                "name": "年假",
+                                "id": "Rule_1639118887365",
+                                "message": ""
+                            }
+                        ],
+                        "options": [
+                            {
+                                "label": "事假",
+                                "value": "S"
+                            },
+                            {
+                                "label": "婚假",
+                                "value": "H"
+                            },
+                            {
+                                "label": "产假",
+                                "value": "C"
+                            },
+                            {
+                                "label": "年假",
+                                "value": "N"
+                            },
+                            {
+                                "label": "调休",
+                                "value": "T"
+                            },
+                            {
+                                "label": "护产假",
+                                "value": "P"
+                            },
+                            {
+                                "label": "非住院病假",
+                                "value": "FB"
+                            },
+                            {
+                                "label": "住院病假",
+                                "value": "ZB"
+                            },
+                            {
+                                "label": "探亲假",
+                                "value": "TQ"
+                            },
+                            {
+                                "label": "产检假",
+                                "value": "CJ"
+                            },
+                            {
+                                "label": "丧假",
+                                "value": "SJ"
+                            },
+                            {
+                                "label": "护理假",
+                                "value": "HL"
+                            }
+                        ],
+                        "use$$ifCode": true,
+                        "$key": "leavetype",
+                        "label": "请假类型",
+                        "$item": {
+                            "name": "RadioGroup",
+                            "label": "单选框",
+                            "id": "RadioGroup_1638870161734"
+                        }
+                    },
+                    {
+                        "set$$ifCode": "function set$$if() {\n  // 在下面返回$$if的值\n  return $data.bigtype === 'W'\n}",
+                        "notShowItem": false,
+                        "size": "default",
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "useChangeCode": true,
+                        "rulesConfig": [
+                            {
+                                "isUse": true,
+                                "code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '请假类型不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+                                "name": "必填",
+                                "id": "Rule_1638955882462",
+                                "message": ""
+                            }
+                        ],
+                        "options": [
+                            {
+                                "label": "市内外出",
+                                "value": "SN"
+                            },
+                            {
+                                "label": "其他外出",
+                                "value": "QW"
+                            },
+                            {
+                                "label": "出差",
+                                "value": "CC"
+                            },
+                            {
+                                "label": "长期驻外",
+                                "value": "CQ"
+                            }
+                        ],
+                        "use$$ifCode": true,
+                        "$key": "leavetype",
+                        "label": "外出类型",
+                        "$item": {
+                            "name": "RadioGroup",
+                            "label": "单选框",
+                            "id": "RadioGroup_1638870488013"
+                        },
+                        "onChangeCode": "function onChange(e) {\n  // 在下面开始编写改变事件\n  $run('clearValidate')\n}"
+                    },
+                    {
+                        "set$$ifCode": "function set$$if() {\n  // 在下面返回$$if的值\n  const { bigtype: t, leavetype: lt } = $data\n  return t === 'W' &&  (lt === 'CC' || lt === 'CQ')\n}",
+                        "children": [
+                            {
+                                "notShowItem": false,
+                                "readonly": false,
+                                "useStyleText": true,
+                                "styleText": "flex: auto;\nmargin-right: 12px;",
+                                "$parent": {
+                                    "name": "FormItem",
+                                    "label": "表单项",
+                                    "id": "FormItem_1638870666701"
+                                },
+                                "rulesConfig": [
+                                    {
+                                        "isUse": false,
+                                        "code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n  \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n    message: '外出地不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+                                        "name": "必填",
+                                        "id": "Rule_1638953703682",
+                                        "message": ""
+                                    }
+                                ],
+                                "disabled": false,
+                                "$key": "leavecity",
+                                "$item": {
+                                    "name": "InputText",
+                                    "label": "输入框",
+                                    "id": "InputText_1638870671385"
+                                },
+                                "label": "",
+                                "allowClear": false,
+                                "styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
+                            },
+                            {
+                                "set$$ifCode": "function set$$if() {\n  // 在下面返回$$if的值\n  return false\n}",
+                                "notShowItem": false,
+                                "useStyleText": true,
+                                "styleText": "flex: auto;",
+                                "$parent": {
+                                    "name": "FormItem",
+                                    "label": "表单项",
+                                    "id": "FormItem_1638870666701"
+                                },
+                                "use$$ifCode": false,
+                                "$key": "isdanger",
+                                "label": "",
+                                "styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}",
+                                "size": "default",
+                                "rulesConfig": [],
+                                "options": [
+                                    {
+                                        "label": "低风险",
+                                        "value": "L"
+                                    },
+                                    {
+                                        "label": "中风险",
+                                        "value": "M"
+                                    },
+                                    {
+                                        "label": "高风险",
+                                        "value": "H"
+                                    }
+                                ],
+                                "$item": {
+                                    "name": "RadioGroup",
+                                    "label": "单选框",
+                                    "id": "RadioGroup_1638870674737"
+                                }
+                            }
+                        ],
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "rulesConfig": [
+                            {
+                                "isUse": true,
+                                "code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n    required: true,\n    message: '外出地不能为空',\n  }\n}",
+                                "name": "必填",
+                                "id": "Rule_1638948205462",
+                                "message": ""
+                            }
+                        ],
+                        "name": "leavecity",
+                        "use$$ifCode": true,
+                        "rules": [],
+                        "$item": {
+                            "name": "FormItem",
+                            "label": "表单项",
+                            "id": "FormItem_1638870666701"
+                        },
+                        "label": "外出地",
+                        "required": false
+                    },
+                    {
+                        "setShowTimeCode": "function setShowTime() {\n  // 在下面返回ShowTime的值\n  return {\n  \tminuteStep: 15,\n    format: 'HH:mm',\n  }\n}",
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "useChangeCode": true,
+                        "showTime": "",
+                        "format": "YYYY-MM-DD HH:mm",
+                        "$key": "begintime",
+                        "label": "开始时间",
+                        "hasFeedback": true,
+                        "rulesConfig": [
+                            {
+                                "isUse": true,
+                                "code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '开始时间不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+                                "name": "必填",
+                                "id": "Rule_1638956319138",
+                                "message": ""
+                            }
+                        ],
+                        "disabled": false,
+                        "useShowTimeCode": true,
+                        "$item": {
+                            "name": "DatePicker",
+                            "label": "日期选择",
+                            "id": "DatePicker_1638863102942"
+                        },
+                        "onChangeCode": "function onChange(date, dateString) {\n  // 在下面开始编写改变事件\n  $run('diffTime')\n}"
+                    },
+                    {
+                        "setShowTimeCode": "function setShowTime() {\n  // 在下面返回ShowTime的值\n  return {\n  \tminuteStep: 15,\n    format: 'HH:mm',\n  }\n}",
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "useChangeCode": true,
+                        "showTime": "",
+                        "format": "YYYY-MM-DD HH:mm",
+                        "$key": "endtime",
+                        "label": "结束时间",
+                        "hasFeedback": true,
+                        "rulesConfig": [
+                            {
+                                "isUse": false,
+                                "code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n \trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \tmessage: '结束时间不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+                                "name": "必填",
+                                "id": "Rule_1638956276698",
+                                "message": ""
+                            }
+                        ],
+                        "disabled": false,
+                        "useShowTimeCode": true,
+                        "$item": {
+                            "name": "DatePicker",
+                            "label": "日期选择",
+                            "id": "DatePicker_1638863112502"
+                        },
+                        "onChangeCode": "function onChange(date, dateString) {\n  // 在下面开始编写改变事件\n  $run('diffTime')\n}"
+                    },
+                    {
+                        "children": [
+                            {
+                                "min": 0,
+                                "useStyleText": true,
+                                "styleText": "flex: auto;\nmargin-right: 20px;",
+                                "$parent": {
+                                    "name": "FormItem",
+                                    "label": "表单项",
+                                    "id": "FormItem_1638863130692"
+                                },
+                                "precision": 1,
+                                "rulesConfig": [
+                                    {
+                                        "isUse": false,
+                                        "name": "必填",
+                                        "id": "Rule_1638956579529",
+                                        "message": ""
+                                    }
+                                ],
+                                "step": 1,
+                                "$key": "leavedays",
+                                "$item": {
+                                    "name": "InputNumber",
+                                    "label": "数字框",
+                                    "id": "InputNumber_1638863146958"
+                                },
+                                "label": "",
+                                "styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
+                            },
+                            {
+                                "notShowItem": false,
+                                "size": "default",
+                                "useStyleText": true,
+                                "styleText": "width: 200px;",
+                                "$parent": {
+                                    "name": "FormItem",
+                                    "label": "表单项",
+                                    "id": "FormItem_1638863130692"
+                                },
+                                "rulesConfig": [],
+                                "options": [
+                                    {
+                                        "label": "小时",
+                                        "value": "H"
+                                    },
+                                    {
+                                        "label": "天",
+                                        "value": "D"
+                                    }
+                                ],
+                                "$key": "timetype",
+                                "$item": {
+                                    "name": "RadioGroup",
+                                    "label": "单选框",
+                                    "id": "RadioGroup_1638863153831"
+                                },
+                                "label": "",
+                                "styleCode": "function style() {\n  // 在下面返回style对象\n  return {}\n}"
+                            }
+                        ],
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "hasFeedback": true,
+                        "rulesConfig": [
+                            {
+                                "isUse": true,
+                                "code": "function generateRule (props) {\n  // 在下面开始编写校验规则\n  return {\n\trequired: true,\n//    min: 0,\n//    max: 10,\n//    len: 5,\n//    type: 'string',\n \t message: '时长不能为空',\n//    async validator(rule, value) {\n//      return Promise.reject('some error messages')\n//    },\n//    pattern: //,\n//    trigger: ['change'],\n  }\n}",
+                                "name": "必填",
+                                "id": "Rule_1638957080371",
+                                "message": ""
+                            }
+                        ],
+                        "name": "leavedays",
+                        "$item": {
+                            "name": "FormItem",
+                            "label": "表单项",
+                            "id": "FormItem_1638863130692"
+                        },
+                        "label": "时长"
+                    },
+                    {
+                        "autoSize": "",
+                        "showCount": true,
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "rulesConfig": [],
+                        "useAutoSizeCode": true,
+                        "$key": "leavereason",
+                        "$item": {
+                            "name": "Textarea",
+                            "label": "文本域",
+                            "id": "Textarea_1638863237510"
+                        },
+                        "label": "事由",
+                        "setAutoSizeCode": "function setAutoSize() {\n  // 在下面返回AutoSize的值\n  return true\n}"
+                    },
+                    {
+                        "notShowItem": false,
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "options": [],
+                        "setOptionsCode": "function setOptions() {\n  // 在下面返回Options的值\n  return $$data.userInfo;\n}",
+                        "showArrow": true,
+                        "$key": "checkuser",
+                        "$item": {
+                            "name": "Select",
+                            "label": "下拉框",
+                            "id": "Select_1645854624005_0.8925002477941295"
+                        },
+                        "label": "预审人",
+                        "bordered": true,
+                        "useOptionsCode": true
+                    },
+                    {
+                        "mode": "multiple",
+                        "notShowItem": false,
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "options": [],
+                        "setOptionsCode": "function setOptions() {\n  // 在下面返回Options的值\n  return $$data.userInfo;\n}",
+                        "showArrow": true,
+                        "$key": "users",
+                        "$item": {
+                            "name": "Select",
+                            "label": "下拉框",
+                            "id": "Select_1645856516346_0.6833342284509456"
+                        },
+                        "label": "抄送人",
+                        "bordered": true,
+                        "useOptionsCode": true
+                    },
+                    {
+                        "onRemoveCode": "function onRemove(file) {\n  // 在下面开始编写删除事件\n  debugger\n if(!$data.files) return \n  $data.files= $data.files.filter(item=>file.fileId != item.fileId)\n}",
+                        "$parent": {
+                            "name": "Form",
+                            "label": "表单",
+                            "id": "Form_1638862965227"
+                        },
+                        "max": 10,
+                        "$key": "files",
+                        "label": "上传文件",
+                        "uploadText": "上传",
+                        "listType": "text",
+                        "useSuccessCode": true,
+                        "useRemoveCode": true,
+                        "disabled": false,
+                        "$item": {
+                            "name": "Upload",
+                            "label": "上传文件",
+                            "id": "Upload_1644829892983_0.3339277409812331"
+                        },
+                        "showUploadList": true,
+                        "onSuccessCode": "function onSuccess(file) {\n  // 在下面开始编写成功事件\n if(!$data.files){\n    $data.files = []\n}\n$data.files.push(file);\n}"
+                    }
+                ],
+                "$parent": {
+                    "name": "Model",
+                    "label": "模块",
+                    "id": "Model_1638862948274"
+                },
+                "labelAlign": "right",
+                "setLoadingCode": "function setLoading() {\n  // 在下面返回Loading的值\n  return $data.loading\n}",
+                "colon": true,
+                "$key": "info",
+                "$item": {
+                    "name": "Form",
+                    "label": "表单",
+                    "id": "Form_1638862965227"
+                },
+                "useLoadingCode": true
+            },
+            {
+                "keyboard": true,
+                "useVisibleCode": true,
+                "setVisibleCode": "function setVisible() {\n  // 在下面返回Visible的值\n  return $data.isConfirmOpen\n}",
+                "$parent": {
+                    "name": "Model",
+                    "label": "模块",
+                    "id": "Model_1638862948274"
+                },
+                "closable": true,
+                "maskClosable": true,
+                "title": "确认提交信息",
+                "onOk": "okConfirm",
+                "children": [
+                    {
+                        "children": [],
+                        "useParamsCode": true,
+                        "$item": {
+                            "name": "Model",
+                            "label": "模块",
+                            "id": "Model_1640226010354"
+                        },
+                        "id": "2446f9f63ec342a2aa118c3c1d1aab7b",
+                        "setParamsCode": " function setParams() {\n  // 在下面返回Params的值\n  $data.info.userNames = $run('translateDicMaps',$data.userInfo,$data.info.users)\n  $data.info.checkuserDesc=$run('translateDicMaps',$data.userInfo,$data.info.checkuser)\n  $data.info.leavetypeDesc=$run('translateDicMaps',$data.leavetypeDic,$data.info.leavetype)\n  return {\n  \tleave: $data.info\n  }\n}"
+                    }
+                ],
+                "onCancel": "cancelConfirm",
+                "width": 640,
+                "$item": {
+                    "name": "Modal",
+                    "label": "模态框",
+                    "id": "Modal_1640225203897"
+                },
+                "mask": true
+            }
+        ],
+        "root": true,
+        "useMountedCode": true,
+        "style": {},
+        "onMountedCode": "function onMounted() {\n  // 在下面开始编写挂载事件\n$run('getUserInfo')\n}",
+        "$item": {
+            "name": "Model",
+            "label": "模块",
+            "id": "Model_1638862948274"
+        },
+        "useLoadingCode": false
+    },
+    "recorder": "D4BtpSxJ",
+    "modelId": "8943ad4401ce4924b190bf0b59afd9e5",
+    "mobileFormTemplate": {
+        "fit": true,
+        "$name": "Model",
+        "children": [
+            {
+                "$name": "MobileLayout",
+                "tabList": [
+                    {
+                        "name": "标签1",
+                        "icon": "home-o"
+                    }
+                ],
+                "children": [
+                    {
+                        "$name": "MobileLayoutContent",
+                        "children": [],
+                        "$item": {
+                            "name": "MobileLayoutContent",
+                            "label": "内容",
+                            "id": "MobileLayoutContent_1649658795811_0.9920892748194223"
+                        }
+                    }
+                ],
+                "footer": {
+                    "$name": "LayoutFooter",
+                    "children": [],
+                    "$item": {
+                        "name": "LayoutFooter",
+                        "label": "移动端底部布局",
+                        "id": "LayoutFooter_1649658795811_0.3964144351804102"
+                    }
+                },
+                "$parent": {
+                    "name": "Model",
+                    "label": "模块",
+                    "id": "Model_1649658789605_0.9390502326410599"
+                },
+                "showTabBar": false,
+                "showHeader": false,
+                "showNavBar": false,
+                "header": {
+                    "$name": "LayoutHeader",
+                    "children": [],
+                    "$item": {
+                        "name": "LayoutHeader",
+                        "label": "移动端顶部布局",
+                        "id": "LayoutHeader_1649658795811_0.8355007332303783"
+                    }
+                },
+                "$item": {
+                    "name": "MobileLayout",
+                    "label": "布局",
+                    "id": "MobileLayout_1649658795811_0.041437008699215516"
+                },
+                "showFooter": false
+            }
+        ],
+        "root": true,
+        "componentData": {},
+        "paramsConfigs": {
+            "Param_1638864376530": {
+                "code": "function watchId(id, oldId) {\n  // 在下面开始编写id监听\n  $run('load', id)\n}",
+                "immediate": true,
+                "name": "id",
+                "id": "Param_1638864376530"
+            },
+            "Param_1640865185828": {
+                "code": "function watchCurrent(current, oldCurrent) {\n  // 在下面开始编写current监听\n  if (current?.format instanceof Function) {\n  \t$data.info.recorddate = current.format('YYYY-MM-DD HH:mm:ss')\n    $data.info.begintime = current.format('YYYY-MM-DD') + ' 08:30:00'\n  }\n}",
+                "immediate": true,
+                "name": "current",
+                "id": "Param_1640865185828"
+            }
+        },
+        "style": {},
+        "$item": {
+            "name": "Model",
+            "label": "模块",
+            "id": "Model_1649658789605_0.9390502326410599"
+        }
+    },
+    "publishDate": "2022-04-11 14:33:19",
+    "modelTag": "表单",
+    "modelType": "G",
+    "osId": "t_H4w2emTnq89GXxEN5Dsw",
+    "modelComment": "创建一个填写表单页面",
+    "structureFunction": {
+        "dataConfigs": {
+            "Data_1640225225034": {
+                "code": "false",
+                "children": [],
+                "name": "isConfirmOpen",
+                "id": "Data_1640225225034",
+                "title": "isConfirmOpen",
+                "type": "b",
+                "key": "Data_1640225225034"
+            },
+            "Data_1638864239918": {
+                "code": "const { userInfo: $u } = $info;\n\nreturn {\n  recorddate: $dayjs().format('YYYY-MM-DD HH:mm:ss'),\n  begintime: $dayjs().format('YYYY-MM-DD') + ' 08:30:00',\n  bigtype: 'Q',\n  leavetype: 'S',  \n  timetype: 'D',  \n  leavedays: 0,\n  usercode: $u.userCode,\n  usercodeDesc: $u.userName,\n  loginname: $u.loginName,\n  ownunit: $u.primaryUnit,\n  ownunitDesc: $u.primaryUnitName,\n}",
+                "children": [
+                    {
+                        "isDefault": true,
+                        "dataType": "timestamp",
+                        "name": "begintime",
+                        "id": "Data_1638864239918_begintime",
+                        "label": "开始时间",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "bigtype",
+                        "id": "Data_1638864239918_bigtype",
+                        "label": "类别",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "checkuser",
+                        "id": "Data_1638864239918_checkuser",
+                        "label": "预审人",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "timestamp",
+                        "name": "endtime",
+                        "id": "Data_1638864239918_endtime",
+                        "label": "结束时间",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "files",
+                        "id": "Data_1638864239918_files",
+                        "label": "上传文件",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "number",
+                        "name": "leavedays",
+                        "id": "Data_1638864239918_leavedays",
+                        "label": "leavedays",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "leavereason",
+                        "id": "Data_1638864239918_leavereason",
+                        "label": "事由",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "leavetype",
+                        "id": "Data_1638864239918_leavetype",
+                        "label": "外出类型",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "ownunit",
+                        "id": "Data_1638864239918_ownunit",
+                        "label": "ownunit",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "ownunitDesc",
+                        "id": "Data_1638864239918_ownunitDesc",
+                        "label": "ownunitDesc",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "recorddate",
+                        "id": "Data_1638864239918_recorddate",
+                        "label": "recorddate",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "timetype",
+                        "id": "Data_1638864239918_timetype",
+                        "label": "timetype",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "usercode",
+                        "id": "Data_1638864239918_usercode",
+                        "label": "usercode",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "usercodeDesc",
+                        "id": "Data_1638864239918_usercodeDesc",
+                        "label": "usercodeDesc",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "users",
+                        "id": "Data_1638864239918_users",
+                        "label": "抄送人",
+                        "type": "schema"
+                    }
+                ],
+                "componentSchemas": {
+                    "leavetype": {
+                        "isDefault": true,
+                        "propertyName": "leavetype",
+                        "fieldLabelName": "外出类型",
+                        "$key": "leavetype",
+                        "fieldType": "string"
+                    },
+                    "checkuser": {
+                        "isDefault": true,
+                        "propertyName": "checkuser",
+                        "fieldLabelName": "预审人",
+                        "$key": "checkuser",
+                        "fieldType": "string"
+                    },
+                    "leavereason": {
+                        "isDefault": true,
+                        "propertyName": "leavereason",
+                        "fieldLabelName": "事由",
+                        "$key": "leavereason",
+                        "fieldType": "string"
+                    },
+                    "endtime": {
+                        "isDefault": true,
+                        "propertyName": "endtime",
+                        "fieldLabelName": "结束时间",
+                        "$key": "endtime",
+                        "fieldType": "timestamp"
+                    },
+                    "files": {
+                        "isDefault": true,
+                        "propertyName": "files",
+                        "fieldLabelName": "上传文件",
+                        "$key": "files",
+                        "fieldType": "string"
+                    },
+                    "begintime": {
+                        "isDefault": true,
+                        "propertyName": "begintime",
+                        "fieldLabelName": "开始时间",
+                        "$key": "begintime",
+                        "fieldType": "timestamp"
+                    },
+                    "bigtype": {
+                        "isDefault": true,
+                        "propertyName": "bigtype",
+                        "fieldLabelName": "类别",
+                        "$key": "bigtype",
+                        "fieldType": "string"
+                    },
+                    "users": {
+                        "isDefault": true,
+                        "propertyName": "users",
+                        "fieldLabelName": "抄送人",
+                        "$key": "users",
+                        "fieldType": "string"
+                    }
+                },
+                "columns": [
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 255,
+                        "columnOrder": 99,
+                        "precision": 255,
+                        "columnComment": "大类型：QJ 请假 BK 补卡 CC 外出",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "bigtype",
+                        "fieldLabelName": "bigType",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "bigType",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 0,
+                        "columnOrder": 99,
+                        "autoCreateRule": "W",
+                        "precision": 0,
+                        "columnComment": "结束时间",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.sql.Date",
+                        "accessType": "N",
+                        "columnType": "DATETIME",
+                        "propertyName": "endtime",
+                        "fieldLabelName": "endTime",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "datetime",
+                        "lastModifyDate": "2022-01-10 09:52:40",
+                        "columnName": "endTime",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "autoCreateRule": "U",
+                        "precision": 32,
+                        "columnComment": "流水号",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": true,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "leaveno",
+                        "fieldLabelName": "leaveNo",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "leaveNo",
+                        "primaryKey": true
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "所属部门",
+                        "referenceType": "1",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "referenceData": "unitCode",
+                        "columnType": "VARCHAR",
+                        "propertyName": "ownunit",
+                        "fieldLabelName": "ownunit",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "ownunit",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 8,
+                        "columnOrder": 99,
+                        "precision": 8,
+                        "columnComment": "是否中高风险",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "isdanger",
+                        "fieldLabelName": "isDanger",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "isDanger",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 1,
+                        "columnOrder": 99,
+                        "precision": 1,
+                        "columnComment": "时间单位",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "CHAR",
+                        "propertyName": "timetype",
+                        "fieldLabelName": "timeType",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "timeType",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "用户号",
+                        "referenceType": "1",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "referenceData": "userCode",
+                        "columnType": "VARCHAR",
+                        "propertyName": "usercode",
+                        "fieldLabelName": "usercode",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "usercode",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 0,
+                        "columnOrder": 99,
+                        "precision": 0,
+                        "columnComment": "开始时间",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.sql.Date",
+                        "accessType": "N",
+                        "columnType": "DATETIME",
+                        "propertyName": "begintime",
+                        "fieldLabelName": "beginTime",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "datetime",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "beginTime",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "预审人",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "checkuser",
+                        "fieldLabelName": "checkUser",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "checkUser",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 255,
+                        "columnOrder": 99,
+                        "precision": 255,
+                        "columnComment": "出差地",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "leavecity",
+                        "fieldLabelName": "leaveCity",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "leaveCity",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 22,
+                        "columnOrder": 99,
+                        "precision": 22,
+                        "columnComment": "请假时间",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.Double",
+                        "accessType": "N",
+                        "columnType": "DOUBLE",
+                        "propertyName": "leavedays",
+                        "fieldLabelName": "leaveDays",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "double",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "leaveDays",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 2,
+                        "columnOrder": 99,
+                        "precision": 2,
+                        "columnComment": "请假类型",
+                        "referenceType": "1",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "referenceData": "gaVXuauTSiO1quaguCpAOA",
+                        "columnType": "VARCHAR",
+                        "propertyName": "leavetype",
+                        "fieldLabelName": "leaveType",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "leaveType",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "登录名",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "loginname",
+                        "fieldLabelName": "loginName",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "loginName",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "交通方式",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "transport",
+                        "fieldLabelName": "transport",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "transport",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 8,
+                        "columnOrder": 99,
+                        "precision": 8,
+                        "columnComment": "批准状态",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "flowresult",
+                        "fieldLabelName": "flowResult",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "flowResult",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 0,
+                        "columnOrder": 99,
+                        "precision": 0,
+                        "columnComment": "请假录入时间",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.sql.Date",
+                        "accessType": "N",
+                        "columnType": "DATETIME",
+                        "propertyName": "recorddate",
+                        "fieldLabelName": "recorddate",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "datetime",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "recorddate",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 0,
+                        "columnOrder": 99,
+                        "precision": 0,
+                        "columnComment": "更新时间",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.sql.Date",
+                        "accessType": "N",
+                        "columnType": "DATETIME",
+                        "propertyName": "updatedate",
+                        "fieldLabelName": "updatedate",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "datetime",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "updatedate",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 1024,
+                        "columnOrder": 99,
+                        "precision": 1024,
+                        "columnComment": "请假原因",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "leavereason",
+                        "fieldLabelName": "leaveReason",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "leaveReason",
+                        "primaryKey": false
+                    },
+                    {
+                        "recorder": "UkBTbun7",
+                        "columnLength": 32,
+                        "columnOrder": 99,
+                        "precision": 32,
+                        "columnComment": "流程实例ID",
+                        "scale": 0,
+                        "lazyFetch": false,
+                        "mandatory": false,
+                        "javaType": "java.lang.String",
+                        "accessType": "N",
+                        "columnType": "VARCHAR",
+                        "propertyName": "flowInstId",
+                        "fieldLabelName": "FLOW_INST_ID",
+                        "tableId": "aJLrc1TqT7as0NMu1vn41Q",
+                        "fieldType": "string",
+                        "lastModifyDate": "2022-01-06 19:13:41",
+                        "columnName": "FLOW_INST_ID",
+                        "primaryKey": false
+                    }
+                ],
+                "name": "info",
+                "hasSchema": true,
+                "id": "Data_1638864239918",
+                "title": "info",
+                "type": "o",
+                "codeSchemas": {
+                    "ownunitDesc": {
+                        "isDefault": true,
+                        "propertyName": "ownunitDesc",
+                        "fieldLabelName": "ownunitDesc",
+                        "fieldType": "string"
+                    },
+                    "leavetype": {
+                        "isDefault": true,
+                        "propertyName": "leavetype",
+                        "fieldLabelName": "leavetype",
+                        "fieldType": "string"
+                    },
+                    "leavedays": {
+                        "isDefault": true,
+                        "propertyName": "leavedays",
+                        "fieldLabelName": "leavedays",
+                        "fieldType": "number"
+                    },
+                    "ownunit": {
+                        "isDefault": true,
+                        "propertyName": "ownunit",
+                        "fieldLabelName": "ownunit",
+                        "fieldType": "string"
+                    },
+                    "usercodeDesc": {
+                        "isDefault": true,
+                        "propertyName": "usercodeDesc",
+                        "fieldLabelName": "usercodeDesc",
+                        "fieldType": "string"
+                    },
+                    "begintime": {
+                        "isDefault": true,
+                        "propertyName": "begintime",
+                        "fieldLabelName": "begintime",
+                        "fieldType": "string"
+                    },
+                    "recorddate": {
+                        "isDefault": true,
+                        "propertyName": "recorddate",
+                        "fieldLabelName": "recorddate",
+                        "fieldType": "string"
+                    },
+                    "bigtype": {
+                        "isDefault": true,
+                        "propertyName": "bigtype",
+                        "fieldLabelName": "bigtype",
+                        "fieldType": "string"
+                    },
+                    "timetype": {
+                        "isDefault": true,
+                        "propertyName": "timetype",
+                        "fieldLabelName": "timetype",
+                        "fieldType": "string"
+                    },
+                    "usercode": {
+                        "isDefault": true,
+                        "propertyName": "usercode",
+                        "fieldLabelName": "usercode",
+                        "fieldType": "string"
+                    }
+                },
+                "key": "Data_1638864239918",
+                "table": [
+                    "qCkELaoFSTm2_AoREWrYGg",
+                    "aJLrc1TqT7as0NMu1vn41Q"
+                ]
+            },
+            "Data_1645855447118": {
+                "code": "[]",
+                "children": [],
+                "dataType": "array",
+                "name": "userInfo",
+                "id": "Data_1645855447118",
+                "title": "userInfo",
+                "type": "o",
+                "codeSchemas": {},
+                "key": "Data_1645855447118"
+            },
+            "Data_1638877568687": {
+                "code": "false",
+                "children": [],
+                "name": "loading",
+                "id": "Data_1638877568687",
+                "title": "loading",
+                "type": "b",
+                "key": "Data_1638877568687"
+            },
+            "Data_1646792665104": {
+                "code": "[\r\n   {label:'事假',value:'S'},\r\n   {label:'婚假',value:'H'},\r\n   {label:'产假',value:'C'},\r\n   {label:'年假',value:'N'},\r\n   {label:'调休',value:'T'},\r\n   {label:'护产假',value:'P'},\r\n   {label:'非住院病假',value:'FB'},\r\n   {label:'住院病假',value:'ZB'},\r\n   {label:'探亲假',value:'TQ'},\r\n   {label:'产检假',value:'CJ'},\r\n   {label:'丧假',value:'SJ'},\r\n   {label:'市内外出',value:'SN'},\r\n   {label:'其他外出',value:'QW'},\r\n   {label:'出差',value:'CC'},\r\n   {label:'长期驻外',value:'CQ'},\r\n   {label:'补打卡',value:'BD'}\r\n]",
+                "children": [
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "label",
+                        "id": "Data_1646792665104_label",
+                        "label": "label",
+                        "type": "schema"
+                    },
+                    {
+                        "isDefault": true,
+                        "dataType": "string",
+                        "name": "value",
+                        "id": "Data_1646792665104_value",
+                        "label": "value",
+                        "type": "schema"
+                    }
+                ],
+                "dataType": "array",
+                "name": "leavetypeDic",
+                "id": "Data_1646792665104",
+                "label": "leavetypeDic",
+                "type": "data",
+                "codeSchemas": {
+                    "label": {
+                        "isDefault": true,
+                        "propertyName": "label",
+                        "fieldLabelName": "label",
+                        "fieldType": "string"
+                    },
+                    "value": {
+                        "isDefault": true,
+                        "propertyName": "value",
+                        "fieldLabelName": "value",
+                        "fieldType": "string"
+                    }
+                }
+            }
+        },
+        "methodsConfigs": {
+            "Method_1640225576969": {
+                "name": "cancelConfirm",
+                "id": "Method_1640225576969",
+                "title": "",
+                "key": "Method_1640225576969"
+            },
+            "Method_1638864247803": {
+                "code": "async function load(leaveno) {\n  if (!leaveno) return\n  const params = { leaveno }\n  $data.loading = true\n  $data.info = await $dde.get('e90824a4d1914eda906d79874182ef89', { params })\n  $data.loading = false\t\n}",
+                "name": "load",
+                "id": "Method_1638864247803",
+                "title": "load",
+                "key": "Method_1638864247803"
+            },
+            "Method_1638954980168": {
+                "code": "function clearValidate() {\n  const { ApplyForm } = $refs\n  return ApplyForm.clearValidate()\n}",
+                "name": "clearValidate",
+                "id": "Method_1638954980168",
+                "title": "clearValidate",
+                "key": "Method_1638954980168"
+            },
+            "Method_1638874856696": {
+                "code": "function diffTime() {\n  const { begintime: b, endtime: e } = $data.info\n  if (!b || !e) return\n  const d1 = $d(b)\n  const d2 = $d(e)\n  const diffH = d2.diff(d1, 'hour', true)\n  const diffD = d2.diff(d1, 'day', true)\n  const info = $data.info\n  if (diffD < 1) {\n    info.leavedays = parseFloat(diffH.toFixed(1))\n    info.timetype = 'H'\n  } else {\n    info.leavedays = parseFloat(diffD.toFixed(1))\n    info.timetype = 'D'\n  }\n}",
+                "name": "diffTime",
+                "id": "Method_1638874856696",
+                "title": "diffTime",
+                "key": "Method_1638874856696"
+            },
+            "Method_1640225334569": {
+                "code": "function closeConfirm() {\n\t$data.isConfirmOpen = false\n}",
+                "name": "closeConfirm",
+                "id": "Method_1640225334569",
+                "title": "closeConfirm",
+                "key": "Method_1640225334569"
+            },
+            "Method_1640138240552": {
+                "code": "function createFlowName(info) {\n  const { bigtype, usercodeDesc } = info\n  const map = {\n  \tW: '外出',\n    Q: '请假',\n    B: '补打卡',\n  } \t\n  if (!bigtype) return `${usercodeDesc}的申请`\n  return `${usercodeDesc}的${map[bigtype]}申请`\n}",
+                "name": "createFlowName",
+                "id": "Method_1640138240552",
+                "title": "createFlowName",
+                "key": "Method_1640138240552"
+            },
+            "Method_1645855991274": {
+                "code": "async function getUserInfo() {\n  const data = await $dde.get('1473565dee594ea698971bd2afda8966')\n  $data.userInfo = data.map(item=>(\n     {label:item.userName,value:item.userCode}\n     ))\n}",
+                "name": "getUserInfo",
+                "id": "Method_1645855991274",
+                "title": "getUserInfo",
+                "key": "Method_1645855991274"
+            },
+            "Method_1638961091182": {
+                "code": "function save() {\n  const { info } = $data\n  const { leaveno } = info\n  \n  // 更新时间\n  const now = $d().format('YYYY-MM-DD HH:mm:ss')\n  info.updatedate = now\n  console.log(leaveno)\n  if (leaveno) {\n  \treturn $dde.put('121f2bd4cfca437ca14589e41bdf1c1d', info)\n  } else {\n    // 创建时间\n    info.recorddate = now\n    info.flowOptName = $run('createFlowName', info)\n    // 提交工作流\n    return $dde.post('78e93bd352ea4d7a829ae69241dc3cd5', info)\n  }\n}",
+                "name": "save",
+                "id": "Method_1638961091182",
+                "title": "save",
+                "key": "Method_1638961091182"
+            },
+            "Method_1640225567064": {
+                "code": "function () {\n}",
+                "name": "okConfirm",
+                "id": "Method_1640225567064",
+                "title": "okConfirm",
+                "key": "Method_1640225567064"
+            },
+            "Method_1646726881030": {
+                "code": "function (dicMaps,lables) {\n  if(!(dicMaps && lables)) return\n  if( typeof lables ==='string') lables = lables.split(',')\n  return dicMaps.filter( dic =>lables.find((item)=>item===dic.value)).map(dic=>dic.label).join(',');\n}",
+                "name": "translateDicMaps",
+                "id": "Method_1646726881030",
+                "title": "translateDicMaps",
+                "key": "Method_1646726881030"
+            },
+            "Method_1638954895952": {
+                "code": "async function validate() {\n  const { ApplyForm } = $refs\n  return await ApplyForm.validate()\n}",
+                "name": "validate",
+                "id": "Method_1638954895952",
+                "title": "validate",
+                "key": "Method_1638954895952"
+            },
+            "Method_1640225251401": {
+                "code": "function openConfirm() {\n  $data.isConfirmOpen = true\n  return new Promise((ok, cancel) => {\n  \t$ctx.methods.okConfirm = () => {\n      console.log('同意提交')\n      ok('同意提交')\n      $run('closeConfirm')\n    }\n    $ctx.methods.cancelConfirm = () => {\n      console.log('取消提交')\n      cancel('取消提交')\n      $run('closeConfirm')\n    }\n  })\n}",
+                "name": "openConfirm",
+                "id": "Method_1640225251401",
+                "title": "openConfirm",
+                "key": "Method_1640225251401"
+            }
+        },
+        "eventsConfigs": [],
+        "paramsConfigs": {
+            "Param_1638864376530": {
+                "code": "function watchId(id, oldId) {\n  // 在下面开始编写id监听\n  $run('load', id)\n}",
+                "immediate": true,
+                "name": "id",
+                "id": "Param_1638864376530"
+            },
+            "Param_1640865185828": {
+                "code": "function watchCurrent(current, oldCurrent) {\n  // 在下面开始编写current监听\n  if (current?.format instanceof Function) {\n  \t$data.info.recorddate = current.format('YYYY-MM-DD HH:mm:ss')\n    $data.info.begintime = current.format('YYYY-MM-DD') + ' 08:30:00'\n  }\n}",
+                "immediate": true,
+                "name": "current",
+                "id": "Param_1640865185828"
+            }
+        }
+    },
+    "modelName": "填写申请信息",
+    "lastModifyDate": "2022-04-11 14:33:19",
+    "optId": "9d6fd68aab8646209bb07d8066bc84e3"
+}

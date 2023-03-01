@@ -41,6 +41,7 @@ public class TestJsonIO {
             this.timestamp = timestamp;
         }
     }
+
     public static void main(String arg[]) throws IOException {
         JSONOpt.fastjsonGlobalConfig();
 
