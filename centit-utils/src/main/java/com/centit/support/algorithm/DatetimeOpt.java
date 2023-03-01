@@ -241,45 +241,18 @@ public abstract class DatetimeOpt {
     }
 
     public static Locale fetchLangLocal(String lang) {
-        switch (lang) {
-            case "en":
-                return Locale.ENGLISH;
-            case "fr":
-                return Locale.FRENCH;
-            case "de":
-                return Locale.GERMAN;
-            case "it":
-                return Locale.ITALIAN;
-            case "ja":
-                return Locale.JAPANESE;
-            case "ko":
-                return Locale.KOREAN;
-            case "zh":
-                return Locale.CHINESE;
-            case "TW":
-                return Locale.TRADITIONAL_CHINESE;
-            case "FR":
-                return Locale.FRANCE;
-            case "DE":
-                return Locale.GERMANY;
-            case "IT":
-                return Locale.ITALY;
-            case "JP":
-                return Locale.JAPAN;
-            case "KR":
-                return Locale.KOREA;
-            case "GB":
-                return Locale.UK;
-            case "US":
-                return Locale.US;
-            case "CA":
-                return Locale.CANADA;
-            case "FC": // fr-CA
-                return Locale.CANADA_FRENCH;
-            case "CN":
-            default:
-                return Locale.SIMPLIFIED_CHINESE;
+        Locale[] locales = Locale.getAvailableLocales();
+        for(Locale locale : locales) {
+            if (StringUtils.equals(locale.getCountry(), lang)) {
+                return locale;
+            }
         }
+        for(Locale locale : locales) {
+            if (StringUtils.equals(locale.getLanguage(), lang)) {
+                return locale;
+            }
+        }
+        return Locale.SIMPLIFIED_CHINESE;
     }
 
     /**
@@ -425,37 +398,43 @@ public abstract class DatetimeOpt {
         return TimeZone.getTimeZone("Asia/Shanghai");
     }
 
+    public static SimpleDateFormat createDateFormat(String sMask){
+        SimpleDateFormat df;
+        if(sMask.startsWith("lang")){
+            Locale local = fetchLangLocal(sMask.substring(5,7));
+            df = new SimpleDateFormat(sMask.substring(7).trim(), local);
+        } else if(sMask.startsWith("zone")){
+            Locale local = fetchLangLocal(sMask.substring(5,7));
+            String zone = sMask.substring(8,11);
+            df = new SimpleDateFormat(sMask.substring(11).trim(), local);
+            df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
+        }  else {
+            df = new SimpleDateFormat(sMask);
+        }
+        return df;
+    }
     /**
      * This method generates a string representation of a date/time in the
      * format you specify on input
      *
-     * @param aMask   the date pattern the string is in
+     * @param sMask   the date pattern the string is in
      * @param strDate a string representation of a date
      * @return a converted Date object
      * @see java.text.SimpleDateFormat 的说明
      */
-    public static Date convertStringToDate(String strDate, String aMask) {
+    public static Date convertStringToDate(String strDate, String sMask) {
         try {
             if (StringUtils.isBlank(strDate))
                 return null;
 
-            String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
-            SimpleDateFormat df;
-            if(aMask.startsWith("lang")){
-                Locale local = fetchLangLocal(aMask.substring(5,7));
-                df = new SimpleDateFormat(aMask.substring(7).trim(), local);
-            } else if(aMask.startsWith("zone")){
-                Locale local = fetchLangLocal(aMask.substring(5,7));
-                String zone = aMask.substring(8,11);
-                df = new SimpleDateFormat(aMask.substring(11).trim(), local);
-                df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
-            }  else {
-                df = new SimpleDateFormat(sMask);
-            }
+            if (StringUtils.isBlank(sMask))
+                return smartPraseDate(strDate);
+
+            SimpleDateFormat df = createDateFormat(sMask);
             return df.parse(strDate);
         } catch (ParseException pe) {
             log.error("converting '" + strDate + "' to date with mask '"
-                + aMask + "'");
+                + sMask + "'" + pe.getMessage());
             return null;
             //throw new ParseException(pe.getMessage(), pe.getErrorOffset());
         }
@@ -475,18 +454,7 @@ public abstract class DatetimeOpt {
             return null;
         }
         String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
-        SimpleDateFormat df;
-        if(aMask.startsWith("lang")){
-            Locale local = fetchLangLocal(aMask.substring(5,7));
-            df = new SimpleDateFormat(aMask.substring(7).trim(), local);
-        } else if(aMask.startsWith("zone")){
-            Locale local = fetchLangLocal(aMask.substring(5,7));
-            String zone = aMask.substring(8,11);
-            df = new SimpleDateFormat(aMask.substring(11).trim(), local);
-            df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
-        } else {
-            df = new SimpleDateFormat(sMask);
-        }
+        SimpleDateFormat df = createDateFormat(sMask);
         return df.format(aDate);
     }
 
