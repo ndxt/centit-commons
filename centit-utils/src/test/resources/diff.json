@@ -1,9 +1,8 @@
 [
 	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.paramsConfigs.Param_1640865185828.code",
-		"newData": "function watchCurrent(current, oldCurrent) {\n  // 在下面开始编写current监听\n  if (current?.format instanceof Function) {\n  \t$data.info.recorddate = current.format('YYYY-MM-DD HH:mm:ss')\n    $data.info.begintime = current.format('YYYY-MM-DD') + ' 08:30:00'\n    $data.info.endtime = current.format('YYYY-MM-DD') + ' 17:30:00'\n  }\n}",
-		"oldData": "function watchCurrent(current, oldCurrent) {\n  // 在下面开始编写current监听\n  if (current?.format instanceof Function) {\n  \t$data.info.recorddate = current.format('YYYY-MM-DD HH:mm:ss')\n    $data.info.begintime = current.format('YYYY-MM-DD') + ' 08:30:00'\n  }\n}"
+		"diffType": "+",
+		"jsonPath": "formTemplate.paramsConfigs.Param_1640865185828.code[5]",
+		"newData": "    $data.info.endtime = current.format('YYYY-MM-DD') + ' 17:30:00'"
 	},
 	{
 		"diffType": "+",
@@ -21,35 +20,11 @@
 		"newData": "FormItem_1639030306559"
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[1].options[0].label",
-		"newData": "出差",
-		"oldData": "请假"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[1].options[0].value",
-		"newData": "C",
-		"oldData": "Q"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[1].options[2].label",
-		"newData": "请假",
-		"oldData": "补打卡"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[1].options[2].value",
-		"newData": "Q",
-		"oldData": "B"
-	},
-	{
 		"diffType": "+",
-		"jsonPath": "formTemplate.children[0].children[1].options[3]",
+		"jsonPath": "formTemplate.children[0].children[1].options[1]",
 		"newData": {
-			"label": "补打卡",
-			"value": "B"
+			"label": "出差",
+			"value": "C"
 		}
 	},
 	{
@@ -59,10 +34,64 @@
 		"oldData": "类别"
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[1].onChangeCode",
-		"newData": "function onChange(e) {\n  $run('onChangeType', $data.bigtype)\n}",
-		"oldData": "function onChange(e) {\n  // 在下面开始编写改变事件\n  const { value } = e.target\n  if (value === 'Q') {\n    $data.leavetype = 'S'\n  } else if (value === 'W') {\n    $data.leavetype = 'SN'\n    $data.isdanger = 'L'\n  } else {\n    $data.leavetype = 'BD'\n  }\n  $run('clearValidate')\n}"
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[1]",
+		"oldData": "  // 在下面开始编写改变事件"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[1]",
+		"newData": "  $run('onChangeType', $data.bigtype)"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[2]",
+		"oldData": "  const { value } = e.target"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[3]",
+		"oldData": "  if (value === 'Q') {"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[4]",
+		"oldData": "    $data.leavetype = 'S'"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[5]",
+		"oldData": "  } else if (value === 'W') {"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[6]",
+		"oldData": "    $data.leavetype = 'SN'"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[7]",
+		"oldData": "    $data.isdanger = 'L'"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[8]",
+		"oldData": "  } else {"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[9]",
+		"oldData": "    $data.leavetype = 'BD'"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[10]",
+		"oldData": "  }"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[1].onChangeCode[11]",
+		"oldData": "  $run('clearValidate')"
 	},
 	{
 		"diffType": "+",
@@ -85,88 +114,20 @@
 		}
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[5].label",
-		"newData": "非住院病假",
-		"oldData": "护产假"
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[2].options[6]",
+		"oldData": {
+			"label": "护产假",
+			"value": "P"
+		}
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[5].value",
-		"newData": "FB",
-		"oldData": "P"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[6].label",
-		"newData": "住院病假",
-		"oldData": "非住院病假"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[6].value",
-		"newData": "ZB",
-		"oldData": "FB"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[7].label",
-		"newData": "探亲假",
-		"oldData": "住院病假"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[7].value",
-		"newData": "TQ",
-		"oldData": "ZB"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[8].label",
-		"newData": "产检假",
-		"oldData": "探亲假"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[8].value",
-		"newData": "CJ",
-		"oldData": "TQ"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[9].label",
-		"newData": "丧假",
-		"oldData": "产检假"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[9].value",
-		"newData": "SJ",
-		"oldData": "CJ"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[10].label",
-		"newData": "护理假",
-		"oldData": "丧假"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[10].value",
-		"newData": "HL",
-		"oldData": "SJ"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[11].label",
-		"newData": "育儿假",
-		"oldData": "护理假"
-	},
-	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[2].options[11].value",
-		"newData": "YE",
-		"oldData": "HL"
+		"diffType": "+",
+		"jsonPath": "formTemplate.children[0].children[2].options[10]",
+		"newData": {
+			"label": "育儿假",
+			"value": "YE"
+		}
 	},
 	{
 		"diffType": "+",
@@ -229,14 +190,18 @@
 		"newData": false
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[3].set$$ifCode",
-		"newData": "function set$$if() {\n  // 在下面返回$$if的值\n  return false // $data.bigtype === 'W'\n}",
-		"oldData": "function set$$if() {\n  // 在下面返回$$if的值\n  return $data.bigtype === 'W'\n}"
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[3].set$$ifCode[2]",
+		"oldData": "  return $data.bigtype === 'W'"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "formTemplate.children[0].children[3].set$$ifCode[2]",
+		"newData": "  return false // $data.bigtype === 'W'"
 	},
 	{
 		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[3].options[2]",
+		"jsonPath": "formTemplate.children[0].children[3].options[0]",
 		"oldData": {
 			"label": "出差",
 			"value": "CC"
@@ -244,7 +209,7 @@
 	},
 	{
 		"diffType": "-",
-		"jsonPath": "formTemplate.children[0].children[3].options[3]",
+		"jsonPath": "formTemplate.children[0].children[3].options[1]",
 		"oldData": {
 			"label": "长期驻外",
 			"value": "CQ"
@@ -311,10 +276,19 @@
 		"newData": false
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[0].children[4].set$$ifCode",
-		"newData": "function set$$if() {\n  // 在下面返回$$if的值\n  return $data.bigtype === 'C'\n}",
-		"oldData": "function set$$if() {\n  // 在下面返回$$if的值\n  const { bigtype: t, leavetype: lt } = $data\n  return t === 'W' &&  (lt === 'CC' || lt === 'CQ')\n}"
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[4].set$$ifCode[2]",
+		"oldData": "  const { bigtype: t, leavetype: lt } = $data"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "formTemplate.children[0].children[4].set$$ifCode[2]",
+		"newData": "  return $data.bigtype === 'C'"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[0].children[4].set$$ifCode[3]",
+		"oldData": "  return t === 'W' &&  (lt === 'CC' || lt === 'CQ')"
 	},
 	{
 		"diffType": "-",
@@ -1451,10 +1425,14 @@
 		"newData": true
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "formTemplate.children[1].children[0].setParamsCode",
-		"newData": " function setParams() {\n  // 在下面返回Params的值\n  $data.info.userNames = $run('translateDicMaps',$data.userInfo,$data.info.users)\n  // $data.info.checkuserDesc=$run('translateDicMaps',$data.userInfo,$data.info.checkuser)\n  $data.info.leavetypeDesc=$run('translateDicMaps',$data.leavetypeDic,$data.info.leavetype)\n  return {\n  \tleave: $data.info\n  }\n}",
-		"oldData": " function setParams() {\n  // 在下面返回Params的值\n  $data.info.userNames = $run('translateDicMaps',$data.userInfo,$data.info.users)\n  $data.info.checkuserDesc=$run('translateDicMaps',$data.userInfo,$data.info.checkuser)\n  $data.info.leavetypeDesc=$run('translateDicMaps',$data.leavetypeDic,$data.info.leavetype)\n  return {\n  \tleave: $data.info\n  }\n}"
+		"diffType": "-",
+		"jsonPath": "formTemplate.children[1].children[0].setParamsCode[3]",
+		"oldData": "  $data.info.checkuserDesc=$run('translateDicMaps',$data.userInfo,$data.info.checkuser)"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "formTemplate.children[1].children[0].setParamsCode[3]",
+		"newData": "  // $data.info.checkuserDesc=$run('translateDicMaps',$data.userInfo,$data.info.checkuser)"
 	},
 	{
 		"diffType": "+",
@@ -1628,10 +1606,29 @@
 		"newData": "isConfirmOpen"
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code",
-		"newData": "const { userInfo: $u } = $info;\n\nreturn {\n  recorddate: $dayjs().format('YYYY-MM-DD HH:mm:ss'),\n  begintime: $dayjs().format('YYYY-MM-DD') + ' 08:30:00',\n  endtime: $dayjs().format('YYYY-MM-DD') + ' 17:30:00',\n  bigtype: 'Q',\n  leavetype: 'S', \n  timetype: 'D',  \n  leavedays: 1,\n  usercode: $u.userCode,\n  usercodeDesc: $u.userName,\n  loginname: $u.loginName,\n  ownunit: $u.primaryUnit,\n  ownunitDesc: $u.primaryUnitName,\n}",
-		"oldData": "const { userInfo: $u } = $info;\n\nreturn {\n  recorddate: $dayjs().format('YYYY-MM-DD HH:mm:ss'),\n  begintime: $dayjs().format('YYYY-MM-DD') + ' 08:30:00',\n  bigtype: 'Q',\n  leavetype: 'S',  \n  timetype: 'D',  \n  leavedays: 0,\n  usercode: $u.userCode,\n  usercodeDesc: $u.userName,\n  loginname: $u.loginName,\n  ownunit: $u.primaryUnit,\n  ownunitDesc: $u.primaryUnitName,\n}"
+		"diffType": "+",
+		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code[5]",
+		"newData": "  endtime: $dayjs().format('YYYY-MM-DD') + ' 17:30:00',"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code[6]",
+		"oldData": "  leavetype: 'S',  "
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code[7]",
+		"newData": "  leavetype: 'S', "
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code[8]",
+		"oldData": "  leavedays: 0,"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.dataConfigs.Data_1638864239918.code[9]",
+		"newData": "  leavedays: 1,"
 	},
 	{
 		"diffType": "*",
@@ -2428,10 +2425,9 @@
 		}
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638864247803.code",
-		"newData": "async function load(leaveno) {\n  if (!leaveno) return\n  const params = { leaveno }\n  $data.loading = true\n  $data.info = await $dde.get('e90824a4d1914eda906d79874182ef89', { params })\n  debugger\n  $data.loading = false\t\n}",
-		"oldData": "async function load(leaveno) {\n  if (!leaveno) return\n  const params = { leaveno }\n  $data.loading = true\n  $data.info = await $dde.get('e90824a4d1914eda906d79874182ef89', { params })\n  $data.loading = false\t\n}"
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638864247803.code[5]",
+		"newData": "  debugger"
 	},
 	{
 		"diffType": "-",
@@ -2474,10 +2470,29 @@
 		"newData": "method"
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code",
-		"newData": "function diffTime() {\n  if($data.info.bigtype==='B'){\n    $data.info.endtime=$data.info.begintime;\n  }\n  const { begintime: b, endtime: e } = $data.info\n  if (!b || !e) return\n  const d1 = $d(b)\n  const d2 = $d(e)\n  const diffH = d2.diff(d1, 'hour', true)\n  const diffD = d2.diff(d1, 'day', true)\n  const info = $data.info\n  if (diffD < 1) {\n    info.leavedays = parseFloat(diffH.toFixed(1))\n    info.timetype = 'H'\n  } else {\n    // info.leavedays = parseFloat(diffD.toFixed(1))\n    info.leavedays = (Math.floor(diffH / 24) + Math.min(1, (diffH % 24) / 8)).toFixed(1) * 1.0\n    info.timetype = 'D'\n  }\n}",
-		"oldData": "function diffTime() {\n  const { begintime: b, endtime: e } = $data.info\n  if (!b || !e) return\n  const d1 = $d(b)\n  const d2 = $d(e)\n  const diffH = d2.diff(d1, 'hour', true)\n  const diffD = d2.diff(d1, 'day', true)\n  const info = $data.info\n  if (diffD < 1) {\n    info.leavedays = parseFloat(diffH.toFixed(1))\n    info.timetype = 'H'\n  } else {\n    info.leavedays = parseFloat(diffD.toFixed(1))\n    info.timetype = 'D'\n  }\n}"
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code[1]",
+		"newData": "  if($data.info.bigtype==='B'){"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code[2]",
+		"newData": "    $data.info.endtime=$data.info.begintime;"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code[12]",
+		"oldData": "    info.leavedays = parseFloat(diffD.toFixed(1))"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code[15]",
+		"newData": "    // info.leavedays = parseFloat(diffD.toFixed(1))"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638874856696.code[16]",
+		"newData": "    info.leavedays = (Math.floor(diffH / 24) + Math.min(1, (diffH % 24) / 8)).toFixed(1) * 1.0"
 	},
 	{
 		"diffType": "-",
@@ -2520,10 +2535,9 @@
 		"newData": "method"
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1640138240552.code",
-		"newData": "function createFlowName(info) {\n  const { bigtype, usercodeDesc } = info\n  const map = {\n  \tW: '外出',\n    Q: '请假',\n    B: '补打卡',\n    C: '出差',\n  } \t\n  if (!bigtype) return `${usercodeDesc}的申请`\n  return `${usercodeDesc}的${map[bigtype]}申请`\n}",
-		"oldData": "function createFlowName(info) {\n  const { bigtype, usercodeDesc } = info\n  const map = {\n  \tW: '外出',\n    Q: '请假',\n    B: '补打卡',\n  } \t\n  if (!bigtype) return `${usercodeDesc}的申请`\n  return `${usercodeDesc}的${map[bigtype]}申请`\n}"
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1640138240552.code[6]",
+		"newData": "    C: '出差',"
 	},
 	{
 		"diffType": "-",
@@ -2546,10 +2560,54 @@
 		"newData": "method"
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code",
-		"newData": "async function getUserInfo() {\n  //const data = await $dde.get('1473565dee594ea698971bd2afda8966')\n  // const data = await $api.System.get('/platform/allusers/'+$info.topUnitCode);\n  // $data.userInfo = data.map(item=>(\n  //    {label:item.userName,value:item.userCode}\n  //    ))\n  $data.userInfo = await $api.queryUnitsUsers(true)\n}",
-		"oldData": "async function getUserInfo() {\n  const data = await $dde.get('1473565dee594ea698971bd2afda8966')\n  $data.userInfo = data.map(item=>(\n     {label:item.userName,value:item.userCode}\n     ))\n}"
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[1]",
+		"oldData": "  const data = await $dde.get('1473565dee594ea698971bd2afda8966')"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[1]",
+		"newData": "  //const data = await $dde.get('1473565dee594ea698971bd2afda8966')"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[2]",
+		"oldData": "  $data.userInfo = data.map(item=>("
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[2]",
+		"newData": "  // const data = await $api.System.get('/platform/allusers/'+$info.topUnitCode);"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[3]",
+		"oldData": "     {label:item.userName,value:item.userCode}"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[3]",
+		"newData": "  // $data.userInfo = data.map(item=>("
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[4]",
+		"oldData": "     ))"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[4]",
+		"newData": "  //    {label:item.userName,value:item.userCode}"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[5]",
+		"newData": "  //    ))"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1645855991274.code[6]",
+		"newData": "  $data.userInfo = await $api.queryUnitsUsers(true)"
 	},
 	{
 		"diffType": "-",
@@ -2572,10 +2630,189 @@
 		"newData": "method"
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code",
-		"newData": "function save() {\n\n    const { info } = $data\n    const { leaveno } = info\n    if (info.bigtype === 'B') {\n        info.endtime = info.begintime;\n        info.leavedays = 0\n    }\n\n    // 更新时间\n    const now = $d().format('YYYY-MM-DD HH:mm:ss')\n    info.updatedate = now\n    console.log(leaveno)\n    if (leaveno) {\n        return $dde.put('121f2bd4cfca437ca14589e41bdf1c1d', info)\n    } else {\n        // 创建时间\n        info.recorddate = now\n        info.flowOptName = $run('createFlowName', info)\n        // 提交工作流\n        return $dde.post('78e93bd352ea4d7a829ae69241dc3cd5', info)\n    }\n}",
-		"oldData": "function save() {\n  const { info } = $data\n  const { leaveno } = info\n  \n  // 更新时间\n  const now = $d().format('YYYY-MM-DD HH:mm:ss')\n  info.updatedate = now\n  console.log(leaveno)\n  if (leaveno) {\n  \treturn $dde.put('121f2bd4cfca437ca14589e41bdf1c1d', info)\n  } else {\n    // 创建时间\n    info.recorddate = now\n    info.flowOptName = $run('createFlowName', info)\n    // 提交工作流\n    return $dde.post('78e93bd352ea4d7a829ae69241dc3cd5', info)\n  }\n}"
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[1]",
+		"oldData": "  const { info } = $data"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[1]",
+		"newData": ""
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[2]",
+		"oldData": "  const { leaveno } = info"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[2]",
+		"newData": "    const { info } = $data"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[3]",
+		"oldData": "  "
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[3]",
+		"newData": "    const { leaveno } = info"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[4]",
+		"oldData": "  // 更新时间"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[4]",
+		"newData": "    if (info.bigtype === 'B') {"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[5]",
+		"oldData": "  const now = $d().format('YYYY-MM-DD HH:mm:ss')"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[5]",
+		"newData": "        info.endtime = info.begintime;"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[6]",
+		"oldData": "  info.updatedate = now"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[6]",
+		"newData": "        info.leavedays = 0"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[7]",
+		"oldData": "  console.log(leaveno)"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[7]",
+		"newData": "    }"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[8]",
+		"oldData": "  if (leaveno) {"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[8]",
+		"newData": ""
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[9]",
+		"oldData": "  \treturn $dde.put('121f2bd4cfca437ca14589e41bdf1c1d', info)"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[9]",
+		"newData": "    // 更新时间"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[10]",
+		"oldData": "  } else {"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[10]",
+		"newData": "    const now = $d().format('YYYY-MM-DD HH:mm:ss')"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[11]",
+		"oldData": "    // 创建时间"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[11]",
+		"newData": "    info.updatedate = now"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[12]",
+		"oldData": "    info.recorddate = now"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[12]",
+		"newData": "    console.log(leaveno)"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[13]",
+		"oldData": "    info.flowOptName = $run('createFlowName', info)"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[13]",
+		"newData": "    if (leaveno) {"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[14]",
+		"oldData": "    // 提交工作流"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[14]",
+		"newData": "        return $dde.put('121f2bd4cfca437ca14589e41bdf1c1d', info)"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[15]",
+		"oldData": "    return $dde.post('78e93bd352ea4d7a829ae69241dc3cd5', info)"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[15]",
+		"newData": "    } else {"
+	},
+	{
+		"diffType": "-",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[16]",
+		"oldData": "  }"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[16]",
+		"newData": "        // 创建时间"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[17]",
+		"newData": "        info.recorddate = now"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[18]",
+		"newData": "        info.flowOptName = $run('createFlowName', info)"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[19]",
+		"newData": "        // 提交工作流"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[20]",
+		"newData": "        return $dde.post('78e93bd352ea4d7a829ae69241dc3cd5', info)"
+	},
+	{
+		"diffType": "+",
+		"jsonPath": "structureFunction.methodsConfigs.Method_1638961091182.code[21]",
+		"newData": "    }"
 	},
 	{
 		"diffType": "-",
@@ -2700,10 +2937,9 @@
 		}
 	},
 	{
-		"diffType": "*",
-		"jsonPath": "structureFunction.paramsConfigs.Param_1640865185828.code",
-		"newData": "function watchCurrent(current, oldCurrent) {\n  // 在下面开始编写current监听\n  if (current?.format instanceof Function) {\n  \t$data.info.recorddate = current.format('YYYY-MM-DD HH:mm:ss')\n    $data.info.begintime = current.format('YYYY-MM-DD') + ' 08:30:00'\n    $data.info.endtime = current.format('YYYY-MM-DD') + ' 17:30:00'\n  }\n}",
-		"oldData": "function watchCurrent(current, oldCurrent) {\n  // 在下面开始编写current监听\n  if (current?.format instanceof Function) {\n  \t$data.info.recorddate = current.format('YYYY-MM-DD HH:mm:ss')\n    $data.info.begintime = current.format('YYYY-MM-DD') + ' 08:30:00'\n  }\n}"
+		"diffType": "+",
+		"jsonPath": "structureFunction.paramsConfigs.Param_1640865185828.code[5]",
+		"newData": "    $data.info.endtime = current.format('YYYY-MM-DD') + ' 17:30:00'"
 	},
 	{
 		"diffType": "+",

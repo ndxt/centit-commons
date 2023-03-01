@@ -199,13 +199,26 @@ public abstract class JSONOpt {
             return differents;
         }
 
-        String diffType = JsonDifferent.JSON_DIFF_TYPE_UPDATE;
+
         if(objectA == null ){
-            diffType = JsonDifferent.JSON_DIFF_TYPE_ADD;
+            differents.add(new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_ADD, null, objectB));
         } else if(objectB == null ){
-            diffType = JsonDifferent.JSON_DIFF_TYPE_DELETE;
+            differents.add(new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_DELETE, objectA, null));
+        } else {
+            String strA = StringBaseOpt.objectToString(objectA);
+            String strB = StringBaseOpt.objectToString(objectB);
+            String[] stringsA = strA.split("\\n");
+            String[] stringsB = strB.split("\\n");
+            if(stringsA.length>1 && stringsB.length>1){
+                List<JsonDifferent> strDiff = listDiff(jsonPath, CollectionsOpt.arrayToList(stringsA), CollectionsOpt.arrayToList(stringsB) , arrayKeys);
+                if(strDiff.size()>0){
+                    differents.addAll(strDiff);
+                }else
+                    differents.add(new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_UPDATE, objectA, objectB));
+            }else
+                differents.add(new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_UPDATE, objectA, objectB));
         }
-        differents.add(new JsonDifferent(jsonPath, diffType, objectA, objectB));
+
         return differents;
     }
 

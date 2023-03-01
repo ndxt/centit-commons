@@ -22,7 +22,7 @@ public class TestJsonObject {
             .getResourceAsStream("/page-v2.json");
         Object object2  = JSON.parse(FileIOOpt.readStringFromInputStream(in));
 
-        System.out.println(JSON.toJSONString(JSONOpt.diff(object, object2, "id")));
+        System.out.println(JSON.toJSONString(JSONOpt.diff(object, object2, "id", "value")));
     }
 
     public static void testJsonTransform() throws IOException {
