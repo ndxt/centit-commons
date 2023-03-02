@@ -1,5 +1,6 @@
 package com.centit.support.algorithm;
 
+import com.centit.support.common.LeftRightPair;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -395,10 +396,10 @@ public abstract class DatetimeOpt {
             case "+11": return TimeZone.getTimeZone("Asia/Magadan");
             case "+12": return TimeZone.getTimeZone("Pacific/Majuro");
         }
-        return TimeZone.getTimeZone("Asia/Shanghai");
+        return TimeZone.getTimeZone(zone);
     }
 
-    public static SimpleDateFormat createDateFormat(String sMask){
+    private static LeftRightPair<SimpleDateFormat, String> createDateFormat(String sMask, String strDate){
         SimpleDateFormat df;
         if(sMask.startsWith("lang")){
             Locale local = fetchLangLocal(sMask.substring(5,7));
@@ -407,11 +408,16 @@ public abstract class DatetimeOpt {
             Locale local = fetchLangLocal(sMask.substring(5,7));
             String zone = sMask.substring(8,11);
             df = new SimpleDateFormat(sMask.substring(11).trim(), local);
+            if("END".equals(zone) || StringUtils.isNotBlank(strDate)){
+                int lastInd = strDate.lastIndexOf(' ');
+                zone = strDate.substring(lastInd+1);
+                strDate = strDate.substring(0, lastInd);
+            }
             df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
         }  else {
             df = new SimpleDateFormat(sMask);
         }
-        return df;
+        return new LeftRightPair<>(df, strDate);
     }
     /**
      * This method generates a string representation of a date/time in the
@@ -430,8 +436,9 @@ public abstract class DatetimeOpt {
             if (StringUtils.isBlank(sMask))
                 return smartPraseDate(strDate);
 
-            SimpleDateFormat df = createDateFormat(sMask);
-            return df.parse(strDate);
+            LeftRightPair<SimpleDateFormat, String> dfAndStr = createDateFormat(sMask , strDate);
+            return dfAndStr.getLeft().parse(dfAndStr.getRight());
+
         } catch (ParseException pe) {
             log.error("converting '" + strDate + "' to date with mask '"
                 + sMask + "'" + pe.getMessage());
@@ -454,8 +461,8 @@ public abstract class DatetimeOpt {
             return null;
         }
         String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
-        SimpleDateFormat df = createDateFormat(sMask);
-        return df.format(aDate);
+        LeftRightPair<SimpleDateFormat, String> dfAndStr = createDateFormat(sMask , null);
+        return dfAndStr.getLeft().format(aDate);
     }
 
     /**
