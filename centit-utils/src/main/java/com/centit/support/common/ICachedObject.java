@@ -12,7 +12,7 @@ public interface ICachedObject<T> {
      */
     long DEFAULT_REFRESH_PERIOD = 900L;
 
-    void evictCahce();
+    void evictCache();
 
     //获取原始缓存数据
     T getRawTarget();

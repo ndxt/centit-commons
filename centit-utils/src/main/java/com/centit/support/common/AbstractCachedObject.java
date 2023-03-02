@@ -22,7 +22,7 @@ public abstract class AbstractCachedObject<T> implements ICachedObject<T> {
     void evictDerivativeCahce() {
         if (deriveCaches != null) {
             for (ICachedObject eriveCache : deriveCaches) {
-                eriveCache.evictCahce();
+                eriveCache.evictCache();
             }
         }
     }
@@ -42,7 +42,7 @@ public abstract class AbstractCachedObject<T> implements ICachedObject<T> {
         }
     }
 
-    public void evictCahce() {
+    public void evictCache() {
         evicted = true;
         evictDerivativeCahce();
     }

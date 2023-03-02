@@ -55,14 +55,14 @@ public class DerivativeCachedMap<K, D, T> extends AbstractCachedObject<Map<K, T>
     public void evictIdentifiedCache(K key) {
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject != null) {
-            identifiedObject.evictCahce();
+            identifiedObject.evictCache();
         }
     }
 
     @Override
-    public void evictCahce() {
+    public void evictCache() {
         targetMap.clear();
-        super.evictCahce();
+        super.evictCache();
     }
 
     public T getCachedValue(K key) {
