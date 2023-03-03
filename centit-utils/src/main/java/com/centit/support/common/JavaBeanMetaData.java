@@ -20,9 +20,6 @@ public class JavaBeanMetaData {
     private Class<?> javaType;
     private Map<String, JavaBeanField> fileds;
 
-    private JavaBeanMetaData() {
-    }
-
     private JavaBeanMetaData(Class<?> javaType) {
         this.javaType = javaType;
         this.fileds = new HashMap<>(30);
