@@ -16,9 +16,9 @@ public class TestExcelImport {
     public static void main(String[] args) throws Exception {
         //"/home/codefan/temp/2018.03.01-2018.04.30.xlsx",
         // "/home/codefan/下载/北京.xlsx"
-        InputStream s = new FileInputStream(new File("/Users/codefan/Documents/temp/ceshi.xlsx"));
+        InputStream s = new FileInputStream(new File("/Users/codefan/Documents/temp/ceshi2.xlsx"));
         List<Map<String, Object>> ss = ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(s,
-            0,1,2,100,1,7);
+            0,2,3,5,0,9);
         System.out.println(JSON.toJSONString(ss));
         /*System.out.println(ExcelImportUtil.mapColumnIndex("A"));
         System.out.println(ExcelImportUtil.mapColumnIndex("AA"));

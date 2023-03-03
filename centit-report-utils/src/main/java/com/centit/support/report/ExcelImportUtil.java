@@ -120,8 +120,13 @@ public abstract class ExcelImportUtil {
         switch (cellType) {
 
             case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    value = cell.getDateCellValue();
+                if (DateUtil.isCellDateFormatted(cell)) { //cell.getCellStyle().getDataFormatString()
+                    String dataFormat = cell.getCellStyle().getDataFormatString();
+                    if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
+                        value = cell.getDateCellValue();
+                    } else {
+                        value = DatetimeOpt.convertDateToString(cell.getDateCellValue(), "hh:mm:mm");
+                    }
                 } else {
                     value = cell.getNumericCellValue();
                 }
@@ -158,7 +163,12 @@ public abstract class ExcelImportUtil {
         switch (cellType) {
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
+                    String dataFormat = cell.getCellStyle().getDataFormatString();
+                    if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
+                        value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
+                    } else {
+                        value = DatetimeOpt.convertDateToString(cell.getDateCellValue(), "hh:mm:mm");
+                    }
                 } else {
                     value = StringBaseOpt.castObjectToString(cell.getNumericCellValue());
                 }
