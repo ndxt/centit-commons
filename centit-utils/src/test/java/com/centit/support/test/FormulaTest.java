@@ -46,6 +46,13 @@ public class FormulaTest {
 
     public static void main(String[] args) throws ParseException {
 
+        Object strReplace =  VariableFormula.calculate(
+            "replace('Jan 1, 2023 6:15:03 p.m. a.m. PST', 'p.m.', 'pm', 'a.m.', 'am')");
+        System.out.println(strReplace);
+        strReplace =  VariableFormula.calculate(
+            "replace(replace('Jan 1, 2023 6:15:03 p.m. a.m. PST', 'p.m.', 'pm'), 'a.m.', 'am')");
+        System.out.println(strReplace);
+
         Object date =  VariableFormula.calculate(
             "toDate('7 ene 2023 03:33:31 GMT-8', 'zone:MX:END d MMM yyyy hh:mm:ss')");
         System.out.println("toDate en -> " + date.toString());
