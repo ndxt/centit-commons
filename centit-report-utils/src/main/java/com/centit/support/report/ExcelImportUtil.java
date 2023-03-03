@@ -6,13 +6,17 @@ import com.centit.support.common.JavaBeanMetaData;
 import com.centit.support.common.LeftRightPair;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.LocaleUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -45,7 +49,7 @@ public abstract class ExcelImportUtil {
                 if (cell.getCellType() == CellType.NUMERIC) {
                     field.setObjectFieldValue(object, cell.getNumericCellValue());
                 } else {
-                    field.setObjectFieldValue(object, cell.toString());
+                    field.setObjectFieldValue(object, getCellString(cell));
                 }
                 break;
 
@@ -55,7 +59,7 @@ public abstract class ExcelImportUtil {
                 if (cell.getCellType() == CellType.NUMERIC) {
                     field.setObjectFieldValue(object, cell.getDateCellValue());
                 } else {
-                    field.setObjectFieldValue(object, cell.toString());
+                    field.setObjectFieldValue(object, getCellString(cell));
                 }
                 break;
             case "boolean":
@@ -63,13 +67,13 @@ public abstract class ExcelImportUtil {
                 if (cell.getCellType() == CellType.BOOLEAN) {
                     field.setObjectFieldValue(object, cell.getBooleanCellValue());
                 } else {
-                    field.setObjectFieldValue(object, cell.toString());
+                    field.setObjectFieldValue(object, getCellString(cell));
                 }
                 break;
             case "byte[]":
             case "String":
             default:
-                field.setObjectFieldValue(object, cell.toString());
+                field.setObjectFieldValue(object, getCellString(cell));
                 break;
         }
     }
@@ -110,29 +114,35 @@ public abstract class ExcelImportUtil {
         if (cell == null) {
             return null;
         }
-        Object value = null;
-        switch (cell.getCellType()) {
-            case STRING:
-                value = cell.getRichStringCellValue().getString();
-                break;
+
+        Object value;
+        CellType cellType = cell.getCellType();
+        if(cellType == CellType.FORMULA){
+            cellType = cell.getCachedFormulaResultType();
+        }
+        switch (cellType) {
+
             case NUMERIC:
-                String dataFormat = cell.getCellStyle().getDataFormatString();
-                if (StringUtils.containsIgnoreCase(dataFormat, "yy")
-                    && StringUtils.containsIgnoreCase(dataFormat, "m")
-                    && StringUtils.containsIgnoreCase(dataFormat, "d")) {
+                if (DateUtil.isCellDateFormatted(cell)) {
                     value = cell.getDateCellValue();
                 } else {
                     value = cell.getNumericCellValue();
                 }
                 break;
+
             case BOOLEAN:
                 value = cell.getBooleanCellValue();
                 break;
-            case BLANK:
-                value = null;
+
+            case STRING:
+                value = cell.getRichStringCellValue().getString();
                 break;
+
+            case FORMULA: // 正常不会运行到这儿
+            case ERROR:
+            case BLANK:
             default:
-                value = cell.toString();
+                value = null;
                 break;
         }
         return value;
@@ -142,16 +152,15 @@ public abstract class ExcelImportUtil {
         if (cell == null) {
             return "";
         }
-        String value = null;
-        switch (cell.getCellType()) {
-            case STRING:
-                value = cell.getRichStringCellValue().getString();
-                break;
+
+        String value;
+        CellType cellType = cell.getCellType();
+        if(cellType == CellType.FORMULA){
+            cellType = cell.getCachedFormulaResultType();
+        }
+        switch (cellType) {
             case NUMERIC:
-                String dataFormat = cell.getCellStyle().getDataFormatString();
-                if (StringUtils.containsIgnoreCase(dataFormat, "yy")
-                    && StringUtils.containsIgnoreCase(dataFormat, "m")
-                    && StringUtils.containsIgnoreCase(dataFormat, "d")) {
+                if (DateUtil.isCellDateFormatted(cell)) {
                     value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
                 } else {
                     value = StringBaseOpt.castObjectToString(cell.getNumericCellValue());
@@ -160,11 +169,18 @@ public abstract class ExcelImportUtil {
             case BOOLEAN:
                 value = cell.getBooleanCellValue() ? BooleanBaseOpt.STRING_TRUE : BooleanBaseOpt.STRING_FALSE;
                 break;
-            case BLANK:
-                value = "";
+
+            case STRING:
+                value = cell.getRichStringCellValue().getString();
                 break;
+
+            case ERROR:
+                return ErrorEval.getText(cell.getErrorCellValue());
+
+            case FORMULA:
+            case BLANK:
             default:
-                value = cell.toString();
+                value = "";
                 break;
         }
         return value;
@@ -193,7 +209,7 @@ public abstract class ExcelImportUtil {
             for (Map.Entry<Integer, String> ent : fieldDesc.entrySet()) {
                 Cell cell = excelRow.getCell(ent.getKey());
                 JavaBeanField field = metaData.getFiled(ent.getValue());
-                if (cell != null && StringUtils.isNotBlank(cell.toString())) {
+                if (cell != null && StringUtils.isNotBlank(getCellString(cell))) {
                     hasValue = true;
                     setObjectFieldValue(rowObj, field, cell);
                 }
@@ -403,7 +419,7 @@ public abstract class ExcelImportUtil {
                 //excelRow.getFirstCellNum()
                 for (int col : columnList) {
                     Cell cell = excelRow.getCell(col);
-                    rowObj[i++] = cell == null ? null : cell.toString();
+                    rowObj[i++] = cell == null ? null : getCellString(cell);
                 }
                 datas.add(rowObj);
             }
@@ -522,7 +538,7 @@ public abstract class ExcelImportUtil {
             for (int col = beginCol; col <= endCol; col++) {
                 Cell cell = excelRow.getCell(col);
                 if (cell != null) {
-                    rowObj[i] = cell.toString();// cell.getStringCellValue();
+                    rowObj[i] = getCellString(cell);// cell.getStringCellValue();
                     hasValue = true;
                 }
                 i++;
@@ -884,11 +900,11 @@ public abstract class ExcelImportUtil {
         List<String> header = new ArrayList<>(60);
         for (int i = beginColumn; i <= endColumn; i++) {
             Cell cell = headRow.getCell(i);
-            if(cell == null || StringUtils.isBlank(cell.toString())){
+            if(cell == null || StringUtils.isBlank(getCellString(cell))){
                 header.add("column" + i );
                 existNoHeader = true;
             } else {
-                header.add(cell.toString());
+                header.add(getCellString(cell));
             }
         }
 
@@ -901,10 +917,10 @@ public abstract class ExcelImportUtil {
                 for(int j=beginColumn; j<=endColumn; j++){
                     if(StringUtils.equals("column" + j, header.get(j - beginColumn))) {
                         Cell cell = headRow.getCell(j);
-                        if (cell == null || StringUtils.isBlank(cell.toString())) {
+                        if (cell == null || StringUtils.isBlank(getCellString(cell))) {
                             existNoHeader = true;
                         } else {
-                            String headerName = cell.toString();
+                            String headerName = getCellString(cell);
                             header.set(j - beginColumn, headerName);
                         }
                     }
