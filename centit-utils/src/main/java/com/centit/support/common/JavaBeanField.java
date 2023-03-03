@@ -91,9 +91,9 @@ public class JavaBeanField {
                 if (!accessible) {
                     objectField.setAccessible(false);
                 }
-            } else {
+            } /*else {
                 logger.error(Object.class.getName() + "没有对应的属性。");
-            }
+            }*/
         } catch (InvocationTargetException | IllegalAccessException e) {
             logger.error(e.getMessage(), e);
         }
@@ -203,11 +203,11 @@ public class JavaBeanField {
                 }
                 Object result = objectField.get(obj);
                 if (!accessible) {
-                    objectField.setAccessible(accessible);
+                    objectField.setAccessible(false);
                 }
                 return result;
             } else {
-                logger.error(Object.class.getName() + "没有对应的属性。");
+                // logger.error(Object.class.getName() + "没有对应的属性。");
                 return null;
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
