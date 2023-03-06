@@ -76,8 +76,8 @@ public class JsonDifferent implements Serializable {
         this.diffChildren = diffChildren;
     }
 
-    public JSONObject toJson(){
-        JSONObject jsonObj = new JSONObject();
+    private JSONObject toJson(){
+        JSONObject jsonObj = toJson(this.diffChildren);
         jsonObj.put("diffType", this.diffType);
         if(this.newData != null){
             jsonObj.put("newData", this.newData);
@@ -85,25 +85,22 @@ public class JsonDifferent implements Serializable {
         if(this.oldData != null){
             jsonObj.put("oldData", this.oldData);
         }
-        if(this.diffChildren != null){
-            for(JsonDifferent childDiff : this.diffChildren){
+        return jsonObj;
+    }
+
+    private static JSONObject toJson(List<JsonDifferent> diffList){
+        JSONObject jsonObj = new JSONObject();
+        if(diffList!=null && diffList.size()>0) {
+            for (JsonDifferent childDiff : diffList) {
                 jsonObj.put(childDiff.getJsonPath(), childDiff.toJson());
             }
         }
         return jsonObj;
     }
 
-    public static Object toJson(List<JsonDifferent> diffList){
-        if(diffList==null || diffList.size()==0){
-            return null;
-        }
-        if(diffList.size()==1){
-            return diffList.get(0).toJson();
-        }
-        JSONArray jsonArray = new JSONArray(diffList.size());
-        for(JsonDifferent childDiff : diffList){
-            jsonArray.add(childDiff.toJson());
-        }
-        return jsonArray;
+    public JSONObject toJSONObject(){
+        JSONObject jsonObj = new JSONObject();
+        jsonObj.put(this.jsonPath, this.toJson());
+        return jsonObj;
     }
 }

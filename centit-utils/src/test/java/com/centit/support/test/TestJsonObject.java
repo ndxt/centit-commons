@@ -20,10 +20,10 @@ public class TestJsonObject {
             .getResourceAsStream("/page-v1.json");
         Object object = JSON.parse(FileIOOpt.readStringFromInputStream(in));
         in = TestJsonObject.class
-            .getResourceAsStream("/page-v2.json");
+            .getResourceAsStream("/page-v1-1.json");
         Object object2  = JSON.parse(FileIOOpt.readStringFromInputStream(in));
         JsonDifferent diff = JSONOpt.diff(object, object2, "id", "value");
-        System.out.println(JSON.toJSONString(diff.toJson()));
+        System.out.println(JSON.toJSONString(diff.toJSONObject()));
     }
 
     public static void testJsonTransform() throws IOException {
