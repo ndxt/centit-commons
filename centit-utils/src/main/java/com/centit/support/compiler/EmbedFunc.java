@@ -434,18 +434,20 @@ public abstract class EmbedFunc {
                     else
                         findType = StringBaseOpt.castObjectToString(slOperand.get(3));
                 }
+                if(nStart<0) nStart = 0;
                 //StringUtils.indexOfIgnoreCase()
                 if (StringUtils.indexOfIgnoreCase(findType,"W")>=0) {
                     Lexer lexer = nStart > 0 ? new Lexer(tempStr.substring(nStart)) : new Lexer(tempStr);
-                    return lexer.findWord(StringBaseOpt.objectToString(slOperand.get(1)),
+                    int nPos = lexer.findWord(StringBaseOpt.objectToString(slOperand.get(1)),
                         StringUtils.indexOfIgnoreCase(findType, "C") >= 0, false);
+                    return nPos>=0 ? nPos + nStart: nPos;
                 }
                 if (StringUtils.indexOfIgnoreCase(findType, "C") >= 0) {
-                   return StringUtils.indexOfIgnoreCase(
-                       tempStr , StringBaseOpt.objectToString(slOperand.get(1)), nStart);
+                    return tempStr.indexOf(
+                        StringBaseOpt.objectToString(slOperand.get(1)), nStart);
                 }
-                return tempStr.indexOf(
-                    StringBaseOpt.objectToString(slOperand.get(1)), nStart);
+                return StringUtils.indexOfIgnoreCase(
+                    tempStr , StringBaseOpt.objectToString(slOperand.get(1)), nStart);
             }
 
             case ConstDefine.FUNC_UPCASE://upcase

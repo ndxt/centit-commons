@@ -49,8 +49,25 @@ public class FormulaTest {
     public static void main(String[] args) throws ParseException {
 
         Object strReplace =  VariableFormula.calculate(
-            "replace('Jan 1, 2023 6:15:03 p.m. a.m. PST', 'p.m.', 'pm', 'a.m.', 'am')");
+            "find('Jan 1, 2023 6:15:03 p.m. a.m. PST', 'pst')");
         System.out.println(strReplace);
+
+        strReplace =  VariableFormula.calculate(
+            "find('Jan 1, pst 6:15:03 p.m. a.m. PST', 'pst', 'C', 7)");
+        System.out.println(strReplace);
+        strReplace =  VariableFormula.calculate(
+            "find('Jan 1, pst 6:15:03 p.m. a.m. PST', 'pst', 'C', 8)");
+        System.out.println(strReplace);
+
+        strReplace =  VariableFormula.calculate(
+            "find('Jan 1, pst002 6:15:03 p.m. a.m. PST', 'pst', 'w')");
+        System.out.println(strReplace);
+
+        strReplace =  VariableFormula.calculate(
+            "find('Jan 1, PST 6:15:03 p.m. a.m. pst', 'pst', 'w')");
+        System.out.println(strReplace);
+
+
         strReplace =  VariableFormula.calculate(
             "replace(replace('Jan 1, 2023 6:15:03 p.m. a.m. PST', 'p.m.', 'pm'), 'a.m.', 'am')");
         System.out.println(strReplace);
