@@ -415,13 +415,35 @@ public abstract class EmbedFunc {
                 if (nOpSum < 2)
                     return -1;
                 int nStart = 0;
-                if (nOpSum > 2 && NumberBaseOpt.isNumber(slOperand.get(2)))
-                    nStart = NumberBaseOpt.castObjectToInteger(slOperand.get(2));
+
                 Object obj = slOperand.get(0);
                 if (obj instanceof Collection) {
                     return ((Collection) obj).contains(slOperand.get(1));
                 }
                 String tempStr = StringBaseOpt.objectToString(obj);
+                String findType = null; //C W
+                if (nOpSum > 2 ) {
+                    if(NumberBaseOpt.isNumber(slOperand.get(2)))
+                        nStart = NumberBaseOpt.castObjectToInteger(slOperand.get(2));
+                    else
+                        findType = StringBaseOpt.castObjectToString(slOperand.get(2));
+                }
+                if (nOpSum > 3 ) {
+                    if(NumberBaseOpt.isNumber(slOperand.get(3)))
+                        nStart = NumberBaseOpt.castObjectToInteger(slOperand.get(3));
+                    else
+                        findType = StringBaseOpt.castObjectToString(slOperand.get(3));
+                }
+                //StringUtils.indexOfIgnoreCase()
+                if (StringUtils.indexOfIgnoreCase(findType,"W")>=0) {
+                    Lexer lexer = nStart > 0 ? new Lexer(tempStr.substring(nStart)) : new Lexer(tempStr);
+                    return lexer.findWord(StringBaseOpt.objectToString(slOperand.get(1)),
+                        StringUtils.indexOfIgnoreCase(findType, "C") >= 0, false);
+                }
+                if (StringUtils.indexOfIgnoreCase(findType, "C") >= 0) {
+                   return StringUtils.indexOfIgnoreCase(
+                       tempStr , StringBaseOpt.objectToString(slOperand.get(1)), nStart);
+                }
                 return tempStr.indexOf(
                     StringBaseOpt.objectToString(slOperand.get(1)), nStart);
             }
