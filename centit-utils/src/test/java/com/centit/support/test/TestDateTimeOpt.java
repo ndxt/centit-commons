@@ -6,12 +6,78 @@ import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.UrlOptUtils;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TestDateTimeOpt {
     public static void main(String[] args) {
-        System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.castObjectToDate("10/16/2022")));
+        Date now = DatetimeOpt.currentUtilDate();
+        System.out.println(now);
+        System.out.println(DatetimeOpt.convertDateToGMTString(now));
+        //testDateTime();
+        //System.out.println(JSON.toJSONString(ZoneInfoFile.getAliasMap()));
+        /*Date currentDate = DatetimeOpt.convertStringToDate(
+            "2022-12-12 12:12:12", "yyyy-MM-dd HH:mm:ss");
+        System.out.println(currentDate);
+        System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12"));
+
+        currentDate = DatetimeOpt.convertStringToDate(
+            "2022-12-12 12:12:12 PST", "yyyy-MM-dd HH:mm:ss zzz");
+        System.out.println(currentDate);
+        System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12 PST"));
+
+        currentDate = DatetimeOpt.convertStringToDate(
+            "2022-12-12 12:12:12 GMT", "yyyy-MM-dd HH:mm:ss zzz");
+        System.out.println(currentDate);
+        System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12 GMT"));
+
+        currentDate = DatetimeOpt.convertStringToDate(
+            "2022-12-12 12:12:12 CST", "yyyy-MM-dd HH:mm:ss zzz");
+        System.out.println(currentDate);
+        System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12 GMT+8"));
+        System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12 GMT+9"));*/
+       /* for(Map.Entry<String, String> ent : ZoneInfoFile.getAliasMap().entrySet()) {
+            TimeZone timeZone = TimeZone.getTimeZone(ent.getValue());
+            if (timeZone.getRawOffset() == 12 * 3600000) {
+                System.out.println("+12:"+ent.getValue());
+            }
+            if (timeZone.getRawOffset() == 10 * 3600000) {
+                System.out.println("+10:"+ent.getValue());
+            }
+        }
+
+
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "yyyy-MM-dd HH:mm:ss.SSS (zzz)"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:GMT yyyy-MM-dd HH:mm:ss.SSS"));
+
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:PST yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-11 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-10 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-09 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-08 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-07 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-06 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-05 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-04 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-03 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-02 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:-01 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+00 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+01 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+02 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+03 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+04 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+05 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+06 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+07 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+08 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+09 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+10 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+11 yyyy-MM-dd HH:mm:ss.SSS"));
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "zone:en:+11 yyyy-MM-dd HH:mm:ss.SSS"));
+       */ /*System.out.println(DatetimeOpt.convertDateToString(DatetimeOpt.castObjectToDate("10/16/2022")));
         System.out.println(DatetimeOpt.createUtilDate(1980,2,1).getTime());
         System.out.println(DatetimeOpt.createUtilDate(2200,1,1).getTime());
         System.out.println(System.currentTimeMillis());
@@ -20,10 +86,8 @@ public class TestDateTimeOpt {
         System.out.println(StringRegularOpt.trimDateString("20190609"));
         System.out.println(DatetimeOpt.smartPraseDate("20190609"));
         System.out.println(DatetimeOpt.smartPraseDate("1591772196532"));
-
         System.out.println(DatetimeOpt.smartPraseDate("20190609093405"));
-        System.out.println(DatetimeOpt.smartPraseDate("2020-06-09T09:34:05.790Z"));
-
+        System.out.println(DatetimeOpt.smartPraseDate("2020-06-09T09:34:05.790Z"));*/
     }
 
     //T代表后面跟着时间，Z代表UTC统一时间
@@ -96,14 +160,14 @@ public class TestDateTimeOpt {
             DatetimeOpt.smartPraseDate(s));
 
 
-        s = "5-6-7-8-9-10-11";
+        s = "2005-6-7 8:9:10.011";
         System.out.println(StringRegularOpt.trimDateString
             (s));
 
         System.out.println(
             DatetimeOpt.smartPraseDate(s));
 
-        s = "5-6-7-8-9-10-11-12";
+        s = "5-6-7-8-9-10-11-12.067";
         System.out.println(StringRegularOpt.trimDateString
             (s));
 

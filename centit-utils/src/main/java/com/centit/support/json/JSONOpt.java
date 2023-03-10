@@ -43,6 +43,7 @@ public abstract class JSONOpt {
         JSON.register(java.sql.Timestamp.class, SqlTimestampDeserializer.instance);
        /* JSON.register(java.util.Date.class, );
         JSON.register(java.sql.Date.class, );*/
+
         JSON.register(java.sql.Timestamp.class, JdbcSupport.createTimestampWriter(
             java.sql.Timestamp.class, DatetimeOpt.timestampPattern));
         JSON.register(java.sql.Blob.class, LobSerializer.instance);
