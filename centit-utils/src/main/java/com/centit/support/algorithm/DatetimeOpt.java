@@ -284,6 +284,8 @@ public abstract class DatetimeOpt {
                 case "+05": return TimeZone.getTimeZone("Asia/Karachi");
                 case "+06": return TimeZone.getTimeZone("Asia/Rangoon");
                 case "+07": return TimeZone.getTimeZone("Asia/Bangkok");
+                case "CST": // 28800000   |   中国标准时间   |   中国标准时间
+                            // ZoneInfoFile 中的 CST 为 "CST": "America/Chicago",
                 case "+08": return TimeZone.getTimeZone("Asia/Shanghai");
                 case "+09": return TimeZone.getTimeZone("Asia/Tokyo");
                 case "+10": return TimeZone.getTimeZone("Australia/Sydney");//**

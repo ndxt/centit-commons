@@ -6,22 +6,28 @@ import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.network.UrlOptUtils;
 
 import java.time.Instant;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class TestDateTimeOpt {
     public static void main(String[] args) {
-        Date now = DatetimeOpt.currentUtilDate();
-        System.out.println(now);
-        System.out.println(DatetimeOpt.convertDateToGMTString(now));
-        //testDateTime();
+        /*TimeZone timeZone = DatetimeOpt.fetchTimeZone("+12");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+
+        Date currentDate = DatetimeOpt.currentUtilDate();
+
+        System.out.println(currentDate);
+        System.out.println(DatetimeOpt.convertDateToGMTString(currentDate));
+        System.out.println(currentDate);
+        System.out.println(DatetimeOpt.convertDateToString(currentDate, "yyyy-MM-dd HH:mm:ss.SSS (zzz)"));
+        *///testDateTime();
         //System.out.println(JSON.toJSONString(ZoneInfoFile.getAliasMap()));
-        /*Date currentDate = DatetimeOpt.convertStringToDate(
+        Date currentDate = DatetimeOpt.convertStringToDate(
             "2022-12-12 12:12:12", "yyyy-MM-dd HH:mm:ss");
         System.out.println(currentDate);
         System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12"));
-
+        System.out.println(DatetimeOpt.convertDateToString(
+            currentDate, "yyyy-MM-dd HH:mm:ss.SSS zzz"));
         currentDate = DatetimeOpt.convertStringToDate(
             "2022-12-12 12:12:12 PST", "yyyy-MM-dd HH:mm:ss zzz");
         System.out.println(currentDate);
@@ -35,6 +41,7 @@ public class TestDateTimeOpt {
         currentDate = DatetimeOpt.convertStringToDate(
             "2022-12-12 12:12:12 CST", "yyyy-MM-dd HH:mm:ss zzz");
         System.out.println(currentDate);
+        /*
         System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12 GMT+8"));
         System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12 GMT+9"));*/
        /* for(Map.Entry<String, String> ent : ZoneInfoFile.getAliasMap().entrySet()) {
