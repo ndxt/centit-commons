@@ -209,50 +209,6 @@ public abstract class ReflectionOpt {
     }
 
     /*
-     * 调用对象函数,忽略private,protected修饰符的限制.
-     *
-     * @throws NoSuchMethodException 如果没有该Method时抛出.
-     */
-    public static Object invokePrivateMethod(Object object, String methodName, Object... params)
-        throws NoSuchMethodException {
-        assert (object != null);
-        assert (methodName != null && !methodName.isEmpty());
-
-        Class<?>[] types = new Class[params.length];
-        for (int i = 0; i < params.length; i++) {
-            types[i] = params[i].getClass();
-        }
-
-        Class<?> clazz = object.getClass();
-        Method method = null;
-        for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
-            try {
-                method = superClass.getDeclaredMethod(methodName, types);
-                break;
-            } catch (NoSuchMethodException e) {
-                logger.debug("方法不在当前类定义,继续向上转型");
-                // 方法不在当前类定义,继续向上转型
-            }
-        }
-
-        if (method == null)
-            throw new NoSuchMethodException("No Such Method:" + clazz.getSimpleName() + methodName);
-
-        boolean accessible = method.isAccessible();
-        method.setAccessible(true);
-        Object result = null;
-        try {
-            result = method.invoke(object, params);
-        } catch (Exception e) {
-            //ReflectionUtils.handleReflectionException(e);
-            logger.error(e.getMessage());
-            logger.error(e.getMessage(), e);//e.printStackTrace();
-        }
-        method.setAccessible(accessible);
-        return result;
-    }
-
-    /*
      * 取得Field列表.
      */
     public static Field[] getFields(Object object) {
@@ -621,35 +577,92 @@ public abstract class ReflectionOpt {
     /*
      * 调用对象的无参数函数
      */
-    public static void invokeNoParamFunc(Object demander, String smethod) {
+    public static Object invokeNoParamFunc(Object demander, String smethod) {
         try {
-            //"copyNotNullProperty"
-            Method setV = demander.getClass().getMethod(smethod);
-            //Class rt = d.getReturnType();
-/*            if(setV == null)
-                return;    */
-            setV.invoke(demander);
+            Method method = demander.getClass().getMethod(smethod);
+            return method.invoke(demander);
         } catch (NoSuchMethodException | SecurityException
             | IllegalAccessException | InvocationTargetException e) {
             logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public static Object invokeMethod(Object demander, String smethod, Object ... params) {
+        if(params==null){
+            return invokeNoParamFunc(demander, smethod);
+        }
+        try {
+            //"copyNotNullProperty"
+            Class<?>[] types = new Class[params.length];
+            for (int i = 0; i < params.length; i++) {
+                types[i] = params[i].getClass();
+            }
+            Method method = demander.getClass().getMethod(smethod, types);
+            return method.invoke(demander, params);
+        } catch (NoSuchMethodException | SecurityException | IllegalArgumentException
+                 | IllegalAccessException | InvocationTargetException e) {
+            logger.error(e.getMessage(), e);
+            return null;
         }
     }
 
     /*
      * 调用相同类型的类之间的二元操作
      */
-    public static <T extends Object> void invokeBinaryOpt(T demander, String smethod, T param) {
+    public static <T extends Object> Object invokeBinaryOpt(T demander, String smethod, T param) {
         try {
-            //"copyNotNullProperty"
             Method setV = demander.getClass().getMethod(smethod, demander.getClass());
-            //Class rt = d.getReturnType();
-/*            if(setV == null)
-                return;    */
-            setV.invoke(demander, param);
+            return setV.invoke(demander, param);
         } catch (NoSuchMethodException | SecurityException | IllegalArgumentException
             | IllegalAccessException | InvocationTargetException e) {
             logger.error(e.getMessage(), e);
+            return null;
         }
+    }
+
+    /*
+     * 调用对象函数,忽略private,protected修饰符的限制.
+     *
+     * @throws NoSuchMethodException 如果没有该Method时抛出.
+     */
+    public static Object invokePrivateMethod(Object object, String methodName, Object... params)
+        throws NoSuchMethodException {
+        assert (object != null);
+        assert (methodName != null && !methodName.isEmpty());
+
+        Class<?>[] types = new Class[params.length];
+        for (int i = 0; i < params.length; i++) {
+            types[i] = params[i].getClass();
+        }
+
+        Class<?> clazz = object.getClass();
+        Method method = null;
+        for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
+            try {
+                method = superClass.getDeclaredMethod(methodName, types);
+                break;
+            } catch (NoSuchMethodException e) {
+                logger.debug("方法不在当前类定义,继续向上转型");
+                // 方法不在当前类定义,继续向上转型
+            }
+        }
+
+        if (method == null)
+            throw new NoSuchMethodException("No Such Method:" + clazz.getSimpleName() + methodName);
+
+        boolean accessible = method.isAccessible();
+        method.setAccessible(true);
+        Object result = null;
+        try {
+            result = method.invoke(object, params);
+        } catch (Exception e) {
+            //ReflectionUtils.handleReflectionException(e);
+            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+        }
+        method.setAccessible(accessible);
+        return result;
     }
 
     /**

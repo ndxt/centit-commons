@@ -10,11 +10,39 @@ import java.util.*;
 
 public class TestDateTimeOpt {
     public static void main(String[] args) {
+        TimeZone timeZone = DatetimeOpt.fetchTimeZone("GMT");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("8");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("+8");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("GMT8");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("GMT+08");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("GMT+0800");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("GMT+8");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("GMT+800");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("GMT800");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+
         /*TimeZone timeZone = DatetimeOpt.fetchTimeZone("+12");
         System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
             +"   |   " + timeZone.getDisplayName(Locale.US));
         */
-        Date currentDate = DatetimeOpt.currentUtilDate();
+        /*Date currentDate = DatetimeOpt.currentUtilDate();
 
         System.out.println(currentDate);
         System.out.println(DatetimeOpt.convertDateToGMTString(currentDate));
@@ -40,7 +68,7 @@ public class TestDateTimeOpt {
 
         currentDate = DatetimeOpt.convertStringToDate(
             "2022-12-12 12:12:12 CST", "yyyy-MM-dd HH:mm:ss zzz");
-        System.out.println(currentDate);
+        System.out.println(currentDate);*/
         /*
         System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12 GMT+8"));
         System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12 GMT+9"));*/
