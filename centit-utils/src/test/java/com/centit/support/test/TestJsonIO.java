@@ -60,6 +60,13 @@ public class TestJsonIO {
         JsonWithDateField jsonDate2 = JSON.parseObject(s, JsonWithDateField.class);
 
         System.out.println(JSON.toJSONString(jsonDate2));
+
+         s = "{\"sqlDate\":\"2021-11-11 12:12:12 GMT+9\",\"timestamp\":\"2023-03-13 09:16:01.538 GMT+11\"," +
+             "\"utilDate\":\"2020-12-31 00:00:00 GMT+10\"}";
+
+        jsonDate2 = JSON.parseObject(s, JsonWithDateField.class);
+
+        System.out.println(JSON.toJSONString(jsonDate2));
     }
 
 }

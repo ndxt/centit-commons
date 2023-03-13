@@ -42,7 +42,7 @@ public abstract class DatetimeOpt {
     //private static String datetimePattern = "yyyy-MM-dd HH:mm";
     public final static String datetimePattern = "yyyy-MM-dd HH:mm:ss";
     public final static String timestampPattern = "yyyy-MM-dd HH:mm:ss.SSS";
-    public final static String gmtDatePattern = "zone:en:GMT yyyy-MM-dd HH:mm:ss.SSS zzz";
+    public final static String gmtDatePattern = "zone:en:GMT yyyy-MM-dd HH:mm:ss";
     private DatetimeOpt() {
         throw new IllegalAccessError("Utility class");
     }
@@ -297,26 +297,7 @@ public abstract class DatetimeOpt {
         return TimeZone.getTimeZone(zone);
     }
 
-    private static LeftRightPair<SimpleDateFormat, String> createDateFormat(String sMask, String strDate){
-        SimpleDateFormat df;
-        if(sMask.startsWith("lang")){
-            Locale local = fetchLangLocal(sMask.substring(5,7));
-            df = new SimpleDateFormat(sMask.substring(7).trim(), local);
-        } else if(sMask.startsWith("zone")){
-            Locale local = fetchLangLocal(sMask.substring(5,7));
-            String zone = sMask.substring(8,11);
-            df = new SimpleDateFormat(sMask.substring(11).trim(), local);
-            if("END".equals(zone) || StringUtils.isNotBlank(strDate)){
-                int lastInd = strDate.lastIndexOf(' ');
-                zone = strDate.substring(lastInd+1);
-                strDate = strDate.substring(0, lastInd);
-            }
-            df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
-        }  else {
-            df = new SimpleDateFormat(sMask);
-        }
-        return new LeftRightPair<>(df, strDate);
-    }
+
     /**
      * This method generates a string representation of a date/time in the
      * format you specify on input
@@ -334,8 +315,24 @@ public abstract class DatetimeOpt {
             return smartPraseDate(strDate);
 
         try {
-            LeftRightPair<SimpleDateFormat, String> dfAndStr = createDateFormat(sMask , strDate);
-            return dfAndStr.getLeft().parse(dfAndStr.getRight());
+            SimpleDateFormat df;
+            if(sMask.startsWith("lang")){
+                Locale local = fetchLangLocal(sMask.substring(5,7));
+                df = new SimpleDateFormat(sMask.substring(7).trim(), local);
+            } else if(sMask.startsWith("zone")){
+                Locale local = fetchLangLocal(sMask.substring(5,7));
+                String zone = sMask.substring(8,11);
+                df = new SimpleDateFormat(sMask.substring(11).trim(), local);
+                if("END".equals(zone) || StringUtils.isNotBlank(strDate)){
+                    int lastInd = strDate.lastIndexOf(' ');
+                    zone = strDate.substring(lastInd+1);
+                    strDate = strDate.substring(0, lastInd);
+                }
+                df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
+            }  else {
+                df = new SimpleDateFormat(sMask);
+            }
+            return df.parse(strDate);
 
         } catch (ParseException pe) {
             log.error("converting '" + strDate + "' to date with mask '"
@@ -371,8 +368,33 @@ public abstract class DatetimeOpt {
             return null;
         }
         String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
-        LeftRightPair<SimpleDateFormat, String> dfAndStr = createDateFormat(sMask , null);
-        return dfAndStr.getLeft().format(aDate);
+        boolean isGmt = false;
+        SimpleDateFormat df;
+        if(sMask.startsWith("lang")){
+            Locale local = fetchLangLocal(sMask.substring(5,7));
+            df = new SimpleDateFormat(sMask.substring(7).trim(), local);
+        } else if(sMask.startsWith("zone")){
+            Locale local = fetchLangLocal(sMask.substring(5,7));
+            String zone = sMask.substring(8,11);
+            if("GMT".equals(zone)){
+                if(sMask.contains("zzz")){
+                    sMask = sMask.replace("zzz", "").trim();
+                }
+                df = new SimpleDateFormat(sMask.substring(11).trim(), local);
+                isGmt = true;
+            } else {
+                df = new SimpleDateFormat(sMask.substring(11).trim(), local);
+                df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
+            }
+        }  else {
+            df = new SimpleDateFormat(sMask);
+        }
+        String sDate = df.format(aDate);
+        if(isGmt){
+            int offset = TimeZone.getDefault().getRawOffset() / 3600000;
+            sDate = sDate +" GMT" + (offset>=0? "+"+offset : offset);
+        }
+        return sDate;
     }
 
     /**
@@ -457,6 +479,7 @@ public abstract class DatetimeOpt {
     public static String convertDateToGMTString(Date aDate) {
         return convertDateToString(aDate, gmtDatePattern);
     }
+
 
     /**
      * 返回日期字符串  "yyyy-MM-dd HH:mm:ss"

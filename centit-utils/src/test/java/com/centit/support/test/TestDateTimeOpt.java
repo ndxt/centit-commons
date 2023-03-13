@@ -13,16 +13,16 @@ public class TestDateTimeOpt {
         /*TimeZone timeZone = DatetimeOpt.fetchTimeZone("+12");
         System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
             +"   |   " + timeZone.getDisplayName(Locale.US));
-
+        */
         Date currentDate = DatetimeOpt.currentUtilDate();
 
         System.out.println(currentDate);
         System.out.println(DatetimeOpt.convertDateToGMTString(currentDate));
         System.out.println(currentDate);
         System.out.println(DatetimeOpt.convertDateToString(currentDate, "yyyy-MM-dd HH:mm:ss.SSS (zzz)"));
-        *///testDateTime();
+        //testDateTime();
         //System.out.println(JSON.toJSONString(ZoneInfoFile.getAliasMap()));
-        Date currentDate = DatetimeOpt.convertStringToDate(
+        currentDate = DatetimeOpt.convertStringToDate(
             "2022-12-12 12:12:12", "yyyy-MM-dd HH:mm:ss");
         System.out.println(currentDate);
         System.out.println(DatetimeOpt.smartPraseDate("2022-12-12 12:12:12"));
