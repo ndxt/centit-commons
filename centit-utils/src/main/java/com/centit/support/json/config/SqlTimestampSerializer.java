@@ -1,12 +1,10 @@
 package com.centit.support.json.config;
 
-
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.writer.ObjectWriter;
 import com.centit.support.algorithm.DatetimeOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Type;
 import java.util.Date;
 

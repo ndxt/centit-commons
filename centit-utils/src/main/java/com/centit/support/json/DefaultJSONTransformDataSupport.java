@@ -3,7 +3,6 @@ package com.centit.support.json;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
-
 import java.util.ArrayList;
 import java.util.List;
 

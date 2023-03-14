@@ -1,19 +1,15 @@
 package com.centit.support.json.config;
 
-
 import com.alibaba.fastjson2.JSONReader;
 import com.alibaba.fastjson2.reader.ObjectReader;
 import com.centit.support.algorithm.DatetimeOpt;
 import org.apache.commons.lang3.StringUtils;
-
 import java.lang.reflect.Type;
-
 
 public class SqlTimestampDeserializer implements ObjectReader<java.sql.Timestamp> {
 
     public final static SqlTimestampDeserializer instance = new SqlTimestampDeserializer();
 
-    @SuppressWarnings("unchecked")
     @Override
     public java.sql.Timestamp readObject(JSONReader jsonReader, Type fieldType, Object fieldName, long features) {
 
