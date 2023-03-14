@@ -35,14 +35,13 @@ public abstract class JSONOpt {
     public static void fastjsonGlobalConfig(){
         JSON.config(JSONReader.Feature.AllowUnQuotedFieldNames);
 
-        /*JSON.register(java.util.Date.class, UtilDateSerializer.instance);
-        JSON.register(java.sql.Date.class, SqlDateSerializer.instance);
-        JSON.register(java.sql.Timestamp.class, SqlTimestampSerializer.instance);
-        */
         JSON.register(java.util.Date.class, UtilDateDeserializer.instance);
         JSON.register(java.sql.Date.class, SqlDateDeserializer.instance);
-        //JSON.register(java.sql.Timestamp.class, SqlTimestampDeserializer.instance);
+        JSON.register(java.sql.Timestamp.class, SqlTimestampDeserializer.instance);
 
+         /*JSON.register(java.util.Date.class, UtilDateSerializer.instance);
+        JSON.register(java.sql.Date.class, SqlDateSerializer.instance);
+        JSON.register(java.sql.Timestamp.class, SqlTimestampSerializer.instance);*/
         JSON.register(java.sql.Timestamp.class, JdbcSupport.createTimestampWriter(
             java.sql.Timestamp.class, DatetimeOpt.timestampPattern));
 
