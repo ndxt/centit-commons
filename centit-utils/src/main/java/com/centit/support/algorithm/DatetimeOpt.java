@@ -898,7 +898,7 @@ public abstract class DatetimeOpt {
      * 将一个字符串转换为日期
      */
     public static java.util.Date smartPraseDate(String sDate) {
-        if (sDate == null || "".equals(sDate))
+        if (StringUtils.isBlank(sDate))
             return null;
         if(sDate.length()>8 && sDate.length()<14 && Pattern.matches("\\d+", sDate)) {
             return new java.util.Date(Long.parseLong(sDate));
@@ -988,12 +988,7 @@ public abstract class DatetimeOpt {
             LocalDate ldt = (LocalDate)obj;
             return Date.from(ldt.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
         }
+        return DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(obj));
 
-        String str = StringBaseOpt.objectToString(obj);
-        if (StringUtils.isBlank(str)) {
-            return null;
-        } else {
-            return DatetimeOpt.smartPraseDate(str);
-        }
     }
 }
