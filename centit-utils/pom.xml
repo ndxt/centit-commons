@@ -18,6 +18,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
+             <version>1.2.83</version>
         </dependency>
         <!--4.5.1 httpclient保持session的问题已经解决-->
         <dependency>

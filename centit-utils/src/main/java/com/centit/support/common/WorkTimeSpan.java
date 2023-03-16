@@ -366,6 +366,10 @@ public class WorkTimeSpan implements java.io.Serializable {
      *
      * @return 分钟
      */
+    public long toNumber() {
+        return this.getSign() * (toAbsNumberAsMillisecond() / MINUTE_MILLISECONDS);
+    }
+
     public long toNumberAsMinute() {
         return this.getSign() * (toAbsNumberAsMillisecond() / MINUTE_MILLISECONDS);
     }
