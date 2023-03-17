@@ -150,9 +150,16 @@ public abstract class ExcelImportUtil {
         return value;
     }
 
+    public static Cell getCell(Sheet sheet, int row, int col) {
+        Row sheetRow = sheet.getRow(row);
+        if(sheetRow==null){
+            return null;
+        }
+        return sheetRow.getCell(col);
+    }
     public static String getCellString(Cell cell) {
         if (cell == null) {
-            return "";
+            return null;
         }
 
         String value;

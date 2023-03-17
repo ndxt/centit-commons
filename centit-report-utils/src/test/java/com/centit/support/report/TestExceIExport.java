@@ -20,6 +20,10 @@ public class TestExceIExport {
         InputStream s = new FileInputStream(new File("/Users/codefan/Documents/temp/source.xlsx"));
         List<Map<String, Object>> ss = ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(s,
             0,2,3,0,0,0);
+
+        s = new FileInputStream(new File("/Users/codefan/Documents/temp/source.xlsx"));
+        List<Map<String, Object>> sheet2Objects = ExcelImportUtil.loadMapFromExcelSheetUseMergeCell(s,
+            1,0,1,0,0,0);
         //System.out.println(JSON.toJSONString(ss));
 
         InputStream template = new FileInputStream(new File("/Users/codefan/Documents/temp/template.xlsx"));
@@ -35,7 +39,18 @@ public class TestExceIExport {
         mapInfo.put(5, "行政编制");
         mapInfo.put(6, "事业编制");
 
-        ExcelExportUtil.saveObjectsToExcelSheet(sheet, ss, mapInfo, 3, true);
+        ExcelExportUtil.saveObjectsToExcelSheet(sheet, ss, mapInfo, 3, true, -1);
+
+        Map<Integer, String> mapInfo2 = new HashMap<>();
+        mapInfo2.put(0, "地区");
+        mapInfo2.put(1, "内设机构");
+        mapInfo2.put(2, "机构性质");
+        mapInfo2.put(3, "行政级别");
+        mapInfo2.put(4, "级别备注");
+        mapInfo2.put(5, "工作职责");
+        mapInfo2.put(6, "编制数");
+        sheet = xssfWorkbook.getSheetAt(1);
+        ExcelExportUtil.saveObjectsToExcelSheet(sheet, sheet2Objects, mapInfo2, 1, true, 1);
 
         OutputStream os = new FileOutputStream( new File("/Users/codefan/Documents/temp/dest.xlsx"));
         xssfWorkbook.write(os);
