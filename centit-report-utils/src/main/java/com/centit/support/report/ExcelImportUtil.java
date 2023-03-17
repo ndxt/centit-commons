@@ -178,7 +178,7 @@ public abstract class ExcelImportUtil {
                 break;
 
             case STRING:
-                value = cell.getRichStringCellValue().getString();
+                value = cell.getRichStringCellValue().getString().trim();
                 break;
 
             case ERROR:

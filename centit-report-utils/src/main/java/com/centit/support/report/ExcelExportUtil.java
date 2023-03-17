@@ -7,17 +7,27 @@ import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.JavaBeanMetaData;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.Units;
+import org.apache.poi.xssf.usermodel.*;
+import org.openxmlformats.schemas.drawingml.x2006.main.*;
+import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTConnector;
+import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTShape;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.apache.poi.ss.usermodel.CellType.NUMERIC;
 
 /**
  * 生成基本EXCEL工具类
@@ -451,9 +461,7 @@ public abstract class ExcelExportUtil {
             CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
             for (int j = 0; j < objLists.get(i).length; j++) {
                 Cell cell = textRow.createCell(j);
-
                 setCellStyle(cell, cellStyle);
-
                 cell.setCellValue(null == objLists.get(i)[j] ? "" : StringBaseOpt.objectToString(objLists.get(i)[j]));
             }
         }
@@ -475,7 +483,7 @@ public abstract class ExcelExportUtil {
             case "double":
             case "Double":
             case "BigDecimal":
-                cell.setCellType(CellType.NUMERIC);
+                cell.setCellType(NUMERIC);
                 break;
             case "String":
                 cell.setCellType(CellType.STRING);
@@ -486,7 +494,7 @@ public abstract class ExcelExportUtil {
                 break;
             case "Date":
             case "Timestamp":
-                cell.setCellType(CellType.NUMERIC);
+                cell.setCellType(NUMERIC);
                 DataFormat format = sheet.getWorkbook().createDataFormat();
                 cellStyle.setDataFormat(format.getFormat("yyyy-MM-dd"));
                 break;
@@ -549,23 +557,24 @@ public abstract class ExcelExportUtil {
 
     public static void saveObjectsToExcelSheet(Sheet sheet, List<? extends Object> objects, Map<Integer, String> fieldDesc, int beginRow, boolean createRow) {
         int nRowCount = objects.size();
-        CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
+        //CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
+        Row excelRow = sheet.getRow(beginRow);
+        int nColCount = excelRow.getLastCellNum() + 1;
+
+        if(createRow){
+            for(int i=1; i<nRowCount; i++)
+                copyRow(sheet.getWorkbook(), sheet, beginRow, beginRow+i, 1, true,  nColCount);
+        }
         for (int i = 0; i < nRowCount; i++) {
-            Row excelRow = createRow ? sheet.createRow(beginRow + i) : sheet.getRow(beginRow + i);
+            excelRow = /*createRow ? sheet.createRow(beginRow + i) : */sheet.getRow(beginRow + i);
             Object rowObj = objects.get(i);
             if (rowObj != null && excelRow != null) {
 
                 for (Map.Entry<Integer, String> ent : fieldDesc.entrySet()) {
-                    Cell cell = null;
-                    if (!createRow) {
-                        cell = excelRow.getCell(ent.getKey());
-                    }
-
+                    Cell cell = excelRow.getCell(ent.getKey());
                     if (cell == null) {
                         cell = excelRow.createCell(ent.getKey());
-                        setCellStyle(cell, cellStyle);
                     }
-
                     cell.setCellValue(StringBaseOpt.objectToString(ReflectionOpt.attainExpressionValue(rowObj, ent.getValue())));
                 }
             }
@@ -575,14 +584,20 @@ public abstract class ExcelExportUtil {
 
     public static void saveObjectsToExcelSheet(Sheet sheet, List<Object[]> objects, int beginCol, int beginRow, boolean createRow) {
         int nRowCount = objects.size();
-        CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
-        for (int i = 0; i < nRowCount; i++) {
-            Row excelRow = createRow ? sheet.createRow(beginRow + i) : sheet.getRow(beginRow + i);
+        //CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
+        Row excelRow = sheet.getRow(beginRow);
+        int nColCount = excelRow.getLastCellNum() + 1;
 
+        if(createRow){
+            for(int i=1; i<nRowCount; i++)
+                copyRow(sheet.getWorkbook(), sheet, beginRow, beginRow+i, 1, true,  nColCount);
+        }
+
+        for (int i = 0; i < nRowCount; i++) {
+            excelRow = sheet.getRow(beginRow + i);
             Object[] rowObj = objects.get(i);
 
             if (rowObj != null && excelRow != null) {
-
                 for (int j = 0; j < rowObj.length; j++) {
                     Cell cell = null;
                     if (!createRow) {
@@ -591,12 +606,10 @@ public abstract class ExcelExportUtil {
 
                     if (cell == null) {
                         cell = excelRow.createCell(beginCol + j);
-                        setCellStyle(cell, cellStyle);
+                        //setCellStyle(cell, cellStyle);
                     }
-
                     cell.setCellValue(StringBaseOpt.objectToString(rowObj[j]));
                 }
-
             }
         }
         //return 0;
@@ -834,5 +847,228 @@ public abstract class ExcelExportUtil {
                 wb.write(newExcelFile);
             }
         }
+    }
+
+    // 复制于csdn
+    public static void copyRow(Workbook workbook, Sheet sheet, int fromRowIndex, int toRowIndex, int copyRowNum, boolean insertFlag
+        , Integer colNum) {
+        for (int i = 0; i < copyRowNum; i++) {
+            Row fromRow = sheet.getRow(fromRowIndex + i);
+            Row toRow = sheet.getRow(toRowIndex + i);
+            if (insertFlag) {
+                //复制行超出原有sheet页的最大行数时，不需要移动直接插入
+                if (toRowIndex + i <= sheet.getLastRowNum()) {
+                    //先移动要插入的行号所在行及之后的行
+                    sheet.shiftRows(toRowIndex + i, sheet.getLastRowNum(), 1, true, false);
+                }
+                //然后再插入行
+                toRow = sheet.createRow(toRowIndex + i);
+                //设置行高
+                toRow.setHeight(fromRow.getHeight());
+            }
+            for (int colIndex = 0; colIndex < (colNum != null ? colNum : fromRow.getLastCellNum()+1); colIndex++) {
+                Cell tmpCell = fromRow.getCell(colIndex);
+                if (tmpCell == null) {
+                    tmpCell = fromRow.createCell(colIndex);
+                    copyCell(workbook, fromRow.createCell(colIndex), tmpCell);
+                }
+                Cell newCell = toRow.createCell(colIndex);
+                copyCell(workbook, tmpCell, newCell);
+            }
+        }
+        //获取合并单元格
+        List<CellRangeAddress> cellRangeAddressList = sheet.getMergedRegions();
+        Map<Integer, List<CellRangeAddress>> rowCellRangeAddressMap = cellRangeAddressList!=null && cellRangeAddressList.size()>0?
+            cellRangeAddressList.stream().collect(Collectors.groupingBy(x ->
+            x.getFirstRow())) : new HashMap<>();
+        //获取形状（线条）
+        XSSFDrawing drawing = (XSSFDrawing) sheet.getDrawingPatriarch();
+        List<XSSFShape> shapeList = new ArrayList<>();
+        Map<Integer, List<XSSFShape>> rowShapeMap = new HashMap<>();
+        if (drawing != null) {
+            shapeList = drawing.getShapes();
+            rowShapeMap = shapeList.stream().filter(x -> x.getAnchor() != null)
+                .collect(Collectors.groupingBy(x -> ((XSSFClientAnchor) x.getAnchor()).getRow1()));
+        }
+        List<XSSFShape> insertShapeList = new ArrayList<>();
+        for (int i = 0; i < copyRowNum; i++) {
+            Row toRow = sheet.getRow(toRowIndex + i);
+            //复制合并单元格
+            List<CellRangeAddress> rowCellRangeAddressList = rowCellRangeAddressMap.get(fromRowIndex + i);
+            if (rowCellRangeAddressList!=null && rowCellRangeAddressList.size()>0) {
+                for (CellRangeAddress cellRangeAddress : rowCellRangeAddressList) {
+                    CellRangeAddress newCellRangeAddress = new CellRangeAddress(toRow.getRowNum(), (toRow.getRowNum() +
+                        (cellRangeAddress.getLastRow() - cellRangeAddress.getFirstRow())), cellRangeAddress
+                        .getFirstColumn(), cellRangeAddress.getLastColumn());
+                    sheet.addMergedRegionUnsafe(newCellRangeAddress);
+                }
+            }
+            //复制形状（线条）
+            List<XSSFShape> rowShapeList = rowShapeMap.get(fromRowIndex + i);
+            if (rowShapeList!=null && rowShapeList.size()>0) {
+                for (XSSFShape shape : rowShapeList) {
+                    //复制描点
+                    XSSFClientAnchor fromAnchor = (XSSFClientAnchor) shape.getAnchor();
+                    XSSFClientAnchor toAnchor = new XSSFClientAnchor();
+                    toAnchor.setDx1(fromAnchor.getDx1());
+                    toAnchor.setDx2(fromAnchor.getDx2());
+                    toAnchor.setDy1(fromAnchor.getDy1());
+                    toAnchor.setDy2(fromAnchor.getDy2());
+                    toAnchor.setRow1(toRow.getRowNum());
+                    toAnchor.setRow2(toRow.getRowNum() + fromAnchor.getRow2() - fromAnchor.getRow1());
+                    toAnchor.setCol1(fromAnchor.getCol1());
+                    toAnchor.setCol2(fromAnchor.getCol2());
+                    //复制形状
+                    if (shape instanceof XSSFConnector) {
+                        copyXSSFConnector((XSSFConnector) shape, drawing, toAnchor);
+                    } else if (shape instanceof XSSFSimpleShape) {
+                        copyXSSFSimpleShape((XSSFSimpleShape) shape, drawing, toAnchor);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 复制XSSFSimpleShape类
+     *
+     * @param fromShape
+     * @param drawing
+     * @param anchor
+     * @return
+     */
+    public static XSSFSimpleShape copyXSSFSimpleShape(XSSFSimpleShape fromShape, XSSFDrawing drawing, XSSFClientAnchor anchor) {
+        XSSFSimpleShape toShape = drawing.createSimpleShape(anchor);
+        CTShape ctShape = fromShape.getCTShape();
+        CTShapeProperties ctShapeProperties = ctShape.getSpPr();
+        CTLineProperties lineProperties = ctShapeProperties.isSetLn() ? ctShapeProperties.getLn() : ctShapeProperties.addNewLn();
+        CTPresetLineDashProperties dashStyle = lineProperties.isSetPrstDash() ? lineProperties.getPrstDash() : CTPresetLineDashProperties.Factory.newInstance();
+        STPresetLineDashVal.Enum dashStyleEnum = dashStyle.isSetVal() ? dashStyle.getVal() : STPresetLineDashVal.Enum.forInt(1);
+        CTSolidColorFillProperties fill = lineProperties.isSetSolidFill() ? lineProperties.getSolidFill() : lineProperties.addNewSolidFill();
+        CTSRgbColor rgb = fill.isSetSrgbClr() ? fill.getSrgbClr() : CTSRgbColor.Factory.newInstance();
+        // 设置形状类型
+        toShape.setShapeType(fromShape.getShapeType());
+        // 设置线宽
+        toShape.setLineWidth(lineProperties.getW() * 1.0 / Units.EMU_PER_POINT);
+        // 设置线的风格
+        toShape.setLineStyle(dashStyleEnum.intValue() - 1);
+        // 设置线的颜色
+        byte[] rgbBytes = rgb.getVal();
+        if (rgbBytes == null) {
+            toShape.setLineStyleColor(0, 0, 0);
+        } else {
+            toShape.setLineStyleColor(rgbBytes[0], rgbBytes[1], rgbBytes[2]);
+        }
+        return toShape;
+    }
+
+    /**
+     * 复制XSSFConnector类
+     *
+     * @param fromShape
+     * @param drawing
+     * @param anchor
+     * @return
+     */
+    public static XSSFConnector copyXSSFConnector(XSSFConnector fromShape, XSSFDrawing drawing, XSSFClientAnchor anchor) {
+        XSSFConnector toShape = drawing.createConnector(anchor);
+        CTConnector ctConnector = fromShape.getCTConnector();
+        CTShapeProperties ctShapeProperties = ctConnector.getSpPr();
+        CTLineProperties lineProperties = ctShapeProperties.isSetLn() ? ctShapeProperties.getLn() : ctShapeProperties.addNewLn();
+        CTPresetLineDashProperties dashStyle = lineProperties.isSetPrstDash() ? lineProperties.getPrstDash() : CTPresetLineDashProperties.Factory.newInstance();
+        STPresetLineDashVal.Enum dashStyleEnum = dashStyle.isSetVal() ? dashStyle.getVal() : STPresetLineDashVal.Enum.forInt(1);
+        CTSolidColorFillProperties fill = lineProperties.isSetSolidFill() ? lineProperties.getSolidFill() : lineProperties.addNewSolidFill();
+        CTSRgbColor rgb = fill.isSetSrgbClr() ? fill.getSrgbClr() : CTSRgbColor.Factory.newInstance();
+        // 设置形状类型
+        toShape.setShapeType(fromShape.getShapeType());
+        // 设置线宽
+        toShape.setLineWidth(lineProperties.getW() * 1.0 / Units.EMU_PER_POINT);
+        // 设置线的风格
+        toShape.setLineStyle(dashStyleEnum.intValue() - 1);
+        // 设置线的颜色
+        byte[] rgbBytes = rgb.getVal();
+        if (rgbBytes == null) {
+            toShape.setLineStyleColor(0, 0, 0);
+        } else {
+            toShape.setLineStyleColor(rgbBytes[0], rgbBytes[1], rgbBytes[2]);
+        }
+        return toShape;
+    }
+
+    /**
+     * 复制单元格
+     *
+     * @param srcCell
+     * @param distCell
+     */
+    public static void copyCell(Workbook workbook, Cell srcCell, Cell distCell) {
+        CellStyle newStyle = workbook.createCellStyle();
+        copyCellStyle(srcCell.getCellStyle(), newStyle, workbook);
+        //样式
+        distCell.setCellStyle(newStyle);
+        //设置内容
+        CellType srcCellType = srcCell.getCellType();//.getCellTypeEnum();
+        distCell.setCellType(srcCellType);
+        if (srcCellType == CellType.NUMERIC) {
+            if (DateUtil.isCellDateFormatted(srcCell)) {
+                distCell.setCellValue(srcCell.getDateCellValue());
+            } else {
+                distCell.setCellValue(srcCell.getNumericCellValue());
+            }
+        } else if (srcCellType == CellType.STRING) {
+            distCell.setCellValue(srcCell.getRichStringCellValue());
+        } else if (srcCellType == CellType.BOOLEAN) {
+            distCell.setCellValue(srcCell.getBooleanCellValue());
+        } else if (srcCellType == CellType.ERROR) {
+            distCell.setCellErrorValue(srcCell.getErrorCellValue());
+        } else if (srcCellType == CellType.FORMULA) {
+            distCell.setCellFormula(srcCell.getCellFormula());
+        } else {
+        }
+    }
+
+    /**
+     * 复制一个单元格样式到目的单元格样式
+     *
+     * @param fromStyle
+     * @param toStyle
+     */
+    public static void copyCellStyle(CellStyle fromStyle, CellStyle toStyle, Workbook workbook) {
+        //水平垂直对齐方式
+        toStyle.setAlignment(fromStyle.getAlignment());
+        toStyle.setVerticalAlignment(fromStyle.getVerticalAlignment());
+        //边框和边框颜色
+        toStyle.setBorderBottom(fromStyle.getBorderBottom());
+        toStyle.setBorderLeft(fromStyle.getBorderLeft());
+        toStyle.setBorderRight(fromStyle.getBorderRight());
+        toStyle.setBorderTop(fromStyle.getBorderTop());
+        toStyle.setTopBorderColor(fromStyle.getTopBorderColor());
+        toStyle.setBottomBorderColor(fromStyle.getBottomBorderColor());
+        toStyle.setRightBorderColor(fromStyle.getRightBorderColor());
+        toStyle.setLeftBorderColor(fromStyle.getLeftBorderColor());
+        //背景和前景
+        if (fromStyle instanceof XSSFCellStyle) {
+            XSSFCellStyle xssfToStyle = (XSSFCellStyle) toStyle;
+            xssfToStyle.setFillBackgroundColor(((XSSFCellStyle) fromStyle).getFillBackgroundColorColor());
+            xssfToStyle.setFillForegroundColor(((XSSFCellStyle) fromStyle).getFillForegroundColorColor());
+        } else {
+            toStyle.setFillBackgroundColor(fromStyle.getFillBackgroundColor());
+            toStyle.setFillForegroundColor(fromStyle.getFillForegroundColor());
+        }
+        toStyle.setDataFormat(fromStyle.getDataFormat());
+        toStyle.setFillPattern(fromStyle.getFillPattern());
+        if (fromStyle instanceof XSSFCellStyle) {
+            toStyle.setFont(((XSSFCellStyle) fromStyle).getFont());
+        } else if (fromStyle instanceof HSSFCellStyle) {
+            toStyle.setFont(((HSSFCellStyle) fromStyle).getFont(workbook));
+        }
+        toStyle.setHidden(fromStyle.getHidden());
+        //首行缩进
+        toStyle.setIndention(fromStyle.getIndention());
+        toStyle.setLocked(fromStyle.getLocked());
+        //旋转
+        toStyle.setRotation(fromStyle.getRotation());
+        toStyle.setWrapText(fromStyle.getWrapText());
+
     }
 }

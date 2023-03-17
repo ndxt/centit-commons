@@ -1,6 +1,5 @@
 package com.centit.support.algorithm;
 
-import com.centit.support.common.LeftRightPair;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -986,7 +985,7 @@ public abstract class DatetimeOpt {
 
         if (obj instanceof LocalDate){
             LocalDate ldt = (LocalDate)obj;
-            return Date.from(ldt.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            return java.util.Date.from(ldt.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
         }
         return DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(obj));
 
