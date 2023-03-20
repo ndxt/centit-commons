@@ -11,6 +11,9 @@ import org.apache.commons.logging.LogFactory;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 @SuppressWarnings("unused")
 public abstract class Watermark4Pdf {
     private Watermark4Pdf() {
@@ -74,8 +77,7 @@ public abstract class Watermark4Pdf {
         PdfStamper pdfStamper = null;
         try{
             pdfReader =new PdfReader(inputFile);
-            pdfStamper = new PdfStamper(pdfReader, new FileOutputStream(
-                        outputFile));
+            pdfStamper = new PdfStamper(pdfReader, Files.newOutputStream(Paths.get(outputFile)));
 
             base = BaseFont.createFont("STSongStd-Light", "UniGB-UCS2-H",
                     BaseFont.NOT_EMBEDDED);
