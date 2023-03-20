@@ -105,7 +105,7 @@ public class ESSearcher implements Searcher{
         queryFields = CollectionsOpt.listToArray(qf);
     }
 
-    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, int pageNo, int pageSize){
+    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, String[] includes, String[] excludes, int pageNo, int pageSize){
         RestHighLevelClient client = null;
         long totalHits =0;
         try {
@@ -130,6 +130,9 @@ public class ESSearcher implements Searcher{
                 .explain(true)
                 .from((pageNo>1)?(pageNo-1)* pageSize:0)
                 .size(pageSize);
+            if(includes!=null || excludes!=null)
+                searchSourceBuilder.fetchSource(includes, excludes);
+
             SearchRequest searchRequest = new SearchRequest(indexName)
                 .source(searchSourceBuilder);
             SearchResponse actionGet = client.search(searchRequest,RequestOptions.DEFAULT);
@@ -194,6 +197,10 @@ public class ESSearcher implements Searcher{
         }
     }
 
+    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder,  int pageNo, int pageSize) {
+        return esSearch(queryBuilder, revertFields,  null,  pageNo, pageSize);
+    }
+
     /**
      * 检索所有文档
      * @param fieldFilter 过滤的文件
@@ -224,6 +231,7 @@ public class ESSearcher implements Searcher{
             queryBuilder.must(QueryBuilders.multiMatchQuery(
                 queryWord, queryFields));
         }
+
         return esSearch(queryBuilder,  pageNo,  pageSize);
     }
 
@@ -326,76 +334,5 @@ public class ESSearcher implements Searcher{
         return this;
     }
 
-    /* **
-     * @param queryBuilder
-     * @param pageNo
-     * @param pageSize
-     * @param includes   返回字段
-     * @param excludes  排除字段
-     * @return
-     */
-    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder,String[] includes,String[] excludes,int pageNo, int pageSize){
-        RestHighLevelClient client = null;
-        long totalHits =0;
-        try {
-            client = clientPool.borrowObject();
-            List<Map<String, Object>> retList = new ArrayList<>(pageSize+5);
-            HighlightBuilder highlightBuilder = new HighlightBuilder();
-            for(String hf : highlightFields) {
-                highlightBuilder.field(hf);
-            }
-            highlightBuilder.preTags(this.highlightPreTags).postTags(this.highlightPostTags);
-            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(queryBuilder)
-                .highlighter(highlightBuilder)
-                .explain(true)
-                .from((pageNo>1)?(pageNo-1)* pageSize:0)
-                .size(pageSize)
-                .fetchSource(includes,excludes);
-            SearchRequest searchRequest = new SearchRequest(indexName)
-                .source(searchSourceBuilder);
-            SearchResponse actionGet = client.search(searchRequest,RequestOptions.DEFAULT);
-            SearchHits hits = actionGet.getHits();
-            if (hits != null) {
-                totalHits = hits.getTotalHits().value;
-                SearchHit[] hitsRes = hits.getHits();
-                if (hitsRes != null) {
-                    for (SearchHit hit : hitsRes) {
-                        Map<String, Object> json = hit.getSourceAsMap();
-                        if (json == null) {
-                            json = new HashMap<>(4);
-                        }
-                        if (hit.getHighlightFields() != null) {
-                            StringBuilder content = new StringBuilder("");
-                            for (Map.Entry<String, HighlightField> highlight : hit.getHighlightFields().entrySet()) {
-                                HighlightField highlightField = highlight.getValue();
-                                if (highlightField != null) {
-                                    for (Text t : highlightField.fragments()) {
-                                        content.append(t.string()/*.replace("\n", "")*/);
-                                    }
-                                }
-                                content.append("\n");
-                            }
-                            json.put("highlight", content);
-                        }
-                        json.put("_score", hit.getScore());
-                        //hit.type()
-                        String hitType = hit.getType();
-                        if (hitType != null) {//获取返回对象的类型
-                            json.put("_type", hitType);
-                        }
-                        retList.add(json);
-                    }
-                }
-            }
-            return new ImmutablePair<>(totalHits, retList);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return null;
-        }finally {
-            if(client!=null) {
-                clientPool.returnObject(client);
-            }
-        }
-    }
+
 }
