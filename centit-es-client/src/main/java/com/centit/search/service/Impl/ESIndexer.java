@@ -148,8 +148,8 @@ public class ESIndexer implements Indexer{
             client = clientPool.borrowObject();
             /*DeleteResponse response = client.prepareDelete(
                 indexName, docType, docId).execute().actionGet();*/
-            DeleteRequest request = new DeleteRequest(indexName,docId);
-            DeleteResponse response = client.delete(request,RequestOptions.DEFAULT);
+            DeleteRequest request = new DeleteRequest(indexName, docId);
+            DeleteResponse response = client.delete(request, RequestOptions.DEFAULT);
             return response.status().getStatus() == 200;
         }
         catch (Exception e) {
@@ -191,7 +191,7 @@ public class ESIndexer implements Indexer{
                         //.type(type)
                         .id(docId)
                         .doc(document.toJSONObject());
-            UpdateResponse response = client.update(request,RequestOptions.DEFAULT);
+            UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
             int ret = response.status().getStatus();
             return (ret == 200)?1:0;
         }
@@ -226,14 +226,14 @@ public class ESIndexer implements Indexer{
                     //.type(type)
                     .id(docId)
                     .doc(document.toJSONObject());
-                UpdateResponse response = client.update(req,RequestOptions.DEFAULT);
+                UpdateResponse response = client.update(req, RequestOptions.DEFAULT);
                 int ret = response.status().getStatus();
                 return (ret == 200)? response.getId() : null;
             }else {
                 IndexRequest req = new IndexRequest(indexName)
                         .id(docId)
                         .source(document.toJSONObject());
-                IndexResponse indexResponse = client.index(req,RequestOptions.DEFAULT);
+                IndexResponse indexResponse = client.index(req, RequestOptions.DEFAULT);
                 return indexResponse.getId();
             }
         }

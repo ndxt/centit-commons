@@ -75,7 +75,7 @@ public class FileDocument implements ESDocument, Serializable {
     /**
      * 文档的内容，用于索引
      */
-    @ESField(type="text",query = true, revert = false, highlight = true, analyzer = "ik_smart")
+    @ESField(type="text", query = true, revert = false, highlight = true, analyzer = "ik_smart")
     private String content;
     /**
      * 文档创建时间
@@ -85,7 +85,7 @@ public class FileDocument implements ESDocument, Serializable {
     /**
      * 文档的关键字 2018-7-23 hpz添加
      */
-    @ESField(type="text",query = true, revert = false, analyzer = "ik_smart")
+    @ESField(type="text", query = true, revert = false, analyzer = "ik_smart")
     private String [] keywords;
     @Override
     public boolean equals(Object o) {
