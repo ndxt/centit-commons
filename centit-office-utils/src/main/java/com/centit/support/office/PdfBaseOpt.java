@@ -25,8 +25,8 @@ public abstract class PdfBaseOpt {
             PdfDictionary xobj =
                 (PdfDictionary) PdfReader.getPdfObject(res.get(PdfName.XOBJECT));
             if (xobj != null) {
-                for (Iterator it = xobj.getKeys().iterator(); it.hasNext(); ) {
-                    PdfObject obj = xobj.get((PdfName) it.next());
+                for (PdfName pdfName : xobj.getKeys()) {
+                    PdfObject obj = xobj.get(pdfName);
                     if (obj.isIndirect()) {
                         PdfDictionary tg = (PdfDictionary) PdfReader.getPdfObject(obj);
                         PdfName type =
@@ -38,7 +38,7 @@ public abstract class PdfBaseOpt {
                             byte[] bytes = PdfReader.getStreamBytesRaw((PRStream) pdfStrem);
                             if ((bytes != null)) {
                                 BufferedImage image = ImageIO.read(new ByteArrayInputStream(bytes));
-                                if(image!=null){
+                                if (image != null) {
                                     images.add(image);
                                 }
                                 //ImageIO.write(image, "jpg", new File("/Users/codefan/Documents/temp/images/image1.jpg"));
