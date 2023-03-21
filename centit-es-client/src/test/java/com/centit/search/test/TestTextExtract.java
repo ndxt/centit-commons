@@ -37,8 +37,10 @@ public class TestTextExtract {
 
         try {
             System.out.println(
-                TikaTextExtractor.extractFileText("/D/WorkDoc/烽火科技/广州616/南大先腾17.3.13.doc"));
+                TikaTextExtractor.extractFileText("/Users/codefan/Documents/temp/testPdfImage.pdf"));
+            System.out.println("done!");
         } catch (IOException | TikaException |SAXException e) {
+            System.out.println("error!" + e.getMessage());
             e.printStackTrace();
         }
      /*
