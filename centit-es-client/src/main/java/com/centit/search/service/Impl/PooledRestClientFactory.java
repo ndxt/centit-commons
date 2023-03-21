@@ -1,6 +1,7 @@
 package com.centit.search.service.Impl;
 
 import com.centit.search.service.ESServerConfig;
+import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.PooledObjectFactory;
@@ -31,7 +32,8 @@ public class PooledRestClientFactory implements PooledObjectFactory<RestHighLeve
         //添加用户认证
         if (StringUtils.isNotBlank(config.getUsername()) && StringUtils.isNotBlank(config.getPassword())){
             final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(config.getUsername(), config.getPassword()));
+            credentialsProvider.setCredentials(AuthScope.ANY,
+                new UsernamePasswordCredentials(config.getUsername(), SecurityOptUtils.decodeSecurityString(config.getPassword())));
             clientBuilder.setHttpClientConfigCallback(httpClientBuilder -> {
                 httpClientBuilder.disableAuthCaching();
                 return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);

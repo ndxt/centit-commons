@@ -38,7 +38,7 @@ import java.util.concurrent.ExecutionException;
 @SuppressWarnings("deprecated")
 public class ElasticSearchTest {
     RestHighLevelClient client;
-    @Before
+
     @SuppressWarnings({ "unchecked" })
     public void before() throws UnknownHostException, InterruptedException, ExecutionException {
         Settings esSettings = Settings.builder()
@@ -50,7 +50,7 @@ public class ElasticSearchTest {
         //client.addTransportAddress(new TransportAddress(InetAddress.getByName("localhost"), 9300));
         client = new RestHighLevelClient(
             RestClient.builder(
-                new HttpHost("192.168.134.9", 9200, "http")));
+                new HttpHost("192.168.134.250", 32404, "http")) );
         System.out.println("success connect");
     }
 
