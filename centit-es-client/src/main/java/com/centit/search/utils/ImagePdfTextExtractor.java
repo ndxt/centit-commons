@@ -85,9 +85,7 @@ public abstract class ImagePdfTextExtractor {
 
     public static String imagesToText(List<InputStream> imageFile, OcrServerHost ocrServer)  {
         try (CloseableHttpClient client = HttpExecutor.createHttpClient()){
-
             HttpExecutorContext executorContext = HttpExecutorContext.create(client);
-
             String response = HttpExecutor.formPost(executorContext, ocrServer.getAuthorUrl(),
                 CollectionsOpt.createHashMap("grant_type", "password",
                     "username", SecurityOptUtils.decodeSecurityString(ocrServer.getUserName()),
@@ -95,7 +93,6 @@ public abstract class ImagePdfTextExtractor {
             JSONObject jsonObject = JSONObject.parseObject(response);
 
             executorContext.header("Authorization", "Bearer " + jsonObject.getString("access_token"));
-
 
             HttpPost httpPost = new HttpPost(ocrServer.getOrcUrl());
             httpPost.setHeader("Content-Type", HttpExecutor.multiPartTypeHead);
@@ -124,7 +121,6 @@ public abstract class ImagePdfTextExtractor {
             for (BufferedImage image : images) {
                 imagesFile.add(ImageOpt.imageToInputStream(image));
             }
-
             return imagesToText(imagesFile, ocrServer);
         } catch (DocumentException | IOException e) {
             throw new ObjectException(e);
