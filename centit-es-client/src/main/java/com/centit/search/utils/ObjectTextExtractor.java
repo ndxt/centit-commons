@@ -1,6 +1,9 @@
 package com.centit.search.utils;
 
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.common.JavaBeanMetaData;
 import lombok.Setter;
@@ -24,6 +27,12 @@ public abstract class ObjectTextExtractor {
         Map<Class<?>, String[]> includes;
         @Setter
         Map<Class<?>, String[]> excludes;
+        @Setter
+        boolean omitNumber;
+
+        @Setter
+        boolean omitSymbol;
+
         ArrayList<Object> hasExtracted;
         StringBuilder   textBuilder;
         boolean includeName;
@@ -52,6 +61,8 @@ public abstract class ObjectTextExtractor {
 
         public TextExtractContent(){
             includeName = false;
+            omitNumber = false;
+            omitSymbol = false;
             hasExtracted = new ArrayList<>(100);
             textBuilder = new StringBuilder();
         }
@@ -95,10 +106,16 @@ public abstract class ObjectTextExtractor {
         return content.textBuilder.toString();
     }
 
-    public static String extractText(Object object) {
+    public static String extractText(Object object, boolean omitNumber, boolean omitSymbol) {
         TextExtractContent content = createContent();
+        content.setOmitNumber(omitNumber);
+        content.setOmitSymbol(omitSymbol);
         innerExtractText(object, content);
         return content.textBuilder.toString();
+    }
+
+    public static String extractText(Object object) {
+        return extractText(object, false, false);
     }
 
     private static void innerExtractText(Object object, TextExtractContent content) {
@@ -107,6 +124,10 @@ public abstract class ObjectTextExtractor {
         }
         Class<?> objClazz = object.getClass();
         if(ReflectionOpt.isScalarType(objClazz)){
+
+            if(content.omitNumber && ( object instanceof Number || object instanceof Boolean
+                    ||(object instanceof String && StringRegularOpt.isNumber((String)object))))
+                return ;
             content.textBuilder.append(object);
             return;
         }
@@ -120,7 +141,8 @@ public abstract class ObjectTextExtractor {
         }
         // 检查对象 循环引用的 问题
         if(content.hasExtracted(object)){
-            content.textBuilder.append(CYCLE_REF_LABEL);//object.getClass().getName() );
+            if(!content.omitSymbol)
+                content.textBuilder.append(CYCLE_REF_LABEL);//object.getClass().getName() );
             return;
         }
         content.addExtractedObject(object);
@@ -128,7 +150,7 @@ public abstract class ObjectTextExtractor {
         if(objClazz.isArray()){
             int len = Array.getLength(object);
             for (int i = 0; i < len; ++i) {
-                if(1>0) {
+                if(i>0 && !content.omitSymbol) {
                     content.textBuilder.append(ARRAY_ITEM_SPLIT_STR);
                 }
                 Object item = Array.get(object, i);
@@ -140,7 +162,7 @@ public abstract class ObjectTextExtractor {
         if(object instanceof Collection){
             Collection<Object> collection = (Collection<Object>) object;
             for (Object item : collection) {
-                if(i>0){
+                if(i>0 && !content.omitSymbol) {
                     content.textBuilder.append(ARRAY_ITEM_SPLIT_STR);
                 }
                 i++;
@@ -153,13 +175,14 @@ public abstract class ObjectTextExtractor {
         if(object instanceof Map){
             Map<Object, Object> map = (Map<Object, Object>) object;
             for (Map.Entry<Object, Object> entry : map.entrySet()) {
-                if(i>0){
+                if(i>0 && !content.omitSymbol) {
                     content.textBuilder.append(FIELD_SPLIT_STR);
                 }
                 i++;
                 if(content.includeName) {
                     innerExtractText(entry.getKey(), content);
-                    content.textBuilder.append(KEY_VALUE_SPLIT_STR);
+                    if(!content.omitSymbol)
+                        content.textBuilder.append(KEY_VALUE_SPLIT_STR);
                 }
                 innerExtractText(entry.getValue(), content);
             }
@@ -182,12 +205,14 @@ public abstract class ObjectTextExtractor {
                 if(field != null){
                     Object item = field.getObjectFieldValue(object);
                     if(item!=null) {
-                        if (i > 0) {
+                        if (i > 0 && !content.omitSymbol) {
                             content.textBuilder.append(FIELD_SPLIT_STR);
                         }
                         i++;
                         if (content.includeName) {
-                            content.textBuilder.append(skey).append(KEY_VALUE_SPLIT_STR);
+                            content.textBuilder.append(skey);
+                            if(!content.omitSymbol)
+                                content.textBuilder.append(KEY_VALUE_SPLIT_STR);
                         }
                         innerExtractText(item, content);
                     }
@@ -199,12 +224,14 @@ public abstract class ObjectTextExtractor {
         for (Map.Entry<String, JavaBeanField> entry : fileds.entrySet()) {
             Object item = entry.getValue().getObjectFieldValue(object);
             if(item!=null) {
-                if (i > 0) {
+                if (i > 0 && !content.omitSymbol) {
                     content.textBuilder.append(FIELD_SPLIT_STR);
                 }
                 i++;
                 if (content.includeName) {
-                    content.textBuilder.append(entry.getKey()).append(KEY_VALUE_SPLIT_STR);
+                    content.textBuilder.append(entry.getKey());
+                    if(!content.omitSymbol)
+                        content.textBuilder.append(KEY_VALUE_SPLIT_STR);
                 }
                 innerExtractText(item, content);
             }
