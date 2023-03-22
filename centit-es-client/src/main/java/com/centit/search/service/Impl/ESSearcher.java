@@ -32,8 +32,6 @@ import java.util.*;
  * Created by codefan on 17-6-12.
  */
 public class ESSearcher implements Searcher{
-    public static final int SEARCH_FRAGMENT_SIZE = 250;
-    public static final int SEARCH_FRAGMENT_NUM = 5;
     private static final String KEYWORD = ".keyword";
     private static Logger logger = LoggerFactory.getLogger(ESSearcher.class);
 
@@ -129,7 +127,7 @@ public class ESSearcher implements Searcher{
                     highlightBuilder.field(hf);
                 }
                 highlightBuilder.preTags(this.highlightPreTags).postTags(this.highlightPostTags)
-                    .fragmentSize(ESSearcher.SEARCH_FRAGMENT_SIZE).numOfFragments(ESSearcher.SEARCH_FRAGMENT_NUM);
+                    .fragmentSize(Searcher.SEARCH_FRAGMENT_SIZE).numOfFragments(Searcher.SEARCH_FRAGMENT_NUM);
                 searchSourceBuilder.highlighter(highlightBuilder);
             }
 
