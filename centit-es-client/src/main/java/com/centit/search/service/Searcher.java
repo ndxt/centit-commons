@@ -10,8 +10,8 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 public interface Searcher {
-    int SEARCH_FRAGMENT_SIZE = 250;
-    int SEARCH_FRAGMENT_NUM = 5;
+    int SEARCH_FRAGMENT_SIZE = 200;
+    int SEARCH_FRAGMENT_NUM = 2;
     /**
      * 检索所有文档
      * @param queryWord 检索的关键字
