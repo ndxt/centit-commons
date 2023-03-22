@@ -63,7 +63,7 @@ public class ObjectDocument implements ESDocument,Serializable {
     /**
      * 文档的内容，用于索引
      */
-    @ESField(type="text", query = true, revert = false, highlight = true, analyzer = "ik_smart")
+    @ESField(type="text", query = true, highlight = true, analyzer = "ik_smart")
     private String content;
     /**
      * 文档创建时间

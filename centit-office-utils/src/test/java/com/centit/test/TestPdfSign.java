@@ -13,7 +13,7 @@ public class TestPdfSign {
     public static void main(String[] args) {
         try {
 
-            String base="/home/codefan/projects/framework/centit-common-modules/centit-office-commons/src/main/resources/template/";
+            String base="/Users/codefan/projects/centit/centit-commons/centit-office-utils/src/test/resources/template/";
             // 将证书文件放入指定路径，并读取keystore ，获得私钥和证书链
             String pkPath = "client1.p12";
             KeyStore ks = KeyStore.getInstance("PKCS12");
@@ -26,14 +26,14 @@ public class TestPdfSign {
             String path = "fff.pdf";
             //签章后的pdf路径
             PdfSignatureUtil.sign(base+path, base+"output.pdf",
-                PdfSignatureUtil.createSingInfo().reason("理由")
-                    .location("位置")
+                PdfSignatureUtil.createSingInfo().reason("我给你的权限，就是这么牛B！")
+                    .location("江苏南京雨花台区")
                     .image(base+"yinzhang.jpg")
                     .privateKey(pk)
                     .certificate(chain)
                     .field("demo")
                     .page(1)
-                    .rect(100,800,200,40));
+                    .rect(100,700,200,800));
         } catch (Exception e) {
             e.printStackTrace();
         }

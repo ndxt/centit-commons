@@ -754,24 +754,25 @@ public abstract class HttpExecutor {
     }
 
     public static String inputStreamUpload(HttpExecutorContext executorContext,
-                                           String uri, InputStream inputStream)
+                                           String uri, InputStream inputStream,
+                                           final String filedName, ContentType contentType, final String filename)
         throws IOException {
 
         HttpPost httpPost = new HttpPost(uri);
-        httpPost.setHeader("Content-Type", applicationOctetStream);
-        /*httpPost.setHeader("Content-Type",
-                //ContentType.MULTIPART_FORM_DATA.toString());
-                "multipart/form-data; boundary=" + BOUNDARY);
-        //httpPost.addHeader("boundary", BOUNDARY);*/
-        InputStreamEntity entity = new InputStreamEntity(inputStream);
-        httpPost.setEntity(entity);
-
+        //httpPost.setHeader("Content-Type", applicationOctetStream);
+        httpPost.setHeader("Content-Type", multiPartTypeHead);
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.setBoundary(BOUNDARY);
+        //builder.setMode(HttpMultipartMode.RFC6532);
+        builder.addBinaryBody(filedName, inputStream,contentType, filename);
+        httpPost.setEntity(builder.build());
         return httpExecute(executorContext, httpPost);
     }
 
 
     public static String inputStreamUpload(HttpExecutorContext executorContext,
-                                           String uri, Map<String, Object> formObjects, InputStream inputStream)
+                                           String uri, Map<String, Object> formObjects, InputStream inputStream,
+                                           final String filedName, ContentType contentType, final String filename)
         throws IOException {
 
         String paramsUrl = null;
@@ -781,7 +782,7 @@ public abstract class HttpExecutor {
                 EntityUtils.toString(new UrlEncodedFormEntity(params, Consts.UTF_8));
         }
         return inputStreamUpload(executorContext,
-            UrlOptUtils.appendParamToUrl(uri, paramsUrl), inputStream);
+            UrlOptUtils.appendParamToUrl(uri, paramsUrl), inputStream, filedName, contentType, filename);
     }
 
 
@@ -814,12 +815,10 @@ public abstract class HttpExecutor {
                                     String uri, File file)
         throws IOException {
         HttpPost httpPost = new HttpPost(uri);
-        httpPost.setHeader("Content-Type", applicationOctetStream);
-        /*httpPost.setHeader("Content-Type",
-                //ContentType.MULTIPART_FORM_DATA.toString());
-                "multipart/form-data; boundary=" + BOUNDARY);
-        //httpPost.addHeader("boundary", BOUNDARY);*/
+        httpPost.setHeader("Content-Type", multiPartTypeHead);
+
         InputStreamEntity entity = new InputStreamEntity(new FileInputStream(file));
+
         httpPost.setEntity(entity);
         return httpExecute(executorContext, httpPost);
     }

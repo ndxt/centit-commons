@@ -482,7 +482,10 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_SPLIT_STR:{ // 分割字符串
                 if (nOpSum < 1) return null;
                 String str = StringBaseOpt.castObjectToString(slOperand.get(0));
-                String splitStr = nOpSum > 1 ? StringBaseOpt.castObjectToString(slOperand.get(1)," "):",";
+                if(StringUtils.isBlank(str)){
+                    return null;
+                }
+                String splitStr = nOpSum > 1 ? StringBaseOpt.castObjectToString(slOperand.get(1),","):",";
                 return str.split(splitStr);
             }
 

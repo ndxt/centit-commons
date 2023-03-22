@@ -3,7 +3,7 @@
 
     <properties>
         <!--<property name="LOG_HOME">/logs/sample</property>-->
-        <property name="LOG_HOME">/D/Projects/RunData/demo_home/logs</property>
+        <property name="LOG_HOME">/Users/codefan/appdata/RunData/demo_home/logs</property>
          <property name="FILE_NAME">mylog</property>
     </properties>
 

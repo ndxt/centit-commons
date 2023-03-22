@@ -735,6 +735,8 @@ public abstract class ReflectionOpt {
         String tpName = tp.getPackage().getName();
         if (tpName.equals("java.lang") || tpName.equals("java.sql"))
             return true;
+        if (java.lang.Number.class.isAssignableFrom(tp))// "java.util.Date".equals(tp.getName()))
+            return true;
         if (java.util.Date.class.isAssignableFrom(tp))// "java.util.Date".equals(tp.getName()))
             return true;
         if (java.util.UUID.class.isAssignableFrom(tp))// "java.util.UUID".equals(tp.getName()))
