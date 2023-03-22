@@ -32,6 +32,8 @@ import java.util.*;
  * Created by codefan on 17-6-12.
  */
 public class ESSearcher implements Searcher{
+    public static final int SEARCH_FRAGMENT_SIZE = 250;
+    public static final int SEARCH_FRAGMENT_NUM = 5;
     private static final String KEYWORD = ".keyword";
     private static Logger logger = LoggerFactory.getLogger(ESSearcher.class);
 
@@ -44,7 +46,6 @@ public class ESSearcher implements Searcher{
 
     private String[] queryFields;
     private Set<String> highlightFields;
-    private String[] revertFields;
 
     public String[] getQueryFields() {
         return queryFields;
@@ -56,10 +57,12 @@ public class ESSearcher implements Searcher{
 
     public ESSearcher(){
         this.highlightFields = new HashSet<>();
+        this.highlightPreTags = new String[]{"<strong>"};
+        this.highlightPostTags = new String[]{"</strong>"};
     }
 
     public ESSearcher(ESServerConfig config, GenericObjectPool<RestHighLevelClient> clientPool){
-        this.highlightFields = new HashSet<>();
+        this();
         this.config = config;
         this.clientPool = clientPool;
     }
@@ -96,12 +99,8 @@ public class ESSearcher implements Searcher{
                 if(esType.highlight()){
                     highlightFields.add(field.getName());
                 }
-                if(esType.revert()){
-                    rf.add(field.getName());
-                }
             }
         }//end of for
-        revertFields = CollectionsOpt.listToArray(rf);
         queryFields = CollectionsOpt.listToArray(qf);
     }
 
@@ -119,17 +118,21 @@ public class ESSearcher implements Searcher{
                 retList.add(json);
                 return retList;
             }*/
-            HighlightBuilder highlightBuilder = new HighlightBuilder();
-            for(String hf : highlightFields) {
-                highlightBuilder.field(hf);
-            }
-            highlightBuilder.preTags(this.highlightPreTags).postTags(this.highlightPostTags);
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(queryBuilder)
-                .highlighter(highlightBuilder)
                 .explain(true)
                 .from((pageNo>1)?(pageNo-1)* pageSize:0)
                 .size(pageSize);
+            if(highlightFields.size()>0) {
+                HighlightBuilder highlightBuilder = new HighlightBuilder();
+                for (String hf : highlightFields) {
+                    highlightBuilder.field(hf);
+                }
+                highlightBuilder.preTags(this.highlightPreTags).postTags(this.highlightPostTags)
+                    .fragmentSize(ESSearcher.SEARCH_FRAGMENT_SIZE).numOfFragments(ESSearcher.SEARCH_FRAGMENT_NUM);
+                searchSourceBuilder.highlighter(highlightBuilder);
+            }
+
             if(includes!=null || excludes!=null)
                 searchSourceBuilder.fetchSource(includes, excludes);
 
@@ -198,7 +201,7 @@ public class ESSearcher implements Searcher{
     }
 
     public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder,  int pageNo, int pageSize) {
-        return esSearch(queryBuilder, revertFields,  null,  pageNo, pageSize);
+        return esSearch(queryBuilder, null,  null,  pageNo, pageSize);
     }
 
     /**

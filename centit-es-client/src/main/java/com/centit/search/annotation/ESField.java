@@ -38,11 +38,6 @@ public @interface ESField {
     boolean highlight() default false;
 
     /**
-     * @return 是否返回原值
-     */
-    boolean revert() default true;
-
-    /**
      * @return 指定 analyzer , "" 为默认的
      */
     String analyzer() default "";
