@@ -1,8 +1,17 @@
 package com.centit.test;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.image.ImageOpt;
+import com.centit.support.network.HttpExecutor;
+import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.office.OfficeToPdf;
 import com.centit.support.office.PdfBaseOpt;
 import com.itextpdf.text.DocumentException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -41,12 +50,31 @@ public class TestToPdf {
 
     public static void fetchPdfImage() throws IOException, DocumentException {
         List<BufferedImage> images =  PdfBaseOpt.fetchPdfImages("/Users/codefan/Documents/temp/testPdfImage.pdf");
-        int i=0;
-        for(BufferedImage image : images){
-            ImageIO.write(image, "jpg", new File("/Users/codefan/Documents/temp/images/image"+i+".jpg"));
-            i++;
+        CloseableHttpClient client = HttpExecutor.createHttpClient();
+        HttpExecutorContext executorContext = HttpExecutorContext.create(client);
+
+        String response = HttpExecutor.formPost(executorContext, "http://192.168.133.61:8080/token",
+            CollectionsOpt.createHashMap("grant_type","password", "username", "admin", "password", "centit"));
+        JSONObject jsonObject = JSONObject.parseObject(response);
+
+        executorContext.header("Authorization", "Bearer " + jsonObject.getString("access_token"));
+
+
+        HttpPost httpPost = new HttpPost("http://192.168.133.61:8080/file-upload/ocr");
+        httpPost.setHeader("Content-Type", HttpExecutor.multiPartTypeHead);
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.setBoundary(HttpExecutor.BOUNDARY);
+        int n=0;
+        for(BufferedImage image :images) {
+            builder.addBinaryBody("files", ImageOpt.imageToInputStream(image),
+                ContentType.IMAGE_JPEG, "image"+n+"jpg");
+            n++;
         }
-        //stp.close();
+        httpPost.setEntity(builder.build());
+        response =  HttpExecutor.httpExecute(executorContext, httpPost);
+
+        System.out.println(response);
+
     }
 
 }
