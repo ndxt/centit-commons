@@ -6,3 +6,4 @@ target
 .mvn
 mvn*
 .settings
+**/~$*
