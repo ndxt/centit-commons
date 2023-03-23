@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public class JSONTransformer {
             JSONObject jobj = new JSONObject();
             for(Map.Entry<String, Object> ent : tempMap.entrySet()){
                 String skey = ent.getKey();
-                if(skey.startsWith("@")){ // 这个必须返回 Map
+                if(skey.startsWith("@")){ // 替换当前属性，这个必须返回 Map
                     Object value = transformer(ent.getValue(), dataSupport);
                     if(value instanceof Map){
                         jobj.putAll(CollectionsOpt.objectToMap(value));
@@ -59,7 +60,7 @@ public class JSONTransformer {
                     List<Object> loopData = CollectionsOpt.objectToList(obj);
                     for(Object ld : loopData){
                         dataSupport.pushStackValue(ld);
-                        if(StringBaseOpt.isNvl(String.valueOf(ent.getValue()))){
+                        if(StringUtils.isBlank(String.valueOf(ent.getValue())) || ".".equals(String.valueOf(ent.getValue()))){
                             array.add(ld);
                         }else {
                             array.add(transformer(ent.getValue(), dataSupport));
@@ -77,7 +78,13 @@ public class JSONTransformer {
             Collection<?> valueList = (Collection<?>) templateObj;
             for (Object ov : valueList) {
                 if (ov != null) {
-                    array.add(transformer(ov, dataSupport));
+                    Object transValue = transformer(ov, dataSupport);
+                    // #loop 的数据集 自动展开
+                    if(!(ov instanceof Collection) && transValue instanceof Collection){
+                        array.addAll((Collection<?>)transValue);
+                    } else { //如果 ov 是数值，这边就会生成二维数据
+                        array.add(transValue);
+                    }
                 }
             }
             return array;
@@ -88,6 +95,7 @@ public class JSONTransformer {
                 int len = Array.getLength(templateObj);
                 if (len > 0) {
                     for (int i = 0; i < len; i++) {
+                        //Array.get(templateObj, i) 这个不可能一个复杂结构，应该是字符串或者数值
                         array.add(transformer(Array.get(templateObj, i), dataSupport));
                     }
                 }

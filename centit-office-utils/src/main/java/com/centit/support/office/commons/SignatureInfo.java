@@ -22,6 +22,13 @@ public class SignatureInfo {
     private String fieldName;//表单域名称
     private Certificate[] chain;//证书链
     private PrivateKey pk;//签名私钥
+    /**
+     * @see com.itextpdf.text.pdf.PdfSignatureAppearance
+     *    int NOT_CERTIFIED = 0;  Approval signature; default value
+     *    int CERTIFIED_NO_CHANGES_ALLOWED = 1; Author signature, no changes allowed
+     *    int CERTIFIED_FORM_FILLING = 2; Author signature, form filling allowed
+     *    int CERTIFIED_FORM_FILLING_AND_ANNOTATIONS = 3; Author signature, form filling and annotations allowed
+     */
     private int certificationLevel; //批准签章
     //表现形式：仅描述，仅图片，图片和描述，签章者和描述
     private PdfSignatureAppearance.RenderingMode renderingMode;
