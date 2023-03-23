@@ -54,13 +54,14 @@ public class JSRuntimeContext {
         }
         return this;
     }
+
     public static Object checkArrayObject(Object object){
         if(object instanceof Map){
             Map<?,?> objMap = (Map<?,?>) object;
             JSONArray objArray = new JSONArray();
             boolean isArray = true;
             for(Map.Entry<?,?> ent : objMap.entrySet()){
-                if(ent.getKey() instanceof Number || StringUtils.isNumeric(ent.getKey().toString())){
+                if(StringUtils.isNumeric(ent.getKey().toString())){
                     objArray.add(ent.getValue());
                 } else {
                     isArray = false;
