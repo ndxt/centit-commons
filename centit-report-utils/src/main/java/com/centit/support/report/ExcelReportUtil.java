@@ -29,20 +29,27 @@ public abstract class ExcelReportUtil {
 
     protected static final Logger logger = LoggerFactory.getLogger(ExcelReportUtil.class);
 
-    public static void exportExcel(InputStream is, OutputStream os, Map<String, Object> model) throws IOException {
+    public static void exportExcel(InputStream is, OutputStream os, Map<String, Object> model, Map<String, Object> extendFuns) throws IOException {
         Context context = new Context(model);
+        Map<String, Object> extFuns = CollectionsOpt.createHashMap("utils", EmbedFuncUtils.instance);
+        if(extendFuns!=null)
+            extFuns.putAll(extendFuns);
+
+        JexlBuilder jb = new JexlBuilder();
+        jb.namespaces(extFuns);
+        JexlEngine je = jb.create();
+
         JxlsHelper jxlsHelper = JxlsHelper.getInstance();
         Transformer transformer = jxlsHelper.createTransformer(is, os);
         //TransformationConfig config = transformer.getTransformationConfig();
         JexlExpressionEvaluator evaluator = (JexlExpressionEvaluator) transformer.getTransformationConfig()
             .getExpressionEvaluator();
-
-        JexlBuilder jb = new JexlBuilder();
-        jb.namespaces(CollectionsOpt.createHashMap("utils", EmbedFuncUtils.instance));
-        JexlEngine je = jb.create();
         evaluator.setJexlEngine(je);
-
         jxlsHelper.processTemplate(context, transformer);
+    }
+
+    public static void exportExcel(InputStream is, OutputStream os, Map<String, Object> model) throws IOException {
+        exportExcel(is, os, model, null);
     }
 
 }

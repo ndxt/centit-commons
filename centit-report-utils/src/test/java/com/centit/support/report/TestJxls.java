@@ -14,8 +14,8 @@ public class TestJxls {
 
             ExcelReportUtil.exportExcel(is, out,
                 CollectionsOpt.createHashMap("employees", CollectionsOpt.createList(
-                    CollectionsOpt.createHashMap("name","userName", "birthDate", DatetimeOpt.currentUtilDate(), "payment", 10000, "bonus", 200 ),
-                    CollectionsOpt.createHashMap("name","userName", "birthDate", DatetimeOpt.currentUtilDate(), "payment", 10200, "bonus", 2020 )
+                    CollectionsOpt.createHashMap("name","userName", "birthDate", DatetimeOpt.currentUtilDate(), "payment", 12312, "bonus", 200 ),
+                    CollectionsOpt.createHashMap("name","userName", "birthDate", DatetimeOpt.currentUtilDate(), "payment", 123232.23, "bonus", 2020 )
                 ),"nowdate", DatetimeOpt.currentUtilDate()));
 
         } catch (IOException e) {
