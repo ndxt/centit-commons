@@ -947,9 +947,8 @@ public abstract class ExcelExportUtil {
         }
     }
 
-    /**
+    /*
      * 复制一个单元格样式到目的单元格样式
-     *
      * @param fromStyle
      * @param toStyle
      */
