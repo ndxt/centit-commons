@@ -1,11 +1,11 @@
 package com.centit.support.report;
 
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.compiler.EmbedFuncUtils;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
 import org.jxls.common.Context;
 import org.jxls.expression.JexlExpressionEvaluator;
-import org.jxls.transform.TransformationConfig;
 import org.jxls.transform.Transformer;
 import org.jxls.util.JxlsHelper;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public abstract class ExcelReportUtil {
             .getExpressionEvaluator();
 
         JexlBuilder jb = new JexlBuilder();
-        jb.namespaces(CollectionsOpt.createHashMap("utils", EmbedFuncUtils.intance));
+        jb.namespaces(CollectionsOpt.createHashMap("utils", EmbedFuncUtils.instance));
         JexlEngine je = jb.create();
         evaluator.setJexlEngine(je);
 

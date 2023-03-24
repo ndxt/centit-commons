@@ -2,12 +2,14 @@ package com.centit.support.test;
 
 import com.centit.support.algorithm.*;
 import com.centit.support.common.DoubleAspect;
+import com.centit.support.compiler.EmbedFuncUtils;
 
 import java.math.BigDecimal;
 
 public class TestNumber {
 
     public static String rmbDX(String f) {
+
         return NumberBaseOpt.capitalization(
             (f.indexOf('.') >= 0 ? f.substring(0, f.indexOf('.')) : f)) + "元"
             + NumberBaseOpt.capitalization(
@@ -32,7 +34,8 @@ public class TestNumber {
     }
 
     public static void main(String[] args) {
-        chengfakoujue();
+        System.out.println(rmbDX("1234.007"));
+        System.out.println(EmbedFuncUtils.instance.capitalRMB("1234.007"));
     }
 
     public static void lastmain(String[] args) {

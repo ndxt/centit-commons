@@ -7,3 +7,4 @@ target
 mvn*
 .settings
 **/~$*
+out.*

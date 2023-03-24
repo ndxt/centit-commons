@@ -256,14 +256,23 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_CAPITAL:// 102
             {
                 if (nOpSum < 1) return null;
-                boolean nT = false;
-                if (nOpSum > 1)
-                    nT = BooleanBaseOpt.castObjectToBoolean(slOperand.get(1), false);
                 if (!NumberBaseOpt.isNumber(slOperand.get(0)))
                     return StringUtils.upperCase(
                         StringBaseOpt.objectToString(slOperand.get(0)));
+                if (nOpSum == 1)
+                    return NumberBaseOpt.capitalization(
+                        StringBaseOpt.objectToString(slOperand.get(0)));
+
+                String ct = StringBaseOpt.castObjectToString(slOperand.get(1), "N");
+                if(StringUtils.equalsAnyIgnoreCase(ct, "r","rmb","yuan"))
+                    return EmbedFuncUtils.instance.capitalRMB(slOperand.get(0));
+
+                if(StringUtils.equalsAnyIgnoreCase(ct, "s","simple")){
+                    return NumberBaseOpt.capitalization(
+                        StringBaseOpt.objectToString(slOperand.get(0)), true);
+                }
                 return NumberBaseOpt.capitalization(
-                    StringBaseOpt.objectToString(slOperand.get(0)), nT);
+                    StringBaseOpt.objectToString(slOperand.get(0)));
             }
             case ConstDefine.FUNC_MAX: {// 103
                 LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
@@ -638,16 +647,10 @@ public abstract class EmbedFunc {
             }
 
             case ConstDefine.FUNC_IF: {// 108 不会运行到这儿
-                if (nOpSum < 2) return null;
-                if (BooleanBaseOpt.castObjectToBoolean(slOperand.get(0), false)) {
-                    return slOperand.get(1);
-                } else {
-                    if (nOpSum > 2)
-                        return slOperand.get(2);
-                    else
-                        return null;
-                }
+                if (nOpSum < 1) return null;
+                return EmbedFuncUtils.instance.ifElse(slOperand.toArray());
             }
+
             case ConstDefine.FUNC_NVL: {// 174
                 if (nOpSum < 1) return null;
                 if (nOpSum == 1 || slOperand.get(0) != null) {
@@ -741,10 +744,7 @@ public abstract class EmbedFunc {
 
             case ConstDefine.FUNC_FORMAT_DATE: {//
                 if (nOpSum < 1) return null;
-                String dateFormat = StringBaseOpt.castObjectToString(slOperand.get(0));
-                Date dt = (nOpSum > 1) ? DatetimeOpt.castObjectToDate(slOperand.get(1)) : DatetimeOpt.currentUtilDate();
-
-                return DatetimeOpt.convertDateToString(dt, dateFormat);
+                return EmbedFuncUtils.instance.formatDate(slOperand.toArray());
             }
 
             case ConstDefine.FUNC_DATE_INFO: {//
@@ -839,11 +839,11 @@ public abstract class EmbedFunc {
                 }
                 if (nOpSum > 1) {
                     return DatetimeOpt.convertStringToDate(
-                        StringBaseOpt.castObjectToString(slOperand.get(0)),
+                        StringBaseOpt.castObjectToString(dt),
                         StringBaseOpt.castObjectToString(slOperand.get(1))
                     );
                 } else {
-                    return DatetimeOpt.castObjectToDate(slOperand.get(0));
+                    return DatetimeOpt.castObjectToDate(dt);
                 }
             }
 
