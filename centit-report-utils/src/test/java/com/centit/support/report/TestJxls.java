@@ -1,7 +1,8 @@
 package com.centit.support.report;
 
-import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.DatetimeOpt;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.centit.support.file.FileIOOpt;
 
 import java.io.*;
 
@@ -10,13 +11,12 @@ public class TestJxls {
         try (InputStream is = TestJxls.class
             .getResourceAsStream("/template.xlsx");
              FileOutputStream out = new FileOutputStream(
-                 "/Users/codefan/projects/centit/centit-commons/centit-report-utils/src/test/resources/out.xlsx")) {
-
-            ExcelReportUtil.exportExcel(is, out,
-                CollectionsOpt.createHashMap("employees", CollectionsOpt.createList(
-                    CollectionsOpt.createHashMap("name","userName", "birthDate", DatetimeOpt.currentUtilDate(), "payment", 12312, "bonus", 200 ),
-                    CollectionsOpt.createHashMap("name","userName", "birthDate", DatetimeOpt.currentUtilDate(), "payment", 123232.23, "bonus", 2020 )
-                ),"nowdate", DatetimeOpt.currentUtilDate()));
+                 //"/Users/codefan/projects/centit/centit-commons/centit-report-utils/src/test/resources/out.xlsx")) {
+                 "C:\\projects\\java\\centit\\centit-commons\\centit-report-utils\\src\\test\\resources\\out.xlsx")) {
+            InputStream in = TestJxls.class
+                .getResourceAsStream("/employees.json");
+            JSONObject object =(JSONObject) JSON.parse(FileIOOpt.readStringFromInputStream(in));
+            ExcelReportUtil.exportExcel(is, out, object);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
