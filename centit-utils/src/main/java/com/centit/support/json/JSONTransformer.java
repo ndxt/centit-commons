@@ -18,23 +18,20 @@ public class JSONTransformer {
     public static void putObjectToJson(JSONObject jobj, String key, Object value){
         if(value == null){
             jobj.remove(key);
-            return ;
+            return;
         }
         /*if(value instanceof Map && ((Map<?,?>)value).size()==0){
             jobj.remove(key);
-            return ;
+            return
         }*/
+
         jobj.put(key, value);
     }
 
     public static void addObjectToJson(JSONArray jArray, Object value){
-        if(value == null){
-            return ;
+        if(value != null){
+            jArray.add(value);
         }
-        /*if(value instanceof Map && ((Map<?,?>)value).size()==0){
-            return ;
-        }*/
-        jArray.add(value);
     }
     /**
      * value | key:value
