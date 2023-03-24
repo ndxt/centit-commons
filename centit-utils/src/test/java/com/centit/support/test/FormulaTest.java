@@ -14,6 +14,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FormulaTest {
+    public static void main(String[] args)  {
+        System.out.println(VariableFormula.calculate(
+            "subStr(getAt(0, regexMatchValue('EI_\\d+','EI_005325,ss,ss')), 3,6)"));
+        System.out.println(VariableFormula.calculate(
+            "subStr(getAt(0,split('EI_005325,ss,ss')),3)"));
+    }
 
         /*TimeZone pdt = DatetimeOpt.fetchTimeZone("PDT");
         System.out.println( pdt.getRawOffset() + " : " + pdt.getDisplayName());
@@ -46,7 +52,7 @@ public class FormulaTest {
     //Jan 1, 2023 6:15:03 p.m. PST
     // 7 ene 2023 03:33:31 GMT-8
 
-    public static void main(String[] args) throws ParseException {
+    public static void testFormatDate(String[] args) throws ParseException {
 
         Object strReplace =  VariableFormula.calculate(
             "find('Jan 1, 2023 6:15:03 p.m. a.m. PST', 'pst')");

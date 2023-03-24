@@ -267,6 +267,16 @@ public class VariableFormula {
                 lex.writeBackAWord(nextWord);
             }
         }
+        if(Lexer.isConstValue(str)){
+            if (StringRegularOpt.isNumber(str)) {
+                return NumberBaseOpt.castObjectToNumber(str);
+            }
+            return StringRegularOpt.trimString(str);
+        }
+
+        if(StringUtils.equalsAnyIgnoreCase(str, "true", "false")){
+            return BooleanBaseOpt.castObjectToBoolean(str);
+        }
 
         int funcNo = EmbedFunc.getFuncNo(str);
         if (funcNo != -1) {
@@ -277,16 +287,8 @@ public class VariableFormula {
             lex.writeBackAWord(nextWord);
         }
 
-        if(StringUtils.equalsAnyIgnoreCase(str, "true", "false")){
-            return BooleanBaseOpt.castObjectToBoolean(str);
-        }
-
-        if (trans != null && !Lexer.isConstValue(str)) {
+        if (trans != null) {
             return trans.getVarValue(str);
-        }
-
-        if (StringRegularOpt.isNumber(str)) {
-            return NumberBaseOpt.castObjectToNumber(str);
         }
 
         return StringRegularOpt.trimString(str);

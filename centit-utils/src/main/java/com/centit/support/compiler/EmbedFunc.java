@@ -60,7 +60,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("rpad", 1, ConstDefine.FUNC_RPAD, ConstDefine.TYPE_STR), // 右侧补充字符串
         new FunctionInfo("find", 2, ConstDefine.FUNC_FIND, ConstDefine.TYPE_NUM),  //求子串位置 find ("123456","34")=2  find ("123456","35")=-1
         new FunctionInfo("frequence", 2, ConstDefine.FUNC_FREQUENCE, ConstDefine.TYPE_NUM), // 求子串个数 find ("12345236","23")=2
-        new FunctionInfo("split", 2, ConstDefine.FUNC_SPLIT_STR, ConstDefine.TYPE_STR),
+        new FunctionInfo("split", 1, ConstDefine.FUNC_SPLIT_STR, ConstDefine.TYPE_STR),
         new FunctionInfo("replace", -1, ConstDefine.FUNC_REPLACE, ConstDefine.TYPE_STR), // 字符串替换
         new FunctionInfo("int", 1, ConstDefine.FUNC_INT, ConstDefine.TYPE_NUM), // 求整数部分 int (12.34)=12 int -12.34)=-12
         new FunctionInfo("integer", 1, ConstDefine.FUNC_INT, ConstDefine.TYPE_NUM), // 求整数部分 integer (12.34)=12 int (-12.34)=-12
@@ -251,6 +251,10 @@ public abstract class EmbedFunc {
                 while (m.find()) {
                     matchValues.add(sValues.substring(m.start(), m.end()));
                 }
+                if(matchValues.size()==0)
+                    return null;
+                if(matchValues.size()==1)
+                    return matchValues.get(0);
                 return matchValues;
             }
             case ConstDefine.FUNC_CAPITAL:// 102
@@ -381,7 +385,7 @@ public abstract class EmbedFunc {
                 if (nOpSum > 2 && NumberBaseOpt.isNumber(slOperand.get(2)))
                     nLength = NumberBaseOpt.castObjectToInteger(slOperand.get(2));
                 else
-                    nLength = tempStr.length();
+                    nLength = tempStr.length() - nStart;
 
                 if (nLength <= 0)
                     nLength = 1;
