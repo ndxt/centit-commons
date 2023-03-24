@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class TestJsonObject {
 
-    public static void main(String arg[]) throws IOException {
+    public static void main2(String arg[]) throws IOException {
         JSONOpt.fastjsonGlobalConfig();
         InputStream in = TestJsonObject.class
             .getResourceAsStream("/page-v1.json");
@@ -26,7 +26,7 @@ public class TestJsonObject {
         System.out.println(JSON.toJSONString(diff.toJSONObject()));
     }
 
-    public static void testJsonTransform() throws IOException {
+    public static void main(String arg[]) throws IOException {
         JSONOpt.fastjsonGlobalConfig();
         InputStream in = TestJsonObject.class
             .getResourceAsStream("/test.json");

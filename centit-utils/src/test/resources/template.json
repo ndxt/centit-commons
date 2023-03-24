@@ -4,7 +4,7 @@
     "#object.properties.array": {
       "b": "count(${/object.properties.array})",
       "a": "b",
-      "date" : "formatDate('yyyy-MM-dd',订单日期)",
+      "date" : "formatDate('yyyy-MM-dd HH:mm:ss',订单日期)",
       "c": 5
     }
   },

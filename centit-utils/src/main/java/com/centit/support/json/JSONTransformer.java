@@ -3,7 +3,6 @@ package com.centit.support.json;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,28 @@ import java.util.Map;
 
 public class JSONTransformer {
     protected static final Logger logger = LoggerFactory.getLogger(JSONTransformer.class);
+
+    public static void putObjectToJson(JSONObject jobj, String key, Object value){
+        if(value == null){
+            jobj.remove(key);
+            return ;
+        }
+        /*if(value instanceof Map && ((Map<?,?>)value).size()==0){
+            jobj.remove(key);
+            return ;
+        }*/
+        jobj.put(key, value);
+    }
+
+    public static void addObjectToJson(JSONArray jArray, Object value){
+        if(value == null){
+            return ;
+        }
+        /*if(value instanceof Map && ((Map<?,?>)value).size()==0){
+            return ;
+        }*/
+        jArray.add(value);
+    }
     /**
      * value | key:value
      * value : 非字符串常量 | string 常量  "@" + 常量 | 引用 ref
@@ -49,7 +70,7 @@ public class JSONTransformer {
                     if(value instanceof Map){
                         jobj.putAll(CollectionsOpt.objectToMap(value));
                     } else {
-                        jobj.put(skey.substring(1), value);
+                        putObjectToJson(jobj, skey.substring(1), value);
                     }
                 } else if(skey.startsWith("#")) { //数组迭代； 并且只能是 单独的 一个key
                     Object obj = dataSupport.attainExpressionValue(skey.substring(1));
@@ -61,18 +82,18 @@ public class JSONTransformer {
                     for(Object ld : loopData){
                         dataSupport.pushStackValue(ld);
                         if(StringUtils.isBlank(String.valueOf(ent.getValue())) || ".".equals(String.valueOf(ent.getValue()))){
-                            array.add(ld);
+                            addObjectToJson(array, ld);
                         }else {
-                            array.add(transformer(ent.getValue(), dataSupport));
+                            addObjectToJson(array, transformer(ent.getValue(), dataSupport));
                         }
                         dataSupport.popStackValue();
                     }
-                    return array;
+                    return array.size()==0 ? null : array;
                 } else {
-                    jobj.put(skey, transformer(ent.getValue(), dataSupport));
+                    putObjectToJson(jobj, skey, transformer(ent.getValue(), dataSupport));
                 }
             }
-            return jobj;
+            return jobj.size()==0 ? null : jobj;
         } else if(templateObj instanceof Collection) {
             JSONArray array = new JSONArray();
             Collection<?> valueList = (Collection<?>) templateObj;
@@ -83,11 +104,11 @@ public class JSONTransformer {
                     if(!(ov instanceof Collection) && transValue instanceof Collection){
                         array.addAll((Collection<?>)transValue);
                     } else { //如果 ov 是数值，这边就会生成二维数据
-                        array.add(transValue);
+                        addObjectToJson(array, transValue);
                     }
                 }
             }
-            return array;
+            return array.size()==0 ? null : array;
         } else {
             Class<?> clazz = templateObj.getClass();
             if (clazz.isArray()) {
@@ -96,10 +117,10 @@ public class JSONTransformer {
                 if (len > 0) {
                     for (int i = 0; i < len; i++) {
                         //Array.get(templateObj, i) 这个不可能一个复杂结构，应该是字符串或者数值
-                        array.add(transformer(Array.get(templateObj, i), dataSupport));
+                        addObjectToJson(array, transformer(Array.get(templateObj, i), dataSupport));
                     }
                 }
-                return array;
+                return array.size()==0 ? null : array;
             } else {
                 return templateObj;
             }
