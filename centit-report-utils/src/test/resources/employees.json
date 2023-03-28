@@ -1,0 +1,39 @@
+{
+  "nowDate" : "2023-3-24 20:20:20",
+  "employees": [
+    {
+      "name": "codefan",
+      "birthday": "1978-10-24",
+      "payment": 124000,
+      "education": [
+        {
+          "school": "东南大学",
+          "graduationTime": "2001-06-01"
+        },
+        {
+          "school": "南京大学",
+          "graduationTime": "2008-03-01"
+        }
+      ]
+    },
+    {
+      "name": "员工1",
+      "birthday": "1988-08-08",
+      "payment": 124000,
+      "education": [
+        {
+          "school": "山东大学",
+          "graduationTime": "2001-06-01"
+        }
+      ],
+      "image": "pic/header.jpg"
+    },
+    {
+      "name": "员工2",
+      "birthday": "1998-10-24",
+      "payment": 124000,
+      "education": [
+      ]
+    }
+  ]
+}
