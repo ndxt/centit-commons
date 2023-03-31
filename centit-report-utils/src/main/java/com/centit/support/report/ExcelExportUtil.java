@@ -11,18 +11,18 @@ import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.util.Units;
-import org.apache.poi.xssf.usermodel.*;
-import org.openxmlformats.schemas.drawingml.x2006.main.*;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTConnector;
-import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTShape;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static org.apache.poi.ss.usermodel.CellType.NUMERIC;
 
@@ -690,14 +690,13 @@ public abstract class ExcelExportUtil {
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(excelTemplateFilePath);
         Workbook wb;
 
-        try (InputStream excelFile = new FileInputStream(new File(excelTemplateFilePath))) {
+        try (InputStream excelFile = Files.newInputStream(new File(excelTemplateFilePath).toPath())) {
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             Sheet sheet = (StringUtils.isBlank(sheetName)) ? wb.getSheetAt(0) : wb.getSheet(sheetName);
             saveObjectsToExcelSheet(sheet, objects, fieldDesc, beginRow, createRow, -1);
-
         }
 
-        try (OutputStream newExcelFile = new FileOutputStream(new File(excelFilePath))) {
+        try (OutputStream newExcelFile = Files.newOutputStream(new File(excelFilePath).toPath())) {
             wb.write(newExcelFile);
         }
     }
@@ -721,14 +720,13 @@ public abstract class ExcelExportUtil {
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(excelTemplateFilePath);
         Workbook wb;
 
-        try (InputStream excelFile = new FileInputStream(new File(excelTemplateFilePath))) {
+        try (InputStream excelFile = Files.newInputStream(new File(excelTemplateFilePath).toPath())) {
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             Sheet sheet = wb.getSheetAt(sheetIndex);
             saveObjectsToExcelSheet(sheet, objects, fieldDesc, beginRow, createRow, -1);
-
         }
 
-        try (OutputStream newExcelFile = new FileOutputStream(new File(excelFilePath))) {
+        try (OutputStream newExcelFile = Files.newOutputStream(new File(excelFilePath).toPath())) {
             wb.write(newExcelFile);
         }
     }
@@ -751,14 +749,13 @@ public abstract class ExcelExportUtil {
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(excelTemplateFilePath);
         Workbook wb;
 
-        try (InputStream excelFile = new FileInputStream(new File(excelTemplateFilePath))) {
+        try (InputStream excelFile = Files.newInputStream(new File(excelTemplateFilePath).toPath())) {
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             Sheet sheet = (StringUtils.isBlank(sheetName)) ? wb.getSheetAt(0) : wb.getSheet(sheetName);
             saveObjectsToExcelSheet(sheet, objects, beginCol, beginRow, createRow, -1);
-
         }
 
-        try (OutputStream newExcelFile = new FileOutputStream(new File(excelFilePath))) {
+        try (OutputStream newExcelFile = Files.newOutputStream(new File(excelFilePath).toPath())) {
             wb.write(newExcelFile);
         }
     }
@@ -780,13 +777,13 @@ public abstract class ExcelExportUtil {
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(excelTemplateFilePath);
         Workbook wb;
 
-        try (InputStream excelFile = new FileInputStream(new File(excelTemplateFilePath))) {
+        try (InputStream excelFile = Files.newInputStream(new File(excelTemplateFilePath).toPath())) {
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             Sheet sheet = wb.getSheetAt(sheetIndex);
             saveObjectsToExcelSheet(sheet, objects, beginCol, beginRow, createRow, -1);
         }
 
-        try (OutputStream newExcelFile = new FileOutputStream(new File(excelFilePath))) {
+        try (OutputStream newExcelFile = Files.newOutputStream(new File(excelFilePath).toPath())) {
             wb.write(newExcelFile);
         }
     }
@@ -799,7 +796,7 @@ public abstract class ExcelExportUtil {
         Sheet sheet;
         File file = new File(excelFilePath);
         if (file.exists()) {
-            InputStream excelFile = new FileInputStream(new File(excelFilePath));
+            InputStream excelFile = Files.newInputStream(file.toPath());
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             sheet = wb.getSheet(sheetName);
             if(sheet==null){
@@ -815,10 +812,8 @@ public abstract class ExcelExportUtil {
             int beginRow = sheet.getLastRowNum() + 1;
             generateExcelText(sheet, objLists, property, beginRow);
         }
-        try (OutputStream newExcelFile = new FileOutputStream(new File(excelFilePath))) {
-            if (wb != null) {
-                wb.write(newExcelFile);
-            }
+        try (OutputStream newExcelFile = Files.newOutputStream(file.toPath())) {
+            wb.write(newExcelFile);
         }
     }
 
@@ -829,7 +824,7 @@ public abstract class ExcelExportUtil {
         Sheet sheet;
         File file = new File(excelFilePath);
         if (file.exists()) {
-            InputStream excelFile = new FileInputStream(new File(excelFilePath));
+            InputStream excelFile = Files.newInputStream(file.toPath());
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             sheet = wb.getSheetAt(sheetIndex);
             if(sheet==null){
@@ -845,10 +840,8 @@ public abstract class ExcelExportUtil {
             int beginRow = sheet.getLastRowNum() + 1;
             generateExcelText(sheet, objLists, property, beginRow);
         }
-        try (OutputStream newExcelFile = new FileOutputStream(new File(excelFilePath))) {
-            if (wb != null) {
-                wb.write(newExcelFile);
-            }
+        try (OutputStream newExcelFile = Files.newOutputStream(file.toPath())) {
+            wb.write(newExcelFile);
         }
     }
 
@@ -858,7 +851,7 @@ public abstract class ExcelExportUtil {
         Sheet sheet;
         File file = new File(excelFilePath);
         if (file.exists()) {
-            InputStream excelFile = new FileInputStream(new File(excelFilePath));
+            InputStream excelFile = Files.newInputStream(file.toPath());
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             sheet = wb.getSheet(sheetName);
             if(sheet==null){
@@ -874,10 +867,8 @@ public abstract class ExcelExportUtil {
             int beginRow = sheet.getLastRowNum() + 1;
             generateExcelText(sheet, objLists, beginRow);
         }
-        try (OutputStream newExcelFile = new FileOutputStream(new File(excelFilePath))) {
-            if (wb != null) {
-                wb.write(newExcelFile);
-            }
+        try (OutputStream newExcelFile = Files.newOutputStream(file.toPath())) {
+            wb.write(newExcelFile);
         }
     }
 
@@ -887,7 +878,7 @@ public abstract class ExcelExportUtil {
         Sheet sheet;
         File file = new File(excelFilePath);
         if (file.exists()) {
-            InputStream excelFile = new FileInputStream(new File(excelFilePath));
+            InputStream excelFile = Files.newInputStream(file.toPath());
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             sheet = wb.getSheetAt(sheetIndex);
         } else {
@@ -900,10 +891,8 @@ public abstract class ExcelExportUtil {
             int beginRow = sheet.getLastRowNum() + 1;
             generateExcelText(sheet, objLists, beginRow);
         }
-        try (OutputStream newExcelFile = new FileOutputStream(new File(excelFilePath))) {
-            if (wb != null) {
-                wb.write(newExcelFile);
-            }
+        try (OutputStream newExcelFile = Files.newOutputStream(file.toPath())) {
+            wb.write(newExcelFile);
         }
     }
 
