@@ -553,6 +553,16 @@ public abstract class ExcelExportUtil {
     }
     private static void createNewRowsForSaveData(Sheet sheet, int beginRow, int nRowCount){
         Row excelRow = sheet.getRow(beginRow);
+        if(excelRow==null){
+            for(int i=0; i<nRowCount; i++ ){
+                Row toRow = sheet.getRow(beginRow + i);
+                if(toRow==null){
+                    sheet.createRow(beginRow + i);
+                }
+            }
+            return;
+        }
+
         int nColCount = excelRow.getLastCellNum() + 1;
         int lastRow = sheet.getLastRowNum();
         if(beginRow < lastRow && nRowCount>1) {
@@ -637,7 +647,9 @@ public abstract class ExcelExportUtil {
     public static void saveObjectsToExcelSheet(Sheet sheet, List<Object[]> objects, int beginCol, int beginRow, boolean createRow, int mergeColCell) {
         int nRowCount = objects.size();
         //CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
-        if(createRow) createNewRowsForSaveData(sheet, beginRow, nRowCount);
+        if(createRow)
+            createNewRowsForSaveData(sheet, beginRow, nRowCount);
+
         for (int i = 0; i < nRowCount; i++) {
             Row excelRow = sheet.getRow(beginRow + i);
             Object[] rowObj = objects.get(i);
