@@ -3,6 +3,7 @@ package com.centit.support.image;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -122,6 +123,8 @@ public class QrCodeConfig {
     }
 
     public void setTopTextFontSize(Integer topTextFontSize) {
+        if(topTextFontSize==null || topTextFontSize<0)
+            return;
         this.topTextFontSize = topTextFontSize;
     }
 
@@ -138,6 +141,8 @@ public class QrCodeConfig {
     }
 
     public void setDownTextFontSize(Integer downTextFontSize) {
+        if(downTextFontSize==null || downTextFontSize<0)
+            return;
         this.downTextFontSize = downTextFontSize;
     }
 
@@ -170,6 +175,8 @@ public class QrCodeConfig {
     }
 
     public void setQrWidth(Integer qrWidth) {
+        if(qrWidth==null || qrWidth<0)
+            return;
         this.qrWidth = qrWidth;
     }
 
@@ -178,6 +185,8 @@ public class QrCodeConfig {
     }
 
     public void setQrHeight(Integer qrHeight) {
+        if(qrHeight==null || qrHeight<0)
+            return;
         this.qrHeight = qrHeight;
     }
 
@@ -194,6 +203,8 @@ public class QrCodeConfig {
     }
 
     public void setPicType(String picType) {
+        if(StringUtils.isBlank(picType))
+            return;
         this.picType = picType;
     }
 
@@ -202,6 +213,8 @@ public class QrCodeConfig {
     }
 
     public void setCode(String code) {
+        if(StringUtils.isBlank(code))
+            return;
         this.code = code;
     }
 
