@@ -61,6 +61,11 @@
             <artifactId>dom4j</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+        </dependency>
+
         <!-- test -->
         <!-- 获取汉字首字母的类库  -->
         <dependency>

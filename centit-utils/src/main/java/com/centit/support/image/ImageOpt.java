@@ -8,10 +8,12 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +26,6 @@ public abstract class ImageOpt {
 
     /**
      * 创建图片的缩略图 ，算法来做网络，测试通过
-     *
      * @param filename    文件名称
      * @param thumbWidth  缩略图宽度
      * @param thumbHeight 缩略图高度
@@ -80,7 +81,6 @@ public abstract class ImageOpt {
 
     /**
      * 抓屏程序 算法来做网络，测试通过
-     *
      * @param fileName 文件名称
      * @throws AWTException 异常
      * @throws IOException  异常
@@ -96,7 +96,6 @@ public abstract class ImageOpt {
 
     /**
      * 对图像进行 裁剪
-     *
      * @param image          图片
      * @param subImageBounds 图片区域
      * @return 截图
@@ -261,4 +260,83 @@ public abstract class ImageOpt {
         ImageIO.write(image, "jpg", os);
         return new ByteArrayInputStream(os.toByteArray());
     }
+
+    /**
+     * 根据路径图片图片
+     * @param uri 本地路径 or 网络地址
+     * @return 图片
+     * @throws IOException 异常
+     */
+    public static BufferedImage loadImage(String uri) throws IOException {
+        if (uri.startsWith("http")) {
+            // 从网络获取logo
+            return ImageIO.read(new URL(uri));
+        } else {
+            // 从资源目录下获取logo
+            return ImageIO.read(new File(uri));
+        }
+    }
+
+    /**
+     * 生成圆角图片
+     * @param image        原始图片
+     * @param cornerRadius 圆角的弧度
+     * @return 返回圆角图
+     */
+    public static BufferedImage makeRoundedCorner(BufferedImage image, int cornerRadius) {
+        int w = image.getWidth();
+        int h = image.getHeight();
+        BufferedImage output = new BufferedImage(w, h,BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = output.createGraphics();
+        // This is what we want, but it only does hard-clipping, i.e. aliasing
+        // g2.setClip(new RoundRectangle2D ...)
+        // so instead fake soft-clipping by first drawing the desired clip shape
+        // in fully opaque white with antialiasing enabled...
+        g2.setComposite(AlphaComposite.Src);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(Color.WHITE);
+        g2.fill(new RoundRectangle2D.Float(0, 0, w, h, cornerRadius,cornerRadius));
+        // ... then compositing the image on top,
+        // using the white shape from above as alpha source
+        g2.setComposite(AlphaComposite.SrcAtop);
+        g2.drawImage(image, 0, 0, null);
+        g2.dispose();
+        return output;
+    }
+
+    /**
+     * 生成圆角图片  圆角边框
+     * @param image        原图
+     * @param cornerRadius 圆角的角度
+     * @param size         边框的边距
+     * @param color        边框的颜色
+     * @return 返回带边框的圆角图
+     */
+    public static BufferedImage makeRoundBorder(BufferedImage image, int cornerRadius, int size, Color color) {
+        // 将图片变成圆角
+        image = makeRoundedCorner(image, cornerRadius);
+
+        int borderSize = size << 1;
+        int w = image.getWidth() + borderSize;
+        int h = image.getHeight() + borderSize;
+        BufferedImage output = new BufferedImage(w, h,
+            BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2 = output.createGraphics();
+        g2.setComposite(AlphaComposite.Src);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(color == null ? Color.WHITE : color);
+        g2.fill(new RoundRectangle2D.Float(0, 0, w, h, cornerRadius,
+            cornerRadius));
+
+        // ... then compositing the image on top,
+        // using the white shape from above as alpha source
+        g2.setComposite(AlphaComposite.SrcAtop);
+        g2.drawImage(image, size, size, null);
+        g2.dispose();
+
+        return output;
+    }
+
 }
