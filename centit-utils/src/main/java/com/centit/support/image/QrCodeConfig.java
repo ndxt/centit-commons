@@ -151,6 +151,8 @@ public class QrCodeConfig {
     }
 
     public void setTopTextFontType(String topTextFontType) {
+        if(StringUtils.isBlank(topTextFontType))
+            return;
         this.topTextFontType = topTextFontType;
     }
 
@@ -159,6 +161,8 @@ public class QrCodeConfig {
     }
 
     public void setDownTextFontType(String downTextFontType) {
+        if(StringUtils.isBlank(downTextFontType))
+            return;
         this.downTextFontType = downTextFontType;
     }
 
