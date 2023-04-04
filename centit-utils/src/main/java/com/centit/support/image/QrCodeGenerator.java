@@ -58,7 +58,7 @@ public abstract class QrCodeGenerator {
      * @return BufferedImage 二维码图片
      * @throws IOException 异常
      */
-    public static BufferedImage toBufferedImage(QrCodeConfig qrCodeConfig, BitMatrix bitMatrix) throws IOException {
+    private static BufferedImage toBufferedImage(QrCodeConfig qrCodeConfig, BitMatrix bitMatrix) throws IOException {
         int qrCodeWidth = bitMatrix.getWidth();
         int qrCodeHeight = bitMatrix.getHeight();
         BufferedImage qrCode = new BufferedImage(qrCodeWidth, qrCodeHeight, BufferedImage.TYPE_INT_RGB);
@@ -86,7 +86,7 @@ public abstract class QrCodeGenerator {
      * @param qrCodeConfig 二维码配置信息
      * @return BufferedImage
      */
-    public static BufferedImage addTextInfo(BufferedImage source, QrCodeConfig qrCodeConfig) {
+    private static BufferedImage addTextInfo(BufferedImage source, QrCodeConfig qrCodeConfig) {
         Graphics2D graphics = (Graphics2D)source.getGraphics();
         String topText = qrCodeConfig.getTopText();
         String downText = qrCodeConfig.getDownText();
@@ -159,11 +159,23 @@ public abstract class QrCodeGenerator {
      * @throws IOException 异常
      * @throws WriterException 异常
      * */
-    public static BufferedImage asBufferedImage(QrCodeConfig qrCodeConfig) throws IOException, WriterException {
+    public static BufferedImage createQRImage(QrCodeConfig qrCodeConfig) throws IOException, WriterException {
         BitMatrix bitMatrix = encode(qrCodeConfig);
         return toBufferedImage(qrCodeConfig, bitMatrix);
     }
 
+    /**
+     * 生成二维码流
+     * @param message 二维码配置信息
+     * @return BufferedImage 二维码流
+     * @throws IOException 异常
+     * @throws WriterException 异常
+     * */
+    public static BufferedImage createQRImage(String message) throws IOException, WriterException {
+        QrCodeConfig config = new QrCodeConfig();
+        config.setMsg(message);
+        return createQRImage(config);
+    }
 
     /**
      * 对 zxing 的 QRCodeWriter 进行扩展, 解决白边过多的问题
