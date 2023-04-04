@@ -94,6 +94,7 @@ public class QrCodeConfig {
         qrHeight = 200;
         code = "UTF-8";
         picType = "png";
+        errorCorrection = ErrorCorrectionLevel.Q;
     }
 
     public String getMsg() {
@@ -226,7 +227,9 @@ public class QrCodeConfig {
         return padding;
     }
 
-    public void setPadding(int padding) {
+    public void setPadding(Integer padding) {
+        if(padding==null || padding<0)
+            return;
         this.padding = padding;
     }
 
@@ -235,6 +238,8 @@ public class QrCodeConfig {
     }
 
     public void setErrorCorrection(ErrorCorrectionLevel errorCorrection) {
+        if(errorCorrection==null)
+            return;
         this.errorCorrection = errorCorrection;
     }
 

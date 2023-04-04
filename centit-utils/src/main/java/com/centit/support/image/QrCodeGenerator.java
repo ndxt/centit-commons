@@ -170,20 +170,12 @@ public abstract class QrCodeGenerator {
      * 源码参考 {@link com.google.zxing.qrcode.QRCodeWriter#encode(String, BarcodeFormat, int, int, Map)}
      */
     private static BitMatrix encode(QrCodeConfig qrCodeConfig) throws WriterException {
-        ErrorCorrectionLevel errorCorrectionLevel = ErrorCorrectionLevel.Q;
-        int quietZone = 1;
-        if (qrCodeConfig.getHints() != null) {
-            if (qrCodeConfig.getHints().containsKey(EncodeHintType.ERROR_CORRECTION)) {
-                errorCorrectionLevel = ErrorCorrectionLevel.valueOf(qrCodeConfig.getHints().get(EncodeHintType.ERROR_CORRECTION).toString());
-            }
-            if (qrCodeConfig.getHints().containsKey(EncodeHintType.MARGIN)) {
-                quietZone = Integer.parseInt(qrCodeConfig.getHints().get(EncodeHintType.MARGIN).toString());
-            }
-            if (quietZone > QUIET_ZONE_SIZE) {
-                quietZone = QUIET_ZONE_SIZE;
-            } else if (quietZone < 0) {
-                quietZone = 0;
-            }
+        ErrorCorrectionLevel errorCorrectionLevel = qrCodeConfig.getErrorCorrection();
+        int quietZone = qrCodeConfig.getPadding();
+        if (quietZone > QUIET_ZONE_SIZE) {
+            quietZone = QUIET_ZONE_SIZE;
+        } else if (quietZone < 0) {
+            quietZone = 0;
         }
         QRCode code = Encoder.encode(qrCodeConfig.getMsg(), errorCorrectionLevel, qrCodeConfig.getHints());
         return renderResult(code, qrCodeConfig.getQrWidth(), qrCodeConfig.getQrHeight(), quietZone);
