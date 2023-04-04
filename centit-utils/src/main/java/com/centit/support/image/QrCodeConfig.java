@@ -95,6 +95,7 @@ public class QrCodeConfig {
         code = "UTF-8";
         picType = "png";
         errorCorrection = ErrorCorrectionLevel.Q;
+        matrixToImageConfig = new MatrixToImageConfig();
     }
 
     public String getMsg() {
@@ -200,6 +201,8 @@ public class QrCodeConfig {
     }
 
     public void setMatrixToImageConfig(MatrixToImageConfig matrixToImageConfig) {
+        if(matrixToImageConfig==null)
+            return;
         this.matrixToImageConfig = matrixToImageConfig;
     }
 
