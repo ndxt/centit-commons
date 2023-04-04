@@ -1,7 +1,6 @@
 package com.centit.support.image;
 
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
@@ -26,6 +25,8 @@ public abstract class QrCodeGenerator {
      * @throws IOException
      */
     public static void insertLogo(BufferedImage qrCode, BufferedImage logImage) throws IOException {
+        if(logImage==null)
+            return;
         int qrcodeWidth = qrCode.getWidth();
         int qrcodeHeight = qrCode.getHeight();
 
@@ -70,12 +71,12 @@ public abstract class QrCodeGenerator {
             }
         }
         // 插入logo
-        if (!(qrCodeConfig.getLogo() == null || "".equals(qrCodeConfig.getLogo()))) {
+        if (StringUtils.isNotBlank(qrCodeConfig.getLogo())) {
             insertLogo(qrCode, ImageOpt.loadImage(qrCodeConfig.getLogo()));
         }
         //插入二维码头文字信息
         if(StringUtils.isNotBlank(qrCodeConfig.getTopText()) || StringUtils.isNotBlank(qrCodeConfig.getDownText())){
-            qrCode = addTextInfo(qrCode,qrCodeConfig);
+            qrCode = addTextInfo(qrCode, qrCodeConfig);
         }
         return qrCode;
     }

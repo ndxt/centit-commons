@@ -1,6 +1,5 @@
 package com.centit.support.image;
 
-import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.security.Md5Encoder;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
@@ -256,9 +255,16 @@ public abstract class ImageOpt {
 
     public static InputStream imageToInputStream(BufferedImage image) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        String imagePath = UuidOpt.randomString(6) + ".jpg";
+        //String imagePath = UuidOpt.randomString(6) + ".jpg";
         ImageIO.write(image, "jpg", os);
         return new ByteArrayInputStream(os.toByteArray());
+    }
+
+    public static byte[] imageToByteArray(BufferedImage image) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        //String imagePath = UuidOpt.randomString(6) + ".jpg";
+        ImageIO.write(image, "jpg", os);
+        return os.toByteArray();
     }
 
     /**
