@@ -66,8 +66,8 @@ public abstract class QrCodeGenerator {
             for (int y = 0; y < qrCodeHeight; y++) {
                 qrCode.setRGB(x, y,
                     bitMatrix.get(x, y) ?
-                        qrCodeConfig.getMatrixToImageConfig().getPixelOnColor() :
-                        qrCodeConfig.getMatrixToImageConfig().getPixelOffColor());
+                        qrCodeConfig.getOnColor() :
+                        qrCodeConfig.getOffColor());
             }
         }
         // 插入logo

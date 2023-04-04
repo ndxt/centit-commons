@@ -74,10 +74,15 @@ public class QrCodeConfig {
      */
     private ErrorCorrectionLevel errorCorrection;
     /**
-     * 生成二维码的颜色
+     * 生成二维码的颜色 Params:
+     * onColor – pixel on color, specified as an ARGB value as an int offColor – pixel off color, specified as an ARGB value as an int
      */
-    private MatrixToImageConfig matrixToImageConfig;
-
+    private int onColor;
+    /**
+     * 生成二维码的颜色 Params:
+     * onColor – pixel on color, specified as an ARGB value as an int offColor – pixel off color, specified as an ARGB value as an int
+     */
+    private int offColor;
 
     /**
      * 生成二维码图片的格式 png, jpg
@@ -95,7 +100,8 @@ public class QrCodeConfig {
         code = "UTF-8";
         picType = "png";
         errorCorrection = ErrorCorrectionLevel.Q;
-        matrixToImageConfig = new MatrixToImageConfig();
+        onColor = MatrixToImageConfig.BLACK;
+        offColor = MatrixToImageConfig.WHITE;
     }
 
     public String getMsg() {
@@ -196,14 +202,22 @@ public class QrCodeConfig {
         this.qrHeight = qrHeight;
     }
 
-    public MatrixToImageConfig getMatrixToImageConfig() {
-        return matrixToImageConfig;
+    public int getOnColor() {
+        return onColor;
     }
 
-    public void setMatrixToImageConfig(MatrixToImageConfig matrixToImageConfig) {
-        if(matrixToImageConfig==null)
-            return;
-        this.matrixToImageConfig = matrixToImageConfig;
+    public void setOnColor(Integer onColor) {
+        if(onColor!=null)
+            this.onColor = onColor;
+    }
+
+    public int getOffColor() {
+        return offColor;
+    }
+
+    public void setOffColor(Integer offColor) {
+        if(offColor!=null)
+            this.offColor = offColor;
     }
 
     public String getPicType() {
