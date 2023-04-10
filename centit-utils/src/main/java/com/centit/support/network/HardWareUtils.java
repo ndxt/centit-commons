@@ -1,9 +1,7 @@
 package com.centit.support.network;
 
 import com.centit.support.common.ObjectException;
-import com.sun.tools.javac.util.Assert;
 import org.apache.commons.lang3.StringUtils;
-
 import java.lang.management.ManagementFactory;
 import java.net.*;
 import java.util.Enumeration;
@@ -46,7 +44,6 @@ public abstract class HardWareUtils {
 
         return ipSet;
     }
-
 
     /**
      * 获取本机网卡IP地址，规则如下：
@@ -96,7 +93,6 @@ public abstract class HardWareUtils {
         return null;
     }
 
-
     /**
      * 获得指定地址信息中的硬件地址
      *
@@ -118,37 +114,6 @@ public abstract class HardWareUtils {
             throw new ObjectException(e);
         }
         return null;
-    }
-
-    /**
-     * 获取数据中心ID<br>
-     * 数据中心ID依赖于本地网卡MAC地址。
-     * <p>
-     * 此算法来自于mybatis-plus#Sequence
-     * </p>
-     *
-     * @param maxDatacenterId 最大的中心ID
-     * @return 数据中心ID
-     * @since 5.7.3
-     */
-    public static long getDataCenterId(long maxDatacenterId) {
-        Assert.check(maxDatacenterId > 0, "maxDatacenterId must be > 0");
-        if(maxDatacenterId == Long.MAX_VALUE){
-            maxDatacenterId -= 1;
-        }
-        long id = 1L;
-        byte[] mac = null;
-        try{
-            mac = getHardwareAddress(getLocalhost());
-        }catch (ObjectException ignore){
-            // ignore
-        }
-        if (null != mac) {
-            id = ((0x000000FF & (long) mac[mac.length - 2])
-                | (0x0000FF00 & (((long) mac[mac.length - 1]) << 8))) >> 6;
-            id = id % (maxDatacenterId + 1);
-        }
-        return id;
     }
 
     public static int getPid() throws ObjectException {

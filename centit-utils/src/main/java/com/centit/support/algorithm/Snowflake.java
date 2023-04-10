@@ -1,10 +1,9 @@
 package com.centit.support.algorithm;
 
-
 import com.centit.support.common.ObjectException;
 import com.centit.support.network.HardWareUtils;
+import com.sun.tools.javac.util.Assert;
 import org.apache.commons.codec.binary.Base64;
-
 import java.io.Serializable;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -78,7 +77,7 @@ public class Snowflake implements Serializable {
      * @return ID
      * @since 5.7.3
      */
-    public static long getWorkerId(long datacenterId, long maxWorkerId) {
+    public static long makeWorkerId(long datacenterId, long maxWorkerId) {
         final StringBuilder mpid = new StringBuilder();
         mpid.append(datacenterId);
         try {
@@ -89,10 +88,42 @@ public class Snowflake implements Serializable {
         return (mpid.toString().hashCode() & 0xffff) % (maxWorkerId + 1);
     }
 
+
+    /**
+     * 获取数据中心ID<br>
+     * 数据中心ID依赖于本地网卡MAC地址。
+     * <p>
+     * 此算法来自于mybatis-plus#Sequence
+     * </p>
+     *
+     * @param maxDatacenterId 最大的中心ID
+     * @return 数据中心ID
+     * @since 5.7.3
+     */
+    public static long makeDataCenterId(long maxDatacenterId) {
+        Assert.check(maxDatacenterId > 0, "maxDatacenterId must be > 0");
+        if(maxDatacenterId == Long.MAX_VALUE){
+            maxDatacenterId -= 1;
+        }
+        long id = 1L;
+        byte[] mac = null;
+        try{
+            mac = HardWareUtils.getHardwareAddress(HardWareUtils.getLocalhost());
+        }catch (ObjectException ignore){
+            // ignore
+        }
+        if (null != mac) {
+            id = ((0x000000FF & (long) mac[mac.length - 2])
+                | (0x0000FF00 & (((long) mac[mac.length - 1]) << 8))) >> 6;
+            id = id % (maxDatacenterId + 1);
+        }
+        return id;
+    }
+
     public Snowflake() {
         this.twepoch = DEFAULT_TWEPOCH;
-        this.dataCenterId = HardWareUtils.getDataCenterId(MAX_DATA_CENTER_ID);
-        this.workerId = Snowflake.getWorkerId(this.dataCenterId , MAX_WORKER_ID);
+        this.dataCenterId = Snowflake.makeDataCenterId(MAX_DATA_CENTER_ID);
+        this.workerId = Snowflake.makeWorkerId(this.dataCenterId , MAX_WORKER_ID);
         this.useSystemClock = false;
         this.timeOffset = DEFAULT_TIME_OFFSET;
         this.randomSequenceLimit = 0;
