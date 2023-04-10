@@ -2,7 +2,7 @@ package com.centit.support.algorithm;
 
 
 import com.centit.support.common.ObjectException;
-import com.centit.support.network.HardWareUtil;
+import com.centit.support.network.HardWareUtils;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.Serializable;
@@ -82,7 +82,7 @@ public class Snowflake implements Serializable {
         final StringBuilder mpid = new StringBuilder();
         mpid.append(datacenterId);
         try {
-            mpid.append(HardWareUtil.getPid());
+            mpid.append(HardWareUtils.getPid());
         } catch (ObjectException igonre) {
             //ignore
         }
@@ -91,7 +91,7 @@ public class Snowflake implements Serializable {
 
     public Snowflake() {
         this.twepoch = DEFAULT_TWEPOCH;
-        this.dataCenterId = HardWareUtil.getDataCenterId(MAX_DATA_CENTER_ID);
+        this.dataCenterId = HardWareUtils.getDataCenterId(MAX_DATA_CENTER_ID);
         this.workerId = Snowflake.getWorkerId(this.dataCenterId , MAX_WORKER_ID);
         this.useSystemClock = false;
         this.timeOffset = DEFAULT_TIME_OFFSET;

@@ -10,7 +10,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.function.Function;
 
-public abstract class HardWareUtil {
+public abstract class HardWareUtils {
 
     /**
      * 获取所有满足过滤条件的本地IP地址对象
