@@ -13,11 +13,16 @@ public class TestMD5 {
 
         Snowflake sf = new Snowflake();
         System.out.println(sf.nextId());
-        System.out.println(sf.nextIdStr());
+        System.out.println(sf.nextId());
         System.out.println(sf.nextId());
         System.out.println(sf.nextIdStr());
-        System.out.println(sf.nextId());
-        System.out.println(sf.nextIdStr());
+        System.out.println(sf.nextIdHex());
+        System.out.println(sf.nextIdHex());
+        System.out.println(sf.nextIdHex());
+        System.out.println(sf.nextIdBase64());
+        System.out.println(sf.nextIdBase64());
+        System.out.println(sf.nextIdBase64());
+        System.out.println(sf.nextIdBase64());
 
 //        System.out.println(HmacSha1Encoder.encode("hello world", "nihao"));
 //        String base64Str = "HxUYHgIQJgwKHB0mDRYmChgAJgAcHA0mEAsWFxAaGBUVACYbDA0mFxYOJhANCiYbHBoWFBwmCRgLDSYWHyYUACYPFhoYGwwVGAsABA==";

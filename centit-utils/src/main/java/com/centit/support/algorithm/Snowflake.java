@@ -3,6 +3,8 @@ package com.centit.support.algorithm;
 
 import com.centit.support.common.ObjectException;
 import com.centit.support.network.HardWareUtil;
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.Serializable;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -182,6 +184,16 @@ public class Snowflake implements Serializable {
      */
     public String nextIdStr() {
         return Long.toString(nextId());
+    }
+
+    public String nextIdHex() {
+        return Long.toHexString(nextId());
+    }
+
+    public String nextIdBase64() {
+        byte[] uidBytes = new byte[8];
+        ByteBaseOpt.writeInt64(uidBytes, nextId(), 0);
+        return new String(Base64.encodeBase64URLSafe(uidBytes));
     }
 
     // ------------------------------------------------------------------------------------------------------------------------------------ Private method start
