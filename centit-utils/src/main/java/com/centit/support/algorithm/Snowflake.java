@@ -2,7 +2,6 @@ package com.centit.support.algorithm;
 
 import com.centit.support.common.ObjectException;
 import com.centit.support.network.HardWareUtils;
-import com.sun.tools.javac.util.Assert;
 import org.apache.commons.codec.binary.Base64;
 import java.io.Serializable;
 import java.util.concurrent.ThreadLocalRandom;
@@ -101,7 +100,7 @@ public class Snowflake implements Serializable {
      * @since 5.7.3
      */
     public static long makeDataCenterId(long maxDatacenterId) {
-        Assert.check(maxDatacenterId > 0, "maxDatacenterId must be > 0");
+        //Assert.check(maxDatacenterId > 0, "maxDatacenterId must be > 0");
         if(maxDatacenterId == Long.MAX_VALUE){
             maxDatacenterId -= 1;
         }
