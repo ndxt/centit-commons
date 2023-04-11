@@ -70,20 +70,38 @@ public abstract class JSONOpt {
         if(differents.size()==0){
             return null;
         }
-        if(differents.size()==1){
-            JsonDifferent updateDiff = differents.get(0);
-            if(StringUtils.isNotBlank(jsonPath)) {
-                updateDiff.setJsonPath(jsonPath+"."+updateDiff.getJsonPath());
-            }
+
+        Map<String, Object> objectId = fetchObjectId(mapA, arrayKeys);
+        if(objectId!=null || differents.size()>1){
+            JsonDifferent updateDiff = new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_UPDATE, null, null);
+            updateDiff.setDiffChildren(differents);
+            updateDiff.setObjectId(objectId);
             return updateDiff;
         }
-        JsonDifferent updateDiff = new JsonDifferent(jsonPath,JsonDifferent.JSON_DIFF_TYPE_UPDATE, null, null);
-        updateDiff.setDiffChildren(differents);
+
+        JsonDifferent updateDiff = differents.get(0);
+        if(StringUtils.isNotBlank(jsonPath)) {
+            updateDiff.setJsonPath(jsonPath+"."+updateDiff.getJsonPath());
+        }
         return updateDiff;
     }
 
+    private static Map<String, Object> fetchObjectId(Map<String, Object> data1,  String[] fields) {
+        if (data1 == null || fields == null) {
+            return null;
+        }
+        Map<String, Object> objectId = new HashMap<>();
+        for (String field : fields) {
+            Object idA = ReflectionOpt.attainExpressionValue(data1, field);
+            if(idA !=null ){
+                objectId.put(field, idA);
+            }
+        }
+        return objectId.size()==0?null:objectId;
+    }
+
     private static int compareTwoRow(Map<String, Object> data1, Map<String, Object> data2, String[] fields) {
-        if ((data1 == null && data2 == null)|| (fields == null)) {
+        if ((data1 == null && data2 == null)|| fields == null) {
             return 0;
         }
 
@@ -95,12 +113,11 @@ public abstract class JSONOpt {
             return 1;
         }
         for (String field : fields) {
-            Object idA = data1.get(field), idB = data2.get(field);
-            if(idA !=null && idB != null){
-                int cr = GeneralAlgorithm.compareTwoObject(idA, idB, true);
-                if (cr != 0) {
-                    return cr;
-                }
+            Object idA = ReflectionOpt.attainExpressionValue(data1, field);
+            Object idB = ReflectionOpt.attainExpressionValue(data2, field);
+            int cr = GeneralAlgorithm.compareTwoObject(idA, idB, true);
+            if (cr != 0) {
+                return cr;
             }
         }
         return 0;

@@ -21,6 +21,9 @@ public class JsonDifferent implements Serializable {
 
     private Object oldData;
 
+    private Object objectId;
+
+
     private List<JsonDifferent> diffChildren;
 
     public JsonDifferent() {
@@ -33,6 +36,7 @@ public class JsonDifferent implements Serializable {
         this.newData = newData;
         this.oldData = oldData;
         this.diffChildren = null;
+        this.objectId = null;
     }
 
     public String getJsonPath() {
@@ -75,6 +79,14 @@ public class JsonDifferent implements Serializable {
         this.diffChildren = diffChildren;
     }
 
+    public Object getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(Object objectId) {
+        this.objectId = objectId;
+    }
+
     private JSONObject toJson(){
         JSONObject jsonObj = toJson(this.diffChildren);
         jsonObj.put("diffType", this.diffType);
@@ -84,6 +96,10 @@ public class JsonDifferent implements Serializable {
         if(this.oldData != null){
             jsonObj.put("oldData", this.oldData);
         }
+        if(this.objectId != null){
+            jsonObj.put("objectId", this.objectId);
+        }
+
         return jsonObj;
     }
 
