@@ -211,15 +211,13 @@ public abstract class GeneralAlgorithm {
                 case 2:
                     return NumberBaseOpt.castObjectToLong(a) +
                         NumberBaseOpt.castObjectToLong(b);
-                case 3:
-                    return NumberBaseOpt.castObjectToFloat(a) +
-                        NumberBaseOpt.castObjectToFloat(b);
                 case 5:
                     return NumberBaseOpt.castObjectToBigInteger(a).add(
                         NumberBaseOpt.castObjectToBigInteger(b));
                 case 6:
                     return NumberBaseOpt.castObjectToBigDecimal(a).add(
                         NumberBaseOpt.castObjectToBigDecimal(b));
+                case 3:
                 case 4:
                 default:
                     return NumberBaseOpt.castObjectToDouble(a) +
@@ -269,15 +267,13 @@ public abstract class GeneralAlgorithm {
                 case 2:
                     return NumberBaseOpt.castObjectToLong(a) -
                         NumberBaseOpt.castObjectToLong(b);
-                case 3:
-                    return NumberBaseOpt.castObjectToFloat(a) -
-                        NumberBaseOpt.castObjectToFloat(b);
                 case 5:
                     return NumberBaseOpt.castObjectToBigInteger(a).subtract(
                         NumberBaseOpt.castObjectToBigInteger(b));
                 case 6:
                     return NumberBaseOpt.castObjectToBigDecimal(a).subtract(
                         NumberBaseOpt.castObjectToBigDecimal(b));
+                case 3:
                 case 4:
                 default:
                     return NumberBaseOpt.castObjectToDouble(a) -
@@ -318,15 +314,13 @@ public abstract class GeneralAlgorithm {
                 case 2:
                     return NumberBaseOpt.castObjectToLong(a) *
                         NumberBaseOpt.castObjectToLong(b);
-                case 3:
-                    return NumberBaseOpt.castObjectToFloat(a) *
-                        NumberBaseOpt.castObjectToFloat(b);
                 case 5:
                     return NumberBaseOpt.castObjectToBigInteger(a).multiply(
                         NumberBaseOpt.castObjectToBigInteger(b));
                 case 6:
                     return NumberBaseOpt.castObjectToBigDecimal(a).multiply(
                         NumberBaseOpt.castObjectToBigDecimal(b));
+                case 3:
                 case 4:
                 default:
                     return NumberBaseOpt.castObjectToDouble(a) *
@@ -373,16 +367,14 @@ public abstract class GeneralAlgorithm {
                 case 2:
                     return NumberBaseOpt.castObjectToLong(a) /
                         NumberBaseOpt.castObjectToLong(b);
-                case 3:
-                    return NumberBaseOpt.castObjectToFloat(a) /
-                        NumberBaseOpt.castObjectToFloat(b);
                 case 5:
                     return NumberBaseOpt.castObjectToBigInteger(a).divide(
                         NumberBaseOpt.castObjectToBigInteger(b));
                 case 6:
                     //默认采用8位有效数字
                     return NumberBaseOpt.castObjectToBigDecimal(a).divide(
-                        NumberBaseOpt.castObjectToBigDecimal(b), 8, RoundingMode.HALF_EVEN);
+                        NumberBaseOpt.castObjectToBigDecimal(b), 20, RoundingMode.HALF_EVEN);
+                case 3:
                 case 4:
                 default:
                     return NumberBaseOpt.castObjectToDouble(a) /

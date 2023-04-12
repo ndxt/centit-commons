@@ -381,7 +381,10 @@ public abstract class NumberBaseOpt {
         if (strNum.indexOf('.') < 0) {
             return castObjectToLong(strNum);
         } else {
-            return castObjectToBigDecimal(strNum);
+            if(strNum.length()>20) // 16个有效数字
+                return castObjectToBigDecimal(strNum);
+            else
+                return castObjectToDouble(strNum);
         }
     }
 

@@ -1,10 +1,14 @@
 package com.centit.support.test;
 
+import com.alibaba.fastjson2.JSON;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.DoubleAspect;
 import com.centit.support.compiler.EmbedFuncUtils;
+import com.centit.support.compiler.VariableFormula;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestNumber {
 
@@ -33,9 +37,28 @@ public class TestNumber {
         }
     }
 
+    public static double[] longLatOffset(double lat, double dst)
+    {
+        double latoffset = dst * 180.f / 6371393.f / Math.PI;
+        double lonoffset = dst * 180.f / 6371393.f / Math.cos( lat * Math.PI /180) / Math.PI;
+        return new double[] { lonoffset, latoffset };
+    }
+
+
     public static void main(String[] args) {
-        System.out.println(rmbDX("1234.007"));
-        System.out.println(EmbedFuncUtils.instance.capitalRMB("1234.007"));
+        double[] ll = longLatOffset(30.f, 1000);
+
+//[0.01038383089076675,0.008992661340005603]
+        System.out.println(JSON.toJSONString(ll));
+
+
+        Map<String, Object> llMap = CollectionsOpt.createHashMap("lon", 30.0, "lat", 30.0, "dst", 1000.0);
+        Object lat = VariableFormula.calculate("dst * 180 / 6371393 / 3.14159265358979323846" , llMap);
+        System.out.println(lat);
+        Object lon = VariableFormula.calculate("dst * 180 / 6371393 / cos( lat * 3.14159265358979323846 / 180) /  3.14159265358979323846" , llMap);
+        System.out.println(lon);
+        //System.out.println(rmbDX("1234.007"));
+        //System.out.println(EmbedFuncUtils.instance.capitalRMB("1234.007"));
     }
 
     public static void lastmain(String[] args) {
