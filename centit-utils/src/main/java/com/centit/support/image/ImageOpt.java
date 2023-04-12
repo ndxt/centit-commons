@@ -85,7 +85,6 @@ public abstract class ImageOpt {
      * @throws IOException  异常
      */
     public static void captureScreen(String fileName) throws AWTException, IOException {
-
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Rectangle screenRectangle = new Rectangle(screenSize);
         Robot robot = new Robot();
@@ -100,7 +99,6 @@ public abstract class ImageOpt {
      * @return 截图
      */
     public static BufferedImage saveSubImage(BufferedImage image, Rectangle subImageBounds) {
-
         BufferedImage subImage = new BufferedImage(subImageBounds.width, subImageBounds.height, 1);
         Graphics g = subImage.getGraphics();
 
@@ -143,6 +141,30 @@ public abstract class ImageOpt {
             images.add(subImage);
         }
         return images;
+    }
+
+    /**
+     * 合并图片
+     * @param imageList 这些图片大小需要一致
+     * @param imagesPreRow 每行几个
+     * @return
+     */
+    public static BufferedImage mergeImages(List<BufferedImage> imageList, int imagesPreRow, int whiteSpace){
+        BufferedImage image = imageList.get(0);
+        int w = image.getWidth();
+        int h = image.getHeight();
+        int imgWidth = whiteSpace + (whiteSpace + w) * imagesPreRow;
+        int imgHeight = whiteSpace + (whiteSpace + h) * ( (imageList.size() - 1) / imagesPreRow + 1 );
+        BufferedImage mergeImage = new BufferedImage(imgWidth, imgHeight, 1);
+        Graphics g = mergeImage.getGraphics();
+        int i = 0;
+        for(BufferedImage img : imageList) {
+            g.drawImage(img,whiteSpace + (whiteSpace + w) * (i % imagesPreRow),
+                whiteSpace + (whiteSpace + h) * (i / imagesPreRow), null);
+            i++;
+        }
+        g.dispose();
+        return mergeImage;
     }
 
     public static int[] getRGB(BufferedImage image) {

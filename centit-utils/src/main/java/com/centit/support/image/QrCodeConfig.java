@@ -5,6 +5,8 @@ import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.apache.commons.lang3.StringUtils;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +50,7 @@ public class QrCodeConfig {
     /**
      * 二维码中间的logo
      */
-    private String logo;
+    private BufferedImage logoImage;
     /**
      * 生成二维码的宽
      */
@@ -90,18 +92,19 @@ public class QrCodeConfig {
     private String picType;
 
     public QrCodeConfig(){
-        padding = 0;
-        downTextFontSize = 7;
-        topTextFontSize = 8;
-        topTextFontType = "雅黑";
-        downTextFontType = "雅黑";
-        qrWidth = 200;
-        qrHeight = 200;
-        code = "UTF-8";
-        picType = "png";
-        errorCorrection = ErrorCorrectionLevel.Q;
-        onColor = MatrixToImageConfig.BLACK;
-        offColor = MatrixToImageConfig.WHITE;
+        this.padding = 0;
+        this.downTextFontSize = 7;
+        this.topTextFontSize = 8;
+        this.topTextFontType = "雅黑";
+        this.downTextFontType = "雅黑";
+        this.qrWidth = 200;
+        this.qrHeight = 200;
+        this.code = "UTF-8";
+        this.picType = "png";
+        this.errorCorrection = ErrorCorrectionLevel.Q;
+        this.onColor = MatrixToImageConfig.BLACK;
+        this.offColor = MatrixToImageConfig.WHITE;
+        this.logoImage = null;
     }
 
     public String getMsg() {
@@ -174,12 +177,20 @@ public class QrCodeConfig {
         this.downTextFontType = downTextFontType;
     }
 
-    public String getLogo() {
-        return logo;
+    public BufferedImage getLogoImage() {
+        return logoImage;
     }
 
-    public void setLogo(String logo) {
-        this.logo = logo;
+    public void setLogoImageUrl(String logoImageUrl) {
+        try {
+            this.logoImage = ImageOpt.loadImage(logoImageUrl);
+        } catch (IOException e) {
+            this.logoImage = null;
+        }
+    }
+
+    public void setLogoImage(BufferedImage logoImage) {
+        this.logoImage = logoImage;
     }
 
     public Integer getQrWidth() {

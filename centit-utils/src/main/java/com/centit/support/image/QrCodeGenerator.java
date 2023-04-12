@@ -22,9 +22,8 @@ public abstract class QrCodeGenerator {
      *
      * @param qrCode 原图
      * @param logImage  image
-     * @throws IOException
      */
-    public static void insertLogo(BufferedImage qrCode, BufferedImage logImage) throws IOException {
+    public static void insertLogo(BufferedImage qrCode, BufferedImage logImage) {
         if(logImage==null)
             return;
         int qrcodeWidth = qrCode.getWidth();
@@ -58,7 +57,7 @@ public abstract class QrCodeGenerator {
      * @return BufferedImage 二维码图片
      * @throws IOException 异常
      */
-    private static BufferedImage toBufferedImage(QrCodeConfig qrCodeConfig, BitMatrix bitMatrix) throws IOException {
+    private static BufferedImage toBufferedImage(QrCodeConfig qrCodeConfig, BitMatrix bitMatrix) {
         int qrCodeWidth = bitMatrix.getWidth();
         int qrCodeHeight = bitMatrix.getHeight();
         BufferedImage qrCode = new BufferedImage(qrCodeWidth, qrCodeHeight, BufferedImage.TYPE_INT_RGB);
@@ -71,8 +70,8 @@ public abstract class QrCodeGenerator {
             }
         }
         // 插入logo
-        if (StringUtils.isNotBlank(qrCodeConfig.getLogo())) {
-            insertLogo(qrCode, ImageOpt.loadImage(qrCodeConfig.getLogo()));
+        if (qrCodeConfig.getLogoImage() != null) {
+            insertLogo(qrCode, qrCodeConfig.getLogoImage());
         }
         //插入二维码头文字信息
         if(StringUtils.isNotBlank(qrCodeConfig.getTopText()) || StringUtils.isNotBlank(qrCodeConfig.getDownText())){
