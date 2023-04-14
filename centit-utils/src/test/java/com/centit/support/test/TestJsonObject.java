@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class TestJsonObject {
 
-    public static void main2(String arg[]) throws IOException {
+    public static void main(String arg[]) throws IOException {
         JSONOpt.fastjsonGlobalConfig();
         InputStream in = TestJsonObject.class
             .getResourceAsStream("/page-v1.json");
@@ -22,11 +22,11 @@ public class TestJsonObject {
         in = TestJsonObject.class
             .getResourceAsStream("/page-v1-1.json");
         Object object2  = JSON.parse(FileIOOpt.readStringFromInputStream(in));
-        JsonDifferent diff = JSONOpt.diff(object, object2, "id", "value");
+        JsonDifferent diff = JSONOpt.diff(object, object2, "$item.id");
         System.out.println(JSON.toJSONString(diff.toJSONObject()));
     }
 
-    public static void main(String arg[]) throws IOException {
+    public static void main2(String arg[]) throws IOException {
         JSONOpt.fastjsonGlobalConfig();
         InputStream in = TestJsonObject.class
             .getResourceAsStream("/test.json");

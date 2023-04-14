@@ -13,7 +13,19 @@ import java.util.TimeZone;
 
 public class TestDateTimeOpt {
     public static void main(String[] args) {
-        TimeZone timeZone = DatetimeOpt.fetchTimeZone("GMT");
+        TimeZone timeZone = DatetimeOpt.fetchTimeZone("UTC");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("UTC+08");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("UTC+0800");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("UTC+8:00");
+        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
+            +"   |   " + timeZone.getDisplayName(Locale.US));
+        timeZone = DatetimeOpt.fetchTimeZone("UTC+800");
         System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
             +"   |   " + timeZone.getDisplayName(Locale.US));
         timeZone = DatetimeOpt.fetchTimeZone("8");
@@ -22,22 +34,11 @@ public class TestDateTimeOpt {
         timeZone = DatetimeOpt.fetchTimeZone("+8");
         System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
             +"   |   " + timeZone.getDisplayName(Locale.US));
-        timeZone = DatetimeOpt.fetchTimeZone("GMT8");
+        timeZone = DatetimeOpt.fetchTimeZone("UTC08");
         System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
             +"   |   " + timeZone.getDisplayName(Locale.US));
-        timeZone = DatetimeOpt.fetchTimeZone("GMT+08");
-        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
-            +"   |   " + timeZone.getDisplayName(Locale.US));
-        timeZone = DatetimeOpt.fetchTimeZone("GMT+0800");
-        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
-            +"   |   " + timeZone.getDisplayName(Locale.US));
-        timeZone = DatetimeOpt.fetchTimeZone("GMT+8");
-        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
-            +"   |   " + timeZone.getDisplayName(Locale.US));
-        timeZone = DatetimeOpt.fetchTimeZone("GMT+800");
-        System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
-            +"   |   " + timeZone.getDisplayName(Locale.US));
-        timeZone = DatetimeOpt.fetchTimeZone("GMT800");
+
+        timeZone = DatetimeOpt.fetchTimeZone("UTC800");
         System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
             +"   |   " + timeZone.getDisplayName(Locale.US));
 

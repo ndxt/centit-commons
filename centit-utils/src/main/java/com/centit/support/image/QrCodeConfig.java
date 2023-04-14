@@ -5,6 +5,7 @@ import com.google.zxing.client.j2se.MatrixToImageConfig;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
@@ -91,10 +92,15 @@ public class QrCodeConfig {
      */
     private String picType;
 
+    private Color textColor;
+
+    private Color frameColor;
+
     public QrCodeConfig(){
         this.padding = 0;
         this.downTextFontSize = 7;
         this.topTextFontSize = 8;
+
         this.topTextFontType = "雅黑";
         this.downTextFontType = "雅黑";
         this.qrWidth = 200;
@@ -105,6 +111,8 @@ public class QrCodeConfig {
         this.onColor = MatrixToImageConfig.BLACK;
         this.offColor = MatrixToImageConfig.WHITE;
         this.logoImage = null;
+        this.frameColor = Color.white;
+        this.textColor = Color.black;
     }
 
     public String getMsg() {
@@ -226,6 +234,21 @@ public class QrCodeConfig {
         return offColor;
     }
 
+    public Color getTextColor() {
+        return textColor;
+    }
+
+    public void setTextColor(Color textColor) {
+        this.textColor = textColor;
+    }
+
+    public Color getFrameColor() {
+        return frameColor;
+    }
+
+    public void setFrameColor(Color frameColor) {
+        this.frameColor = frameColor;
+    }
     public void setOffColor(Integer offColor) {
         if(offColor!=null)
             this.offColor = offColor;
@@ -278,6 +301,5 @@ public class QrCodeConfig {
         hints.put(EncodeHintType.MARGIN, this.getPadding());
         return hints;
     }
-
 }
 

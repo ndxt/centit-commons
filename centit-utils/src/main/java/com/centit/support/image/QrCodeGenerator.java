@@ -126,8 +126,9 @@ public abstract class QrCodeGenerator {
         //开启文字抗锯齿
         graph.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         // 画文字到新的面板
-        graph.setBackground(Color.BLUE);
-        graph.setColor(Color.white);
+        graph.setBackground(qrCodeConfig.getFrameColor());
+        graph.setColor(qrCodeConfig.getTextColor());
+
         graph.clearRect(0, 0, newQrWidth,newHeight);
 
         if(StringUtils.isNotBlank(topText)){

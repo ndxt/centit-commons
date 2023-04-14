@@ -1,5 +1,7 @@
 package com.centit.support.image;
 
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.security.Md5Encoder;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
@@ -367,4 +369,47 @@ public abstract class ImageOpt {
         return output;
     }
 
+    public static Color castObjectToColor(Object obj) {
+        if(obj==null)
+            return null;
+        if(obj instanceof Color)
+            return (Color)obj;
+        if(obj instanceof Number){
+            return new Color( ((Number)obj).intValue());
+        }
+        String colorStr = StringBaseOpt.castObjectToString(obj);
+        if(StringRegularOpt.isDigit(colorStr)){
+            if(colorStr.length()==9){
+                int r = Integer.getInteger(colorStr.substring(0,3));
+                int g = Integer.getInteger(colorStr.substring(3,6));
+                int b = Integer.getInteger(colorStr.substring(6,9));
+                return new Color( r, g, b);
+            } else {
+                return new Color(Integer.getInteger(colorStr));
+            }
+        }
+        colorStr = colorStr.toLowerCase();
+        switch (colorStr){
+            case "white":       return Color.white;
+            case "lightgray":   return Color.lightGray;
+            case "gray":        return Color.gray;
+            case "darkgray":    return Color.darkGray;
+            case "black":       return Color.black;
+            case "red":         return Color.red;
+            case "pink":        return Color.pink;
+            case "orange":      return Color.orange;
+            case "yellow":      return Color.yellow;
+            case "green":       return Color.green;
+            case "magenta":     return Color.magenta;
+            case "cyan":        return Color.cyan;
+            case "blue":        return Color.blue;
+            default:
+                return null;
+        }
+    }
+
+    public static Color castObjectToColor(Object obj, Color defaultColor) {
+        Color cr = castObjectToColor(obj);
+        return cr==null ? defaultColor : cr;
+    }
 }
