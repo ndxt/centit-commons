@@ -190,6 +190,8 @@ public class QrCodeConfig {
     }
 
     public void setLogoImageUrl(String logoImageUrl) {
+        if(StringUtils.isBlank(logoImageUrl))
+            return;
         try {
             this.logoImage = ImageOpt.loadImage(logoImageUrl);
         } catch (IOException e) {
