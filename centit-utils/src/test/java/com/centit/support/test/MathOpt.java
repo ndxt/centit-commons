@@ -26,7 +26,7 @@ public class MathOpt {
     }
 
     public static void main(String arg[]) throws IOException {
-        System.out.println(ImageOpt.castObjectToColor("#FFFF").getRGB());
+        System.out.println(ImageOpt.castObjectToColor("#00F").getRGB());
         System.out.println(ImageOpt.castObjectToColor("#abcdef12").getRGB());
 
         System.out.println(GeneralAlgorithm.sumObjects(CollectionsOpt.<Object>createList(

@@ -383,20 +383,20 @@ public abstract class ImageOpt {
         if(colorStr.startsWith("#")){
             int r=255, g=255, b=255, a=255;
             if(strLen>6){
-                r = Integer.decode("0x"+colorStr.substring(1,3));
-                g = Integer.decode("0x"+colorStr.substring(3,5));
-                b = Integer.decode("0x"+colorStr.substring(5,7));
+                r = Integer.parseInt(colorStr.substring(1,3), 16);
+                g = Integer.parseInt(colorStr.substring(3,5), 16);
+                b = Integer.parseInt(colorStr.substring(5,7), 16);
                 if(strLen>8)
-                    a = Integer.decode("0x"+colorStr.substring(7,9));
+                    a = Integer.parseInt(colorStr.substring(7,9), 16);
             } else {
                 if(strLen>1) {
-                    r = Integer.decode("0x" + colorStr.charAt(1));
+                    r = Integer.parseInt(colorStr.substring(1, 2), 16);
                     if(strLen>2) {
-                        g = Integer.decode("0x" + colorStr.charAt(2));
+                        g = Integer.parseInt(colorStr.substring(2, 3), 16);
                         if(strLen>3) {
-                            b = Integer.decode("0x" + colorStr.charAt(3));
+                            b = Integer.parseInt(colorStr.substring(3, 4), 16);
                             if (strLen > 4)
-                                a = Integer.decode("0x" + colorStr.charAt(4));
+                                a = Integer.parseInt(colorStr.substring(4, 5), 16);
                         }
                     }
                 }
