@@ -377,9 +377,35 @@ public abstract class ImageOpt {
         if(obj instanceof Number){
             return new Color( ((Number)obj).intValue());
         }
+
         String colorStr = StringBaseOpt.castObjectToString(obj);
+        int strLen = colorStr.length();
+        if(colorStr.startsWith("#")){
+            int r=255, g=255, b=255, a=255;
+            if(strLen>6){
+                r = Integer.decode("0x"+colorStr.substring(1,3));
+                g = Integer.decode("0x"+colorStr.substring(3,5));
+                b = Integer.decode("0x"+colorStr.substring(5,7));
+                if(strLen>8)
+                    a = Integer.decode("0x"+colorStr.substring(7,9));
+            } else {
+                if(strLen>1) {
+                    r = Integer.decode("0x" + colorStr.substring(1, 2));
+                    if(strLen>2) {
+                        g = Integer.decode("0x" + colorStr.substring(2, 3));
+                        if(strLen>3) {
+                            b = Integer.decode("0x" + colorStr.substring(3, 4));
+                            if (strLen > 4)
+                                a = Integer.decode("0x" + colorStr.substring(4, 5));
+                        }
+                    }
+                }
+            }
+            return new Color(r, g, b, a);
+        }
+
         if(StringRegularOpt.isDigit(colorStr)){
-            if(colorStr.length()==9){
+            if(strLen==9){
                 int r = Integer.getInteger(colorStr.substring(0,3));
                 int g = Integer.getInteger(colorStr.substring(3,6));
                 int b = Integer.getInteger(colorStr.substring(6,9));

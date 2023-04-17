@@ -2,6 +2,7 @@ package com.centit.support.test;
 
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.GeneralAlgorithm;
+import com.centit.support.image.ImageOpt;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +26,8 @@ public class MathOpt {
     }
 
     public static void main(String arg[]) throws IOException {
+        System.out.println(ImageOpt.castObjectToColor("#FFFF").getRGB());
+        System.out.println(ImageOpt.castObjectToColor("#abcdef12").getRGB());
 
         System.out.println(GeneralAlgorithm.sumObjects(CollectionsOpt.<Object>createList(
             2, null, null, 1, null, 2, 0.3f, "hello"
