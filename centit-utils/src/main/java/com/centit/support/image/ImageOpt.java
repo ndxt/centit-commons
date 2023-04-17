@@ -390,13 +390,13 @@ public abstract class ImageOpt {
                     a = Integer.decode("0x"+colorStr.substring(7,9));
             } else {
                 if(strLen>1) {
-                    r = Integer.decode("0x" + colorStr.substring(1, 2));
+                    r = Integer.decode("0x" + colorStr.charAt(1));
                     if(strLen>2) {
-                        g = Integer.decode("0x" + colorStr.substring(2, 3));
+                        g = Integer.decode("0x" + colorStr.charAt(2));
                         if(strLen>3) {
-                            b = Integer.decode("0x" + colorStr.substring(3, 4));
+                            b = Integer.decode("0x" + colorStr.charAt(3));
                             if (strLen > 4)
-                                a = Integer.decode("0x" + colorStr.substring(4, 5));
+                                a = Integer.decode("0x" + colorStr.charAt(4));
                         }
                     }
                 }
