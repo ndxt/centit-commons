@@ -381,7 +381,7 @@ public abstract class ImageOpt {
         String colorStr = StringBaseOpt.castObjectToString(obj);
         int strLen = colorStr.length();
         if(colorStr.startsWith("#")){
-            int r=255, g=255, b=255, a=255;
+            int r=0, g=0, b=0, a=255;
             if(strLen>6){
                 r = Integer.parseInt(colorStr.substring(1,3), 16);
                 g = Integer.parseInt(colorStr.substring(3,5), 16);
