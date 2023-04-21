@@ -71,6 +71,9 @@ public class JSONTransformer {
                     }
                 } else if(skey.startsWith("#")) { //数组迭代； 并且只能是 单独的 一个key
                     Object obj = dataSupport.attainExpressionValue(skey.substring(1));
+                    if(obj==null){
+                        return null;
+                    }
                     if(! (obj instanceof Collection)){
                         logger.warn(skey.substring(1) + "对应的数据不是数组");
                     }
