@@ -1254,8 +1254,18 @@ public abstract class ExcelImportUtil {
         Sheet sheet = loadExcelFileSheet(excelFile, sheetName);
         return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, beginColumn, endColumn, true);
     }
+    public static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(InputStream excelFile, String sheetName, int beginRow, int endRow, boolean userUpMergeCell)
+        throws IOException{
+        Sheet sheet = loadExcelFileSheet(excelFile, sheetName);
+        return loadMapFromExcelSheetUseIndexAsKey(sheet, beginRow, endRow, userUpMergeCell);
+    }
 
-    public static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(Sheet sheet, int beginRow, int endRow, boolean userUpMergeCell) {
+    public static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(InputStream excelFile, int sheetIndex, int beginRow, int endRow, boolean userUpMergeCell) throws IOException{
+        Sheet sheet = loadExcelFileSheet(excelFile, sheetIndex);
+        return loadMapFromExcelSheetUseIndexAsKey(sheet, beginRow, endRow, userUpMergeCell);
+    }
+
+    private static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(Sheet sheet, int beginRow, int endRow, boolean userUpMergeCell) {
         if (sheet == null)
             return null;
 
