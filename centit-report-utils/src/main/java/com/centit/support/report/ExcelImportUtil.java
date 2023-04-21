@@ -93,6 +93,22 @@ public abstract class ExcelImportUtil {
         return index - 1;
     }
 
+    public static String mapIndexColumn(int ind) {
+        int index = ind + 1;
+        String column="";
+        while(index>0){
+            int i = index % 26;
+            if(i==0){
+                column = 'Z' + column;
+                index = index / 26 -1;
+            }else {
+                column = (char) (64 + i) + column;
+                index = index / 26;
+            }
+        }
+        return column;
+    }
+
     public static Map<Integer, String> mapColumnIndex(Map<String, String> fieldDesc) {
         Map<Integer, String> fieldIndexDesc = new HashMap<>(fieldDesc.size() + 4);
         for (Map.Entry<String, String> ent : fieldDesc.entrySet()) {
@@ -1237,6 +1253,41 @@ public abstract class ExcelImportUtil {
         throws IOException {
         Sheet sheet = loadExcelFileSheet(excelFile, sheetName);
         return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, beginColumn, endColumn, true);
+    }
+
+    public static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(Sheet sheet, int beginRow, int endRow, boolean userUpMergeCell) {
+        if (sheet == null)
+            return null;
+
+        List<Map<String, Object>> datas = new ArrayList<>(endRow - beginRow + 1);
+        List<CellRangeAddress> cellRanges = userUpMergeCell? sheet.getMergedRegions():null;
+        Map<String, Object> preRowObj = null;
+        for (int row = beginRow; row < endRow; row++) {
+            Row excelRow = sheet.getRow(row);
+            if (excelRow == null)
+                continue;
+            int lcn = excelRow.getLastCellNum();
+            Map<String, Object> rowObj = new HashMap<>(lcn+2);
+            boolean hasValue = false;
+            //excelRow.getFirstCellNum()
+            for (int i=0; i<lcn; i++) {
+                Object cellValue = ExcelImportUtil.getCellValue(excelRow.getCell(i));
+                String columnIndex = mapIndexColumn(i);
+                if (cellValue != null) {
+                    hasValue = true;
+                    rowObj.put(columnIndex, cellValue);
+                } else if(userUpMergeCell && preRowObj!=null && isMergedRegion(cellRanges, row, i)) {
+                    // 判断是否在合并单元格中
+                    rowObj.put(columnIndex, preRowObj.get(columnIndex));
+                }
+            }
+            if (hasValue) {
+                datas.add(rowObj);
+                preRowObj = rowObj;
+            }
+
+        }
+        return datas;
     }
 
     private static List<Map<String, Object>> loadMapFromExcelSheet(Sheet sheet,
