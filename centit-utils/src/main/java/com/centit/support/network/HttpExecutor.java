@@ -6,7 +6,10 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.*;
+import org.apache.http.Consts;
+import org.apache.http.Header;
+import org.apache.http.HttpHost;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -932,5 +935,27 @@ public abstract class HttpExecutor {
 
     public interface DoOperateInputStream<T> {
         T doOperate(InputStream inputStream) throws IOException;
+    }
+
+    public static String formUrlEncodePost(HttpExecutorContext executorContext,
+                                           String uri, Object formData)
+        throws IOException {
+        return formUrlEncodePost(executorContext, uri, formData, false);
+    }
+
+    public static String formUrlEncodePost(HttpExecutorContext executorContext,
+                                           String uri, Object formData, final boolean asPutMethod)
+        throws IOException {
+
+        HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
+        httpPost.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        if (formData != null) {
+            List<NameValuePair> params = makeRequectParams(formData, "");
+            UrlEncodedFormEntity urlEncodedFormEntity = new UrlEncodedFormEntity(params, "UTF-8");
+            httpPost.setEntity(urlEncodedFormEntity);
+        }
+
+        return httpExecute(executorContext, httpPost);
     }
 }
