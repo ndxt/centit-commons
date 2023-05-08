@@ -672,7 +672,7 @@ public abstract class EmbedFunc {
                 if (nOpSum < 2) return null;
                 String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
                 int MatchType = 0;
-                if (tempStr.equalsIgnoreCase("true"))
+                if ("true".equalsIgnoreCase(tempStr))
                     MatchType = 1;
                 else {
                     if (NumberBaseOpt.isNumber(slOperand.get(0))) {
@@ -692,7 +692,7 @@ public abstract class EmbedFunc {
                                 return slOperand.get(i + 1);
                         }
                     } else {
-                        if (tempStr.equals(StringBaseOpt.objectToString(slOperand.get(i))))
+                        if (StringUtils.equals(tempStr, StringBaseOpt.objectToString(slOperand.get(i))))
                             return slOperand.get(i + 1);
                     }
                 }
