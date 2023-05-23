@@ -141,7 +141,7 @@ public abstract class ExcelImportUtil {
                     if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
                         value = cell.getDateCellValue();
                     } else {
-                        value = DatetimeOpt.convertDateToString(cell.getDateCellValue(), "hh:mm:mm");
+                        value = DatetimeOpt.convertTimeWithSecondToString(cell.getDateCellValue());
                     }
                 } else {
                     value = cell.getNumericCellValue();
@@ -190,7 +190,7 @@ public abstract class ExcelImportUtil {
                     if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
                         value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
                     } else {
-                        value = DatetimeOpt.convertDateToString(cell.getDateCellValue(), "hh:mm:mm");
+                        value = DatetimeOpt.convertTimeWithSecondToString(cell.getDateCellValue());
                     }
                 } else {
                     value = StringBaseOpt.castObjectToString(cell.getNumericCellValue());

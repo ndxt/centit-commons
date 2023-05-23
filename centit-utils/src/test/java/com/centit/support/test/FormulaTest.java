@@ -79,7 +79,7 @@ public class FormulaTest {
         System.out.println(strReplace);
 
         Object date =  VariableFormula.calculate(
-            "toDate('7 ene 2023 03:33:31 GMT-8', 'zone:MX:END d MMM yyyy hh:mm:ss')");
+            "toDate('7 ene 2023 03:33:31 GMT-8', 'zone:MX:END d MMM yyyy HH:mm:ss')");
         System.out.println("toDate en -> " + date.toString());
         System.out.println("toDate en -> " + DatetimeOpt.convertDateToString((Date) date,
             "lang:MX MMM d, yyyy h:mm:ss aa (zzz)"));
