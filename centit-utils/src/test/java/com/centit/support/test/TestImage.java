@@ -1,5 +1,6 @@
 package com.centit.support.test;
 
+import com.centit.support.image.CaptchaImageUtil;
 import com.centit.support.image.ImageOpt;
 
 import javax.imageio.ImageIO;
@@ -8,12 +9,33 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
 
 public class TestImage {
-    public static void main(String arg[]) {
+    public static void main(String arg[]) throws IOException{
+        Random random = new Random();
+        int a = random.nextInt(100);
+        int b = random.nextInt(100);
+        boolean c = (random.nextInt(100) % 2) == 1;
+        String code, value;
+        if(c){
+            if(a<b){
+                int d=a;
+                a=b;
+                b=d;
+            }
+            code = String.valueOf(a)+"-" + String.valueOf(b);
+            value = String.valueOf(a-b);
+        } else {
+            code = String.valueOf(a)+"+" + String.valueOf(b);
+            value = String.valueOf(a+b);
+        }
+
+        BufferedImage image = CaptchaImageUtil.generateCaptchaImage(code);
+        ImageIO.write(image, "png", new File("/Users/codefan/Documents/temp/captcha.png"));
         //String[] s=decode("d:\\52570486.pdf");
         //System.out.println("发票类型"+s[1]+"发票号码"+s[3]+"发票金额"+s[4]);
-        testCreateIcon();
+        //testCreateIcon();
         /*System.out.println(CaptchaImageUtil.checkcodeMatch("",null));
         System.out.println(CaptchaImageUtil.checkcodeMatch("hello","hello "));
         System.out.println(CaptchaImageUtil.checkcodeMatch("hello","HeL1o"));
