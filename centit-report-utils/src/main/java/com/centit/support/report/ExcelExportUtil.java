@@ -923,10 +923,10 @@ public abstract class ExcelExportUtil {
      * @param distCell
      */
     public static void copyCell(Workbook workbook, Cell srcCell, Cell distCell) {
-        CellStyle newStyle = workbook.createCellStyle();
-        copyCellStyle(srcCell.getCellStyle(), newStyle, workbook);
+        //CellStyle newStyle = workbook.createCellStyle();
+        //copyCellStyle(srcCell.getCellStyle(), newStyle, workbook);
         //样式
-        distCell.setCellStyle(newStyle);
+        distCell.setCellStyle(srcCell.getCellStyle());//newStyle
         //设置内容
         CellType srcCellType = srcCell.getCellType();//.getCellTypeEnum();
         distCell.setCellType(srcCellType);
