@@ -17,21 +17,21 @@ public abstract class AESSecurityUtils {
 
     protected static final Logger logger = LoggerFactory.getLogger(AESSecurityUtils.class);
     public static final String AES_DEFAULT_KEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
-
+    public static final String AES_CIPHER_TYPE="AES/ECB/PKCS5Padding";
     private AESSecurityUtils() {
         throw new IllegalAccessError("Utility class");
     }
 
     public static Cipher createEncryptCipher(String keyValue) throws GeneralSecurityException {
         Key key = getKey(keyValue);
-        Cipher encryptCipher = Cipher.getInstance("AES");//"AES/ECB/PKCS5Padding"
+        Cipher encryptCipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE);//"AES/ECB/PKCS5Padding"
         encryptCipher.init(Cipher.ENCRYPT_MODE, key);
         return encryptCipher;
     }
 
     public static Cipher createDencryptCipher(String keyValue) throws GeneralSecurityException {
         Key key = getKey(keyValue);
-        Cipher decryptCipher = Cipher.getInstance("AES");//"AES/ECB/PKCS5Padding"
+        Cipher decryptCipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE);//"AES/ECB/PKCS5Padding"
         decryptCipher.init(Cipher.DECRYPT_MODE, key);
         return decryptCipher;
     }
