@@ -19,15 +19,15 @@ public class AES {
     private Cipher cipher;
 
     private SecretKeySpec secretKeySpec;
-
+    private IvParameterSpec ivParameterSpec;
     public void init() throws Exception {
         String type = "AES";
         String pattern = "AES/CBC/PKCS5Padding";
         cipher = Cipher.getInstance(pattern);
         // AES加密key是16位字符串
-        String key = "1234567890ABCDEF";
+        String key = "1234567890abcdef";
         secretKeySpec = new SecretKeySpec(key.getBytes(), type);
-        //ivParameterSpec = new IvParameterSpec(key.getBytes());
+        ivParameterSpec = new IvParameterSpec(key.getBytes());
     }
 
 
@@ -43,13 +43,13 @@ public class AES {
 
     public String encipher(String str) throws Exception {
         // 设置加密规则，如果加密模式是CBC加密则需要设置ivParameterSpec
-        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
         return Base64.encode(cipher.doFinal(str.getBytes()));
     }
 
     public String decipher(String str) throws Exception {
         // 设置解密规则，如果加密模式是CBC加密则需要设置ivParameterSpec
-        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
         return new String(cipher.doFinal(Base64.decode(str)));
     }
 
@@ -64,8 +64,10 @@ public class AES {
         System.out.println(AESSecurityUtils.encryptAndBase64(
             "centit.1", "1234567890ABCDEF"));
 
-        System.out.println(AESSecurityUtils.encryptParameterString("centit.1"));
-        System.out.println(AESSecurityUtils.decryptParameterString("cipher:pzS0Vd7iuzB2C+pdhEjVzw=="));
-        System.out.println(AESSecurityUtils.decryptParameterString("cipher:U2FsdGVkX1+BymlPjWWWUG1TpTpkinX9pNNs+I4xqBU="));
+        System.out.println(AESSecurityUtils.encryptAsCBCType("centit.1", "1234567890abcdef", "1234567890abcdef"));
+        System.out.println(AESSecurityUtils.encryptAsCBCType("centit.1", AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC));
+
+        System.out.println(AESSecurityUtils.decryptAsCBCType("k556Ug617iPVULItZldkOQ==", AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC));
+
     }
 }

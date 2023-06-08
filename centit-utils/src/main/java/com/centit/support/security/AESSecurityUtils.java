@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
@@ -18,9 +20,11 @@ public abstract class AESSecurityUtils {
     protected static final Logger logger = LoggerFactory.getLogger(AESSecurityUtils.class);
     public static final String AES_DEFAULT_KEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
     public static final String AES_CIPHER_TYPE="AES/ECB/PKCS5Padding";
-    private AESSecurityUtils() {
-        throw new IllegalAccessError("Utility class");
-    }
+
+    public static final String AES_CIPHER_TYPE_CBC= "AES/CBC/PKCS5Padding";
+    public static final String AES_SECRET_KEY_SPEC   = "U2FsdGVkX1BymlPj";
+    public static final String AES_IV_PARAMETER_SPEC = "WUG1TpTpkinX9pNs";
+
 
     public static Cipher createEncryptCipher(String keyValue) throws GeneralSecurityException {
         Key key = getKey(keyValue);
@@ -125,21 +129,29 @@ public abstract class AESSecurityUtils {
         }
     }
 
-    public static String encryptParameterString(String param){
-        if(param.startsWith("cipher:")) {
-            return param;
-        }else {
-            return "cipher:" + encryptAndBase64(
-                param, AESSecurityUtils.AES_DEFAULT_KEY);
+    public static String encryptAsCBCType(String str, String keyValue, String ivParameter) {
+        try {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue.getBytes(), "AES");
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
+            return new String(Base64.encodeBase64(cipher.doFinal(str.getBytes())));
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
         }
     }
 
-    public static String decryptParameterString(String securityParam){
-        if(securityParam.startsWith("cipher:")) {
-            return decryptBase64String(
-                securityParam.substring(7), AESSecurityUtils.AES_DEFAULT_KEY);
-        }else {
-            return securityParam;
+    public static String decryptAsCBCType(String str, String keyValue, String ivParameter) {
+        try {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue.getBytes(), "AES");
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+            return new String(cipher.doFinal(Base64.decodeBase64(str)));
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
         }
     }
 }
