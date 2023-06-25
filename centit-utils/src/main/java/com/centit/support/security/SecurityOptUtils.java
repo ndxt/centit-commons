@@ -1,6 +1,7 @@
 package com.centit.support.security;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +13,7 @@ public abstract class SecurityOptUtils {
     protected static final Logger logger = LoggerFactory.getLogger(SecurityOptUtils.class);
 
     public static String decodeSecurityString(String sStr){
-        if(sStr==null)
+        if(StringUtils.isBlank(sStr))
             return "";
         sStr = sStr.trim();
         if (sStr.startsWith("encode:")) {

@@ -29,6 +29,14 @@ public abstract class ExcelReportUtil {
 
     protected static final Logger logger = LoggerFactory.getLogger(ExcelReportUtil.class);
 
+    /**
+     * jxls 模版导入导出 文档
+     * @param is jxls模版
+     * @param os 生产的excel表格
+     * @param model  数据模型
+     * @param extendFuns 外部函数
+     * @throws IOException IO异常
+     */
     public static void exportExcel(InputStream is, OutputStream os, Map<String, Object> model, Map<String, Object> extendFuns) throws IOException {
         Context context = new Context(model);
         Map<String, Object> extFuns = CollectionsOpt.createHashMap("utils", EmbedFuncUtils.instance);
@@ -48,6 +56,13 @@ public abstract class ExcelReportUtil {
         jxlsHelper.processTemplate(context, transformer);
     }
 
+    /**
+     * jxls 模版导入导出 文档
+     * @param is jxls模版
+     * @param os 生产的excel表格
+     * @param model  数据模型
+     * @throws IOException IO异常
+     */
     public static void exportExcel(InputStream is, OutputStream os, Map<String, Object> model) throws IOException {
         exportExcel(is, os, model, null);
     }
