@@ -28,81 +28,81 @@ public class VariableFormula {
         switch (sp) {
             case '=':
                 if (sp2 == '=') {
-                    return (ConstDefine.OP_EQ);//m_iPreIsn = ConstDefine.OP_EQ ;return ConstDefine.OP_EQ;
+                    return ConstDefine.OP_EQ;//m_iPreIsn = ConstDefine.OP_EQ ;return ConstDefine.OP_EQ;
                 }
-                return (ConstDefine.OP_EVALUATE);//    m_iPreIsn = ConstDefine.OP_EVALUATE;return ConstDefine.OP_EVALUATE;
+                return ConstDefine.OP_EVALUATE;//    m_iPreIsn = ConstDefine.OP_EVALUATE;return ConstDefine.OP_EVALUATE;
             case '+': {
                 if (sl == 1) {
-                    return (ConstDefine.OP_ADD); //{ m_iPreIsn = ConstDefine.OP_ADD ; return ConstDefine.OP_ADD ;}
+                    return ConstDefine.OP_ADD; //{ m_iPreIsn = ConstDefine.OP_ADD ; return ConstDefine.OP_ADD ;}
                 }
                 break;
             }
             case '-': {
                 if (sl == 1) {
-                    return (ConstDefine.OP_SUB);//{ m_iPreIsn = ConstDefine.OP_SUB ; return ConstDefine.OP_SUB;}
+                    return ConstDefine.OP_SUB;//{ m_iPreIsn = ConstDefine.OP_SUB ; return ConstDefine.OP_SUB;}
                 }
                 break;
             }
             case '*':
-                return (ConstDefine.OP_MUL);//m_iPreIsn = ConstDefine.OP_MUL; return ConstDefine.OP_MUL;
+                return ConstDefine.OP_MUL;//m_iPreIsn = ConstDefine.OP_MUL; return ConstDefine.OP_MUL;
             case '/':
-                return (ConstDefine.OP_DIV);//m_iPreIsn = ConstDefine.OP_DIV; return ConstDefine.OP_DIV;
+                return ConstDefine.OP_DIV;//m_iPreIsn = ConstDefine.OP_DIV; return ConstDefine.OP_DIV;
             case '%':
-                return (ConstDefine.OP_MOD);
+                return ConstDefine.OP_MOD;
             case '^':
-                return (ConstDefine.OP_POWER);//m_iPreIsn = ConstDefine.OP_POWER; return ConstDefine.OP_POWER;
+                return ConstDefine.OP_POWER;//m_iPreIsn = ConstDefine.OP_POWER; return ConstDefine.OP_POWER;
             case '>':
                 if (sp2 == '=') {
-                    return (ConstDefine.OP_EB);//    return ConstDefine.OP_EB;    m_iPreIsn = ConstDefine.OP_EB ;
+                    return ConstDefine.OP_EB;//    return ConstDefine.OP_EB;    m_iPreIsn = ConstDefine.OP_EB ;
                 }
                 if (sp2 == '>')
-                    return (ConstDefine.OP_RMOV);
-                return (ConstDefine.OP_BG);//m_iPreIsn = ConstDefine.OP_BG ;    return ConstDefine.OP_BG ;
+                    return ConstDefine.OP_RMOV;
+                return ConstDefine.OP_BG;//m_iPreIsn = ConstDefine.OP_BG ;    return ConstDefine.OP_BG ;
             case '<':
                 if (sp2 == '=') {
-                    return (ConstDefine.OP_EL);//return ConstDefine.OP_EL; m_iPreIsn = ConstDefine.OP_EL;
+                    return ConstDefine.OP_EL;//return ConstDefine.OP_EL; m_iPreIsn = ConstDefine.OP_EL;
                 }
                 if (sp2 == '>') {
-                    return (ConstDefine.OP_NE);//    return ConstDefine.OP_NE;    m_iPreIsn = ConstDefine.OP_NE ;
+                    return ConstDefine.OP_NE;//    return ConstDefine.OP_NE;    m_iPreIsn = ConstDefine.OP_NE ;
                 }
                 if (sp2 == '<') {
-                    return (ConstDefine.OP_LMOV);//    return ConstDefine.OP_NE;    m_iPreIsn = ConstDefine.OP_NE ;
+                    return ConstDefine.OP_LMOV;//    return ConstDefine.OP_NE;    m_iPreIsn = ConstDefine.OP_NE ;
                 }
-                return (ConstDefine.OP_LT);//m_iPreIsn = ConstDefine.OP_LT ;return ConstDefine.OP_LT ;
+                return ConstDefine.OP_LT;//m_iPreIsn = ConstDefine.OP_LT ;return ConstDefine.OP_LT ;
             case '&':
                 if (sp2 == '&') {
-                    return (ConstDefine.OP_AND);//return ConstDefine.OP_EL; m_iPreIsn = ConstDefine.OP_EL;
+                    return ConstDefine.OP_AND;//return ConstDefine.OP_EL; m_iPreIsn = ConstDefine.OP_EL;
                 }
-                return (ConstDefine.OP_BITAND);//m_iPreIsn = ConstDefine.OP_AND ; return  ConstDefine.OP_AND;
+                return ConstDefine.OP_BITAND;//m_iPreIsn = ConstDefine.OP_AND ; return  ConstDefine.OP_AND;
             case '|':
                 if (sp2 == '|') {
-                    return (ConstDefine.OP_OR);//return ConstDefine.OP_EL; m_iPreIsn = ConstDefine.OP_EL;
+                    return ConstDefine.OP_OR;//return ConstDefine.OP_EL; m_iPreIsn = ConstDefine.OP_EL;
                 }
-                return (ConstDefine.OP_BITOR);//m_iPreIsn = ConstDefine.OP_OR; return  ConstDefine.OP_OR;
+                return ConstDefine.OP_BITOR;//m_iPreIsn = ConstDefine.OP_OR; return  ConstDefine.OP_OR;
             case '!':
                 if (sp2 == '=') {
-                    return (ConstDefine.OP_NE);//return ConstDefine.OP_NE;    m_iPreIsn = ConstDefine.OP_NE;
+                    return ConstDefine.OP_NE;//return ConstDefine.OP_NE;    m_iPreIsn = ConstDefine.OP_NE;
                 }
-                return (ConstDefine.OP_NOT);//m_iPreIsn = ConstDefine.OP_NOT; return  ConstDefine.OP_NOT;
+                return ConstDefine.OP_NOT;//m_iPreIsn = ConstDefine.OP_NOT; return  ConstDefine.OP_NOT;
         }
         if (sOptName.equalsIgnoreCase("LIKE"))
-            return (ConstDefine.OP_LIKE);
+            return ConstDefine.OP_LIKE;
         if (sOptName.equalsIgnoreCase("AND"))
-            return (ConstDefine.OP_LOGICAND);
+            return ConstDefine.OP_LOGICAND;
         if (sOptName.equalsIgnoreCase("OR"))
-            return (ConstDefine.OP_LOGICOR);
+            return ConstDefine.OP_LOGICOR;
         if (sOptName.equalsIgnoreCase("NOT"))
-            return (ConstDefine.OP_NOT);
+            return ConstDefine.OP_NOT;
         if (sOptName.equalsIgnoreCase("IN"))
-            return (ConstDefine.OP_IN);
+            return ConstDefine.OP_IN;
         if (sOptName.equalsIgnoreCase("DIV"))
-            return (ConstDefine.OP_DIV);
+            return ConstDefine.OP_DIV;
         if (sOptName.equalsIgnoreCase("MOD"))
-            return (ConstDefine.OP_MOD);
+            return ConstDefine.OP_MOD;
         if (sOptName.equalsIgnoreCase("DBMOD"))
-            return (ConstDefine.OP_DBMOD);
+            return ConstDefine.OP_DBMOD;
         if (sOptName.equalsIgnoreCase("XOR"))
-            return (ConstDefine.OP_XOR);
+            return ConstDefine.OP_XOR;
         return -1;
     }
 

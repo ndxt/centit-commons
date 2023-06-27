@@ -1,33 +1,6 @@
 package com.centit.support.compiler;
 
 public class OptStack {
-
-    /*public static final int   OP_BASE      = 30;    // +
-    public static final int   OP_ADD         = 30;    // +
-    public static final int   OP_SUB         = 31;  // -
-    public static final int   OP_MUL         = 32;  // *
-    public static final int   OP_DIV         = 33;  // /
-    public static final int   OP_EQ          = 34;    //==
-    public static final int   OP_BG          = 35;  //>
-    public static final int   OP_LT          = 36;  //<
-    public static final int   OP_EL          = 37;  //<=
-    public static final int   OP_EB          = 38;  //>=
-    public static final int   OP_NE          = 39;  //!=
-    public static final int   OP_BITOR       = 40;  //|
-    public static final int   OP_BITAND      = 41;  //&
-    public static final int   OP_NOT         = 42;  //!
-    public static final int   OP_POWER       = 43;  //^
-    public static final int   OP_LMOV        = 44;  // >>
-    public static final int   OP_RMOV        = 45;  // <<
-    public static final int   OP_LIKE        = 46;  //LIKE
-    public static final int   OP_IN          = 47 ; //IN
-    public static final int   OP_LOGICOR     = 48;  // or
-    public static final int   OP_AND         = OP_BITAND;  //&&
-    public static final int   OP_LOGICAND    = 49;  // and
-    public static final int   OP_MOD         = 50;  // mod % 取整后取模
-    public static final int   OP_DBMOD       = 51;  // dbmod 取模
-    public static final int   OP_XOR         = 52;  // xor 异或
-    */
     /**
      * @param args 数值越小优先级越低
      */
