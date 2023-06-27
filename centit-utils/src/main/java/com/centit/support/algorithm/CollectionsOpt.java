@@ -13,6 +13,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * 一些通用的算法，这些算法都和具体的业务数据结构解耦
@@ -378,6 +379,41 @@ public abstract class CollectionsOpt {
                 resList.add(node);
         }
         return resList;
+    }
+
+    public static <T> TreeNode<T> fetchTreeBranch(List<T> list, Predicate<T> startKey, ParentChild<? super T> c, int levels) {
+
+        TreeNode<T> node =  null;
+        for (T m : list) {
+            if (startKey.test(m)) {
+                node = new TreeNode<>(m);
+                break;
+            }
+        }
+
+        if( node == null ){
+            return node;
+        }
+
+        List<TreeNode<T>> treeList = new ArrayList<>();
+        treeList.add(node);
+        while(levels != 0 && treeList.size()>0){
+            List<TreeNode<T>> newNodes = new ArrayList<>();
+            for (TreeNode<T> pNode : treeList) {
+                for (T m : list) {
+                    if (pNode.getValue() != m && c.parentAndChild(pNode.getValue(), m)) {
+                        TreeNode<T> cNode = new TreeNode<>(m);
+                        newNodes.add(cNode);
+                        pNode.addChild(cNode);
+                        break;
+                    }
+                }
+            }
+            treeList = newNodes;
+            levels --;
+        }
+
+        return node;
     }
 
     /**
