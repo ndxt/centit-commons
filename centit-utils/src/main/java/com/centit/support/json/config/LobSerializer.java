@@ -51,12 +51,13 @@ public class LobSerializer implements ObjectWriter<java.sql.Blob> {
                 InputStream is = lobData.getBinaryStream();
                 byte[] readBytes = new byte[is.available()];
                 int count = is.read(readBytes);
-                if(count>0)
+                if (count > 0)
                     jsonWriter.writeString(new String(Base64.encodeBase64(readBytes)));
             } catch (SQLException | IOException e) {
-                logger.error(e.getMessage(),e);//e.printStackTrace();
+                logger.error(e.getMessage(), e);//e.printStackTrace();
                 //throw new IOException("write blob error", e);
             }
+        } else {
             jsonWriter.writeString(StringBaseOpt.objectToString(object));
         }
     }
