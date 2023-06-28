@@ -419,7 +419,7 @@ public abstract class GeneralAlgorithm {
     }
 
     public static Object maxObject(Collection<Object> ar) {
-        if (ar.size() < 1)
+        if (ar == null || ar.size() < 1)
             return null;
         Iterator<Object> ari = ar.iterator();
         Object maxObject = ar.iterator().next();
@@ -476,7 +476,7 @@ public abstract class GeneralAlgorithm {
     }
 
     public static Object minObject(Collection<Object> ar) {
-        if (ar.size() < 1)
+        if (ar == null || ar.size() < 1)
             return null;
         Iterator<Object> ari = ar.iterator();
         Object minObject = ar.iterator().next();
