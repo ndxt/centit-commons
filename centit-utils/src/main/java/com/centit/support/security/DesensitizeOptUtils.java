@@ -3,11 +3,12 @@ package com.centit.support.security;
 import org.apache.commons.lang3.StringUtils;
 
 /**
+ * @author codefan
  * 脱敏操作类
+ * @see //https://blog.51cto.com/u_15895329/5894220
+ * 重新设计
  */
 public abstract class DesensitizeOptUtils {
-
-    //https://blog.51cto.com/u_15895329/5894220
 
     public static final String SYMBOL_STAR = "*";
     public static final int ADDRESS_SENSITIVE_SIZE = 7;
@@ -91,7 +92,6 @@ public abstract class DesensitizeOptUtils {
         }
     }
 
-
     /**
      * 【中文姓名】只显示第一个汉字，其他隐藏为2个星号，比如：李**
      *
@@ -174,8 +174,8 @@ public abstract class DesensitizeOptUtils {
     /**
      * 【手机号码】前三位，后四位，其他隐藏，比如135****6810
      *
-     * @param num
-     * @return
+     * @param num 手机号码
+     * @return 前三位，后四位
      */
     public static String mobilePhone(String num) {
         return showHeadAndTail(num,3,4);
