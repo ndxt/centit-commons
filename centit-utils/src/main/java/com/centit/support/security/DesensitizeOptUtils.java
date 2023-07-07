@@ -20,6 +20,10 @@ public abstract class DesensitizeOptUtils {
      */
     public enum SensitiveTypeEnum {
         /**
+         * 无
+         */
+        NONE,
+        /**
          * 中文名
          */
         CHINESE_NAME,
@@ -51,6 +55,47 @@ public abstract class DesensitizeOptUtils {
          * 密码
          */
         PASSWORD;
+    }
+
+    /**
+     * 映射 脱敏操作类型
+     * @param sensitiveType 脱敏操作类型字符串描述
+     * @return 脱敏操作类型
+     */
+    public static SensitiveTypeEnum mapSensitiveType(String sensitiveType){
+        if(StringUtils.isBlank(sensitiveType))
+            return SensitiveTypeEnum.NONE;
+        switch (sensitiveType.toLowerCase()){
+            case "chinesename":
+            case "chinese_name": {
+                return SensitiveTypeEnum.CHINESE_NAME;
+            }
+            case "idcard":
+            case "id_card":{
+                return SensitiveTypeEnum.ID_CARD;
+            }
+            case "phone": {
+                return SensitiveTypeEnum.PHONE;
+            }
+            case "address": {
+                return SensitiveTypeEnum.ADDRESS;
+            }
+            case "email": {
+                return SensitiveTypeEnum.EMAIL;
+            }
+            case "bankcard":
+            case "bank_card":{
+                return SensitiveTypeEnum.BANK_CARD;
+            }
+            case "password": {
+                return SensitiveTypeEnum.PASSWORD;
+            }
+            case "account":{
+                return SensitiveTypeEnum.ACCOUNT;
+            }
+            default:
+                return SensitiveTypeEnum.NONE;
+        }
     }
 
     public static String desensitize(String sensitive, SensitiveTypeEnum sensitiveType){
