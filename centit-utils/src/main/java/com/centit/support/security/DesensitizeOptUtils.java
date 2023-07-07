@@ -1,6 +1,11 @@
 package com.centit.support.security;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author codefan
@@ -271,6 +276,37 @@ public abstract class DesensitizeOptUtils {
             return "";
         }
         return StringUtils.rightPad(SYMBOL_STAR, StringUtils.length(password), SYMBOL_STAR);
+    }
+
+    public static Map<String, SensitiveTypeEnum> mapDesensitizeOpt(Map<String, String> desenDesc){
+        Map<String, DesensitizeOptUtils.SensitiveTypeEnum> optDesc = new HashMap<>(desenDesc.size());
+        for(Map.Entry<String, String> ent : desenDesc.entrySet()){
+            DesensitizeOptUtils.SensitiveTypeEnum sensType = DesensitizeOptUtils.mapSensitiveType(ent.getValue());
+            if( DesensitizeOptUtils.SensitiveTypeEnum.NONE != sensType){
+                optDesc.put(ent.getKey(), sensType);
+            }
+        }
+        return optDesc;
+    }
+
+    public static Map<String, Object> desensitize(Map<String, Object> data, Map<String, DesensitizeOptUtils.SensitiveTypeEnum> desenDesc){
+        for(Map.Entry<String, DesensitizeOptUtils.SensitiveTypeEnum> ent : desenDesc.entrySet()){
+            String sensitive = DesensitizeOptUtils.desensitize(
+                StringBaseOpt.castObjectToString(data.get(ent.getKey())), ent.getValue());
+            if(StringUtils.isNotBlank(sensitive)){
+                data.put(ent.getKey(), sensitive);
+            }
+        }
+        return data;
+    }
+
+    public static JSONArray desensitize(JSONArray data, Map<String, DesensitizeOptUtils.SensitiveTypeEnum> desenDesc){
+        for(Object obj : data){
+            if(obj instanceof Map){
+                desensitize((Map<String, Object>)obj, desenDesc);
+            }
+        }
+        return data;
     }
 
 }
