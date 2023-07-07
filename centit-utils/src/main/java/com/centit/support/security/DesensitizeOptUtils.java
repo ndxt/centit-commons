@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author codefan
  * 脱敏操作类
  * @see //https://blog.51cto.com/u_15895329/5894220
- * 重新设计
+ * 算法重新设计
  */
 public abstract class DesensitizeOptUtils {
 
@@ -28,13 +28,9 @@ public abstract class DesensitizeOptUtils {
          */
         ID_CARD,
         /**
-         * 座机号
+         * 座机号、手机号
          */
-        FIXED_PHONE,
-        /**
-         * 手机号
-         */
-        MOBILE_PHONE,
+        PHONE,
         /**
          * 地址
          */
@@ -61,16 +57,13 @@ public abstract class DesensitizeOptUtils {
 
         switch (sensitiveType) {
             case CHINESE_NAME: {
-                return DesensitizeOptUtils.chineseName(sensitive, true);
+                return DesensitizeOptUtils.chineseName(sensitive, 3);
             }
             case ID_CARD: {
                 return DesensitizeOptUtils.idCardNum(sensitive);
             }
-            case FIXED_PHONE: {
-                return DesensitizeOptUtils.fixedPhone(sensitive);
-            }
-            case MOBILE_PHONE: {
-                return DesensitizeOptUtils.mobilePhone(sensitive);
+            case PHONE: {
+                return DesensitizeOptUtils.phone(sensitive);
             }
             case ADDRESS: {
                 return DesensitizeOptUtils.address(sensitive, ADDRESS_SENSITIVE_SIZE);
@@ -96,17 +89,26 @@ public abstract class DesensitizeOptUtils {
      * 【中文姓名】只显示第一个汉字，其他隐藏为2个星号，比如：李**
      *
      * @param fullName 姓名
-     * @param hideName true 隐藏名， false 隐藏姓
+     * @param hideType  1 隐藏名， 2 隐藏姓, 3 隐藏中间的，如果两个字隐藏名
      * @return 脱敏后的姓名
      */
-    public static String chineseName(String fullName, boolean hideName) {
+    public static String chineseName(String fullName, int hideType) {
         if (StringUtils.isBlank(fullName)) {
             return "";
         }
-        if(hideName) {
+        int nameLen = StringUtils.length(fullName);
+        if(hideType == 1) { //1 隐藏名
             String name = StringUtils.left(fullName, 1);
-            return StringUtils.rightPad(name, StringUtils.length(fullName), SYMBOL_STAR);
-        } else {
+            return StringUtils.rightPad(name, nameLen, SYMBOL_STAR);
+        } else if(hideType == 3) {
+            String name = StringUtils.left(fullName, 1);
+            if(nameLen==2){
+                return name + SYMBOL_STAR;
+            }
+            return StringUtils.join( name,
+                StringUtils.rightPad(SYMBOL_STAR, nameLen-2, SYMBOL_STAR),
+                StringUtils.right(fullName, 1));
+        } else { // 2 隐藏姓
             return SYMBOL_STAR + StringUtils.substring(fullName, 1);
         }
     }
@@ -155,30 +157,19 @@ public abstract class DesensitizeOptUtils {
         return showHeadAndTail(id,2,2);
     }
 
-
     /**
      * 【固定电话】有区号的显示前3后4，其他的只显示后四位，其他隐藏，比如1234
-     *
+     * 【手机号码】前三位，后四位，其他隐藏，比如135****6810
      * @param num 电话号码
      * @return 脱敏后的账号
      */
-    public static String fixedPhone(String num) {
+    public static String phone(String num) {
         if (StringUtils.isBlank(num)) {
             return "";
         }
-        return showHeadAndTail(num,
-            StringUtils.startsWithAny(num, "0","+")?3:0,
+        int header = StringUtils.startsWithAny(num, "0", "+", "1" )?3:0;
+        return showHeadAndTail(num, header,
             4);
-    }
-
-    /**
-     * 【手机号码】前三位，后四位，其他隐藏，比如135****6810
-     *
-     * @param num 手机号码
-     * @return 前三位，后四位
-     */
-    public static String mobilePhone(String num) {
-        return showHeadAndTail(num,3,4);
     }
 
     /**
