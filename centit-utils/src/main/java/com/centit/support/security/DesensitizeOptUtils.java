@@ -1,9 +1,9 @@
 package com.centit.support.security;
 
-import com.alibaba.fastjson2.JSONArray;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -300,7 +300,7 @@ public abstract class DesensitizeOptUtils {
         return data;
     }
 
-    public static JSONArray desensitize(JSONArray data, Map<String, DesensitizeOptUtils.SensitiveTypeEnum> desenDesc){
+    public static Collection<Object> desensitize(Collection<Object> data, Map<String, DesensitizeOptUtils.SensitiveTypeEnum> desenDesc){
         for(Object obj : data){
             if(obj instanceof Map){
                 desensitize((Map<String, Object>)obj, desenDesc);

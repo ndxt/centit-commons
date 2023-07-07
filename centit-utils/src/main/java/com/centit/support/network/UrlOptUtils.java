@@ -78,7 +78,6 @@ public abstract class UrlOptUtils {
         return params;
     }
 
-
     /**
      * 根据URL 获取域名
      *
@@ -129,8 +128,9 @@ public abstract class UrlOptUtils {
             (uri.indexOf('?') == -1 ? uri + '?' + queryUrl : uri + '&' + queryUrl);
     }
 
-
     public static String urlDecode(String urlParam){
+        if(StringUtils.isNotBlank(urlParam))
+            return urlParam;
         try {
             return URLDecoder.decode(urlParam, "UTF-8");
         } catch (UnsupportedEncodingException e) {
@@ -139,6 +139,8 @@ public abstract class UrlOptUtils {
     }
 
     public static String urlEncodeShareNotDuplicate(String urlParam){
+        if(StringUtils.isNotBlank(urlParam))
+            return urlParam;
         try {
             //避免重复encode
             return URLEncoder.encode(urlDecode(urlParam),"UTF-8");
@@ -148,6 +150,8 @@ public abstract class UrlOptUtils {
     }
 
     public static String urlEncode(String urlParam){
+        if(StringUtils.isNotBlank(urlParam))
+            return urlParam;
         try {
             return URLEncoder.encode(urlParam,"UTF-8");
         } catch (UnsupportedEncodingException e) {
