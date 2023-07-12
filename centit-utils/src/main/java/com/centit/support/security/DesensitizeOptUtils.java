@@ -301,9 +301,11 @@ public abstract class DesensitizeOptUtils {
     }
 
     public static Collection<Object> desensitize(Collection<Object> data, Map<String, DesensitizeOptUtils.SensitiveTypeEnum> desenDesc){
-        for(Object obj : data){
-            if(obj instanceof Map){
-                desensitize((Map<String, Object>)obj, desenDesc);
+        if(! desenDesc.isEmpty()) {
+            for (Object obj : data) {
+                if (obj instanceof Map) {
+                    desensitize((Map<String, Object>) obj, desenDesc);
+                }
             }
         }
         return data;
