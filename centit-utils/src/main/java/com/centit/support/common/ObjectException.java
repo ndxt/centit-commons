@@ -130,10 +130,6 @@ public class ObjectException extends RuntimeException {
             "未知错误("+ex.getClass().getName()+")。":originErrMessage;
     }
 
-    public static String extortExceptionTraceMessage(Throwable ex) {
-        return extortExceptionTraceMessage(ex, 15);
-    }
-
     public static String extortExceptionTraceMessage(Throwable ex, int maxStacks) {
         StringBuilder errorMsg = new StringBuilder(2048);
         StackTraceElement[] traces = ex.getStackTrace();
@@ -153,6 +149,12 @@ public class ObjectException extends RuntimeException {
         return extortExceptionOriginMessage(ex) +"\r\n"
             + extortExceptionTraceMessage(ex, maxStacks);
     }
+
+
+    public static String extortExceptionTraceMessage(Throwable ex) {
+        return extortExceptionTraceMessage(ex, 15);
+    }
+
 
     public static String extortExceptionMessage(Throwable ex) {
         return extortExceptionMessage(ex, 15);
