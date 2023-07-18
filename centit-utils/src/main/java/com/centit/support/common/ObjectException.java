@@ -11,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
  * @author <a href="mailto:codefan@sina.com">codefan</a>
  */
 public class ObjectException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
     public static final int UNKNOWN_EXCEPTION = 601;
     public static final int NULL_EXCEPTION = 602;
     public static final int BLANK_EXCEPTION = 603;
@@ -27,7 +29,9 @@ public class ObjectException extends RuntimeException {
     public static final int DATA_VALIDATE_ERROR = 611;
     //系统配置错误
     public static final int SYSTEM_CONFIG_ERROR = 612;
-    private static final long serialVersionUID = 4050482305178810162L;
+    // 不支持的防范
+    public static final int FUNCTION_NOT_SUPPORT = 613;
+
     protected int exceptionCode;
     private Object objectData;
     /**
