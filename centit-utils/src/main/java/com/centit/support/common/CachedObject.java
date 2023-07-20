@@ -76,12 +76,7 @@ public class CachedObject<T> extends AbstractCachedObject<T> {
             freshLock.lock();
             //刷新派生缓存
             evictDerivativeCahce();
-            T tempTarget = null;
-            try {
-                tempTarget = refresher.get();
-            } catch (RuntimeException re) {
-                logger.error(re.getMessage(), re);
-            }
+            T tempTarget = refresher.get();
             setRefreshDataAndState(tempTarget, freshPeriod, true);
         } finally {
             freshLock.unlock();

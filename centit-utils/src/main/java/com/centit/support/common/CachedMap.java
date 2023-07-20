@@ -197,12 +197,7 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
                 freshLock.lock();
                 //刷新派生缓存
                 evictDerivativeCahce();
-                T tempTarget = null;
-                try {
-                    tempTarget = refresher.apply(this.key);
-                } catch (RuntimeException re) {
-                    logger.error(re.getLocalizedMessage());
-                }
+                T tempTarget = refresher.apply(this.key);
                 setRefreshDataAndState(tempTarget, freshPeriod, true);
             } finally {
                 freshLock.unlock();

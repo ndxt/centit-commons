@@ -117,13 +117,7 @@ public class DerivativeCachedMap<K, D, T> extends AbstractCachedObject<Map<K, T>
                 }
             }
 
-            T tempTarget = null;
-            try {
-                //parentCachedMap.getCachedValue(this.key)
-                tempTarget = refresher.apply(parentCache.getCachedTarget());
-            } catch (RuntimeException re) {
-                logger.error(re.getLocalizedMessage());
-            }
+            T tempTarget = refresher.apply(parentCache.getCachedTarget());
             setRefreshDataAndState(tempTarget, freshPeriod, false);
         }
 

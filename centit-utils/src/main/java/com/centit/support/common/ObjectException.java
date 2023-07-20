@@ -3,6 +3,8 @@ package com.centit.support.common;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.SQLException;
+
 /**
  * An exception that is thrown by classes wanting to trap unique
  * constraint violations.  This is used to wrap Spring's
@@ -31,6 +33,15 @@ public class ObjectException extends RuntimeException {
     public static final int SYSTEM_CONFIG_ERROR = 612;
     // 不支持的防范
     public static final int FUNCTION_NOT_SUPPORT = 613;
+
+    public static final int DATABASE_OPERATE_EXCEPTION = 620;
+    public static final int DATABASE_OUT_SYNC_EXCEPTION = 621;
+    public static final int DATABASE_SQL_EXCEPTION = 622;
+    public static final int DATABASE_IO_EXCEPTION = 623;
+    public static final int NOSUCHFIELD_EXCEPTION = 624;
+    public static final int INSTANTIATION_EXCEPTION = 625;
+    public static final int ILLEGALACCESS_EXCEPTION = 626;
+    public static final int ORM_METADATA_EXCEPTION = 627;
 
     protected int exceptionCode;
     private Object objectData;
@@ -72,6 +83,18 @@ public class ObjectException extends RuntimeException {
     public ObjectException(Throwable exception) {
         super(exception);
         this.exceptionCode = UNKNOWN_EXCEPTION;
+    }
+
+    /**
+     * @param exception SQLException
+     */
+    public ObjectException(SQLException exception) {
+        this(DATABASE_SQL_EXCEPTION, exception);
+    }
+
+
+    public ObjectException(String sql, SQLException e) {
+        this(DATABASE_SQL_EXCEPTION, sql + " raise " + e.getMessage(), e.getCause());
     }
 
     /**
