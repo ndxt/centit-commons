@@ -129,7 +129,7 @@ public abstract class UrlOptUtils {
     }
 
     public static String urlDecode(String urlParam){
-        if(StringUtils.isNotBlank(urlParam))
+        if(StringUtils.isBlank(urlParam))
             return urlParam;
         try {
             return URLDecoder.decode(urlParam, "UTF-8");
@@ -139,7 +139,7 @@ public abstract class UrlOptUtils {
     }
 
     public static String urlEncodeShareNotDuplicate(String urlParam){
-        if(StringUtils.isNotBlank(urlParam))
+        if(StringUtils.isBlank(urlParam))
             return urlParam;
         try {
             //避免重复encode
@@ -150,7 +150,7 @@ public abstract class UrlOptUtils {
     }
 
     public static String urlEncode(String urlParam){
-        if(StringUtils.isNotBlank(urlParam))
+        if(StringUtils.isBlank(urlParam))
             return urlParam;
         try {
             return URLEncoder.encode(urlParam,"UTF-8");
