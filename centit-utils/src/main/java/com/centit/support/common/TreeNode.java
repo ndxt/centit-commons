@@ -185,4 +185,15 @@ public class TreeNode<T> {
         return rootValue;
     }
 
+    public static JSONArray toJSONArray(List<? extends TreeNode<? extends Object>> forest, String childrenPropertyName){
+        JSONArray ja = new JSONArray();
+        for (TreeNode c : forest) {
+            ja.add(c.toJSONObject(childrenPropertyName));
+        }
+        return ja;
+    }
+
+    public static JSONArray toJSONArray(List<? extends TreeNode<? extends Object>> forest){
+        return toJSONArray(forest, "children");
+    }
 }

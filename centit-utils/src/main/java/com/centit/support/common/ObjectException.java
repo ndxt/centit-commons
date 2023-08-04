@@ -3,6 +3,8 @@ package com.centit.support.common;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.SQLException;
+
 /**
  * An exception that is thrown by classes wanting to trap unique
  * constraint violations.  This is used to wrap Spring's
@@ -11,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
  * @author <a href="mailto:codefan@sina.com">codefan</a>
  */
 public class ObjectException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
     public static final int UNKNOWN_EXCEPTION = 601;
     public static final int NULL_EXCEPTION = 602;
     public static final int BLANK_EXCEPTION = 603;
@@ -27,7 +31,18 @@ public class ObjectException extends RuntimeException {
     public static final int DATA_VALIDATE_ERROR = 611;
     //系统配置错误
     public static final int SYSTEM_CONFIG_ERROR = 612;
-    private static final long serialVersionUID = 4050482305178810162L;
+    // 不支持的防范
+    public static final int FUNCTION_NOT_SUPPORT = 613;
+
+    public static final int DATABASE_OPERATE_EXCEPTION = 620;
+    public static final int DATABASE_OUT_SYNC_EXCEPTION = 621;
+    public static final int DATABASE_SQL_EXCEPTION = 622;
+    public static final int DATABASE_IO_EXCEPTION = 623;
+    public static final int NOSUCHFIELD_EXCEPTION = 624;
+    public static final int INSTANTIATION_EXCEPTION = 625;
+    public static final int ILLEGALACCESS_EXCEPTION = 626;
+    public static final int ORM_METADATA_EXCEPTION = 627;
+
     protected int exceptionCode;
     private Object objectData;
     /**
@@ -68,6 +83,18 @@ public class ObjectException extends RuntimeException {
     public ObjectException(Throwable exception) {
         super(exception);
         this.exceptionCode = UNKNOWN_EXCEPTION;
+    }
+
+    /**
+     * @param exception SQLException
+     */
+    public ObjectException(SQLException exception) {
+        this(DATABASE_SQL_EXCEPTION, exception);
+    }
+
+
+    public ObjectException(String sql, SQLException e) {
+        this(DATABASE_SQL_EXCEPTION, sql + " raise " + e.getMessage(), e.getCause());
     }
 
     /**
@@ -120,24 +147,38 @@ public class ObjectException extends RuntimeException {
         this.objectData = obj;
     }
 
-    public static String extortExceptionMessage(Throwable ex, int maxStacks) {
+    public static String extortExceptionOriginMessage(Throwable ex){
         String originErrMessage = ex.getMessage();
-        StringBuilder errorMsg = new StringBuilder(StringUtils.isBlank(originErrMessage) ?
-                    "未知错误("+ex.getClass().getName()+")":originErrMessage);
+        return StringUtils.isBlank(originErrMessage) ?
+            "未知错误("+ex.getClass().getName()+")。":originErrMessage;
+    }
+
+    public static String extortExceptionTraceMessage(Throwable ex, int maxStacks) {
+        StringBuilder errorMsg = new StringBuilder(2048);
         StackTraceElement[] traces = ex.getStackTrace();
         if (traces != null) {
             int len = traces.length > maxStacks ? maxStacks : traces.length;
             for (int i = 0; i < len; i++) {
-                errorMsg.append("\r\n")
-                    .append(traces[i].toString());
+                errorMsg.append(traces[i].toString()).append("\r\n");
                 /*.append("class: ").append(traces[i].getClassName()).append(",")
                 .append("method: ").append(traces[i].getMethodName()).append(",")
                 .append("line: ").append(traces[i].getLineNumber()).append(".");*/
-
             }
         }
         return errorMsg.toString();
     }
+
+    public static String extortExceptionMessage(Throwable ex, int maxStacks) {
+        return extortExceptionOriginMessage(ex) +"\r\n"
+            + extortExceptionTraceMessage(ex, maxStacks);
+    }
+
+
+    public static String extortExceptionTraceMessage(Throwable ex) {
+        return extortExceptionTraceMessage(ex, 15);
+    }
+
+
     public static String extortExceptionMessage(Throwable ex) {
         return extortExceptionMessage(ex, 15);
     }

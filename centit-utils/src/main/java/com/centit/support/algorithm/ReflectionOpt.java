@@ -98,7 +98,7 @@ public abstract class ReflectionOpt {
             try {
                 md = obj.getClass().getMethod("is" + StringUtils.capitalize(fieldName));
             } catch (Exception e) {
-                logger.error(noGet.getMessage() + e.getMessage());
+                logger.error(noGet.getMessage() + "," + e.getMessage());
             }
         } catch (Exception e) {
             logger.error(e.getMessage());

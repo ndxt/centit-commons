@@ -76,12 +76,8 @@ public abstract class ZipCompressor {
      * @param srcPathNames    输入的文件路径列表
      */
     public static void compressFiles(String zipFilePathName, String[] srcPathNames) {
-        try {
-            File zipFile = new File(zipFilePathName);
-            FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
-
-            ZipOutputStream out = convertToZipOutputStream(fileOutputStream);
-            // new ZipOutputStream(cos);
+        try(FileOutputStream fileOutputStream = new FileOutputStream(zipFilePathName);
+            ZipOutputStream out = convertToZipOutputStream(fileOutputStream)){
             String basedir = "";
             for (String srcPathName : srcPathNames) {
                 File file = new File(srcPathName);
@@ -89,8 +85,7 @@ public abstract class ZipCompressor {
                     compress(file, out, basedir);
                 }
             }
-            out.close();
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

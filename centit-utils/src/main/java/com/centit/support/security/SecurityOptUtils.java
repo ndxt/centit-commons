@@ -19,6 +19,9 @@ public abstract class SecurityOptUtils {
             return new String(Base64.decodeBase64(sStr.substring(7))).trim();
         } if (sStr.startsWith("cipher:")) {
             return AESSecurityUtils.decryptBase64String(sStr.substring(7), AESSecurityUtils.AES_DEFAULT_KEY);
+        } else if (sStr.startsWith("aescbc:")) {
+            return AESSecurityUtils.decryptAsCBCType(sStr.substring(7),
+                AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC);
         } else {
             return sStr;
         }
@@ -33,6 +36,9 @@ public abstract class SecurityOptUtils {
                     sStr, AESSecurityUtils.AES_DEFAULT_KEY);
             case "base64":
                 return "encode:" + Base64.encodeBase64String(sStr.getBytes(StandardCharsets.UTF_8));
+            case "aescbc":
+                return "aescbc:" + AESSecurityUtils.encryptAsCBCType(sStr,
+                    AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC);
             default:
                 return sStr;
         }

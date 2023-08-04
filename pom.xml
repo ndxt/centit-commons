@@ -98,6 +98,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
             </plugin>
             <!-- GPG自动签名的插件-->
             <!--<plugin>

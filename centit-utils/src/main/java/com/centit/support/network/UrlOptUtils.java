@@ -2,7 +2,6 @@ package com.centit.support.network;
 
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.security.Md5Encoder;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,7 +58,7 @@ public abstract class UrlOptUtils {
             if (n2 < 0) {
                 String value = szUrlParameter.substring(n + 1);
                 try {
-                    value = java.net.URLDecoder.decode(value, "utf-8");
+                    value = URLDecoder.decode(value, "utf-8");
                 } catch (UnsupportedEncodingException e) {
                     logger.error(e.getMessage(), e);//e.printStackTrace();
                 }
@@ -66,7 +67,7 @@ public abstract class UrlOptUtils {
             } else {
                 String value = szUrlParameter.substring(n + 1, n2);
                 try {
-                    value = java.net.URLDecoder.decode(value, "utf-8");
+                    value = URLDecoder.decode(value, "utf-8");
                 } catch (UnsupportedEncodingException e) {
                     logger.error(e.getMessage(), e);//e.printStackTrace();
                 }
@@ -76,7 +77,6 @@ public abstract class UrlOptUtils {
         }
         return params;
     }
-
 
     /**
      * 根据URL 获取域名
@@ -110,7 +110,7 @@ public abstract class UrlOptUtils {
                 urlBuilder.append('&');
             n++;
             urlBuilder.append(ent.getKey()).append('=').append(
-                StringEscapeUtils.escapeHtml4(
+                urlEncodeShareNotDuplicate(
                     StringBaseOpt.objectToString(ent.getValue()))
             );
         }
@@ -128,11 +128,45 @@ public abstract class UrlOptUtils {
             (uri.indexOf('?') == -1 ? uri + '?' + queryUrl : uri + '&' + queryUrl);
     }
 
+    public static String urlDecode(String urlParam) {
+        if (StringUtils.isBlank(urlParam)) {
+            return urlParam;
+        }
+        try {
+            return URLDecoder.decode(urlParam, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return urlParam;
+        }
+    }
+
+    public static String urlEncodeShareNotDuplicate(String urlParam) {
+        if (StringUtils.isBlank(urlParam)) {
+            return urlParam;
+        }
+        try {
+            //避免重复encode
+            return URLEncoder.encode(urlDecode(urlParam), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return urlParam;
+        }
+    }
+
+    public static String urlEncode(String urlParam) {
+        if (StringUtils.isBlank(urlParam)) {
+            return urlParam;
+        }
+        try {
+            return URLEncoder.encode(urlParam, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return urlParam;
+        }
+    }
+
     public static String appendParamToUrl(String uri, String paramName, Object paramValue) {
         return (uri.endsWith("?") || uri.endsWith("&")) ?
             uri + paramName + "=" + StringBaseOpt.objectToString(paramValue) :
             uri + (uri.indexOf('?') == -1 ? '?' : '&')
-                + paramName + "=" + StringEscapeUtils.escapeHtml4(
+                + paramName + "=" + urlEncodeShareNotDuplicate(
                 StringBaseOpt.objectToString(paramValue));
     }
 
