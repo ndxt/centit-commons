@@ -149,7 +149,8 @@ public abstract class ImageOpt {
      * 合并图片
      * @param imageList 这些图片大小需要一致
      * @param imagesPreRow 每行几个
-     * @return
+     * @param whiteSpace 空白占位符
+     * @return BufferedImage 返回图片
      */
     public static BufferedImage mergeImages(List<BufferedImage> imageList, int imagesPreRow, int whiteSpace){
         BufferedImage image = imageList.get(0);

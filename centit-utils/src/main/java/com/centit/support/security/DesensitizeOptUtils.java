@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * @author codefan
  * 脱敏操作类
- * @see //https://blog.51cto.com/u_15895329/5894220
+ * https://blog.51cto.com/u_15895329/5894220
  * 算法重新设计
  */
 public abstract class DesensitizeOptUtils {
@@ -20,8 +20,7 @@ public abstract class DesensitizeOptUtils {
 
     /**
      * 需要脱敏的字段类型
-     * @author xh
-     * @Date 2022/7/20
+     * @author codefan@sina.com 2022/7/20
      */
     public enum SensitiveTypeEnum {
         /**
@@ -238,7 +237,7 @@ public abstract class DesensitizeOptUtils {
     }
 
     /**
-     * 【电子邮箱 邮箱前缀仅显示第一个字母，前缀其他隐藏，用星号代替，@及后面的地址显示，比如：d**@126.com>
+     * 【电子邮箱 邮箱前缀仅显示第一个字母，前缀其他隐藏，用星号代替，at 及后面的地址显示，比如：d星星 at 126.com
      *
      * @param email 邮件地址
      * @return 脱敏后的邮件地址
@@ -256,7 +255,7 @@ public abstract class DesensitizeOptUtils {
     }
 
     /**
-     * 【银行卡号】前4位，后3位，其他用星号隐藏每位1个星号，比如：6217 **** **** **** 567>
+     * 【银行卡号】前4位，后3位，其他用星号隐藏每位1个星号，比如 6217 星星 567
      *
      * @param cardNum 【银行卡号】
      * @return 【银行卡号】前4位，后3位
