@@ -16,7 +16,9 @@ public class ListAppendMap<T> {
             //this.appendMap = new HashMap<>();
             this.appendMap = new HashMap<>(listData.size());
             for(T d : listData){
-                this.appendMap.put(func.apply(d), d);
+                if(d != null) {
+                    this.appendMap.put(func.apply(d), d);
+                }
             }
             //this.appendMap = Collections.unmodifiableMap(this.appendMap);
         } else {
