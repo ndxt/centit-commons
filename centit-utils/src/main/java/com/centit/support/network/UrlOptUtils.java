@@ -138,17 +138,6 @@ public abstract class UrlOptUtils {
         }
     }
 
-    public static String urlEncodeShareNotDuplicate(String urlParam){
-        if(StringUtils.isBlank(urlParam))
-            return urlParam;
-        try {
-            //避免重复encode
-            return URLEncoder.encode(urlDecode(urlParam),"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return urlParam;
-        }
-    }
-
     public static String urlEncode(String urlParam){
         if(StringUtils.isBlank(urlParam))
             return urlParam;
