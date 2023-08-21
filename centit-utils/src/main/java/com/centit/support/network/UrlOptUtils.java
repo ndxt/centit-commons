@@ -110,7 +110,7 @@ public abstract class UrlOptUtils {
                 urlBuilder.append('&');
             n++;
             urlBuilder.append(ent.getKey()).append('=').append(
-                urlEncodeShareNotDuplicate(
+                urlEncode(//urlEncodeShareNotDuplicate(
                     StringBaseOpt.objectToString(ent.getValue()))
             );
         }
@@ -163,7 +163,7 @@ public abstract class UrlOptUtils {
         return (uri.endsWith("?") || uri.endsWith("&")) ?
             uri + paramName + "=" + StringBaseOpt.objectToString(paramValue) :
             uri + (uri.indexOf('?') == -1 ? '?' : '&')
-                + paramName + "=" +urlEncodeShareNotDuplicate(//StringEscapeUtils.escapeHtml4(
+                + paramName + "=" +  urlEncode(//urlEncodeShareNotDuplicate(//StringEscapeUtils.escapeHtml4(
                 StringBaseOpt.objectToString(paramValue));
     }
 
