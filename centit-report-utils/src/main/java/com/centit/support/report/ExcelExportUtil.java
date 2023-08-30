@@ -918,9 +918,9 @@ public abstract class ExcelExportUtil {
 
     /**
      * 复制单元格
-     *
-     * @param srcCell
-     * @param distCell
+     * @param workbook excel工作簿
+     * @param srcCell 源单元格
+     * @param distCell 目标单元格
      */
     public static void copyCell(Workbook workbook, Cell srcCell, Cell distCell) {
         //CellStyle newStyle = workbook.createCellStyle();

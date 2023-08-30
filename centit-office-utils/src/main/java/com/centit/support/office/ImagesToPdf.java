@@ -35,8 +35,8 @@ public abstract class ImagesToPdf {
 
     /**
      * 二维码写入pdf
-     * @param imageList
-     * @param outPdfStram
+     * @param imageList 多个图像列表
+     * @param outPdfStram 合并为同一个pdf文件
      */
 
     public static void imagesToA4SizePdf(List<Image> imageList, OutputStream outPdfStram){
