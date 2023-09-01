@@ -53,6 +53,7 @@
         <module>centit-es-client</module>
         <module>centit-office-utils</module>
         <module>centit-report-utils</module>
+        <module>centit-quartz-extend</module>
     </modules>
 
     <build>
