@@ -1,6 +1,7 @@
 package com.centit.support.algorithm;
 
 import com.centit.support.common.LeftRightPair;
+import com.centit.support.common.ObjectException;
 import com.centit.support.common.ParamName;
 import com.centit.support.file.FileType;
 import org.apache.commons.lang3.StringUtils;
@@ -99,6 +100,7 @@ public abstract class ReflectionOpt {
                 md = obj.getClass().getMethod("is" + StringUtils.capitalize(fieldName));
             } catch (Exception e) {
                 logger.error(noGet.getMessage() + "," + e.getMessage());
+                logger.error(ObjectException.extortExceptionTraceMessage(noGet));
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
