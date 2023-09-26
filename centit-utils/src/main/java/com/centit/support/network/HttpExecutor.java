@@ -174,6 +174,20 @@ public abstract class HttpExecutor {
             for (Map.Entry<String, String> entHeader : executorContext.getHttpHeaders().entrySet())
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
         }
+
+        if (executorContext.getHttpCookies() != null) {
+            StringBuilder cookieString = new StringBuilder();
+            int i = 0;
+            for (Map.Entry<String, String> entCookie : executorContext.getHttpCookies().entrySet()) {
+                if(i>0){
+                    cookieString.append(";");
+                }
+                cookieString.append(entCookie.getKey()).append("=").append(entCookie.getValue());
+                i++;
+            }
+            httpRequest.setHeader("Cookie", cookieString.toString());
+        }
+
         RequestConfig.Builder builder = RequestConfig.custom().setRedirectsEnabled(false);
         if(executorContext.getHttpProxy() != null || executorContext.getTimeout() != -1) {
             if (executorContext.getHttpProxy() != null) {
