@@ -175,7 +175,7 @@ public abstract class HttpExecutor {
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
         }
 
-        if (executorContext.getHttpCookies() != null) {
+        if (executorContext.getHttpCookies() != null && executorContext.getHttpCookies().size()>0) {
             StringBuilder cookieString = new StringBuilder();
             int i = 0;
             for (Map.Entry<String, String> entCookie : executorContext.getHttpCookies().entrySet()) {
