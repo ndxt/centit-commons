@@ -7,6 +7,71 @@ import java.util.function.Consumer;
 
 public class Mathematics {
 
+
+    private static <T> void swap(List<T> list, int i, int j) {
+        T temp = list.get(i);
+        list.set(i, list.get(j));
+        list.set(j, temp);
+    }
+
+    private static <T> void reverse(List<T> list, int i, int j) {
+        while (i < j) {
+            swap(list, i++, j--);
+        }
+    }
+
+    /*
+     * 编写一个类似C++ STL中的两个关于全排列的函数,分别为next_permutation， prev_permutation
+     */
+    public static <T> boolean nextPermutation(List<T> list, Comparator<? super T> comparable) {
+        int i = list.size() - 1;
+        while (i > 0 && comparable.compare(list.get(i - 1), list.get(i))  >=  0) {
+            i--;
+        }
+
+        if (i == 0) {
+            return false;
+        }
+
+        int j = list.size() - 1;
+        while (comparable.compare(list.get(j), list.get(i - 1)) <= 0) {
+            j--;
+        }
+
+        swap(list, i - 1, j);
+        reverse(list, i, list.size() - 1);
+        return true;
+    }
+    /*
+     * 编写一个类似C++ STL中的两个关于全排列的函数, prev_permutation
+     */
+    public static <T> boolean prevPermutation(List<T> list, Comparator<? super T> comparable) {
+        if (list == null || list.isEmpty()) {
+            return false;
+        }
+        int __last = list.size();
+        int __i = __last-1;
+
+        while (true)
+        {
+            int __ip1 = __i;
+            if (comparable.compare(list.get(--__i), list.get(__ip1)) >= 0)
+            {
+                int __j = __last;
+                while (comparable.compare(list.get(__i), list.get(--__j))<=0)
+                    ;
+                swap(list, __i, __j);
+                reverse(list, __ip1, __last-1);
+                return true;
+            }
+            if (__i == 0)
+            {
+                reverse(list,0, __last-1);
+                return false;
+            }
+        }
+    }
+
     /**
      * 非递归的排列
      *

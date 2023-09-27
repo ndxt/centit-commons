@@ -1,6 +1,8 @@
 package com.centit.support.test;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.Mathematics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,17 @@ import java.util.List;
  */
 public class TestListOpt {
     public static void main(String arg[]) {
+        List<Integer> sortData = CollectionsOpt.arrayToList(new Integer[]{3,2,1,4});
+        int c =0 ;
+        while (Mathematics.nextPermutation(sortData, (a,b)-> a-b)) {
+            System.out.println(sortData);
+            c++;
+            if(c>50)
+                break;
+        }
+        System.out.println(c);
+    }
+    public static void main2(String arg[]) {
         JSONObject strMap = new JSONObject();
         strMap.put("a", "B");
         strMap.put("c", "D");
