@@ -20,30 +20,46 @@ public class Mathematics {
         }
     }
 
-    /*
-     * 编写一个类似C++ STL中的两个关于全排列的函数,分别为next_permutation， prev_permutation
+    /**
+     * 编写一个类似C++ STL中的两个关于全排列的函数,分别为next_permutation
+     * @param list 排序列表
+     * @param comparable 比较函数，更换这个比较函数可以实现等价于 prev_permutation 的算法，这两个是对称的
+     * @return This method returns true if the list is in next permutation order, false otherwise
+     * @param <T> 排列数据类型
      */
     public static <T> boolean nextPermutation(List<T> list, Comparator<? super T> comparable) {
+        //Start from the end of the list
         int i = list.size() - 1;
+        //Loop until the list is not in descending order
         while (i > 0 && comparable.compare(list.get(i - 1), list.get(i))  >=  0) {
             i--;
         }
 
+        //If the list is in descending order, return false
         if (i == 0) {
             return false;
         }
 
+        //Start from the end of the list
         int j = list.size() - 1;
+        //Loop until the list is not in ascending order
         while (comparable.compare(list.get(j), list.get(i - 1)) <= 0) {
             j--;
         }
 
+        //Swap the elements at index i-1 and j
         swap(list, i - 1, j);
+        //Reverse the list from index i to the end
         reverse(list, i, list.size() - 1);
         return true;
     }
-    /*
+    /**
      * 编写一个类似C++ STL中的两个关于全排列的函数, prev_permutation
+     * 这个算法的实现是从C++ STL中抄过来的
+     * @param list 排序列表
+     * @param comparable 比较函数，更换这个比较函数可以实现等价于 nextPermutation 的算法，这两个是对称的
+     * @return 返回下一个排列
+     * @param <T> 排列数据类型
      */
     public static <T> boolean prevPermutation(List<T> list, Comparator<? super T> comparable) {
         if (list == null || list.isEmpty()) {
