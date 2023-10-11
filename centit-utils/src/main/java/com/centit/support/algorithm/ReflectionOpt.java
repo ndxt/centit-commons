@@ -75,7 +75,8 @@ public abstract class ReflectionOpt {
         assert (object != null);
 
         boolean accessible = field.isAccessible();
-        field.setAccessible(true);
+        if(!accessible)
+            field.setAccessible(true);
 
         Object result = null;
         try {
@@ -83,7 +84,8 @@ public abstract class ReflectionOpt {
         } catch (IllegalAccessException e) {
             logger.info("error wont' happen." + e.getMessage());
         }
-        field.setAccessible(accessible);
+        if(!accessible)
+            field.setAccessible(accessible);
         return result;
     }
 
@@ -654,7 +656,8 @@ public abstract class ReflectionOpt {
             throw new NoSuchMethodException("No Such Method:" + clazz.getSimpleName() + methodName);
 
         boolean accessible = method.isAccessible();
-        method.setAccessible(true);
+        if(!accessible)
+            method.setAccessible(true);
         Object result = null;
         try {
             result = method.invoke(object, params);
@@ -663,7 +666,8 @@ public abstract class ReflectionOpt {
             logger.error(e.getMessage());
             logger.error(e.getMessage(), e);//e.printStackTrace();
         }
-        method.setAccessible(accessible);
+        if(!accessible)
+            method.setAccessible(accessible);
         return result;
     }
 
