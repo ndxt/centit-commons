@@ -55,8 +55,6 @@ public abstract class StringBaseOpt {
      * @return String
      */
     public static String encodeBase64(String str) {
-        //sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
-        //return encoder.encodeBuffer(str.getBytes()).trim();
         return new String(Base64.encodeBase64(str.getBytes()));
     }
 
@@ -67,7 +65,6 @@ public abstract class StringBaseOpt {
      * @return String
      */
     public static String decodeBase64(String str) {
-        //sun.misc.BASE64Decoder dec = new sun.misc.BASE64Decoder();
         return new String(Base64.decodeBase64(str.getBytes()));
     }
 
