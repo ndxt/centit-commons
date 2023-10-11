@@ -6,8 +6,14 @@ import com.centit.support.security.Md5Encoder;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGEncodeParam;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;
+import com.sun.imageio.plugins.jpeg.JPEGImageWriter;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -45,7 +51,6 @@ public abstract class ImageOpt {
         mediaTracker.waitForID(0);
         // use this to test for errors at this point:
         // System.out.println(mediaTracker.isErrorAny());
-
         // determine thumbnail size from WIDTH and HEIGHT
         double thumbRatio = (double) thumbWidth / (double) thumbHeight;
         int imageWidth = image.getWidth(null);
@@ -71,14 +76,27 @@ public abstract class ImageOpt {
     public static void saveBufferedImage(String filename, BufferedImage image, int quality)
         throws IOException {
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(filename))) {
-            JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-            JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(image);
-            quality = Math.max(0, Math.min(quality, 100));
-            param.setQuality((float) quality / 100.0f, false);
-            encoder.setJPEGEncodeParam(param);
-            encoder.encode(image);
+            //ImageIO.write(image, "jpg", out);
+            JPEGImageWriter imageWriter = (JPEGImageWriter) ImageIO
+                .getImageWritersBySuffix("jpg").next();
+            ImageOutputStream ios = ImageIO.createImageOutputStream(out);
+            imageWriter.setOutput(ios);
+            // and metadata
+            IIOMetadata imageMetaData = imageWriter.getDefaultImageMetadata(
+                new ImageTypeSpecifier(image), null);
+            if (quality > 0 && quality <100) {
+                JPEGImageWriteParam jpegParams = (JPEGImageWriteParam) imageWriter
+                    .getDefaultWriteParam();
+                jpegParams.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);
+                jpegParams.setCompressionQuality((float) quality / 100.0f);
+            }
+            imageWriter.write(imageMetaData,
+                new IIOImage(image, null, null), null);
+            imageWriter.dispose();
+            ios.close();
         }
     }
+
 
     /**
      * 抓屏程序 算法来做网络，测试通过

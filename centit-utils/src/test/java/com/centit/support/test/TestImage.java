@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 public class TestImage {
-    public static void main(String arg[]) throws IOException{
+    public static void main2(String arg[]) throws IOException{
         Random random = new Random();
         int a = random.nextInt(100);
         int b = random.nextInt(100);
@@ -76,16 +76,15 @@ public class TestImage {
         }
     }
 
-    public static void testImageOpt2() {
+    public static void main(String arg[]) {
         try {
-            ImageOpt.captureScreen("D:/Projects/RunData/demo_home/images/screen.jpg");
-            ImageOpt.createThumbnail("D:/Projects/RunData/demo_home/images/screen.jpg",
-                800, 600, 50, "D:/Projects/RunData/demo_home/images/screen2.jpg");
+            //ImageOpt.captureScreen("/Users/codefan/appdata/RunData/screen.jpg");
+            ImageOpt.createThumbnail("/Users/codefan/appdata/RunData/screen.jpg",
+                800, 600, 30, "/Users/codefan/appdata/RunData/screen4.jpg");
             System.out.println("Done!");
         } catch (Exception e) {
             System.out.println("Error!");
             //e.printStackTrace();
         }
-
     }
 }
