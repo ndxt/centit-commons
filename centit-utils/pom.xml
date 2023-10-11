@@ -5,11 +5,12 @@
     <parent>
         <artifactId>centit-commons</artifactId>
         <groupId>com.centit.support</groupId>
-        <version>5.4-SNAPSHOT</version>
+        <version>JDK21-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>centit-utils</artifactId>
     <name>com.centit.support:centit-utils</name>
+
     <packaging>jar</packaging>
     <description>java 常用工具类,作为 apache-commons的补充</description>
 
@@ -84,27 +85,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
-            <version>${jdk.version}</version>
-            <scope>system</scope>
-            <systemPath>${java.home}/../lib/tools.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>rt</artifactId>
-            <version>${jdk.version}</version>
-            <scope>system</scope>
-            <systemPath>${java.home}/lib/rt.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>jce</artifactId>
-            <version>${jdk.version}</version>
-            <scope>system</scope>
-            <systemPath>${java.home}/lib/jce.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

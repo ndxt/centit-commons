@@ -1,7 +1,6 @@
 package com.centit.search.test;
 
 import com.centit.search.utils.TikaTextExtractor;
-import lombok.Data;
 import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;
 
@@ -17,20 +16,75 @@ public class TestTextExtract {
 
 
 
-    @Data
+
     public static class T1{
         int a;
         String b;
         Map<String, Object> map;
         //List<T2> t2List;
+
+        public int getA() {
+            return a;
+        }
+
+        public void setA(int a) {
+            this.a = a;
+        }
+
+        public String getB() {
+            return b;
+        }
+
+        public void setB(String b) {
+            this.b = b;
+        }
+
+        public Map<String, Object> getMap() {
+            return map;
+        }
+
+        public void setMap(Map<String, Object> map) {
+            this.map = map;
+        }
     }
 
-    @Data
     public static class T2{
         float f;
         Date date;
         byte[] c;
         Set<T1> t1List;
+
+        public float getF() {
+            return f;
+        }
+
+        public void setF(float f) {
+            this.f = f;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public void setDate(Date date) {
+            this.date = date;
+        }
+
+        public byte[] getC() {
+            return c;
+        }
+
+        public void setC(byte[] c) {
+            this.c = c;
+        }
+
+        public Set<T1> getT1List() {
+            return t1List;
+        }
+
+        public void setT1List(Set<T1> t1List) {
+            this.t1List = t1List;
+        }
     }
 
     public static void main(String[] args) {

@@ -1,8 +1,7 @@
 package com.centit.support.test;
 
 import com.centit.support.security.AESSecurityUtils;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-
+import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -41,13 +40,13 @@ public class AES {
     public String encipher(String str) throws Exception {
         // 设置加密规则，如果加密模式是CBC加密则需要设置ivParameterSpec
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
-        return Base64.encode(cipher.doFinal(str.getBytes()));
+        return Base64.getEncoder().encodeToString(cipher.doFinal(str.getBytes()));
     }
 
     public String decipher(String str) throws Exception {
         // 设置解密规则，如果加密模式是CBC加密则需要设置ivParameterSpec
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
-        return new String(cipher.doFinal(Base64.decode(str)));
+        return new String(cipher.doFinal(Base64.getDecoder().decode(str)));
     }
 
     public static void main(String[] args) throws Exception{

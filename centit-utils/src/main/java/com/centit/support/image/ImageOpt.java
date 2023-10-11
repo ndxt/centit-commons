@@ -3,9 +3,6 @@ package com.centit.support.image;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.security.Md5Encoder;
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -71,12 +68,7 @@ public abstract class ImageOpt {
     public static void saveBufferedImage(String filename, BufferedImage image, int quality)
         throws IOException {
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(filename))) {
-            JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(out);
-            JPEGEncodeParam param = encoder.getDefaultJPEGEncodeParam(image);
-            quality = Math.max(0, Math.min(quality, 100));
-            param.setQuality((float) quality / 100.0f, false);
-            encoder.setJPEGEncodeParam(param);
-            encoder.encode(image);
+            ImageIO.write(image, "jpg", out);
         }
     }
 

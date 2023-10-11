@@ -6,7 +6,6 @@ import com.centit.search.annotation.ESField;
 import com.centit.search.annotation.ESType;
 import com.centit.search.utils.ObjectTextExtractor;
 import com.centit.support.security.Md5Encoder;
-import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -15,7 +14,7 @@ import java.util.Date;
 /**
  * Created by codefan on 17-6-1.
  */
-@Data
+
 @ESType(indexName="objects", replicas = 2, shards = 5)
 public class ObjectDocument implements ESDocument,Serializable {
     private static final long serialVersionUID =  1L;
@@ -123,5 +122,85 @@ public class ObjectDocument implements ESDocument,Serializable {
     public ObjectDocument contentObject(Object obj){
         this.content = ObjectTextExtractor.extractText(obj);
         return this;
+    }
+
+    public String getOsId() {
+        return osId;
+    }
+
+    public void setOsId(String osId) {
+        this.osId = osId;
+    }
+
+    public String getOptId() {
+        return optId;
+    }
+
+    public void setOptId(String optId) {
+        this.optId = optId;
+    }
+
+    public String getOptMethod() {
+        return optMethod;
+    }
+
+    public void setOptMethod(String optMethod) {
+        this.optMethod = optMethod;
+    }
+
+    public String getOptTag() {
+        return optTag;
+    }
+
+    public void setOptTag(String optTag) {
+        this.optTag = optTag;
+    }
+
+    public String getOptUrl() {
+        return optUrl;
+    }
+
+    public void setOptUrl(String optUrl) {
+        this.optUrl = optUrl;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
+    }
+
+    public String getUnitCode() {
+        return unitCode;
+    }
+
+    public void setUnitCode(String unitCode) {
+        this.unitCode = unitCode;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.centit.support</groupId>
     <artifactId>centit-commons</artifactId>
-    <version>5.4-SNAPSHOT</version>
+    <version>JDK21-SNAPSHOT</version>
     <name>com.centit.support:centit-commons</name>
     <packaging>pom</packaging>
     <description>java 常用工具类,作为 apache-commons的补充</description>
@@ -23,6 +23,10 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
+
+    <properties>
+        <jdk.version>17</jdk.version>
+    </properties>
 
     <organization>
         <name>江苏南大先腾信息产业股份有限公司</name>
@@ -67,7 +71,7 @@
                     <encoding>UTF-8</encoding>
                     <compilerArguments>
                         <verbose/>
-                        <bootclasspath>${java.home}/lib/rt.jar;${java.home}/lib/jce.jar</bootclasspath>
+                        <bootclasspath>${java.home}/lib/jrt-fs.jar</bootclasspath>
                     </compilerArguments>
                 </configuration>
             </plugin>
@@ -86,7 +90,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
+           <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <executions>
@@ -97,7 +101,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <!-- GPG自动签名的插件-->
             <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>

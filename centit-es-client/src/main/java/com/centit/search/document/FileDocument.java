@@ -4,15 +4,12 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.annotation.ESField;
 import com.centit.search.annotation.ESType;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by codefan on 17-6-1.
  */
-@Data
 @ESType(indexName="files", replicas = 2, shards = 5)
 public class FileDocument implements ESDocument, Serializable {
     //public static final String ES_DOCUMENT_TYPE = "file";
@@ -136,5 +133,117 @@ public class FileDocument implements ESDocument, Serializable {
     @Override
     public JSONObject toJSONObject() {
         return (JSONObject)JSON.toJSON(this);
+    }
+
+    public String getOsId() {
+        return osId;
+    }
+
+    public void setOsId(String osId) {
+        this.osId = osId;
+    }
+
+    public String getOptId() {
+        return optId;
+    }
+
+    public void setOptId(String optId) {
+        this.optId = optId;
+    }
+
+    public String getOptTag() {
+        return optTag;
+    }
+
+    public void setOptTag(String optTag) {
+        this.optTag = optTag;
+    }
+
+    public String getOptMethod() {
+        return optMethod;
+    }
+
+    public void setOptMethod(String optMethod) {
+        this.optMethod = optMethod;
+    }
+
+    public String getOptUrl() {
+        return optUrl;
+    }
+
+    public void setOptUrl(String optUrl) {
+        this.optUrl = optUrl;
+    }
+
+    public String getUserCode() {
+        return userCode;
+    }
+
+    public void setUserCode(String userCode) {
+        this.userCode = userCode;
+    }
+
+    public String getUnitCode() {
+        return unitCode;
+    }
+
+    public void setUnitCode(String unitCode) {
+        this.unitCode = unitCode;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileSummary() {
+        return fileSummary;
+    }
+
+    public void setFileSummary(String fileSummary) {
+        this.fileSummary = fileSummary;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    public String getFileMD5() {
+        return fileMD5;
+    }
+
+    public void setFileMD5(String fileMD5) {
+        this.fileMD5 = fileMD5;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String[] getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String[] keywords) {
+        this.keywords = keywords;
     }
 }
