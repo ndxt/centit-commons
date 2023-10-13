@@ -424,8 +424,7 @@ public abstract class CollectionsOpt {
      * @param childrenPropertyName 为孩子的 属性名
      * @return JSONArray
      */
-    public static <T> JSONArray treeToJSONArray
-    (List<TreeNode<T>> treeList, String childrenPropertyName) {
+    public static <T> JSONArray treeToJSONArray(List<TreeNode<T>> treeList, String childrenPropertyName) {
         if (treeList == null || treeList.size() == 0)
             return null;
 
@@ -453,8 +452,95 @@ public abstract class CollectionsOpt {
         return treeToJSONArray(sortTree, childrenPropertyName);
     }
 
-    /*
+    /**
+     * 深度优先遍历树
+     * @param rootObject 根节点
+     * @param expendTree 展开的列表
+     * @param childrenPropertyName 孩子节点
+     */
+    public static void depthFirstTraverseTree(Object rootObject, List<Object> expendTree, String childrenPropertyName){
+        expendTree.add(rootObject);
+        Object children = ReflectionOpt.attainExpressionValue(rootObject, childrenPropertyName);
+        if(children==null) return;
+        if(children instanceof Collection){
+            Collection<Object> childrenList = (Collection<Object>) children;
+            for(Object object : childrenList){
+                depthFirstTraverseTree(object, expendTree, childrenPropertyName);
+            }
+        } else {
+            depthFirstTraverseTree(children, expendTree, childrenPropertyName);
+        }
+    }
+
+    /**
+     * 深度优先遍森林
+     * @param treeObjects 森林list
+     * @param childrenPropertyName 孩子节点
+     * @return 展开的树
+     */
+    public static List<Object> depthFirstTraverseForest(Collection<Object> treeObjects, String childrenPropertyName){
+        List<Object> expendTree = new ArrayList<>(128);
+        for(Object obj : treeObjects){
+            depthFirstTraverseTree(obj, expendTree, childrenPropertyName);
+        }
+        return expendTree;
+    }
+
+    /**
+     * 深度优先遍树
+     * @param rootObject 树的根对象
+     * @param childrenPropertyName 孩子节点
+     * @return 展开的树
+     */
+    public static List<Object> depthFirstTraverseTree(Object rootObject, String childrenPropertyName){
+        List<Object> expendTree = new ArrayList<>(128);
+        depthFirstTraverseTree(rootObject, expendTree, childrenPropertyName);
+        return expendTree;
+    }
+
+    /**
+     * 广度优先遍森林
+     * @param treeObjects 森林list
+     * @param childrenPropertyName 孩子节点
+     * @return 展开的树
+     */
+    public static List<Object> breadthFirstTraverseForest(Collection<Object> treeObjects, String childrenPropertyName){
+        List<Object> expendTree = new ArrayList<>(128);
+        int nExpendInd = 0;
+        for(Object obj : treeObjects){
+            expendTree.add(obj);
+        }
+        while (nExpendInd < expendTree.size()){
+            Object nodeObject = expendTree.get(nExpendInd);
+            Object children = ReflectionOpt.attainExpressionValue(nodeObject, childrenPropertyName);
+            if(children != null){
+                if(children instanceof Collection){
+                    Collection<Object> childrenList = (Collection<Object>) children;
+                    expendTree.addAll(childrenList);
+                } else {
+                    expendTree.add(children);
+                }
+            }
+            nExpendInd ++;
+        }
+        return expendTree;
+    }
+
+    /**
+     * 广度优先遍树
+     * @param rootObject 树的根节点
+     * @param childrenPropertyName 孩子节点
+     * @return 展开的树
+     */
+    public static List<Object> breadthFirstTraverseTree(Object rootObject, String childrenPropertyName){
+        return breadthFirstTraverseForest(CollectionsOpt.createList(rootObject), childrenPropertyName);
+    }
+
+    /**
      * 克隆 一个 list
+     * @param souList 源列表
+     * @return 复制列表
+     * @param <T> 模版类型
      */
     public static <T> List<T> cloneList(Collection<T> souList) {
         if (souList == null) {
