@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-framework-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
-        <version>5.4-SNAPSHOT</version>
+        <version>JDK21-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
