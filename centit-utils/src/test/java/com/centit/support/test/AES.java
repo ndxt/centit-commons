@@ -1,10 +1,11 @@
 package com.centit.support.test;
 
 import com.centit.support.security.AESSecurityUtils;
-import java.util.Base64;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 
 /**
  * @author huwenlong

@@ -9,6 +9,7 @@ import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -49,12 +50,7 @@ public abstract class HmacSha1Encoder {
     }
 
     public static String encode(String data, String secret) {
-        try {
-            return encode(data.getBytes("utf8"), secret);
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
-            return null;
-        }
+        return encode(data.getBytes(StandardCharsets.UTF_8), secret);
     }
 
     public static String encodeBase64(byte[] data, String secret, boolean urlSafe) {
@@ -68,12 +64,7 @@ public abstract class HmacSha1Encoder {
     }
 
     public static String encodeBase64(String data, String secret, boolean urlSafe) {
-        try {
-            return encodeBase64(data.getBytes("utf8"), secret, urlSafe);
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
-            return null;
-        }
+        return encodeBase64(data.getBytes(StandardCharsets.UTF_8), secret, urlSafe);
     }
 
 }

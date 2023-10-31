@@ -5,7 +5,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -44,12 +44,7 @@ public abstract class Md5Encoder {
     }
 
     public static String encode(String data) {
-        try {
-            return encode(data.getBytes("utf8"));
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
-            return null;
-        }
+        return encode(data.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -74,12 +69,7 @@ public abstract class Md5Encoder {
     }
 
     public static String encodeBase64(String data, boolean urlSafe) {
-        try {
-            return encodeBase64(data.getBytes("utf8"), urlSafe);
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
-            return null;
-        }
+        return encodeBase64(data.getBytes(StandardCharsets.UTF_8), urlSafe);
     }
 
     public static String encodeBase64(String data) {
@@ -111,13 +101,13 @@ public abstract class Md5Encoder {
         MessageDigest MD5;
         try {
             MD5 = MessageDigest.getInstance("MD5");
-            byte[] saltBytes = salt.getBytes("utf8");
+            byte[] saltBytes = salt.getBytes(StandardCharsets.UTF_8);
             MD5.update(saltBytes, 0, saltBytes.length);
-            byte[] hashedBytes = MD5.digest(data.getBytes("utf8"));
+            byte[] hashedBytes = MD5.digest(data.getBytes(StandardCharsets.UTF_8));
             for (int i = 0; i < iterations - 1; i++)
                 hashedBytes = MD5.digest(hashedBytes);
             return new String(Hex.encodeHex(hashedBytes));
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException e) {
             logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
         }
