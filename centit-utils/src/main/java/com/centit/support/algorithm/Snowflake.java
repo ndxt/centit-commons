@@ -3,6 +3,7 @@ package com.centit.support.algorithm;
 import com.centit.support.common.ObjectException;
 import com.centit.support.network.HardWareUtils;
 import org.apache.commons.codec.binary.Base64;
+
 import java.io.Serializable;
 import java.util.concurrent.ThreadLocalRandom;
 
