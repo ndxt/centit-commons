@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 76;
+    public static final int functionsSum = 77;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -86,6 +86,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("lastofmonth", -1, ConstDefine.FUNC_LAST_OF_MONTH, ConstDefine.TYPE_ANY),//日期函数   求这个月的第一天
         new FunctionInfo("toDate", 1, ConstDefine.FUNC_TO_DATE, ConstDefine.TYPE_DATE),// 转换为日期
         new FunctionInfo("toString", 1, ConstDefine.FUNC_TO_STRING, ConstDefine.TYPE_STR),//转换为String
+        new FunctionInfo("toJsonString", 1, ConstDefine.FUNC_TO_JSON_STRING, ConstDefine.TYPE_STR),//转换为String
         new FunctionInfo("toObject", 1, ConstDefine.FUNC_TO_OBJECT, ConstDefine.TYPE_ANY),//转换为json 对象
         new FunctionInfo("toNumber", 1, ConstDefine.FUNC_TO_NUMBER, ConstDefine.TYPE_NUM),//转换为数字
         new FunctionInfo("toByteArray", 1, ConstDefine.FUNC_TOBYTEARRAY, ConstDefine.TYPE_ANY),//转换为数字
@@ -855,11 +856,23 @@ public abstract class EmbedFunc {
                 if (nOpSum < 1) {
                     return null;
                 }
-                String svalue = StringBaseOpt.castObjectToString(slOperand.get(0));
-                if (StringUtils.isBlank(svalue) && nOpSum > 1) {
-                    return slOperand.get(1);
+                for(int i=0; i<nOpSum; i++) {
+                    String sValue = StringBaseOpt.castObjectToString(slOperand.get(i));
+                    if (StringUtils.isNotBlank(sValue)) {
+                        return sValue;
+                    }
                 }
-                return svalue;
+                return null;
+            }
+
+            case ConstDefine.FUNC_TO_JSON_STRING: {//
+                if (nOpSum < 1) {
+                    return null;
+                }
+                if(slOperand.get(0) instanceof String){
+                    return slOperand.get(0);
+                }
+                return JSON.toJSONString(slOperand.get(0));
             }
 
             case ConstDefine.FUNC_TOBYTEARRAY:{
