@@ -30,8 +30,6 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
      */
     private long timeSpan;
 
-    private Long timeSpan2;
-
     public WorkTimeSpan() {
         dayWorkMilliseconds = DEFAULT_DAY_WORK_MILLISECONDS;
         timeSpan = 0;
