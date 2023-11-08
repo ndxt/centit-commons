@@ -5,7 +5,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -47,12 +47,7 @@ public abstract class Sha1Encoder {
     }
 
     public static String encode(String data) {
-        try {
-            return encode(data.getBytes("utf8"));
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
-            return null;
-        }
+        return encode(data.getBytes(StandardCharsets.UTF_8));
     }
 
     public static String encodeBase64(byte[] data, boolean urlSafe) {
@@ -66,11 +61,6 @@ public abstract class Sha1Encoder {
     }
 
     public static String encodeBase64(String data, boolean urlSafe) {
-        try {
-            return encodeBase64(data.getBytes("utf8"), urlSafe);
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
-            return null;
-        }
+        return encodeBase64(data.getBytes(StandardCharsets.UTF_8), urlSafe);
     }
 }

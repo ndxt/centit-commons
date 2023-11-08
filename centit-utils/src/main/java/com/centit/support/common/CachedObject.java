@@ -2,8 +2,8 @@ package com.centit.support.common;
 
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
@@ -12,7 +12,7 @@ import static java.lang.Thread.sleep;
 
 public class CachedObject<T> extends AbstractCachedObject<T> {
 
-    private static Log logger = LogFactory.getLog(CachedObject.class);
+    protected Logger logger = LoggerFactory.getLogger(CachedObject.class);
 
     private Supplier<T> refresher;
     protected long freshPeriod;
