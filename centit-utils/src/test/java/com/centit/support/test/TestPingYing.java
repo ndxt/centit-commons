@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 public class TestPingYing {
     public static void main(String[] args) {
+        System.out.println(StringBaseOpt.prevCode("200ZAAAA00"));
         //1.展示单个汉字的字母拼写
         String[] res1= PinyinHelper.toHanyuPinyinStringArray('芮');
         System.out.println(Arrays.toString(res1));

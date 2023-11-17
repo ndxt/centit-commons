@@ -363,6 +363,29 @@ public abstract class StringBaseOpt {
         return sDocNo;
     }
 
+    public static String prevCode(String sCode) {
+        int nSL = sCode.length();
+        String sRes = "";
+        int i = nSL;
+        while (i > 0) {
+            i--;
+            char c = sCode.charAt(i);
+            if (c == '0') {
+                sRes = '9' + sRes;
+            } else if (c == 'a') {
+                sRes = 'z' + sRes;
+            } else if (c == 'A') {
+                sRes = 'Z' + sRes;
+            } else {
+                c -= 1;
+                sRes = c + sRes;
+                break;
+            }
+        }
+        if (i > 0)
+            sRes = sCode.substring(0, i) + sRes;
+        return sRes;
+    }
     /**
      * 寻找比它大一个字符串 nextCode("0000200")=="0000201"
      * nextCode("000AZZZ")=="000BAAA"
