@@ -50,6 +50,8 @@ public class JSONTransformer {
      */
     public static Object transformer(Object templateObj,
                                      JSONTransformDataSupport dataSupport){
+        if(templateObj == null)
+            return null;
         if(templateObj instanceof String){
             String value = (String)templateObj;
             if(value.startsWith("@")){
