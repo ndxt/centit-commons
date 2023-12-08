@@ -11,6 +11,7 @@ import java.math.RoundingMode;
 import java.text.Collator;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Created by codefan on 17-9-7.
@@ -591,5 +592,28 @@ public abstract class GeneralAlgorithm {
 
     public static Object castObjectToType(Object obj, Class<?> type) {
         return TypeUtils.cast(obj, type);
+    }
+
+    public static boolean isEmpty(Object obj) {
+        if(obj == null)
+            return true;
+        if(obj instanceof String)
+            return StringUtils.isBlank((String)obj);
+        if (obj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<Object, Object> objMap = (Map<Object, Object>) obj;
+            return objMap.isEmpty();
+        } else  if (obj instanceof Collection) {
+            Collection<?> objlist = (Collection<?>) obj;
+            return objlist.size() > 0;
+        } else if (obj instanceof Object[]) {
+            Object[] objs = (Object[]) obj;
+            return objs.length > 0;
+        } else if(obj instanceof Supplier){
+            Object retObj = ((Supplier)obj).get();
+            return isEmpty(retObj);
+        } else {
+            return StringUtils.isBlank(StringBaseOpt.castObjectToString(obj));
+        }
     }
 }

@@ -585,14 +585,24 @@ public abstract class EmbedFunc {
             }
 
             case ConstDefine.FUNC_ISEMPTY: //判断参数是否为空
-                if (nOpSum < 1 || slOperand.get(0) == null)
+                if (nOpSum < 1)
                     return true;
-                return StringUtils.isBlank(StringBaseOpt.objectToString(slOperand.get(0)));
+                for(int i=0; i<nOpSum; i++){
+                    if(!GeneralAlgorithm.isEmpty(slOperand.get(i))){
+                        return false;
+                    }
+                }
+                return true;
 
             case ConstDefine.FUNC_NOTEMPTY: //判断参数是否为空
-                if (nOpSum < 1 || slOperand.get(0) == null)
+                if (nOpSum < 1)
                     return false;
-                return StringUtils.isNotBlank(StringBaseOpt.objectToString(slOperand.get(0)));
+                for(int i=0; i<nOpSum; i++){
+                    if(!GeneralAlgorithm.isEmpty(slOperand.get(i))){
+                        return true;
+                    }
+                }
+                return false;
 
             case ConstDefine.FUNC_LN: {
                 if (nOpSum < 1) return null;
