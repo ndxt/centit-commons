@@ -211,6 +211,14 @@ public abstract class HttpExecutor {
         } else {
             httpClient = executorContext.getHttpclient();
         }
+        //设置超时时间
+        RequestConfig requestConfig =  RequestConfig.custom()
+            .setConnectTimeout(5000)
+            .setSocketTimeout(600000)
+            .setConnectionRequestTimeout(5000)
+            .setMaxRedirects(3).build();
+        httpRequest.setConfig(requestConfig);
+
         try (CloseableHttpResponse response = httpClient.execute(httpRequest, executorContext.getHttpContext())) {
             return responseHandler.handleResponse(response);
         } finally {

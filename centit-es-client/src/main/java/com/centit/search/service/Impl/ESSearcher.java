@@ -32,7 +32,7 @@ import java.util.*;
  * Created by codefan on 17-6-12.
  */
 public class ESSearcher implements Searcher{
-    private static final String KEYWORD = ".keyword";
+
     private static Logger logger = LoggerFactory.getLogger(ESSearcher.class);
 
     private ESServerConfig config;
@@ -219,17 +219,17 @@ public class ESSearcher implements Searcher{
                 /*Class tp = obj.getClass();
                 return tp.isArray()?true:obj instanceof Collection;*/
                 if (ent.getValue().getClass().isArray()) {
-                    queryBuilder.must(QueryBuilders.termsQuery(ent.getKey()+ KEYWORD, (String[]) ent.getValue()));
+                    queryBuilder.must(QueryBuilders.termsQuery(ent.getKey(), (String[]) ent.getValue()));
                 } else if (ent.getValue() instanceof Collection) {
                     queryBuilder.must(QueryBuilders.termsQuery(
-                        ent.getKey()+ KEYWORD, CollectionsOpt.listToArray((Collection)ent.getValue())));
+                        ent.getKey(), CollectionsOpt.listToArray((Collection)ent.getValue())));
                 } else {
-                    queryBuilder.must(QueryBuilders.termQuery(ent.getKey()+ KEYWORD, ent.getValue()));
+                    queryBuilder.must(QueryBuilders.termQuery(ent.getKey(), ent.getValue()));
                 }
             }
         }
         if (StringUtils.isNotBlank(queryWord)) {
-            queryBuilder.must(QueryBuilders.multiMatchQuery(
+            queryBuilder.filter(QueryBuilders.multiMatchQuery(
                 queryWord, queryFields));
         }
 
