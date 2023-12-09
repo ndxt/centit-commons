@@ -606,10 +606,20 @@ public abstract class GeneralAlgorithm {
             return objMap.isEmpty();
         } else  if (obj instanceof Collection) {
             Collection<?> objlist = (Collection<?>) obj;
-            return objlist.size() == 0;
+            if(objlist.isEmpty())
+                return true;
+            for(Object obj1 : objlist){
+                if(!isEmpty(obj1))
+                    return false;
+            }
+            return true;
         } else if (obj instanceof Object[]) {
             Object[] objs = (Object[]) obj;
-            return objs.length == 0;
+            for(Object obj1 : objs){
+                if(!isEmpty(obj1))
+                    return false;
+            }
+            return true;
         } else if(obj instanceof Supplier){
             Object retObj = ((Supplier)obj).get();
             return isEmpty(retObj);
