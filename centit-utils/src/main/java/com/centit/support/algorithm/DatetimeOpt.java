@@ -626,6 +626,13 @@ public abstract class DatetimeOpt {
         cal.set(Calendar.MILLISECOND, 0);
     }
 
+    public static java.util.Date truncateToSecond(java.util.Date date) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
     public static java.util.Date truncateToDay(java.util.Date date) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
