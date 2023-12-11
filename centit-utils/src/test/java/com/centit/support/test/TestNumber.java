@@ -3,11 +3,9 @@ package com.centit.support.test;
 import com.alibaba.fastjson2.JSON;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.DoubleAspect;
-import com.centit.support.compiler.EmbedFuncUtils;
 import com.centit.support.compiler.VariableFormula;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
 
 public class TestNumber {

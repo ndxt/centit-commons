@@ -6,8 +6,8 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +21,8 @@ public abstract class Watermark4Pdf {
 
     public static final boolean runFlag = false;
 
-    private static Log logger = LogFactory.getLog(Watermark4Pdf.class);
+    protected static Logger logger = LoggerFactory.getLogger(Watermark4Pdf.class);
+
 
     /**
      * 为文档添加水印：目前只支持给pdf、word、excel、ppt增加水印，并且输出只能是Pdf文件。

@@ -2,6 +2,7 @@ package com.centit.support.algorithm;
 
 import com.alibaba.fastjson2.JSON;
 import com.centit.support.file.FileIOOpt;
+import net.sourceforge.pinyin4j.PinyinHelper;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -359,6 +360,30 @@ public abstract class StringBaseOpt {
         return sDocNo;
     }
 
+    public static String prevCode(String sCode) {
+        int nSL = sCode.length();
+        String sRes = "";
+        int i = nSL;
+        while (i > 0) {
+            i--;
+            char c = sCode.charAt(i);
+            if (c == '0') {
+                sRes = '9' + sRes;
+            } else if (c == 'a') {
+                sRes = 'z' + sRes;
+            } else if (c == 'A') {
+                sRes = 'Z' + sRes;
+            } else {
+                c -= 1;
+                sRes = c + sRes;
+                break;
+            }
+        }
+        if (i > 0)
+            sRes = sCode.substring(0, i) + sRes;
+        return sRes;
+    }
+
     /**
      * 寻找比它大一个字符串 nextCode("0000200")=="0000201"
      * nextCode("000AZZZ")=="000BAAA"
@@ -390,8 +415,14 @@ public abstract class StringBaseOpt {
         return sRes;
     }
 
-    private static String getPinYin(String hanzi) {
-        try {
+    private static char getPinYinShenMu(char ch) {
+        String[] res1 = PinyinHelper.toHanyuPinyinStringArray(ch);
+        if (res1.length > 0) {
+            return res1[0].charAt(0);
+        }
+        return ' ';
+    }
+        /*try {
             String chinese = new String(hanzi.getBytes("GB2312"), "ISO8859-1");
             if (chinese.length() > 1) {
                 int li_SectorCode = (int) chinese.charAt(0); // 汉字区码
@@ -414,8 +445,8 @@ public abstract class StringBaseOpt {
             }
         } catch (UnsupportedEncodingException e) {
             return "";
-        }
-    }
+        }*/
+
 
     /**
      * 获取一个汉字的拼音首字母。 GB码两个字节分别减去160，转换成10进制码组合就可以得到区位码
@@ -428,8 +459,7 @@ public abstract class StringBaseOpt {
     public static String getFirstLetter(String oriStr) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < oriStr.length(); i++) {
-            String pinyin = getPinYin(String.valueOf(oriStr.charAt(i)));
-            sb.append(pinyin);
+            sb.append(getPinYinShenMu(oriStr.charAt(i)));
         }
         return sb.toString();
     }

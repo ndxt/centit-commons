@@ -17,7 +17,8 @@ import java.util.Date;
  */
 @Data
 @ESType(indexName="objects", replicas = 2, shards = 5)
-public class ObjectDocument implements ESDocument,Serializable {
+public class ObjectDocument implements ESDocument, Serializable {
+
     private static final long serialVersionUID =  1L;
     /**
      * 所属系统
