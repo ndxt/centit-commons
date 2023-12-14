@@ -11,6 +11,7 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class JSRuntimeContext {
     protected static final Logger logger = LoggerFactory.getLogger(JSRuntimeContext.class);
@@ -18,11 +19,18 @@ public class JSRuntimeContext {
 
     public JSRuntimeContext(){
         ScriptEngineManager sem = new ScriptEngineManager();
-        scriptEngine = sem.getEngineByName("graal.js");
-        var bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
-        bindings.put("polyglot.js.allowAllAccess",true);
         // "nashorn" 等价与 “js”, "JavaScript"
         // "graal.js"
+        scriptEngine = sem.getEngineByName("graal.js");
+        /**
+         如此之后，就可以支持nashorn里的一些特性了：
+         Java.type()
+         Java.from, Java.to
+         Java.extend, Java.super
+         */
+        var bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
+        bindings.put("polyglot.js.allowAllAccess",true);
+        bindings.put("polyglot.js.allowHostClassLookup", (Predicate<String>) s -> true);
     }
 
     public JSRuntimeContext compileScript(String js){
