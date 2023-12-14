@@ -5,10 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
@@ -21,7 +18,9 @@ public class JSRuntimeContext {
 
     public JSRuntimeContext(){
         ScriptEngineManager sem = new ScriptEngineManager();
-        scriptEngine = sem.getEngineByName("js");
+        scriptEngine = sem.getEngineByName("graal.js");
+        var bindings = scriptEngine.getBindings(ScriptContext.ENGINE_SCOPE);
+        bindings.put("polyglot.js.allowAllAccess",true);
         // "nashorn" 等价与 “js”, "JavaScript"
         // "graal.js"
     }
