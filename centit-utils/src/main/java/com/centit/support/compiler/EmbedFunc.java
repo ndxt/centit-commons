@@ -272,6 +272,9 @@ public abstract class EmbedFunc {
                 if(StringUtils.equalsAnyIgnoreCase(ct, "r","rmb","yuan"))
                     return EmbedFuncUtils.instance.capitalRMB(slOperand.get(0));
 
+                if(StringUtils.equalsAnyIgnoreCase(ct, "yjf","yuanjiaofen"))
+                    return EmbedFuncUtils.instance.capitalRmbYJF(slOperand.get(0));
+
                 if(StringUtils.equalsAnyIgnoreCase(ct, "s","simple")){
                     return NumberBaseOpt.capitalization(
                         StringBaseOpt.objectToString(slOperand.get(0)), true);
