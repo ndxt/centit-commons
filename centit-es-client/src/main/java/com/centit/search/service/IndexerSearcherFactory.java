@@ -131,10 +131,7 @@ public abstract class IndexerSearcherFactory {
             properties.getProperty("elasticsearch.server.username")));
         config.setPassword(SecurityOptUtils.decodeSecurityString(
             properties.getProperty("elasticsearch.server.password")));
-        /*config.setIndexName(
-                StringUtils.lowerCase(properties.getProperty("elasticsearch.index")));*/
         config.setOsId(properties.getProperty("elasticsearch.osId"));
-
         config.setMinScore(NumberBaseOpt.parseFloat(
                 properties.getProperty("elasticsearch.filter.minScore"), 0.5f));
         return config;
