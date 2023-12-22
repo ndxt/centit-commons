@@ -13,7 +13,7 @@ import java.util.Date;
  * Created by codefan on 17-6-1.
  */
 @Data
-@ESType(indexName="files", replicas = 2, shards = 5)
+@ESType(indexName="files", shards = 5)
 public class FileDocument implements ESDocument, Serializable {
     //public static final String ES_DOCUMENT_TYPE = "file";
     private static final long serialVersionUID =  1L;

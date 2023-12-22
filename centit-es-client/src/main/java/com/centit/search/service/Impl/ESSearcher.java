@@ -224,7 +224,25 @@ public class ESSearcher implements Searcher{
                     queryBuilder.must(QueryBuilders.termsQuery(
                         ent.getKey(), CollectionsOpt.listToArray((Collection)ent.getValue())));
                 } else {
-                    queryBuilder.must(QueryBuilders.termQuery(ent.getKey(), ent.getValue()));
+                    String key = ent.getKey(); int keyLen = key.length();
+                    String optSuffix = keyLen>3 ? key.substring(keyLen - 3).toLowerCase() : "_eq";
+                    switch (optSuffix) {
+                        case "_gt":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).gt(ent.getValue()));
+                            break;
+                        case "_ge":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).gte(ent.getValue()));
+                            break;
+                        case "_lt":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).lt(ent.getValue()));
+                            break;
+                        case "_le":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).lte(ent.getValue()));
+                            break;
+                        default:
+                            queryBuilder.must(QueryBuilders.termQuery(ent.getKey(), ent.getValue()));
+                            break;
+                    }
                 }
             }
         }
@@ -245,7 +263,7 @@ public class ESSearcher implements Searcher{
      */
     @Override
     public Pair<Long,List<Map<String, Object>>> search(String queryWord, int pageNo, int pageSize) {
-        return search(null,queryWord,pageNo,pageSize);
+        return search(null, queryWord, pageNo, pageSize);
     }
 
     /**
