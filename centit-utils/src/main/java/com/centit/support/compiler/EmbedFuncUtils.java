@@ -8,12 +8,11 @@ import com.centit.support.algorithm.StringBaseOpt;
 import java.util.Date;
 
 public class EmbedFuncUtils {
-
+    //这个单例对象，用于jxls中的拓展函数
     public static final EmbedFuncUtils instance = new EmbedFuncUtils();
 
     private EmbedFuncUtils() {
     }
-
 
     public String formatDate(Object... slOperand) {
         int nOpSum = (slOperand == null) ? 0 : slOperand.length;
@@ -43,6 +42,17 @@ public class EmbedFuncUtils {
     public String capital(Object object){
         return NumberBaseOpt.capitalization(
             StringBaseOpt.objectToString(object));
+    }
+
+    public String capitalRmbYJF(Object object){
+        Double db = NumberBaseOpt.castObjectToDouble(object);
+        Long yuan = db.longValue();
+        int jiao = (int) ((db - yuan) * 10);
+        int fen = (int) ((db - yuan) * 100f + 0.5f) % 10;
+        StringBuilder sValue = new StringBuilder(NumberBaseOpt.capitalization(String.valueOf(yuan)));
+        sValue.append("元").append(NumberBaseOpt.capitalization(String.valueOf(jiao))).append("角")
+            .append(NumberBaseOpt.capitalization(String.valueOf(fen))).append("分");
+        return sValue.toString();
     }
 
     public String capitalRMB(Object object) {

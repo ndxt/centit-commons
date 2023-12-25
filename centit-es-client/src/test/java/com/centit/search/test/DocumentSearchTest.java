@@ -52,6 +52,11 @@ public class DocumentSearchTest {
             CollectionsOpt.createHashMap("osId", "zp_Qn5R5ROSo4sf-eovoWA"),
             "输入框", 1, 20);
 
+        //添加.keyword是因为类型不一样， text类型的如果想精确匹配就需要添加.keyword，如果本来就是keyword类型就不需要
+        /*Pair<Long, List<Map<String, Object>>> res = fetchSearcher.search(
+            CollectionsOpt.createHashMap("topUnit.keyword", "T2w2m00e", "logLevel.keyword", "0"),
+            "胡知非", 1, 20);
+        */
         System.out.println(JSON.toJSONString(res));
     }
 }
