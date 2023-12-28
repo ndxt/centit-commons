@@ -72,6 +72,16 @@
             <artifactId>javase</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15to18</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15to18</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- test -->
         <!-- 获取汉字首字母的类库  -->
         <dependency>
