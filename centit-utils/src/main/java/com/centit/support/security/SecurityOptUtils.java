@@ -12,6 +12,8 @@ public abstract class SecurityOptUtils {
 
     protected static final Logger logger = LoggerFactory.getLogger(SecurityOptUtils.class);
 
+    public static final String GENERAL_DEFAULT_KEY="qbh07dTZ$sO7_wC1slEAYAe2@dh3otTOqHdydl1Cyt3Q_0W_tocQTCa1B6yK7iKt";
+                                         //"GAOPwRFySfRh-uEPITdWRYmQR1b3k3r8QhmIR0gsZThoowq0QKYYk-RneeoOQPyu";
     public static String decodeSecurityString(String sStr){
         if(StringUtils.isBlank(sStr))
             return "";

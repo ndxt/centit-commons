@@ -22,6 +22,7 @@ public class SM4Util extends GMBaseUtil {
     public static final String ALGORITHM_NAME_ECB_NOPADDING = "SM4/ECB/NoPadding";
     public static final String ALGORITHM_NAME_CBC_PADDING = "SM4/CBC/PKCS5Padding";
     public static final String ALGORITHM_NAME_CBC_NOPADDING = "SM4/CBC/NoPadding";
+
     public static final int DEFAULT_KEY_SIZE = 128;
 
     public static byte[] generateKey() throws NoSuchAlgorithmException, NoSuchProviderException {
