@@ -158,7 +158,7 @@ public class SM4Util extends GMBaseUtil {
         return mac.doFinal();
     }
 
-    private static Cipher generateEcbCipher(String algorithmName, int mode, byte[] key)
+    public static Cipher generateEcbCipher(String algorithmName, int mode, byte[] key)
         throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException,
         InvalidKeyException {
         Cipher cipher = Cipher.getInstance(algorithmName, BouncyCastleProvider.PROVIDER_NAME);
@@ -167,7 +167,7 @@ public class SM4Util extends GMBaseUtil {
         return cipher;
     }
 
-    private static Cipher generateCbcCipher(String algorithmName, int mode, byte[] key, byte[] iv)
+    public static Cipher generateCbcCipher(String algorithmName, int mode, byte[] key, byte[] iv)
         throws InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException,
         NoSuchProviderException, NoSuchPaddingException {
         Cipher cipher = Cipher.getInstance(algorithmName, BouncyCastleProvider.PROVIDER_NAME);
