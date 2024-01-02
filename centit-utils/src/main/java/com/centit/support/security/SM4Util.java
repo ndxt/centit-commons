@@ -1,5 +1,6 @@
 package com.centit.support.security;
 
+import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.engines.SM4Engine;
 import org.bouncycastle.crypto.macs.CBCBlockCipherMac;
@@ -10,19 +11,25 @@ import org.bouncycastle.crypto.paddings.PKCS7Padding;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
 
-public class SM4Util extends GMBaseUtil {
+public abstract class SM4Util extends GMBaseUtil {
+
+    protected static final Logger logger = LoggerFactory.getLogger(SM4Util.class);
     public static final String ALGORITHM_NAME = "SM4";
     public static final String ALGORITHM_NAME_ECB_PADDING = "SM4/ECB/PKCS5Padding";
     public static final String ALGORITHM_NAME_ECB_NOPADDING = "SM4/ECB/NoPadding";
     public static final String ALGORITHM_NAME_CBC_PADDING = "SM4/CBC/PKCS5Padding";
     public static final String ALGORITHM_NAME_CBC_NOPADDING = "SM4/CBC/NoPadding";
 
+    public static final String SM4_SECRET_KEY_SPEC="qbh07dTZ$sO7_wC1";
+    public static final String SM4_IV_PARAMETER_SPEC = "slEAYAe2@dh3otTO";
     public static final int DEFAULT_KEY_SIZE = 128;
 
     public static byte[] generateKey() throws NoSuchAlgorithmException, NoSuchProviderException {
@@ -176,4 +183,31 @@ public class SM4Util extends GMBaseUtil {
         cipher.init(mode, sm4Key, ivParameterSpec);
         return cipher;
     }
+
+    public static String encryptAsCBCType(String str, String keyValue, String ivParameter) {
+        try {
+            SecretKeySpec sm4Key = new SecretKeySpec(keyValue.getBytes(), ALGORITHM_NAME);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            Cipher cipher = Cipher.getInstance(ALGORITHM_NAME_CBC_PADDING, BouncyCastleProvider.PROVIDER_NAME);
+            cipher.init(Cipher.ENCRYPT_MODE, sm4Key, ivParameterSpec);
+            return new String(Base64.encodeBase64(cipher.doFinal(str.getBytes())));
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String decryptAsCBCType(String str, String keyValue, String ivParameter) {
+        try {
+            SecretKeySpec sm4Key = new SecretKeySpec(keyValue.getBytes(), ALGORITHM_NAME);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            Cipher cipher = Cipher.getInstance(ALGORITHM_NAME_CBC_PADDING, BouncyCastleProvider.PROVIDER_NAME);
+            cipher.init(Cipher.DECRYPT_MODE, sm4Key, ivParameterSpec);
+            return new String(cipher.doFinal(Base64.decodeBase64(str)));
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
+        }
+    }
+
 }

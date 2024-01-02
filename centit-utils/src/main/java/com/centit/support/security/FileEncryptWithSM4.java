@@ -39,7 +39,8 @@ public abstract class FileEncryptWithSM4 {
     public static void encrypt(InputStream sourceFile, OutputStream diminationFile, String keyValue)
         throws IOException, GeneralSecurityException {
         try (CipherInputStream cis = new CipherInputStream(sourceFile,
-                SM4Util.generateEcbCipher(SM4Util.ALGORITHM_NAME_ECB_PADDING, Cipher.ENCRYPT_MODE, keyValue.getBytes(StandardCharsets.UTF_8)))) {
+                SM4Util.generateCbcCipher(SM4Util.ALGORITHM_NAME_CBC_PADDING, Cipher.ENCRYPT_MODE,
+                    keyValue.getBytes(StandardCharsets.UTF_8), SM4Util.SM4_IV_PARAMETER_SPEC.getBytes(StandardCharsets.UTF_8)))) {
             byte[] buffer = new byte[1024];
             int r;
             while ((r = cis.read(buffer)) > 0) {
@@ -88,7 +89,8 @@ public abstract class FileEncryptWithSM4 {
         throws IOException, GeneralSecurityException {
         try (
             CipherOutputStream cos = new CipherOutputStream(diminationFile,
-                SM4Util.generateEcbCipher(SM4Util.ALGORITHM_NAME_ECB_PADDING, Cipher.DECRYPT_MODE, keyValue.getBytes(StandardCharsets.UTF_8)))) {
+                SM4Util.generateCbcCipher(SM4Util.ALGORITHM_NAME_CBC_PADDING, Cipher.DECRYPT_MODE,
+                    keyValue.getBytes(StandardCharsets.UTF_8), SM4Util.SM4_IV_PARAMETER_SPEC.getBytes(StandardCharsets.UTF_8)))) {
             byte[] buffer = new byte[1024];
             int r;
             while ((r = sourceFile.read(buffer)) >= 0) {

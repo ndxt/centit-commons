@@ -12,8 +12,7 @@ public abstract class SecurityOptUtils {
 
     protected static final Logger logger = LoggerFactory.getLogger(SecurityOptUtils.class);
 
-    public static final String GENERAL_DEFAULT_KEY="qbh07dTZ$sO7_wC1slEAYAe2@dh3otTOqHdydl1Cyt3Q_0W_tocQTCa1B6yK7iKt";
-                                         //"GAOPwRFySfRh-uEPITdWRYmQR1b3k3r8QhmIR0gsZThoowq0QKYYk-RneeoOQPyu";
+
     public static String decodeSecurityString(String sStr){
         if(StringUtils.isBlank(sStr))
             return "";
@@ -25,6 +24,9 @@ public abstract class SecurityOptUtils {
         } else if (sStr.startsWith("aescbc:")) {
             return AESSecurityUtils.decryptAsCBCType(sStr.substring(7),
                 AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC);
+        } else if (sStr.startsWith("sm4cbc:")) {
+            return SM4Util.decryptAsCBCType(sStr.substring(7),
+                SM4Util.SM4_SECRET_KEY_SPEC, SM4Util.SM4_IV_PARAMETER_SPEC);
         } else {
             return sStr;
         }
@@ -42,6 +44,9 @@ public abstract class SecurityOptUtils {
             case "aescbc":
                 return "aescbc:" + AESSecurityUtils.encryptAsCBCType(sStr,
                     AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC);
+            case "sm4cbc":
+                return "sm4cbc:" + SM4Util.encryptAsCBCType(sStr,
+                    SM4Util.SM4_SECRET_KEY_SPEC, SM4Util.SM4_IV_PARAMETER_SPEC);
             default:
                 return sStr;
         }

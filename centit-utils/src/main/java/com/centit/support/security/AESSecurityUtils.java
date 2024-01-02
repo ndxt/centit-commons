@@ -19,8 +19,8 @@ public abstract class AESSecurityUtils {
 
     protected static final Logger logger = LoggerFactory.getLogger(AESSecurityUtils.class);
     public static final String AES_DEFAULT_KEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
-    public static final String AES_CIPHER_TYPE="AES/ECB/PKCS5Padding";
 
+    public static final String AES_CIPHER_TYPE="AES/ECB/PKCS5Padding";
     public static final String AES_CIPHER_TYPE_CBC= "AES/CBC/PKCS5Padding";
     public static final String AES_SECRET_KEY_SPEC   = "U2FsdGVkX1BymlPj";
     public static final String AES_IV_PARAMETER_SPEC = "WUG1TpTpkinX9pNs";
