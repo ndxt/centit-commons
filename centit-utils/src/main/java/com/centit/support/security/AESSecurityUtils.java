@@ -154,4 +154,30 @@ public abstract class AESSecurityUtils {
             return null;
         }
     }
+
+    public static byte[] encryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+        try {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue.getBytes(), "AES");
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
+            return cipher.doFinal(bytes);
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static byte[] decryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+        try {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue.getBytes(), "AES");
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+            return cipher.doFinal(bytes);
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
+        }
+    }
 }

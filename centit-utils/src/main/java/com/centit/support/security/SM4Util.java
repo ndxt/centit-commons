@@ -192,7 +192,7 @@ public abstract class SM4Util extends GMBaseUtil {
             cipher.init(Cipher.ENCRYPT_MODE, sm4Key, ivParameterSpec);
             return new String(Base64.encodeBase64(cipher.doFinal(str.getBytes())));
         } catch (GeneralSecurityException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -205,9 +205,34 @@ public abstract class SM4Util extends GMBaseUtil {
             cipher.init(Cipher.DECRYPT_MODE, sm4Key, ivParameterSpec);
             return new String(cipher.doFinal(Base64.decodeBase64(str)));
         } catch (GeneralSecurityException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return null;
         }
     }
 
+    public static byte[] encryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+        try {
+            SecretKeySpec sm4Key = new SecretKeySpec(keyValue.getBytes(), ALGORITHM_NAME);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            Cipher cipher = Cipher.getInstance(ALGORITHM_NAME_CBC_PADDING, BouncyCastleProvider.PROVIDER_NAME);
+            cipher.init(Cipher.ENCRYPT_MODE, sm4Key, ivParameterSpec);
+            return cipher.doFinal(bytes);
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public static byte[] decryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+        try {
+            SecretKeySpec sm4Key = new SecretKeySpec(keyValue.getBytes(), ALGORITHM_NAME);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            Cipher cipher = Cipher.getInstance(ALGORITHM_NAME_CBC_PADDING, BouncyCastleProvider.PROVIDER_NAME);
+            cipher.init(Cipher.DECRYPT_MODE, sm4Key, ivParameterSpec);
+            return cipher.doFinal(bytes);
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
 }
