@@ -1,5 +1,6 @@
 package com.centit.support.security;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.crypto.Cipher;
@@ -46,7 +47,8 @@ public abstract class FileEncryptUtils {
         switch (algorithm){
             case "SM4":
                 cipher = SM4Util.generateEcbCipher(SM4Util.ALGORITHM_NAME_ECB_PADDING, Cipher.ENCRYPT_MODE,
-                    keyValue.getBytes(StandardCharsets.UTF_8));
+                    StringUtils.isBlank(keyValue)? SM4Util.SM4_SECRET_KEY_SPEC.getBytes(StandardCharsets.UTF_8)
+                        :keyValue.getBytes(StandardCharsets.UTF_8));
                 break;
             case "AES_CBC": {
                 Pair<String, String> key =  SecurityOptUtils.makeCbcKey(keyValue, "AES");
@@ -62,7 +64,8 @@ public abstract class FileEncryptUtils {
             break;
             case "AES":
             default:
-                cipher = AESSecurityUtils.createEncryptCipher(keyValue);
+                cipher = AESSecurityUtils.createEncryptCipher(
+                    StringUtils.isBlank(keyValue)? AESSecurityUtils.AES_SECRET_KEY_SPEC : keyValue);
                 break;
         }
 
@@ -117,7 +120,8 @@ public abstract class FileEncryptUtils {
         switch (algorithm){
             case "SM4":
                 cipher = SM4Util.generateEcbCipher(SM4Util.ALGORITHM_NAME_ECB_PADDING, Cipher.DECRYPT_MODE,
-                    keyValue.getBytes(StandardCharsets.UTF_8));
+                    StringUtils.isBlank(keyValue)? SM4Util.SM4_SECRET_KEY_SPEC.getBytes(StandardCharsets.UTF_8)
+                        :keyValue.getBytes(StandardCharsets.UTF_8));
                 break;
             case "AES_CBC": {
                 Pair<String, String> key =  SecurityOptUtils.makeCbcKey(keyValue, "AES");
@@ -133,7 +137,8 @@ public abstract class FileEncryptUtils {
             break;
             case "AES":
             default:
-                cipher = AESSecurityUtils.createDencryptCipher(keyValue);
+                cipher = AESSecurityUtils.createDencryptCipher(
+                    StringUtils.isBlank(keyValue)? AESSecurityUtils.AES_SECRET_KEY_SPEC : keyValue);
                 break;
         }
 
