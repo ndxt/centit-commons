@@ -6,13 +6,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.SecureRandom;
+import java.security.*;
 
 @SuppressWarnings("unused")
 public abstract class AESSecurityUtils {
@@ -38,6 +37,26 @@ public abstract class AESSecurityUtils {
         Cipher decryptCipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE);//"AES/ECB/PKCS5Padding"
         decryptCipher.init(Cipher.DECRYPT_MODE, key);
         return decryptCipher;
+    }
+
+    public static Cipher createCbcDencryptCipher(byte[] key, byte[] iv)
+        throws InvalidKeyException, InvalidAlgorithmParameterException,
+                NoSuchAlgorithmException,  NoSuchPaddingException {
+        Cipher cipher = Cipher.getInstance(AES_CIPHER_TYPE_CBC);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+        return cipher;
+    }
+
+    public static Cipher createCbcEncryptCipher(byte[] key, byte[] iv)
+        throws InvalidKeyException, InvalidAlgorithmParameterException,
+            NoSuchAlgorithmException,  NoSuchPaddingException {
+        Cipher cipher = Cipher.getInstance(AES_CIPHER_TYPE_CBC);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
+        return cipher;
     }
 
     /**
