@@ -51,7 +51,7 @@ public abstract class DocumentUtils {
                         fieldConfig.put("search_analyzer", esType.searchAnalyzer());
                     }
                 }
-                fieldsMap.put(field.getName(),fieldConfig);
+                fieldsMap.put(field.getName(), fieldConfig);
             }
         }//end of for
         JSONObject jsonObject = new JSONObject();

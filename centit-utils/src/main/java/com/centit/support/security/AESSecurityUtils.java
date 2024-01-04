@@ -6,21 +6,20 @@ import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.SecureRandom;
+import java.security.*;
 
 @SuppressWarnings("unused")
 public abstract class AESSecurityUtils {
 
     protected static final Logger logger = LoggerFactory.getLogger(AESSecurityUtils.class);
     public static final String AES_DEFAULT_KEY="0123456789abcdefghijklmnopqrstuvwxyzABCDEF";
-    public static final String AES_CIPHER_TYPE="AES/ECB/PKCS5Padding";
 
+    public static final String AES_CIPHER_TYPE="AES/ECB/PKCS5Padding";
     public static final String AES_CIPHER_TYPE_CBC= "AES/CBC/PKCS5Padding";
     public static final String AES_SECRET_KEY_SPEC   = "U2FsdGVkX1BymlPj";
     public static final String AES_IV_PARAMETER_SPEC = "WUG1TpTpkinX9pNs";
@@ -38,6 +37,26 @@ public abstract class AESSecurityUtils {
         Cipher decryptCipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE);//"AES/ECB/PKCS5Padding"
         decryptCipher.init(Cipher.DECRYPT_MODE, key);
         return decryptCipher;
+    }
+
+    public static Cipher createCbcDencryptCipher(byte[] key, byte[] iv)
+        throws InvalidKeyException, InvalidAlgorithmParameterException,
+                NoSuchAlgorithmException,  NoSuchPaddingException {
+        Cipher cipher = Cipher.getInstance(AES_CIPHER_TYPE_CBC);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+        return cipher;
+    }
+
+    public static Cipher createCbcEncryptCipher(byte[] key, byte[] iv)
+        throws InvalidKeyException, InvalidAlgorithmParameterException,
+            NoSuchAlgorithmException,  NoSuchPaddingException {
+        Cipher cipher = Cipher.getInstance(AES_CIPHER_TYPE_CBC);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
+        IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
+        return cipher;
     }
 
     /**
@@ -149,6 +168,32 @@ public abstract class AESSecurityUtils {
             Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
             return new String(cipher.doFinal(Base64.decodeBase64(str)));
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static byte[] encryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+        try {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue.getBytes(), "AES");
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
+            return cipher.doFinal(bytes);
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static byte[] decryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+        try {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue.getBytes(), "AES");
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+            return cipher.doFinal(bytes);
         } catch (GeneralSecurityException e) {
             logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;

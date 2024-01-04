@@ -16,8 +16,9 @@ import java.util.Date;
  * Created by codefan on 17-6-1.
  */
 @Data
-@ESType(indexName="objects", replicas = 2, shards = 5)
-public class ObjectDocument implements ESDocument,Serializable {
+@ESType(indexName="objects", shards = 5)
+public class ObjectDocument implements ESDocument, Serializable {
+
     private static final long serialVersionUID =  1L;
     /**
      * 所属系统

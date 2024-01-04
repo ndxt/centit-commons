@@ -1,6 +1,7 @@
 package com.centit.support.algorithm;
 
 import com.alibaba.fastjson2.util.TypeUtils;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,6 +12,7 @@ import java.math.RoundingMode;
 import java.text.Collator;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Created by codefan on 17-9-7.
@@ -591,5 +593,42 @@ public abstract class GeneralAlgorithm {
 
     public static Object castObjectToType(Object obj, Class<?> type) {
         return TypeUtils.cast(obj, type);
+    }
+
+    public static boolean isEmpty(Object obj) {
+        if(obj == null)
+            return true;
+        if(obj instanceof String)
+            return StringUtils.isBlank((String)obj);
+        if (obj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<Object, Object> objMap = (Map<Object, Object>) obj;
+            return objMap.isEmpty();
+        } else  if (obj instanceof Collection) {
+            Collection<?> objlist = (Collection<?>) obj;
+            if(objlist.isEmpty())
+                return true;
+            for(Object obj1 : objlist){
+                if(!isEmpty(obj1))
+                    return false;
+            }
+            return true;
+        } else if (obj instanceof Object[]) {
+            Object[] objs = (Object[]) obj;
+            for(Object obj1 : objs){
+                if(!isEmpty(obj1))
+                    return false;
+            }
+            return true;
+        } else if(obj instanceof Supplier){
+            Object retObj = ((Supplier)obj).get();
+            return isEmpty(retObj);
+        } else if(obj instanceof ScriptObjectMirror){
+            ScriptObjectMirror jsObj = (ScriptObjectMirror) obj;
+            return jsObj.isEmpty();
+        } else{
+            return StringUtils.isBlank(StringBaseOpt.castObjectToString(obj));
+        }
+
     }
 }

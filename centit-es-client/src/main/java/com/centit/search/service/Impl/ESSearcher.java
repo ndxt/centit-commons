@@ -32,7 +32,7 @@ import java.util.*;
  * Created by codefan on 17-6-12.
  */
 public class ESSearcher implements Searcher{
-    private static final String KEYWORD = ".keyword";
+
     private static Logger logger = LoggerFactory.getLogger(ESSearcher.class);
 
     private ESServerConfig config;
@@ -219,17 +219,35 @@ public class ESSearcher implements Searcher{
                 /*Class tp = obj.getClass();
                 return tp.isArray()?true:obj instanceof Collection;*/
                 if (ent.getValue().getClass().isArray()) {
-                    queryBuilder.must(QueryBuilders.termsQuery(ent.getKey()+ KEYWORD, (String[]) ent.getValue()));
+                    queryBuilder.must(QueryBuilders.termsQuery(ent.getKey(), (String[]) ent.getValue()));
                 } else if (ent.getValue() instanceof Collection) {
                     queryBuilder.must(QueryBuilders.termsQuery(
-                        ent.getKey()+ KEYWORD, CollectionsOpt.listToArray((Collection)ent.getValue())));
+                        ent.getKey(), CollectionsOpt.listToArray((Collection)ent.getValue())));
                 } else {
-                    queryBuilder.must(QueryBuilders.termQuery(ent.getKey()+ KEYWORD, ent.getValue()));
+                    String key = ent.getKey(); int keyLen = key.length();
+                    String optSuffix = keyLen>3 ? key.substring(keyLen - 3).toLowerCase() : "_eq";
+                    switch (optSuffix) {
+                        case "_gt":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).gt(ent.getValue()));
+                            break;
+                        case "_ge":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).gte(ent.getValue()));
+                            break;
+                        case "_lt":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).lt(ent.getValue()));
+                            break;
+                        case "_le":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).lte(ent.getValue()));
+                            break;
+                        default:
+                            queryBuilder.must(QueryBuilders.termQuery(ent.getKey(), ent.getValue()));
+                            break;
+                    }
                 }
             }
         }
         if (StringUtils.isNotBlank(queryWord)) {
-            queryBuilder.must(QueryBuilders.multiMatchQuery(
+            queryBuilder.filter(QueryBuilders.multiMatchQuery(
                 queryWord, queryFields));
         }
 
@@ -245,7 +263,7 @@ public class ESSearcher implements Searcher{
      */
     @Override
     public Pair<Long,List<Map<String, Object>>> search(String queryWord, int pageNo, int pageSize) {
-        return search(null,queryWord,pageNo,pageSize);
+        return search(null, queryWord, pageNo, pageSize);
     }
 
     /**

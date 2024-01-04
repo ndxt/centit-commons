@@ -6,6 +6,8 @@ import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.Impl.PooledRestClientFactory;
 import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.file.PropertiesReader;
+import com.centit.support.security.AESSecurityUtils;
+import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -125,12 +127,11 @@ public abstract class IndexerSearcherFactory {
         config.setServerHostIp(properties.getProperty("elasticsearch.server.ip"));
         config.setServerHostPort(properties.getProperty("elasticsearch.server.port"));
         config.setClusterName(properties.getProperty("elasticsearch.server.cluster"));
-        config.setUsername(properties.getProperty("elasticsearch.server.username"));
-        config.setPassword(properties.getProperty("elasticsearch.server.password"));
-        /*config.setIndexName(
-                StringUtils.lowerCase(properties.getProperty("elasticsearch.index")));*/
+        config.setUsername(SecurityOptUtils.decodeSecurityString(
+            properties.getProperty("elasticsearch.server.username")));
+        config.setPassword(SecurityOptUtils.decodeSecurityString(
+            properties.getProperty("elasticsearch.server.password")));
         config.setOsId(properties.getProperty("elasticsearch.osId"));
-
         config.setMinScore(NumberBaseOpt.parseFloat(
                 properties.getProperty("elasticsearch.filter.minScore"), 0.5f));
         return config;

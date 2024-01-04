@@ -2,8 +2,8 @@ package com.centit.support.common;
 
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,8 @@ import static java.lang.Thread.sleep;
  * @param <T> target 缓存对象的类型
  */
 public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
-    private static Log logger = LogFactory.getLog(CachedMap.class);
+
+    protected Logger logger = LoggerFactory.getLogger(CachedMap.class);
     private ConcurrentMap<K, CachedIdentifiedObject> targetMap;
     private long freshPeriod;
     private Function<K, T> refresher;
