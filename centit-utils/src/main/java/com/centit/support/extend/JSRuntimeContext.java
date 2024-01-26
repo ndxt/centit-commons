@@ -1,7 +1,5 @@
 package com.centit.support.extend;
 
-import com.alibaba.fastjson2.JSONArray;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +8,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Map;
 import java.util.function.Predicate;
 
 public class JSRuntimeContext {
@@ -62,30 +59,10 @@ public class JSRuntimeContext {
         return this;
     }
 
-    public static Object checkArrayObject(Object object){
-        if(object instanceof Map){
-            Map<?,?> objMap = (Map<?,?>) object;
-            JSONArray objArray = new JSONArray();
-            boolean isArray = true;
-            for(Map.Entry<?,?> ent : objMap.entrySet()){
-                if(StringUtils.isNumeric(ent.getKey().toString())){
-                    objArray.add(ent.getValue());
-                } else {
-                    isArray = false;
-                    break;
-                }
-            }
-            if(isArray && objArray.size()>0){
-                return objArray;
-            }
-        }
-        return object;
-    }
-
     public Object callJsFunc(String funcName, Object... args) throws
         ScriptException, NoSuchMethodException {
         Invocable invocable = (Invocable) scriptEngine;
-        return checkArrayObject(invocable.invokeFunction(funcName, args));
+        return invocable.invokeFunction(funcName, args);
     }
 
     public Object getJsObject(String objName){
@@ -94,12 +71,12 @@ public class JSRuntimeContext {
 
     public Object getJsObjectProperty(String objName, String propertyName)
         throws ScriptException {
-       return checkArrayObject(scriptEngine.eval(objName+"."+propertyName));
+       return scriptEngine.eval(objName+"."+propertyName);
     }
 
     public Object callJsObjectMethod(Object jsObject, String methodName, Object... args)
         throws ScriptException, NoSuchMethodException {
         Invocable invocable = (Invocable) scriptEngine;
-        return checkArrayObject(invocable.invokeMethod(jsObject, methodName, args));
+        return invocable.invokeMethod(jsObject, methodName, args);
     }
 }
