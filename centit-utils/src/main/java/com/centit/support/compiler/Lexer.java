@@ -370,6 +370,16 @@ public class Lexer {
             startPos++;
             canAcceptOpt = true;
             s = formulaSen.substring(bp, startPos);
+        } else if ("`".equals(s)) {
+            int bp = startPos - 1;
+            while (startPos < sl && formulaSen.charAt(startPos) != '`') {
+                startPos++;
+            }
+            if (startPos >= sl)//没有找到配对的'`'
+                return null;
+            startPos++;
+            canAcceptOpt = true;
+            s = formulaSen.substring(bp, startPos);
         }
         return s;
     }
