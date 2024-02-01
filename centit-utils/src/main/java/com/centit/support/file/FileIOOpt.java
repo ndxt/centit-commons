@@ -195,7 +195,7 @@ public abstract class FileIOOpt {
         if (data instanceof InputStream) {
             return (InputStream)data;
         }
-        if (data instanceof OutputStream) {
+        if (data instanceof ByteArrayOutputStream) {
             ByteArrayOutputStream outputStream = (ByteArrayOutputStream) data;
             return new ByteArrayInputStream(outputStream.toByteArray());
         }

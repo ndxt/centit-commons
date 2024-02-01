@@ -8,3 +8,4 @@ mvn*
 .settings
 **/~$*
 out.*
+.flattened-pom.xml

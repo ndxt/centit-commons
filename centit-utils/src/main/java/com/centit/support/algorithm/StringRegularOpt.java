@@ -19,7 +19,8 @@ public abstract class StringRegularOpt {
 
         int sl = strWord.length();
         if (sl >= 2 && ((strWord.charAt(0) == '\"' && strWord.charAt(sl - 1) == '\"') ||
-            (strWord.charAt(0) == '\'' && strWord.charAt(sl - 1) == '\''))) {
+            (strWord.charAt(0) == '\'' && strWord.charAt(sl - 1) == '\'')||
+            (strWord.charAt(0) == '`' && strWord.charAt(sl - 1) == '`'))) { // 96 控制字符
             if (sl > 2)
                 strWord = strWord.substring(1, sl - 1);
             else
