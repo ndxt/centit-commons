@@ -478,7 +478,7 @@ public abstract class CollectionsOpt {
      * @param childrenPropertyName 孩子节点
      * @return 展开的树
      */
-    public static List<Object> depthFirstTraverseForest(Collection<Object> treeObjects, String childrenPropertyName){
+    public static List<Object> depthFirstTraverseForest(Collection<? extends Object> treeObjects, String childrenPropertyName){
         List<Object> expendTree = new ArrayList<>(128);
         for(Object obj : treeObjects){
             depthFirstTraverseTree(obj, expendTree, childrenPropertyName);
@@ -504,7 +504,7 @@ public abstract class CollectionsOpt {
      * @param childrenPropertyName 孩子节点
      * @return 展开的树
      */
-    public static List<Object> breadthFirstTraverseForest(Collection<Object> treeObjects, String childrenPropertyName){
+    public static List<Object> breadthFirstTraverseForest(Collection<? extends Object> treeObjects, String childrenPropertyName){
         List<Object> expendTree = new ArrayList<>(128);
         int nExpendInd = 0;
         for(Object obj : treeObjects){
