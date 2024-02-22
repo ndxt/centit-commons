@@ -182,6 +182,14 @@ public abstract class GeneralAlgorithm {
         }
     }
 
+    private static Object checkStringObject(Object obj){
+        if(obj instanceof String ) {
+            if( StringRegularOpt.isNumber( (String)obj)){
+                return NumberBaseOpt.castObjectToNumber(obj);
+            }
+        }
+        return obj;
+    }
     /**
      * 将两个对象加+起来，可能是数字相加，也可能是字符串连接
      *
@@ -203,6 +211,8 @@ public abstract class GeneralAlgorithm {
             }
             return a;
         }
+        a = checkStringObject(a);
+        b = checkStringObject(b);
 
         if (a instanceof java.lang.Number && b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
@@ -259,6 +269,8 @@ public abstract class GeneralAlgorithm {
             }
             return a;
         }
+        a = checkStringObject(a);
+        b = checkStringObject(b);
 
         if (a instanceof java.lang.Number && b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
@@ -306,6 +318,9 @@ public abstract class GeneralAlgorithm {
     public static Object multiplyTwoObject(Object a, Object b) {
         if (a == null || b == null)
             return null;
+
+        a = checkStringObject(a);
+        b = checkStringObject(b);
 
         if (a instanceof java.lang.Number && b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
@@ -356,6 +371,8 @@ public abstract class GeneralAlgorithm {
     public static Object divideTwoObject(Object a, Object b) {
         if (a == null || b == null)
             return null;
+        a = checkStringObject(a);
+        b = checkStringObject(b);
 
         if (a instanceof java.lang.Number && b instanceof java.lang.Number) {
             BigDecimal dbop2 = NumberBaseOpt.castObjectToBigDecimal(b);
@@ -395,6 +412,8 @@ public abstract class GeneralAlgorithm {
     public static Object modTwoObject(Object a, Object b) {
         if (a == null || b == null)
             return null;
+        a = checkStringObject(a);
+        b = checkStringObject(b);
         if (a instanceof java.lang.Number && b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
             switch (retType) {
@@ -421,8 +440,9 @@ public abstract class GeneralAlgorithm {
     }
 
     public static Object maxObject(Collection<Object> ar) {
-        if (ar == null || ar.size() < 1)
+        if (ar == null || ar.isEmpty())
             return null;
+
         Iterator<Object> ari = ar.iterator();
         Object maxObject = ar.iterator().next();
         if (ar.size() == 1)
