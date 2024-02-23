@@ -2,6 +2,7 @@ package com.centit.support.security;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,9 @@ public abstract class Md5Encoder {
     }
 
     public static byte[] rawEncode(byte[] data) {
+        if(data == null){
+            return null;
+        }
         MessageDigest MD5;
         try {
             MD5 = MessageDigest.getInstance("MD5");
@@ -44,6 +48,9 @@ public abstract class Md5Encoder {
     }
 
     public static String encode(String data) {
+        if(StringUtils.isBlank(data)){
+            return null;
+        }
         try {
             return encode(data.getBytes("utf8"));
         } catch (UnsupportedEncodingException e) {
@@ -74,6 +81,9 @@ public abstract class Md5Encoder {
     }
 
     public static String encodeBase64(String data, boolean urlSafe) {
+        if(StringUtils.isBlank(data)){
+            return null;
+        }
         try {
             return encodeBase64(data.getBytes("utf8"), urlSafe);
         } catch (UnsupportedEncodingException e) {
