@@ -438,13 +438,13 @@ public class VariableFormula {
     }
 
     public Object calcFormula() {
-        List<Object> slOperand = new ArrayList<>();
+        Stack<Object> slOperand = new Stack<>();
         OptStack optStack = new OptStack();
 
         String str;
         while (true) {
             Object item = calcItem();
-            slOperand.add(0, item);
+            slOperand.push(item);
             str = lex.getAWord();
             if (str == null || str.length() == 0)
                 break;
@@ -457,9 +457,9 @@ public class VariableFormula {
             //--------run OP_IN----------------------------------
             if (optID == ConstDefine.OP_IN) { // Specail Opt For In multi operand
                 Boolean bInRes = false;
-                Object operand = slOperand.remove(0);
+                Object operand = slOperand.pop();
                 str = lex.getAWord();
-                if (str == null || str.length() == 0 || !str.equals("(")) return null;
+                if (str == null || str.isEmpty() || !str.equals("(")) return null;
 
                 while (true) {
                     item = calcFormula();
@@ -485,14 +485,14 @@ public class VariableFormula {
                         }
                     }
                     str = lex.getAWord();
-                    if (str == null || str.length() == 0 || (!str.equals(",") && !str.equals(")"))) return null;
+                    if (str == null || str.isEmpty() || (!str.equals(",") && !str.equals(")"))) return null;
                     if (str.equals(")")) {
                         lex.writeBackAWord(str);
                         break;
                     }
                 }
                 lex.seekToRightBracket();
-                slOperand.add(0, bInRes);
+              slOperand.push(bInRes);
                 str = lex.getAWord();
                 optID = VariableFormula.getOptID(str);
                 if (optID == -1) {
@@ -502,18 +502,18 @@ public class VariableFormula {
             }
             //----------end opt in--------------------------------
             for (int op = optStack.pushOpt(optID); op != 0; op = optStack.pushOpt(optID)) {
-                Object operand2 = slOperand.remove(0);
-                Object operand = slOperand.remove(0);
-                slOperand.add(0, calcOperate(operand, operand2, op));
+                Object operand2 = slOperand.pop();
+                Object operand = slOperand.pop();
+              slOperand.push(calcOperate(operand, operand2, op));
             }
         }
 
         for (int op = optStack.popOpt(); op != 0; op = optStack.popOpt()) {
-            Object operand2 = slOperand.remove(0);
-            Object operand = slOperand.remove(0);
-            slOperand.add(0, calcOperate(operand, operand2, op));
+            Object operand2 = slOperand.pop();
+            Object operand = slOperand.pop();
+          slOperand.push(calcOperate(operand, operand2, op));
         }
-        return slOperand.get(0);
+        return slOperand.peek();
     }
 
     private Object calcFunc(int nFuncNo) {
