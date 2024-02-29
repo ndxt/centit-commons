@@ -16,7 +16,7 @@ import java.util.Map;
 public class FormulaTest {
     public static void main(String[] args)  {
         System.out.println(VariableFormula.calculate(
-            "int( (no-1) / 3) + 1", CollectionsOpt.createHashMap("no", "5")));
+            "1- 2 * 30 / 5", CollectionsOpt.createHashMap("no", "5")));
         System.out.println(VariableFormula.calculate(
             "subStr(getAt(0,split('EI_005325,ss,ss')),3)"));
     }
