@@ -29,6 +29,15 @@ public abstract class StringRegularOpt {
         return strWord;
     }
 
+    public static String trimStringBlankAsNull(String szWord) {
+        if (szWord == null)
+            return null;
+        String strWord = szWord.trim();
+        if(StringUtils.isBlank(strWord))
+            return null;
+        return strWord;
+    }
+
     public static String trimStringQuoted(String szWord) {
         return trimString(szWord);
     }
