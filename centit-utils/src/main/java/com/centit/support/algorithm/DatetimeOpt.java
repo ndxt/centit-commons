@@ -775,7 +775,7 @@ public abstract class DatetimeOpt {
         //System.out.println(endDate.getTime());
         java.util.Date bD = (beginDate.getTime() > endDate.getTime()) ? truncateToDay(endDate) : truncateToDay(beginDate);
         java.util.Date eD = (beginDate.getTime() > endDate.getTime()) ? beginDate : endDate;
-        return (int) ((eD.getTime() - bD.getTime()) / 86400000 + 1);
+        return (int) (( eD.getTime() - bD.getTime()) / 86400000 + 1);
     }
 
     /**
@@ -783,12 +783,8 @@ public abstract class DatetimeOpt {
      * @param endDate   endTime
      * @return 计算这个周期中的天数, 不足一天用小数表示
      */
-    public static float calcDateSpan(java.util.Date beginDate, java.util.Date endDate) {
-        //System.out.println(beginDate.getTime());
-        //System.out.println(endDate.getTime());
-        java.util.Date bD = (beginDate.getTime() > endDate.getTime()) ? truncateToDay(endDate) : truncateToDay(beginDate);
-        java.util.Date eD = (beginDate.getTime() > endDate.getTime()) ? beginDate : endDate;
-        return Double.valueOf((eD.getTime() - bD.getTime()) / 86400000.0).floatValue();
+    public static double calcDateSpan(java.util.Date beginDate, java.util.Date endDate) {
+        return (beginDate.getTime() - endDate.getTime()) / 86400000.0;
     }
 
     /*

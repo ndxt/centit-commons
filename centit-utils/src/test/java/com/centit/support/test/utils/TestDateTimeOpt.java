@@ -3,6 +3,7 @@ package com.centit.support.test.utils;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
+import com.centit.support.compiler.VariableFormula;
 import com.centit.support.network.UrlOptUtils;
 
 import java.time.Instant;
@@ -13,6 +14,12 @@ import java.util.TimeZone;
 
 public class TestDateTimeOpt {
     public static void main(String[] args) {
+        System.out.println(VariableFormula.calculate(" adddays(today(), 1)"));
+        System.out.println(VariableFormula.calculate(" today()"));
+        System.out.println(VariableFormula.calculate(" datespan(adddays(today(), 1), today())"));
+        System.out.println(VariableFormula.calculate(" datespan(adddays(today(), 1), today()) * 24 * 60 "));
+    }
+    public static void testTZ() {
         TimeZone timeZone = DatetimeOpt.fetchTimeZone("UTC");
         System.out.println(timeZone.getRawOffset() +"   |   "+ timeZone.getDisplayName()
             +"   |   " + timeZone.getDisplayName(Locale.US));
