@@ -858,7 +858,7 @@ public abstract class HttpExecutor {
             UrlOptUtils.appendParamToUrl(uri, paramsUrl), file);
     }
 
-    protected static String extraFileName(CloseableHttpResponse response) {
+    public static String extraFileName(CloseableHttpResponse response) {
         Header[] contentDispositionHeader = response
             .getHeaders("Content-disposition");
 
