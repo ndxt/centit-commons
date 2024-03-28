@@ -93,6 +93,14 @@ public abstract class UrlOptUtils {
         }
     }
 
+    public static String fetchFilenameFromUrl(String curl) {
+        int nBpos = curl.lastIndexOf('/') + 1;
+        int nEpos = curl.indexOf('?');
+        if(nEpos<0)
+            return curl.substring(nBpos);
+        return curl.substring(nBpos, nEpos);
+    }
+
     public static String appendParamsToUrl(String uri, Map<String, Object> queryParam) {
         if (queryParam == null) {
             return uri;

@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.centit.support.network.HtmlFormUtils;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
+import com.centit.support.network.UrlOptUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -12,7 +13,10 @@ import java.util.Map;
 
 public class TestTcpip {
     public static void main(String arg[]) {
-        System.out.println(HtmlFormUtils.htmlString("http://locode.net?url=&amp;"));
+        System.out.println(UrlOptUtils.fetchFilenameFromUrl("abcedfg.pdf"));
+        System.out.println(UrlOptUtils.fetchFilenameFromUrl("abcedfg.pdf?ajax=true"));
+        System.out.println(UrlOptUtils.fetchFilenameFromUrl("http://baidu.com/abcedfg.pdf?ajax=true"));
+        System.out.println(UrlOptUtils.fetchFilenameFromUrl("http://baidu.com/abcedfg.pdf"));
     }
     public static void testPosts() {
         Map<String, Object> formData = new HashMap<String, Object>();
