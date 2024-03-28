@@ -860,8 +860,10 @@ public abstract class HttpExecutor {
 
     public static String extraFileName(CloseableHttpResponse response) {
         Header[] contentDispositionHeader = response
-            .getHeaders("Content-disposition");
-
+            .getHeaders("Content-Disposition");
+        if(contentDispositionHeader == null || contentDispositionHeader.length == 0){
+            return null;
+        }
         Matcher m = Pattern.compile(".*filename=\"(.*)\"").matcher(contentDispositionHeader[0].getValue());
         if (m.matches()) {
             return m.group(1);
