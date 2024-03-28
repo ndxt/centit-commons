@@ -163,13 +163,8 @@ public abstract class HttpExecutor {
         return createHttpClient(null, true, true);
     }
 
-    public static <T> T httpExecute(HttpExecutorContext executorContext,
-                                    HttpRequestBase httpRequest, ResponseHandler<T> responseHandler)
-        throws IOException {
-
-        /*if(executorContext==null){
-            executorContext = HttpExecutorContext.create();
-        }else {*/
+    public static void prepareHttpRequest(HttpExecutorContext executorContext,
+                                   HttpRequestBase httpRequest){
         if (executorContext.getHttpHeaders() != null) {
             for (Map.Entry<String, String> entHeader : executorContext.getHttpHeaders().entrySet())
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
@@ -218,6 +213,12 @@ public abstract class HttpExecutor {
         }else {
             httpRequest.setConfig(builder.build());
         }
+    }
+    public static <T> T httpExecute(HttpExecutorContext executorContext,
+                                    HttpRequestBase httpRequest, ResponseHandler<T> responseHandler)
+        throws IOException {
+
+        prepareHttpRequest(executorContext, httpRequest);
 
         CloseableHttpClient httpClient = null;
         boolean createSelfClient = executorContext.getHttpclient() == null;
@@ -243,7 +244,6 @@ public abstract class HttpExecutor {
         throws IOException {
         return httpExecute(executorContext, httpRequest, Utf8ResponseHandler.INSTANCE);
     }
-
 
     public static String simpleGet(HttpExecutorContext executorContext, String uri, String queryParam)
         throws IOException {
@@ -894,6 +894,7 @@ public abstract class HttpExecutor {
         } else {
             httpClient = executorContext.getHttpclient();
         }
+        prepareHttpRequest(executorContext, httpGet);
 
         try (CloseableHttpResponse response = httpClient.execute(httpGet, executorContext.getHttpContext())) {
 
