@@ -608,9 +608,11 @@ public class VariableFormula {
             }
             lex.writeBackAWord(str);
             Object item = calcFormula();
-            if (item != null) { // 外部函数不可以传入 null 数值参数
+            //if (item != null) {
+            // 外部函数不可以传入 null 数值参数
+            //FIX: 2024-4-1 不能传入null是没有道理的
                 slOperand.add(item);
-            }
+            //}
             str = lex.getAWord();
             if (!",".equals(str)) break;
         }
