@@ -278,6 +278,10 @@ public class VariableFormula {
             return BooleanBaseOpt.castObjectToBoolean(str);
         }
 
+        if(StringUtils.equalsIgnoreCase(str, "null")){
+            return null;
+        }
+
         int funcNo = EmbedFunc.getFuncNo(str);
         if (funcNo != -1) {
             String nextWord = lex.getAWord();
