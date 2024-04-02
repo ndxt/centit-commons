@@ -257,16 +257,6 @@ public class VariableFormula {
             }
         }
 
-        if (extendFuncMap != null) {
-            Function<Object[], Object> func = extendFuncMap.get(str);
-            if (func != null) {
-                String nextWord = lex.getAWord();
-                if ("(".equals(nextWord)) {
-                    return calcExtendFunc(func);
-                }
-                lex.writeBackAWord(nextWord);
-            }
-        }
         if(Lexer.isConstValue(str)){
             if (StringRegularOpt.isNumber(str)) {
                 return NumberBaseOpt.castObjectToNumber(str);
@@ -280,6 +270,17 @@ public class VariableFormula {
 
         if(StringUtils.equalsIgnoreCase(str, "null")){
             return null;
+        }
+
+        if (extendFuncMap != null) {
+            Function<Object[], Object> func = extendFuncMap.get(str);
+            if (func != null) {
+                String nextWord = lex.getAWord();
+                if ("(".equals(nextWord)) {
+                    return calcExtendFunc(func);
+                }
+                lex.writeBackAWord(nextWord);
+            }
         }
 
         int funcNo = EmbedFunc.getFuncNo(str);
