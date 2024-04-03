@@ -226,10 +226,11 @@ public class ESSearcher implements Searcher{
         return esSearch(queryBuilder, sortBuilders,  null,null,  pageNo, pageSize);
     }
 
-    public static void mapSortBuilder(List<SortBuilder<?>> sortBuilders, Map<String, Object> filterMap) {
+    public static List<SortBuilder<?>> mapSortBuilder(Map<String, Object> filterMap) {
         if(filterMap==null || filterMap.isEmpty()){
-            return ;
+            return null;
         }
+        List<SortBuilder<?>> sortBuilders = new ArrayList<>();
         String selfOrderBy = StringBaseOpt.objectToString(filterMap.get(SELF_ORDER_BY));
         if (StringUtils.isNotBlank(selfOrderBy)) {
             Lexer lexer = new Lexer(selfOrderBy, Lexer.LANG_TYPE_SQL);
@@ -272,6 +273,7 @@ public class ESSearcher implements Searcher{
             }
             sortBuilders.add(sortBuilder);
         }
+        return sortBuilders;
     }
 
     /**
@@ -322,10 +324,8 @@ public class ESSearcher implements Searcher{
             queryBuilder.filter(QueryBuilders.multiMatchQuery(
                 queryWord, queryFields));
         }
-        List<SortBuilder<?>> sortBuilders = new ArrayList<>();
-        mapSortBuilder(sortBuilders, fieldFilter);
 
-        return esSearch(queryBuilder, sortBuilders, pageNo, pageSize);
+        return esSearch(queryBuilder, mapSortBuilder(fieldFilter), pageNo, pageSize);
     }
 
     /**
