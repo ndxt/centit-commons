@@ -22,6 +22,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +103,9 @@ public class ESSearcher implements Searcher{
         queryFields = CollectionsOpt.listToArray(qf);
     }
 
-    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, String[] includes, String[] excludes, int pageNo, int pageSize){
+    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
+                                                         String[] includes, String[] excludes,
+                                                         int pageNo, int pageSize){
         RestHighLevelClient client = null;
         long totalHits =0;
         try {
@@ -118,6 +121,7 @@ public class ESSearcher implements Searcher{
             }*/
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(queryBuilder)
+                .sort(sortBuilders)
                 .explain(true)
                 .from((pageNo>1)?(pageNo-1)* pageSize:0)
                 .size(pageSize);
@@ -199,7 +203,10 @@ public class ESSearcher implements Searcher{
     }
 
     public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder,  int pageNo, int pageSize) {
-        return esSearch(queryBuilder, null,  null,  pageNo, pageSize);
+        return esSearch(queryBuilder, null,  null,null,  pageNo, pageSize);
+    }
+    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder,List<SortBuilder<?>> sortBuilders,  int pageNo, int pageSize) {
+        return esSearch(queryBuilder, sortBuilders,  null,null,  pageNo, pageSize);
     }
 
     /**
