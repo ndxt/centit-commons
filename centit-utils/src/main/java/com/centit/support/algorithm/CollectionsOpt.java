@@ -688,6 +688,17 @@ public abstract class CollectionsOpt {
         return paramsMap;
     }
 
+    public static <K,V> Map<K, V> copyMapWithoutNullItem(Map<K, V> map){
+        if(map==null)
+            return null;
+        Map<K, V> newMap = new HashMap<>(map.size()+1);
+        for(Map.Entry<K,V> ent : map.entrySet()){
+            if(ent.getValue()!=null)
+                newMap.put(ent.getKey(), ent.getValue());
+        }
+        return newMap;
+    }
+
     public static <T> Map<String, T> createHashMap(List<T> listData, Function<T, String> func){
         if(listData==null) {
             return null;

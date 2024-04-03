@@ -257,16 +257,6 @@ public class VariableFormula {
             }
         }
 
-        if (extendFuncMap != null) {
-            Function<Object[], Object> func = extendFuncMap.get(str);
-            if (func != null) {
-                String nextWord = lex.getAWord();
-                if ("(".equals(nextWord)) {
-                    return calcExtendFunc(func);
-                }
-                lex.writeBackAWord(nextWord);
-            }
-        }
         if(Lexer.isConstValue(str)){
             if (StringRegularOpt.isNumber(str)) {
                 return NumberBaseOpt.castObjectToNumber(str);
@@ -276,6 +266,21 @@ public class VariableFormula {
 
         if(StringUtils.equalsAnyIgnoreCase(str, "true", "false")){
             return BooleanBaseOpt.castObjectToBoolean(str);
+        }
+
+        if(StringUtils.equalsIgnoreCase(str, "null")){
+            return null;
+        }
+
+        if (extendFuncMap != null) {
+            Function<Object[], Object> func = extendFuncMap.get(str);
+            if (func != null) {
+                String nextWord = lex.getAWord();
+                if ("(".equals(nextWord)) {
+                    return calcExtendFunc(func);
+                }
+                lex.writeBackAWord(nextWord);
+            }
         }
 
         int funcNo = EmbedFunc.getFuncNo(str);
@@ -608,9 +613,11 @@ public class VariableFormula {
             }
             lex.writeBackAWord(str);
             Object item = calcFormula();
-            if (item != null) { // 外部函数不可以传入 null 数值参数
+            //if (item != null) {
+            // 外部函数不可以传入 null 数值参数
+            //FIX: 2024-4-1 不能传入null是没有道理的
                 slOperand.add(item);
-            }
+            //}
             str = lex.getAWord();
             if (!",".equals(str)) break;
         }

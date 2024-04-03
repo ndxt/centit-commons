@@ -16,9 +16,9 @@ import java.util.Map;
 public class FormulaTest {
     public static void main(String[] args)  {
         System.out.println(VariableFormula.calculate(
-            "1- 2 * 30 / 5", CollectionsOpt.createHashMap("no", "5")));
+            "nvl(null2, no)"));
         System.out.println(VariableFormula.calculate(
-            "subStr(getAt(0,split('EI_005325,ss,ss')),3)"));
+            "subStr(getAt(0,split('EI_005325,ss,ss')),2)"));
     }
 
         /*TimeZone pdt = DatetimeOpt.fetchTimeZone("PDT");
