@@ -5,6 +5,8 @@ import com.centit.search.document.DocumentUtils;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Searcher;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.compiler.Lexer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,6 +25,8 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +37,16 @@ import java.util.*;
  * Created by codefan on 17-6-12.
  */
 public class ESSearcher implements Searcher{
+
+    public static final String SELF_ORDER_BY = "ORDER_BY";
+    /**
+     * 用户自定义排序字段 ， 放到 filterDesc 中
+     */
+    public static final String TABLE_SORT_FIELD = "sort";
+    /**
+     * 用户自定义排序字段的排序顺序 ， 放到 filterDesc 中
+     */
+    public static final String TABLE_SORT_ORDER = "order";
 
     private static Logger logger = LoggerFactory.getLogger(ESSearcher.class);
 
@@ -120,12 +134,13 @@ public class ESSearcher implements Searcher{
                 return retList;
             }*/
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(queryBuilder)
-                .sort(sortBuilders)
-                .explain(true)
+                .query(queryBuilder);
+            if(sortBuilders != null && !sortBuilders.isEmpty())
+                searchSourceBuilder.sort(sortBuilders);
+            searchSourceBuilder.explain(true)
                 .from((pageNo>1)?(pageNo-1)* pageSize:0)
                 .size(pageSize);
-            if(highlightFields.size()>0) {
+            if(!highlightFields.isEmpty()) {
                 HighlightBuilder highlightBuilder = new HighlightBuilder();
                 for (String hf : highlightFields) {
                     highlightBuilder.field(hf);
@@ -202,11 +217,61 @@ public class ESSearcher implements Searcher{
         }
     }
 
-    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder,  int pageNo, int pageSize) {
+    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, int pageNo, int pageSize) {
         return esSearch(queryBuilder, null,  null,null,  pageNo, pageSize);
     }
-    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder,List<SortBuilder<?>> sortBuilders,  int pageNo, int pageSize) {
+
+    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
+                                                         int pageNo, int pageSize) {
         return esSearch(queryBuilder, sortBuilders,  null,null,  pageNo, pageSize);
+    }
+
+    public static void mapSortBuilder(List<SortBuilder<?>> sortBuilders, Map<String, Object> filterMap) {
+        if(filterMap==null || filterMap.isEmpty()){
+            return ;
+        }
+        String selfOrderBy = StringBaseOpt.objectToString(filterMap.get(SELF_ORDER_BY));
+        if (StringUtils.isNotBlank(selfOrderBy)) {
+            Lexer lexer = new Lexer(selfOrderBy, Lexer.LANG_TYPE_SQL);
+            String aWord = lexer.getAWord();
+            StringBuilder orderBuilder = new StringBuilder();
+            while (StringUtils.isNotBlank(aWord)) {
+                if (StringUtils.equalsAnyIgnoreCase(aWord,
+                    ",", "desc", "asc")) {
+                    orderBuilder.append(aWord);
+                } else {
+                    orderBuilder.append(aWord);
+                }
+                orderBuilder.append(" ");
+                aWord = lexer.getAWord();
+            }
+            String[] fields = orderBuilder.toString().split(",");
+            for (String field : fields) {
+                SortBuilder sortBuilder;
+                String[] field2 = field.split(" ");
+                if (field2.length > 1) {
+                    if (field2[1].equalsIgnoreCase("desc")) {
+                        sortBuilder = SortBuilders.fieldSort(field2[0]).order(SortOrder.DESC);
+                    } else {
+                        sortBuilder = SortBuilders.fieldSort(field2[0]).order(SortOrder.ASC);
+                    }
+                } else {
+                    sortBuilder = SortBuilders.fieldSort(field2[0]).order(SortOrder.ASC);
+                }
+                sortBuilders.add(sortBuilder);
+            }
+        }
+        String sortField = StringBaseOpt.objectToString(filterMap.get(TABLE_SORT_FIELD));
+        if (StringUtils.isNotBlank(sortField)) {
+            SortBuilder sortBuilder;
+            String sOrder = StringBaseOpt.objectToString(filterMap.get(TABLE_SORT_ORDER));
+            if ("desc".equalsIgnoreCase(sOrder)) {
+                sortBuilder = SortBuilders.fieldSort(sortField).order(SortOrder.DESC);
+            } else {
+                sortBuilder = SortBuilders.fieldSort(sortField).order(SortOrder.ASC);
+            }
+            sortBuilders.add(sortBuilder);
+        }
     }
 
     /**
@@ -257,8 +322,10 @@ public class ESSearcher implements Searcher{
             queryBuilder.filter(QueryBuilders.multiMatchQuery(
                 queryWord, queryFields));
         }
+        List<SortBuilder<?>> sortBuilders = new ArrayList<>();
+        mapSortBuilder(sortBuilders, fieldFilter);
 
-        return esSearch(queryBuilder,  pageNo,  pageSize);
+        return esSearch(queryBuilder, sortBuilders, pageNo, pageSize);
     }
 
     /**
@@ -359,6 +426,5 @@ public class ESSearcher implements Searcher{
         this.highlightPostTags = highlightPostTags;
         return this;
     }
-
 
 }
