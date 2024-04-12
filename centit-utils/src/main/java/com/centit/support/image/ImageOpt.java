@@ -455,4 +455,16 @@ public abstract class ImageOpt {
         return watermarkedImage;
     }
 
+    public static boolean addWaterMark(InputStream imageIS, OutputStream imageOS,
+                                       String waterMark, String fontName, Color color, int size, int x, int y) {
+        try {
+            BufferedImage image = ImageIO.read(imageIS);
+            BufferedImage markImage = ImageOpt.addWaterMark(image, waterMark, fontName, color, size, x, y);
+            ImageIO.write(markImage, "jpg", imageOS);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
 }
