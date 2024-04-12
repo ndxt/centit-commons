@@ -9,7 +9,7 @@ import com.itextpdf.text.pdf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -23,35 +23,6 @@ public abstract class Watermark4Pdf {
 
     protected static Logger logger = LoggerFactory.getLogger(Watermark4Pdf.class);
 
-
-    /**
-     * 为文档添加水印：目前只支持给pdf、word、excel、ppt增加水印，并且输出只能是Pdf文件。
-     *
-     * @param inputFile       源文件路径及文件
-     * @param waterMarkStr    水印字符串
-     * @param suffix          前缀
-     * @return 是否成功
-     */
-    public static boolean addWatermark(String inputFile, String waterMarkStr, String suffix) {
-        //将源office文件转换为pdf
-        //String suffix = inputFile.substring(inputFile.lastIndexOf("."));
-        String tmpPdfFile = inputFile.substring(0,inputFile.lastIndexOf("."))+
-                 DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "yyyyMMddHHmmssSSS")+".pdf";
-        String wartermarkFile = inputFile.substring(0,inputFile.lastIndexOf("."))+ ".pdf";
-        if(! OfficeToPdf.word2Pdf(inputFile,tmpPdfFile,suffix)) {
-            return false;
-        }
-
-        return  addWatermark4Pdf(tmpPdfFile,
-                wartermarkFile,
-                waterMarkStr,
-                0.4f,
-                45f,
-                60f);
-
-    }
-
-
     /**
      * 为文档添加水印：目前只支持给pdf、word、excel、ppt增加水印，并且输出只能是Pdf文件。
      *
@@ -63,12 +34,12 @@ public abstract class Watermark4Pdf {
      * @param fontSize        字体大小(1-1)
      * @return boolean        目前 不支持位置自定义：因设置了文字大小、倾斜度后不好计算水印文字的长宽数据。
      */
-    public static boolean addWatermark4Pdf(String inputFile,
-                                    String outputFile,
-                                    String waterMarkStr,
-                                    float opacity,
-                                    float rotation,
-                                    float fontSize) {
+    public static boolean addWatermark4Pdf(InputStream inputFile,
+                                           OutputStream outputFile,
+                                           String waterMarkStr,
+                                           float opacity,
+                                           float rotation,
+                                           float fontSize) {
         PdfContentByte content = null;
         BaseFont base = null;
         Rectangle pageRect = null;
@@ -77,7 +48,7 @@ public abstract class Watermark4Pdf {
         PdfStamper pdfStamper = null;
         try{
             pdfReader =new PdfReader(inputFile);
-            pdfStamper = new PdfStamper(pdfReader, Files.newOutputStream(Paths.get(outputFile)));
+            pdfStamper = new PdfStamper(pdfReader, outputFile);
 
             base = BaseFont.createFont("STSongStd-Light", "UniGB-UCS2-H",
                     BaseFont.NOT_EMBEDDED);
@@ -126,6 +97,53 @@ public abstract class Watermark4Pdf {
             }
         }
         return true;
+    }
+
+    public static boolean addWatermark4Pdf(String inputFile,
+                                           String outputFile,
+                                           String waterMarkStr,
+                                           float opacity,
+                                           float rotation,
+                                           float fontSize) {
+        try {
+            return addWatermark4Pdf(Files.newInputStream(Paths.get(inputFile)),
+                    Files.newOutputStream(Paths.get(outputFile)),
+                waterMarkStr,
+                opacity,
+                rotation,
+                fontSize);
+
+        }catch(IOException e) {
+            logger.error(e.getMessage(),e);//e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    /**
+     * 为文档添加水印：目前只支持给pdf、word、excel、ppt增加水印，并且输出只能是Pdf文件。
+     *
+     * @param inputFile       源文件路径及文件
+     * @param waterMarkStr    水印字符串
+     * @param suffix          前缀
+     * @return 是否成功
+     */
+    public static boolean addWatermark4Word(String inputFile, String waterMarkStr, String suffix) {
+        //将源office文件转换为pdf
+        //String suffix = inputFile.substring(inputFile.lastIndexOf("."));
+        String tmpPdfFile = inputFile.substring(0,inputFile.lastIndexOf("."))+
+            DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(), "yyyyMMddHHmmssSSS")+".pdf";
+        String wartermarkFile = inputFile.substring(0,inputFile.lastIndexOf("."))+ ".pdf";
+        if(! OfficeToPdf.word2Pdf(inputFile,tmpPdfFile,suffix)) {
+            return false;
+        }
+
+        return  addWatermark4Pdf(tmpPdfFile,
+            wartermarkFile,
+            waterMarkStr,
+            0.4f,
+            45f,
+            60f);
     }
 
 }
