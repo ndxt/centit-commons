@@ -430,4 +430,29 @@ public abstract class ImageOpt {
         Color cr = castObjectToColor(obj);
         return cr==null ? defaultColor : cr;
     }
+
+    /*
+     * 这个方法是一个静态方法（static method），静态方法不需要实例化类就可以调用。静态方法通常用于共享的或者工具性的代码，它们可以被同一个类下的所有实例共享使用。
+     *
+     * 在实际应用中，这个方法可能用于给图片添加水印，例如logo、商标或者文本信息等。水印通常用于保护原始图片的完整性和版权，避免未经授权的复制和分发。
+     *
+     * 需要注意的是，这个方法只是一个注释，并没有实际的实现。实际的实现需要根据具体的应用场景和需求来编写。
+     */
+    public static BufferedImage addWaterMark(BufferedImage image, String waterMark, String fontName, Color color, int size, int x, int y) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        BufferedImage watermarkedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = watermarkedImage.createGraphics();
+        // 绘制原始图片
+        g2d.drawImage(image, 0, 0, width, height, null);
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.5f));
+        g2d.setColor(color);
+        g2d.setFont(new Font(fontName, Font.PLAIN, size));
+        g2d.drawString(waterMark, x, y);
+        g2d.dispose();
+        //ImageIO.write(watermarkedImage, "jpg", new File(outputPath));
+        return watermarkedImage;
+    }
+
 }
