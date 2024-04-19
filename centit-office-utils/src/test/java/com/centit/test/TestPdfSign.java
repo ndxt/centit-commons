@@ -33,7 +33,7 @@ public class TestPdfSign {
                     .certificate(chain)
                     .field("demo")
                     .page(1)
-                    .rect(100,700,200,800));
+                    .rect(200,650,300,750));
         } catch (Exception e) {
             e.printStackTrace();
         }
