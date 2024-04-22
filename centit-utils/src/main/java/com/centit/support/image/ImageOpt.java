@@ -1,5 +1,6 @@
 package com.centit.support.image;
 
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.security.Md5Encoder;
@@ -431,6 +432,21 @@ public abstract class ImageOpt {
         return cr==null ? defaultColor : cr;
     }
 
+    public static class ImageTextInfo {
+        public int x;
+        public int y;
+        public String text;
+        public ImageTextInfo(int x, int y, String t){
+            this.x = x;
+            this.y = y;
+            this.text = t;
+        }
+    }
+
+    public static ImageTextInfo createImageText(int x, int y, String t){
+        return new ImageTextInfo(x, y ,t);
+    }
+
     /*
      * 这个方法是一个静态方法（static method），静态方法不需要实例化类就可以调用。静态方法通常用于共享的或者工具性的代码，它们可以被同一个类下的所有实例共享使用。
      *
@@ -438,10 +454,13 @@ public abstract class ImageOpt {
      *
      * 需要注意的是，这个方法只是一个注释，并没有实际的实现。实际的实现需要根据具体的应用场景和需求来编写。
      */
-    public static BufferedImage addWaterMark(BufferedImage image, String waterMark, String fontName, Color color, int size, int x, int y) {
+    public static BufferedImage addTextToImage(BufferedImage image,
+                                             String fontName,
+                                             Color color,
+                                             int size,
+                                             List<ImageTextInfo> textList) {
         int width = image.getWidth();
         int height = image.getHeight();
-
         BufferedImage watermarkedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = watermarkedImage.createGraphics();
         // 绘制原始图片
@@ -449,17 +468,20 @@ public abstract class ImageOpt {
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.5f));
         g2d.setColor(color);
         g2d.setFont(new Font(fontName, Font.PLAIN, size));
-        g2d.drawString(waterMark, x, y);
+        for(ImageTextInfo iti : textList) {
+            g2d.drawString(iti.text, iti.x, iti.y);
+        }
         g2d.dispose();
         //ImageIO.write(watermarkedImage, "jpg", new File(outputPath));
         return watermarkedImage;
     }
 
-    public static boolean addWaterMark(InputStream imageIS, OutputStream imageOS,
+    public static boolean addTextToImage(InputStream imageIS, OutputStream imageOS,
                                        String waterMark, String fontName, Color color, int size, int x, int y) {
         try {
             BufferedImage image = ImageIO.read(imageIS);
-            BufferedImage markImage = ImageOpt.addWaterMark(image, waterMark, fontName, color, size, x, y);
+            BufferedImage markImage = ImageOpt.addTextToImage(image, fontName, color, size,
+                CollectionsOpt.createList(createImageText(x, y, waterMark)));
             ImageIO.write(markImage, "jpg", imageOS);
             return true;
         } catch (IOException e) {
@@ -467,4 +489,19 @@ public abstract class ImageOpt {
         }
     }
 
+    public static boolean addTextToImage(InputStream imageIS, OutputStream imageOS,
+                                         String fontName,
+                                         Color color,
+                                         int size,
+                                         List<ImageTextInfo> textList) {
+        try {
+            BufferedImage image = ImageIO.read(imageIS);
+            BufferedImage markImage = ImageOpt.addTextToImage(image, fontName, color, size,
+                textList);
+            ImageIO.write(markImage, "jpg", imageOS);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
 }

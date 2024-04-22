@@ -1,15 +1,14 @@
 package com.centit.support.office;
 
 import com.centit.support.algorithm.DatetimeOpt;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -65,7 +64,7 @@ public abstract class Watermark4Pdf {
                 float x = pageRect.getWidth() / 2;
                 float y = pageRect.getHeight() / 2;
                 // 获得PDF最顶层
-                content = pdfStamper.getOverContent(i);
+                content = pdfStamper.getUnderContent(i);
                 content.saveState();
                 // set Transparency
                 content.setGState(gs);
@@ -144,6 +143,66 @@ public abstract class Watermark4Pdf {
             0.4f,
             45f,
             60f);
+    }
+
+    public static boolean addImage2Pdf(InputStream inputFile,
+                                       OutputStream outputFile,
+                                       int page,
+                                       Image image,
+                                       float x,  float y, float w, float h) { // 图章路径
+        try {
+            PdfReader pdfReader = new PdfReader(inputFile);
+            PdfStamper pdfStamper = new PdfStamper(pdfReader, outputFile);
+            //Image image = Image.getInstance(imageFile);
+
+            image.setAbsolutePosition(x,y);
+            Rectangle rectangle = new Rectangle(0, 0, w, h);
+            image.scaleToFit(rectangle);
+            int pdfNumber = pdfReader.getNumberOfPages()+1;
+            PdfContentByte pdfContentByte = null;
+            PdfGState pdfGState = new PdfGState();
+            //设置透明度
+            pdfGState.setFillOpacity(0.2f);
+            if(page<0) {
+                for (int i = 1; i < pdfNumber; i++) {
+                    //在内容下方加水印OverContent
+                    pdfContentByte = pdfStamper.getOverContent(i);
+                    pdfContentByte.setGState(pdfGState);
+                    pdfContentByte.addImage(image);
+                }
+            } else {
+                pdfContentByte = pdfStamper.getOverContent(page);
+                pdfContentByte.setGState(pdfGState);
+                pdfContentByte.addImage(image);
+            }
+            pdfStamper.close();
+            pdfReader.close();
+            return true;
+        } catch (IOException | DocumentException e) {
+            return false;
+        }
+
+    }
+
+    public static boolean addImage2Pdf(String inputFile,
+                                       String outputFile,
+                                       String imageFile) { // 图章路径
+        try {
+            Image image = Image.getInstance(imageFile);
+            addImage2Pdf(Files.newInputStream(Paths.get(inputFile)),
+                Files.newOutputStream(Paths.get(outputFile)),
+                -1,
+                image,
+                0, 0, image.getWidth(), image.getHeight());
+            return true;
+        } catch (BadElementException | IOException e) {
+            //throw new RuntimeException(e);
+            return false;
+        }
+    }
+
+    public static Image createPdfImage(byte [] imageBytes) throws BadElementException, IOException {
+        return Image.getInstance(imageBytes);
     }
 
 }
