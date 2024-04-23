@@ -15,10 +15,13 @@ import java.util.Map;
 
 public class FormulaTest {
     public static void main(String[] args)  {
-        System.out.println(VariableFormula.calculate(
+        Object s;
+        s = VariableFormula.calculate("6 between (1+2) and 9 and 2<1");
+        System.out.println(s);
+      /*  System.out.println(VariableFormula.calculate(
             "nvl(null2, no)"));
         System.out.println(VariableFormula.calculate(
-            "subStr(getAt(0,split('EI_005325,ss,ss')),2)"));
+            "subStr(getAt(0,split('EI_005325,ss,ss')),2)"));*/
     }
 
         /*TimeZone pdt = DatetimeOpt.fetchTimeZone("PDT");

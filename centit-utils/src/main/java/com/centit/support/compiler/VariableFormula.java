@@ -103,6 +103,8 @@ public class VariableFormula {
             return ConstDefine.OP_DBMOD;
         if (sOptName.equalsIgnoreCase("XOR"))
             return ConstDefine.OP_XOR;
+        if (sOptName.equalsIgnoreCase("BETWEEN"))
+            return ConstDefine.OP_BETWEEN;
         return -1;
     }
 
@@ -442,6 +444,46 @@ public class VariableFormula {
         return lex.seekToRightBracket();
     }
 
+    private Boolean calcOperatorIn(Object operand){
+        Boolean bInRes = false;
+        String str = lex.getAWord();
+        if (str == null || str.isEmpty() || !str.equals("(")) return null;
+
+        while (true) {
+            Object item = calcFormula();
+            // 需要展开 数组
+            if (item instanceof Object[]) {
+                Object[] objs = (Object[]) item;
+                for (int i = 0; i < objs.length; i++) {
+                    if (GeneralAlgorithm.compareTwoObject(operand, objs[i]) == 0) {
+                        bInRes = true;
+                        break;
+                    }
+                }
+            } else if (item instanceof Collection) {
+                for (Object obj : (Collection) item) {
+                    if (GeneralAlgorithm.compareTwoObject(operand, obj) == 0) {
+                        bInRes = true;
+                        break;
+                    }
+                }
+            } else {
+                if (GeneralAlgorithm.compareTwoObject(operand, item) == 0) {
+                    bInRes = true;
+                }
+            }
+            str = lex.getAWord();
+            if (str == null || str.length() == 0 || (!str.equals(",") && !str.equals(")"))) return null;
+            if (str.equals(")")) {
+                lex.writeBackAWord(str);
+                break;
+            }
+        }
+
+        lex.seekToRightBracket();
+        return bInRes;
+    }
+
     public Object calcFormula() {
         OptStack optStack = new OptStack();
         Stack<Object> slOperand = new Stack<>();
@@ -460,43 +502,43 @@ public class VariableFormula {
             }
             //--------run OP_IN----------------------------------
             if (optID == ConstDefine.OP_IN) { // Specail Opt For In multi operand
-                Boolean bInRes = false;
                 Object operand = slOperand.pop();
+                Boolean bInRes = calcOperatorIn(operand);
+                if (bInRes == null) return null;
+                slOperand.push(bInRes);
                 str = lex.getAWord();
-                if (str == null || str.isEmpty() || !str.equals("(")) return null;
-
-                while (true) {
-                    item = calcFormula();
-                    // 需要展开 数组
-                    if (item instanceof Object[]) {
-                        Object[] objs = (Object[]) item;
-                        for (int i = 0; i < objs.length; i++) {
-                            if (GeneralAlgorithm.compareTwoObject(operand, objs[i]) == 0) {
-                                bInRes = true;
-                                break;
-                            }
-                        }
-                    } else if (item instanceof Collection) {
-                        for (Object obj : (Collection) item) {
-                            if (GeneralAlgorithm.compareTwoObject(operand, obj) == 0) {
-                                bInRes = true;
-                                break;
-                            }
-                        }
-                    } else {
-                        if (GeneralAlgorithm.compareTwoObject(operand, item) == 0) {
-                            bInRes = true;
-                        }
-                    }
+                optID = VariableFormula.getOptID(str);
+                if (optID == -1) {
+                    lex.writeBackAWord(str);
+                    break;
+                }
+            } else if (optID == ConstDefine.OP_NOT) { // Specail Opt For not In multi operand
+                str = lex.getAWord();
+                if("in".equalsIgnoreCase(str)){ // NOT_IN
+                    Object operand = slOperand.pop();
+                    Boolean bInRes = calcOperatorIn(operand);
+                    if (bInRes == null) return null;
+                    slOperand.push(! bInRes);// not in
                     str = lex.getAWord();
-                    if (str == null || str.length() == 0 || (!str.equals(",") && !str.equals(")"))) return null;
-                    if (str.equals(")")) {
+                    optID = VariableFormula.getOptID(str);
+                    if (optID == -1) {
                         lex.writeBackAWord(str);
                         break;
                     }
+                } else {
+                    lex.writeBackAWord(str);
                 }
-                lex.seekToRightBracket();
-                slOperand.push(bInRes);
+            } else if (optID == ConstDefine.OP_BETWEEN) { // Specail Opt For between operand
+                Object operand = slOperand.pop();
+                // between中的值 不支持表达式，因为 现在表达式中无法 区分 and 的 特殊性 如果需要表达式需要用括号
+                Object obj1 = calcItem();
+                str = lex.getAWord();
+                if(!str.equalsIgnoreCase("and")){
+                    return null;
+                }
+                Object obj2 = calcItem();
+                Boolean bBetweenRes = GeneralAlgorithm.betweenTwoObject(operand, obj1, obj2);
+                slOperand.push(bBetweenRes);// not in
                 str = lex.getAWord();
                 optID = VariableFormula.getOptID(str);
                 if (optID == -1) {

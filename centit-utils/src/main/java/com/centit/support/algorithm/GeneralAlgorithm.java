@@ -117,6 +117,12 @@ public abstract class GeneralAlgorithm {
         return compareTwoObject(operand, operand2, true);
     }
 
+    public static boolean betweenTwoObject(Object operand, Object obj1, Object obj2) {
+        int a = compareTwoObject(operand, obj1);
+        int b = compareTwoObject(operand, obj2);
+        return a * b <= 0;
+    }
+
     /**
      * int compare(final T c1, final T c2)
      * 等价于 ObjectUtils.compare
