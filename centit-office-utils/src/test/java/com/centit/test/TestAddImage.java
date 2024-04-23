@@ -22,7 +22,7 @@ public class TestAddImage {
             // 将证书文件放入指定路径，并读取keystore ，获得私钥和证书链
             Watermark4Pdf.addImage2Pdf(base+"fff.pdf",
                 base+"output2.pdf",
-                 base+"yinzhang.jpg");
+                 base+"yinzhang.jpg", 0.4f);
         } catch (Exception e) {
             e.printStackTrace();
         }

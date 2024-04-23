@@ -149,6 +149,7 @@ public abstract class Watermark4Pdf {
                                        OutputStream outputFile,
                                        int page,
                                        Image image,
+                                       float opacity,
                                        float x,  float y, float w, float h) { // 图章路径
         try {
             PdfReader pdfReader = new PdfReader(inputFile);
@@ -162,7 +163,7 @@ public abstract class Watermark4Pdf {
             PdfContentByte pdfContentByte = null;
             PdfGState pdfGState = new PdfGState();
             //设置透明度
-            pdfGState.setFillOpacity(0.2f);
+            pdfGState.setFillOpacity(opacity);
             if(page<0) {
                 for (int i = 1; i < pdfNumber; i++) {
                     //在内容下方加水印OverContent
@@ -186,13 +187,14 @@ public abstract class Watermark4Pdf {
 
     public static boolean addImage2Pdf(String inputFile,
                                        String outputFile,
-                                       String imageFile) { // 图章路径
+                                       String imageFile,
+                                       float opacity) { // 图章路径
         try {
             Image image = Image.getInstance(imageFile);
             addImage2Pdf(Files.newInputStream(Paths.get(inputFile)),
                 Files.newOutputStream(Paths.get(outputFile)),
                 -1,
-                image,
+                image, opacity,
                 0, 0, image.getWidth(), image.getHeight());
             return true;
         } catch (BadElementException | IOException e) {
