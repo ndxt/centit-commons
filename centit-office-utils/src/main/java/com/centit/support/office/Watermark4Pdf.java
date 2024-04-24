@@ -188,6 +188,7 @@ public abstract class Watermark4Pdf {
     public static boolean addImage2Pdf(String inputFile,
                                        String outputFile,
                                        String imageFile,
+                                       float x, float y,
                                        float opacity) { // 图章路径
         try {
             Image image = Image.getInstance(imageFile);
@@ -195,7 +196,7 @@ public abstract class Watermark4Pdf {
                 Files.newOutputStream(Paths.get(outputFile)),
                 -1,
                 image, opacity,
-                0, 0, image.getWidth(), image.getHeight());
+                x, y, image.getWidth(), image.getHeight());
             return true;
         } catch (BadElementException | IOException e) {
             //throw new RuntimeException(e);
