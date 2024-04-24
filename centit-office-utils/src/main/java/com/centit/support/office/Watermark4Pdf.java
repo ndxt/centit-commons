@@ -188,8 +188,8 @@ public abstract class Watermark4Pdf {
     public static boolean addImage2Pdf(String inputFile,
                                        String outputFile,
                                        String imageFile,
-                                       float x, float y,
-                                       float opacity) { // 图章路径
+                                       float opacity,
+                                       float x, float y) { // 图章路径
         try {
             Image image = Image.getInstance(imageFile);
             addImage2Pdf(Files.newInputStream(Paths.get(inputFile)),

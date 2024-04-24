@@ -23,8 +23,8 @@ public class TestAddImage {
             Watermark4Pdf.addImage2Pdf(base+"fff.pdf",
                 base+"output2.pdf",
                  base+"yinzhang.jpg",
-                100, 200,
-                0.4f);
+                0.4f,
+                100, 200);
         } catch (Exception e) {
             e.printStackTrace();
         }
