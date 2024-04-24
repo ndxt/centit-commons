@@ -476,20 +476,20 @@ public abstract class ImageOpt {
         return watermarkedImage;
     }
 
-    public static boolean addTextToImage(InputStream imageIS, OutputStream imageOS,
+    public static boolean addTextToImage(InputStream imageIS, String  imageType, OutputStream imageOS,
                                        String waterMark, String fontName, Color color, int size, int x, int y) {
         try {
             BufferedImage image = ImageIO.read(imageIS);
             BufferedImage markImage = ImageOpt.addTextToImage(image, fontName, color, size,
                 CollectionsOpt.createList(createImageText(x, y, waterMark)));
-            ImageIO.write(markImage, "jpg", imageOS);
+            ImageIO.write(markImage, imageType, imageOS);
             return true;
         } catch (IOException e) {
             return false;
         }
     }
 
-    public static boolean addTextToImage(InputStream imageIS, OutputStream imageOS,
+    public static boolean addTextToImage(InputStream imageIS, String  imageType, OutputStream imageOS,
                                          String fontName,
                                          Color color,
                                          int size,
@@ -498,7 +498,7 @@ public abstract class ImageOpt {
             BufferedImage image = ImageIO.read(imageIS);
             BufferedImage markImage = ImageOpt.addTextToImage(image, fontName, color, size,
                 textList);
-            ImageIO.write(markImage, "jpg", imageOS);
+            ImageIO.write(markImage, imageType, imageOS);
             return true;
         } catch (IOException e) {
             return false;
