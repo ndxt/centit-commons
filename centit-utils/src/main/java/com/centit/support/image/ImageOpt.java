@@ -459,12 +459,10 @@ public abstract class ImageOpt {
                                              Color color,
                                              int size,
                                              List<ImageTextInfo> textList) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        BufferedImage watermarkedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage watermarkedImage = image;//new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = watermarkedImage.createGraphics();
         // 绘制原始图片
-        g2d.drawImage(image, 0, 0, width, height, null);
+        // g2d.drawImage(image, 0, 0, width, height, null);
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.5f));
         g2d.setColor(color);
         g2d.setFont(new Font(fontName, Font.PLAIN, size));
@@ -496,8 +494,10 @@ public abstract class ImageOpt {
                                          List<ImageTextInfo> textList) {
         try {
             BufferedImage image = ImageIO.read(imageIS);
+            //image.getAlphaRaster()
             BufferedImage markImage = ImageOpt.addTextToImage(image, fontName, color, size,
                 textList);
+            //markImage.getAlphaRaster().setPixels(0, 0, markImage.getWidth(), markImage.getHeight(),
             ImageIO.write(markImage, imageType, imageOS);
             return true;
         } catch (IOException e) {

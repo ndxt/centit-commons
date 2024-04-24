@@ -6,8 +6,7 @@ import com.centit.support.image.ImageOpt;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Random;
 
@@ -77,10 +76,19 @@ public class TestImage {
     }
 
     public static void main(String arg[]) {
-        try {
+        String base="/Users/codefan/projects/centit/centit-commons/centit-office-utils/src/test/resources/template/";
+        try (InputStream image =  new FileInputStream(base+"group3.png");
+             OutputStream image2 =  new FileOutputStream(base+"group4.png")) {
             //ImageOpt.captureScreen("/Users/codefan/appdata/RunData/screen.jpg");
-            ImageOpt.createThumbnail("/Users/codefan/appdata/RunData/screen.jpg",
-                800, 600, 30, "/Users/codefan/appdata/RunData/screen4.jpg");
+
+            // 将证书文件放入指定路径，并读取keystore ，获得私钥和证书链
+            ImageOpt.addTextToImage(image, "png",
+                image2,
+                "hello 雅黑 world",
+                "雅黑",
+                Color.GREEN,
+                28, 50, 50);
+
             System.out.println("Done!");
         } catch (Exception e) {
             System.out.println("Error!");
