@@ -155,9 +155,9 @@ public abstract class Watermark4Pdf {
             PdfReader pdfReader = new PdfReader(inputFile);
             PdfStamper pdfStamper = new PdfStamper(pdfReader, outputFile);
             //Image image = Image.getInstance(imageFile);
-
             image.setAbsolutePosition(x,y);
-            Rectangle rectangle = new Rectangle(0, 0, w, h);
+            Rectangle rectangle = new Rectangle(0, 0,
+                w<=0?image.getWidth():w, h<=0?image.getHeight():h);
             image.scaleToFit(rectangle);
             int pdfNumber = pdfReader.getNumberOfPages()+1;
             PdfContentByte pdfContentByte = null;
@@ -196,7 +196,7 @@ public abstract class Watermark4Pdf {
                 Files.newOutputStream(Paths.get(outputFile)),
                 -1,
                 image, opacity,
-                x, y, image.getWidth(), image.getHeight());
+                x, y, -1, -1);
             return true;
         } catch (BadElementException | IOException e) {
             //throw new RuntimeException(e);
