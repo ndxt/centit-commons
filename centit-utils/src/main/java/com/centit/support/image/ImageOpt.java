@@ -466,6 +466,7 @@ public abstract class ImageOpt {
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.5f));
         g2d.setColor(color);
         g2d.setFont(new Font(fontName, Font.PLAIN, size));
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
         for(ImageTextInfo iti : textList) {
             g2d.drawString(iti.text, iti.x, iti.y);
         }
@@ -494,7 +495,7 @@ public abstract class ImageOpt {
                                          List<ImageTextInfo> textList) {
         try {
             BufferedImage image = ImageIO.read(imageIS);
-            //image.getAlphaRaster()
+            // image.getAlphaRaster()
             BufferedImage markImage = ImageOpt.addTextToImage(image, fontName, color, size,
                 textList);
             //markImage.getAlphaRaster().setPixels(0, 0, markImage.getWidth(), markImage.getHeight(),

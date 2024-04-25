@@ -77,8 +77,8 @@ public class TestImage {
 
     public static void main(String arg[]) {
         String base="/Users/codefan/projects/centit/centit-commons/centit-office-utils/src/test/resources/template/";
-        try (InputStream image =  new FileInputStream(base+"group3.png");
-             OutputStream image2 =  new FileOutputStream(base+"group4.png")) {
+        try (InputStream image =  new FileInputStream(base+"group1.png");
+             OutputStream image2 =  new FileOutputStream(base+"group2.png")) {
             //ImageOpt.captureScreen("/Users/codefan/appdata/RunData/screen.jpg");
 
             // 将证书文件放入指定路径，并读取keystore ，获得私钥和证书链
@@ -86,7 +86,7 @@ public class TestImage {
                 image2,
                 "hello 雅黑 world",
                 "雅黑",
-                Color.GREEN,
+                Color.BLACK,
                 28, 50, 50);
 
             System.out.println("Done!");
