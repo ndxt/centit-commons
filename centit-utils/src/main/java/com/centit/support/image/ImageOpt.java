@@ -463,6 +463,7 @@ public abstract class ImageOpt {
         Graphics2D g2d = watermarkedImage.createGraphics();
         // 绘制原始图片
         // g2d.drawImage(image, 0, 0, width, height, null);
+        // 搞不懂为什么要设置两次 Composite ，否则 文字的颜色不纯粹，不知道原因
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.5f));
         g2d.setColor(color);
         g2d.setFont(new Font(fontName, Font.PLAIN, size));
