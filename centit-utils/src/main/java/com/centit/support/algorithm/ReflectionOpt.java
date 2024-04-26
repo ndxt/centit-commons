@@ -1,9 +1,11 @@
 package com.centit.support.algorithm;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.common.ObjectException;
 import com.centit.support.common.ParamName;
 import com.centit.support.file.FileType;
+import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,6 +153,36 @@ public abstract class ReflectionOpt {
 
     public static boolean setFieldValue(Object object, String fieldName, Object newValue) {
         return setFieldValue(object, fieldName, newValue, null);
+    }
+
+    public static boolean setAttributeValue(Object object, String attributeName, Object newValue) {
+        if(object==null)
+            return false;
+        if(object instanceof JSONObject) {
+            JSONOpt.setAttribute((JSONObject)object, attributeName, newValue);
+            return true;
+        }
+        int dotPos = attributeName.indexOf(".");
+        if (dotPos > 0) {
+            String fieldName = attributeName.substring(0, dotPos);
+            Object fieldValue;
+            if(object instanceof  Map){
+                Map<String, Object> map = (Map<String, Object>) object;
+                fieldValue = map.get(fieldName);
+            } else {
+                fieldValue = getFieldValue(object, fieldName);
+            }
+            if(fieldValue==null)
+                return false;
+            return setAttributeValue(fieldValue, attributeName.substring(dotPos+1), newValue);
+        } else {
+            if(object instanceof  Map){
+                Map<String, Object> map = (Map<String, Object>) object;
+                map.put(attributeName, newValue);
+                return true;
+            }
+            return setFieldValue(object, attributeName, newValue);
+        }
     }
 
     /*
