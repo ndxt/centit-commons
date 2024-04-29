@@ -8,6 +8,8 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.security.*;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 
 public abstract class PdfSignatureUtil {
@@ -16,7 +18,7 @@ public abstract class PdfSignatureUtil {
         return new SignatureInfo();
     }
 
-    public static void sign(InputStream srcStream, OutputStream targetStream, SignatureInfo signatureInfo) {
+    public static boolean sign(InputStream srcStream, OutputStream targetStream, SignatureInfo signatureInfo) {
         try{
             ByteArrayOutputStream tempArrayOutputStream = new ByteArrayOutputStream();
             PdfReader reader = new PdfReader(srcStream);
@@ -53,17 +55,20 @@ public abstract class PdfSignatureUtil {
                     MakeSignature.CryptoStandard.CADES);
             targetStream.write(tempArrayOutputStream.toByteArray());
             targetStream.flush();
+            return true;
         } catch (DocumentException | IOException | GeneralSecurityException e) {
             e.printStackTrace();
+            return false;
         }
     }
 
-    public static void sign(String src, String target, SignatureInfo signatureInfo) {
-        try(InputStream srcStream = new FileInputStream(new File(src));
-            OutputStream targetStream = new FileOutputStream(new File(target))) {
-            sign(srcStream, targetStream, signatureInfo);
+    public static boolean sign(String src, String target, SignatureInfo signatureInfo) {
+        try(InputStream srcStream = Files.newInputStream(Paths.get(src));
+            OutputStream targetStream = Files.newOutputStream(Paths.get(target))) {
+            return sign(srcStream, targetStream, signatureInfo);
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

@@ -145,13 +145,12 @@ public abstract class Watermark4Pdf {
             60f);
     }
 
-    public static boolean addImage2Pdf(InputStream inputFile,
+    public static void addImage2Pdf(InputStream inputFile,
                                        OutputStream outputFile,
                                        int page,
                                        Image image,
                                        float opacity,
-                                       float x,  float y, float w, float h) { // 图章路径
-        try {
+                                       float x,  float y, float w, float h) throws DocumentException, IOException { // 图章路径
             PdfReader pdfReader = new PdfReader(inputFile);
             PdfStamper pdfStamper = new PdfStamper(pdfReader, outputFile);
             //Image image = Image.getInstance(imageFile);
@@ -178,30 +177,20 @@ public abstract class Watermark4Pdf {
             }
             pdfStamper.close();
             pdfReader.close();
-            return true;
-        } catch (IOException | DocumentException e) {
-            return false;
-        }
 
     }
 
-    public static boolean addImage2Pdf(String inputFile,
+    public static void addImage2Pdf(String inputFile,
                                        String outputFile,
                                        String imageFile,
                                        float opacity,
-                                       float x, float y) { // 图章路径
-        try {
+                                       float x, float y) throws DocumentException, IOException { // 图章路径
             Image image = Image.getInstance(imageFile);
             addImage2Pdf(Files.newInputStream(Paths.get(inputFile)),
                 Files.newOutputStream(Paths.get(outputFile)),
                 -1,
                 image, opacity,
                 x, y, -1, -1);
-            return true;
-        } catch (BadElementException | IOException e) {
-            //throw new RuntimeException(e);
-            return false;
-        }
     }
 
     public static Image createPdfImage(byte [] imageBytes) throws BadElementException, IOException {

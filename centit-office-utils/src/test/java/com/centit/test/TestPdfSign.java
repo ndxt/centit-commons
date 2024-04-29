@@ -23,7 +23,7 @@ public class TestPdfSign {
             // 得到证书链
             Certificate[] chain = ks.getCertificateChain(alias);
             //需要进行签章的pdf
-            String path = "fff.pdf";
+            String path = "sec.pdf";
             //签章后的pdf路径
             PdfSignatureUtil.sign(base+path, base+"output.pdf",
                 PdfSignatureUtil.createSingInfo().reason("我给你的权限，就是这么牛B！")
