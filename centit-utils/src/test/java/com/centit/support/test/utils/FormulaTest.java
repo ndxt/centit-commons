@@ -16,7 +16,8 @@ import java.util.Map;
 public class FormulaTest {
     public static void main(String[] args)  {
         Object s;
-        s = VariableFormula.calculate("6 between (1+2) and 9 and 2<1");
+        s = VariableFormula.calculate("eval(f)+d",
+            CollectionsOpt.createHashMap("a", 1, "b", 2, "c", 3, "d", 4, "e", 5, "f", "f*b+c"));
         System.out.println(s);
       /*  System.out.println(VariableFormula.calculate(
             "nvl(null2, no)"));

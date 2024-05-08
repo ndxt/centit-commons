@@ -95,7 +95,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR),//取汉字拼音
         new FunctionInfo("random", -1, ConstDefine.FUNC_RANDOM, ConstDefine.TYPE_ANY), // 取随机数
         new FunctionInfo("hash", 1, ConstDefine.FUNC_HASH, ConstDefine.TYPE_STR), // 计算hash值
-        new FunctionInfo("value", -1, ConstDefine.FUNC_VALUE, ConstDefine.TYPE_ANY) // 和 FUNC_IF 在外层运行
+        new FunctionInfo("eval", -1, ConstDefine.FUNC_EVAL, ConstDefine.TYPE_ANY) // 和 eval在外层运行
     };
     private static double COMPARE_MIN_DOUBLE = 0.0000001;
     private EmbedFunc() {

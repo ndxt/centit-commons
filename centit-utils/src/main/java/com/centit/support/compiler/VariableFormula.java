@@ -628,15 +628,12 @@ public class VariableFormula {
             return null;
         }
 
-        if (EmbedFunc.functionsList[nFuncNo].nFuncID == ConstDefine.FUNC_VALUE) {
-            if(slOperand.size()<1){
+        if (EmbedFunc.functionsList[nFuncNo].nFuncID == ConstDefine.FUNC_EVAL) {
+            if(slOperand.isEmpty()){
                 return null;
             }
             String valuePath = StringBaseOpt.castObjectToString(slOperand.get(0));
-            if(StringUtils.isBlank(valuePath)){
-                return null;
-            }
-            return this.trans.getVarValue(valuePath);
+            return VariableFormula.calculate(valuePath, this.trans, this.extendFuncMap);
         }
 
         if (EmbedFunc.functionsList[nFuncNo].nPrmSum != -1
