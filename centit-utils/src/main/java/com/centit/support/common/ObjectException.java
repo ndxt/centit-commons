@@ -31,9 +31,10 @@ public class ObjectException extends RuntimeException {
     public static final int DATA_VALIDATE_ERROR = 611;
     //系统配置错误
     public static final int SYSTEM_CONFIG_ERROR = 612;
-    // 不支持的防范
+    // 不支持的方法
     public static final int FUNCTION_NOT_SUPPORT = 613;
-
+    // 参数配置/设置不正确。
+    public static final int PARAMETER_NOT_CORRECT = 614;
     public static final int DATABASE_OPERATE_EXCEPTION = 620;
     public static final int DATABASE_OUT_SYNC_EXCEPTION = 621;
     public static final int DATABASE_SQL_EXCEPTION = 622;
