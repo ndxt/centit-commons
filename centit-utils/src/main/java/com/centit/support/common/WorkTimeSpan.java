@@ -8,7 +8,7 @@ import java.util.Date;
  * @author codefan@sina.com
  */
 @SuppressWarnings("unused")
-public class WorkTimeSpan extends Number implements java.io.Serializable {
+public class WorkTimeSpan extends Number implements java.io.Serializable, Comparable<Number> {
 
     /**
      * 默认每日工作时间
@@ -474,6 +474,11 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
         return this;
     }
 
+    public WorkTimeSpan subtractWorkTimeSpan(WorkTimeSpan timeSpan) {
+        this.timeSpan -= timeSpan.timeSpan;
+        return this;
+    }
+
     public long getDays() {
         return timeSpan > 0 ? timeSpan / DAY_MILLISECONDS
             : (0 - timeSpan) / DAY_MILLISECONDS;
@@ -503,5 +508,10 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
 
     public boolean isPositiveTimeSpan(WorkTimeSpan timeSpan) {
         return this.timeSpan > 0;
+    }
+
+    @Override
+    public int compareTo(Number o) {
+        return Long.compare(this.timeSpan, o.longValue());
     }
 }
