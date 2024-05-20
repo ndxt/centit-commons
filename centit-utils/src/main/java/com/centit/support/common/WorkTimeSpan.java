@@ -121,21 +121,21 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
     public static WorkTimeSpan calcDatatimeSpan(Date beginDate, Date endDate) {
         WorkTimeSpan wrokTimeSpan = new WorkTimeSpan();
         wrokTimeSpan.setDayWorkMilliseconds(DAY_MILLISECONDS);
-        wrokTimeSpan.setTimeSpan(beginDate.getTime() - endDate.getTime());
+        wrokTimeSpan.setTimeSpan(endDate.getTime() - beginDate.getTime());
         return wrokTimeSpan;
     }
 
     public static WorkTimeSpan calcWorkTimeSpan(Date beginDate, Date endDate, Long dayWorkMinutes) {
         WorkTimeSpan wrokTimeSpan = new WorkTimeSpan();
         wrokTimeSpan.setDayWorkMilliseconds(dayWorkMinutes * MINUTE_MILLISECONDS);
-        wrokTimeSpan.setTimeSpan(beginDate.getTime() - endDate.getTime());
+        wrokTimeSpan.setTimeSpan(endDate.getTime() - beginDate.getTime());
         return wrokTimeSpan;
     }
 
     public static WorkTimeSpan calcWorkTimeSpan(Date beginDate, Date endDate) {
         WorkTimeSpan wrokTimeSpan = new WorkTimeSpan();
         wrokTimeSpan.setDayWorkMilliseconds(DEFAULT_DAY_WORK_MILLISECONDS);
-        wrokTimeSpan.setTimeSpan(beginDate.getTime() - endDate.getTime());
+        wrokTimeSpan.setTimeSpan(endDate.getTime() - beginDate.getTime());
         return wrokTimeSpan;
     }
 
