@@ -469,6 +469,11 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
         return this;
     }
 
+    public WorkTimeSpan addWorkTimeSpan(WorkTimeSpan timeSpan) {
+        this.timeSpan += timeSpan.timeSpan;
+        return this;
+    }
+
     public long getDays() {
         return timeSpan > 0 ? timeSpan / DAY_MILLISECONDS
             : (0 - timeSpan) / DAY_MILLISECONDS;
@@ -494,5 +499,9 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
 
     public long getMilliseconds() {
         return getRemainderMilliseconds() % SECOND_MILLISECONDS;
+    }
+
+    public boolean isPositiveTimeSpan(WorkTimeSpan timeSpan) {
+        return this.timeSpan > 0;
     }
 }
