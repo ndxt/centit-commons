@@ -60,7 +60,7 @@ public class FileDocument implements ESDocument, Serializable {
     /**
      * 文档的摘要
      */
-    @ESField(type="text",query = true, highlight = true, analyzer = "ik_smart")
+    @ESField(type="text", query = true, highlight = true, analyzer = "ik_smart")
     private String fileSummary;
     /**
      * 文档的ID
