@@ -55,7 +55,7 @@ public class FileDocument implements ESDocument, Serializable {
     /**
      * 文档名称
      */
-    @ESField(type="text", query = true, analyzer = "ik_smart")
+    @ESField(type="text", query = true, highlight = true, analyzer = "ik_smart")
     private String fileName;
     /**
      * 文档的摘要
