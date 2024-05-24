@@ -359,7 +359,7 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
         return getRemainderMilliseconds() % SECOND_MILLISECONDS;
     }
 
-    public boolean isPositiveTimeSpan(DateTimeSpan timeSpan) {
+    public boolean isPositiveTimeSpan() {
         return this.timeSpan > 0;
     }
 
