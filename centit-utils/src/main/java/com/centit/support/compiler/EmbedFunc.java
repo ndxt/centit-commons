@@ -803,8 +803,13 @@ public abstract class EmbedFunc {
                 LeftRightPair<Date, Object> dateOpt = fetchDateOpt(nOpSum, slOperand);
                 if (dateOpt.getLeft() == null || dateOpt.getRight() == null)
                     return null;
-                return DatetimeOpt.addDays(dateOpt.getLeft(),
-                    NumberBaseOpt.castObjectToInteger(dateOpt.getRight()));
+                if(dateOpt.getRight() instanceof Integer || dateOpt.getRight() instanceof Long) {
+                    return DatetimeOpt.addDays(dateOpt.getLeft(),
+                        NumberBaseOpt.castObjectToInteger(dateOpt.getRight()));
+                } else {
+                    return DatetimeOpt.addDays(dateOpt.getLeft(),
+                        NumberBaseOpt.castObjectToFloat(dateOpt.getRight()));
+                }
             }
             case ConstDefine.FUNC_ADD_MONTHS: {//
                 LeftRightPair<Date, Object> dateOpt = fetchDateOpt(nOpSum, slOperand);
