@@ -14,10 +14,10 @@ import java.util.TimeZone;
 
 public class TestDateTimeOpt {
     public static void main(String[] args) {
-        System.out.println(VariableFormula.calculate(" adddays(today(), 1)"));
-        System.out.println(VariableFormula.calculate(" today()"));
-        System.out.println(VariableFormula.calculate(" datespan(adddays(today(), 1), today())"));
-        System.out.println(VariableFormula.calculate(" datespan(adddays(today(), 1), today()) * 24 * 60 "));
+        System.out.println(VariableFormula.calculate(" addMonths(today(), 1)"));
+        System.out.println(VariableFormula.calculate(" addMonths(toDate('2023-1-30'), 1)"));//toDate
+        System.out.println(VariableFormula.calculate(" truncDate(today(), 'W')"));
+        System.out.println(VariableFormula.calculate(" truncDate(addMonths(toDate('2023-1-30'), 1), 'W')"));
     }
     public static void testTZ() {
         TimeZone timeZone = DatetimeOpt.fetchTimeZone("UTC");
