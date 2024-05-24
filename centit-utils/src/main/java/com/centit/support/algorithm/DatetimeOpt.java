@@ -672,10 +672,10 @@ public abstract class DatetimeOpt {
     }
 
     /**
-     * 获取一周第一天（周一凌晨一点）
+     * 获取一周第一天（周一凌晨零点）
      *
      * @param date 输入时间
-     * @return 周一凌晨一点
+     * @return 周一凌晨0点
      */
     public static java.util.Date truncateToWeek(java.util.Date date) {
         Calendar cal = new GregorianCalendar();
@@ -693,10 +693,10 @@ public abstract class DatetimeOpt {
     }
 
     /**
-     * 获取一周最后一天（周日凌晨一点）
+     * 获取一周最后一天（周日凌晨零点）
      *
      * @param date 输入时间
-     * @return 周日凌晨一点
+     * @return 周日凌晨零点
      */
     public static java.util.Date seekEndOfWeek(java.util.Date date) {
         Calendar cal = new GregorianCalendar();

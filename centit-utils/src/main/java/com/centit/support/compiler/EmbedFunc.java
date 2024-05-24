@@ -82,7 +82,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("adddays", 2, ConstDefine.FUNC_ADD_DAYS, ConstDefine.TYPE_ANY),//日期函数  加天数
         new FunctionInfo("addmonths", 2, ConstDefine.FUNC_ADD_MONTHS, ConstDefine.TYPE_ANY),//日期函数  加月数
         new FunctionInfo("addyears", 2, ConstDefine.FUNC_ADD_YEARS, ConstDefine.TYPE_ANY),//日期函数   加年数
-        new FunctionInfo("truncdate", -1, ConstDefine.FUNC_TRUNC_DATE, ConstDefine.TYPE_ANY),//日期函数   截断日期  第二个参数  Y ，M , D 分别返回一年、月的第一天 ，或者一日的零点
+        new FunctionInfo("truncdate", -1, ConstDefine.FUNC_TRUNC_DATE, ConstDefine.TYPE_ANY),//日期函数   截断日期  第二个参数  Y ，M , D  W 分别返回一年、月的第一天 ，一日的零点， 一周周一
         new FunctionInfo("lastofmonth", -1, ConstDefine.FUNC_LAST_OF_MONTH, ConstDefine.TYPE_ANY),//日期函数   求这个月的第一天
         new FunctionInfo("toDate", 1, ConstDefine.FUNC_TO_DATE, ConstDefine.TYPE_DATE),// 转换为日期
         new FunctionInfo("toString", 1, ConstDefine.FUNC_TO_STRING, ConstDefine.TYPE_STR),//转换为String
@@ -835,12 +835,14 @@ public abstract class EmbedFunc {
                     ti = slOperand.get(1);
                 }
                 String tempStr = StringBaseOpt.objectToString(ti);
-                if ("M".equalsIgnoreCase(tempStr))
+                if ("M".equalsIgnoreCase(tempStr)) {
                     return DatetimeOpt.truncateToMonth(dt);
-                else if ("Y".equalsIgnoreCase(tempStr))
+                } else if ("Y".equalsIgnoreCase(tempStr)) {
                     return DatetimeOpt.truncateToYear(dt);
-                else
-                    return DatetimeOpt.truncateToDay(dt);
+                } else if ("W".equalsIgnoreCase(tempStr)) {
+                    return DatetimeOpt.truncateToWeek(dt);
+                } // D
+                return DatetimeOpt.truncateToDay(dt);
             }
 
             case ConstDefine.FUNC_LAST_OF_MONTH: {//
