@@ -135,8 +135,12 @@ public class ESSearcher implements Searcher{
             }*/
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(queryBuilder);
-            if(sortBuilders != null && !sortBuilders.isEmpty())
+            //添加默认根据匹配度排序 .order(SortOrder.DESC)
+            searchSourceBuilder.sort(SortBuilders.scoreSort());
+            if(sortBuilders != null && !sortBuilders.isEmpty()) {
                 searchSourceBuilder.sort(sortBuilders);
+            }
+
             searchSourceBuilder.explain(true)
                 .from((pageNo>1)?(pageNo-1)* pageSize:0)
                 .size(pageSize);
@@ -232,6 +236,9 @@ public class ESSearcher implements Searcher{
         }
         List<SortBuilder<?>> sortBuilders = new ArrayList<>();
         String selfOrderBy = StringBaseOpt.objectToString(filterMap.get(SELF_ORDER_BY));
+        if(StringUtils.isBlank(selfOrderBy)){
+            selfOrderBy = StringBaseOpt.objectToString(filterMap.get("orderBy"));
+        }
         if (StringUtils.isNotBlank(selfOrderBy)) {
             Lexer lexer = new Lexer(selfOrderBy, Lexer.LANG_TYPE_SQL);
             String aWord = lexer.getAWord();

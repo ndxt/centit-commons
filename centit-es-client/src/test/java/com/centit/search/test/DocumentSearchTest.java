@@ -1,7 +1,6 @@
 package com.centit.search.test;
 
 import com.alibaba.fastjson2.JSON;
-import com.centit.search.document.ObjectDocument;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
