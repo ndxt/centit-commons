@@ -140,10 +140,12 @@ public class ESSearcher implements Searcher{
             if(sortBuilders != null && !sortBuilders.isEmpty()) {
                 searchSourceBuilder.sort(sortBuilders);
             }
+            if(pageSize>0) {
+                searchSourceBuilder.explain(true)
+                    .from((pageNo > 1) ? (pageNo - 1) * pageSize : 0)
+                    .size(pageSize);
+            }
 
-            searchSourceBuilder.explain(true)
-                .from((pageNo>1)?(pageNo-1)* pageSize:0)
-                .size(pageSize);
             if(!highlightFields.isEmpty()) {
                 HighlightBuilder highlightBuilder = new HighlightBuilder();
                 for (String hf : highlightFields) {
@@ -359,7 +361,7 @@ public class ESSearcher implements Searcher{
     public Pair<Long,List<Map<String, Object>>> searchOpt(String optId,
                                                           String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("optId", optId),
-            queryWord,pageNo,pageSize);
+            queryWord, pageNo, pageSize);
     }
 
     /**
@@ -374,7 +376,7 @@ public class ESSearcher implements Searcher{
     public Pair<Long,List<Map<String, Object>>> searchOwner(String owner,
                                                             String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("userCode", owner),
-            queryWord,pageNo,pageSize);
+            queryWord, pageNo, pageSize);
     }
 
     /**
@@ -390,7 +392,7 @@ public class ESSearcher implements Searcher{
     public Pair<Long,List<Map<String, Object>>> searchOwner(String owner, String optId,
                                                             String queryWord, int pageNo, int pageSize){
         return search(CollectionsOpt.createHashMap("userCode", owner,"optId", optId),
-            queryWord,pageNo,pageSize);
+            queryWord, pageNo, pageSize);
     }
 
     /**
@@ -405,7 +407,7 @@ public class ESSearcher implements Searcher{
     public Pair<Long,List<Map<String, Object>>> searchUnits(String[] units,
                                                             String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("unitCode", units),
-            queryWord,pageNo,pageSize);
+            queryWord, pageNo, pageSize);
     }
 
     /**
@@ -421,7 +423,7 @@ public class ESSearcher implements Searcher{
     public Pair<Long,List<Map<String, Object>>> searchUnits(String[] units,
                                                             String optId, String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("optId", optId, "unitCode", units),
-            queryWord,pageNo,pageSize);
+            queryWord, pageNo, pageSize);
     }
 
     public ESSearcher setHighlightPreTags(String[] highlightPreTags) {
