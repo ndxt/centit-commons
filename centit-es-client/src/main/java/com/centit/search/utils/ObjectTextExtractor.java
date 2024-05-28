@@ -35,7 +35,6 @@ public abstract class ObjectTextExtractor {
         StringBuilder   textBuilder;
         boolean includeName;
 
-
         public TextExtractContent includePropertyName(boolean includeKey){
             includeName = includeKey;
             return this;

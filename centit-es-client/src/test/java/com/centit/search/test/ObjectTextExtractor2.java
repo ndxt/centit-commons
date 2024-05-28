@@ -1,4 +1,4 @@
-package com.centit.search.utils;
+package com.centit.search.test;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;

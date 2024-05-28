@@ -6,6 +6,7 @@ import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Searcher;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Lexer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -214,8 +215,8 @@ public class ESSearcher implements Searcher{
             }
             return new ImmutablePair<>(totalHits, retList);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return null;
+            throw new ObjectException(ObjectException.UNKNOWN_EXCEPTION,
+                "查询ES失败:"+e.getMessage(), e);
         }finally {
             if(client!=null) {
                 clientPool.returnObject(client);
