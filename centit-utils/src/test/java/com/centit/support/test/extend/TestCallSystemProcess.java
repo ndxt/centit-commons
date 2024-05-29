@@ -13,7 +13,7 @@ public class TestCallSystemProcess {
         cs.setRunPath("/Users/codefan/temp");
         String pythonScript = "print(\"hello world from Python3!\");\n";
         cs.addExtendFile("test.py", FileIOOpt.castObjectToInputStream(pythonScript));
-        List<String> lines = cs.callSystemProcess("python3", "test.py");
+        List<String> lines = cs.runCommand("python3", "test.py");
         System.out.println(lines.toString());
     }
 }

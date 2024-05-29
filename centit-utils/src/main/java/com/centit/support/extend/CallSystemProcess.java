@@ -44,7 +44,7 @@ public class CallSystemProcess {
         }
     }
 
-    public List<String> callSystemProcess(String ... command){
+    public List<String> runCommand(String ... command){
         try {
             for(Map.Entry<String, InputStream> entry : extendFiles.entrySet()){
                 FileIOOpt.writeInputStreamToFile(entry.getValue(), mapFilePath(entry.getKey()));
