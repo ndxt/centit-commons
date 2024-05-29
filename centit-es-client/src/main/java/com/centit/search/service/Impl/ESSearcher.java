@@ -245,33 +245,20 @@ public class ESSearcher implements Searcher{
         if (StringUtils.isNotBlank(selfOrderBy)) {
             Lexer lexer = new Lexer(selfOrderBy, Lexer.LANG_TYPE_SQL);
             String aWord = lexer.getAWord();
-            StringBuilder orderBuilder = new StringBuilder();
             while (StringUtils.isNotBlank(aWord)) {
-                if (StringUtils.equalsAnyIgnoreCase(aWord,
-                    ",", "desc", "asc")) {
-                    orderBuilder.append(aWord);
-                } else {
-                    orderBuilder.append(aWord);
-                }
-                orderBuilder.append(" ");
+                String field = aWord;
+                SortOrder sortOrder = SortOrder.ASC;
                 aWord = lexer.getAWord();
-            }
-            String[] fields = orderBuilder.toString().split(",");
-            for (String field : fields) {
-                SortBuilder sortBuilder;
-                String[] field2 = field.split(" ");
-                if (field2.length > 1) {
-                    if (field2[1].equalsIgnoreCase("desc")) {
-                        sortBuilder = SortBuilders.fieldSort(field2[0]).order(SortOrder.DESC);
-                    } else {
-                        sortBuilder = SortBuilders.fieldSort(field2[0]).order(SortOrder.ASC);
-                    }
-                } else {
-                    sortBuilder = SortBuilders.fieldSort(field2[0]).order(SortOrder.ASC);
+                if("desc".equalsIgnoreCase(aWord)){
+                    sortOrder = SortOrder.DESC;
                 }
-                sortBuilders.add(sortBuilder);
+                sortBuilders.add(SortBuilders.fieldSort(field).order(sortOrder));
+                while(StringUtils.equalsAnyIgnoreCase(aWord, "desc", "asc", ",")){
+                    aWord = lexer.getAWord();
+                }
             }
         }
+
         String sortField = StringBaseOpt.objectToString(filterMap.get(TABLE_SORT_FIELD));
         if (StringUtils.isNotBlank(sortField)) {
             SortBuilder sortBuilder;
