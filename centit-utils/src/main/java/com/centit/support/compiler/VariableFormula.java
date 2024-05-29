@@ -105,6 +105,8 @@ public class VariableFormula {
             return ConstDefine.OP_XOR;
         if (sOptName.equalsIgnoreCase("BETWEEN"))
             return ConstDefine.OP_BETWEEN;
+        if (sOptName.equalsIgnoreCase("IS"))
+            return ConstDefine.OP_IS;
         return -1;
     }
 
@@ -539,6 +541,27 @@ public class VariableFormula {
                 Object obj2 = calcItem();
                 Boolean bBetweenRes = GeneralAlgorithm.betweenTwoObject(operand, obj1, obj2);
                 slOperand.push(bBetweenRes);// not in
+                str = lex.getAWord();
+                optID = VariableFormula.getOptID(str);
+                if (optID == -1) {
+                    lex.writeBackAWord(str);
+                    break;
+                }
+            } // IS NULL IS NOT NULL
+            else if (optID == ConstDefine.OP_IS) {
+                Object operand = slOperand.pop();
+                Boolean bRes = null;
+                str = lex.getAWord();
+                if("NULL".equalsIgnoreCase(str)){
+                    bRes = GeneralAlgorithm.isEmpty(operand);
+                } else if("NOT".equalsIgnoreCase(str)){
+                    str = lex.getAWord();
+                    if("NULL".equalsIgnoreCase(str)){
+                        bRes = !GeneralAlgorithm.isEmpty(operand);
+                    }
+                }
+                if (bRes == null) return null;
+                slOperand.push(bRes);
                 str = lex.getAWord();
                 optID = VariableFormula.getOptID(str);
                 if (optID == -1) {

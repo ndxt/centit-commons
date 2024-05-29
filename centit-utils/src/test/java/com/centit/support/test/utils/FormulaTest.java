@@ -16,7 +16,7 @@ import java.util.Map;
 public class FormulaTest {
     public static void main(String[] args)  {
         Object s;
-        s = VariableFormula.calculate("eval(f)+d",
+        s = VariableFormula.calculate("a is not null + 2",
             CollectionsOpt.createHashMap("a", 1, "b", 2, "c", 3, "d", 4, "e", 5, "f", "f*b+c"));
         System.out.println(s);
       /*  System.out.println(VariableFormula.calculate(
