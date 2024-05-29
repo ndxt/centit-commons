@@ -74,22 +74,22 @@ public abstract class AbstractRuntimeContext {
         return object;
     }
 
-    public Object callJsFunc(String funcName, Object... args) throws
+    public Object callFunc(String funcName, Object... args) throws
         ScriptException, NoSuchMethodException {
         Invocable invocable = (Invocable) scriptEngine;
         return checkArrayObject(invocable.invokeFunction(funcName, args));
     }
 
-    public Object getJsObject(String objName){
+    public Object getObject(String objName){
         return scriptEngine.get(objName);
     }
 
-    public Object getJsObjectProperty(String objName, String propertyName)
+    public Object getObjectProperty(String objName, String propertyName)
         throws ScriptException {
        return checkArrayObject(scriptEngine.eval(objName+"."+propertyName));
     }
 
-    public Object callJsObjectMethod(Object jsObject, String methodName, Object... args)
+    public Object callObjectMethod(Object jsObject, String methodName, Object... args)
         throws ScriptException, NoSuchMethodException {
         Invocable invocable = (Invocable) scriptEngine;
         return checkArrayObject(invocable.invokeMethod(jsObject, methodName, args));

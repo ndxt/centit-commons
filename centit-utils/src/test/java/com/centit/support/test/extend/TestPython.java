@@ -12,7 +12,7 @@ public class TestPython {
         pythonRuntimeContext.compileScript("def add2num(y, t):\n" +
             "    print \"hello\", y+t \n" +
             "    return y + t\n");
-        Object obj = pythonRuntimeContext.callJsFunc("add2num", 1, 2);
+        Object obj = pythonRuntimeContext.callFunc("add2num", 1, 2);
         System.out.println(StringBaseOpt.castObjectToString(obj));
     }
 }

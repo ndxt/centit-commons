@@ -15,7 +15,7 @@ public class TestJsRunTime {
                 .getResourceAsStream("/testJs.js");
             jsRuntimeContext.compileScriptStream(in);
 
-            Object obj = jsRuntimeContext.callJsFunc("runOpt", new Object());
+            Object obj = jsRuntimeContext.callFunc("runOpt", new Object());
             System.out.println(JSON.toJSONString(obj));
         } catch (ScriptException e) {
             throw new RuntimeException(e);
