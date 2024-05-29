@@ -40,6 +40,8 @@ import java.util.*;
 public class ESSearcher implements Searcher{
 
     public static final String SELF_ORDER_BY = "ORDER_BY";
+
+    public static final String SELF_ORDER_BY2 = "orderBy";
     /**
      * 用户自定义排序字段 ， 放到 filterDesc 中
      */
@@ -58,6 +60,7 @@ public class ESSearcher implements Searcher{
     private String[] highlightPreTags;
     private String[] highlightPostTags;
 
+    private List<String> allFields;
     private String[] queryFields;
     private Set<String> highlightFields;
 
@@ -73,6 +76,7 @@ public class ESSearcher implements Searcher{
         this.highlightFields = new HashSet<>();
         this.highlightPreTags = new String[]{"<strong>"};
         this.highlightPostTags = new String[]{"</strong>"};
+        this.allFields = new ArrayList<>();
     }
 
     public ESSearcher(ESServerConfig config, GenericObjectPool<RestHighLevelClient> clientPool){
@@ -113,8 +117,10 @@ public class ESSearcher implements Searcher{
                 if(esType.highlight()){
                     highlightFields.add(field.getName());
                 }
+                allFields.add(field.getName());
             }
         }//end of for
+
         queryFields = CollectionsOpt.listToArray(qf);
     }
 
@@ -240,7 +246,7 @@ public class ESSearcher implements Searcher{
         List<SortBuilder<?>> sortBuilders = new ArrayList<>();
         String selfOrderBy = StringBaseOpt.objectToString(filterMap.get(SELF_ORDER_BY));
         if(StringUtils.isBlank(selfOrderBy)){
-            selfOrderBy = StringBaseOpt.objectToString(filterMap.get("orderBy"));
+            selfOrderBy = StringBaseOpt.objectToString(filterMap.get(SELF_ORDER_BY2));
         }
         if (StringUtils.isNotBlank(selfOrderBy)) {
             Lexer lexer = new Lexer(selfOrderBy, Lexer.LANG_TYPE_SQL);
@@ -287,15 +293,22 @@ public class ESSearcher implements Searcher{
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         if(fieldFilter!=null) {
             for (Map.Entry<String, Object> ent : fieldFilter.entrySet()) {
-                /*Class tp = obj.getClass();
-                return tp.isArray()?true:obj instanceof Collection;*/
+                boolean isField = false;
+                for(String fieldName : allFields) {
+                    if(ent.getKey().startsWith(fieldName)) {
+                        isField = true;
+                        break;
+                    }
+                }
+                if(!isField) continue;
                 if (ent.getValue().getClass().isArray()) {
                     queryBuilder.must(QueryBuilders.termsQuery(ent.getKey(), (String[]) ent.getValue()));
                 } else if (ent.getValue() instanceof Collection) {
                     queryBuilder.must(QueryBuilders.termsQuery(
                         ent.getKey(), CollectionsOpt.listToArray((Collection)ent.getValue())));
                 } else {
-                    String key = ent.getKey(); int keyLen = key.length();
+                    String key = ent.getKey();
+                    int keyLen = key.length();
                     String optSuffix = keyLen>3 ? key.substring(keyLen - 3).toLowerCase() : "_eq";
                     switch (optSuffix) {
                         case "_gt":
