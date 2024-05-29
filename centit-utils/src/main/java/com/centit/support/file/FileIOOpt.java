@@ -30,7 +30,7 @@ public abstract class FileIOOpt {
     public static int writeInputStreamToFile(InputStream in,
                                              File file) throws IOException {
 
-        try (FileOutputStream out = new FileOutputStream(file, true)) {
+        try (FileOutputStream out = new FileOutputStream(file, false)) {
             return writeInputStreamToOutputStream(in, out);
         }
     }
@@ -47,7 +47,7 @@ public abstract class FileIOOpt {
     }
 
     public static void writeStringToFile(String strData, File file) throws IOException {
-        try (Writer writer = new FileWriter(file)) {
+        try (Writer writer = new FileWriter(file, false)) {
             writer.write(strData);
         }
     }
