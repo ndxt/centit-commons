@@ -3,6 +3,7 @@ package com.centit.support.quartz;
 import com.centit.support.algorithm.GeneralAlgorithm;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.common.LeftRightPair;
+import com.centit.support.common.ObjectException;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -40,6 +41,10 @@ public class JavaBeanJob extends AbstractQuartzJob {
         if(bean == null) {
             WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
             bean = webApplicationContext.getBean(beanName);
+        }
+        if(bean == null){
+            throw new ObjectException(ObjectException.DATA_NOT_FOUND_EXCEPTION,
+                "找不到对应的bean，beanName:" + beanName);
         }
         LeftRightPair<Method, Object[]> mp = ReflectionOpt.getMatchBestMethod(bean.getClass(), methodName, params);
         boolean ret = true;
