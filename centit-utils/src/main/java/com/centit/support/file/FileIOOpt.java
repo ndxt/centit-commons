@@ -40,6 +40,19 @@ public abstract class FileIOOpt {
         return writeInputStreamToFile(in, new File(filePath));
     }
 
+    public static int appendInputStreamToFile(InputStream in,
+                                             File file) throws IOException {
+
+        try (FileOutputStream out = new FileOutputStream(file, true)) {
+            return writeInputStreamToOutputStream(in, out);
+        }
+    }
+
+    public static int appendInputStreamToFile(InputStream in,
+                                             String filePath) throws IOException {
+        return appendInputStreamToFile(in, new File(filePath));
+    }
+
     public static void writeStringToOutputStream(String strData, OutputStream io) throws IOException {
         try (Writer writer = new OutputStreamWriter(io)) {
             writer.write(strData);
@@ -55,6 +68,17 @@ public abstract class FileIOOpt {
     public static void writeStringToFile(String strData, String fileName) throws IOException {
         writeStringToFile(strData, new File(fileName));
     }
+
+    public static void appendStringToFile(String strData, File file) throws IOException {
+        try (Writer writer = new FileWriter(file, true)) {
+            writer.write(strData);
+        }
+    }
+
+    public static void appendStringToFile(String strData, String fileName) throws IOException {
+        appendStringToFile(strData, new File(fileName));
+    }
+
 
     public static String readStringFromRead(Reader reader) throws IOException {
         try (StringWriter writer = new StringWriter()) {
@@ -155,7 +179,7 @@ public abstract class FileIOOpt {
     }
 
     public static void writeObjectToFile(Object obj, String fileName) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName, false))) {
             oos.writeObject(obj);
         }
     }
@@ -177,9 +201,19 @@ public abstract class FileIOOpt {
     }
 
     public static void writeBytesToFile(byte[] bytes, File file) throws IOException {
-        try (FileOutputStream writer = new FileOutputStream(file)) {
+        try (FileOutputStream writer = new FileOutputStream(file, false)) {
             writer.write(bytes);
         }
+    }
+
+    public static void appendBytesToFile(byte[] bytes, File file) throws IOException {
+        try (FileOutputStream writer = new FileOutputStream(file, true)) {
+            writer.write(bytes);
+        }
+    }
+
+    public static void appendBytesToFile(byte[] bytes, String fileName) throws IOException {
+        appendBytesToFile(bytes, new File(fileName));
     }
 
     public static <T> T readObjectAsJsonFromFile(String fileName, Class<T> clazz)
