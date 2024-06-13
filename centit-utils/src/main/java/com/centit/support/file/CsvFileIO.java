@@ -23,28 +23,22 @@ public abstract class CsvFileIO {
             Charset.forName(charsetType)), 8192)) {
             // firstRowAsHeader 如果是true则以第一行为key生成一个map，如果第一行不够长，后面的key自动为 column+i
             // 如果firstRowAsHeader为false，则必须要指定每一列的key，不够长同样自动为column+i
-            CSVFormat csvFormat = CSVFormat.EXCEL;
-            CSVParser csvParser = csvFormat.parse(reader);
+            CSVParser csvParser = CSVFormat.EXCEL.parse(reader);
             List<CSVRecord> recordList = csvParser.getRecords();
-            List<String> headers = null;
+            if(recordList==null || recordList.isEmpty()){
+                return list;
+            }
+            int dataPos = 0;
+            List<String> headers;
             if (firstRowAsHeader) {
-                if (!recordList.isEmpty()) {
-                    CSVRecord record = recordList.get(0);
-                    headers = new ArrayList<>(record.size());
-                    Iterator<String> iterator = record.iterator();
-                    while (iterator.hasNext()){
-                        headers.add(iterator.next());
-                    }
-                }
+                dataPos = 1;
+                headers = CollectionsOpt.mergeTwoList(columnNames, recordList.get(0).toList());
             } else {
                 headers = columnNames;
             }
             // csvFormat.withHeader(CollectionsOpt.listToArray(headers));
-            int headLen = 0;
-            if(headers!=null){
-                headLen=headers.size();
-            }
-            for (int k = 1; k < recordList.size(); k++) {
+            int headLen = headers==null? 0 : headers.size();
+            for (int k = dataPos; k < recordList.size(); k++) {
                 CSVRecord record = recordList.get(k);
                 int splitResultLength = record.size();
                 Map<String, Object> map = new HashMap<>(splitResultLength);

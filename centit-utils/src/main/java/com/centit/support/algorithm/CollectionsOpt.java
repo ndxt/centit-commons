@@ -731,6 +731,14 @@ public abstract class CollectionsOpt {
         return paramsMap;
     }
 
+    /**
+     * 合并两个 map 有相同key的元素，以map1为准
+     * @param map1 主map
+     * @param map2 辅map
+     * @return 合并的map
+     * @param <K> key类型
+     * @param <V> value类型
+     */
     public static <K, V> Map<K, V> unionTwoMap(Map<K, V> map1, Map<K, V> map2) {
         if(map1 == null){
             return map2;
@@ -742,6 +750,34 @@ public abstract class CollectionsOpt {
         paramsMap.putAll(map2);
         paramsMap.putAll(map1);
         return paramsMap;
+    }
+
+    /**
+     * 合并两个数组，注意不是连接，相同位置的以list1 为主
+     * @param list1 主数据
+     * @param list2 辅数组
+     * @return 合并后的数组
+     * @param <T> 数组元素类型
+     */
+    public static <T> List<T> mergeTwoList(List<T> list1, List<T> list2) {
+        if(list1 == null){
+            return list2;
+        }
+        if(list2 == null){
+            return list1;
+        }
+        int l1 =  list1.size();
+        int l2 =  list2.size();
+        int ll = Math.max(l1, l2);
+        List<T> desList = new ArrayList<>(ll+1);
+        for(int i=0; i<ll; i++){
+            T a = (i<l1)?list1.get(i):null;
+            if(a == null){
+               a = (i<l2)?list2.get(i):null;
+            }
+            desList.add(a);
+        }
+        return desList;
     }
 
     /**
