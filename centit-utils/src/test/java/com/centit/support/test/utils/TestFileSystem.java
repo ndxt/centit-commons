@@ -17,7 +17,7 @@ public class TestFileSystem {
     public static void main(String[] args) throws IOException {
         CsvFileIO.saveData2OutputStream(
             CollectionsOpt.createList(
-                CollectionsOpt.createHashMap("c", 12, "b", "hello", "d", 2.5f),
+                CollectionsOpt.createHashMap("c", 17, "b", "hello", "d", 2.5f),
                 CollectionsOpt.createHashMap("d", 12, "b", "world", "g", 100)),
             new FileOutputStream("/Users/codefan/temp/test2.csv"),
             true, null, "UTF-8");
