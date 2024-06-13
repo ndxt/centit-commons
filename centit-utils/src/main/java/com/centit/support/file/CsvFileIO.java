@@ -1,5 +1,7 @@
 package com.centit.support.file;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.csv.CSVFormat;
@@ -89,6 +91,47 @@ public abstract class CsvFileIO {
                     values[i] = StringBaseOpt.castObjectToString(row.get(columnNames.get(i)), "");
                 }
                 csvPrinter.printRecord(values);
+            }
+            csvPrinter.flush();
+            csvPrinter.close();
+        }
+    }
+
+    public static void saveJSON2OutputStream(JSONArray listData, OutputStream outs,
+                                             boolean firstRowAsHeader, List<String> columnNames,
+                                             String charsetType) throws IOException {
+        if (listData==null || listData.isEmpty()) {
+            return;
+        }
+        if (columnNames == null || columnNames.isEmpty()) {
+            Set<String> headers = new HashSet<>(20);
+            for (Object row : listData) {
+                if(row instanceof JSONObject) {
+                    headers.addAll(((JSONObject)row).keySet());
+                }
+            }
+            columnNames = CollectionsOpt.cloneList(headers);
+        }
+        if (columnNames == null || columnNames.isEmpty()) {
+            return;
+        }
+
+        try (
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outs, Charset.forName(charsetType)))) {
+            CSVFormat csvFormat = CSVFormat.EXCEL;
+            if(firstRowAsHeader){
+                csvFormat.withHeader(CollectionsOpt.listToArray(columnNames));
+            }
+            CSVPrinter csvPrinter = csvFormat.print(writer);
+            String[] values = new String[columnNames.size()];
+            for (Object row : listData) {
+                if(row instanceof JSONObject) {
+                    JSONObject rowJson = (JSONObject) row;
+                    for (int i = 0; i < columnNames.size(); i++) {
+                        values[i] = StringBaseOpt.castObjectToString(rowJson.get(columnNames.get(i)), "");
+                    }
+                    csvPrinter.printRecord(values);
+                }
             }
             csvPrinter.flush();
             csvPrinter.close();
