@@ -112,11 +112,10 @@ public abstract class CsvFileIO {
 
         try (
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outs, Charset.forName(charsetType)))) {
-            CSVFormat csvFormat = CSVFormat.EXCEL;
+            CSVPrinter csvPrinter = CSVFormat.EXCEL.print(writer);
             if(firstRowAsHeader){
-                csvFormat.withHeader(CollectionsOpt.listToArray(columnNames));
+                csvPrinter.printRecord(columnNames);
             }
-            CSVPrinter csvPrinter = csvFormat.print(writer);
             String[] values = new String[columnNames.size()];
             for (Object row : listData) {
                 if(row instanceof JSONObject) {
