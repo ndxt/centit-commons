@@ -25,7 +25,7 @@ public class TxtLogFile {
     private BufferedWriter logWriter;
     private FileWriter fileWriter;
 
-    private final static void innerWriteLog(Writer bw, String slog, boolean bNewLine, boolean bShowTime) throws IOException {
+    private static void innerWriteLog(Writer bw, String slog, boolean bNewLine, boolean bShowTime) throws IOException {
         if (bShowTime) {
             bw.write(DatetimeOpt.convertDateToString(DatetimeOpt.currentUtilDate(),
                 DatetimeOpt.getDateTimePattern()));
