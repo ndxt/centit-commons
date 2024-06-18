@@ -314,11 +314,20 @@ public abstract class CollectionsOpt {
                         jsonTree.add(jsonNode);
                     } else {
                         JSONObject parentJson = jsonPath.peek();
-                        JSONArray children = (JSONArray) parentJson.get(childrenPropertyName);
-                        if (children == null)
-                            children = new JSONArray();
-                        children.add(jsonNode);
-                        parentJson.put(childrenPropertyName, children);
+                        JSONArray children;
+                        Object obj =  parentJson.get(childrenPropertyName);
+                        if (obj instanceof JSONArray) {
+                            children = (JSONArray) obj;
+                            children.add(jsonNode);
+                        } else {
+                            if(obj instanceof List && !((List<?>) obj).isEmpty()){
+                                children = JSONArray.from(obj);
+                            } else {
+                                children = new JSONArray();
+                            }
+                            children.add(jsonNode);
+                            parentJson.put(childrenPropertyName, children);
+                        }
                     }
                     treePath.push(treeNode);
                     jsonPath.push(jsonNode);
