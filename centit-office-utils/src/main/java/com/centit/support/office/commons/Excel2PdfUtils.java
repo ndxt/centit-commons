@@ -13,6 +13,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -109,6 +110,9 @@ public class Excel2PdfUtils {
         if (cell == null) {
             return null;
         }
+        if(cell instanceof XSSFCell){
+            return ((XSSFCell) cell).getRawValue();
+        }
 
         String value;
         CellType cellType = cell.getCellType();
@@ -152,7 +156,7 @@ public class Excel2PdfUtils {
         if(hasAnchor){
             return new Phrase(getCellString(cell), getFontByExcel(wb, cell.getCellStyle()));
         } else {
-            Anchor anchor = new Anchor(cell.toString(), getFontByExcel(wb, cell.getCellStyle()));
+            Anchor anchor = new Anchor(getCellString(cell), getFontByExcel(wb, cell.getCellStyle()));
             anchor.setName("excel_sheet_" + sheetIndex);
             return anchor;
         }
