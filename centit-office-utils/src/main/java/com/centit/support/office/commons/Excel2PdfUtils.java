@@ -1,11 +1,16 @@
 package com.centit.support.office.commons;
 
+import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFColor;
@@ -100,9 +105,52 @@ public class Excel2PdfUtils {
         return widthPixel;
     }
 
+    public static String getCellString(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+
+        String value;
+        CellType cellType = cell.getCellType();
+        if(cellType == CellType.FORMULA){
+            cellType = cell.getCachedFormulaResultType();
+        }
+        switch (cellType) {
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    String dataFormat = cell.getCellStyle().getDataFormatString();
+                    if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
+                        value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
+                    } else {
+                        value = DatetimeOpt.convertTimeWithSecondToString(cell.getDateCellValue());
+                    }
+                } else {
+                    value = StringBaseOpt.castObjectToString(cell.getNumericCellValue());
+                }
+                break;
+            case BOOLEAN:
+                value = cell.getBooleanCellValue() ? BooleanBaseOpt.STRING_TRUE : BooleanBaseOpt.STRING_FALSE;
+                break;
+
+            case STRING:
+                value = cell.getRichStringCellValue().getString().trim();
+                break;
+
+            case ERROR:
+                return ErrorEval.getText(cell.getErrorCellValue());
+
+            case FORMULA:
+            case BLANK:
+            default:
+                value = cell.toString();
+                break;
+        }
+        return value;
+    }
+
     public static Phrase getPhrase(Workbook wb, Cell cell, boolean hasAnchor, int sheetIndex) {
         if(hasAnchor){
-            return new Phrase(cell.toString(), getFontByExcel(wb, cell.getCellStyle()));
+            return new Phrase(getCellString(cell), getFontByExcel(wb, cell.getCellStyle()));
         } else {
             Anchor anchor = new Anchor(cell.toString(), getFontByExcel(wb, cell.getCellStyle()));
             anchor.setName("excel_sheet_" + sheetIndex);
@@ -111,14 +159,13 @@ public class Excel2PdfUtils {
     }
 
     public static PdfPTable toParseContent(Workbook wb, Sheet sheet, int sheetIndex) throws BadElementException, IOException {
-        int rows = sheet.getPhysicalNumberOfRows();
 
         List<PdfPCell> cells = new ArrayList<>();
         List<Integer> colRanges= new ArrayList<>(100);
         float[] widths = {30F,400F};
         float mw = 0;
         boolean hasAnchor = false;
-        for (int i = 0; i <= rows; i++) {
+        for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if(row==null){
                 continue;
