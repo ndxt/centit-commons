@@ -13,7 +13,6 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -110,9 +109,9 @@ public class Excel2PdfUtils {
         if (cell == null) {
             return null;
         }
-        if(cell instanceof XSSFCell){
+        /*if(cell instanceof XSSFCell){
             return ((XSSFCell) cell).getRawValue();
-        }
+        }*/
 
         String value;
         CellType cellType = cell.getCellType();
