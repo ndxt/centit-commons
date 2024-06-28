@@ -137,8 +137,21 @@ public abstract class GeneralAlgorithm {
         }
 
         for (String field : fields) {
-            int cr = GeneralAlgorithm.compareTwoObject(
-                ReflectionOpt.getFieldValue(data1, field), ReflectionOpt.getFieldValue(data2, field), nullAsFirst);
+            Object obj1;
+            if(data1 instanceof Map){
+                obj1 = ((Map<?, ?>)data1).get(field);
+            }else{
+                obj1 = ReflectionOpt.getFieldValue(data1, field);
+            }
+
+            Object obj2;
+            if(data2 instanceof Map){
+                obj2 = ((Map<?, ?>)data2).get(field);
+            }else{
+                obj2 = ReflectionOpt.getFieldValue(data2, field);
+            }
+
+            int cr = GeneralAlgorithm.compareTwoObject(obj1, obj2, nullAsFirst);
             if (cr != 0) {
                 return cr;
             }
