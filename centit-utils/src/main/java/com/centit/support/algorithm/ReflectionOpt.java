@@ -91,11 +91,13 @@ public abstract class ReflectionOpt {
         return result;
     }
 
-
     /*
      * 获得get field value by getter
      */
     public static Object getFieldValue(Object obj, String fieldName) {
+        if(obj instanceof Map){
+            return ((Map<?, ?>)obj).get(fieldName);
+        }
         Method md = null;
         try {
             md = obj.getClass().getMethod("get" + StringUtils.capitalize(fieldName));

@@ -123,6 +123,29 @@ public abstract class GeneralAlgorithm {
         return a * b <= 0;
     }
 
+    public static int compareTwoObjectByField(Object data1, Object data2, String[] fields, boolean nullAsFirst) {
+        if ((data1 == null && data2 == null) || (fields == null)) {
+            return 0;
+        }
+
+        if (data1 == null) {
+            return nullAsFirst?-1:1;
+        }
+
+        if (data2 == null) {
+            return nullAsFirst?1:-1;
+        }
+
+        for (String field : fields) {
+            int cr = GeneralAlgorithm.compareTwoObject(
+                ReflectionOpt.getFieldValue(data1, field), ReflectionOpt.getFieldValue(data2, field), nullAsFirst);
+            if (cr != 0) {
+                return cr;
+            }
+        }
+        return 0;
+    }
+
     /**
      * int compare(final T c1, final T c2)
      * 等价于 ObjectUtils.compare
