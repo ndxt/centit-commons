@@ -112,7 +112,7 @@ public abstract class StringRegularOpt {
      * @see org.apache.commons.lang3.StringUtils
      */
     public static boolean isNvl(String str) {
-        return (str == null) || "".equals(str.trim());
+        return StringUtils.isBlank(str);
     }
 
     public static boolean isTrue(String str) {
@@ -481,6 +481,18 @@ public abstract class StringRegularOpt {
                 sTmp2.append(szDigits.charAt(j));
         }
         return sTmp2.toString();
+    }
+
+    public static String trimRightZeroInNumber(String numStr){
+        if(!StringRegularOpt.isNumber(numStr))
+            return numStr;
+        int pointPos = numStr.indexOf(".");
+        if(pointPos < 0)
+            return numStr;
+        int endPos = numStr.length();
+        while(numStr.charAt(endPos-1) == '0') endPos --;
+        if(numStr.charAt(endPos-1) == '.') endPos --;
+        return numStr.substring(0, endPos);
     }
 
     public static String trimNumber(String szNumber) {

@@ -3,6 +3,7 @@ package com.centit.support.office.commons;
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.StringRegularOpt;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -153,9 +154,11 @@ public class Excel2PdfUtils {
 
     public static Phrase getPhrase(Workbook wb, Cell cell, boolean hasAnchor, int sheetIndex) {
         if(hasAnchor){
-            return new Phrase(getCellString(cell), getFontByExcel(wb, cell.getCellStyle()));
+            return new Phrase(StringRegularOpt.trimRightZeroInNumber(getCellString(cell)),
+                getFontByExcel(wb, cell.getCellStyle()));
         } else {
-            Anchor anchor = new Anchor(getCellString(cell), getFontByExcel(wb, cell.getCellStyle()));
+            Anchor anchor = new Anchor(StringRegularOpt.trimRightZeroInNumber(getCellString(cell)),
+                getFontByExcel(wb, cell.getCellStyle()));
             anchor.setName("excel_sheet_" + sheetIndex);
             return anchor;
         }

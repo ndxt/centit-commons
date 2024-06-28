@@ -6,8 +6,8 @@ public class TestToPdf {
 
     public static void main(String[] args) {
 
-        OfficeToPdf.excel2Pdf("D:\\projects\\RunData\\testToPdf.xlsx",
-            "D:\\projects\\RunData\\testToPdf.pdf"
+        OfficeToPdf.excel2Pdf("D:\\projects\\RunData\\month6.xlsx",
+            "D:\\projects\\RunData\\month6.pdf"
         );
         System.out.println("Done!");
     }
