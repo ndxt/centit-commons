@@ -2,7 +2,6 @@ package com.centit.support.office.commons;
 
 import com.centit.support.algorithm.BooleanBaseOpt;
 import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.*;
@@ -18,6 +17,7 @@ import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,6 +122,7 @@ public class Excel2PdfUtils {
         switch (cellType) {
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
+
                     String dataFormat = cell.getCellStyle().getDataFormatString();
                     if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
                         value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
@@ -129,7 +130,25 @@ public class Excel2PdfUtils {
                         value = DatetimeOpt.convertTimeWithSecondToString(cell.getDateCellValue());
                     }
                 } else {
-                    value = StringBaseOpt.castObjectToString(cell.getNumericCellValue());
+                    String dataFormat = cell.getCellStyle().getDataFormatString();
+                    int dotPos = dataFormat.indexOf(".");
+                    if(dotPos>=0){
+                        int ePos = dataFormat.indexOf("%");
+                        if(ePos>=0){
+                            value = new DecimalFormat(StringUtils.rightPad("#.",ePos-dotPos+1, '0'))
+                                .format(cell.getNumericCellValue()*100)+"%";
+                        }else{
+                            ePos = dataFormat.indexOf("_");
+                            if(ePos<0){
+                                ePos = dataFormat.length();
+                            }
+                            value = new DecimalFormat(StringUtils.rightPad("#.",ePos-dotPos+1, '0'))
+                                .format(cell.getNumericCellValue());
+                        }
+                    }else {
+                        value = new DecimalFormat("#.00000000000").format(cell.getNumericCellValue());
+                        value = StringRegularOpt.trimRightZeroInNumber(value);
+                    }
                 }
                 break;
             case BOOLEAN:
@@ -154,10 +173,10 @@ public class Excel2PdfUtils {
 
     public static Phrase getPhrase(Workbook wb, Cell cell, boolean hasAnchor, int sheetIndex) {
         if(hasAnchor){
-            return new Phrase(StringRegularOpt.trimRightZeroInNumber(getCellString(cell)),
+            return new Phrase(getCellString(cell),
                 getFontByExcel(wb, cell.getCellStyle()));
         } else {
-            Anchor anchor = new Anchor(StringRegularOpt.trimRightZeroInNumber(getCellString(cell)),
+            Anchor anchor = new Anchor(getCellString(cell),
                 getFontByExcel(wb, cell.getCellStyle()));
             anchor.setName("excel_sheet_" + sheetIndex);
             return anchor;
