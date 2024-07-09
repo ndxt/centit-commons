@@ -122,7 +122,6 @@ public class Excel2PdfUtils {
         switch (cellType) {
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-
                     String dataFormat = cell.getCellStyle().getDataFormatString();
                     if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
                         value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
@@ -185,7 +184,7 @@ public class Excel2PdfUtils {
 
     public static PdfPTable toParseContent(Workbook wb, Sheet sheet, int sheetIndex) throws BadElementException, IOException {
 
-        List<PdfPCell> cells = new ArrayList<>();
+        List<List<PdfPCell>> cells = new ArrayList<>();
         List<Integer> colRanges= new ArrayList<>(100);
         float[] widths = {30F,400F};
         float mw = 0;
@@ -195,14 +194,16 @@ public class Excel2PdfUtils {
             if(row==null){
                 continue;
             }
+            List<PdfPCell> rowCells = new ArrayList<>();
             int columns = row.getLastCellNum();
             if(columns <= 0){
                 for(int k=0; k<colRanges.size(); k++){
                     PdfPCell pdfpCell = new PdfPCell();
                     pdfpCell.setBorder(Rectangle.NO_BORDER);
                     pdfpCell.setFixedHeight(20);
-                    cells.add(pdfpCell);
+                    rowCells.add(pdfpCell);
                 }
+                cells.add(rowCells);
                 continue;
             }
             for(int j=colRanges.size();j<columns; j++){
@@ -217,14 +218,12 @@ public class Excel2PdfUtils {
                 Cell cell = row.getCell(j);
                 if (cell == null) {
                     PdfPCell pdfpCell = new PdfPCell();
-                    cells.add(pdfpCell);
+                    rowCells.add(pdfpCell);
                 } else {
                     float cw = getPOIColumnWidth(sheet, cell);
                     cws[cell.getColumnIndex()] = cw;
-
                     //cell.setCellType(CellType.STRING);
                     CellRangeAddress range = getColspanRowspanByExcel(sheet, row.getRowNum(), cell.getColumnIndex());
-
                     int rowspan = 1;
                     int colspan = 1;
                     if (range != null) {
@@ -255,10 +254,11 @@ public class Excel2PdfUtils {
                     }
                     addBorderByExcel(wb, pdfpCell, cell.getCellStyle());
                     addImageByPOICell(sheet, pdfpCell, cell);
-                    cells.add(pdfpCell);
+                    rowCells.add(pdfpCell);
                 }
-            }
 
+            }
+            cells.add(rowCells);
             float rw = 0;
             for (int j = 0; j < cws.length; j++) {
                 rw += cws[j];
@@ -272,8 +272,10 @@ public class Excel2PdfUtils {
         PdfPTable table = new PdfPTable(widths);
         table.setWidthPercentage(100);
 //        table.setLockedWidth(true);
-        for (PdfPCell pdfpCell : cells) {
-            table.addCell(pdfpCell);
+        for (List<PdfPCell> rowCells : cells) {
+            for (PdfPCell pdfpCell : rowCells)
+                table.addCell(pdfpCell);
+            table.completeRow();
         }
         return table;
     }
