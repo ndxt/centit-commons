@@ -19,6 +19,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Excel2PdfUtils {
@@ -106,14 +107,80 @@ public class Excel2PdfUtils {
         return widthPixel;
     }
 
+    /**
+     * 得到date单元格格式的值
+     *
+     * @param dataFormat       来自Cell.getCellStyle().getDataFormat()的值
+     * @param dataFormatString 来自Cell.getCellStyle().getDataFormatString()的值
+     * @param date            来自Cell.getDateCellValue()的值
+     * @return
+     */
+    private static String getFormatDateStringValue(Short dataFormat, String dataFormatString, Date date) {
+        if (date == null) {
+            return null;
+        }
+        /**
+         * 年月日时分秒
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_NYRSFM_STRING.contains(dataFormatString)) {
+            return DatetimeOpt.convertDatetimeToString(date);
+        }
+        /**
+         * 年月日
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_NYR_STRING.contains(dataFormatString)) {
+            return DatetimeOpt.convertDateToString(date);
+        }
+        /**
+         * 年月
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_NY_STRING.contains(dataFormatString)
+            || CellFormatConstants.EXCEL_FORMAT_INDEX_DATA_EXACT_NY.equals(dataFormat)) {
+            return DatetimeOpt.convertDateToString(date, "yyyy-MM");
+        }
+        /**
+         * 月日
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_YR_STRING.contains(dataFormatString)
+            || CellFormatConstants.EXCEL_FORMAT_INDEX_DATA_EXACT_YR.equals(dataFormat)) {
+            return DatetimeOpt.convertDateToString(date, "MM-dd");
+
+        }
+        /**
+         * 月
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_Y_STRING.contains(dataFormatString)) {
+            return DatetimeOpt.convertDateToString(date, "MM");
+        }
+        /**
+         * 星期X
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_XQ_STRING.contains(dataFormatString)) {
+            return CellFormatConstants.COMMON_DATE_FORMAT_XQ + CellFormatConstants.WEEK_DAYS[DatetimeOpt.getDayOfWeek(date)];
+        }
+        /**
+         * 周X
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_Z_STRING.contains(dataFormatString)) {
+            return CellFormatConstants.COMMON_DATE_FORMAT_Z + CellFormatConstants.WEEK_DAYS[DatetimeOpt.getDayOfWeek(date)];
+        }
+        /**
+         * 时间格式
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_TIME_STRING.contains(dataFormatString)
+            || CellFormatConstants.EXCEL_FORMAT_INDEX_TIME_EXACT.contains(dataFormat)) {
+            return DatetimeOpt.convertTimeWithSecondToString(date);
+        }
+        /**
+         * 单元格为其他未覆盖到的类型
+         */
+        return DatetimeOpt.convertDatetimeToString(date);
+    }
+
     public static String getCellString(Cell cell) {
         if (cell == null) {
             return null;
         }
-        /*if(cell instanceof XSSFCell){
-            return ((XSSFCell) cell).getRawValue();
-        }*/
-
         String value;
         CellType cellType = cell.getCellType();
         if(cellType == CellType.FORMULA){
@@ -122,12 +189,14 @@ public class Excel2PdfUtils {
         switch (cellType) {
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    String dataFormat = cell.getCellStyle().getDataFormatString();
+                    value =  getFormatDateStringValue(cell.getCellStyle().getDataFormat(),
+                        cell.getCellStyle().getDataFormatString(), cell.getDateCellValue());
+                    /*String dataFormat = cell.getCellStyle().getDataFormatString();
                     if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
                         value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
                     } else {
                         value = DatetimeOpt.convertTimeWithSecondToString(cell.getDateCellValue());
-                    }
+                    }*/
                 } else {
                     String dataFormat = cell.getCellStyle().getDataFormatString();
                     int dotPos = dataFormat.indexOf(".");
