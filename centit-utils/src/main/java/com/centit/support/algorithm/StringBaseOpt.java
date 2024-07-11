@@ -416,7 +416,8 @@ public abstract class StringBaseOpt {
     }
 
     public static char getPinYinShenMu(char ch) {
-        if(Character.isLetter(ch))
+        int charAscii = ch;
+        if(charAscii>0 && charAscii<256)
             return ch;
         String[] res1 = PinyinHelper.toHanyuPinyinStringArray(ch);
         if (res1!=null && res1.length > 0) {

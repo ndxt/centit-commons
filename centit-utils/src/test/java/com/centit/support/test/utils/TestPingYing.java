@@ -10,8 +10,11 @@ public class TestPingYing {
         //1.展示单个汉字的字母拼写
         String[] res1= PinyinHelper.toHanyuPinyinStringArray('芮');
         System.out.println(Arrays.toString(res1));
-
-        System.out.println(StringBaseOpt.getFirstLetter("芮"));
+        char  a ='a', b='芮';
+        System.out.println((int)a);
+        System.out.println((int)b);
+        System.out.println(StringBaseOpt.getFirstLetter("芮a杨"));
+        System.out.println(StringBaseOpt.getFirstLetter("a"));
     }
 
 }
