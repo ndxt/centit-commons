@@ -925,8 +925,17 @@ public abstract class EmbedFunc {
 
             case ConstDefine.FUNC_GET_PY: {//
                 if (nOpSum < 1) return null;
-                return StringBaseOpt.getFirstLetter(
-                    StringBaseOpt.objectToString(slOperand.get(0)));
+                // 0 首字母 1 全拼
+                String pinYinType = "0";
+                if(nOpSum > 1){
+                    pinYinType = StringBaseOpt.castObjectToString(slOperand.get(1));
+                }
+                if("1".equals(pinYinType))
+                    return StringBaseOpt.getPinYin(
+                        StringBaseOpt.objectToString(slOperand.get(0)));
+                else
+                    return StringBaseOpt.getFirstLetter(
+                        StringBaseOpt.objectToString(slOperand.get(0)));
             }
 
             case ConstDefine.FUNC_GET_ATTR:{

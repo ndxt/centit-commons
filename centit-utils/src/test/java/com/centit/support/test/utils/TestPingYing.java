@@ -13,8 +13,8 @@ public class TestPingYing {
         char  a ='a', b='芮';
         System.out.println((int)a);
         System.out.println((int)b);
-        System.out.println(StringBaseOpt.getFirstLetter("芮a杨"));
-        System.out.println(StringBaseOpt.getFirstLetter("a"));
+        System.out.println(StringBaseOpt.getPinYin("芮a杨"));
+        System.out.println(StringBaseOpt.getPinYin("南大先腾"));
     }
 
 }

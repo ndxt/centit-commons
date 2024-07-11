@@ -425,6 +425,21 @@ public abstract class StringBaseOpt {
         }
         return ' ';
     }
+    public static String getPinYin(char ch) {
+        int charAscii = ch;
+        if(charAscii>0 && charAscii<256)
+            return String.valueOf(ch);
+        String[] res1 = PinyinHelper.toHanyuPinyinStringArray(ch);
+        if (res1!=null && res1.length > 0) {
+            String str = res1[0];
+            int sl = str.length();
+            if(str.charAt(sl-1) >='0' && str.charAt(sl-1)<='9'){
+                return str.substring(0, sl-1);
+            }
+            return str;
+        }
+        return "";
+    }
         /*try {
             String chinese = new String(hanzi.getBytes("GB2312"), "ISO8859-1");
             if (chinese.length() > 1) {
@@ -463,6 +478,14 @@ public abstract class StringBaseOpt {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < oriStr.length(); i++) {
             sb.append(getPinYinShenMu(oriStr.charAt(i)));
+        }
+        return sb.toString();
+    }
+
+    public static String getPinYin(String oriStr) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < oriStr.length(); i++) {
+            sb.append(getPinYin(oriStr.charAt(i)));
         }
         return sb.toString();
     }
