@@ -11,6 +11,8 @@ public class TestStringBuilder {
 
     public static void main(String[] args) {
 
+        System.out.println(StringBaseOpt.getPinYinShenMu('a'));
+
         System.out.println(StringRegularOpt.isMatch("a??d","abcd"));
         //System.out.println(UrlOptUtils.urlEncode("hello > < world"));
         //System.out.println(UrlOptUtils.urlEncode(UrlOptUtils.urlDecode("hello > < world")));
