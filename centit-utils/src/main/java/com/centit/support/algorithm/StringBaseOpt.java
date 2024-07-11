@@ -434,9 +434,9 @@ public abstract class StringBaseOpt {
             String str = res1[0];
             int sl = str.length();
             if(str.charAt(sl-1) >='0' && str.charAt(sl-1)<='9'){
-                return str.substring(0, sl-1);
+                return str.substring(0, sl-1).replace("u:","v");
             }
-            return str;
+            return str.replace("u:","v");
         }
         return "";
     }
