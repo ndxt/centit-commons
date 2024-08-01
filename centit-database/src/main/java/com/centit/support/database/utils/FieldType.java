@@ -49,13 +49,18 @@ public abstract class FieldType {
         return st;
     }
 
-    //单字母_ 前缀忽略
-    public static String mapToHumpName(String columnName, boolean firstUpCase) {
+    /**
+     * @param columnName  字段名字符串，
+     * @param firstUpCase 驼峰属性名
+     * @param ignoreSingleCharPrefix  单字母_ 前缀忽略
+     * @return 返回驼峰字母
+     */
+    public static String mapToHumpName(String columnName, boolean firstUpCase, boolean ignoreSingleCharPrefix) {
         int nl = columnName.length();
         int i = 0;
         //忽略 单字母加下划线的前缀
-        if(nl>2 && columnName.charAt(1) == '_'){
-            i=2;
+        if (ignoreSingleCharPrefix && nl > 2 && columnName.charAt(1) == '_') {
+            i = 2;
         }
 
         StringBuilder sClassName = new StringBuilder();
@@ -67,9 +72,9 @@ public abstract class FieldType {
                 upCase = true;
                 continue;
             }
-            if (upCase && currChar>='a' && currChar<='z') {
+            if (upCase && currChar >= 'a' && currChar <= 'z') {
                 sClassName.append((char) (currChar - 32));
-            } else if (!upCase && currChar>='A' && currChar<='Z' ) {
+            } else if (!upCase && currChar >= 'A' && currChar <= 'Z') {
                 sClassName.append((char) (currChar + 32));
             } else {
                 sClassName.append(currChar);
@@ -84,7 +89,7 @@ public abstract class FieldType {
      * @return 大驼峰 名称
      */
     public static String mapClassName(String columnName) {
-        return mapToHumpName(columnName, true);
+        return mapToHumpName(columnName, true, true);
     }
 
 
@@ -93,7 +98,7 @@ public abstract class FieldType {
      * @return 小驼峰 名称
      */
     public static String mapPropName(String columnName) {
-        return mapToHumpName(columnName, false);
+        return mapToHumpName(columnName, false, false);
     }
 
     /**

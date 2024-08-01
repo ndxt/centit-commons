@@ -272,7 +272,7 @@ public abstract class DatabaseAccess {
 
     @Deprecated
     public static String mapColumnNameToField(String colName) {
-        return FieldType.mapToHumpName(colName, false);
+        return FieldType.mapToHumpName(colName, false, false);
         /*if(StringUtils.isBlank(colName)){
             return colName;
         }
@@ -312,7 +312,7 @@ public abstract class DatabaseAccess {
             return null;
         String[] fns = new String[colNames.size()];
         for (int i = 0; i < colNames.size(); i++)
-            fns[i] = FieldType.mapToHumpName(colNames.get(i), false);
+            fns[i] = FieldType.mapToHumpName(colNames.get(i), false, false);
         return fns;
     }
 

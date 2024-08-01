@@ -13,7 +13,7 @@ public class TestQueryUtils {
         InputStream s=new ByteArrayInputStream("ss".getBytes());
         List<Object> params = new ArrayList<>();
         System.out.println(params.toArray());
-        System.out.println(FieldType.mapToHumpName("F_Bc_2014_AAe", false) );
+        System.out.println(FieldType.mapToHumpName("F_Bc_2014_AAe", false, false) );
 
         String sql = "select distinct top 20 abcd.FLOW_INST_ID, abcd.VERSION, abcd.FLOW_CODE, FLOW_OPT_NAME, " +
             "FLOW_OPT_TAG, CREATE_TIME, PROMISE_TIME, TIME_LIMIT, INST_STATE, " +
