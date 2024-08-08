@@ -84,6 +84,18 @@ public class ObjectException extends RuntimeException {
     }
 
     /**
+     * @param obj           Object
+     * @param exceptionCode 异常码
+     * @param message       异常信息
+     * @param exception     异常信息
+     */
+    public ObjectException(Object obj, int exceptionCode, String message, Throwable exception) {
+        super(message, exception);
+        this.exceptionCode = exceptionCode;
+        this.objectData = obj;
+    }
+
+    /**
      * @param exception Throwable
      */
     public ObjectException(Throwable exception) {
