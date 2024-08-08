@@ -48,7 +48,7 @@ public class ObjectException extends RuntimeException {
     public static final int INSTANTIATION_EXCEPTION = 625;
     public static final int ILLEGALACCESS_EXCEPTION = 626;
     public static final int ORM_METADATA_EXCEPTION = 627;
-
+    public static final int FILE_OPERATE_EXCEPTION = 628;
     protected int exceptionCode;
     private Object objectData;
     /**
