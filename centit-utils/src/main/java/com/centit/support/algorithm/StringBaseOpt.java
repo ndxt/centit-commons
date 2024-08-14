@@ -205,6 +205,36 @@ public abstract class StringBaseOpt {
         return false;
     }
 
+    public static String minString(Collection<Object> objs) {
+        String str= null;
+        if(objs!=null) {
+            for (Object obj : objs){
+                String temp = StringBaseOpt.castObjectToString(obj);
+                if(temp!=null) {
+                    if (str==null || StringUtils.compare(str, temp) > 0) {
+                        str = temp;
+                    }
+                }
+            }
+        }
+        return str;
+    }
+
+    public static String maxString(Collection<Object> objs) {
+        String str= null;
+        if(objs!=null) {
+            for (Object obj : objs){
+                String temp = StringBaseOpt.castObjectToString(obj);
+                if(temp!=null) {
+                    if (str==null || StringUtils.compare(str, temp) < 0) {
+                        str = temp;
+                    }
+                }
+            }
+        }
+        return str;
+    }
+
     /**
      * copyProperties(),删除备份条件的后缀,如"value_CODE"过滤成"value"
      *
@@ -425,6 +455,7 @@ public abstract class StringBaseOpt {
         }
         return ' ';
     }
+
     public static String getPinYin(char ch) {
         int charAscii = ch;
         if(charAscii>0 && charAscii<256)
