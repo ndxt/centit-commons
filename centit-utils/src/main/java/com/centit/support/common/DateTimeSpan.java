@@ -8,30 +8,21 @@ import java.util.Date;
  * @author codefan@sina.com
  */
 @SuppressWarnings("unused")
-public class WorkTimeSpan extends Number implements java.io.Serializable {
+public class DateTimeSpan extends Number implements java.io.Serializable, Comparable<Number> {
 
-    /**
-     * 默认每日工作时间
-     */
-    public static final long DEFAULT_DAY_WORK_MILLISECONDS = 28800000;
-    public static final long DEFAULT_DAY_WORK_MINUTES = 480;// 八小时
     public static final long DAY_MILLISECONDS = 86400000;
     public static final long HOUR_MILLISECONDS = 3600000;
     public static final long MINUTE_MILLISECONDS = 60000;
     public static final long SECOND_MILLISECONDS = 1000;
     private static final long serialVersionUID = 1L;
-    /**
-     * 每日工作时间(毫秒)
-     */
-    private long dayWorkMilliseconds;
+
     /**
      * 这个值是保存时间差的，单位毫秒
      * 这个时间差是自然时间差，就是每天 86400000 秒，如果要获取工作时间差需要调用 toNumber* 转换
      */
     private long timeSpan;
 
-    public WorkTimeSpan() {
-        dayWorkMilliseconds = DEFAULT_DAY_WORK_MILLISECONDS;
+    public DateTimeSpan() {
         timeSpan = 0;
     }
 
@@ -55,23 +46,20 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
         return (double)timeSpan;
     }
 
-    public WorkTimeSpan(Date beginDate, Date endDate, long dayWorkMinutes) {
-        dayWorkMilliseconds = dayWorkMinutes * MINUTE_MILLISECONDS;
+    public DateTimeSpan(Date beginDate, Date endDate) {
         this.fromDatatimeSpan(beginDate, endDate);
     }
 
-    public WorkTimeSpan(Date beginDate, Date endDate) {
-        this(beginDate, endDate, DEFAULT_DAY_WORK_MINUTES);
-    }
-
-    public WorkTimeSpan(String sTimeSpan) {
-        dayWorkMilliseconds = DEFAULT_DAY_WORK_MILLISECONDS;
+    public DateTimeSpan(String sTimeSpan) {
         this.fromString(sTimeSpan);
     }
 
-    public WorkTimeSpan(String sign, long dayWorkMinutes, long days, long hours,
+    public DateTimeSpan(long lMillisecond)  {
+        this.fromNumberAsMillisecond(lMillisecond);
+    }
+
+    public DateTimeSpan(String sign, long days, long hours,
                         long minutes, long second, long millisecond) {
-        this.dayWorkMilliseconds = dayWorkMinutes * MINUTE_MILLISECONDS;
         timeSpan = days * DAY_MILLISECONDS +
             hours * HOUR_MILLISECONDS +
             minutes * MINUTE_MILLISECONDS +
@@ -81,35 +69,19 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
             timeSpan = 0 - timeSpan;
     }
 
-    public WorkTimeSpan(long dayWorkMinutes, long days, long hours,
+    public DateTimeSpan(long days, long hours,
                         long minutes, long second, long millisecond) {
-        this("", dayWorkMinutes, days, hours, minutes, second, millisecond);
+        this("", days, hours, minutes, second, millisecond);
     }
 
-    public WorkTimeSpan(String sign, long days, long hours, long minutes, long second, long millisecond) {
-        this(sign, DEFAULT_DAY_WORK_MINUTES, days, hours, minutes, second, millisecond);
+    public DateTimeSpan(String sign, long days, long hours, long minutes) {
+        this(sign, days, hours, minutes, 0, 0);
     }
 
-    public WorkTimeSpan(String sign, long dayWorkMinutes, long days, long hours, long minutes) {
-        this(sign, dayWorkMinutes, days, hours, minutes, 0, 0);
+    public DateTimeSpan(long days, long hours, long minutes) {
+        this("",  days, hours, minutes, 0, 0);
     }
 
-    public WorkTimeSpan(long dayWorkMinutes, long days, long hours, long minutes) {
-        this("", dayWorkMinutes, days, hours, minutes, 0, 0);
-    }
-
-    public WorkTimeSpan(String sign, long days, long hours, long minutes) {
-        this(sign, DEFAULT_DAY_WORK_MINUTES, days, hours, minutes, 0, 0);
-    }
-
-    public WorkTimeSpan(long days, long hours, long minutes) {
-        this("", DEFAULT_DAY_WORK_MINUTES, days, hours, minutes, 0, 0);
-    }
-
-    public WorkTimeSpan(long dayWorkMinutes) {
-        this.dayWorkMilliseconds = dayWorkMinutes * MINUTE_MILLISECONDS;
-        timeSpan = 0;
-    }
 
     /**
      * 计算两个日期之间的时间差
@@ -118,24 +90,9 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
      * @param endDate   结束日期
      * @return 时间间隔
      */
-    public static WorkTimeSpan calcDatatimeSpan(Date beginDate, Date endDate) {
-        WorkTimeSpan wrokTimeSpan = new WorkTimeSpan();
-        wrokTimeSpan.setDayWorkMilliseconds(DAY_MILLISECONDS);
-        wrokTimeSpan.setTimeSpan(beginDate.getTime() - endDate.getTime());
-        return wrokTimeSpan;
-    }
-
-    public static WorkTimeSpan calcWorkTimeSpan(Date beginDate, Date endDate, Long dayWorkMinutes) {
-        WorkTimeSpan wrokTimeSpan = new WorkTimeSpan();
-        wrokTimeSpan.setDayWorkMilliseconds(dayWorkMinutes * MINUTE_MILLISECONDS);
-        wrokTimeSpan.setTimeSpan(beginDate.getTime() - endDate.getTime());
-        return wrokTimeSpan;
-    }
-
-    public static WorkTimeSpan calcWorkTimeSpan(Date beginDate, Date endDate) {
-        WorkTimeSpan wrokTimeSpan = new WorkTimeSpan();
-        wrokTimeSpan.setDayWorkMilliseconds(DEFAULT_DAY_WORK_MILLISECONDS);
-        wrokTimeSpan.setTimeSpan(beginDate.getTime() - endDate.getTime());
+    public static DateTimeSpan calcDateTimeSpan(Date beginDate, Date endDate) {
+        DateTimeSpan wrokTimeSpan = new DateTimeSpan();
+        wrokTimeSpan.setTimeSpan(endDate.getTime() - beginDate.getTime());
         return wrokTimeSpan;
     }
 
@@ -157,90 +114,11 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
         this.timeSpan = timeSpan;
     }
 
-    /**
-     * 每日工作时间(毫秒)
-     * 当这个值为24时,这个worktimespan就是datetimespan
-     *
-     * @return 每日工作时间
-     */
-    public long getDayWorkMilliseconds() {
-        return dayWorkMilliseconds;
-    }
-
-    /**
-     * 每日工作时间(毫秒)
-     * 当这个值为24时,这个worktimespan就是datetimespan
-     *
-     * @param dayWorkMilliseconds 每日工作时间
-     */
-    public void setDayWorkMilliseconds(long dayWorkMilliseconds) {
-        this.dayWorkMilliseconds = dayWorkMilliseconds;
-    }
-
-    /**
-     * 每日工作时间(秒)
-     * 当这个值为24时,这个worktimespan就是datetimespan
-     *
-     * @return 每日工作时间
-     */
-    public long getDayWorkSeconds() {
-        return dayWorkMilliseconds / SECOND_MILLISECONDS;
-    }
-
-    /**
-     * 每日工作时间(秒)
-     * 当这个值为24时,这个worktimespan就是datetimespan
-     *
-     * @param dayWorkSeconds 每日工作时间
-     */
-    public void setDayWorkSeconds(long dayWorkSeconds) {
-        this.dayWorkMilliseconds = dayWorkSeconds * SECOND_MILLISECONDS;
-    }
-
-    /**
-     * 每日工作时间(分钟)
-     * 当这个值为24时,这个worktimespan就是datetimespan
-     *
-     * @return 每日工作时间
-     */
-    public long getDayWorkMinutes() {
-        return dayWorkMilliseconds / MINUTE_MILLISECONDS;
-    }
-
-    /**
-     * 每日工作时间(分钟)
-     * 当这个值为24时,这个worktimespan就是datetimespan
-     *
-     * @param dayWorkMinutes 每日工作时间
-     */
-    public void setDayWorkMinutes(long dayWorkMinutes) {
-        this.dayWorkMilliseconds = dayWorkMinutes * MINUTE_MILLISECONDS;
-    }
-
-    /**
-     * 每日工作时间(小时)
-     * 当这个值为24时,这个worktimespan就是datetimespan
-     *
-     * @return 每日工作时间
-     */
-    public long getDayWorkHours() {
-        return dayWorkMilliseconds / HOUR_MILLISECONDS;
-    }
-
-    /**
-     * 每日工作时间(小时)
-     * 当这个值为24时,这个worktimespan就是datetimespan
-     *
-     * @param dayWorkHours 每日工作时间
-     */
-    public void setDayWorkHours(long dayWorkHours) {
-        this.dayWorkMilliseconds = dayWorkHours * HOUR_MILLISECONDS;
-    }
-
-    public WorkTimeSpan fromDatatimeSpan(Date beginDate, Date endDate) {
+    public DateTimeSpan fromDatatimeSpan(Date beginDate, Date endDate) {
         this.setTimeSpan(beginDate.getTime() - endDate.getTime());
         return this;
     }
+
     //默认值为 分钟
     public void fromString(String sTimeSpan) {
         int sign = 1;
@@ -367,15 +245,11 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
     }
 
     private long toAbsNumberAsMillisecond() {
-        return this.getDays() * dayWorkMilliseconds +
-            this.getHours() * HOUR_MILLISECONDS +
-            this.getMinutes() * MINUTE_MILLISECONDS +
-            this.getSeconds() * SECOND_MILLISECONDS +
-            this.getMilliseconds();
+        return this.timeSpan>0? this.timeSpan: 0 - this.timeSpan;
     }
 
     public long toNumberAsMillisecond() {
-        return this.getSign() * toAbsNumberAsMillisecond();
+        return this.timeSpan;
     }
 
     /**
@@ -407,18 +281,7 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
     }
 
     public void fromNumberAsMillisecond(long lSpan) {
-        long tempSpan;
-        long nSign;
-        if (lSpan > 0) {
-            tempSpan = lSpan;
-            nSign = 1;
-        } else {
-            tempSpan = 0 - lSpan;
-            nSign = -1;
-        }
-        long nDays = tempSpan / dayWorkMilliseconds;
-        long nRemainder = tempSpan % dayWorkMilliseconds;
-        this.timeSpan = nSign * (nDays * DAY_MILLISECONDS + nRemainder);
+        this.timeSpan = lSpan;
     }
 
     public long getSign() {
@@ -429,43 +292,43 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
         return timeSpan > 0 ? "" : "-";
     }
 
-    public WorkTimeSpan changeSign() {
+    public DateTimeSpan changeSign() {
         timeSpan = 0 - timeSpan;
         return this;
     }
 
-    public WorkTimeSpan addDays(long ndays) {
-        fromNumberAsMillisecond(
-            toNumberAsMillisecond()
-                + ndays * dayWorkMilliseconds);
+    public DateTimeSpan addDays(long ndays) {
+        timeSpan += ndays * DAY_MILLISECONDS;
         return this;
     }
 
-    public WorkTimeSpan addHours(long nHours) {
-        fromNumberAsMillisecond(
-            toNumberAsMillisecond()
-                + nHours * HOUR_MILLISECONDS);
+    public DateTimeSpan addHours(long nHours) {
+        timeSpan += nHours * HOUR_MILLISECONDS;
         return this;
     }
 
-    public WorkTimeSpan addMinutes(long nMinutes) {
-        fromNumberAsMillisecond(
-            toNumberAsMillisecond()
-                + nMinutes * MINUTE_MILLISECONDS);
+    public DateTimeSpan addMinutes(long nMinutes) {
+        timeSpan += nMinutes * MINUTE_MILLISECONDS;
         return this;
     }
 
-    public WorkTimeSpan addSeconds(long nSeconds) {
-        fromNumberAsMillisecond(
-            toNumberAsMillisecond()
-                + nSeconds * SECOND_MILLISECONDS);
+    public DateTimeSpan addSeconds(long nSeconds) {
+        timeSpan += nSeconds * SECOND_MILLISECONDS;
         return this;
     }
 
-    public WorkTimeSpan addMilliseconds(long nMilliseconds) {
-        fromNumberAsMillisecond(
-            toNumberAsMillisecond()
-                + nMilliseconds);
+    public DateTimeSpan addMilliseconds(long nMilliseconds) {
+        timeSpan += nMilliseconds;
+        return this;
+    }
+
+    public DateTimeSpan addDateTimeSpan(DateTimeSpan timeSpan) {
+        this.timeSpan += timeSpan.timeSpan;
+        return this;
+    }
+
+    public DateTimeSpan subtractDateTimeSpan(DateTimeSpan timeSpan) {
+        this.timeSpan -= timeSpan.timeSpan;
         return this;
     }
 
@@ -494,5 +357,14 @@ public class WorkTimeSpan extends Number implements java.io.Serializable {
 
     public long getMilliseconds() {
         return getRemainderMilliseconds() % SECOND_MILLISECONDS;
+    }
+
+    public boolean isPositiveTimeSpan() {
+        return this.timeSpan > 0;
+    }
+
+    @Override
+    public int compareTo(Number o) {
+        return Long.compare(this.timeSpan, o.longValue());
     }
 }
