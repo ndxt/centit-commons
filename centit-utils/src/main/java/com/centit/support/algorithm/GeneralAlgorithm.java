@@ -1,7 +1,6 @@
 package com.centit.support.algorithm;
 
 import com.alibaba.fastjson2.util.TypeUtils;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -685,9 +684,6 @@ public abstract class GeneralAlgorithm {
         } else if(obj instanceof Supplier){
             Object retObj = ((Supplier)obj).get();
             return isEmpty(retObj);
-        } else if(obj instanceof ScriptObjectMirror){
-            ScriptObjectMirror jsObj = (ScriptObjectMirror) obj;
-            return jsObj.isEmpty();
         } else{
             return StringUtils.isBlank(StringBaseOpt.castObjectToString(obj));
         }
