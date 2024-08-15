@@ -1,6 +1,7 @@
 package com.centit.support.algorithm;
 
 import com.alibaba.fastjson2.util.TypeUtils;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,6 +12,7 @@ import java.math.RoundingMode;
 import java.text.Collator;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Created by codefan on 17-9-7.
@@ -115,6 +117,48 @@ public abstract class GeneralAlgorithm {
         return compareTwoObject(operand, operand2, true);
     }
 
+    public static boolean betweenTwoObject(Object operand, Object obj1, Object obj2) {
+        int a = compareTwoObject(operand, obj1);
+        int b = compareTwoObject(operand, obj2);
+        return a * b <= 0;
+    }
+
+    public static int compareTwoObjectByField(Object data1, Object data2, String[] fields, boolean nullAsFirst) {
+        if ((data1 == null && data2 == null) || (fields == null)) {
+            return 0;
+        }
+
+        if (data1 == null) {
+            return nullAsFirst?-1:1;
+        }
+
+        if (data2 == null) {
+            return nullAsFirst?1:-1;
+        }
+
+        for (String field : fields) {
+            Object obj1;
+            if(data1 instanceof Map){
+                obj1 = ((Map<?, ?>)data1).get(field);
+            }else{
+                obj1 = ReflectionOpt.getFieldValue(data1, field);
+            }
+
+            Object obj2;
+            if(data2 instanceof Map){
+                obj2 = ((Map<?, ?>)data2).get(field);
+            }else{
+                obj2 = ReflectionOpt.getFieldValue(data2, field);
+            }
+
+            int cr = GeneralAlgorithm.compareTwoObject(obj1, obj2, nullAsFirst);
+            if (cr != 0) {
+                return cr;
+            }
+        }
+        return 0;
+    }
+
     /**
      * int compare(final T c1, final T c2)
      * 等价于 ObjectUtils.compare
@@ -180,6 +224,14 @@ public abstract class GeneralAlgorithm {
         }
     }
 
+    private static Object checkStringObject(Object obj){
+        if(obj instanceof String ) {
+            if( StringRegularOpt.isNumber( (String)obj)){
+                return NumberBaseOpt.castObjectToNumber(obj);
+            }
+        }
+        return obj;
+    }
     /**
      * 将两个对象加+起来，可能是数字相加，也可能是字符串连接
      *
@@ -201,6 +253,8 @@ public abstract class GeneralAlgorithm {
             }
             return a;
         }
+        a = checkStringObject(a);
+        b = checkStringObject(b);
 
         if (a instanceof java.lang.Number && b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
@@ -257,6 +311,8 @@ public abstract class GeneralAlgorithm {
             }
             return a;
         }
+        a = checkStringObject(a);
+        b = checkStringObject(b);
 
         if (a instanceof java.lang.Number && b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
@@ -304,6 +360,9 @@ public abstract class GeneralAlgorithm {
     public static Object multiplyTwoObject(Object a, Object b) {
         if (a == null || b == null)
             return null;
+
+        a = checkStringObject(a);
+        b = checkStringObject(b);
 
         if (a instanceof java.lang.Number && b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
@@ -354,6 +413,8 @@ public abstract class GeneralAlgorithm {
     public static Object divideTwoObject(Object a, Object b) {
         if (a == null || b == null)
             return null;
+        a = checkStringObject(a);
+        b = checkStringObject(b);
 
         if (a instanceof java.lang.Number && b instanceof java.lang.Number) {
             BigDecimal dbop2 = NumberBaseOpt.castObjectToBigDecimal(b);
@@ -393,6 +454,8 @@ public abstract class GeneralAlgorithm {
     public static Object modTwoObject(Object a, Object b) {
         if (a == null || b == null)
             return null;
+        a = checkStringObject(a);
+        b = checkStringObject(b);
         if (a instanceof java.lang.Number && b instanceof java.lang.Number) {
             int retType = Math.max(getJavaTypeOrder(a), getJavaTypeOrder(b));
             switch (retType) {
@@ -419,8 +482,9 @@ public abstract class GeneralAlgorithm {
     }
 
     public static Object maxObject(Collection<Object> ar) {
-        if (ar == null || ar.size() < 1)
+        if (ar == null || ar.isEmpty())
             return null;
+
         Iterator<Object> ari = ar.iterator();
         Object maxObject = ar.iterator().next();
         if (ar.size() == 1)
@@ -591,5 +655,42 @@ public abstract class GeneralAlgorithm {
 
     public static Object castObjectToType(Object obj, Class<?> type) {
         return TypeUtils.cast(obj, type);
+    }
+
+    public static boolean isEmpty(Object obj) {
+        if(obj == null)
+            return true;
+        if(obj instanceof String)
+            return StringUtils.isBlank((String)obj);
+        if (obj instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<Object, Object> objMap = (Map<Object, Object>) obj;
+            return objMap.isEmpty();
+        } else  if (obj instanceof Collection) {
+            Collection<?> objlist = (Collection<?>) obj;
+            if(objlist.isEmpty())
+                return true;
+            for(Object obj1 : objlist){
+                if(!isEmpty(obj1))
+                    return false;
+            }
+            return true;
+        } else if (obj instanceof Object[]) {
+            Object[] objs = (Object[]) obj;
+            for(Object obj1 : objs){
+                if(!isEmpty(obj1))
+                    return false;
+            }
+            return true;
+        } else if(obj instanceof Supplier){
+            Object retObj = ((Supplier)obj).get();
+            return isEmpty(retObj);
+        } else if(obj instanceof ScriptObjectMirror){
+            ScriptObjectMirror jsObj = (ScriptObjectMirror) obj;
+            return jsObj.isEmpty();
+        } else{
+            return StringUtils.isBlank(StringBaseOpt.castObjectToString(obj));
+        }
+
     }
 }

@@ -192,7 +192,6 @@ public abstract class Pretreatment {
         return mapTemplateStringAsFormula(template, object, "", canOmitDollar);
     }
 
-
     /**
      * mapTemplateStringAsFormula
      * 表达式 形式如 {表达式} 注意这个和上面的不一，表达式必须放在{}中

@@ -4,6 +4,7 @@ import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.common.JavaBeanMetaData;
+import lombok.Setter;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.Array;
@@ -20,19 +21,19 @@ public abstract class ObjectTextExtractor {
     private static String CYCLE_REF_LABEL = "-@-";
 
     public static class TextExtractContent{
-
+        @Setter
         Map<Class<?>, String[]> includes;
-
+        @Setter
         Map<Class<?>, String[]> excludes;
-
+        @Setter
         boolean omitNumber;
 
+        @Setter
         boolean omitSymbol;
 
         ArrayList<Object> hasExtracted;
         StringBuilder   textBuilder;
         boolean includeName;
-
 
         public TextExtractContent includePropertyName(boolean includeKey){
             includeName = includeKey;
@@ -91,22 +92,6 @@ public abstract class ObjectTextExtractor {
                 }
             }
             return null;
-        }
-
-        public void setIncludes(Map<Class<?>, String[]> includes) {
-            this.includes = includes;
-        }
-
-        public void setExcludes(Map<Class<?>, String[]> excludes) {
-            this.excludes = excludes;
-        }
-
-        public void setOmitNumber(boolean omitNumber) {
-            this.omitNumber = omitNumber;
-        }
-
-        public void setOmitSymbol(boolean omitSymbol) {
-            this.omitSymbol = omitSymbol;
         }
     }
     public static TextExtractContent createContent(){

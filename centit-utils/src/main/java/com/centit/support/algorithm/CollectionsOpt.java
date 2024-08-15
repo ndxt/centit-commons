@@ -314,11 +314,20 @@ public abstract class CollectionsOpt {
                         jsonTree.add(jsonNode);
                     } else {
                         JSONObject parentJson = jsonPath.peek();
-                        JSONArray children = (JSONArray) parentJson.get(childrenPropertyName);
-                        if (children == null)
-                            children = new JSONArray();
-                        children.add(jsonNode);
-                        parentJson.put(childrenPropertyName, children);
+                        JSONArray children;
+                        Object obj =  parentJson.get(childrenPropertyName);
+                        if (obj instanceof JSONArray) {
+                            children = (JSONArray) obj;
+                            children.add(jsonNode);
+                        } else {
+                            if(obj instanceof List && !((List<?>) obj).isEmpty()){
+                                children = JSONArray.from(obj);
+                            } else {
+                                children = new JSONArray();
+                            }
+                            children.add(jsonNode);
+                            parentJson.put(childrenPropertyName, children);
+                        }
                     }
                     treePath.push(treeNode);
                     jsonPath.push(jsonNode);
@@ -424,8 +433,7 @@ public abstract class CollectionsOpt {
      * @param childrenPropertyName 为孩子的 属性名
      * @return JSONArray
      */
-    public static <T> JSONArray treeToJSONArray
-    (List<TreeNode<T>> treeList, String childrenPropertyName) {
+    public static <T> JSONArray treeToJSONArray(List<TreeNode<T>> treeList, String childrenPropertyName) {
         if (treeList == null || treeList.size() == 0)
             return null;
 
@@ -453,8 +461,95 @@ public abstract class CollectionsOpt {
         return treeToJSONArray(sortTree, childrenPropertyName);
     }
 
-    /*
+    /**
+     * 深度优先遍历树
+     * @param rootObject 根节点
+     * @param expendTree 展开的列表
+     * @param childrenPropertyName 孩子节点
+     */
+    public static void depthFirstTraverseTree(Object rootObject, List<Object> expendTree, String childrenPropertyName){
+        expendTree.add(rootObject);
+        Object children = ReflectionOpt.attainExpressionValue(rootObject, childrenPropertyName);
+        if(children==null) return;
+        if(children instanceof Collection){
+            Collection<Object> childrenList = (Collection<Object>) children;
+            for(Object object : childrenList){
+                depthFirstTraverseTree(object, expendTree, childrenPropertyName);
+            }
+        } else {
+            depthFirstTraverseTree(children, expendTree, childrenPropertyName);
+        }
+    }
+
+    /**
+     * 深度优先遍森林
+     * @param treeObjects 森林list
+     * @param childrenPropertyName 孩子节点
+     * @return 展开的树
+     */
+    public static List<Object> depthFirstTraverseForest(Collection<? extends Object> treeObjects, String childrenPropertyName){
+        List<Object> expendTree = new ArrayList<>(128);
+        for(Object obj : treeObjects){
+            depthFirstTraverseTree(obj, expendTree, childrenPropertyName);
+        }
+        return expendTree;
+    }
+
+    /**
+     * 深度优先遍树
+     * @param rootObject 树的根对象
+     * @param childrenPropertyName 孩子节点
+     * @return 展开的树
+     */
+    public static List<Object> depthFirstTraverseTree(Object rootObject, String childrenPropertyName){
+        List<Object> expendTree = new ArrayList<>(128);
+        depthFirstTraverseTree(rootObject, expendTree, childrenPropertyName);
+        return expendTree;
+    }
+
+    /**
+     * 广度优先遍森林
+     * @param treeObjects 森林list
+     * @param childrenPropertyName 孩子节点
+     * @return 展开的树
+     */
+    public static List<Object> breadthFirstTraverseForest(Collection<? extends Object> treeObjects, String childrenPropertyName){
+        List<Object> expendTree = new ArrayList<>(128);
+        int nExpendInd = 0;
+        for(Object obj : treeObjects){
+            expendTree.add(obj);
+        }
+        while (nExpendInd < expendTree.size()){
+            Object nodeObject = expendTree.get(nExpendInd);
+            Object children = ReflectionOpt.attainExpressionValue(nodeObject, childrenPropertyName);
+            if(children != null){
+                if(children instanceof Collection){
+                    Collection<Object> childrenList = (Collection<Object>) children;
+                    expendTree.addAll(childrenList);
+                } else {
+                    expendTree.add(children);
+                }
+            }
+            nExpendInd ++;
+        }
+        return expendTree;
+    }
+
+    /**
+     * 广度优先遍树
+     * @param rootObject 树的根节点
+     * @param childrenPropertyName 孩子节点
+     * @return 展开的树
+     */
+    public static List<Object> breadthFirstTraverseTree(Object rootObject, String childrenPropertyName){
+        return breadthFirstTraverseForest(CollectionsOpt.createList(rootObject), childrenPropertyName);
+    }
+
+    /**
      * 克隆 一个 list
+     * @param souList 源列表
+     * @return 复制列表
+     * @param <T> 模版类型
      */
     public static <T> List<T> cloneList(Collection<T> souList) {
         if (souList == null) {
@@ -602,6 +697,17 @@ public abstract class CollectionsOpt {
         return paramsMap;
     }
 
+    public static <K,V> Map<K, V> copyMapWithoutNullItem(Map<K, V> map){
+        if(map==null)
+            return null;
+        Map<K, V> newMap = new HashMap<>(map.size()+1);
+        for(Map.Entry<K,V> ent : map.entrySet()){
+            if(ent.getValue()!=null)
+                newMap.put(ent.getKey(), ent.getValue());
+        }
+        return newMap;
+    }
+
     public static <T> Map<String, T> createHashMap(List<T> listData, Function<T, String> func){
         if(listData==null) {
             return null;
@@ -634,6 +740,14 @@ public abstract class CollectionsOpt {
         return paramsMap;
     }
 
+    /**
+     * 合并两个 map 有相同key的元素，以map1为准
+     * @param map1 主map
+     * @param map2 辅map
+     * @return 合并的map
+     * @param <K> key类型
+     * @param <V> value类型
+     */
     public static <K, V> Map<K, V> unionTwoMap(Map<K, V> map1, Map<K, V> map2) {
         if(map1 == null){
             return map2;
@@ -645,6 +759,34 @@ public abstract class CollectionsOpt {
         paramsMap.putAll(map2);
         paramsMap.putAll(map1);
         return paramsMap;
+    }
+
+    /**
+     * 合并两个数组，注意不是连接，相同位置的以list1 为主
+     * @param list1 主数据
+     * @param list2 辅数组
+     * @return 合并后的数组
+     * @param <T> 数组元素类型
+     */
+    public static <T> List<T> mergeTwoList(List<T> list1, List<T> list2) {
+        if(list1 == null){
+            return list2;
+        }
+        if(list2 == null){
+            return list1;
+        }
+        int l1 =  list1.size();
+        int l2 =  list2.size();
+        int ll = Math.max(l1, l2);
+        List<T> desList = new ArrayList<>(ll+1);
+        for(int i=0; i<ll; i++){
+            T a = (i<l1)?list1.get(i):null;
+            if(a == null){
+               a = (i<l2)?list2.get(i):null;
+            }
+            desList.add(a);
+        }
+        return desList;
     }
 
     /**

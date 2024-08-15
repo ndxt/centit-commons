@@ -33,11 +33,12 @@ public class PooledRestClientFactory implements PooledObjectFactory<RestHighLeve
         if (StringUtils.isNotBlank(config.getUsername()) && StringUtils.isNotBlank(config.getPassword())){
             final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
             credentialsProvider.setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(config.getUsername(), SecurityOptUtils.decodeSecurityString(config.getPassword())));
-            clientBuilder.setHttpClientConfigCallback(httpClientBuilder -> {
-                httpClientBuilder.disableAuthCaching();
-                return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-            });
+                new UsernamePasswordCredentials(
+                    SecurityOptUtils.decodeSecurityString(config.getUsername()),
+                    SecurityOptUtils.decodeSecurityString(config.getPassword())));
+            clientBuilder.setHttpClientConfigCallback(httpClientBuilder ->
+                    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+            // httpClientBuilder.disableAuthCaching();
         }
         RestHighLevelClient client = new RestHighLevelClient(clientBuilder);
         return new DefaultPooledObject<>(client);

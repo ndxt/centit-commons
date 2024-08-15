@@ -1,8 +1,5 @@
 package com.centit.support.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,8 +13,7 @@ import java.util.function.Function;
  * @param <T> target 缓存对象的类型
  */
 public class DerivativeCachedMap<K, D, T> extends AbstractCachedObject<Map<K, T>> {
-
-    protected Logger logger = LoggerFactory.getLogger(DerivativeCachedMap.class);
+    //protected Logger logger = LoggerFactory.getLogger(DerivativeCachedMap.class);
 
     private ConcurrentMap<K, CachedIdentifiedObject> targetMap;
     private long freshPeriod;

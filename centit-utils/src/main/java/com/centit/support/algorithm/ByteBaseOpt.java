@@ -1,10 +1,12 @@
 package com.centit.support.algorithm;
 
+import com.alibaba.fastjson2.JSON;
 import com.centit.support.file.FileIOOpt;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @SuppressWarnings("unused")
@@ -40,7 +42,7 @@ public abstract class ByteBaseOpt {
                 }
                 return bytes;
             }
-            return StringBaseOpt.objectToString(obj).getBytes();
+            return JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8);
         }
 
         if (obj instanceof Long) {
@@ -80,7 +82,8 @@ public abstract class ByteBaseOpt {
                 return null;
             }
         }
-        return StringBaseOpt.objectToString(obj).getBytes();
+
+        return JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8);
     }
 
 

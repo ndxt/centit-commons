@@ -2,10 +2,11 @@ package com.centit.support.security;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -23,6 +24,9 @@ public abstract class Md5Encoder {
     }
 
     public static byte[] rawEncode(byte[] data) {
+        if(data == null){
+            return null;
+        }
         MessageDigest MD5;
         try {
             MD5 = MessageDigest.getInstance("MD5");
@@ -44,7 +48,15 @@ public abstract class Md5Encoder {
     }
 
     public static String encode(String data) {
-        return encode(data.getBytes(StandardCharsets.UTF_8));
+        if(StringUtils.isBlank(data)){
+            return null;
+        }
+        try {
+            return encode(data.getBytes("utf8"));
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -69,7 +81,15 @@ public abstract class Md5Encoder {
     }
 
     public static String encodeBase64(String data, boolean urlSafe) {
-        return encodeBase64(data.getBytes(StandardCharsets.UTF_8), urlSafe);
+        if(StringUtils.isBlank(data)){
+            return null;
+        }
+        try {
+            return encodeBase64(data.getBytes("utf8"), urlSafe);
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);//e.printStackTrace();
+            return null;
+        }
     }
 
     public static String encodeBase64(String data) {
@@ -101,13 +121,13 @@ public abstract class Md5Encoder {
         MessageDigest MD5;
         try {
             MD5 = MessageDigest.getInstance("MD5");
-            byte[] saltBytes = salt.getBytes(StandardCharsets.UTF_8);
+            byte[] saltBytes = salt.getBytes("utf8");
             MD5.update(saltBytes, 0, saltBytes.length);
-            byte[] hashedBytes = MD5.digest(data.getBytes(StandardCharsets.UTF_8));
+            byte[] hashedBytes = MD5.digest(data.getBytes("utf8"));
             for (int i = 0; i < iterations - 1; i++)
                 hashedBytes = MD5.digest(hashedBytes);
             return new String(Hex.encodeHex(hashedBytes));
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             logger.error(e.getMessage(), e);//e.printStackTrace();
             return null;
         }

@@ -56,8 +56,6 @@ public abstract class StringBaseOpt {
      * @return String
      */
     public static String encodeBase64(String str) {
-        //sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
-        //return encoder.encodeBuffer(str.getBytes()).trim();
         return new String(Base64.encodeBase64(str.getBytes()));
     }
 
@@ -68,7 +66,6 @@ public abstract class StringBaseOpt {
      * @return String
      */
     public static String decodeBase64(String str) {
-        //sun.misc.BASE64Decoder dec = new sun.misc.BASE64Decoder();
         return new String(Base64.decodeBase64(str.getBytes()));
     }
 
@@ -206,6 +203,36 @@ public abstract class StringBaseOpt {
                 return true;
         }
         return false;
+    }
+
+    public static String minString(Collection<Object> objs) {
+        String str= null;
+        if(objs!=null) {
+            for (Object obj : objs){
+                String temp = StringBaseOpt.castObjectToString(obj);
+                if(temp!=null) {
+                    if (str==null || StringUtils.compare(str, temp) > 0) {
+                        str = temp;
+                    }
+                }
+            }
+        }
+        return str;
+    }
+
+    public static String maxString(Collection<Object> objs) {
+        String str= null;
+        if(objs!=null) {
+            for (Object obj : objs){
+                String temp = StringBaseOpt.castObjectToString(obj);
+                if(temp!=null) {
+                    if (str==null || StringUtils.compare(str, temp) < 0) {
+                        str = temp;
+                    }
+                }
+            }
+        }
+        return str;
     }
 
     /**
@@ -386,6 +413,7 @@ public abstract class StringBaseOpt {
             sRes = sCode.substring(0, i) + sRes;
         return sRes;
     }
+
     /**
      * 寻找比它大一个字符串 nextCode("0000200")=="0000201"
      * nextCode("000AZZZ")=="000BAAA"
@@ -417,16 +445,33 @@ public abstract class StringBaseOpt {
         return sRes;
     }
 
-    private static char getPinYinShenMu(char ch) {
+    public static char getPinYinShenMu(char ch) {
+        int charAscii = ch;
+        if(charAscii>0 && charAscii<256)
+            return ch;
         String[] res1 = PinyinHelper.toHanyuPinyinStringArray(ch);
-        if (res1.length > 0) {
+        if (res1!=null && res1.length > 0) {
             return res1[0].charAt(0);
         }
         return ' ';
     }
-    /*
-    private static String getPinYin(String hanzi) {
-        try {
+
+    public static String getPinYin(char ch) {
+        int charAscii = ch;
+        if(charAscii>0 && charAscii<256)
+            return String.valueOf(ch);
+        String[] res1 = PinyinHelper.toHanyuPinyinStringArray(ch);
+        if (res1!=null && res1.length > 0) {
+            String str = res1[0];
+            int sl = str.length();
+            if(str.charAt(sl-1) >='0' && str.charAt(sl-1)<='9'){
+                return str.substring(0, sl-1).replace("u:","v");
+            }
+            return str.replace("u:","v");
+        }
+        return "";
+    }
+        /*try {
             String chinese = new String(hanzi.getBytes("GB2312"), "ISO8859-1");
             if (chinese.length() > 1) {
                 int li_SectorCode = (int) chinese.charAt(0); // 汉字区码
@@ -449,8 +494,8 @@ public abstract class StringBaseOpt {
             }
         } catch (UnsupportedEncodingException e) {
             return "";
-        }
-    }*/
+        }*/
+
 
     /**
      * 获取一个汉字的拼音首字母。 GB码两个字节分别减去160，转换成10进制码组合就可以得到区位码
@@ -463,8 +508,15 @@ public abstract class StringBaseOpt {
     public static String getFirstLetter(String oriStr) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < oriStr.length(); i++) {
-            //String pinyin = getPinYin(String.valueOf(oriStr.charAt(i)));
             sb.append(getPinYinShenMu(oriStr.charAt(i)));
+        }
+        return sb.toString();
+    }
+
+    public static String getPinYin(String oriStr) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < oriStr.length(); i++) {
+            sb.append(getPinYin(oriStr.charAt(i)));
         }
         return sb.toString();
     }

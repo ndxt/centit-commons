@@ -1,5 +1,6 @@
 package com.centit.support.image;
 
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import com.centit.support.security.Md5Encoder;
@@ -30,11 +31,10 @@ public abstract class ImageOpt {
      * @param quality     缩略图质量
      * @param outFilename 输出文件名
      * @throws InterruptedException  分析异常
-     * @throws FileNotFoundException 文件读取异常
      * @throws IOException           IO
      */
     public static void createThumbnail(String filename, int thumbWidth, int thumbHeight, int quality,
-                                       String outFilename) throws InterruptedException, FileNotFoundException, IOException {
+                                       String outFilename) throws InterruptedException, IOException {
         // load image from filename
         Image image = Toolkit.getDefaultToolkit().getImage(filename);
         MediaTracker mediaTracker = new MediaTracker(new Container());
@@ -42,7 +42,6 @@ public abstract class ImageOpt {
         mediaTracker.waitForID(0);
         // use this to test for errors at this point:
         // System.out.println(mediaTracker.isErrorAny());
-
         // determine thumbnail size from WIDTH and HEIGHT
         double thumbRatio = (double) thumbWidth / (double) thumbHeight;
         int imageWidth = image.getWidth(null);
@@ -65,12 +64,13 @@ public abstract class ImageOpt {
         saveBufferedImage(outFilename, thumbImage, quality);
     }
 
-    public static void saveBufferedImage(String filename, BufferedImage image, int quality)
+    public static void saveBufferedImage(String filename, BufferedImage image,/*暂时没有用起来*/ int quality)
         throws IOException {
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(filename))) {
             ImageIO.write(image, "jpg", out);
         }
     }
+
 
     /**
      * 抓屏程序 算法来做网络，测试通过
@@ -430,5 +430,80 @@ public abstract class ImageOpt {
     public static Color castObjectToColor(Object obj, Color defaultColor) {
         Color cr = castObjectToColor(obj);
         return cr==null ? defaultColor : cr;
+    }
+
+    public static class ImageTextInfo {
+        public int x;
+        public int y;
+        public String text;
+        public ImageTextInfo(int x, int y, String t){
+            this.x = x;
+            this.y = y;
+            this.text = t;
+        }
+    }
+
+    public static ImageTextInfo createImageText(int x, int y, String t){
+        return new ImageTextInfo(x, y ,t);
+    }
+
+    /*
+     * 这个方法是一个静态方法（static method），静态方法不需要实例化类就可以调用。静态方法通常用于共享的或者工具性的代码，它们可以被同一个类下的所有实例共享使用。
+     *
+     * 在实际应用中，这个方法可能用于给图片添加水印，例如logo、商标或者文本信息等。水印通常用于保护原始图片的完整性和版权，避免未经授权的复制和分发。
+     *
+     * 需要注意的是，这个方法只是一个注释，并没有实际的实现。实际的实现需要根据具体的应用场景和需求来编写。
+     */
+    public static BufferedImage addTextToImage(BufferedImage image,
+                                             String fontName,
+                                             Color color,
+                                             int size,
+                                             List<ImageTextInfo> textList) {
+        BufferedImage watermarkedImage = image;//new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = watermarkedImage.createGraphics();
+        // 绘制原始图片
+        // g2d.drawImage(image, 0, 0, width, height, null);
+        // 搞不懂为什么要设置两次 Composite ，否则 文字的颜色不纯粹，不知道原因
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.5f));
+        g2d.setColor(color);
+        g2d.setFont(new Font(fontName, Font.PLAIN, size));
+        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
+        for(ImageTextInfo iti : textList) {
+            g2d.drawString(iti.text, iti.x, iti.y);
+        }
+        g2d.dispose();
+        //ImageIO.write(watermarkedImage, "jpg", new File(outputPath));
+        return watermarkedImage;
+    }
+
+    public static boolean addTextToImage(InputStream imageIS, String  imageType, OutputStream imageOS,
+                                       String waterMark, String fontName, Color color, int size, int x, int y) {
+        try {
+            BufferedImage image = ImageIO.read(imageIS);
+            BufferedImage markImage = ImageOpt.addTextToImage(image, fontName, color, size,
+                CollectionsOpt.createList(createImageText(x, y, waterMark)));
+            ImageIO.write(markImage, imageType, imageOS);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public static boolean addTextToImage(InputStream imageIS, String  imageType, OutputStream imageOS,
+                                         String fontName,
+                                         Color color,
+                                         int size,
+                                         List<ImageTextInfo> textList) {
+        try {
+            BufferedImage image = ImageIO.read(imageIS);
+            // image.getAlphaRaster()
+            BufferedImage markImage = ImageOpt.addTextToImage(image, fontName, color, size,
+                textList);
+            //markImage.getAlphaRaster().setPixels(0, 0, markImage.getWidth(), markImage.getHeight(),
+            ImageIO.write(markImage, imageType, imageOS);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

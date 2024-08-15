@@ -3,9 +3,9 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>centit-framework-dependencies</artifactId>
         <groupId>com.centit.framework</groupId>
         <version>JDK21-SNAPSHOT</version>
+        <artifactId>centit-framework-dependencies</artifactId>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -69,10 +69,6 @@
                     <source>${jdk.version}</source>
                     <target>${jdk.version}</target>
                     <encoding>UTF-8</encoding>
-                    <compilerArguments>
-                        <verbose/>
-                        <bootclasspath>${java.home}/lib/jrt-fs.jar</bootclasspath>
-                    </compilerArguments>
                 </configuration>
             </plugin>
 

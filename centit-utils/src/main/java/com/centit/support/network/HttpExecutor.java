@@ -163,13 +163,8 @@ public abstract class HttpExecutor {
         return createHttpClient(null, true, true);
     }
 
-    public static <T> T httpExecute(HttpExecutorContext executorContext,
-                                    HttpRequestBase httpRequest, ResponseHandler<T> responseHandler)
-        throws IOException {
-
-        /*if(executorContext==null){
-            executorContext = HttpExecutorContext.create();
-        }else {*/
+    public static void prepareHttpRequest(HttpExecutorContext executorContext,
+                                   HttpRequestBase httpRequest){
         if (executorContext.getHttpHeaders() != null) {
             for (Map.Entry<String, String> entHeader : executorContext.getHttpHeaders().entrySet())
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
@@ -188,20 +183,43 @@ public abstract class HttpExecutor {
             httpRequest.setHeader("Cookie", cookieString.toString());
         }
 
-        RequestConfig.Builder builder = RequestConfig.custom().setRedirectsEnabled(false);
+        /**
+         * 1.connectionRequestTimout(单位是ms)：指从连接池获取连接的timeout超出预设时间(
+         *
+         * 从连接池获取连接的超时时间，如果连接池里连接都被用了，且超过设定时间,就会报错connectionrequesttimeout，会抛出超时异常.
+         *
+         * 2.connetionTimeout(单位是ms)：指客户端和服务器建立连接的timeout.
+         *
+         * 就是http请求的三个阶段，一：建立连接；二：数据传送；三，断开连接。如果与服务器(这里指数据库)请求建立连接的时间超过ConnectionTimeOut，就会抛 ConnectionTimeOutException，即服务器连接超时，没有在规定的时间内建立连接。
+         *
+         * 3.socketTimeout(单位是ms)：指客户端从服务器读取数据的timeout超出预期设定时间，超出后会抛出SocketTimeOutException.
+         */
+        RequestConfig.Builder builder = RequestConfig.custom().setMaxRedirects(3);
         if(executorContext.getHttpProxy() != null || executorContext.getTimeout() != -1) {
             if (executorContext.getHttpProxy() != null) {
                 builder.setProxy(executorContext.getHttpProxy());
             }
+            //设置超时时间
             if(executorContext.getTimeout()!=-1){
-                builder.setConnectionRequestTimeout(executorContext.getTimeout())
-                    .setSocketTimeout(executorContext.getTimeout()).setConnectTimeout(executorContext.getTimeout());
+                builder.setConnectionRequestTimeout(5000)
+                    .setConnectTimeout(executorContext.getTimeout())
+                    .setSocketTimeout(executorContext.getTimeout());
+            } else {
+                builder.setConnectionRequestTimeout(5000)
+                    .setConnectTimeout(10000)
+                    .setSocketTimeout(20000);
             }
             httpRequest.setConfig(builder.build());
         }else {
             httpRequest.setConfig(builder.build());
         }
-        //}
+    }
+    public static <T> T httpExecute(HttpExecutorContext executorContext,
+                                    HttpRequestBase httpRequest, ResponseHandler<T> responseHandler)
+        throws IOException {
+
+        prepareHttpRequest(executorContext, httpRequest);
+
         CloseableHttpClient httpClient = null;
         boolean createSelfClient = executorContext.getHttpclient() == null;
         if (createSelfClient) {
@@ -211,6 +229,7 @@ public abstract class HttpExecutor {
         } else {
             httpClient = executorContext.getHttpclient();
         }
+
         try (CloseableHttpResponse response = httpClient.execute(httpRequest, executorContext.getHttpContext())) {
             return responseHandler.handleResponse(response);
         } finally {
@@ -225,7 +244,6 @@ public abstract class HttpExecutor {
         throws IOException {
         return httpExecute(executorContext, httpRequest, Utf8ResponseHandler.INSTANCE);
     }
-
 
     public static String simpleGet(HttpExecutorContext executorContext, String uri, String queryParam)
         throws IOException {
@@ -850,10 +868,12 @@ public abstract class HttpExecutor {
             UrlOptUtils.appendParamToUrl(uri, paramsUrl), file);
     }
 
-    protected static String extraFileName(CloseableHttpResponse response) {
+    public static String extraFileName(CloseableHttpResponse response) {
         Header[] contentDispositionHeader = response
-            .getHeaders("Content-disposition");
-
+            .getHeaders("Content-Disposition");
+        if(contentDispositionHeader == null || contentDispositionHeader.length == 0){
+            return null;
+        }
         Matcher m = Pattern.compile(".*filename=\"(.*)\"").matcher(contentDispositionHeader[0].getValue());
         if (m.matches()) {
             return m.group(1);
@@ -874,6 +894,7 @@ public abstract class HttpExecutor {
         } else {
             httpClient = executorContext.getHttpclient();
         }
+        prepareHttpRequest(executorContext, httpGet);
 
         try (CloseableHttpResponse response = httpClient.execute(httpGet, executorContext.getHttpContext())) {
 

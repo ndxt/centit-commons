@@ -9,6 +9,7 @@ import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.security.SecurityOptUtils;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.*;
+import lombok.Data;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -63,6 +64,7 @@ public abstract class ImagePdfTextExtractor {
         return images;
     }
 
+    @Data
     public static class OcrServerHost{
         String authorUrl;
         String orcUrl;
@@ -70,38 +72,6 @@ public abstract class ImagePdfTextExtractor {
         String  userName;
 
         String  password;
-
-        public String getAuthorUrl() {
-            return authorUrl;
-        }
-
-        public void setAuthorUrl(String authorUrl) {
-            this.authorUrl = authorUrl;
-        }
-
-        public String getOrcUrl() {
-            return orcUrl;
-        }
-
-        public void setOrcUrl(String orcUrl) {
-            this.orcUrl = orcUrl;
-        }
-
-        public String getUserName() {
-            return userName;
-        }
-
-        public void setUserName(String userName) {
-            this.userName = userName;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
     }
 
     public static OcrServerHost fetchDefaultOrrServer(){

@@ -14,7 +14,6 @@ public class ESServerConfig {
     private String clusterName ;
     private String username ;
     private String password ;
-    //private String indexName;
     //#elasticsearch.filter.minScore
     private float minScore;
     private HttpHost[] httpHosts;

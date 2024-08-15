@@ -85,11 +85,8 @@ public abstract class ConstDefine {
     public static final int FUNC_NVL = 174;
     public static final int FUNC_REPLACE = 175;
     public static final int FUNC_TOBYTEARRAY = 176;
-
-    public static final int FUNC_VALUE = 177;
-
+    public static final int FUNC_EVAL = 177;
     public static final int FUNC_TO_JSON_STRING = 178;
-
     public static final int OP_BASE = 30;    // +
     public static final int OP_ADD = 30;    // +
     public static final int OP_SUB = 31;  // -
@@ -117,6 +114,11 @@ public abstract class ConstDefine {
     public static final int OP_MOD = 50;  // mod % 取整后取模
     public static final int OP_DBMOD = 51;  // dbmod 取模
     public static final int OP_XOR = 52;  // xor 异或
+
+    public static final int OP_NOT_IN = 53; //NOT IN
+    public static final int OP_BETWEEN = 54; //BETWEEN
+    public static final int OP_IS = 55; //BETWEEN
+
     private ConstDefine() {
         throw new IllegalAccessError("Utility class");
     }

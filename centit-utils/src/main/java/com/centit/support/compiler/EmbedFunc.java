@@ -82,7 +82,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("adddays", 2, ConstDefine.FUNC_ADD_DAYS, ConstDefine.TYPE_ANY),//日期函数  加天数
         new FunctionInfo("addmonths", 2, ConstDefine.FUNC_ADD_MONTHS, ConstDefine.TYPE_ANY),//日期函数  加月数
         new FunctionInfo("addyears", 2, ConstDefine.FUNC_ADD_YEARS, ConstDefine.TYPE_ANY),//日期函数   加年数
-        new FunctionInfo("truncdate", -1, ConstDefine.FUNC_TRUNC_DATE, ConstDefine.TYPE_ANY),//日期函数   截断日期  第二个参数  Y ，M , D 分别返回一年、月的第一天 ，或者一日的零点
+        new FunctionInfo("truncdate", -1, ConstDefine.FUNC_TRUNC_DATE, ConstDefine.TYPE_ANY),//日期函数   截断日期  第二个参数  Y ，M , D  W 分别返回一年、月的第一天 ，一日的零点， 一周周一
         new FunctionInfo("lastofmonth", -1, ConstDefine.FUNC_LAST_OF_MONTH, ConstDefine.TYPE_ANY),//日期函数   求这个月的第一天
         new FunctionInfo("toDate", 1, ConstDefine.FUNC_TO_DATE, ConstDefine.TYPE_DATE),// 转换为日期
         new FunctionInfo("toString", 1, ConstDefine.FUNC_TO_STRING, ConstDefine.TYPE_STR),//转换为String
@@ -95,7 +95,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR),//取汉字拼音
         new FunctionInfo("random", -1, ConstDefine.FUNC_RANDOM, ConstDefine.TYPE_ANY), // 取随机数
         new FunctionInfo("hash", 1, ConstDefine.FUNC_HASH, ConstDefine.TYPE_STR), // 计算hash值
-        new FunctionInfo("value", -1, ConstDefine.FUNC_VALUE, ConstDefine.TYPE_ANY) // 和 FUNC_IF 在外层运行
+        new FunctionInfo("eval", -1, ConstDefine.FUNC_EVAL, ConstDefine.TYPE_ANY) // 和 eval在外层运行
     };
     private static double COMPARE_MIN_DOUBLE = 0.0000001;
     private EmbedFunc() {
@@ -271,6 +271,9 @@ public abstract class EmbedFunc {
                 String ct = StringBaseOpt.castObjectToString(slOperand.get(1), "N");
                 if(StringUtils.equalsAnyIgnoreCase(ct, "r","rmb","yuan"))
                     return EmbedFuncUtils.instance.capitalRMB(slOperand.get(0));
+
+                if(StringUtils.equalsAnyIgnoreCase(ct, "yjf","yuanjiaofen"))
+                    return EmbedFuncUtils.instance.capitalRmbYJF(slOperand.get(0));
 
                 if(StringUtils.equalsAnyIgnoreCase(ct, "s","simple")){
                     return NumberBaseOpt.capitalization(
@@ -585,14 +588,24 @@ public abstract class EmbedFunc {
             }
 
             case ConstDefine.FUNC_ISEMPTY: //判断参数是否为空
-                if (nOpSum < 1 || slOperand.get(0) == null)
+                if (nOpSum < 1)
                     return true;
-                return StringUtils.isBlank(StringBaseOpt.objectToString(slOperand.get(0)));
+                for(int i=0; i<nOpSum; i++){
+                    if(!GeneralAlgorithm.isEmpty(slOperand.get(i))){
+                        return false;
+                    }
+                }
+                return true;
 
             case ConstDefine.FUNC_NOTEMPTY: //判断参数是否为空
-                if (nOpSum < 1 || slOperand.get(0) == null)
+                if (nOpSum < 1)
                     return false;
-                return StringUtils.isNotBlank(StringBaseOpt.objectToString(slOperand.get(0)));
+                for(int i=0; i<nOpSum; i++){
+                    if(!GeneralAlgorithm.isEmpty(slOperand.get(i))){
+                        return true;
+                    }
+                }
+                return false;
 
             case ConstDefine.FUNC_LN: {
                 if (nOpSum < 1) return null;
@@ -790,8 +803,13 @@ public abstract class EmbedFunc {
                 LeftRightPair<Date, Object> dateOpt = fetchDateOpt(nOpSum, slOperand);
                 if (dateOpt.getLeft() == null || dateOpt.getRight() == null)
                     return null;
-                return DatetimeOpt.addDays(dateOpt.getLeft(),
-                    NumberBaseOpt.castObjectToInteger(dateOpt.getRight()));
+                if(dateOpt.getRight() instanceof Integer || dateOpt.getRight() instanceof Long) {
+                    return DatetimeOpt.addDays(dateOpt.getLeft(),
+                        NumberBaseOpt.castObjectToInteger(dateOpt.getRight()));
+                } else {
+                    return DatetimeOpt.addDays(dateOpt.getLeft(),
+                        NumberBaseOpt.castObjectToFloat(dateOpt.getRight()));
+                }
             }
             case ConstDefine.FUNC_ADD_MONTHS: {//
                 LeftRightPair<Date, Object> dateOpt = fetchDateOpt(nOpSum, slOperand);
@@ -822,12 +840,14 @@ public abstract class EmbedFunc {
                     ti = slOperand.get(1);
                 }
                 String tempStr = StringBaseOpt.objectToString(ti);
-                if ("M".equalsIgnoreCase(tempStr))
+                if ("M".equalsIgnoreCase(tempStr)) {
                     return DatetimeOpt.truncateToMonth(dt);
-                else if ("Y".equalsIgnoreCase(tempStr))
+                } else if ("Y".equalsIgnoreCase(tempStr)) {
                     return DatetimeOpt.truncateToYear(dt);
-                else
-                    return DatetimeOpt.truncateToDay(dt);
+                } else if ("W".equalsIgnoreCase(tempStr)) {
+                    return DatetimeOpt.truncateToWeek(dt);
+                } // D
+                return DatetimeOpt.truncateToDay(dt);
             }
 
             case ConstDefine.FUNC_LAST_OF_MONTH: {//
@@ -856,19 +876,24 @@ public abstract class EmbedFunc {
                 if (nOpSum < 1) {
                     return null;
                 }
-                return StringBaseOpt.castObjectToString(slOperand.get(0));
+                for(int i=0; i<nOpSum; i++) {
+                    String sValue = StringBaseOpt.castObjectToString(slOperand.get(i));
+                    if (StringUtils.isNotBlank(sValue)) {
+                        return sValue;
+                    }
+                }
+                return null;
             }
 
             case ConstDefine.FUNC_TO_JSON_STRING: {//
                 if (nOpSum < 1) {
                     return null;
                 }
-                if(slOperand.get(0) instanceof String str){
-                    return str;
+                if(slOperand.get(0) instanceof String){
+                    return slOperand.get(0);
                 }
                 return JSON.toJSONString(slOperand.get(0));
             }
-
 
             case ConstDefine.FUNC_TOBYTEARRAY:{
                 if (nOpSum < 1) {
@@ -900,8 +925,17 @@ public abstract class EmbedFunc {
 
             case ConstDefine.FUNC_GET_PY: {//
                 if (nOpSum < 1) return null;
-                return StringBaseOpt.getFirstLetter(
-                    StringBaseOpt.objectToString(slOperand.get(0)));
+                // 0 首字母 1 全拼
+                String pinYinType = "0";
+                if(nOpSum > 1){
+                    pinYinType = StringBaseOpt.castObjectToString(slOperand.get(1));
+                }
+                if("1".equals(pinYinType))
+                    return StringBaseOpt.getPinYin(
+                        StringBaseOpt.objectToString(slOperand.get(0)));
+                else
+                    return StringBaseOpt.getFirstLetter(
+                        StringBaseOpt.objectToString(slOperand.get(0)));
             }
 
             case ConstDefine.FUNC_GET_ATTR:{

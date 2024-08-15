@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
 
 /**
  * @author zhf
@@ -88,8 +89,8 @@ public abstract class OfficeToPdf {
 
         String inputFile = CommonUtils.mapWidowsPathIfNecessary(inWordFile);
         String pdfFile = CommonUtils.mapWidowsPathIfNecessary(outPdfFile);
-        try(InputStream inWordStream = new FileInputStream(new File(inputFile));
-            OutputStream outPdfStram = new FileOutputStream(new File(pdfFile))) {
+        try(InputStream inWordStream = Files.newInputStream(new File(inputFile).toPath());
+            OutputStream outPdfStram = Files.newOutputStream(new File(pdfFile).toPath())) {
             return word2Pdf(inWordStream, outPdfStram, suffix);
         } catch (IOException e) {
             logger.error(e.getMessage());

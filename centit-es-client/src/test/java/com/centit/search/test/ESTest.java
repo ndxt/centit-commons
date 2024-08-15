@@ -57,10 +57,10 @@ public class ESTest {
         //ESServerConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/src/test/resources/system.properties");
         ESServerConfig config = new ESServerConfig();
         config.setServerHostIp("192.168.134.250");
-        config.setServerHostPort("32404");
-        config.setClusterName("centit");
-        config.setUsername("elastic");
-        config.setPassword("*********");
+        config.setServerHostPort("32590");
+       // config.setClusterName("centit");
+        //config.setUsername("elastic");
+        //config.setPassword("*********");
         /*config.setIndexName(
                 StringUtils.lowerCase(properties.getProperty("elasticsearch.index")));*/
         config.setOsId("dde");

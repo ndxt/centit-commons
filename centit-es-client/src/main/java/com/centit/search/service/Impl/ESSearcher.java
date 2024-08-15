@@ -5,6 +5,9 @@ import com.centit.search.document.DocumentUtils;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Searcher;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.common.ObjectException;
+import com.centit.support.compiler.Lexer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -22,6 +25,9 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +38,19 @@ import java.util.*;
  * Created by codefan on 17-6-12.
  */
 public class ESSearcher implements Searcher{
-    private static final String KEYWORD = ".keyword";
+
+    public static final String SELF_ORDER_BY = "ORDER_BY";
+
+    public static final String SELF_ORDER_BY2 = "orderBy";
+    /**
+     * 用户自定义排序字段 ， 放到 filterDesc 中
+     */
+    public static final String TABLE_SORT_FIELD = "sort";
+    /**
+     * 用户自定义排序字段的排序顺序 ， 放到 filterDesc 中
+     */
+    public static final String TABLE_SORT_ORDER = "order";
+
     private static Logger logger = LoggerFactory.getLogger(ESSearcher.class);
 
     private ESServerConfig config;
@@ -42,6 +60,7 @@ public class ESSearcher implements Searcher{
     private String[] highlightPreTags;
     private String[] highlightPostTags;
 
+    private List<String> allFields;
     private String[] queryFields;
     private Set<String> highlightFields;
 
@@ -57,6 +76,7 @@ public class ESSearcher implements Searcher{
         this.highlightFields = new HashSet<>();
         this.highlightPreTags = new String[]{"<strong>"};
         this.highlightPostTags = new String[]{"</strong>"};
+        this.allFields = new ArrayList<>();
     }
 
     public ESSearcher(ESServerConfig config, GenericObjectPool<RestHighLevelClient> clientPool){
@@ -97,12 +117,16 @@ public class ESSearcher implements Searcher{
                 if(esType.highlight()){
                     highlightFields.add(field.getName());
                 }
+                allFields.add(field.getName());
             }
         }//end of for
+
         queryFields = CollectionsOpt.listToArray(qf);
     }
 
-    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, String[] includes, String[] excludes, int pageNo, int pageSize){
+    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
+                                                         String[] includes, String[] excludes,
+                                                         int pageNo, int pageSize){
         RestHighLevelClient client = null;
         long totalHits =0;
         try {
@@ -117,11 +141,19 @@ public class ESSearcher implements Searcher{
                 return retList;
             }*/
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(queryBuilder)
-                .explain(true)
-                .from((pageNo>1)?(pageNo-1)* pageSize:0)
-                .size(pageSize);
-            if(highlightFields.size()>0) {
+                .query(queryBuilder);
+            //添加默认根据匹配度排序 .order(SortOrder.DESC)
+            searchSourceBuilder.sort(SortBuilders.scoreSort());
+            if(sortBuilders != null && !sortBuilders.isEmpty()) {
+                searchSourceBuilder.sort(sortBuilders);
+            }
+            if(pageSize>0) {
+                searchSourceBuilder.explain(true)
+                    .from((pageNo > 1) ? (pageNo - 1) * pageSize : 0)
+                    .size(pageSize);
+            }
+
+            if(!highlightFields.isEmpty()) {
                 HighlightBuilder highlightBuilder = new HighlightBuilder();
                 for (String hf : highlightFields) {
                     highlightBuilder.field(hf);
@@ -189,8 +221,8 @@ public class ESSearcher implements Searcher{
             }
             return new ImmutablePair<>(totalHits, retList);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return null;
+            throw new ObjectException(ObjectException.UNKNOWN_EXCEPTION,
+                "查询ES失败:"+e.getMessage(), e);
         }finally {
             if(client!=null) {
                 clientPool.returnObject(client);
@@ -198,8 +230,53 @@ public class ESSearcher implements Searcher{
         }
     }
 
-    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder,  int pageNo, int pageSize) {
-        return esSearch(queryBuilder, null,  null,  pageNo, pageSize);
+    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, int pageNo, int pageSize) {
+        return esSearch(queryBuilder, null,  null,null,  pageNo, pageSize);
+    }
+
+    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
+                                                         int pageNo, int pageSize) {
+        return esSearch(queryBuilder, sortBuilders,  null,null,  pageNo, pageSize);
+    }
+
+    public static List<SortBuilder<?>> mapSortBuilder(Map<String, Object> filterMap) {
+        if(filterMap==null || filterMap.isEmpty()){
+            return null;
+        }
+        List<SortBuilder<?>> sortBuilders = new ArrayList<>();
+        String selfOrderBy = StringBaseOpt.objectToString(filterMap.get(SELF_ORDER_BY));
+        if(StringUtils.isBlank(selfOrderBy)){
+            selfOrderBy = StringBaseOpt.objectToString(filterMap.get(SELF_ORDER_BY2));
+        }
+        if (StringUtils.isNotBlank(selfOrderBy)) {
+            Lexer lexer = new Lexer(selfOrderBy, Lexer.LANG_TYPE_SQL);
+            String aWord = lexer.getAWord();
+            while (StringUtils.isNotBlank(aWord)) {
+                String field = aWord;
+                SortOrder sortOrder = SortOrder.ASC;
+                aWord = lexer.getAWord();
+                if("desc".equalsIgnoreCase(aWord)){
+                    sortOrder = SortOrder.DESC;
+                }
+                sortBuilders.add(SortBuilders.fieldSort(field).order(sortOrder));
+                while(StringUtils.equalsAnyIgnoreCase(aWord, "desc", "asc", ",")){
+                    aWord = lexer.getAWord();
+                }
+            }
+        }
+
+        String sortField = StringBaseOpt.objectToString(filterMap.get(TABLE_SORT_FIELD));
+        if (StringUtils.isNotBlank(sortField)) {
+            SortBuilder sortBuilder;
+            String sOrder = StringBaseOpt.objectToString(filterMap.get(TABLE_SORT_ORDER));
+            if ("desc".equalsIgnoreCase(sOrder)) {
+                sortBuilder = SortBuilders.fieldSort(sortField).order(SortOrder.DESC);
+            } else {
+                sortBuilder = SortBuilders.fieldSort(sortField).order(SortOrder.ASC);
+            }
+            sortBuilders.add(sortBuilder);
+        }
+        return sortBuilders;
     }
 
     /**
@@ -216,24 +293,49 @@ public class ESSearcher implements Searcher{
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         if(fieldFilter!=null) {
             for (Map.Entry<String, Object> ent : fieldFilter.entrySet()) {
-                /*Class tp = obj.getClass();
-                return tp.isArray()?true:obj instanceof Collection;*/
+                boolean isField = false;
+                for(String fieldName : allFields) {
+                    if(ent.getKey().startsWith(fieldName)) {
+                        isField = true;
+                        break;
+                    }
+                }
+                if(!isField) continue;
                 if (ent.getValue().getClass().isArray()) {
-                    queryBuilder.must(QueryBuilders.termsQuery(ent.getKey()+ KEYWORD, (String[]) ent.getValue()));
+                    queryBuilder.must(QueryBuilders.termsQuery(ent.getKey(), (String[]) ent.getValue()));
                 } else if (ent.getValue() instanceof Collection) {
                     queryBuilder.must(QueryBuilders.termsQuery(
-                        ent.getKey()+ KEYWORD, CollectionsOpt.listToArray((Collection)ent.getValue())));
+                        ent.getKey(), CollectionsOpt.listToArray((Collection)ent.getValue())));
                 } else {
-                    queryBuilder.must(QueryBuilders.termQuery(ent.getKey()+ KEYWORD, ent.getValue()));
+                    String key = ent.getKey();
+                    int keyLen = key.length();
+                    String optSuffix = keyLen>3 ? key.substring(keyLen - 3).toLowerCase() : "_eq";
+                    switch (optSuffix) {
+                        case "_gt":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).gt(ent.getValue()));
+                            break;
+                        case "_ge":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).gte(ent.getValue()));
+                            break;
+                        case "_lt":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).lt(ent.getValue()));
+                            break;
+                        case "_le":
+                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).lte(ent.getValue()));
+                            break;
+                        default:
+                            queryBuilder.must(QueryBuilders.termQuery(ent.getKey(), ent.getValue()));
+                            break;
+                    }
                 }
             }
         }
         if (StringUtils.isNotBlank(queryWord)) {
-            queryBuilder.must(QueryBuilders.multiMatchQuery(
+            queryBuilder.filter(QueryBuilders.multiMatchQuery(
                 queryWord, queryFields));
         }
 
-        return esSearch(queryBuilder,  pageNo,  pageSize);
+        return esSearch(queryBuilder, mapSortBuilder(fieldFilter), pageNo, pageSize);
     }
 
     /**
@@ -245,7 +347,7 @@ public class ESSearcher implements Searcher{
      */
     @Override
     public Pair<Long,List<Map<String, Object>>> search(String queryWord, int pageNo, int pageSize) {
-        return search(null,queryWord,pageNo,pageSize);
+        return search(null, queryWord, pageNo, pageSize);
     }
 
     /**
@@ -260,7 +362,7 @@ public class ESSearcher implements Searcher{
     public Pair<Long,List<Map<String, Object>>> searchOpt(String optId,
                                                           String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("optId", optId),
-            queryWord,pageNo,pageSize);
+            queryWord, pageNo, pageSize);
     }
 
     /**
@@ -275,7 +377,7 @@ public class ESSearcher implements Searcher{
     public Pair<Long,List<Map<String, Object>>> searchOwner(String owner,
                                                             String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("userCode", owner),
-            queryWord,pageNo,pageSize);
+            queryWord, pageNo, pageSize);
     }
 
     /**
@@ -291,7 +393,7 @@ public class ESSearcher implements Searcher{
     public Pair<Long,List<Map<String, Object>>> searchOwner(String owner, String optId,
                                                             String queryWord, int pageNo, int pageSize){
         return search(CollectionsOpt.createHashMap("userCode", owner,"optId", optId),
-            queryWord,pageNo,pageSize);
+            queryWord, pageNo, pageSize);
     }
 
     /**
@@ -306,7 +408,7 @@ public class ESSearcher implements Searcher{
     public Pair<Long,List<Map<String, Object>>> searchUnits(String[] units,
                                                             String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("unitCode", units),
-            queryWord,pageNo,pageSize);
+            queryWord, pageNo, pageSize);
     }
 
     /**
@@ -322,7 +424,7 @@ public class ESSearcher implements Searcher{
     public Pair<Long,List<Map<String, Object>>> searchUnits(String[] units,
                                                             String optId, String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("optId", optId, "unitCode", units),
-            queryWord,pageNo,pageSize);
+            queryWord, pageNo, pageSize);
     }
 
     public ESSearcher setHighlightPreTags(String[] highlightPreTags) {
@@ -334,6 +436,5 @@ public class ESSearcher implements Searcher{
         this.highlightPostTags = highlightPostTags;
         return this;
     }
-
 
 }

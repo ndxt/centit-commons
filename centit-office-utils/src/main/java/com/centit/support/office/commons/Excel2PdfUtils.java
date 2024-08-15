@@ -1,18 +1,25 @@
 package com.centit.support.office.commons;
 
+import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.StringRegularOpt;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Excel2PdfUtils {
@@ -100,37 +107,172 @@ public class Excel2PdfUtils {
         return widthPixel;
     }
 
+    /**
+     * 得到date单元格格式的值
+     *
+     * @param dataFormat       来自Cell.getCellStyle().getDataFormat()的值
+     * @param dataFormatString 来自Cell.getCellStyle().getDataFormatString()的值
+     * @param date            来自Cell.getDateCellValue()的值
+     * @return
+     */
+    private static String getFormatDateStringValue(Short dataFormat, String dataFormatString, Date date) {
+        if (date == null) {
+            return null;
+        }
+        /**
+         * 年月日时分秒
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_NYRSFM_STRING.contains(dataFormatString)) {
+            return DatetimeOpt.convertDatetimeToString(date);
+        }
+        /**
+         * 年月日
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_NYR_STRING.contains(dataFormatString)) {
+            return DatetimeOpt.convertDateToString(date);
+        }
+        /**
+         * 年月
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_NY_STRING.contains(dataFormatString)
+            || CellFormatConstants.EXCEL_FORMAT_INDEX_DATA_EXACT_NY.equals(dataFormat)) {
+            return DatetimeOpt.convertDateToString(date, "yyyy-MM");
+        }
+        /**
+         * 月日
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_YR_STRING.contains(dataFormatString)
+            || CellFormatConstants.EXCEL_FORMAT_INDEX_DATA_EXACT_YR.equals(dataFormat)) {
+            return DatetimeOpt.convertDateToString(date, "MM-dd");
+
+        }
+        /**
+         * 月
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_Y_STRING.contains(dataFormatString)) {
+            return DatetimeOpt.convertDateToString(date, "MM");
+        }
+        /**
+         * 星期X
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_XQ_STRING.contains(dataFormatString)) {
+            return CellFormatConstants.COMMON_DATE_FORMAT_XQ + CellFormatConstants.WEEK_DAYS[DatetimeOpt.getDayOfWeek(date)];
+        }
+        /**
+         * 周X
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_Z_STRING.contains(dataFormatString)) {
+            return CellFormatConstants.COMMON_DATE_FORMAT_Z + CellFormatConstants.WEEK_DAYS[DatetimeOpt.getDayOfWeek(date)];
+        }
+        /**
+         * 时间格式
+         */
+        if (CellFormatConstants.EXCEL_FORMAT_INDEX_TIME_STRING.contains(dataFormatString)
+            || CellFormatConstants.EXCEL_FORMAT_INDEX_TIME_EXACT.contains(dataFormat)) {
+            return DatetimeOpt.convertTimeWithSecondToString(date);
+        }
+        /**
+         * 单元格为其他未覆盖到的类型
+         */
+        return DatetimeOpt.convertDatetimeToString(date);
+    }
+
+    public static String getCellString(Cell cell) {
+        if (cell == null) {
+            return null;
+        }
+        String value;
+        CellType cellType = cell.getCellType();
+        if(cellType == CellType.FORMULA){
+            cellType = cell.getCachedFormulaResultType();
+        }
+        switch (cellType) {
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    value =  getFormatDateStringValue(cell.getCellStyle().getDataFormat(),
+                        cell.getCellStyle().getDataFormatString(), cell.getDateCellValue());
+                    /*String dataFormat = cell.getCellStyle().getDataFormatString();
+                    if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
+                        value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
+                    } else {
+                        value = DatetimeOpt.convertTimeWithSecondToString(cell.getDateCellValue());
+                    }*/
+                } else {
+                    String dataFormat = cell.getCellStyle().getDataFormatString();
+                    int dotPos = dataFormat.indexOf(".");
+                    if(dotPos>=0){
+                        int ePos = dataFormat.indexOf("%");
+                        if(ePos>=0){
+                            value = new DecimalFormat(StringUtils.rightPad("#.",ePos-dotPos+1, '0'))
+                                .format(cell.getNumericCellValue()*100)+"%";
+                        }else{
+                            ePos = dataFormat.indexOf("_");
+                            if(ePos<0){
+                                ePos = dataFormat.length();
+                            }
+                            value = new DecimalFormat(StringUtils.rightPad("#.",ePos-dotPos+1, '0'))
+                                .format(cell.getNumericCellValue());
+                        }
+                    }else {
+                        value = new DecimalFormat("#.00000000000").format(cell.getNumericCellValue());
+                        value = StringRegularOpt.trimRightZeroInNumber(value);
+                    }
+                }
+                break;
+            case BOOLEAN:
+                value = cell.getBooleanCellValue() ? BooleanBaseOpt.STRING_TRUE : BooleanBaseOpt.STRING_FALSE;
+                break;
+
+            case STRING:
+                value = cell.getRichStringCellValue().getString().trim();
+                break;
+
+            case ERROR:
+                return ErrorEval.getText(cell.getErrorCellValue());
+
+            case FORMULA:
+            case BLANK:
+            default:
+                value = cell.toString();
+                break;
+        }
+        return value;
+    }
+
     public static Phrase getPhrase(Workbook wb, Cell cell, boolean hasAnchor, int sheetIndex) {
         if(hasAnchor){
-            return new Phrase(cell.toString(), getFontByExcel(wb, cell.getCellStyle()));
+            return new Phrase(getCellString(cell),
+                getFontByExcel(wb, cell.getCellStyle()));
         } else {
-            Anchor anchor = new Anchor(cell.toString(), getFontByExcel(wb, cell.getCellStyle()));
+            Anchor anchor = new Anchor(getCellString(cell),
+                getFontByExcel(wb, cell.getCellStyle()));
             anchor.setName("excel_sheet_" + sheetIndex);
             return anchor;
         }
     }
 
     public static PdfPTable toParseContent(Workbook wb, Sheet sheet, int sheetIndex) throws BadElementException, IOException {
-        int rows = sheet.getPhysicalNumberOfRows();
 
-        List<PdfPCell> cells = new ArrayList<>();
+        List<List<PdfPCell>> cells = new ArrayList<>();
         List<Integer> colRanges= new ArrayList<>(100);
         float[] widths = {30F,400F};
         float mw = 0;
         boolean hasAnchor = false;
-        for (int i = 0; i <= rows; i++) {
+        for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
             if(row==null){
                 continue;
             }
+            List<PdfPCell> rowCells = new ArrayList<>();
             int columns = row.getLastCellNum();
             if(columns <= 0){
                 for(int k=0; k<colRanges.size(); k++){
                     PdfPCell pdfpCell = new PdfPCell();
                     pdfpCell.setBorder(Rectangle.NO_BORDER);
                     pdfpCell.setFixedHeight(20);
-                    cells.add(pdfpCell);
+                    rowCells.add(pdfpCell);
                 }
+                cells.add(rowCells);
                 continue;
             }
             for(int j=colRanges.size();j<columns; j++){
@@ -145,14 +287,12 @@ public class Excel2PdfUtils {
                 Cell cell = row.getCell(j);
                 if (cell == null) {
                     PdfPCell pdfpCell = new PdfPCell();
-                    cells.add(pdfpCell);
+                    rowCells.add(pdfpCell);
                 } else {
                     float cw = getPOIColumnWidth(sheet, cell);
                     cws[cell.getColumnIndex()] = cw;
-
                     //cell.setCellType(CellType.STRING);
                     CellRangeAddress range = getColspanRowspanByExcel(sheet, row.getRowNum(), cell.getColumnIndex());
-
                     int rowspan = 1;
                     int colspan = 1;
                     if (range != null) {
@@ -183,10 +323,11 @@ public class Excel2PdfUtils {
                     }
                     addBorderByExcel(wb, pdfpCell, cell.getCellStyle());
                     addImageByPOICell(sheet, pdfpCell, cell);
-                    cells.add(pdfpCell);
+                    rowCells.add(pdfpCell);
                 }
-            }
 
+            }
+            cells.add(rowCells);
             float rw = 0;
             for (int j = 0; j < cws.length; j++) {
                 rw += cws[j];
@@ -200,8 +341,10 @@ public class Excel2PdfUtils {
         PdfPTable table = new PdfPTable(widths);
         table.setWidthPercentage(100);
 //        table.setLockedWidth(true);
-        for (PdfPCell pdfpCell : cells) {
-            table.addCell(pdfpCell);
+        for (List<PdfPCell> rowCells : cells) {
+            for (PdfPCell pdfpCell : rowCells)
+                table.addCell(pdfpCell);
+            table.completeRow();
         }
         return table;
     }

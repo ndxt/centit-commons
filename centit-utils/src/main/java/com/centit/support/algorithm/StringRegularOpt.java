@@ -19,12 +19,22 @@ public abstract class StringRegularOpt {
 
         int sl = strWord.length();
         if (sl >= 2 && ((strWord.charAt(0) == '\"' && strWord.charAt(sl - 1) == '\"') ||
-            (strWord.charAt(0) == '\'' && strWord.charAt(sl - 1) == '\''))) {
+            (strWord.charAt(0) == '\'' && strWord.charAt(sl - 1) == '\'')||
+            (strWord.charAt(0) == '`' && strWord.charAt(sl - 1) == '`'))) { // 96 控制字符
             if (sl > 2)
                 strWord = strWord.substring(1, sl - 1);
             else
                 strWord = "";
         }
+        return strWord;
+    }
+
+    public static String trimStringBlankAsNull(String szWord) {
+        if (szWord == null)
+            return null;
+        String strWord = szWord.trim();
+        if(StringUtils.isBlank(strWord))
+            return null;
         return strWord;
     }
 
@@ -102,7 +112,7 @@ public abstract class StringRegularOpt {
      * @see org.apache.commons.lang3.StringUtils
      */
     public static boolean isNvl(String str) {
-        return (str == null) || "".equals(str.trim());
+        return StringUtils.isBlank(str);
     }
 
     public static boolean isTrue(String str) {
@@ -471,6 +481,18 @@ public abstract class StringRegularOpt {
                 sTmp2.append(szDigits.charAt(j));
         }
         return sTmp2.toString();
+    }
+
+    public static String trimRightZeroInNumber(String numStr){
+        if(!StringRegularOpt.isNumber(numStr))
+            return numStr;
+        int pointPos = numStr.indexOf(".");
+        if(pointPos < 0)
+            return numStr;
+        int endPos = numStr.length();
+        while(numStr.charAt(endPos-1) == '0') endPos --;
+        if(numStr.charAt(endPos-1) == '.') endPos --;
+        return numStr.substring(0, endPos);
     }
 
     public static String trimNumber(String szNumber) {
