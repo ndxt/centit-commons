@@ -53,7 +53,7 @@ public class DefaultJSONTransformDataSupport
 
     @Override
     public String mapTemplateString(String templateString) {
-        return Pretreatment.mapTemplateString(templateString, this);
+        return Pretreatment.mapTemplateStringAsFormula(templateString, this);
     }
 
     private Object currentValue(){
