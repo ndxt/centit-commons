@@ -1,6 +1,7 @@
 package com.centit.support.json;
 
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
 
@@ -52,7 +53,7 @@ public class DefaultJSONTransformDataSupport
 
     @Override
     public String mapTemplateString(String templateString) {
-        return templateString;
+        return Pretreatment.mapTemplateString(templateString, this);
     }
 
     private Object currentValue(){

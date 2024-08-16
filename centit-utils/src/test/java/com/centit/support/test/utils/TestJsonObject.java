@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class TestJsonObject {
 
-    public static void main(String arg[]) throws IOException {
+    public static void main2(String arg[]) throws IOException {
         JSONOpt.fastjsonGlobalConfig();
         InputStream in = TestJsonObject.class
             .getResourceAsStream("/page-v1.json");
@@ -26,7 +26,7 @@ public class TestJsonObject {
         System.out.println(JSON.toJSONString(diff.toJSONObject()));
     }
 
-    public static void main2(String arg[]) throws IOException {
+    public static void main(String arg[]) throws IOException {
         JSONOpt.fastjsonGlobalConfig();
         InputStream in = TestJsonObject.class
             .getResourceAsStream("/test.json");
@@ -34,8 +34,10 @@ public class TestJsonObject {
         in = TestJsonObject.class
             .getResourceAsStream("/template.json");
         Object template  = JSON.parse(FileIOOpt.readStringFromInputStream(in));
-
-        System.out.println(JSON.toJSONString(JSONTransformer.transformer(template, object)));
+        Object object1 = JSONTransformer.transformer(template, object);
+        FileIOOpt.writeObjectAsJsonToFile(object1,
+            "/Users/codefan/projects/centit/centit-commons/centit-utils/src/test/resources/ouput.json");
+        System.out.println(JSON.toJSONString(object1));
     }
     public static void testObjectToJson() {
         System.out.println(JSON.toJSONString(new Object[]{5, 6, "hello"}));

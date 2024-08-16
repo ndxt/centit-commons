@@ -1,25 +1,27 @@
 {
-  object: {
-    "properties": {
-      "optid": {
-        "type": "调度",
-        "index": "analyzed"
-      },
-      "osid": {
-        "type": "string",
-        "index": "osidIndex"
-      },
-      array :[
-        {
-          "a": 2,
-          "b": 3,
-          "订单日期": "2022-12-31"
-        },
-        {
-          "a": 4,
-          "b": 5
-        }
-      ]
+  "testInfo": {
+    "school" : "清华大学",
+    "name": "2024期末考试",
+    "subject" :"高等数据"
+  },
+  "students":[
+    {
+      "no" : 1,
+      "name" : "张三",
+      "score" : 74
+    },
+    {
+      "no" : 2,
+      "name" : "李四",
+      "score" : 56
+    },{
+      "no" : 3,
+      "name" : "孙山",
+      "score" : 82
+    },{
+      "no" : 4,
+      "name" : "王五",
+      "score" : 37
     }
-  }
+  ]
 }
