@@ -96,6 +96,15 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
         return wrokTimeSpan;
     }
 
+    public static DateTimeSpan calcDateTimeSpanAsAbs(Date beginDate, Date endDate) {
+        DateTimeSpan wrokTimeSpan = new DateTimeSpan();
+        if(endDate.getTime() > beginDate.getTime()) {
+            wrokTimeSpan.setTimeSpan(endDate.getTime() - beginDate.getTime());
+        }else{
+            wrokTimeSpan.setTimeSpan(beginDate.getTime() - endDate.getTime());
+        }
+        return wrokTimeSpan;
+    }
     /**
      * 时间间隔精确到毫秒
      *
