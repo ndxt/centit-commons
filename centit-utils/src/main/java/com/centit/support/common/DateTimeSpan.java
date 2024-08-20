@@ -47,7 +47,7 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
     }
 
     public DateTimeSpan(Date beginDate, Date endDate) {
-        this.fromDatatimeSpan(beginDate, endDate);
+        this.fromDatetimeSpan(beginDate, endDate);
     }
 
     public DateTimeSpan(String sTimeSpan) {
@@ -114,8 +114,17 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
         this.timeSpan = timeSpan;
     }
 
-    public DateTimeSpan fromDatatimeSpan(Date beginDate, Date endDate) {
-        this.setTimeSpan(beginDate.getTime() - endDate.getTime());
+    public DateTimeSpan fromDatetimeSpan(Date beginDate, Date endDate) {
+        this.setTimeSpan(endDate.getTime() - beginDate.getTime());
+        return this;
+    }
+
+    public DateTimeSpan fromDatetimeSpanAsAbs(Date beginDate, Date endDate) {
+        if(beginDate.getTime() > endDate.getTime()){
+            this.setTimeSpan(beginDate.getTime() - endDate.getTime());
+        } else {
+            this.setTimeSpan(beginDate.getTime() - endDate.getTime());
+        }
         return this;
     }
 
