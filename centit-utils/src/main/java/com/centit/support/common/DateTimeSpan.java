@@ -91,19 +91,19 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
      * @return 时间间隔
      */
     public static DateTimeSpan calcDateTimeSpan(Date beginDate, Date endDate) {
-        DateTimeSpan wrokTimeSpan = new DateTimeSpan();
-        wrokTimeSpan.setTimeSpan(endDate.getTime() - beginDate.getTime());
-        return wrokTimeSpan;
+        DateTimeSpan workTimeSpan = new DateTimeSpan();
+        workTimeSpan.setTimeSpan(endDate.getTime() - beginDate.getTime());
+        return workTimeSpan;
     }
 
     public static DateTimeSpan calcDateTimeSpanAsAbs(Date beginDate, Date endDate) {
-        DateTimeSpan wrokTimeSpan = new DateTimeSpan();
+        DateTimeSpan workTimeSpan = new DateTimeSpan();
         if(endDate.getTime() > beginDate.getTime()) {
-            wrokTimeSpan.setTimeSpan(endDate.getTime() - beginDate.getTime());
+            workTimeSpan.setTimeSpan(endDate.getTime() - beginDate.getTime());
         }else{
-            wrokTimeSpan.setTimeSpan(beginDate.getTime() - endDate.getTime());
+            workTimeSpan.setTimeSpan(beginDate.getTime() - endDate.getTime());
         }
-        return wrokTimeSpan;
+        return workTimeSpan;
     }
     /**
      * 时间间隔精确到毫秒
