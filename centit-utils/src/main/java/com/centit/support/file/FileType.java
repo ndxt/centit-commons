@@ -960,6 +960,22 @@ public abstract class FileType {
     }
 
     /**
+     * 截取文件后缀名
+     *
+     * @param fileName 文件名
+     * @return 文件名包括文件路径，去掉后缀名
+     */
+    public static String getFileTruncateExtName(String fileName) {
+        if (fileName == null || fileName.isEmpty())
+            return "";
+        int lastIndex = fileName.lastIndexOf(".");
+        if (lastIndex < 0)
+            return "";
+        return fileName.substring(0,lastIndex);
+    }
+
+
+    /**
      * 获取文件的后缀名
      *
      * @param fileName 文件名
