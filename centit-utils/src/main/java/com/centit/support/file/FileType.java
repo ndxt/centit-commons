@@ -990,21 +990,6 @@ public abstract class FileType {
         return fileName.substring(lastIndex + 1, fileName.length());
     }
 
-    /**
-     * 获取文件的后缀名
-     *
-     * @param fileName 文件名
-     * @return 后缀名
-     */
-    public static String getFileTruncateExtName(String fileName) {
-        if (fileName == null || fileName.isEmpty())
-            return "";
-        int lastIndex = fileName.lastIndexOf(".");
-        if (lastIndex < 0)
-            return "";
-        return fileName.substring(0,lastIndex);
-    }
-
     /*
      * 判断输入的文件是够是office的文件
      */
