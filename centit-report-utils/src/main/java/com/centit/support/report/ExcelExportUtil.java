@@ -6,6 +6,7 @@ import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.JavaBeanMetaData;
+import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -395,7 +396,7 @@ public abstract class ExcelExportUtil {
                 generateExcelText(sheet, objLists, property, beginRow);
             }
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | NoSuchFieldException e) {
-            throw new StatReportException(e);
+            throw new ObjectException(e);
         }
     }
 
