@@ -9,3 +9,4 @@ mvn*
 **/~$*
 out.*
 .flattened-pom.xml
+.DS_Store
