@@ -42,7 +42,7 @@ public abstract class WordReportUtil {
     protected static final Logger logger = LoggerFactory.getLogger(WordReportUtil.class);
 
     /**
-     * 这个可以在linux运行，缺点是转换的不完美 自动编号的转换会有错误，并且只能转换Docx，就是xml格式的我让的文档
+     * 这个可以在linux运行，缺点是转换的不完美 自动编号的转换会有错误，并且只能转换Docx，就是xml格式的word文档
      *
      * @param docxFilePath word文件路径
      * @param pdfFilePath  pdf文件路径questionAnswer
