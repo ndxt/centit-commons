@@ -965,7 +965,7 @@ public abstract class FileType {
      * @param fileName 文件名
      * @return 文件名包括文件路径，去掉后缀名
      */
-    public static String getFileTruncateExtName(String fileName) {
+    public static String truncateFileExtNameWithPath(String fileName) {
         if (fileName == null || fileName.isEmpty())
             return "";
         int lastIndex = fileName.lastIndexOf(".");
