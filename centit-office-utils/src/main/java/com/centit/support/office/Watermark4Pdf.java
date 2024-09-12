@@ -31,6 +31,7 @@ public abstract class Watermark4Pdf {
      * @param opacity         文字透明度(1-10)
      * @param rotation        旋转度数(1-170)
      * @param fontSize        字体大小(1-1)
+     * @param isRepeat        水印是否重复
      * @return boolean        目前 不支持位置自定义：因设置了文字大小、倾斜度后不好计算水印文字的长宽数据。
      */
     public static boolean addWatermark4Pdf(InputStream inputFile,
@@ -38,18 +39,19 @@ public abstract class Watermark4Pdf {
                                            String waterMarkStr,
                                            float opacity,
                                            float rotation,
-                                           float fontSize) {
-        PdfContentByte content = null;
-        BaseFont base = null;
-        Rectangle pageRect = null;
+                                           float fontSize,
+                                           boolean isRepeat) {
         PdfGState gs = new PdfGState();
         PdfReader pdfReader = null;
         PdfStamper pdfStamper = null;
+        float cosRotation = (float) Math.cos(rotation/180*Math.PI);
+        float sinRotation = (float) Math.sin(rotation/180*Math.PI);
+        int strSize = waterMarkStr.length() / 2 + (waterMarkStr.getBytes().length - waterMarkStr.length()) / 4 + 2;
         try{
             pdfReader =new PdfReader(inputFile);
             pdfStamper = new PdfStamper(pdfReader, outputFile);
 
-            base = BaseFont.createFont("STSongStd-Light", "UniGB-UCS2-H",
+            BaseFont base = BaseFont.createFont("STSongStd-Light", "UniGB-UCS2-H",
                     BaseFont.NOT_EMBEDDED);
             if (base == null) {
                 return false;
@@ -59,12 +61,9 @@ public abstract class Watermark4Pdf {
             gs.setStrokeOpacity(opacity);
             int toPage = pdfStamper.getReader().getNumberOfPages();
             for (int i = 1; i <= toPage; i++) {
-                pageRect = pdfStamper.getReader().getPageSizeWithRotation(i);
-                // 计算水印X,Y坐标
-                float x = pageRect.getWidth() / 2;
-                float y = pageRect.getHeight() / 2;
+                Rectangle pageRect = pdfStamper.getReader().getPageSizeWithRotation(i);
                 // 获得PDF最顶层
-                content = pdfStamper.getUnderContent(i);
+                PdfContentByte content = pdfStamper.getUnderContent(i);
                 content.saveState();
                 // set Transparency
                 content.setGState(gs);
@@ -72,8 +71,38 @@ public abstract class Watermark4Pdf {
                 content.setColorFill(BaseColor.GRAY);
                 content.setFontAndSize(base, fontSize);
                 // 水印文字成45度角倾斜
-                content.showTextAligned(Element.ALIGN_CENTER, waterMarkStr, x,
-                        y, rotation);
+                if(isRepeat) {
+                    // 水印文字成45度角倾斜
+                    int endLine = (int) (pageRect.getHeight() / (3 * fontSize)) + 1;
+                    if (endLine < 1) {
+                        endLine = 1;
+                    }
+                    int beginLine = (int) (0 - pageRect.getWidth() / (3 * fontSize)) - 1;
+                    if (beginLine > 0) {
+                        beginLine = 0;
+                    }
+                    int repeat = (int) (pageRect.getWidth() / cosRotation / (strSize * fontSize)) + 1;
+                    if (repeat < 1) {
+                        repeat = 1;
+                    }
+
+                    for (int j = beginLine; j < endLine; j++) {
+                        for (int k = 0; k < repeat; k++) {
+                            // 计算水印X,Y坐标
+                            float l = strSize * fontSize * (k + 0.5f);
+                            float y = fontSize * (3 * j + 2) + l * sinRotation;
+                            float x = l * cosRotation;
+                            if (y > 0 && y < pageRect.getHeight() && x < pageRect.getWidth()) {
+                                content.showTextAligned(Element.ALIGN_CENTER, waterMarkStr, x,
+                                    y, rotation);
+                            }
+                        }
+                    }
+                } else {
+                    content.showTextAligned(Element.ALIGN_CENTER, waterMarkStr, pageRect.getWidth() / 2,
+                        pageRect.getHeight() / 2, rotation);
+                }
+
                 content.endText();
             }
 
@@ -81,15 +110,12 @@ public abstract class Watermark4Pdf {
             logger.error(e1.getMessage(),e1);//e1.printStackTrace();
             return false;
         } finally {
-            content = null;
-            base = null;
-            pageRect = null;
             try {
-                if(pdfReader!=null) {
-                    pdfReader.close();
-                }
-                if(pdfStamper!=null) {
+                if(pdfStamper != null) {
                     pdfStamper.close();
+                }
+                if(pdfReader != null) {
+                    pdfReader.close();
                 }
             } catch (DocumentException | IOException e) {
                 logger.error(e.getMessage(),e);//e.printStackTrace();
@@ -103,14 +129,15 @@ public abstract class Watermark4Pdf {
                                            String waterMarkStr,
                                            float opacity,
                                            float rotation,
-                                           float fontSize) {
+                                           float fontSize,
+                                           boolean isRepeat) {
         try {
             return addWatermark4Pdf(Files.newInputStream(Paths.get(inputFile)),
                     Files.newOutputStream(Paths.get(outputFile)),
                 waterMarkStr,
                 opacity,
                 rotation,
-                fontSize);
+                fontSize, isRepeat);
 
         }catch(IOException e) {
             logger.error(e.getMessage(),e);//e.printStackTrace();
@@ -127,7 +154,7 @@ public abstract class Watermark4Pdf {
      * @param suffix          前缀
      * @return 是否成功
      */
-    public static boolean addWatermark4Word(String inputFile, String waterMarkStr, String suffix) {
+    public static boolean addWatermark4Word(String inputFile, String waterMarkStr, String suffix, boolean isRepeat) {
         //将源office文件转换为pdf
         //String suffix = inputFile.substring(inputFile.lastIndexOf("."));
         String tmpPdfFile = inputFile.substring(0,inputFile.lastIndexOf("."))+
@@ -142,7 +169,7 @@ public abstract class Watermark4Pdf {
             waterMarkStr,
             0.4f,
             45f,
-            60f);
+            60f, isRepeat);
     }
 
     public static void addImage2Pdf(InputStream inputFile,
