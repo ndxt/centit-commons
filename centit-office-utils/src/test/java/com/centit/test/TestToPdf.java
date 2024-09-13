@@ -1,14 +1,20 @@
 package com.centit.test;
 
-import com.centit.support.office.OfficeToPdf;
+import com.centit.support.office.Watermark4Pdf;
+
+import java.io.IOException;
 
 public class TestToPdf {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
-        OfficeToPdf.excel2Pdf("/Users/codefan/Downloads/month6.xlsx",
-            "/Users/codefan/Downloads/month6.pdf"
-        );
+        /*String waterMark = "杨淮生 codefan 2024-9-12";
+        System.out.println(waterMark.length());*/
+
+        Watermark4Pdf.addWatermark4Pdf("/Users/codefan/Documents/temp/zhuanli.pdf",
+            "/Users/codefan/Documents/temp/zhuanli-sy.pdf",
+            "杨淮生 codefan 2024-9-12",
+            0.4f,-45,24, true);
         System.out.println("Done!");
     }
 }

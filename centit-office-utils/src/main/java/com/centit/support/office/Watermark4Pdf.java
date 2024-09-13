@@ -29,7 +29,7 @@ public abstract class Watermark4Pdf {
      * @param outputFile      输出文件路径及文件名称
      * @param waterMarkStr    水印字符串
      * @param opacity         文字透明度(1-10)
-     * @param rotation        旋转度数(1-170)
+     * @param rotation        旋转度数(-90 ~ 90)
      * @param fontSize        字体大小(1-1)
      * @param isRepeat        水印是否重复
      * @return boolean        目前 不支持位置自定义：因设置了文字大小、倾斜度后不好计算水印文字的长宽数据。
@@ -52,7 +52,7 @@ public abstract class Watermark4Pdf {
             pdfStamper = new PdfStamper(pdfReader, outputFile);
 
             BaseFont base = BaseFont.createFont("STSongStd-Light", "UniGB-UCS2-H",
-                    BaseFont.NOT_EMBEDDED);
+                BaseFont.NOT_EMBEDDED);
             if (base == null) {
                 return false;
             }
@@ -79,6 +79,10 @@ public abstract class Watermark4Pdf {
                     }
                     int beginLine = (int) (0 - pageRect.getWidth() / (3 * fontSize)) - 1;
                     if (beginLine > 0) {
+                        beginLine = 0;
+                    }
+                    if(rotation<0){
+                        endLine -= beginLine;
                         beginLine = 0;
                     }
                     int repeat = (int) (pageRect.getWidth() / cosRotation / (strSize * fontSize)) + 1;
