@@ -34,16 +34,6 @@
             <artifactId>poi-scratchpad</artifactId>
         </dependency>
 
-         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15to18</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15to18</artifactId>
-        </dependency>
-
         <!--com.lowagie itext 4.2.1 相当有 itextpdf的5.5.6，同时
          它将覆盖 com.lowagie 2.1.7 -->
         <dependency>
