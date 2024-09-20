@@ -63,7 +63,7 @@ public abstract class Watermark4Pdf {
             for (int i = 1; i <= toPage; i++) {
                 Rectangle pageRect = pdfStamper.getReader().getPageSizeWithRotation(i);
                 // 获得PDF最顶层
-                PdfContentByte content = pdfStamper.getUnderContent(i);
+                PdfContentByte content = pdfStamper.getOverContent(i);
                 content.saveState();
                 // set Transparency
                 content.setGState(gs);
