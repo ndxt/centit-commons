@@ -91,7 +91,6 @@ public abstract class FileIOOpt {
         }
     }
 
-
     /**
      * @param is 输入流
      * @return 读取的字节
