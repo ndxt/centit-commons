@@ -943,7 +943,6 @@ public abstract class HttpExecutor {
         return fetchInputStreamByUrl(executorContext,
             uri, queryParam,
             (inputStream) -> FileSystemOpt.createFile(inputStream, filePath));
-
     }
 
     public static boolean fileDownload(HttpExecutorContext executorContext,

@@ -305,8 +305,7 @@ public abstract class FileSystemOpt {
     /*
      * 创建文件
      */
-    public static boolean createFile(InputStream inputStream, String filePath) throws IOException {
-
+    public static Boolean createFile(InputStream inputStream, String filePath) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(filePath)) {
             int read = 0;
             byte[] bytes = new byte[1024 * 100];
@@ -315,7 +314,7 @@ public abstract class FileSystemOpt {
             }
             fos.flush();
             //fos.close();
-            return true;
+            return Boolean.TRUE;
         }
     }
 
