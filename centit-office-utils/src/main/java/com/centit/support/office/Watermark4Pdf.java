@@ -64,7 +64,7 @@ public abstract class Watermark4Pdf {
                 float x = pageRect.getWidth() / 2;
                 float y = pageRect.getHeight() / 2;
                 // 获得PDF最顶层
-                content = pdfStamper.getUnderContent(i);
+                content = pdfStamper.getOverContent(i);
                 content.saveState();
                 // set Transparency
                 content.setGState(gs);
