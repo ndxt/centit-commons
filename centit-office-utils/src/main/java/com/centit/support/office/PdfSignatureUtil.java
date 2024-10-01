@@ -6,6 +6,8 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSignatureAppearance;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.security.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 
 public abstract class PdfSignatureUtil {
+    private static final Logger logger = LogManager.getLogger(PdfSignatureUtil.class);
 
     public static SignatureInfo createSingInfo(){
         return new SignatureInfo();
@@ -60,7 +63,7 @@ public abstract class PdfSignatureUtil {
             targetStream.flush();
             return true;
         } catch (DocumentException | IOException | GeneralSecurityException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return false;
         }
     }
@@ -70,7 +73,7 @@ public abstract class PdfSignatureUtil {
             OutputStream targetStream = Files.newOutputStream(Paths.get(target))) {
             return sign(srcStream, targetStream, signatureInfo);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             return false;
         }
     }

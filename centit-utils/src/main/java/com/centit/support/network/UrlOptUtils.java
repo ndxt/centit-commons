@@ -60,7 +60,7 @@ public abstract class UrlOptUtils {
                 try {
                     value = URLDecoder.decode(value, "utf-8");
                 } catch (UnsupportedEncodingException e) {
-                    logger.error(e.getMessage(), e);//e.printStackTrace();
+                    logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
                 }
                 params.put(name, value);
                 break;
@@ -69,7 +69,7 @@ public abstract class UrlOptUtils {
                 try {
                     value = URLDecoder.decode(value, "utf-8");
                 } catch (UnsupportedEncodingException e) {
-                    logger.error(e.getMessage(), e);//e.printStackTrace();
+                    logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
                 }
                 params.put(name, value);
                 bpos = n2 + 1;
@@ -88,7 +88,7 @@ public abstract class UrlOptUtils {
         try {
             return new URL(curl).getHost();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }

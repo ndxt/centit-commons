@@ -142,7 +142,7 @@ public class Lunar {
 /*        try {
             baseDate = chineseDateFormat.parse("1900年1月31日");
         } catch (ParseException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace(); // To change body of catch statement use
+            logger.error(e.getMessage(),e);//logger.error(e.getMessage(), e); // To change body of catch statement use
                                     // Options | File Templates.
         }
 */

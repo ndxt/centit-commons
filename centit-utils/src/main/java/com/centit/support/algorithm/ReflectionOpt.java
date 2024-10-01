@@ -2,7 +2,6 @@ package com.centit.support.algorithm;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.common.LeftRightPair;
-import com.centit.support.common.ObjectException;
 import com.centit.support.common.ParamName;
 import com.centit.support.file.FileType;
 import com.centit.support.json.JSONOpt;
@@ -695,7 +694,7 @@ public abstract class ReflectionOpt {
         } catch (Exception e) {
             //ReflectionUtils.handleReflectionException(e);
             logger.error(e.getMessage());
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
         if(!accessible)
             method.setAccessible(accessible);

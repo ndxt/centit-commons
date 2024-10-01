@@ -59,7 +59,7 @@ public class TestImage {
             ImageIO.write(image, "png", new File("/D/Projects/RunData/demo_home/images/杨4.png"));
 
         } catch (IOException e) {
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
     }
 
@@ -71,7 +71,7 @@ public class TestImage {
             for (BufferedImage subimage : subimages)
                 ImageIO.write(subimage, "png", new File("D:/Projects/RunData/demo_home/images/word9_" + i++ + ".png"));
         } catch (IOException e) {
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
     }
 
@@ -92,7 +92,7 @@ public class TestImage {
             System.out.println("Done!");
         } catch (Exception e) {
             System.out.println("Error!");
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
     }
 }

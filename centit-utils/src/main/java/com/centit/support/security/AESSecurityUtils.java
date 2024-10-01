@@ -123,7 +123,7 @@ public abstract class AESSecurityUtils {
         try {
             return new String(Base64.encodeBase64(encrypt(str.getBytes(charsetName), keyValue)));
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -143,7 +143,7 @@ public abstract class AESSecurityUtils {
         try {
             return new String(decrypt(Base64.decodeBase64(str.getBytes()), keyValue), charsetName);
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -156,7 +156,7 @@ public abstract class AESSecurityUtils {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
             return new String(Base64.encodeBase64(cipher.doFinal(str.getBytes())));
         } catch (GeneralSecurityException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -169,7 +169,7 @@ public abstract class AESSecurityUtils {
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
             return new String(cipher.doFinal(Base64.decodeBase64(str)));
         } catch (GeneralSecurityException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -182,7 +182,7 @@ public abstract class AESSecurityUtils {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
             return cipher.doFinal(bytes);
         } catch (GeneralSecurityException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -195,7 +195,7 @@ public abstract class AESSecurityUtils {
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
             return cipher.doFinal(bytes);
         } catch (GeneralSecurityException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }

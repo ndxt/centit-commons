@@ -51,7 +51,7 @@ public class ESSearcher implements Searcher{
      */
     public static final String TABLE_SORT_ORDER = "order";
 
-    private static Logger logger = LoggerFactory.getLogger(ESSearcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(ESSearcher.class);
 
     private ESServerConfig config;
 

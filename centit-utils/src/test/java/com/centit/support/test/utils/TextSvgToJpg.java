@@ -21,7 +21,7 @@ public class TextSvgToJpg {
             System.out.println(FileType.getFileType(
                 new File("D:/WorkDoc/业务拓展/复星集团/星采网+技术标第二轮+评分标准+－供应商版.pdf")));
         } catch (IOException e) {
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
     }
 
@@ -86,7 +86,7 @@ public class TextSvgToJpg {
             jpg.close();*/
 
         } catch (Exception e) {
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
     }
 

@@ -1,10 +1,14 @@
 package com.centit.support.test.utils;
 
 import com.centit.support.algorithm.ByteBaseOpt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.Socket;
 
 public class TestSocket {
+    protected static final Logger logger = LoggerFactory.getLogger(TestSocket.class);
+
     public static int generateCheckSum(byte[] buf, int bufLen) {
         int idx;
         long cks = 0;
@@ -56,7 +60,7 @@ public class TestSocket {
             System.out.println(readbuf);
             socket.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 }

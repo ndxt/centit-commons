@@ -33,7 +33,7 @@ public abstract class Md5Encoder {
             MD5.update(data, 0, data.length);
             return MD5.digest();
         } catch (NoSuchAlgorithmException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -54,7 +54,7 @@ public abstract class Md5Encoder {
         try {
             return encode(data.getBytes("utf8"));
         } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -87,7 +87,7 @@ public abstract class Md5Encoder {
         try {
             return encodeBase64(data.getBytes("utf8"), urlSafe);
         } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -128,7 +128,7 @@ public abstract class Md5Encoder {
                 hashedBytes = MD5.digest(hashedBytes);
             return new String(Hex.encodeHex(hashedBytes));
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }

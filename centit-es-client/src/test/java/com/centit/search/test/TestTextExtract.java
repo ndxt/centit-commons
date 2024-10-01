@@ -2,6 +2,8 @@ package com.centit.search.test;
 
 import com.centit.search.utils.TikaTextExtractor;
 import lombok.Data;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;
 
@@ -14,8 +16,7 @@ import java.util.Set;
  * Created by codefan on 17-6-22.
  */
 public class TestTextExtract {
-
-
+    private static final Logger logger = LogManager.getLogger(TestTextExtract.class);
 
     @Data
     public static class T1{
@@ -41,7 +42,7 @@ public class TestTextExtract {
             System.out.println("done!");
         } catch (IOException | TikaException |SAXException e) {
             System.out.println("error!" + e.getMessage());
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
      /*
         T1 t11 = new T1();

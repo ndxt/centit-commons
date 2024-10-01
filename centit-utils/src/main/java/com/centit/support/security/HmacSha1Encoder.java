@@ -35,7 +35,7 @@ public abstract class HmacSha1Encoder {
             mac.init(secretKey);
             return mac.doFinal(data);
         } catch (NoSuchAlgorithmException | InvalidKeyException | UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -52,7 +52,7 @@ public abstract class HmacSha1Encoder {
         try {
             return encode(data.getBytes("utf8"), secret);
         } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -71,7 +71,7 @@ public abstract class HmacSha1Encoder {
         try {
             return encodeBase64(data.getBytes("utf8"), secret, urlSafe);
         } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }

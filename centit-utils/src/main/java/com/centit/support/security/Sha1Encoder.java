@@ -2,9 +2,10 @@ package com.centit.support.security;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.lang3.StringUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -35,7 +36,7 @@ public abstract class Sha1Encoder {
             SHA1.update(data, 0, data.length);
             return SHA1.digest();
         } catch (NoSuchAlgorithmException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -56,7 +57,7 @@ public abstract class Sha1Encoder {
         try {
             return encode(data.getBytes("utf8"));
         } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -78,7 +79,7 @@ public abstract class Sha1Encoder {
         try {
             return encodeBase64(data.getBytes("utf8"), urlSafe);
         } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }

@@ -58,7 +58,7 @@ public abstract class FtpExecutor {
             ftp.logout();
             success = true;
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         } finally {
             if (ftp.isConnected()) {
                 try {
@@ -121,7 +121,7 @@ public abstract class FtpExecutor {
             ftp.logout();
             success = true;
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         } finally {
             if (ftp.isConnected()) {
                 try {

@@ -39,7 +39,7 @@ public abstract class FileMD5Maker {
             }
             return new String(Hex.encodeHex(MD5.digest()));
         } catch (NoSuchAlgorithmException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }

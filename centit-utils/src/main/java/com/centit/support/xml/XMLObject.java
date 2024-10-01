@@ -185,7 +185,7 @@ public abstract class XMLObject {
             Document doc = DocumentHelper.parseText(xmlString);
             return elementToJSONObject(doc.getRootElement());
         } catch (DocumentException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -195,7 +195,7 @@ public abstract class XMLObject {
             Document doc = DocumentHelper.parseText(xmlString);
             return elementToObject(doc.getRootElement());
         } catch (DocumentException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }

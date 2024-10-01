@@ -641,7 +641,7 @@ public abstract class JSONOpt {
                 try {
                     value = m.invoke(obj);
                 } catch (Exception e) {
-                    logger.error(e.getMessage(), e);//e.printStackTrace();
+                    logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
                 }
                 jObj.put(fieldName,
                     makeJSONValue(value, methodOnly, fieldOnly));

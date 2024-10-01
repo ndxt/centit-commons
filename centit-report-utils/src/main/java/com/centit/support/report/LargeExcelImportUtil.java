@@ -65,7 +65,7 @@ public abstract class LargeExcelImportUtil {
                 }
                 consumer.accept(rowObj);
             } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         });
     }

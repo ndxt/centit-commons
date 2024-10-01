@@ -6,6 +6,8 @@ import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.support.algorithm.CollectionsOpt;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +21,8 @@ import java.util.Properties;
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration
 public class DocumentSearchTest {
+
+    private static final Logger logger = LogManager.getLogger(DocumentSearchTest.class);
 
     public static Properties loadProperties() {
         Properties prop = new Properties();
@@ -35,7 +39,7 @@ public class DocumentSearchTest {
                 prop.load(resource);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return prop;
     }

@@ -43,7 +43,7 @@ public class TxtLogFile {
             innerWriteLog(bw, slog, bNewLine, bShowTime);
             bw.flush();
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
     }
 
@@ -53,7 +53,7 @@ public class TxtLogFile {
             innerWriteLog(bw, slog, bNewLine, bShowTime);
             System.out.println(DatetimeOpt.currentDatetime() + " - " + slog);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
     }
 
@@ -63,7 +63,7 @@ public class TxtLogFile {
             bw.write(slog);
             //bw.close();
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
     }
 
@@ -75,7 +75,7 @@ public class TxtLogFile {
             logWriter = new BufferedWriter(fileWriter);
             bOpened = true;
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
         return bOpened;
     }
@@ -90,7 +90,7 @@ public class TxtLogFile {
             logWriter = null;
             bClosed = true;
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
         return bClosed;
     }
@@ -99,7 +99,7 @@ public class TxtLogFile {
         try {
             innerWriteLog(logWriter, slog, bNewLine, bShowTime);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
     }
 
@@ -108,7 +108,7 @@ public class TxtLogFile {
             innerWriteLog(logWriter, slog, bNewLine, bShowTime);
             System.out.println(DatetimeOpt.currentDatetime() + " - " + slog);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.centit.support.test.utils;
 
 import com.alibaba.fastjson2.JSON;
-import com.centit.support.network.HtmlFormUtils;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.UrlOptUtils;
@@ -38,7 +37,7 @@ public class TestTcpip {
             System.out.println(sRet);
         } catch (IOException e) {
 
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
     }
 
@@ -62,7 +61,7 @@ public class TestTcpip {
             System.out.println(sRet);
         } catch (IOException e) {
 
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
 
     }

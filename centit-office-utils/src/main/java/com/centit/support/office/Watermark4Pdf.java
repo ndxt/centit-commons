@@ -122,7 +122,7 @@ public abstract class Watermark4Pdf {
                     pdfReader.close();
                 }
             } catch (DocumentException | IOException e) {
-                logger.error(e.getMessage(),e);//e.printStackTrace();
+                logger.error(e.getMessage(),e);//logger.error(e.getMessage(), e);
             }
         }
         return true;
@@ -144,7 +144,7 @@ public abstract class Watermark4Pdf {
                 fontSize, isRepeat);
 
         }catch(IOException e) {
-            logger.error(e.getMessage(),e);//e.printStackTrace();
+            logger.error(e.getMessage(),e);//logger.error(e.getMessage(), e);
             return false;
         }
     }

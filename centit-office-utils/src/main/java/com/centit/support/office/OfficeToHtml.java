@@ -34,7 +34,7 @@ import java.util.List;
  */
 
 public abstract class OfficeToHtml {
-    private static Logger logger = LoggerFactory.getLogger(OfficeToHtml.class);
+    private static final Logger logger = LoggerFactory.getLogger(OfficeToHtml.class);
 
     private OfficeToHtml() {
         throw new IllegalAccessError("Utility class");
@@ -160,7 +160,7 @@ public abstract class OfficeToHtml {
                 outFilePath.substring(0,outFilePath.lastIndexOf('.')),
                 FileType.getFileExtName(inWordFile));
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             return false;
         }
 

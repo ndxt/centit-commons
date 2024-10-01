@@ -25,7 +25,7 @@ import java.io.InputStream;
 @SuppressWarnings("unused")
 public abstract class TikaTextExtractor {
 
-    private static Logger logger = LoggerFactory.getLogger(TikaTextExtractor.class);
+    private static final Logger logger = LoggerFactory.getLogger(TikaTextExtractor.class);
 
     public static String extractInputStreamText(InputStream inputStream) throws IOException, TikaException, SAXException {
         Parser tikaParser = new AutoDetectParser();//AutoDetectParser根据不同的二进制文件的特殊格式 (比如说Magic Code)，来寻找适合的Parser。

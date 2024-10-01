@@ -533,7 +533,7 @@ public abstract class StringBaseOpt {
             byte[] readBytes = out.toByteArray();
             return new String(readBytes);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
         return null;
     }
@@ -559,7 +559,7 @@ public abstract class StringBaseOpt {
             in.close();
             return buffer.toString();
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
         return null;
     }
