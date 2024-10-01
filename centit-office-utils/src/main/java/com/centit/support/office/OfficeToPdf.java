@@ -32,7 +32,7 @@ public abstract class OfficeToPdf {
         throw new IllegalAccessError("Utility class");
     }
 
-    private static Logger logger = LoggerFactory.getLogger(OfficeToHtml.class);
+    private static final Logger logger = LoggerFactory.getLogger(OfficeToPdf.class);
 
     final static String DOC = "doc";
     final static String DOCX = "docx";
@@ -59,14 +59,14 @@ public abstract class OfficeToPdf {
                 // 中文字体处理
                 options.fontProvider((familyName, encoding, size, style, color) -> {
                     try {
-                        BaseFont bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                        BaseFont bfChinese = BaseFont.createFont("STSongStd-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
                         Font fontChinese = new Font(bfChinese, size, style, color);
                         if (familyName != null) {
                             fontChinese.setFamily(familyName);
                         }
                         return fontChinese;
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error(e.getMessage(), e);
                         return null;
                     }
                 });
@@ -90,8 +90,8 @@ public abstract class OfficeToPdf {
         String inputFile = CommonUtils.mapWidowsPathIfNecessary(inWordFile);
         String pdfFile = CommonUtils.mapWidowsPathIfNecessary(outPdfFile);
         try(InputStream inWordStream = Files.newInputStream(new File(inputFile).toPath());
-            OutputStream outPdfStram = Files.newOutputStream(new File(pdfFile).toPath())) {
-            return word2Pdf(inWordStream, outPdfStram, suffix);
+            OutputStream outPdfStream = Files.newOutputStream(new File(pdfFile).toPath())) {
+            return word2Pdf(inWordStream, outPdfStream, suffix);
         } catch (IOException e) {
             logger.error(e.getMessage());
             return false;
@@ -137,9 +137,9 @@ public abstract class OfficeToPdf {
     public static boolean excel2Pdf(String inExcelFile, String outPdfFile) {
         String inputFile = CommonUtils.mapWidowsPathIfNecessary(inExcelFile);
         String pdfFile = CommonUtils.mapWidowsPathIfNecessary(outPdfFile);
-        try(InputStream inExcelStream = new FileInputStream(new File(inputFile));
-            OutputStream outPdfStram = new FileOutputStream(new File(pdfFile))) {
-            return excel2Pdf(inExcelStream, outPdfStram);
+        try(InputStream inExcelStream = Files.newInputStream(new File(inputFile).toPath());
+            OutputStream outPdfStream = Files.newOutputStream(new File(pdfFile).toPath())) {
+            return excel2Pdf(inExcelStream, outPdfStream);
         } catch (IOException e) {
             logger.error(e.getMessage());
             return false;

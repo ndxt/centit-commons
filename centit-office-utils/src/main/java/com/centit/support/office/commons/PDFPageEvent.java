@@ -1,23 +1,28 @@
 package com.centit.support.office.commons;
 
+import com.centit.support.office.OfficeToHtml;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.ExceptionConverter;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.pdf.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PDFPageEvent extends PdfPageEventHelper {
     protected PdfTemplate template;
     public BaseFont baseFont;
 
+    private static final Logger logger = LoggerFactory.getLogger(PDFPageEvent.class);
+
     protected static BaseFont BASE_FONT_CHINESE;
     static {
         try {
-            BASE_FONT_CHINESE = BaseFont.createFont("simsun.ttf", com.lowagie.text.pdf.BaseFont.IDENTITY_H, com.lowagie.text.pdf.BaseFont.NOT_EMBEDDED);
+            BASE_FONT_CHINESE = BaseFont.createFont("STSongStd-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
             // 搜尋系統,載入系統內的字型(慢)
             FontFactory.registerDirectories();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 
