@@ -116,10 +116,10 @@ public abstract class SM4Util extends GMBaseUtil {
     /**
      * 默认使用PKCS7Padding/PKCS5Padding填充的CBCMAC
      *
-     * @param key
-     * @param iv
-     * @param data
-     * @return
+     * @param key 密码
+     * @param iv iv
+     * @param data 待加密数据
+     * @return byte[]
      */
     public static byte[] doCBCMac(byte[] key, byte[] iv, byte[] data) {
         SM4Engine engine = new SM4Engine();
@@ -129,12 +129,12 @@ public abstract class SM4Util extends GMBaseUtil {
 
     /**
      *
-     * @param key
-     * @param iv
+     * @param key 密码
+     * @param iv iv
      * @param padding 可以传null，传null表示NoPadding，由调用方保证数据必须是BlockSize的整数倍
-     * @param data
-     * @return
-     * @throws Exception
+     * @param data 待加密数据
+     * @return byte[]
+     * @throws Exception 异常
      */
     public static byte[] doCBCMac(byte[] key, byte[] iv, BlockCipherPadding padding, byte[] data) throws Exception {
         SM4Engine engine = new SM4Engine();
