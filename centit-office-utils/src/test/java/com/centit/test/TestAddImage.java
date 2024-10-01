@@ -1,16 +1,6 @@
 package com.centit.test;
 
-import com.centit.support.image.ImageOpt;
-import com.centit.support.office.PdfSignatureUtil;
 import com.centit.support.office.Watermark4Pdf;
-import com.itextpdf.text.Jpeg;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
 
 public class TestAddImage {
     public static final char[] PASSWORD = "123456".toCharArray();// keystory密码

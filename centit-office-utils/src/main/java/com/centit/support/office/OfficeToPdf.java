@@ -21,7 +21,10 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 
 /**
@@ -59,7 +62,7 @@ public abstract class OfficeToPdf {
                 // 中文字体处理
                 options.fontProvider((familyName, encoding, size, style, color) -> {
                     try {
-                        BaseFont bfChinese = BaseFont.createFont("STSongStd-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+                        BaseFont bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
                         Font fontChinese = new Font(bfChinese, size, style, color);
                         if (familyName != null) {
                             fontChinese.setFamily(familyName);
