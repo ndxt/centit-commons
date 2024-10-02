@@ -785,6 +785,21 @@ public abstract class HttpExecutor {
             uri, new Object[]{formObject}, extFormObjects, false);
     }
 
+    public static String inputStreamUploadPut(HttpExecutorContext executorContext,
+                                           String uri, InputStream inputStream,
+                                           final String filedName, ContentType contentType, final String filename)
+        throws IOException {
+        HttpPut httpPut = new HttpPut(uri);
+        //httpPost.setHeader("Content-Type", applicationOctetStream);
+        httpPut.setHeader("Content-Type", multiPartTypeHead);
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.setBoundary(BOUNDARY);
+        //builder.setMode(HttpMultipartMode.RFC6532);
+        builder.addBinaryBody(filedName, inputStream,contentType, filename);
+        httpPut.setEntity(builder.build());
+        return httpExecute(executorContext, httpPut);
+    }
+
     public static String inputStreamUpload(HttpExecutorContext executorContext,
                                            String uri, InputStream inputStream,
                                            final String filedName, ContentType contentType, final String filename)
