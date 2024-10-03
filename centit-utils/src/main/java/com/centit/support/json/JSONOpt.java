@@ -759,4 +759,10 @@ public abstract class JSONOpt {
         int ind;
     }
 
+    public static Object parseJsonString(String jsonStr) {
+        if(StringUtils.isNotBlank(jsonStr) && ( jsonStr.startsWith("{") || jsonStr.startsWith("[")))
+            return JSON.parse(jsonStr);
+        return jsonStr;
+    }
+
 }
