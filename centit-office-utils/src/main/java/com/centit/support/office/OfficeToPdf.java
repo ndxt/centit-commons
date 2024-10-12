@@ -74,7 +74,7 @@ public abstract class OfficeToPdf {
                             bfChinese = BaseFont.createFont("simfang.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
                         } else if(familyName.indexOf("宋")>=0) { //宋体
                             bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                        } else if(familyName.indexOf("楷")>=0) { //宋体
+                        } else if(familyName.indexOf("楷")>=0) { //楷体
                             bfChinese = BaseFont.createFont("simkai.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
                         } else  { // 黑体
                             bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
