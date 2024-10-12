@@ -65,7 +65,8 @@ public abstract class OfficeToPdf {
                 // 中文字体处理
                 options.fontProvider((familyName, encoding, size, style, color) -> {
                     try {
-                        Font fontChinese = fontMap.get(familyName);
+                        String fontFamilyKey = familyName+"-"+size+"-"+style+"-"+color.getRGB();
+                        Font fontChinese = fontMap.get(fontFamilyKey);
                         if(fontChinese!=null){
                             return fontChinese;
                         }
@@ -81,7 +82,7 @@ public abstract class OfficeToPdf {
                         }
                         fontChinese = new Font(bfChinese, size, style, color);
                         fontChinese.setFamily(familyName);
-                        fontMap.put(familyName, fontChinese);
+                        fontMap.put(fontFamilyKey, fontChinese);
                         return fontChinese;
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
