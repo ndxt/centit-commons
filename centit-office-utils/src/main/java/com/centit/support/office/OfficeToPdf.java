@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author zhf
@@ -59,14 +61,25 @@ public abstract class OfficeToPdf {
             if (DOCX.equalsIgnoreCase(suffix)) {
                 XWPFDocument docx = new XWPFDocument(inWordStream);
                 PdfOptions options = PdfOptions.create();
+                Map<String, Font> fontMap = new HashMap<>();
                 // 中文字体处理
                 options.fontProvider((familyName, encoding, size, style, color) -> {
                     try {
-                        BaseFont bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                        Font fontChinese = new Font(bfChinese, size, style, color);
-                        if (familyName != null) {
-                            fontChinese.setFamily(familyName);
+                        Font fontChinese = fontMap.get(familyName);
+                        if(fontChinese!=null){
+                            return fontChinese;
                         }
+                        BaseFont bfChinese;
+                        if(familyName.indexOf("仿")>=0) { //仿宋
+                            bfChinese = BaseFont.createFont("simfang.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                        } else if(familyName.indexOf("宋")>=0) { //宋体
+                            bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                        } else  { // 黑体
+                            bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                        }
+                        fontChinese = new Font(bfChinese, size, style, color);
+                        fontChinese.setFamily(familyName);
+                        fontMap.put(familyName, fontChinese);
                         return fontChinese;
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
