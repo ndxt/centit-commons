@@ -1,6 +1,7 @@
 package com.centit.search.service;
 
 import com.centit.support.algorithm.NumberBaseOpt;
+import com.centit.support.security.SecurityOptUtils;
 import org.apache.http.HttpHost;
 
 /**
@@ -27,7 +28,7 @@ public class ESServerConfig {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.username = SecurityOptUtils.decodeSecurityString(username);;
     }
 
     public String getPassword() {
@@ -35,7 +36,7 @@ public class ESServerConfig {
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.password = SecurityOptUtils.decodeSecurityString(password);
     }
 
     public String getOsId() {
