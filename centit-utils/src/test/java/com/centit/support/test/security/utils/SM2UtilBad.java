@@ -20,7 +20,7 @@ import java.security.*;
 import java.security.spec.ECFieldFp;
 import java.security.spec.EllipticCurve;
 
-public class SM2Util extends GMBaseUtil {
+public class SM2UtilBad extends GMBaseUtil {
     //////////////////////////////////////////////////////////////////////////////////////
     /*
      * 以下为SM2推荐曲线参数

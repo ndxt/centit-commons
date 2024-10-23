@@ -1,5 +1,7 @@
 package com.centit.support.test.security.utils;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -19,7 +21,6 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.math.ec.ECCurve;
-import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
@@ -98,8 +99,12 @@ public class BCECUtil {
 
     public static ECPublicKeyParameters createECPublicKeyParameters(String xHex, String yHex,
                                                                     ECCurve curve, ECDomainParameters domainParameters) {
-        return createECPublicKeyParameters(ByteUtils.fromHexString(xHex), ByteUtils.fromHexString(yHex),
-            curve, domainParameters);
+        try {
+            return createECPublicKeyParameters(Hex.decodeHex(xHex), Hex.decodeHex(yHex),
+                curve, domainParameters);
+        }catch (DecoderException e){
+            return null;
+        }
     }
 
     public static ECPublicKeyParameters createECPublicKeyParameters(byte[] xBytes, byte[] yBytes,
@@ -227,7 +232,7 @@ public class BCECUtil {
          * 参考org.bouncycastle.asn1.pkcs.PrivateKeyInfo和
          * org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey，逆向拼装
          */
-        X962Parameters params = getDomainParametersFromName(SM2Util.JDK_EC_SPEC, false);
+        X962Parameters params = getDomainParametersFromName(SM2UtilBad.JDK_EC_SPEC, false);
         ASN1OctetString privKey = new DEROctetString(sec1Key);
         ASN1EncodableVector v = new ASN1EncodableVector();
         v.add(new ASN1Integer(0)); //版本号

@@ -2,7 +2,7 @@ package com.centit.support.test.security.cert;
 
 
 import com.centit.support.test.security.utils.BCECUtil;
-import com.centit.support.test.security.utils.SM2Util;
+import com.centit.support.test.security.utils.SM2UtilBad;
 import org.bouncycastle.asn1.pkcs.ContentInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -33,8 +33,8 @@ public class SM2CertUtil {
     public static BCECPublicKey getBCECPublicKey(X509Certificate sm2Cert) {
         ECPublicKey pubKey = (ECPublicKey) sm2Cert.getPublicKey();
         ECPoint q = pubKey.getQ();
-        ECParameterSpec parameterSpec = new ECParameterSpec(SM2Util.CURVE, SM2Util.G_POINT,
-            SM2Util.SM2_ECC_N, SM2Util.SM2_ECC_H);
+        ECParameterSpec parameterSpec = new ECParameterSpec(SM2UtilBad.CURVE, SM2UtilBad.G_POINT,
+            SM2UtilBad.SM2_ECC_N, SM2UtilBad.SM2_ECC_H);
         ECPublicKeySpec pubKeySpec = new ECPublicKeySpec(q, parameterSpec);
         return new BCECPublicKey(pubKey.getAlgorithm(), pubKeySpec,
             BouncyCastleProvider.CONFIGURATION);
