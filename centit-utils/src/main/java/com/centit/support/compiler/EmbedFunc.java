@@ -10,6 +10,7 @@ import com.centit.support.security.HmacSha1Encoder;
 import com.centit.support.security.Md5Encoder;
 import com.centit.support.security.SM3Util;
 import com.centit.support.security.Sha1Encoder;
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 77;
+    public static final int functionsSum = 79;
     protected static final FunctionInfo functionsList[] = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -98,7 +99,9 @@ public abstract class EmbedFunc {
         new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR),//取汉字拼音
         new FunctionInfo("random", -1, ConstDefine.FUNC_RANDOM, ConstDefine.TYPE_ANY), // 取随机数
         new FunctionInfo("hash", 1, ConstDefine.FUNC_HASH, ConstDefine.TYPE_STR), // 计算hash值
-        new FunctionInfo("eval", -1, ConstDefine.FUNC_EVAL, ConstDefine.TYPE_ANY) // 和 eval在外层运行
+        new FunctionInfo("eval", -1, ConstDefine.FUNC_EVAL, ConstDefine.TYPE_ANY), // 和 eval在外层运行
+        new FunctionInfo("encode", 1, ConstDefine.FUNC_ENCODE, ConstDefine.TYPE_STR), // 编码 目前仅支持 HEX base64 base64UrlSafe
+        new FunctionInfo("decode", 1, ConstDefine.FUNC_DECODE, ConstDefine.TYPE_ANY)// 解码 目前仅支持 HEX base64 base64UrlSafe
     };
     private static double COMPARE_MIN_DOUBLE = 0.0000001;
     private EmbedFunc() {
@@ -1073,6 +1076,53 @@ public abstract class EmbedFunc {
                 }
             }
 
+            case ConstDefine.FUNC_ENCODE: {
+                if (nOpSum < 1) return null;
+                String encodeType = "HEX";
+                if (nOpSum > 1) {
+                    String ec = StringBaseOpt.castObjectToString(slOperand.get(3));
+                    if(StringUtils.equalsAnyIgnoreCase(ec, "base64urlsafe","urlsafe")){
+                        encodeType = "BASE64URL";
+                    } else if(StringUtils.equalsIgnoreCase(ec,"base64")){
+                        encodeType = "BASE64";
+                    }
+                }
+                byte [] data = ByteBaseOpt.castObjectToBytes(slOperand.get(0));
+                if(data==null || data.length==0) {
+                    return null;
+                }
+                switch (encodeType) {
+                    case "BASE64URL":
+                        return Base64.encodeBase64URLSafeString(data);
+                    case "BASE64":
+                        return Base64.encodeBase64String(data);
+                    case "HEX":
+                    default:
+                        return String.valueOf(Hex.encodeHex(data));
+                }
+            }
+            case ConstDefine.FUNC_DECODE: {
+                if (nOpSum < 1) return null;
+                String encodeType = "HEX";
+                if (nOpSum > 1) {
+                    String ec = StringBaseOpt.castObjectToString(slOperand.get(3));
+                    if(StringUtils.equalsAnyIgnoreCase(ec, "base64urlsafe","urlsafe","base64")){
+                        encodeType = "BASE64";
+                    }
+                }
+
+                switch (encodeType) {
+                    case "BASE64":
+                        return Base64.decodeBase64(ByteBaseOpt.castObjectToBytes(slOperand.get(0)));
+                    case "HEX":
+                    default:
+                        try {
+                            return Hex.decodeHex(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                        } catch (DecoderException e) {
+                            return "";
+                        }
+                }
+            }
             default:
                 break;
         }
