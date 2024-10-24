@@ -1,6 +1,8 @@
 package com.centit.support.algorithm;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.*;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -151,10 +153,18 @@ public abstract class ZipCompressor {
     }
 
     public static void compressFile(InputStream fis, String fileName, ZipOutputStream out, String basedir) {
-
+        String filePath;
+        if(StringUtils.isBlank(basedir)){
+            filePath = fileName;
+        }else {
+            if(basedir.endsWith("/") || basedir.endsWith("\\")){
+                filePath = basedir + fileName;
+            } else {
+                filePath = basedir + File.separatorChar + fileName;
+            }
+        }
         try (BufferedInputStream bis = new BufferedInputStream(fis)) {
-
-            ZipEntry entry = new ZipEntry(basedir + fileName);
+            ZipEntry entry = new ZipEntry(filePath);
             out.putNextEntry(entry);
             int count;
             byte data[] = new byte[BUFFER];
