@@ -137,7 +137,6 @@ public abstract class SM2Util {
         return Pair.of(publicKey, privateKey);
     }
 
-
     /**
      * 签名
      *
@@ -181,7 +180,7 @@ public abstract class SM2Util {
      * @param signatureValue 签名
      * @return 验签结果
      */
-    public static boolean verify(byte[] data, String pubKey, String signatureValue) {
+    public static boolean verify(byte[] data, String pubKey, byte[] signatureValue) {
         // 非压缩模式公钥对接放是128位HEX秘钥，需要为BC库加上“04”标记
         if (pubKey.length() == 128) {
             pubKey = "04" + pubKey;
@@ -204,7 +203,7 @@ public abstract class SM2Util {
             // 初始化为验签状态
             signature.initVerify(bcecPublicKey);
             signature.update(data);
-            return signature.verify(Hex.decode(signatureValue));
+            return signature.verify(signatureValue);
         } catch (Exception e) {
             throw new ObjectException(e);
         }

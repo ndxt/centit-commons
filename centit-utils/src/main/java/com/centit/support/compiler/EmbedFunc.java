@@ -1064,9 +1064,9 @@ public abstract class EmbedFunc {
                 }
                 switch (encodeType){
                     case "BASE64URL":
-                        return Base64.encodeBase64URLSafe(hashData);
+                        return Base64.encodeBase64URLSafeString(hashData);
                     case "BASE64":
-                        return Base64.encodeBase64(hashData);
+                        return Base64.encodeBase64String(hashData);
                     case "HEX":
                     default:
                         return String.valueOf(Hex.encodeHex(hashData));
