@@ -1,4 +1,4 @@
-package com.centit.support.test.utils;
+package com.centit.support.test.security;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;

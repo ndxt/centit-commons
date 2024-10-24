@@ -1,4 +1,4 @@
-package com.centit.support.test.utils;
+package com.centit.support.test.security;
 
 import com.centit.support.security.AESSecurityUtils;
 import com.centit.support.security.SM4Util;
