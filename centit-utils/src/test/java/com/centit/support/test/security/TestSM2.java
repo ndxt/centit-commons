@@ -25,15 +25,15 @@ public class TestSM2 {
         Pair<String, String> key = SM2Util.generateKey(false);
         String plainText = "哈哈哈哈哈你好";
 
-        byte[] secretKeyByte = SM2Util.encryptUsePublicKey(pubKey, plainText.getBytes());
-        byte[] plainText2 = SM2Util.decryptUserPrivateKey(priKey, secretKeyByte);
+        byte[] secretKeyByte = SM2Util.encryptUsePublicKey(plainText.getBytes(), pubKey);
+        byte[] plainText2 = SM2Util.decryptUserPrivateKey(secretKeyByte, priKey);
         System.out.println(new  String(plainText2));
 
         //System.out.println(key.getLeft());
         //System.out.println(key.getRight());
 
-        secretKeyByte = SM2Util.encryptUsePublicKey(key.getLeft(), plainText.getBytes());
-        plainText2 = SM2Util.decryptUserPrivateKey(key.getRight(), secretKeyByte);
+        secretKeyByte = SM2Util.encryptUsePublicKey(plainText.getBytes(), key.getLeft());
+        plainText2 = SM2Util.decryptUserPrivateKey(secretKeyByte, key.getRight());
         System.out.println(new  String(plainText2));
 
 

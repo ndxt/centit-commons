@@ -37,7 +37,7 @@ public abstract class SM2Util {
      * @param data 明文数据
      * @return 秘文
      */
-    public static  byte[] encryptUsePublicKey(String publicKey, byte[] data) {
+    public static  byte[] encryptUsePublicKey(byte[] data, String publicKey) {
         if (publicKey.length() == 128) {
             publicKey = "04" + publicKey;
         }
@@ -69,7 +69,7 @@ public abstract class SM2Util {
      * @param cipherDataByte 秘文数据
      * @return 明文
      */
-    public static byte[] decryptUserPrivateKey(String privateKey, byte[] cipherDataByte) {
+    public static byte[] decryptUserPrivateKey(byte[] cipherDataByte, String privateKey) {
         BigInteger privateKeyD = new BigInteger(privateKey, 16);
         //获取一条SM2曲线参数
         X9ECParameters sm2ECParameters = GMNamedCurves.getByName(CRYPTO_NAME_SM2);
