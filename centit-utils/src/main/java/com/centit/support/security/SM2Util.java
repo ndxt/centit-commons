@@ -21,22 +21,12 @@ import java.security.spec.ECGenParameterSpec;
 public abstract class SM2Util {
 
     /**
-     *
+     *  测试通过
      * @param publicKey 公钥
      * @param data 明文数据
-     * @param forEncryption true 加密， false 解密
-     * @return
+     * @return 秘文
      */
-    private static String usePublicKey(String publicKey, String data, boolean forEncryption){
-        byte[] in;// = data.getBytes();
-        if(forEncryption){
-            in = data.getBytes();
-        } else {
-            if (!data.startsWith("04")){
-                data = "04" + data;
-            }
-            in = Hex.decode(data);
-        }
+    public static  byte[] encryptUsePublicKey(String publicKey, byte[] data) {
         // 获取一条SM2曲线参数
         X9ECParameters sm2ECParameters = GMNamedCurves.getByName("sm2p256v1");
         // 构造ECC算法参数，曲线方程、椭圆曲线G点、大整数N
@@ -48,28 +38,78 @@ public abstract class SM2Util {
 
         SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
         // 设置sm2为加密模式
-        sm2Engine.init(forEncryption, new ParametersWithRandom(publicKeyParameters, new SecureRandom()));
+        sm2Engine.init(true, new ParametersWithRandom(publicKeyParameters, new SecureRandom()));
 
-        byte[] arrayOfBytes = null;
         try {
-            arrayOfBytes = sm2Engine.processBlock(in, 0, in.length);
+            return sm2Engine.processBlock(data, 0, data.length);
         } catch (Exception e) {
-            System.out.println("SM2加密时出现异常:"+e.getMessage());
+            System.out.println("SM2公钥加密时出现异常:"+e.getMessage());
         }
-        return Hex.toHexString(arrayOfBytes);
+        return null;
+
     }
 
-    private static String usePrivateKey(String privateKey, String data, boolean forEncryption){
-        byte[] cipherDataByte;// = data.getBytes();
-        if(forEncryption){
-            cipherDataByte = data.getBytes();
-        } else {
-            if (!data.startsWith("04")){
-                data = "04" + data;
-            }
-            cipherDataByte = Hex.decode(data);
-        }
+    /**
+     *  测试没有通过
+     * @param publicKey 公钥
+     * @param cipherData 秘文数据
+     * @return 明文
+     */
+    public static byte[]  decryptUsePublicKey(String publicKey, byte[] cipherData) {
 
+        // 获取一条SM2曲线参数
+        X9ECParameters sm2ECParameters = GMNamedCurves.getByName("sm2p256v1");
+        // 构造ECC算法参数，曲线方程、椭圆曲线G点、大整数N
+        ECDomainParameters domainParameters = new ECDomainParameters(sm2ECParameters.getCurve(), sm2ECParameters.getG(), sm2ECParameters.getN());
+        //提取公钥点
+        ECPoint pukPoint = sm2ECParameters.getCurve().decodePoint(Hex.decode(publicKey));
+        // 公钥前面的02或者03表示是压缩公钥，04表示未压缩公钥, 04的时候，可以去掉前面的04
+        ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(pukPoint, domainParameters);
+        SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
+        // 设置sm2为加密模式
+        sm2Engine.init(false, publicKeyParameters);
+        try {
+            return sm2Engine.processBlock(cipherData, 0, cipherData.length);
+        } catch (Exception e) {
+            System.out.println("SM2公钥解密时出现异常:"+e.getMessage());
+        }
+        return null;
+
+    }
+
+    /**
+     *  测试没有通过
+     * @param privateKey 私钥
+     * @param data 明文数据
+     * @return 秘文
+     */
+    public static byte[]  encryptUsePrivateKey(String privateKey, byte[] data) {
+
+        // 初始化SM2算法需要的参数
+        BigInteger privateKeyD = new BigInteger(privateKey, 16);
+        //获取一条SM2曲线参数
+        X9ECParameters sm2ECParameters = GMNamedCurves.getByName("sm2p256v1");
+        //构造domain参数
+        ECDomainParameters domainParameters = new ECDomainParameters(sm2ECParameters.getCurve(), sm2ECParameters.getG(), sm2ECParameters.getN());
+        ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(privateKeyD, domainParameters);
+        try {
+            // 加密私钥
+            SM2Engine engine = new SM2Engine();
+            engine.init(true, new ParametersWithRandom(privateKeyParameters, new SecureRandom()));
+            return engine.processBlock(data, 0, data.length);
+        } catch (Exception e) {
+            System.out.println("SM2私钥加密时出现异常:"+e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     *  测试通过
+     * @param privateKey 私钥
+     * @param cipherDataByte 秘文数据
+     * @return 明文
+     */
+    public static byte[] decryptUserPrivateKey(String privateKey, byte[] cipherDataByte) {
         BigInteger privateKeyD = new BigInteger(privateKey, 16);
         //获取一条SM2曲线参数
         X9ECParameters sm2ECParameters = GMNamedCurves.getByName("sm2p256v1");
@@ -79,34 +119,14 @@ public abstract class SM2Util {
 
         SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
         // 设置sm2为解密模式
-        sm2Engine.init(forEncryption, privateKeyParameters);
+        sm2Engine.init(false, privateKeyParameters);
 
-        String result = "";
         try {
-            byte[] arrayOfBytes = sm2Engine.processBlock(cipherDataByte, 0, cipherDataByte.length);
-            return new String(arrayOfBytes);
+            return sm2Engine.processBlock(cipherDataByte, 0, cipherDataByte.length);
         } catch (Exception e) {
-            System.out.println("SM2解密时出现异常:"+e.getMessage());
+            System.out.println("SM2私钥解密时出现异常:"+e.getMessage());
         }
-        return result;
-    }
-
-    public static String encryptUsePublicKey(String publicKey, String data) {
-        return usePublicKey(publicKey, data, true);
-
-    }
-    public static String decryptUsePublicKey(String publicKey, String cipherData) {
-        return usePublicKey(publicKey, cipherData, false);
-
-    }
-
-    public static String encryptUsePrivateKey(String privateKey, String data) {
-        return usePrivateKey(privateKey, data, true);
-
-    }
-
-    public static String decryptUserPrivateKey(String privateKey, String cipherData) {
-        return usePrivateKey(privateKey, cipherData, false);
+        return null;
     }
 
     public static Pair<String, String> createKey()  {
@@ -130,4 +150,5 @@ public abstract class SM2Util {
             return Pair.of("error", e.getMessage());
         }
     }
+
 }
