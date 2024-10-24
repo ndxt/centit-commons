@@ -8,7 +8,10 @@ import com.centit.support.image.CaptchaImageUtil;
 import com.centit.support.json.JSONOpt;
 import com.centit.support.security.HmacSha1Encoder;
 import com.centit.support.security.Md5Encoder;
+import com.centit.support.security.SM3Util;
 import com.centit.support.security.Sha1Encoder;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -1000,65 +1003,74 @@ public abstract class EmbedFunc {
             }
 
             //hash(object)
-            //hash(object, "md5/sha", base64)
-            //hash(object, "hmac-sha1", "secret-key")
-            //hash(object, "hmac-sha1", "secret-key"，'base64')
+            //hash(object, "sm3/md5/sha", base64)
+            //hash(object, "sm3/hmac-sha1", "secret-key")
+            //hash(object, "sm3/hmac-sha1", "secret-key"，'base64')
             case ConstDefine.FUNC_HASH:{
                 if (nOpSum < 1) return null;
-                if (nOpSum < 2) {
-                    return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                String hashType = "MD5";//SHA SM3 HMAC-SHA HMAC-SM3
+                String encodeType = "HEX";
+                String secretKey = "";
+                if (nOpSum > 1) {
+                    String ht = StringBaseOpt.castObjectToString(slOperand.get(1));
+                    if(StringUtils.equalsAnyIgnoreCase(ht, "sha","sha1","sha-1")){
+                        hashType = "SHA";
+                    } else if(StringUtils.equalsAnyIgnoreCase(ht, "hmac-sha1","macsha","hmacsha","hmacsha1")){
+                        hashType = "HMAC-SHA";
+                    } else if(StringUtils.equalsAnyIgnoreCase(ht, "sm","sm3")){
+                        hashType = "SM3";
+                    } else if(StringUtils.equalsAnyIgnoreCase(ht, "hmac-sm3","sm3-hmac")){
+                        hashType = "HMAC-SM3";
+                    }
                 }
-                if (nOpSum < 3) {
-                    String encodeType = StringBaseOpt.castObjectToString(slOperand.get(1));
-                    if(StringUtils.equalsAnyIgnoreCase(encodeType, "sha","sha1","sha-1")){
-                        return Sha1Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                if (nOpSum == 3) {
+                    if(StringUtils.equalsAnyIgnoreCase(hashType, "SHA","MD5", "SM3")){
+                        String ec = StringBaseOpt.castObjectToString(slOperand.get(2));
+                        if(StringUtils.equalsAnyIgnoreCase(ec, "base64urlsafe","urlsafe")){
+                            encodeType = "BASE64URL";
+                        } else if(StringUtils.equalsIgnoreCase(ec,"base64")){
+                            encodeType = "BASE64";
+                        }
                     } else {
-                        if(StringUtils.equalsAnyIgnoreCase(encodeType, "base64urlsafe","urlsafe")){
-                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), true);
-                        } else if(StringUtils.equalsIgnoreCase(encodeType,"base64")){
-                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), false);
-                        } else {
-                            return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
-                        }
+                        secretKey = StringBaseOpt.castObjectToString(slOperand.get(2));
                     }
                 }
-                if(nOpSum < 4) {
-                    String encodeType = StringBaseOpt.castObjectToString(slOperand.get(1));
-                    String param = StringBaseOpt.castObjectToString(slOperand.get(2));
-                    if(StringUtils.equalsAnyIgnoreCase(encodeType, "sha","sha1","sha-1")){
-                        if(StringUtils.equalsAnyIgnoreCase(param, "base64urlsafe","urlsafe")){
-                            return Sha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), true);
-                        } else if(StringUtils.equalsIgnoreCase(param,"base64")){
-                            return Sha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), false);
-                        } else {
-                            return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
-                        }
-                    } else if(StringUtils.equalsAnyIgnoreCase(encodeType, "hmac-sha1","macsha","hmacsha","hmacsha1")){
-                        return HmacSha1Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)), param);
-                    } else { //md5
-                        if (StringUtils.equalsAnyIgnoreCase(param, "base64urlsafe", "urlsafe")) {
-                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), true);
-                        } else if (StringUtils.equalsIgnoreCase(param, "base64")) {
-                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), false);
-                        } else {
-                            return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
-                        }
+                if(nOpSum == 4) {
+                    String ec = StringBaseOpt.castObjectToString(slOperand.get(3));
+                    if(StringUtils.equalsAnyIgnoreCase(ec, "base64urlsafe","urlsafe")){
+                        encodeType = "BASE64URL";
+                    } else if(StringUtils.equalsIgnoreCase(ec,"base64")){
+                        encodeType = "BASE64";
                     }
                 }
-
-                String encodeType = StringBaseOpt.castObjectToString(slOperand.get(1));
-                String secretKey = StringBaseOpt.castObjectToString(slOperand.get(2));
-                String param = StringBaseOpt.castObjectToString(slOperand.get(3));
-                if(StringUtils.equalsAnyIgnoreCase(encodeType, "hmac-sha1","macsha","hmacsha","hmacsha1")){
-                    if (StringUtils.equalsAnyIgnoreCase(param, "base64urlsafe", "urlsafe")) {
-                        return HmacSha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), secretKey,  true);
-                    } else if (StringUtils.equalsIgnoreCase(param, "base64")) {
-                        return HmacSha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), secretKey, false);
-                    } else {
-                        return HmacSha1Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)), secretKey);
-                    }
+                byte [] hashData;
+                switch (hashType){
+                    case "SM3":
+                        hashData = SM3Util.hash(ByteBaseOpt.castObjectToBytes(slOperand.get(0)));
+                        break;
+                    case "SHA":
+                        hashData = Sha1Encoder.rawEncode(ByteBaseOpt.castObjectToBytes(slOperand.get(0)));
+                        break;
+                    case "HMAC-SM3":
+                        hashData = SM3Util.hmac(ByteBaseOpt.castObjectToBytes(slOperand.get(0)), ByteBaseOpt.castObjectToBytes(secretKey));
+                        break;
+                    case "HMAC-SHA":
+                        hashData = HmacSha1Encoder.rawEncode(ByteBaseOpt.castObjectToBytes(slOperand.get(0)),secretKey);
+                        break;
+                    case "MD5":
+                    default:
+                        hashData = Md5Encoder.rawEncode(ByteBaseOpt.castObjectToBytes(slOperand.get(0)));
+                        break;
                 }
-                return null;
+                switch (encodeType){
+                    case "BASE64URL":
+                        return Base64.encodeBase64URLSafe(hashData);
+                    case "BASE64":
+                        return Base64.encodeBase64(hashData);
+                    case "HEX":
+                    default:
+                        return String.valueOf(Hex.encodeHex(hashData));
+                }
             }
 
             default:

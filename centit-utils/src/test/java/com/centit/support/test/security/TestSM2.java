@@ -1,4 +1,4 @@
-package com.centit.support.test.security.test;
+package com.centit.support.test.security;
 
 import com.centit.support.security.SM2Util;
 import org.apache.commons.lang3.tuple.Pair;
@@ -13,7 +13,7 @@ public class TestSM2 {
 
     public static void main(String[] args)  throws Exception {
 
-        Pair<String, String> key = SM2Util.createKey();
+        Pair<String, String> key = SM2Util.generateKey(false);
         String plainText = "哈哈哈哈哈你好";
 
         String pubKey = "04F6E0C3345AE42B51E06BF50B98834988D54EBC7460FE135A48171BC0629EAE205EEDE253A530608178A98F1E19BB737302813BA39ED3FA3C51639D7A20C7391A";
@@ -29,9 +29,7 @@ public class TestSM2 {
         plainText2 = SM2Util.decryptUserPrivateKey(key.getRight(), secretKeyByte);
         System.out.println(new  String(plainText2));
 
-        secretKeyByte = SM2Util.encryptUsePrivateKey(key.getRight(), plainText.getBytes());
-        plainText2 = SM2Util.decryptUsePublicKey(key.getLeft(), secretKeyByte);
-        System.out.println(new  String(plainText2));
+
     }
 }
 
