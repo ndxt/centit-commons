@@ -60,7 +60,7 @@ public class JSONTransformer {
             }
             if(value.charAt(0) == '@'){
                 return dataSupport.mapTemplateString(value.substring(1));
-            } else if(value.charAt(0) == '#'){ // 两次计算 map-> formula
+            } else if(value.charAt(0) == '#'){ // 两次计算 map-> formula ； eval 函数也可以实现同样的功能
                 String formula = dataSupport.mapTemplateString(value.substring(1));
                 return dataSupport.attainExpressionValue(formula);
             } else {
