@@ -55,33 +55,39 @@ public class JSONTransformer {
         }
         if(templateObj instanceof String){
             String value = (String)templateObj;
-            if(value.startsWith("@")){
+            if(value.isEmpty()){
+                return null;
+            }
+            if(value.charAt(0) == '@'){
                 return dataSupport.mapTemplateString(value.substring(1));
-            } /*else if(value.startsWith("#")){ // 两次计算
-                String formula= dataSupport.mapTemplateString(value.substring(1));
+            } else if(value.charAt(0) == '#'){ // 两次计算 map-> formula
+                String formula = dataSupport.mapTemplateString(value.substring(1));
                 return dataSupport.attainExpressionValue(formula);
-            } */else {
+            } else {
                 return dataSupport.attainExpressionValue(value);
             }
         } else if(templateObj instanceof Map){
             Map<String, Object> tempMap = CollectionsOpt.objectToMap(templateObj);
-            JSONObject jobj = new JSONObject();
+            JSONObject jObj = new JSONObject();
             for(Map.Entry<String, Object> ent : tempMap.entrySet()){
-                String skey = ent.getKey();
-                if(skey.startsWith("@")){ // 替换当前属性，这个必须返回 Map
+                String sKey = ent.getKey();
+                if(sKey.isEmpty()){
+                    return null;
+                }
+                if(sKey.charAt(0) == '@'){ // 替换当前属性，这个必须返回 Map
                     Object value = transformer(ent.getValue(), dataSupport);
                     if(value instanceof Map){
-                        jobj.putAll(CollectionsOpt.objectToMap(value));
+                        jObj.putAll(CollectionsOpt.objectToMap(value));
                     } else {
-                        putObjectToJson(jobj, skey.substring(1), value);
+                        putObjectToJson(jObj, sKey.substring(1), value);
                     }
-                } else if(skey.startsWith("#")) { //数组迭代； 并且只能是 单独的 一个key
-                    Object obj = dataSupport.attainExpressionValue(skey.substring(1));
+                } else if(sKey.charAt(0) == '#') { //数组迭代； 并且只能是 单独的 一个key
+                    Object obj = dataSupport.attainExpressionValue(sKey.substring(1));
                     if(obj==null){
                         return null;
                     }
                     if(! (obj instanceof Collection)){
-                        logger.warn(skey.substring(1) + "对应的数据不是数组");
+                        logger.warn(sKey.substring(1) + "对应的数据不是数组");
                     }
                     JSONArray array = new JSONArray();
                     List<Object> loopData = CollectionsOpt.objectToList(obj);
@@ -94,12 +100,12 @@ public class JSONTransformer {
                         }
                         dataSupport.popStackValue();
                     }
-                    return array.size()==0 ? null : array;
+                    return array.isEmpty() ? null : array;
                 } else {
-                    putObjectToJson(jobj, skey, transformer(ent.getValue(), dataSupport));
+                    putObjectToJson(jObj, sKey, transformer(ent.getValue(), dataSupport));
                 }
             }
-            return jobj.size()==0 ? null : jobj;
+            return jObj.isEmpty() ? null : jObj;
         } else if(templateObj instanceof Collection) {
             JSONArray array = new JSONArray();
             Collection<?> valueList = (Collection<?>) templateObj;
@@ -114,7 +120,7 @@ public class JSONTransformer {
                     }
                 }
             }
-            return array.size()==0 ? null : array;
+            return array.isEmpty() ? null : array;
         } else {
             Class<?> clazz = templateObj.getClass();
             if (clazz.isArray()) {
@@ -126,7 +132,7 @@ public class JSONTransformer {
                         addObjectToJson(array, transformer(Array.get(templateObj, i), dataSupport));
                     }
                 }
-                return array.size()==0 ? null : array;
+                return array.isEmpty() ? null : array;
             } else {
                 return templateObj;
             }
