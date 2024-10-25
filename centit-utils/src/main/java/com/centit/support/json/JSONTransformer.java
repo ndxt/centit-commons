@@ -57,7 +57,10 @@ public class JSONTransformer {
             String value = (String)templateObj;
             if(value.startsWith("@")){
                 return dataSupport.mapTemplateString(value.substring(1));
-            } else {
+            } /*else if(value.startsWith("#")){ // 两次计算
+                String formula= dataSupport.mapTemplateString(value.substring(1));
+                return dataSupport.attainExpressionValue(formula);
+            } */else {
                 return dataSupport.attainExpressionValue(value);
             }
         } else if(templateObj instanceof Map){
