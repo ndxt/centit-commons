@@ -38,7 +38,7 @@ public class TestTextExtract {
 
         try {
             System.out.println(
-                TikaTextExtractor.extractFileText("/Users/codefan/Documents/temp/testPdfImage.pdf"));
+                TikaTextExtractor.extractFileText("/Users/codefan/Documents/temp/fp.pdf"));
             System.out.println("done!");
         } catch (IOException | TikaException |SAXException e) {
             System.out.println("error!" + e.getMessage());
