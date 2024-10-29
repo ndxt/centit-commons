@@ -31,7 +31,7 @@ public abstract class XMLObject {
     }
 
     @SuppressWarnings("unchecked")
-    public static Element createXMLElementFromObject(String elementName, Object object) {
+    public static Element createXMLElementFromObject(String elementName, Object object, HashSet<Object> hasSerialized) {
         if (object instanceof String) {
             return createXMLElement(elementName, "String", object);
         }
@@ -58,9 +58,11 @@ public abstract class XMLObject {
             element.addAttribute("type", "Object");
             element.addAttribute("class", object.getClass().getName());
             for (Map.Entry<Object, Object> jo : ((Map<Object, Object>) object).entrySet()) {
-                if (jo.getValue() != null)
-                    element.add(createXMLElementFromObject(
-                        StringBaseOpt.objectToString(jo.getKey()), jo.getValue()));
+                if (jo.getValue() != null) {
+                    Element entry = createXMLElementFromObject("entry", jo.getValue(), hasSerialized);
+                    entry.addAttribute("key", StringBaseOpt.objectToString(jo.getKey()));
+                    element.add(entry);
+                }
             }
             return element;
         }
@@ -71,7 +73,7 @@ public abstract class XMLObject {
             element.addAttribute("class", object.getClass().getName());
             for (Object obj : (Object[]) object) {
                 if (obj != null) {
-                    element.add(createXMLElementFromObject("item", obj));
+                    element.add(createXMLElementFromObject("item", obj, hasSerialized));
                 }
             }
             return element;
@@ -81,7 +83,7 @@ public abstract class XMLObject {
             element.addAttribute("class", object.getClass().getName());
             for (Object obj : (Collection<?>) object) {
                 if (obj != null) {
-                    element.add(createXMLElementFromObject("item", obj));
+                    element.add(createXMLElementFromObject("item", obj, hasSerialized));
                 }
             }
             return element;
@@ -90,6 +92,10 @@ public abstract class XMLObject {
         if (ReflectionOpt.isScalarType(object.getClass())) {
             return createXMLElement(elementName, "String", object);
         } else {
+            if(hasSerialized.contains(object)){
+                return createXMLElement(elementName, "recursion", object.getClass().getName());
+            }
+            hasSerialized.add(object);
             JavaBeanMetaData jbm = JavaBeanMetaData.createBeanMetaDataFromType(object.getClass());
             Map<String, JavaBeanField> fields = jbm.getFileds();
             if (fields == null)
@@ -101,7 +107,7 @@ public abstract class XMLObject {
             for (Map.Entry<String, JavaBeanField> field : fields.entrySet()) {
                 Object obj = field.getValue().getObjectFieldValue(object);
                 if (obj != null)
-                    element.add(createXMLElementFromObject(field.getKey(), obj));
+                    element.add(createXMLElementFromObject(field.getKey(), obj, hasSerialized));
 
             }
             return element;
@@ -109,13 +115,15 @@ public abstract class XMLObject {
     }
 
     public static String jsonObjectToXMLString(Map<String, Object> json) {
-        Element element = createXMLElementFromObject("object", json);
+        HashSet<Object> hasSerialized = new HashSet<>();
+        Element element = createXMLElementFromObject("object", json, hasSerialized);
         return element.asXML();
         //return DocumentHelper.createDocument(element).asXML();
     }
 
     public static String objectToXMLString(String rootName, Object object) {
-        Element element = createXMLElementFromObject(rootName, object);
+        HashSet<Object> hasSerialized = new HashSet<>();
+        Element element = createXMLElementFromObject(rootName, object, hasSerialized);
         return element.asXML();
         //return DocumentHelper.createDocument(element).asXML();
     }
