@@ -6,6 +6,7 @@ import com.centit.support.json.JSONOpt;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -43,6 +44,9 @@ public class TestJsonIO {
 
     public static void main(String arg[]) throws IOException {
         JSONOpt.fastjsonGlobalConfig();
+        String s = "Hello world!";
+        System.out.println(JSON.toJSONString(s));
+        System.out.println(JSON.toJSONString(s.getBytes(StandardCharsets.UTF_8)));
 
         JsonWithDateField jsonDate = new JsonWithDateField();
         jsonDate.setSqlDate(DatetimeOpt.convertToSqlDate(
@@ -50,7 +54,7 @@ public class TestJsonIO {
         jsonDate.setUtilDate(DatetimeOpt.createUtilDate(2020,12, 31));
         jsonDate.setTimestamp(DatetimeOpt.currentSqlTimeStamp());
 
-        String s = JSON.toJSONString(jsonDate);
+        s = JSON.toJSONString(jsonDate);
         System.out.println(s);
 
          s = "{\"sqlDate\":\"2021-11-11 12:12:12 GMT+9\",\"timestamp\":\"2023-03-13 09:16:01.538 GMT+11\"," +

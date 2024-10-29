@@ -32,23 +32,18 @@ public abstract class XMLObject {
 
     @SuppressWarnings("unchecked")
     public static Element createXMLElementFromObject(String elementName, Object object) {
-
         if (object instanceof String) {
             return createXMLElement(elementName, "String", object);
         }
-
         if (object instanceof Long) {
             return createXMLElement(elementName, "Long", object);
         }
-
         if (object instanceof BigDecimal) {
             return createXMLElement(elementName, "BigDecimal", object);
         }
-
         if (object instanceof Boolean) {
             return createXMLElement(elementName, "Boolean", object);
         }
-
         if (object instanceof Integer) {
             return createXMLElement(elementName, "Integer", object);
         }
@@ -132,20 +127,20 @@ public abstract class XMLObject {
     public static Object elementToObject(Element element) {
         //Map<String, Object> objectMap = new HashMap<>();
         Attribute attr = element.attribute("type");
-        String stype = attr == null ? null : element.attribute("type").getValue();
-        if (StringUtils.equals("Date", stype)) {
+        String sType = attr == null ? null : element.attribute("type").getValue();
+        if (StringUtils.equals("Date", sType)) {
             return DatetimeOpt.smartPraseDate(element.getTextTrim());
-        } else if (StringUtils.equals("Long", stype)) {
+        } else if (StringUtils.equals("Long", sType)) {
             return NumberBaseOpt.castObjectToLong(element.getTextTrim());
-        } else if (StringUtils.equals("Integer", stype)) {
+        } else if (StringUtils.equals("Integer", sType)) {
             return NumberBaseOpt.castObjectToInteger(element.getTextTrim());
-        } else if (StringUtils.equals("Number", stype)) {
+        } else if (StringUtils.equals("Number", sType)) {
             return NumberBaseOpt.castObjectToDouble(element.getTextTrim());
-        } else if (StringUtils.equals("Boolean", stype)) {
+        } else if (StringUtils.equals("Boolean", sType)) {
             return StringRegularOpt.isTrue(element.getTextTrim());
-        } else if (StringUtils.equals("BigDecimal", stype)) {
+        } else if (StringUtils.equals("BigDecimal", sType)) {
             return new BigDecimal(element.getTextTrim());
-        } else if (StringUtils.equals("Array", stype)) {
+        } else if (StringUtils.equals("Array", sType)) {
             List<Element> subElements = element.elements();
             if (subElements == null)
                 return null;
@@ -157,18 +152,16 @@ public abstract class XMLObject {
                 }
             }
             return objs;
-        } else if (StringUtils.equals("Object", stype)) {
+        } else /*if (StringUtils.equals("Object", sType)) */{
             Map<String, Object> objectMap = new HashMap<>();
             List<Element> subElements = element.elements();
-            if (subElements == null)
-                return null;
+            if (subElements == null || subElements.isEmpty())
+                return element.getTextTrim();
             for (Element subE : subElements) {
                 objectMap.put(element.getName(),
                     elementToObject(subE));
             }
             return objectMap;
-        } else {
-            return element.getTextTrim();
         }
     }
 

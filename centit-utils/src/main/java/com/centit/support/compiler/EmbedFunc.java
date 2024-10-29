@@ -10,6 +10,7 @@ import com.centit.support.security.HmacSha1Encoder;
 import com.centit.support.security.Md5Encoder;
 import com.centit.support.security.SM3Util;
 import com.centit.support.security.Sha1Encoder;
+import com.centit.support.xml.XMLObject;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -913,6 +914,13 @@ public abstract class EmbedFunc {
                     return null;
                 }
                 if(slOperand.get(0) instanceof String){
+                    String objType = "json";
+                    if(nOpSum>1){
+                        objType = StringBaseOpt.castObjectToString(slOperand.get(1));
+                    }
+                    if("xml".equalsIgnoreCase(objType)){
+                        return XMLObject.xmlStringToObject((String) slOperand.get(0));
+                    }
                     return JSON.parse((String) slOperand.get(0));
                 }
                 return slOperand.get(0);
