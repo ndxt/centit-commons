@@ -3,6 +3,8 @@ package com.centit.support.algorithm;
 import com.alibaba.fastjson2.JSON;
 import com.centit.support.file.FileIOOpt;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
@@ -45,6 +47,24 @@ public abstract class ByteBaseOpt {
             return JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8);
         }
 
+        if (obj instanceof ByteArrayInputStream){
+            ByteArrayInputStream byteInput = (ByteArrayInputStream) obj;
+            byteInput.reset();
+        }
+
+        if (obj instanceof InputStream){
+            try {
+                return FileIOOpt.readBytesFromInputStream((InputStream)obj);
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        if (obj instanceof ByteArrayOutputStream){
+            ByteArrayOutputStream byteOutput = (ByteArrayOutputStream) obj;
+            return byteOutput.toByteArray();
+        }
+
         if (obj instanceof Long) {
             byte[] buf = new byte[8];
             writeInt64(buf, (Long) obj, 0);
@@ -73,14 +93,6 @@ public abstract class ByteBaseOpt {
             byte[] buf = new byte[8];
             writeDouble(buf, (Double) obj, 0);
             return buf;
-        }
-
-        if (obj instanceof InputStream){
-            try {
-                return FileIOOpt.readBytesFromInputStream((InputStream)obj);
-            } catch (IOException e) {
-                return null;
-            }
         }
 
         return JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8);
