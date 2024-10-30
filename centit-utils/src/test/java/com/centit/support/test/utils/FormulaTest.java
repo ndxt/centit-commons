@@ -15,8 +15,7 @@ import java.util.Map;
 
 public class FormulaTest {
     public static void main(String[] args)  {
-        System.out.println(Pretreatment.mapTemplateStringAsFormula(
-            "上报企业（一级集团）统一社会信用代码_业务编码_版本号_{formatdate(today(), 'YYYYMMDD')}_{random('str','uuid32')}.zip", null));
+        System.out.println(VariableFormula.calculate("concat('意见', '\\n', '征询')"));
 
         Object s;
         s = VariableFormula.calculate("a is not null + 2",
