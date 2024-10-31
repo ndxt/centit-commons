@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.centit.support.algorithm.*;
+import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Lexer;
 import com.centit.support.database.metadata.TableField;
 import com.centit.support.database.metadata.TableInfo;
@@ -338,14 +339,17 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             String aWord = lexer.getAWord();
             while (StringUtils.isNotBlank(aWord)) {
                 if (StringUtils.equalsAnyIgnoreCase(aWord,
-                    ",", "(", ")", "order", "by", "desc", "asc", "nulls", "first", "last")) {
+                    ",", "order", "by", "desc", "asc", "nulls", "first", "last")) {
                     orderBuilder.append(aWord);
                 } else {
                     String orderField = GeneralJsonObjectDao.mapFieldToColumnPiece(querySql, aWord);
                     if (orderField != null) {
                         orderBuilder.append(orderField);
                     } else {
-                        orderBuilder.append(aWord);
+                        //orderBuilder.append(aWord); // 这个会引起sql注入
+                        throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR,
+                            "SQL语句中没有对应的排序字段: "+selfOrderBy+"，找不到对应的排序字段");
+
                     }
                 }
                 orderBuilder.append(" ");
@@ -377,16 +381,16 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
             String aWord = lexer.getAWord();
             while (StringUtils.isNotBlank(aWord)) {
                 if (StringUtils.equalsAnyIgnoreCase(aWord,
-                    ",", "(", ")", "order", "by", "desc", "asc", "nulls", "first", "last")) {
+                    ",", "order", "by", "desc", "asc", "nulls", "first", "last")) {
                     orderBuilder.append(aWord);
                 } else {
                     TableField field = ti.findFieldByName(aWord);
                     if (field != null) {
                         orderBuilder.append(field.getColumnName());
                     } else {
-                        orderBuilder.append(aWord);
-                        //throw new RuntimeException("表"+ti.getTableName()
-                        //+"应用排序语句"+selfOrderBy+"出错，找不到对应的排序字段");
+                        //orderBuilder.append(aWord); // 这个会引起sql注入
+                        throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR,
+                            "SQL语句中没有对应的排序字段: "+selfOrderBy+"，找不到对应的排序字段");
                     }
                 }
                 orderBuilder.append(" ");
