@@ -390,7 +390,7 @@ public abstract class GeneralJsonObjectDao implements JsonObjectDao {
                     } else {
                         //orderBuilder.append(aWord); // 这个会引起sql注入
                         throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR,
-                            "SQL语句中没有对应的排序字段: "+selfOrderBy+"，找不到对应的排序字段");
+                            "表"+ti.getTableName() + "应用排序语句"+selfOrderBy+"出错，找不到对应的排序字段");
                     }
                 }
                 orderBuilder.append(" ");
