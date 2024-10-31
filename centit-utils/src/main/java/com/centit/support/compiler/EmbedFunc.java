@@ -1088,7 +1088,7 @@ public abstract class EmbedFunc {
                 if (nOpSum < 1) return null;
                 String encodeType = "HEX";
                 if (nOpSum > 1) {
-                    String ec = StringBaseOpt.castObjectToString(slOperand.get(3));
+                    String ec = StringBaseOpt.castObjectToString(slOperand.get(1));
                     if(StringUtils.equalsAnyIgnoreCase(ec, "base64urlsafe","urlsafe")){
                         encodeType = "BASE64URL";
                     } else if(StringUtils.equalsIgnoreCase(ec,"base64")){
@@ -1113,7 +1113,7 @@ public abstract class EmbedFunc {
                 if (nOpSum < 1) return null;
                 String encodeType = "HEX";
                 if (nOpSum > 1) {
-                    String ec = StringBaseOpt.castObjectToString(slOperand.get(3));
+                    String ec = StringBaseOpt.castObjectToString(slOperand.get(1));
                     if(StringUtils.equalsAnyIgnoreCase(ec, "base64urlsafe","urlsafe","base64")){
                         encodeType = "BASE64";
                     }
