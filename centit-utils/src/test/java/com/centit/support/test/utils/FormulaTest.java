@@ -18,8 +18,9 @@ public class FormulaTest {
         System.out.println(VariableFormula.calculate("concat('意见', '\\n', '征询')"));
 
         Object s;
-        s = VariableFormula.calculate("a is not null + 2",
-            CollectionsOpt.createHashMap("a", 1, "b", 2, "c", 3, "d", 4, "e", 5, "f", "f*b+c"));
+        s = VariableFormula.calculate("find(yjzxBranch,'gx')",
+            CollectionsOpt.createHashMap("yjzxBranch", CollectionsOpt.createList("gx","js","ps")
+                , "tmp", 'F', "c", 3, "d", 4, "e", 5, "f", "f*b+c"));
         System.out.println(s);
       /*  System.out.println(VariableFormula.calculate(
             "nvl(null2, no)"));

@@ -442,7 +442,11 @@ public abstract class EmbedFunc {
 
                 Object obj = slOperand.get(0);
                 if (obj instanceof Collection) {
-                    return ((Collection) obj).contains(slOperand.get(1));
+                    if(obj instanceof List){
+                        List<?> list = (List<?>)obj;
+                        return list.indexOf(slOperand.get(1));
+                    }
+                    return ((Collection<?>) obj).contains(slOperand.get(1))?1:-1;
                 }
                 String tempStr = StringBaseOpt.objectToString(obj);
                 String findType = null; //C W
