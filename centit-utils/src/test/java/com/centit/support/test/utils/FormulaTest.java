@@ -19,7 +19,7 @@ public class FormulaTest {
 
         Object s;
         s = VariableFormula.calculate("find(yjzxBranch,'gx')",
-            CollectionsOpt.createHashMap("yjzxBranch", CollectionsOpt.createList("gx","js","ps")
+            CollectionsOpt.createHashMap("yjzxBranch", CollectionsOpt.createHashSet("gx","js","ps")
                 , "tmp", 'F', "c", 3, "d", 4, "e", 5, "f", "f*b+c"));
         System.out.println(s);
       /*  System.out.println(VariableFormula.calculate(
