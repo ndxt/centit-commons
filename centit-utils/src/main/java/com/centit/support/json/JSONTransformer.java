@@ -91,14 +91,17 @@ public class JSONTransformer {
                     }
                     JSONArray array = new JSONArray();
                     List<Object> loopData = CollectionsOpt.objectToList(obj);
+                    int loopSize = loopData.size();
+                    int index = 0;
                     for(Object ld : loopData){
-                        dataSupport.pushStackValue(ld);
+                        dataSupport.pushStackValue(ld, index, loopSize);
                         if(StringUtils.isBlank(String.valueOf(ent.getValue())) || ".".equals(String.valueOf(ent.getValue()))){
                             addObjectToJson(array, ld);
                         }else {
                             addObjectToJson(array, transformer(ent.getValue(), dataSupport));
                         }
                         dataSupport.popStackValue();
+                        index++;
                     }
                     return array.isEmpty() ? null : array;
                 } else {
