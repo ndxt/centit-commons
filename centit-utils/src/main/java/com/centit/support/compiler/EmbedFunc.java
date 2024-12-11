@@ -514,6 +514,9 @@ public abstract class EmbedFunc {
                     return null;
                 }
                 String splitStr = nOpSum > 1 ? StringBaseOpt.castObjectToString(slOperand.get(1),","):",";
+                if(StringUtils.equalsAny(splitStr, ".","*","?","$","+","|","\\")){
+                    splitStr = String.format("\\%s", splitStr);
+                }
                 return str.split(splitStr);
             }
 
