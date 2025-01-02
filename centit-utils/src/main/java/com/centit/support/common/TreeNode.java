@@ -105,7 +105,7 @@ public class TreeNode<T> {
         return jo;
     }
 
-    public static JSONArray toJSONArray(List<? extends TreeNode<? extends Object>> forest, String childrenPropertyName){
+    public static JSONArray toJSONArray(List<? extends TreeNode<?>> forest, String childrenPropertyName){
         JSONArray ja = new JSONArray();
         for (TreeNode c : forest) {
             ja.add(c.toJSONObject(childrenPropertyName));
@@ -113,7 +113,7 @@ public class TreeNode<T> {
         return ja;
     }
 
-    public static JSONArray toJSONArray(List<? extends TreeNode<? extends Object>> forest){
+    public static JSONArray toJSONArray(List<? extends TreeNode<?>> forest){
         return toJSONArray(forest, "children");
     }
 

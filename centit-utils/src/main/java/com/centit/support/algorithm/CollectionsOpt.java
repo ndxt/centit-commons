@@ -487,7 +487,7 @@ public abstract class CollectionsOpt {
      * @param childrenPropertyName 孩子节点
      * @return 展开的树
      */
-    public static List<Object> depthFirstTraverseForest(Collection<? extends Object> treeObjects, String childrenPropertyName){
+    public static List<Object> depthFirstTraverseForest(Collection<?> treeObjects, String childrenPropertyName){
         List<Object> expendTree = new ArrayList<>(128);
         for(Object obj : treeObjects){
             depthFirstTraverseTree(obj, expendTree, childrenPropertyName);
@@ -513,7 +513,7 @@ public abstract class CollectionsOpt {
      * @param childrenPropertyName 孩子节点
      * @return 展开的树
      */
-    public static List<Object> breadthFirstTraverseForest(Collection<? extends Object> treeObjects, String childrenPropertyName){
+    public static List<Object> breadthFirstTraverseForest(Collection<?> treeObjects, String childrenPropertyName){
         List<Object> expendTree = new ArrayList<>(128);
         int nExpendInd = 0;
         for(Object obj : treeObjects){
@@ -952,25 +952,25 @@ public abstract class CollectionsOpt {
         }
     }
 
-    public static Map<String, String> objectMapToStringMap(Map<? extends Object, ? extends Object> objectMap) {
+    public static Map<String, String> objectMapToStringMap(Map<?, ?> objectMap) {
         if(objectMap==null){
             return null;
         }
         Map<String, String> stringMap = new HashMap<>(objectMap.size());
-        for(Map.Entry<? extends Object, ? extends Object> ent : objectMap.entrySet()){
+        for(Map.Entry<?, ?> ent : objectMap.entrySet()){
             stringMap.put(StringBaseOpt.objectToString(ent.getKey()),
                 StringBaseOpt.objectToString(ent.getValue()));
         }
         return stringMap;
     }
 
-    public static <K,V> Map<K,V> translateMapType(Map<? extends Object, ? extends Object> objectMap,
+    public static <K,V> Map<K,V> translateMapType(Map<?, ?> objectMap,
                                                   Function<Object, K> transKey , Function<Object, V> transValue) {
         if(objectMap==null){
             return null;
         }
         Map<K, V> stringMap = new HashMap<>(objectMap.size());
-        for(Map.Entry<? extends Object, ? extends Object> ent : objectMap.entrySet()){
+        for(Map.Entry<?, ?> ent : objectMap.entrySet()){
             stringMap.put(transKey.apply(ent.getKey()),
                 transValue.apply(ent.getValue()));
         }
