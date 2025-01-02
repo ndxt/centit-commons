@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Created by codefan on 17-9-23.
  */
-public class TestExceIExport {
+public class TestExcelExport {
 
     public static void main(String[] args) throws Exception {
         //"/home/codefan/temp/2018.03.01-2018.04.30.xlsx",

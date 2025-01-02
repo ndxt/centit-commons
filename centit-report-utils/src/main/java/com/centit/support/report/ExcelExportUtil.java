@@ -12,6 +12,7 @@ import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.poi.ss.usermodel.CellType.NUMERIC;
+
 
 /**
  * 生成基本EXCEL工具类
@@ -54,7 +55,7 @@ public abstract class ExcelExportUtil {
      */
     public static void generateExcel(OutputStream outputStream, String sheetName,
                                      List<?> objLists, String[] header, String[] property) throws IOException {
-        try(XSSFWorkbook wb = new XSSFWorkbook()) {
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
             Sheet sheet = wb.createSheet(sheetName);
             generateExcelSheet(sheet, objLists, header, property);
             wb.write(outputStream);
@@ -71,7 +72,7 @@ public abstract class ExcelExportUtil {
      * @throws IOException 文件操作异常
      */
     public static void generateExcel(OutputStream outputStream, List<?> objLists, String[] header, String[] property) throws IOException {
-        try(XSSFWorkbook wb = new XSSFWorkbook()) {
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
             Sheet sheet = wb.createSheet();
             generateExcelSheet(sheet, objLists, header, property);
             wb.write(outputStream);
@@ -89,7 +90,7 @@ public abstract class ExcelExportUtil {
      */
     public static void generateExcel(OutputStream outputStream, String sheetName,
                                      List<Object[]> objLists, String[] header) throws IOException {
-        try(XSSFWorkbook wb = new XSSFWorkbook()) {
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
             Sheet sheet = wb.createSheet(sheetName);
             generateExcelSheet(sheet, objLists, header);
             wb.write(outputStream);
@@ -97,7 +98,7 @@ public abstract class ExcelExportUtil {
     }
 
     public static void generateExcel(OutputStream outputStream, List<Object[]> objLists, String[] header) throws IOException {
-        try(XSSFWorkbook wb = new XSSFWorkbook()) {
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
             Sheet sheet = wb.createSheet();
             generateExcelSheet(sheet, objLists, header);
             wb.write(outputStream);
@@ -115,7 +116,7 @@ public abstract class ExcelExportUtil {
      **/
     public static void generateExcel(OutputStream outputStream, String sheetName,
                                      List<?> objLists, Class<?> objType) throws IOException {
-        try(XSSFWorkbook wb = new XSSFWorkbook()) {
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
             Sheet sheet = wb.createSheet(sheetName);
             generateExcelSheet(sheet, objLists, objType);
             wb.write(outputStream);
@@ -123,7 +124,7 @@ public abstract class ExcelExportUtil {
     }
 
     public static void generateExcel(OutputStream outputStream, List<?> objLists, Class<?> objType) throws IOException {
-        try(XSSFWorkbook wb = new XSSFWorkbook()) {
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
             Sheet sheet = wb.createSheet();
             generateExcelSheet(sheet, objLists, objType);
             wb.write(outputStream);
@@ -384,7 +385,6 @@ public abstract class ExcelExportUtil {
         }
     }
 
-
     /**
      * 生成Excel字节流
      *
@@ -435,7 +435,6 @@ public abstract class ExcelExportUtil {
         for (int i = 0; i < header.length; i++) {
             Cell cell = headerRow.createCell(i);
             setCellStyle(cell, cellStyle);
-
             cell.setCellValue(header[i]);
         }
     }
@@ -492,7 +491,7 @@ public abstract class ExcelExportUtil {
             case "double":
             case "Double":
             case "BigDecimal":
-                cell.setCellType(NUMERIC);
+                cell.setCellType(CellType.NUMERIC);
                 break;
             case "String":
                 cell.setCellType(CellType.STRING);
@@ -503,7 +502,7 @@ public abstract class ExcelExportUtil {
                 break;
             case "Date":
             case "Timestamp":
-                cell.setCellType(NUMERIC);
+                cell.setCellType(CellType.NUMERIC);
                 DataFormat format = sheet.getWorkbook().createDataFormat();
                 cellStyle.setDataFormat(format.getFormat("yyyy-MM-dd"));
                 break;
@@ -870,7 +869,7 @@ public abstract class ExcelExportUtil {
                 sheet=wb.createSheet(sheetName);
             }
         } else {
-            wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook() : new XSSFWorkbook();
+            wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook() : new SXSSFWorkbook();
             sheet = wb.createSheet(sheetName);
         }
         if (sheet.getLastRowNum() == 0) {
@@ -894,7 +893,7 @@ public abstract class ExcelExportUtil {
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             sheet = wb.getSheetAt(sheetIndex);
         } else {
-            wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook() : new XSSFWorkbook();
+            wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook() : new SXSSFWorkbook();
             sheet = wb.createSheet();
         }
         if (sheet.getLastRowNum() == 0) {
