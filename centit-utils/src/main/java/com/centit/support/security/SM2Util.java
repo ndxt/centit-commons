@@ -1,6 +1,7 @@
 package com.centit.support.security;
 
 import com.centit.support.common.ObjectException;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bouncycastle.asn1.gm.GMNamedCurves;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
@@ -24,6 +25,8 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Locale;
 
 public abstract class SM2Util {
@@ -31,6 +34,25 @@ public abstract class SM2Util {
      * 数字签名参数
      */
     public static final String CRYPTO_NAME_SM2 = "sm2p256v1";
+
+    /**
+     * 从证书中获取公钥，证书为base64编码字符串
+     * @param certStr 证书为base64编码字符串
+     * @return 公钥 04开头
+     */
+    public static String obtainPublicKey(String certStr){
+        try {
+            CertificateFactory factory = new CertificateFactory();
+            X509Certificate certificate = (X509Certificate) factory
+                .engineGenerateCertificate(new ByteArrayInputStream(Base64.decodeBase64(certStr)));
+            String publicKeyStr = Hex.toHexString(certificate.getPublicKey().getEncoded());
+            return publicKeyStr.length()>130?
+                publicKeyStr.substring(publicKeyStr.length() - 130) : publicKeyStr;
+        }catch (Exception e){
+            throw new ObjectException(ObjectException.DATA_VALIDATE_ERROR, "证书解析错误，请检查证书格式！", e);
+        }
+    }
+
     /**
      *  测试通过
      * @param publicKey 公钥
@@ -40,6 +62,8 @@ public abstract class SM2Util {
     public static  byte[] encryptUsePublicKey(byte[] data, String publicKey) {
         if (publicKey.length() == 128) {
             publicKey = "04" + publicKey;
+        } else if (publicKey.length() > 500) { //这个应该是传承了base64证书了
+            publicKey = obtainPublicKey(publicKey);
         }
         // 获取一条SM2曲线参数
         X9ECParameters sm2ECParameters = GMNamedCurves.getByName(CRYPTO_NAME_SM2);
@@ -211,9 +235,8 @@ public abstract class SM2Util {
 
     /**
      * 证书验签
-     *
      * @param certStr      证书串
-     * @param data    签名原文
+     * @param data         签名原文
      * @param signValueStr 签名产生签名值 此处的签名值实际上就是 R和S的sequence
      * @return 证书验证结果
      */
@@ -235,4 +258,5 @@ public abstract class SM2Util {
             throw new ObjectException(e);
         }
     }
+
 }
