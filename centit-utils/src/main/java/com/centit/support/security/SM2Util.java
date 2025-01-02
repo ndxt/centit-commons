@@ -62,7 +62,7 @@ public abstract class SM2Util {
     public static  byte[] encryptUsePublicKey(byte[] data, String publicKey) {
         if (publicKey.length() == 128) {
             publicKey = "04" + publicKey;
-        } else if (publicKey.length() > 500) { //这个应该是传承了base64证书了
+        } else if (publicKey.length() > 500) { //这个应该是传成了base64证书了
             publicKey = obtainPublicKey(publicKey);
         }
         // 获取一条SM2曲线参数
