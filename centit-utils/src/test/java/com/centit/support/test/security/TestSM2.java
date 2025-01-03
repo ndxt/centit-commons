@@ -6,6 +6,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import org.apache.commons.codec.binary.Base64;
 
+import java.io.IOException;
+
 
 /**
  * 简单的sm2
@@ -20,7 +22,21 @@ public class TestSM2 {
         System.out.println(SM2Util.verify(data, pubKey, sign));
     }
 
-    public static void main(String[] args)  throws Exception {
+    public static void main5(String[] args) throws IOException {
+        String password = "a123456789012345";
+        String publicKey="04F6E0C3345AE42B51E06BF50B98834988D54EBC7460FE135A48171BC0629EAE205EEDE253A530608178A98F1E19BB737302813BA39ED3FA3C51639D7A20C7391A";
+        System.out.println(Base64.encodeBase64String(SM2Util.encryptUsePublicKey( password.getBytes(), publicKey)));
+    }
+
+
+    public static void main(String[] args) throws IOException {
+        String dataBase64 ="MHgCIGmOeERO+YT/Ld5DWv31QqCMCFn3p7UJM4RfKjXIX1J3AiBJdiIqSUVSN7E0m6hTVR6BtgewdtQBj0tYdA/AIO/dZAQgaKGllqH2OEkayagjUUE8/PQdlQPG8Oo6Iwz+KSYzAnUEEOuTCiHFycxmmXzHp1qjV0A=";
+        byte[] plainText2 = SM2Util.decryptUserPrivateKey(Base64.decodeBase64(dataBase64), priKey);
+        System.out.println(new  String(plainText2));
+
+    }
+
+    public static void main3(String[] args)  throws Exception {
 
         Pair<String, String> key = SM2Util.generateSm2Keys(false);
         String plainText = "哈哈哈哈哈你好";

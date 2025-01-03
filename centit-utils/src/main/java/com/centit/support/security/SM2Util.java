@@ -25,8 +25,6 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Locale;
 
 public abstract class SM2Util {
@@ -84,7 +82,6 @@ public abstract class SM2Util {
             System.out.println("SM2公钥加密时出现异常:"+e.getMessage());
         }
         return null;
-
     }
 
     /**
@@ -108,7 +105,7 @@ public abstract class SM2Util {
         try {
             return sm2Engine.processBlock(cipherDataByte, 0, cipherDataByte.length);
         } catch (Exception e) {
-            System.out.println("SM2私钥解密时出现异常:"+e.getMessage());
+            System.out.println("SM2私钥解密时出现异常:"+ e.getMessage());
         }
         return null;
     }
