@@ -259,7 +259,6 @@ public abstract class SM2Util {
         }
     }
 
-
     public static byte[] toAniBytes(byte[] ansiBytes) throws IOException {
         byte[] source = new byte[32];
         System.arraycopy(ansiBytes, 1, source, 0, 32);
