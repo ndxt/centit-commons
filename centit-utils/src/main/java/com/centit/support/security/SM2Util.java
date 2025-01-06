@@ -3,6 +3,7 @@ package com.centit.support.security;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.gm.GMNamedCurves;
 import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ECParameters;
@@ -21,6 +22,8 @@ import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.X509Certificate;
@@ -75,7 +78,6 @@ public abstract class SM2Util {
         SM2Engine sm2Engine = new SM2Engine(SM2Engine.Mode.C1C3C2);
         // 设置sm2为加密模式
         sm2Engine.init(true, new ParametersWithRandom(publicKeyParameters, new SecureRandom()));
-
         try {
             return sm2Engine.processBlock(data, 0, data.length);
         } catch (Exception e) {
@@ -105,6 +107,7 @@ public abstract class SM2Util {
         try {
             return sm2Engine.processBlock(cipherDataByte, 0, cipherDataByte.length);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("SM2私钥解密时出现异常:"+ e.getMessage());
         }
         return null;
@@ -253,6 +256,44 @@ public abstract class SM2Util {
             return signature.verify(signValue);
         } catch (Exception e) {
             throw new ObjectException(e);
+        }
+    }
+
+
+    public static byte[] toAniBytes(byte[] ansiBytes) throws IOException {
+        byte[] source = new byte[32];
+        System.arraycopy(ansiBytes, 1, source, 0, 32);
+        ASN1Integer x = new ASN1Integer(source);
+        System.arraycopy(ansiBytes, 33, source, 0, 32);
+        ASN1Integer y = new ASN1Integer(source);
+        System.arraycopy(ansiBytes, 65, source, 0, 32);
+        DEROctetString derDig = new DEROctetString(source);
+        int mwlen = ansiBytes.length-97;
+        byte[] mw = new byte[mwlen];
+        System.arraycopy(ansiBytes, 97, mw, 0, mwlen);
+        DEROctetString derEnc = new DEROctetString(mw);
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        v.add(x);
+        v.add(y);
+        v.add(derDig);
+        v.add(derEnc);
+        DERSequence seq = new DERSequence(v);
+        return seq.getEncoded();
+
+    }
+
+    public static byte[] obtainAniBytes(byte[] ansiBytes) throws IOException {
+        try(ByteArrayInputStream bis = new ByteArrayInputStream(ansiBytes);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream()){
+            ASN1InputStream dis = new ASN1InputStream(bis);
+            bos.write(4);
+            ASN1Primitive derObj = dis.readObject();
+            ASN1Sequence asn1 = (ASN1Sequence) derObj;
+            for(int i=0; i< 4; i++) {
+                byte[] temp = asn1.getObjectAt(i).toASN1Primitive().getEncoded();
+                bos.write(temp, 2, temp.length-2);
+            }
+            return bos.toByteArray();
         }
     }
 
