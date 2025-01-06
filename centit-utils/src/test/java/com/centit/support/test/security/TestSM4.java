@@ -1,5 +1,6 @@
 package com.centit.support.test.security;
 
+import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.security.SM4Util;
 
@@ -38,5 +39,15 @@ public class TestSM4 {
             }
         }
         System.out.println("解密成功");
+    }
+
+    public static void main12(String[] args) throws Exception {  String helloWorld = "Hello World！";
+        byte[] bytes = helloWorld.getBytes();
+        byte[] ivBytes = UuidOpt.randomString(16).getBytes();
+        byte[] cipherText = SM4Util.encryptCbcPadding("a123456789012345".getBytes(StandardCharsets.UTF_8),
+            ivBytes, bytes);
+        bytes = SM4Util.decryptCbcPadding("a123456789012345".getBytes(StandardCharsets.UTF_8),
+            ivBytes, cipherText);
+        System.out.println(new String(bytes));
     }
 }
