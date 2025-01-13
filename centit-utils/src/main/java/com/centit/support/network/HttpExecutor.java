@@ -197,7 +197,7 @@ public abstract class HttpExecutor {
                 builder.setProxy(executorContext.getHttpProxy());
             }
             //设置超时时间
-            if(executorContext.getTimeout()!=-1){
+            if(executorContext.getTimeout()>1000){
                 builder.setConnectionRequestTimeout(executorContext.getTimeout())
                     .setConnectTimeout(executorContext.getTimeout())
                     .setSocketTimeout(executorContext.getTimeout());
