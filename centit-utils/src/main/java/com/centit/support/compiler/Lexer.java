@@ -399,9 +399,9 @@ public class Lexer {
 
         while (true) {
             curWord = getARegularWord();
-            if (curWord == null || "".equals(curWord))
+            if (curWord == null || curWord.isEmpty()) {
                 break;
-            else if ((this.languageType == LANG_TYPE_JAVA && "//".equals(curWord)) ||
+            } else if ((this.languageType == LANG_TYPE_JAVA && "//".equals(curWord)) ||
                 (this.languageType == LANG_TYPE_SQL && "--".equals(curWord)))
                 this.seekToLineEnd();
             else if (this.languageType != LANG_TYPE_DEFAULT && "/*".equals(curWord))

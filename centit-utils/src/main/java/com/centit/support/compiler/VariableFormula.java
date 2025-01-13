@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 public class VariableFormula {
 
-    private Lexer lex;
+    private final Lexer lex;
     private VariableTranslate trans;
     private Map<String, Function<Object[], Object>> extendFuncMap;
 
@@ -111,7 +111,7 @@ public class VariableFormula {
     }
 
     public static boolean isKeyWord(String sWord) {
-        if (sWord == null || sWord.length() == 0)
+        if (sWord == null || sWord.isEmpty())
             return false;
         char firstChar = sWord.charAt(0);
         if ((firstChar == ',') || (firstChar == '(') || (firstChar == ')'))
@@ -120,7 +120,7 @@ public class VariableFormula {
     }
 
     private static boolean isBinocularOperator(String sWord) {
-        if (sWord == null || sWord.length() == 0)
+        if (sWord == null || sWord.isEmpty())
             return false;
         char firstChar = sWord.charAt(0);
         if (firstChar == ',')
@@ -199,7 +199,7 @@ public class VariableFormula {
 
     private Object calcItem() {
         String str = lex.getAWord();
-        if (str == null || str.length() == 0) return null;
+        if (str == null || str.isEmpty()) return null;
         // 表达式结束
         if (str.charAt(0) == ')' || str.charAt(0) == ',' || str.charAt(0) == ';') {
             lex.writeBackAWord(str);
@@ -226,10 +226,10 @@ public class VariableFormula {
                     retSet.add(nextObj);
                     str = lex.getAWord();
                 }
-                if (str == null || str.length() == 0 || str.charAt(0) != ')') return null;
+                if (str == null || str.isEmpty() || str.charAt(0) != ')') return null;
                 return retSet;
             }  else {
-                if (str == null || str.length() == 0 || str.charAt(0) != ')') return null;
+                if (str == null || str.isEmpty() || str.charAt(0) != ')') return null;
                 return resStr;
             }
         } else if ((str.charAt(0) == '!') || str.equalsIgnoreCase("NOT")) {
@@ -253,7 +253,7 @@ public class VariableFormula {
                 Object item = calcFormula();
                 slOperand.add(item);
                 str = lex.getAWord();
-                if (str == null || str.length() == 0 || (!str.equals(",") && !str.equals("]")))
+                if (str == null || str.isEmpty() || (!str.equals(",") && !str.equals("]")))
                     return null;
                 if (str.equals("]")) {
                     return slOperand;
@@ -447,23 +447,23 @@ public class VariableFormula {
     }
 
     private Boolean calcOperatorIn(Object operand){
-        Boolean bInRes = false;
+        boolean bInRes = false;
         String str = lex.getAWord();
-        if (str == null || str.isEmpty() || !str.equals("(")) return null;
+        if (str == null || !str.equals("(")) return null;
 
         while (true) {
             Object item = calcFormula();
             // 需要展开 数组
             if (item instanceof Object[]) {
                 Object[] objs = (Object[]) item;
-                for (int i = 0; i < objs.length; i++) {
-                    if (GeneralAlgorithm.compareTwoObject(operand, objs[i]) == 0) {
+                for (Object obj : objs) {
+                    if (GeneralAlgorithm.compareTwoObject(operand, obj) == 0) {
                         bInRes = true;
                         break;
                     }
                 }
             } else if (item instanceof Collection) {
-                for (Object obj : (Collection) item) {
+                for (Object obj : (Collection<?>) item) {
                     if (GeneralAlgorithm.compareTwoObject(operand, obj) == 0) {
                         bInRes = true;
                         break;
@@ -475,7 +475,7 @@ public class VariableFormula {
                 }
             }
             str = lex.getAWord();
-            if (str == null || str.length() == 0 || (!str.equals(",") && !str.equals(")"))) return null;
+            if (str == null || str.isEmpty() || (!str.equals(",") && !str.equals(")"))) return null;
             if (str.equals(")")) {
                 lex.writeBackAWord(str);
                 break;
