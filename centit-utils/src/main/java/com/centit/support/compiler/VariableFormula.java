@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 
+@SuppressWarnings("unused")
 public class VariableFormula {
 
     private final Lexer lex;

@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class Lexer {
 
     /**
@@ -529,7 +530,7 @@ public class Lexer {
 
     public String getStringUntil(String szBreak) {
         int bp = startPos;
-        int ep = startPos;
+        int ep;
         while (true) {
             ep = startPos;
             String sWord = getAWord(false);
