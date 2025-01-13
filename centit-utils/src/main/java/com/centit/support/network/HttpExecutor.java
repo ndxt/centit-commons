@@ -198,11 +198,11 @@ public abstract class HttpExecutor {
             }
             //设置超时时间
             if(executorContext.getTimeout()!=-1){
-                builder.setConnectionRequestTimeout(5000)
+                builder.setConnectionRequestTimeout(executorContext.getTimeout())
                     .setConnectTimeout(executorContext.getTimeout())
                     .setSocketTimeout(executorContext.getTimeout());
             } else {
-                builder.setConnectionRequestTimeout(5000)
+                builder.setConnectionRequestTimeout(10000)
                     .setConnectTimeout(10000)
                     .setSocketTimeout(20000);
             }
