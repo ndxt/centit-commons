@@ -317,6 +317,10 @@ public class VariableFormula {
                     return BooleanBaseOpt.castObjectToBoolean(operand) ||
                         BooleanBaseOpt.castObjectToBoolean(operand2);
                 }
+                if(operand==null || StringUtils.isBlank(StringBaseOpt.objectToString(operand)))
+                    return operand2;
+                if(operand2==null || StringUtils.isBlank(StringBaseOpt.objectToString(operand2)))
+                    return operand;
                 return StringBaseOpt.concat(operand, operand2);
             }
 
