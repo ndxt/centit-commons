@@ -357,7 +357,7 @@ public class Lexer {
             startPos++;
             canAcceptOpt = true;
             s = formulaSen.substring(bp, startPos);
-        } else if ("\'".equals(s)) {
+        } else if ("'".equals(s)) {
             int bp = startPos - 1;
             while (startPos < sl && formulaSen.charAt(startPos) != '\'') {
                 if (this.languageType == LANG_TYPE_JAVA && formulaSen.charAt(startPos) == '\\') {
@@ -450,7 +450,7 @@ public class Lexer {
         int nBracket = 1;
         while (true) {
             String sWord = getAWord(false);
-            if (sWord == null || sWord.equals(""))
+            if (sWord == null || sWord.isEmpty())
                 return false;
             if (sWord.equals("("))
                 nBracket++;
@@ -470,7 +470,7 @@ public class Lexer {
         int nBracket = 1;
         while (true) {
             String sWord = getAWord(false);
-            if (sWord == null || sWord.equals(""))
+            if (sWord == null || sWord.isEmpty())
                 return false;
             if (sWord.equals("["))
                 nBracket++;
@@ -490,7 +490,7 @@ public class Lexer {
         int nBracket = 1;
         while (true) {
             String sWord = getAWord(false);
-            if (sWord == null || sWord.equals(""))
+            if (sWord == null || sWord.isEmpty())
                 return false;
             if (sWord.equals("{"))
                 nBracket++;
@@ -506,7 +506,7 @@ public class Lexer {
         String sWord;
         while (true) {
             sWord = getAWord();
-            if (sWord == null || sWord.equals(""))
+            if (sWord == null || sWord.isEmpty())
                 return;
             if (sWord.equals("("))
                 nBracket++;
@@ -533,11 +533,10 @@ public class Lexer {
         while (true) {
             ep = startPos;
             String sWord = getAWord(false);
-            if (sWord == null || sWord.equals("") || sWord.equals(szBreak))
+            if (sWord == null || sWord.isEmpty() || sWord.equals(szBreak))
                 break;
         }
-        String str = formulaSen.substring(bp, ep);
-        return str;
+        return formulaSen.substring(bp, ep);
     }
 
     public void resetToBegin() {
@@ -571,7 +570,7 @@ public class Lexer {
     public boolean seekTo(String aword, final boolean skipAnnotate) {
         while (true) {
             curWord = skipAnnotate ? this.getAWord() : this.getARegularWord();
-            if (curWord == null || "".equals(curWord))
+            if (curWord == null || curWord.isEmpty())
                 return false;
             if (curWord.equals(aword))
                 return true;
