@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -51,12 +50,7 @@ public abstract class Md5Encoder {
         if(StringUtils.isBlank(data)){
             return null;
         }
-        try {
-            return encode(data.getBytes("utf8"));
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
-            return null;
-        }
+        return encode(data.getBytes());
     }
 
     /**
@@ -84,12 +78,7 @@ public abstract class Md5Encoder {
         if(StringUtils.isBlank(data)){
             return null;
         }
-        try {
-            return encodeBase64(data.getBytes("utf8"), urlSafe);
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
-            return null;
-        }
+        return encodeBase64(data.getBytes(), urlSafe);
     }
 
     public static String encodeBase64(String data) {
@@ -121,13 +110,13 @@ public abstract class Md5Encoder {
         MessageDigest MD5;
         try {
             MD5 = MessageDigest.getInstance("MD5");
-            byte[] saltBytes = salt.getBytes("utf8");
+            byte[] saltBytes = salt.getBytes();
             MD5.update(saltBytes, 0, saltBytes.length);
-            byte[] hashedBytes = MD5.digest(data.getBytes("utf8"));
+            byte[] hashedBytes = MD5.digest(data.getBytes());
             for (int i = 0; i < iterations - 1; i++)
                 hashedBytes = MD5.digest(hashedBytes);
             return new String(Hex.encodeHex(hashedBytes));
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException e) {
             logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }

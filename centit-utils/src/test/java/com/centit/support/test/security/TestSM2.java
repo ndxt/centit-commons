@@ -2,14 +2,8 @@ package com.centit.support.test.security;
 
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.security.SM2Util;
-import org.apache.commons.lang3.tuple.Pair;
-
 import org.apache.commons.codec.binary.Base64;
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.math.ec.ECPoint;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 
