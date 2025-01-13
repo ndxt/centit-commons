@@ -305,19 +305,15 @@ public class VariableFormula {
 
     private Object calcOperate(Object operand, Object operand2, int optID) {
         switch (optID) {
-            case ConstDefine.OP_LOGICOR: {
-                return BooleanBaseOpt.castObjectToBoolean(operand, false) ||
-                    BooleanBaseOpt.castObjectToBoolean(operand2, false);
-            }
             case ConstDefine.OP_AND:
-            case ConstDefine.OP_LOGICAND: {
+            case ConstDefine.OP_BITAND: {
                 return BooleanBaseOpt.castObjectToBoolean(operand, false) &&
                     BooleanBaseOpt.castObjectToBoolean(operand2, false);
             }
 
+            case ConstDefine.OP_BITOR:
             case ConstDefine.OP_OR: {
-                if ((BooleanBaseOpt.isBoolean(operand) || NumberBaseOpt.isNumber(operand))
-                    && (BooleanBaseOpt.isBoolean(operand2) || NumberBaseOpt.isNumber(operand2))) {
+                if (BooleanBaseOpt.isBoolean(operand) && BooleanBaseOpt.isBoolean(operand2) ) {
                     return BooleanBaseOpt.castObjectToBoolean(operand) ||
                         BooleanBaseOpt.castObjectToBoolean(operand2);
                 }
