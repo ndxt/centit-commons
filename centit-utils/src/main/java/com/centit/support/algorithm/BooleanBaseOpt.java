@@ -36,7 +36,7 @@ public abstract class BooleanBaseOpt {
         if (StringUtils.equalsAnyIgnoreCase(str, "n", "no", "f", "false", "off")) {
             return false;
         }
-        return null;//ringRegularOpt.isNumber(str);
+        return null;//StringRegularOpt.isNumber(str);
     }
 
     public static Boolean castObjectToBoolean(Object obj, Boolean defaultValue) {
