@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
     public static final int functionsSum = 79;
-    protected static final FunctionInfo functionsList[] = {
+    protected static final FunctionInfo[] functionsList = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
         new FunctionInfo("capital", 1, ConstDefine.FUNC_CAPITAL, ConstDefine.TYPE_STR),  // capital (123.45)="一百二十三点四五"
@@ -104,7 +104,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("encode", 1, ConstDefine.FUNC_ENCODE, ConstDefine.TYPE_STR), // 编码 目前仅支持 HEX base64 base64UrlSafe
         new FunctionInfo("decode", 1, ConstDefine.FUNC_DECODE, ConstDefine.TYPE_ANY)// 解码 目前仅支持 HEX base64 base64UrlSafe
     };
-    private static double COMPARE_MIN_DOUBLE = 0.0000001;
+    private static final double COMPARE_MIN_DOUBLE = 0.0000001;
     private EmbedFunc() {
         throw new IllegalAccessError("Utility class");
     }
@@ -120,7 +120,7 @@ public abstract class EmbedFunc {
     private static LeftRightPair<Integer, List<Object>> flatOperands(List<Object> slOperand) {
         int nCount = 0;
         List<Object> ret = new ArrayList<>();
-        if (slOperand != null && slOperand.size() > 0) {
+        if (slOperand != null && !slOperand.isEmpty()) {
             for (Object obj : slOperand) {
                 if (obj instanceof Object[]) {
                     Object[] objs = (Object[]) obj;
@@ -129,8 +129,8 @@ public abstract class EmbedFunc {
                         nCount++;
                     }
                 } else if (obj instanceof Collection) {
-                    ret.addAll((Collection) obj);
-                    nCount += ((Collection) obj).size();
+                    ret.addAll((Collection<?>) obj);
+                    nCount += ((Collection<?>) obj).size();
                 } else {
                     ret.add(obj);
                     nCount++;
@@ -259,7 +259,7 @@ public abstract class EmbedFunc {
                 while (m.find()) {
                     matchValues.add(sValues.substring(m.start(), m.end()));
                 }
-                if(matchValues.size()==0)
+                if(matchValues.isEmpty())
                     return null;
                 if(matchValues.size()==1)
                     return matchValues.get(0);
@@ -787,6 +787,8 @@ public abstract class EmbedFunc {
                     dt = DatetimeOpt.currentUtilDate();
                 Calendar cal = new GregorianCalendar();
                 cal.setTime(dt);
+                //Calendar.DAY_OF_WEEK
+                //assert field <=17 && field >=0;
                 return cal.get(field);
             }
 
