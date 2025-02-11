@@ -12,6 +12,8 @@ import java.io.OutputStream;
 import java.util.List;
 /**
  * 未归类的文档操作，比如：文档合并
+ * OFD 操作指南
+ * http://www.kler.cn/a/414463.html?action=onClick
  * <dependency>
  *     <groupId>org.ofdrw</groupId>
  *     <artifactId>ofdrw-tool</artifactId>
