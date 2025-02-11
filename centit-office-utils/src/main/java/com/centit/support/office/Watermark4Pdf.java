@@ -156,6 +156,7 @@ public abstract class Watermark4Pdf {
      * @param inputFile       源文件路径及文件
      * @param waterMarkStr    水印字符串
      * @param suffix          前缀
+     * @param isRepeat        水印是否重复
      * @return 是否成功
      */
     public static boolean addWatermark4Word(String inputFile, String waterMarkStr, String suffix, boolean isRepeat) {

@@ -14,11 +14,11 @@ import java.util.List;
  * 未归类的文档操作，比如：文档合并
  * OFD 操作指南
  * http://www.kler.cn/a/414463.html?action=onClick
- * <dependency>
- *     <groupId>org.ofdrw</groupId>
- *     <artifactId>ofdrw-tool</artifactId>
- *     <version>2.3.5</version>
- * </dependency>
+ * &lt;dependency&gt;
+ *     &lt;groupId&gt;org.ofdrw&lt;/groupId&gt;
+ *     &lt;artifactId&gt;ofdrw-tool&lt;/artifactId&gt;
+ *     &lt;version&gt;2.3.5&lt;/version&gt;
+ * &lt;/dependency&gt;
  */
 
 public class DocOptUtil {
