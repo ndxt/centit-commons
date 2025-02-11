@@ -10,9 +10,17 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+/**
+ * 未归类的文档操作，比如：文档合并
+ * <dependency>
+ *     <groupId>org.ofdrw</groupId>
+ *     <artifactId>ofdrw-tool</artifactId>
+ *     <version>2.3.5</version>
+ * </dependency>
+ */
 
-public class PdfOptUtil {
-    private static final Logger logger = LoggerFactory.getLogger(PdfOptUtil.class);
+public class DocOptUtil {
+    private static final Logger logger = LoggerFactory.getLogger(DocOptUtil.class);
 
     public static void mergePdfFiles(String outputPath, List<String> inputPaths) {
         try (FileOutputStream fos = new FileOutputStream(outputPath)) {
