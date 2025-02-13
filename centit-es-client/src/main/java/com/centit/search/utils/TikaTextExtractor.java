@@ -3,8 +3,7 @@ package com.centit.search.utils;
 import com.centit.support.network.HttpExecutor;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.*;
 import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +30,12 @@ public abstract class TikaTextExtractor {
          *  Tika tika = new Tika();
          *  tika.parseToString(inputStream);
          */
-        AutoDetectParser tikaParser = new AutoDetectParser();// AutoDetectParser 根据不同的二进制文件的特殊格式 (比如说Magic Code)，来寻找适合的Parser。
+        Parser tikaParser = new AutoDetectParser();// AutoDetectParser 根据不同的二进制文件的特殊格式 (比如说Magic Code)，来寻找适合的Parser。
         ContentHandler handler = new BodyContentHandler(500*1024*1024);
         Metadata metadata = new Metadata();
         ParseContext parseContext = new ParseContext();
-        parseContext.set(AutoDetectParser.class, tikaParser);
+        parseContext.set(Parser.class, tikaParser);
+
         /*
          * 参数的含义为：
          * inputStream：文件输入流
@@ -44,12 +44,11 @@ public abstract class TikaTextExtractor {
          * ParseContext:用来存储需要填入的参数,最少需要设置tikaParser本身
          * **/
         tikaParser.parse(inputStream, handler, metadata, parseContext);
-        /*System.out.println(handler.toString());
-        System.out.println("---------------------------");
+        //System.out.println(handler.toString());
         for(String name :metadata.names()){
             System.out.println(name+"-->"+metadata.get(name));
-        }*/
-        //String text = metadata.get(Metadata.SOURCE);
+        }
+        System.out.println("---------------------------");
         return handler.toString();
     }
 
