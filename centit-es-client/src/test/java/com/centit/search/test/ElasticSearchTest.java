@@ -168,7 +168,7 @@ public class ElasticSearchTest {
     }
 
 
-    public ObjectDocument setIndexDocument() throws TikaException, IOException, SAXException {
+    public ObjectDocument setIndexDocument() throws IOException, SAXException, TikaException {
         ObjectDocument indexDocument = new ObjectDocument();
         indexDocument.setOsId("ESXM");
         indexDocument.setOptId("JSPT");
@@ -181,7 +181,7 @@ public class ElasticSearchTest {
     }
 
     //@Test
-    public void Obj2json() throws TikaException, IOException, SAXException {
+    public void Obj2json() throws IOException, SAXException, TikaException {
         ObjectDocument indexDocument = setIndexDocument();
         String aa = JSONObject.toJSONString(indexDocument);
         IndexRequest request = new IndexRequest("test", "info");

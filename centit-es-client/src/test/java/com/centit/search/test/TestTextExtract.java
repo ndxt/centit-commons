@@ -35,10 +35,9 @@ public class TestTextExtract {
     }
 
     public static void main(String[] args) {
-
         try {
             System.out.println(
-                TikaTextExtractor.extractFileText("/Users/codefan/Documents/temp/fp.pdf"));
+                TikaTextExtractor.extractFileText("/Users/codefan/Documents/WorkDoc/产品研发/数据中台/智慧路灯数据中台.docx"));
             System.out.println("done!");
         } catch (IOException | TikaException |SAXException e) {
             System.out.println("error!" + e.getMessage());
@@ -48,7 +47,6 @@ public class TestTextExtract {
         T1 t11 = new T1();
         t11.setA(1);
         t11.setB("T11");
-
         T1 t12 = new T1();
         t12.setA(2);
         t12.setB("T12");
