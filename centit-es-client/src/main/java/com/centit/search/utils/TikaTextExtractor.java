@@ -49,8 +49,8 @@ public abstract class TikaTextExtractor {
         for(String name :metadata.names()){
             System.out.println(name+"-->"+metadata.get(name));
         }*/
-        String text = metadata.get(Metadata.SOURCE);
-        return text;
+        //String text = metadata.get(Metadata.SOURCE);
+        return handler.toString();
     }
 
     public static String extractFileText(File file) throws IOException, TikaException, SAXException {
