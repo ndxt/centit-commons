@@ -35,7 +35,6 @@ public abstract class TikaTextExtractor {
         Metadata metadata = new Metadata();
         ParseContext parseContext = new ParseContext();
         parseContext.set(Parser.class, tikaParser);
-
         /*
          * 参数的含义为：
          * inputStream：文件输入流
@@ -45,10 +44,10 @@ public abstract class TikaTextExtractor {
          * **/
         tikaParser.parse(inputStream, handler, metadata, parseContext);
         //System.out.println(handler.toString());
-        for(String name :metadata.names()){
+        /*for(String name :metadata.names()){
             System.out.println(name+"-->"+metadata.get(name));
         }
-        System.out.println("---------------------------");
+        System.out.println("---------------------------");*/
         return handler.toString();
     }
 
