@@ -1,8 +1,10 @@
 package com.centit.search.service.Impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.annotation.ESField;
 import com.centit.search.document.DocumentUtils;
 import com.centit.search.service.ESServerConfig;
+import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.search.service.Searcher;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -20,6 +22,7 @@ import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -435,6 +438,33 @@ public class ESSearcher implements Searcher{
     public ESSearcher setHighlightPostTags(String[] highlightPostTags) {
         this.highlightPostTags = highlightPostTags;
         return this;
+    }
+
+    public JSONObject getDocumentById(String idFieldName, String docId) {
+        RestHighLevelClient restHighLevelClient = null;
+        try {
+            SearchRequest searchRequest = new SearchRequest(indexName);
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            TermQueryBuilder termQuery = QueryBuilders.termQuery(idFieldName, docId);
+            searchSourceBuilder.query(termQuery);
+            searchRequest.source(searchSourceBuilder);
+            restHighLevelClient = clientPool.borrowObject();
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHit[] hits = searchResponse.getHits().getHits();
+            if(hits.length > 0) {
+                String sourceAsString = hits[0].getSourceAsString();
+                return JSONObject.parseObject(sourceAsString);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("查询异常,异常信息：" + e.getMessage());
+            return null;
+        } finally {
+            if (restHighLevelClient != null) {
+                clientPool.returnObject(restHighLevelClient);
+            }
+        }
     }
 
 }
