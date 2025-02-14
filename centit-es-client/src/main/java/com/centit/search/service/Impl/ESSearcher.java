@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.annotation.ESField;
 import com.centit.search.document.DocumentUtils;
 import com.centit.search.service.ESServerConfig;
-import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.search.service.Searcher;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
