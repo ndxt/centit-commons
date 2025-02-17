@@ -1,5 +1,6 @@
 package com.centit.search.service;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.centit.search.document.DocumentUtils;
 import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.Impl.ESSearcher;
@@ -9,7 +10,7 @@ import com.centit.support.file.PropertiesReader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.elasticsearch.client.RestHighLevelClient;
+
 
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,15 +27,15 @@ public abstract class IndexerSearcherFactory {
     private static ConcurrentHashMap<String, ESSearcher> searcherMap
             = new ConcurrentHashMap<>();
 
-    private static ConcurrentHashMap<ESServerConfig, GenericObjectPool<RestHighLevelClient>> clientPoolMap
+    private static ConcurrentHashMap<ESServerConfig, GenericObjectPool<ElasticsearchClient>> clientPoolMap
         = new ConcurrentHashMap<>();
 
 
-    public static GenericObjectPool<RestHighLevelClient> obtainclientPool(ESServerConfig config, boolean createNew){
-        GenericObjectPool<RestHighLevelClient> clientPool =
+    public static GenericObjectPool<ElasticsearchClient> obtainclientPool(ESServerConfig config, boolean createNew){
+        GenericObjectPool<ElasticsearchClient> clientPool =
             clientPoolMap.get(config);
         if(clientPool==null && createNew) {
-            GenericObjectPoolConfig<RestHighLevelClient> poolConfig = new GenericObjectPoolConfig<>();
+            GenericObjectPoolConfig<ElasticsearchClient> poolConfig = new GenericObjectPoolConfig<>();
             poolConfig.setMaxTotal(30);
             poolConfig.setMinIdle(3);
             clientPool = new GenericObjectPool<>(new PooledRestClientFactory(config),
@@ -44,7 +45,7 @@ public abstract class IndexerSearcherFactory {
         return clientPool;
     }
 
-    public static GenericObjectPool<RestHighLevelClient> obtainclientPool(ESServerConfig config){
+    public static GenericObjectPool<ElasticsearchClient> obtainclientPool(ESServerConfig config){
         return obtainclientPool(config, true);
     }
 

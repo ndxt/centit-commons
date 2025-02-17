@@ -14,7 +14,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -36,7 +36,7 @@ import java.util.concurrent.ExecutionException;
  */
 @SuppressWarnings("deprecated")
 public class ElasticSearchTest {
-    RestHighLevelClient client;
+    ElasticsearchClient client;
 
     @SuppressWarnings({ "unchecked" })
     public void before() throws UnknownHostException, InterruptedException, ExecutionException {
@@ -47,7 +47,7 @@ public class ElasticSearchTest {
         //client = new PreBuiltTransportClient(esSettings);//初始化client较老版本发生了变化，此方法有几个重载方法，初始化插件等。
         //此步骤添加IP，至少一个，其实一个就够了，因为添加了自动嗅探配置
         //client.addTransportAddress(new TransportAddress(InetAddress.getByName("localhost"), 9300));
-        client = new RestHighLevelClient(
+        client = new ElasticsearchClient(
             RestClient.builder(
                 new HttpHost("192.168.134.250", 32590, "http")) );
         System.out.println("success connect");

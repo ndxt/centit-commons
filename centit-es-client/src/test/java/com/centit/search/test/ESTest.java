@@ -20,7 +20,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.core.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -67,7 +67,7 @@ public class ESTest {
         config.setMinScore(0.5f);
 
 
-        RestHighLevelClient esClient = IndexerSearcherFactory.obtainclientPool(config).borrowObject();
+        ElasticsearchClient esClient = IndexerSearcherFactory.obtainclientPool(config).borrowObject();
         //jsjtkj_index
         //过滤条件 filterColumnName  filterValue
         SearchRequest searchRequest = new SearchRequest("jsjtkj_index");
@@ -160,7 +160,7 @@ public class ESTest {
     }
 
     public static void testESIndex2(){
-        try (final RestHighLevelClient client = new RestHighLevelClient(
+        try (final ElasticsearchClient client = new ElasticsearchClient(
             RestClient.builder(
                 new HttpHost("192.168.134.250", 32404, "http")
             )

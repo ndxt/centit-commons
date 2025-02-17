@@ -1,5 +1,7 @@
 package com.centit.search.service.Impl;
 
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch.core.GetResponse;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.annotation.ESField;
 import com.centit.search.document.DocumentUtils;
@@ -13,26 +15,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.text.Text;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.management.Query;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -57,7 +45,7 @@ public class ESSearcher implements Searcher{
 
     private ESServerConfig config;
 
-    private GenericObjectPool<RestHighLevelClient> clientPool;
+    private GenericObjectPool<ElasticsearchClient> clientPool;
     private String indexName;
     private String[] highlightPreTags;
     private String[] highlightPostTags;
@@ -81,7 +69,7 @@ public class ESSearcher implements Searcher{
         this.allFields = new ArrayList<>();
     }
 
-    public ESSearcher(ESServerConfig config, GenericObjectPool<RestHighLevelClient> clientPool){
+    public ESSearcher(ESServerConfig config, GenericObjectPool<ElasticsearchClient> clientPool){
         this();
         this.config = config;
         this.clientPool = clientPool;
@@ -91,7 +79,7 @@ public class ESSearcher implements Searcher{
         this.config = config;
     }
 
-    public void setClientPool(GenericObjectPool<RestHighLevelClient> clientPool) {
+    public void setClientPool(GenericObjectPool<ElasticsearchClient> clientPool) {
         this.clientPool = clientPool;
     }
 
@@ -126,22 +114,15 @@ public class ESSearcher implements Searcher{
         queryFields = CollectionsOpt.listToArray(qf);
     }
 
-    public Pair<Long, List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
-                                                         String[] includes, String[] excludes,
-                                                         int pageNo, int pageSize){
-        RestHighLevelClient client = null;
+    public Pair<Long, List<Map<String, Object>>> esSearch(Query query, List<SortOptions> sortOptions,
+                                                          List<String> includes, List<String> excludes,
+                                                          int pageNo, int pageSize) {
+        ElasticsearchClient client = null;
         long totalHits =0;
         try {
             client = clientPool.borrowObject();
             List<Map<String, Object>> retList = new ArrayList<>(pageSize+5);
-            /*IndicesExistsResponse indicesExistsResponse = client.admin().indices()
-                    .exists(new IndicesExistsRequest(config.getIndexName()))
-                    .actionGet();
-            if (!indicesExistsResponse.isExists()){
-                json.put("error","索引不存在");
-                retList.add(json);
-                return retList;
-            }*/
+
             SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(queryBuilder);
             //添加默认根据匹配度排序 .order(SortOrder.DESC)
@@ -439,20 +420,16 @@ public class ESSearcher implements Searcher{
         return this;
     }
 
-    public JSONObject getDocumentById(String idFieldName, String docId) {
-        RestHighLevelClient restHighLevelClient = null;
+    public <T> T getDocumentById(String idFieldName, String docId, Class<T> clazz) {
+        ElasticsearchClient client = null;
         try {
-            SearchRequest searchRequest = new SearchRequest(indexName);
-            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-            TermQueryBuilder termQuery = QueryBuilders.termQuery(idFieldName, docId);
-            searchSourceBuilder.query(termQuery);
-            searchRequest.source(searchSourceBuilder);
-            restHighLevelClient = clientPool.borrowObject();
-            SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHit[] hits = searchResponse.getHits().getHits();
-            if(hits.length > 0) {
-                String sourceAsString = hits[0].getSourceAsString();
-                return JSONObject.parseObject(sourceAsString);
+            client = clientPool.borrowObject();
+            GetResponse<T> response = client.get(g -> g
+                    .index(indexName)
+                    .id(docId), clazz
+            );
+            if (response.found()) {
+                return response.source();
             } else {
                 return null;
             }
@@ -460,8 +437,8 @@ public class ESSearcher implements Searcher{
             logger.error("查询异常,异常信息：" + e.getMessage());
             return null;
         } finally {
-            if (restHighLevelClient != null) {
-                clientPool.returnObject(restHighLevelClient);
+            if (client != null) {
+                clientPool.returnObject(client);
             }
         }
     }

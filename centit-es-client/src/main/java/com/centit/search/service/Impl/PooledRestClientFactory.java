@@ -1,5 +1,9 @@
 package com.centit.search.service.Impl;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.centit.search.service.ESServerConfig;
 import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -9,16 +13,13 @@ import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-
 
 /**
  * Created by codefan on 17-6-27.
  */
-public class PooledRestClientFactory implements PooledObjectFactory<RestHighLevelClient> {
+public class PooledRestClientFactory implements PooledObjectFactory<ElasticsearchClient> {
 
     private ESServerConfig config;
 
@@ -27,7 +28,7 @@ public class PooledRestClientFactory implements PooledObjectFactory<RestHighLeve
     }
 
     @Override
-    public PooledObject<RestHighLevelClient> makeObject() throws Exception {
+    public PooledObject<ElasticsearchClient> makeObject() throws Exception {
         RestClientBuilder clientBuilder = RestClient.builder(config.getHttpHosts());
         //添加用户认证
         if (StringUtils.isNotBlank(config.getUsername()) && StringUtils.isNotBlank(config.getPassword())){
@@ -40,41 +41,44 @@ public class PooledRestClientFactory implements PooledObjectFactory<RestHighLeve
                     httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
             // httpClientBuilder.disableAuthCaching();
         }
-        RestHighLevelClient client = new RestHighLevelClient(clientBuilder);
+        ElasticsearchTransport transport = new RestClientTransport(
+            clientBuilder.build(), new JacksonJsonpMapper());
+        ElasticsearchClient client = new ElasticsearchClient(transport);
         return new DefaultPooledObject<>(client);
     }
 
     @Override
-    public void destroyObject(PooledObject<RestHighLevelClient> p) throws Exception {
+    public void destroyObject(PooledObject<ElasticsearchClient> p) throws Exception {
+        // RestClient restClient = p.getObject(); restClient.close();
         //p.getObject().close();
-        RestHighLevelClient client = p.getObject();
-        if( client!= null && client.ping(RequestOptions.DEFAULT)) {
-            try {
+        /* ElasticsearchClient client = p.getObject();
+         if(client!= null && client.ping().value()) { //RequestOptions.DEFAULT
+           try {
                 client.close();
             }catch (Exception e){
                 //ignore
             }
-        }
+        }*/
     }
 
     @Override
-    public boolean validateObject(PooledObject<RestHighLevelClient> p) {
-        RestHighLevelClient client = p.getObject();
+    public boolean validateObject(PooledObject<ElasticsearchClient> p) {
+        ElasticsearchClient client = p.getObject();
         try {
-            return client.ping(RequestOptions.DEFAULT);
+            return client.ping().value(); // RequestOptions.DEFAULT
         }catch(Exception e){
             return false;
         }
     }
 
     @Override
-    public void activateObject(PooledObject<RestHighLevelClient> p) throws Exception {
-        RestHighLevelClient client = p.getObject();
-        /*boolean response = */client.ping(RequestOptions.DEFAULT);
+    public void activateObject(PooledObject<ElasticsearchClient> p) throws Exception {
+        ElasticsearchClient client = p.getObject();
+        /*boolean response = */client.ping(); // RequestOptions.DEFAULT
     }
 
     @Override
-    public void passivateObject(PooledObject<RestHighLevelClient> p) throws Exception {
+    public void passivateObject(PooledObject<ElasticsearchClient> p) throws Exception {
         // Auto-generated method stub
     }
 
