@@ -81,8 +81,9 @@ public class PooledRestClientFactory implements PooledObjectFactory<Elasticsearc
 
     @Override
     public void activateObject(PooledObject<ElasticsearchClient> p) throws Exception {
-        ElasticsearchClient client = p.getObject();
-        /*boolean response = */client.ping(); // RequestOptions.DEFAULT
+        ///ElasticsearchClient client = p.getObject();
+        /*boolean response = */
+        // client.ping(); // RequestOptions.DEFAULT
     }
 
     @Override

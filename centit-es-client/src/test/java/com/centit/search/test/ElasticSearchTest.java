@@ -2,36 +2,45 @@ package com.centit.search.test;
 
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.centit.search.document.ObjectDocument;
 import com.centit.search.utils.TikaTextExtractor;
+import com.centit.support.security.SecurityOptUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.tika.exception.TikaException;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.Date;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by zhang_gd on 2017/6/12.
  */
 @SuppressWarnings("deprecated")
 public class ElasticSearchTest {
-    ElasticsearchClient client;
 
 
-    public void before() throws UnknownHostException, InterruptedException, ExecutionException {
-        /*Settings esSettings = Settings.builder()
-                //.put("cluster.name", "elasticsearch_zgd") //设置ES实例的名称
-                .put("client.transport.sniff", true) //自动嗅探整个集群的状态，把集群中其他ES节点的ip添加到本地的客户端列表中
-                .build();*/
-        //client = new PreBuiltTransportClient(esSettings);//初始化client较老版本发生了变化，此方法有几个重载方法，初始化插件等。
-        //此步骤添加IP，至少一个，其实一个就够了，因为添加了自动嗅探配置
-        //client.addTransportAddress(new TransportAddress(InetAddress.getByName("localhost"), 9300));
-       /* client = new ElasticsearchClient(
-            RestClient.builder(
-                new HttpHost("192.168.134.250", 32590, "http")) );
-        System.out.println("success connect");*/
+    public static void main(String[] args) throws IOException, SAXException, TikaException {
+        RestClientBuilder clientBuilder = RestClient.builder(
+            new HttpHost("192.168.134.250", 32590, "http"));
+        final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(AuthScope.ANY,
+            new UsernamePasswordCredentials(
+                SecurityOptUtils.decodeSecurityString("elastic"),
+                SecurityOptUtils.decodeSecurityString("MrGehkgo")));
+        clientBuilder.setHttpClientConfigCallback(httpClientBuilder ->
+            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+        ElasticsearchTransport transport = new RestClientTransport(
+            clientBuilder.build(), new JacksonJsonpMapper());
+        ElasticsearchClient client = new ElasticsearchClient(transport);
+
     }
 
     public ObjectDocument setIndexDocument() throws IOException, SAXException, TikaException {

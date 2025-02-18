@@ -48,9 +48,7 @@ public class DocumentSearchTest {
 
         ESServerConfig esServerConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
                 loadProperties() );
-
         ESSearcher fetchSearcher = IndexerSearcherFactory.obtainSearcher(esServerConfig, HelpDoc.class);
-
         Pair<Long, List<Map<String, Object>>> res = fetchSearcher.search(
             CollectionsOpt.createHashMap("osId", "zp_Qn5R5ROSo4sf-eovoWA"),
             "输入框", 1, 20);

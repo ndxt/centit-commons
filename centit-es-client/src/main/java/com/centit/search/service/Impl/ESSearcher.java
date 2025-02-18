@@ -59,9 +59,9 @@ public class ESSearcher implements Searcher{
     private List<String> highlightPreTags;
     private List<String> highlightPostTags;
 
-    private List<String> allFields;
     private List<String> queryFields;
-    private Set<String> highlightFields;
+    private final List<String> allFields;
+    private final Set<String> highlightFields;
 
 
     public ESSearcher(){
@@ -215,9 +215,7 @@ public class ESSearcher implements Searcher{
     }
 
     public static SortOptions.Builder mapSortBuilder( Map<String, Object> filterMap) {
-        if(filterMap==null || filterMap.isEmpty()){
-            return null;
-        }
+        boolean setSortField = false;
         SortOptions.Builder builder = new SortOptions.Builder();
         String selfOrderBy = StringBaseOpt.objectToString(filterMap.get(SELF_ORDER_BY));
         if(StringUtils.isBlank(selfOrderBy)){
@@ -231,6 +229,7 @@ public class ESSearcher implements Searcher{
                 aWord = lexer.getAWord();
                 String finalAWord = aWord;
                 builder.field(f -> f.field(field).order("desc".equalsIgnoreCase(finalAWord)?SortOrder.Desc:SortOrder.Asc));
+                setSortField = true;
                 while(StringUtils.equalsAnyIgnoreCase(aWord, "desc", "asc", ",")){
                     aWord = lexer.getAWord();
                 }
@@ -241,6 +240,10 @@ public class ESSearcher implements Searcher{
         if (StringUtils.isNotBlank(sortField)) {
             String sOrder = StringBaseOpt.objectToString(filterMap.get(TABLE_SORT_ORDER));
             builder.field(f -> f.field(sortField).order("desc".equalsIgnoreCase(sOrder)?SortOrder.Desc:SortOrder.Asc));
+            setSortField = true;
+        }
+        if(!setSortField) {
+            builder.score(s -> s.order(SortOrder.Desc));
         }
         return builder;
     }
@@ -264,10 +267,11 @@ public class ESSearcher implements Searcher{
                                               int pageNo, int pageSize) {
         SearchRequest.Builder builder = new SearchRequest.Builder();
         builder.query(Query.of(q -> q.bool(mapSearchRequest(filterMap, queryWords).build())))
-            .sort(mapSortBuilder(filterMap).build())
-            .from(pageNo>1?(pageNo-1)*pageSize:0)
-            .size(pageSize);
-
+            .sort(mapSortBuilder(filterMap).build());
+        if(pageSize>0){
+            builder.from(pageNo>1?(pageNo-1)*pageSize:0)
+                .size(pageSize);
+        }
         if(includes!=null && !includes.isEmpty() || excludes!=null && !excludes.isEmpty()) {
             builder.source(sc -> sc.filter(f -> {
                     if(includes!=null && !includes.isEmpty()){
@@ -312,8 +316,6 @@ public class ESSearcher implements Searcher{
         }
     }
 
-
-
     /**
      * 检索所有文档
      * @param fieldFilter 过滤的文件
@@ -325,9 +327,8 @@ public class ESSearcher implements Searcher{
     @Override
     public Pair<Long, List<Map<String, Object>>> search(Map<String, Object> fieldFilter,
                                                        String queryWords, int pageNo, int pageSize){
-
-
-        return esSearch(builderSearchRequest(queryWords, fieldFilter, null, null, pageNo, pageSize));
+        return esSearch(builderSearchRequest(queryWords, fieldFilter,
+            null, null, pageNo, pageSize));
     }
 
     /**
