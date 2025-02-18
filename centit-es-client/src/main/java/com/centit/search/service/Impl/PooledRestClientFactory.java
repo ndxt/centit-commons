@@ -5,14 +5,17 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.centit.search.service.ESServerConfig;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.PooledObjectFactory;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.http.Header;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 
@@ -29,7 +32,15 @@ public class PooledRestClientFactory implements PooledObjectFactory<Elasticsearc
 
     @Override
     public PooledObject<ElasticsearchClient> makeObject() throws Exception {
-        RestClientBuilder clientBuilder = RestClient.builder(config.getHttpHosts());
+        RestClientBuilder clientBuilder = RestClient.builder(config.getHttpHosts())
+            .setHttpClientConfigCallback(httpClientBuilder -> {
+            // 关键配置：移除默认的兼容性头
+            httpClientBuilder.setDefaultHeaders(CollectionsOpt.createList(
+                new BasicHeader("Content-Type", "application/json"),
+                new BasicHeader("Accept", "application/json")) // 强制指定旧版头
+            );
+            return httpClientBuilder;
+        });
         // Create the low-level client
         /*RestClient restClient = RestClient
             .builder(HttpHost.create(serverUrl))
