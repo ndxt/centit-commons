@@ -30,6 +30,14 @@ public class PooledRestClientFactory implements PooledObjectFactory<Elasticsearc
     @Override
     public PooledObject<ElasticsearchClient> makeObject() throws Exception {
         RestClientBuilder clientBuilder = RestClient.builder(config.getHttpHosts());
+        // Create the low-level client
+        /*RestClient restClient = RestClient
+            .builder(HttpHost.create(serverUrl))
+            .setDefaultHeaders(new Header[]{
+                new BasicHeader("Authorization", "ApiKey " + apiKey)
+            })
+            .build();
+        */
         //添加用户认证
         if (StringUtils.isNotBlank(config.getUsername()) && StringUtils.isNotBlank(config.getPassword())){
             final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
