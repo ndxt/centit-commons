@@ -121,12 +121,6 @@ public class ESSearcher implements Searcher{
     public BoolQuery.Builder mapSearchRequest(Map<String, Object> fieldFilter,
                                                         String queryWord){
         BoolQuery.Builder builder = new BoolQuery.Builder();
-        builder.must(m -> m.match(t -> t.field("title").query("紧急")))
-                .filter(f -> f.range(r -> r
-                    .field("createTime")
-                    .gte(JsonData.of("2023-01-01"))
-                ));
-
         if(fieldFilter!=null) {
             for (Map.Entry<String, Object> ent : fieldFilter.entrySet()) {
                 boolean isField = false;
@@ -136,8 +130,9 @@ public class ESSearcher implements Searcher{
                         break;
                     }
                 }
-                if(!isField) continue;
-
+                if(!isField) {
+                    continue;
+                }
                 String key = ent.getKey();
                 int keyLen = key.length();
                 String optSuffix = keyLen>3 ? key.substring(keyLen - 3).toLowerCase() : "_eq";
