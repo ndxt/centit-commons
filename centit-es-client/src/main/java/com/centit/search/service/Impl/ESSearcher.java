@@ -439,6 +439,7 @@ public class ESSearcher implements Searcher{
         return this;
     }
 
+    @Override
     public JSONObject getDocumentById(String idFieldName, String docId) {
         RestHighLevelClient restHighLevelClient = null;
         try {
