@@ -1,6 +1,7 @@
 package com.centit.support.common;
 
 
+import com.alibaba.fastjson2.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.SQLException;
@@ -217,4 +218,11 @@ public class ObjectException extends RuntimeException {
         this.objectData = objectData;
     }
 
+    public String toJSONString(){
+        JSONObject object = new JSONObject();
+        object.put("code", this.exceptionCode);
+        object.put("message", this.getMessage());
+        object.put("data", this.objectData);
+        return object.toJSONString();
+    }
 }
