@@ -33,7 +33,7 @@ public abstract class DocumentUtils {
                 JSONObject fieldConfig = new JSONObject(CollectionsOpt.createHashMap(
                     "type", StringUtils.isBlank(esType.type())?
                                       field.getType().getSimpleName() : esType.type(),
-                        "index", esType.index(),// ? "analyzed" : "not_analyzed",
+                        // "index", esType.index(),// ? "analyzed" : "not_analyzed",
                         "store", esType.store()));
 
                 if(esType.query()) {

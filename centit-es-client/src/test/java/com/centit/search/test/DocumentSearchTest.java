@@ -2,6 +2,7 @@ package com.centit.search.test;
 
 import com.alibaba.fastjson2.JSON;
 import com.centit.search.service.ESServerConfig;
+import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.support.algorithm.CollectionsOpt;
@@ -44,7 +45,22 @@ public class DocumentSearchTest {
         return prop;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        ESServerConfig esServerConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
+            loadProperties() );
+        ESIndexer docIndexer = IndexerSearcherFactory.obtainIndexer(esServerConfig, HelpDoc.class);
+        HelpDoc doc = new HelpDoc();
+        doc.setDocId("1");
+        doc.setDocLevel(2);
+        doc.setDocPath("file/doc-text.txt");
+        doc.setCatalogId("test");
+        doc.setOptId("test");
+        doc.setDocTitle("测试文档，用来测试索引的创建，类型是否正确！");
+        String id = docIndexer.saveNewDocument(doc);
+        System.out.println(id);
+    }
+
+    public static void query(String[] args) throws Exception {
 
         ESServerConfig esServerConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
                 loadProperties() );
