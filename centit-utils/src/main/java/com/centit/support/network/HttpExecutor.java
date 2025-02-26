@@ -512,7 +512,8 @@ public abstract class HttpExecutor {
                                  String uri, Object formData)
         throws IOException {
         HttpPut httpPut = new HttpPut(uri);
-        httpPut.setHeader("Content-Type", applicationFormHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", applicationFormHead);
         if (formData != null) {
             httpPut.setEntity(buildEntity(formData));
         }
@@ -524,7 +525,8 @@ public abstract class HttpExecutor {
                                       String uri, Object[] formObjects, Map<String, Object> extFormObjects)
         throws IOException {
         HttpPut httpPut = new HttpPut(uri);
-        httpPut.setHeader("Content-Type", applicationFormHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", applicationFormHead);
         httpPut.setEntity(buildEntity(formObjects, extFormObjects));
         return httpExecute(executorContext, httpPut);
     }
@@ -543,7 +545,8 @@ public abstract class HttpExecutor {
                                     String uri, String postEntity, final boolean asPutMethod)
         throws IOException {
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-        httpPost.setHeader("Content-Type", plainTextHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", plainTextHead);
         if (postEntity != null) {
             StringEntity entity = new StringEntity(postEntity, Consts.UTF_8);
             httpPost.setEntity(entity);
@@ -566,8 +569,8 @@ public abstract class HttpExecutor {
                                                 String uri, InputStream postIS)
         throws IOException {
         HttpPost httpPost = new HttpPost(uri);
-
-        httpPost.setHeader("Content-Type", applicationFormHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", applicationFormHead);
 
         if (postIS != null) {
             InputStreamEntity entity = new InputStreamEntity(postIS);
@@ -582,8 +585,8 @@ public abstract class HttpExecutor {
         throws IOException {
 
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-
-        httpPost.setHeader("Content-Type", applicationFormHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", applicationFormHead);
 
         if (bytes != null) {
             ByteArrayEntity entity = new ByteArrayEntity(bytes);
@@ -613,7 +616,8 @@ public abstract class HttpExecutor {
         }
 
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-        httpPost.setHeader("Content-Type", applicationJSONHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", applicationJSONHead);
         if (jsonString != null && ! "".equals(jsonString)) {
             StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
             httpPost.setEntity(entity);
@@ -628,7 +632,6 @@ public abstract class HttpExecutor {
         return jsonPost(executorContext, uri, obj, false);
     }
 
-
     public static String jsonPut(HttpExecutorContext executorContext,
                                  String uri, Object jsonObj)
         throws IOException {
@@ -641,7 +644,8 @@ public abstract class HttpExecutor {
             }
         }
         HttpPut httpPut = new HttpPut(uri);
-        httpPut.setHeader("Content-Type", applicationJSONHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", applicationJSONHead);
         if (jsonString != null && !"".equals(jsonString)) {
             StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
             httpPut.setEntity(entity);
@@ -654,7 +658,8 @@ public abstract class HttpExecutor {
         throws IOException {
 
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-        httpPost.setHeader("Content-Type", xmlTextHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", xmlTextHead);
 
         if (xmlEntity != null) {
             StringEntity entity = new StringEntity(xmlEntity, Consts.UTF_8);
@@ -673,9 +678,9 @@ public abstract class HttpExecutor {
     public static String xmlPut(HttpExecutorContext executorContext,
                                 String uri, String xmlEntity)
         throws IOException {
-
         HttpPut httpPut = new HttpPut(uri);
-        httpPut.setHeader("Content-Type", xmlTextHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", xmlTextHead);
         if (xmlEntity != null && !"".equals(xmlEntity)) {
             StringEntity entity = new StringEntity(xmlEntity, Consts.UTF_8);
             httpPut.setEntity(entity);
@@ -699,7 +704,8 @@ public abstract class HttpExecutor {
                                   String uri, Object formData, final boolean asPutMethod)
         throws IOException {
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-        httpPost.setHeader("Content-Type", applicationFormHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", applicationFormHead);
         if (formData != null) {
             httpPost.setEntity(buildEntity(formData));
         }
@@ -717,9 +723,9 @@ public abstract class HttpExecutor {
         throws IOException {
 
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-        httpPost.setHeader("Content-Type", applicationFormHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", applicationFormHead);
         httpPost.setEntity(buildEntity(formObjects, extFormObjects));
-
         return httpExecute(executorContext, httpPost);
     }
 
@@ -752,7 +758,8 @@ public abstract class HttpExecutor {
         throws IOException {
         HttpPut httpPut = new HttpPut(uri);
         //httpPost.setHeader("Content-Type", applicationOctetStream);
-        httpPut.setHeader("Content-Type", multiPartTypeHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", multiPartTypeHead);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(BOUNDARY);
         //builder.setMode(HttpMultipartMode.RFC6532);
@@ -768,7 +775,8 @@ public abstract class HttpExecutor {
 
         HttpPost httpPost = new HttpPost(uri);
         //httpPost.setHeader("Content-Type", applicationOctetStream);
-        httpPost.setHeader("Content-Type", multiPartTypeHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", multiPartTypeHead);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(BOUNDARY);
         //builder.setMode(HttpMultipartMode.RFC6532);
@@ -798,7 +806,8 @@ public abstract class HttpExecutor {
                                                 String uri, Map<String, Object> formObjects, Map<String, File> files)
         throws IOException {
         HttpPost httpPost = new HttpPost(uri);
-        httpPost.setHeader("Content-Type", multiPartTypeHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", multiPartTypeHead);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(BOUNDARY);
         builder.setMode(HttpMultipartMode.RFC6532);
@@ -823,10 +832,9 @@ public abstract class HttpExecutor {
                                     String uri, File file)
         throws IOException {
         HttpPost httpPost = new HttpPost(uri);
-        httpPost.setHeader("Content-Type", multiPartTypeHead);
-
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", multiPartTypeHead);
         InputStreamEntity entity = new InputStreamEntity(new FileInputStream(file));
-
         httpPost.setEntity(entity);
         return httpExecute(executorContext, httpPost);
     }
