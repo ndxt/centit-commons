@@ -139,10 +139,11 @@ public abstract class XMLObject {
         return element.asXML();
     }
 
-    public static String objectToXMLString(String rootName, String namespace, Object object, boolean addAttr, boolean fieldAsKeyAttr) {
+    public static String objectToXMLString(String rootName, String nameSpacePrefix, String namespace, Object object, boolean addAttr, boolean fieldAsKeyAttr) {
         HashSet<Object> hasSerialized = new HashSet<>();
-        Element element = createXMLElementFromObject(rootName, object, addAttr, fieldAsKeyAttr, hasSerialized);
-        element.add( new Namespace(null, namespace));
+        Element element = createXMLElementFromObject(nameSpacePrefix+":"+rootName,
+            object, addAttr, fieldAsKeyAttr, hasSerialized);
+        element.add(new Namespace(nameSpacePrefix, namespace));
         return element.asXML();
     }
 

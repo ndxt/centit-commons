@@ -8,7 +8,7 @@ public class TestXmlObject {
 
     public static void main(String[] args) {
 
-       String xmlBoday = XMLObject.objectToXMLString("getData", "http://tempuri.org",
+       String xmlBoday = XMLObject.objectToXMLString("getData", "act", "http://tempuri.org",
            CollectionsOpt.createHashMap("funName", "string1", "userName",
                "string2", "password", "string3",
                "paramXml", "string4"), false, false);
