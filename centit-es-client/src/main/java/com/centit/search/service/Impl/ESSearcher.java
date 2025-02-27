@@ -87,6 +87,22 @@ public class ESSearcher implements Searcher{
         this.clientPool = clientPool;
     }
 
+    public RestHighLevelClient fetchClient() {
+        RestHighLevelClient client = null;
+        try {
+            client = clientPool.borrowObject();
+        } catch (Exception e) {
+            logger.error("获取ES客户端失败", e);
+        }
+        return client;
+    }
+
+    public void releaseClient(RestHighLevelClient client) {
+        if(client!=null) {
+            clientPool.returnObject(client);
+        }
+    }
+
     public void setESServerConfig(ESServerConfig config){
         this.config = config;
     }
