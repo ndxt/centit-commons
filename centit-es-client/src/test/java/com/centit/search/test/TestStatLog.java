@@ -107,7 +107,7 @@ public class TestStatLog {
         // 构建聚合
         DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("hourly")
             .field("runBeginTime")
-            .interval(60000000L);
+            .interval(60000L);
         ValueCountAggregationBuilder countAggregation = AggregationBuilders.count("count").field("taskId");
         dateHistogramAggregation.subAggregation(countAggregation);
 
