@@ -1,12 +1,16 @@
 package com.centit.search.test;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
+import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.DatetimeOpt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -17,8 +21,12 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.metrics.ParsedValueCount;
 import org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -92,7 +100,6 @@ public class TestStatLog {
     public static Map<String, Long> getLogStatistics(String taskId, Date startDate, Date endDate) throws IOException {
         SearchRequest searchRequest = new SearchRequest("callapilog");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-
         // 构建过滤条件
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         boolQuery.must(QueryBuilders.termQuery("taskId", taskId));
@@ -107,7 +114,8 @@ public class TestStatLog {
         // 构建聚合
         DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("hourly")
             .field("runBeginTime")
-            .interval(60000L);
+            .interval(360000L) // 3600000 milliseconds = 1 hour
+            .format("yyyy-MM-dd"); // 明确日期格式
         ValueCountAggregationBuilder countAggregation = AggregationBuilders.count("count").field("taskId");
         dateHistogramAggregation.subAggregation(countAggregation);
 
@@ -128,8 +136,86 @@ public class TestStatLog {
         return result;
     }
 
+
+    public static JSONArray statTopActive(String osId, Date startDate, Date endDate) throws IOException {
+        SearchRequest searchRequest = new SearchRequest("callapilog");
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        // 构建过滤条件
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.termQuery("applicationId", osId));
+
+        RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("runBeginTime")
+            .gte(startDate)
+            .lte(endDate);
+        boolQuery.must(rangeQuery);
+
+        sourceBuilder.query(boolQuery);
+
+        // 构建聚合
+        TermsAggregationBuilder termsAggregation = AggregationBuilders.terms("top_task_ids")
+            .field("taskId")
+            .size(30) // 只取前30个
+            .order(BucketOrder.count(false)); // 按条目数降序排列
+
+        sourceBuilder.aggregation(termsAggregation);
+        JSONArray result = new JSONArray();
+        searchRequest.source(sourceBuilder);
+        try (RestHighLevelClient client = createSearch().fetchClient()) { // 假设 ESSearcher 有 getClient 方法
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            ParsedTerms topTaskIds = searchResponse.getAggregations().get("top_task_ids");
+            for (Terms.Bucket bucket : topTaskIds.getBuckets()) {
+                String keyAsString = bucket.getKeyAsString();
+                long docCount = bucket.getDocCount();
+
+                result.add(CollectionsOpt.createHashMap(keyAsString, docCount));
+            }
+        }
+        return result;
+    }
+
+    public static JSONArray statCallSumByOs(String osId, Date startDate, Date endDate){
+        SearchRequest searchRequest = new SearchRequest("callapilog");
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+        // 构建过滤条件
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.termQuery("applicationId", osId));
+        RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("runBeginTime")
+            .gte(startDate)
+            .lte(endDate);
+        boolQuery.must(rangeQuery);
+        sourceBuilder.query(boolQuery);
+
+        // 构建聚合
+        DateHistogramAggregationBuilder dateHistogramAggregation = AggregationBuilders.dateHistogram("daily")
+            .field("runBeginTime")
+            .interval(86400000L) // 3600000 milliseconds = 1 hour
+            .format("yyyy-MM-dd"); // 明确日期格式
+
+        sourceBuilder.aggregation(dateHistogramAggregation);
+        searchRequest.source(sourceBuilder);
+        JSONArray result = new JSONArray();
+        try (RestHighLevelClient client = createSearch().fetchClient()) { // 使用 try-with-resources
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            Histogram dailyHistogram = searchResponse.getAggregations().get("daily");
+            for (Histogram.Bucket dailyBucket : dailyHistogram.getBuckets()) {
+                String keyAsString = dailyBucket.getKeyAsString();
+                long docCount = dailyBucket.getDocCount();
+                JSONObject sums = new JSONObject();
+                sums.put("runBeginTime", keyAsString); // daily
+                sums.put("callSum", docCount);
+                result.add(sums);
+            }
+        } catch (IOException | ElasticsearchException e) { // 捕获更广泛的异常
+            logger.error("Error occurred while processing application: {}, start date: {}, end date: {}",
+                osId, startDate, endDate, e);
+        }
+
+        return result;
+    }
+
     public static void main(String[] args)  throws IOException {
-        Map<String, Long>  map = getLogStatistics("bb08bb1dea024ddebd8e84d65173564d",
+        JSONArray  map = statTopActive("t_H4w2emTnq89GXxEN5Dsw",
             DatetimeOpt.createUtilDate(2025,2,18, 9, 0, 0),
             DatetimeOpt.createUtilDate(2025,2,20, 9, 0, 0));
         /*List<Map<String, Object>> logs = listLogs("bb08bb1dea024ddebd8e84d65173564d",

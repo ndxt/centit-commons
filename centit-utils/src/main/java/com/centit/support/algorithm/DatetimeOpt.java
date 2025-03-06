@@ -34,8 +34,8 @@ import java.util.regex.Pattern;
 public abstract class DatetimeOpt {
 
     private static Logger log = LoggerFactory.getLogger(DatetimeOpt.class);
-    private static String defaultDatePattern = "yyyy-MM-dd";
-    private static String timePattern = "HH:mm";
+    public final static String defaultDatePattern = "yyyy-MM-dd";
+    public final static String timePattern = "HH:mm";
     public final static String timeWithSecondPattern = "HH:mm:ss";
     //private static String datetimeWithoutYearPattern = "MM-dd HH:mm";
     //private static String datetimePattern = "yyyy-MM-dd HH:mm";
