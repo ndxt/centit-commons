@@ -137,13 +137,15 @@ public class TestStatLog {
     }
 
 
-    public static JSONArray statTopActive(String osId, Date startDate, Date endDate) throws IOException {
+    public static JSONArray statTopTask(String osId, String countType, int topSize, Date startDate, Date endDate)  {
         SearchRequest searchRequest = new SearchRequest("callapilog");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         // 构建过滤条件
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
         boolQuery.must(QueryBuilders.termQuery("applicationId", osId));
-
+        if("failed".equalsIgnoreCase(countType)) {
+            boolQuery.must( QueryBuilders.rangeQuery("errorPieces").gt(0));
+        }
         RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("runBeginTime")
             .gte(startDate)
             .lte(endDate);
@@ -154,21 +156,24 @@ public class TestStatLog {
         // 构建聚合
         TermsAggregationBuilder termsAggregation = AggregationBuilders.terms("top_task_ids")
             .field("taskId")
-            .size(30) // 只取前30个
+            .size(topSize) // 只取前30个
             .order(BucketOrder.count(false)); // 按条目数降序排列
 
         sourceBuilder.aggregation(termsAggregation);
         JSONArray result = new JSONArray();
         searchRequest.source(sourceBuilder);
-        try (RestHighLevelClient client = createSearch().fetchClient()) { // 假设 ESSearcher 有 getClient 方法
+        try (RestHighLevelClient client = createSearch().fetchClient()) { // 使用 try-with-resources
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             ParsedTerms topTaskIds = searchResponse.getAggregations().get("top_task_ids");
             for (Terms.Bucket bucket : topTaskIds.getBuckets()) {
                 String keyAsString = bucket.getKeyAsString();
                 long docCount = bucket.getDocCount();
 
-                result.add(CollectionsOpt.createHashMap(keyAsString, docCount));
+                result.add(CollectionsOpt.createHashMap("taskId", keyAsString, "callSum", docCount));
             }
+        } catch (IOException | ElasticsearchException e) { // 捕获更广泛的异常
+            logger.error("Error occurred while processing application: {}, countType: {}, start date: {}, end date: {}",
+                osId, countType, startDate, endDate, e);
         }
         return result;
     }
@@ -215,8 +220,8 @@ public class TestStatLog {
     }
 
     public static void main(String[] args)  throws IOException {
-        JSONArray  map = statTopActive("t_H4w2emTnq89GXxEN5Dsw",
-            DatetimeOpt.createUtilDate(2025,2,18, 9, 0, 0),
+        JSONArray  map = statTopTask("t_H4w2emTnq89GXxEN5Dsw", "all", 10,
+            DatetimeOpt.createUtilDate(2025,1,18, 9, 0, 0),
             DatetimeOpt.createUtilDate(2025,2,20, 9, 0, 0));
         /*List<Map<String, Object>> logs = listLogs("bb08bb1dea024ddebd8e84d65173564d",
             DatetimeOpt.createUtilDate(2025,2,18, 9, 0, 0),
