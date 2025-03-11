@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,20 +16,24 @@ public abstract class SecurityOptUtils {
 
     protected static final Logger logger = LoggerFactory.getLogger(SecurityOptUtils.class);
 
-    public static Pair<String, String> makeCbcKey(String password, String algorithm){
+    public static Pair<byte[], byte[]> makeCbcKey(String password, String algorithm){
         if(StringUtils.isBlank(password)){
             if(StringUtils.equalsIgnoreCase("SM4", algorithm)){
-                return new MutablePair<>(SM4Util.SM4_SECRET_KEY_SPEC, SM4Util.SM4_IV_PARAMETER_SPEC);
+                return new MutablePair<>(SM4Util.SM4_SECRET_KEY_SPEC.getBytes(), SM4Util.SM4_IV_PARAMETER_SPEC.getBytes());
             } else { //AES
-                return new ImmutablePair<>(AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC);
+                return new ImmutablePair<>(AESSecurityUtils.AES_SECRET_KEY_SPEC.getBytes(), AESSecurityUtils.AES_IV_PARAMETER_SPEC.getBytes());
             }
         }
         int strLen = password.length();
+        if(strLen == 64){
+            return new ImmutablePair<>(Hex.decode(password.substring(0,32)), Hex.decode(password.substring(32,64)));
+        }
         while (strLen < 32){
             password = password + password;
             strLen *= 2;
         }
-        return new ImmutablePair<>(password.substring(0,16), password.substring(16,32));
+        return new ImmutablePair<>(password.substring(0,16).getBytes(StandardCharsets.UTF_8),
+            password.substring(16,32).getBytes(StandardCharsets.UTF_8));
     }
 
     public static String decodeSecurityString(String sStr){
