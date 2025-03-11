@@ -61,10 +61,13 @@ public class AES {
         System.out.println(AESSecurityUtils.encryptAndBase64(
             "centit.1", "1234567890ABCDEF"));
 
-        System.out.println(AESSecurityUtils.encryptAsCBCType("centit.1", "1234567890abcdef", "1234567890abcdef"));
-        System.out.println(AESSecurityUtils.encryptAsCBCType("centit.1", AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC));
+        System.out.println(AESSecurityUtils.encryptAsCBCTypeAsBase64("centit.1",
+            "1234567890abcdef", "1234567890abcdef"));
+        System.out.println(AESSecurityUtils.encryptAsCBCTypeAsBase64("centit.1",
+            AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC));
 
-        System.out.println(AESSecurityUtils.decryptAsCBCType("k556Ug617iPVULItZldkOQ==", AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC));
+        System.out.println(AESSecurityUtils.decryptBase64AsCBCType("k556Ug617iPVULItZldkOQ==",
+            AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC));
 
     }
 }

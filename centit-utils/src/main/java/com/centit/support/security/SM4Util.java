@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 
 public abstract class SM4Util extends GMBaseUtil {
@@ -184,10 +185,10 @@ public abstract class SM4Util extends GMBaseUtil {
         return cipher;
     }
 
-    public static String encryptAsCBCType(String str, String keyValue, String ivParameter) {
+    public static String encryptAsCBCTypeAsBase64(String str, byte[] keyValue, byte[] ivParameter) {
         try {
-            SecretKeySpec sm4Key = new SecretKeySpec(keyValue.getBytes(), ALGORITHM_NAME);
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            SecretKeySpec sm4Key = new SecretKeySpec(keyValue, ALGORITHM_NAME);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter);
             Cipher cipher = Cipher.getInstance(ALGORITHM_NAME_CBC_PADDING, BouncyCastleProvider.PROVIDER_NAME);
             cipher.init(Cipher.ENCRYPT_MODE, sm4Key, ivParameterSpec);
             return new String(Base64.encodeBase64(cipher.doFinal(str.getBytes())));
@@ -197,10 +198,15 @@ public abstract class SM4Util extends GMBaseUtil {
         }
     }
 
-    public static String decryptAsCBCType(String str, String keyValue, String ivParameter) {
+    public static String encryptAsCBCTypeAsBase64(String str, String keyValue, String ivParameter) {
+        return encryptAsCBCTypeAsBase64(str, keyValue.getBytes(StandardCharsets.UTF_8),
+            ivParameter.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String decryptBase64AsCBCType(String str, byte[]  keyValue, byte[]  ivParameter) {
         try {
-            SecretKeySpec sm4Key = new SecretKeySpec(keyValue.getBytes(), ALGORITHM_NAME);
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            SecretKeySpec sm4Key = new SecretKeySpec(keyValue, ALGORITHM_NAME);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter);
             Cipher cipher = Cipher.getInstance(ALGORITHM_NAME_CBC_PADDING, BouncyCastleProvider.PROVIDER_NAME);
             cipher.init(Cipher.DECRYPT_MODE, sm4Key, ivParameterSpec);
             return new String(cipher.doFinal(Base64.decodeBase64(str)));
@@ -210,10 +216,15 @@ public abstract class SM4Util extends GMBaseUtil {
         }
     }
 
-    public static byte[] encryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+    public static String decryptBase64AsCBCType(String str, String keyValue, String ivParameter) {
+        return decryptBase64AsCBCType(str, keyValue.getBytes(StandardCharsets.UTF_8),
+            ivParameter.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static byte[] encryptAsCBCType(byte[] bytes, byte[] keyValue, byte[] ivParameter) {
         try {
-            SecretKeySpec sm4Key = new SecretKeySpec(keyValue.getBytes(), ALGORITHM_NAME);
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            SecretKeySpec sm4Key = new SecretKeySpec(keyValue, ALGORITHM_NAME);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter);
             Cipher cipher = Cipher.getInstance(ALGORITHM_NAME_CBC_PADDING, BouncyCastleProvider.PROVIDER_NAME);
             cipher.init(Cipher.ENCRYPT_MODE, sm4Key, ivParameterSpec);
             return cipher.doFinal(bytes);
@@ -223,10 +234,15 @@ public abstract class SM4Util extends GMBaseUtil {
         }
     }
 
-    public static byte[] decryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+    public static byte[] encryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+        return encryptAsCBCType(bytes, keyValue.getBytes(StandardCharsets.UTF_8),
+            ivParameter.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static byte[] decryptAsCBCType(byte[] bytes, byte[] keyValue, byte[] ivParameter) {
         try {
-            SecretKeySpec sm4Key = new SecretKeySpec(keyValue.getBytes(), ALGORITHM_NAME);
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            SecretKeySpec sm4Key = new SecretKeySpec(keyValue, ALGORITHM_NAME);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter);
             Cipher cipher = Cipher.getInstance(ALGORITHM_NAME_CBC_PADDING, BouncyCastleProvider.PROVIDER_NAME);
             cipher.init(Cipher.DECRYPT_MODE, sm4Key, ivParameterSpec);
             return cipher.doFinal(bytes);
@@ -234,5 +250,10 @@ public abstract class SM4Util extends GMBaseUtil {
             logger.error(e.getMessage(), e);
             return null;
         }
+    }
+
+    public static byte[] decryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+        return decryptAsCBCType(bytes, keyValue.getBytes(StandardCharsets.UTF_8),
+            ivParameter.getBytes(StandardCharsets.UTF_8));
     }
 }
