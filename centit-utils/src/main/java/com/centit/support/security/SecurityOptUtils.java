@@ -19,19 +19,23 @@ public abstract class SecurityOptUtils {
     public static Pair<byte[], byte[]> makeCbcKey(String password, String algorithm){
         if(StringUtils.isBlank(password)){
             if(StringUtils.equalsIgnoreCase("SM4", algorithm)){
-                return new MutablePair<>(SM4Util.SM4_SECRET_KEY_SPEC.getBytes(), SM4Util.SM4_IV_PARAMETER_SPEC.getBytes());
+                return new MutablePair<>(SM4Util.SM4_SECRET_KEY_SPEC.getBytes(),
+                    SM4Util.SM4_IV_PARAMETER_SPEC.getBytes());
             } else { //AES
-                return new ImmutablePair<>(AESSecurityUtils.AES_SECRET_KEY_SPEC.getBytes(), AESSecurityUtils.AES_IV_PARAMETER_SPEC.getBytes());
+                return new ImmutablePair<>(AESSecurityUtils.AES_SECRET_KEY_SPEC.getBytes(),
+                    AESSecurityUtils.AES_IV_PARAMETER_SPEC.getBytes());
             }
         }
         int strLen = password.length();
         if(strLen == 64){
             return new ImmutablePair<>(Hex.decode(password.substring(0,32)), Hex.decode(password.substring(32,64)));
         }
+
         while (strLen < 32){
-            password = password + password;
+            password += password;
             strLen *= 2;
         }
+
         return new ImmutablePair<>(password.substring(0,16).getBytes(StandardCharsets.UTF_8),
             password.substring(16,32).getBytes(StandardCharsets.UTF_8));
     }
