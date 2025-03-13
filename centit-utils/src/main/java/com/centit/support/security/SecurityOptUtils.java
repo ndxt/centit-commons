@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 @SuppressWarnings("unused")
 public abstract class SecurityOptUtils {
@@ -27,15 +28,18 @@ public abstract class SecurityOptUtils {
             }
         }
         int strLen = password.length();
-        if(strLen == 64){
+        if(strLen == 64){//HEX 编码
             return new ImmutablePair<>(Hex.decode(password.substring(0,32)), Hex.decode(password.substring(32,64)));
         }
-
-        while (strLen < 32){
+        if(strLen == 44 && password.endsWith("=")){ // base64 编码
+            byte[] pwdBytes = Base64.decodeBase64(password);
+            return new ImmutablePair<>( Arrays.copyOfRange(pwdBytes, 0, 16),
+                Arrays.copyOfRange(pwdBytes, 16, 32));
+        }
+        while (strLen < 32){ // 长度应该为 32
             password += password;
             strLen *= 2;
         }
-
         return new ImmutablePair<>(password.substring(0,16).getBytes(StandardCharsets.UTF_8),
             password.substring(16,32).getBytes(StandardCharsets.UTF_8));
     }

@@ -4,6 +4,7 @@ import com.centit.support.algorithm.UuidOpt;
 import com.centit.support.file.FileIOOpt;
 import com.centit.support.security.SM4Util;
 import com.centit.support.security.SecurityOptUtils;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.nio.charset.StandardCharsets;
@@ -11,7 +12,13 @@ import java.nio.charset.StandardCharsets;
 public class TestSM4 {
 
     public static void main(String[] args) throws Exception {
-        Pair<byte[], byte[]> key = SecurityOptUtils.makeCbcKey(
+        String password = "SGVsbG8gV29ybGQ0SGVsbG8gV29ybGQ0SGVsbG8gV28=";
+        Pair<byte[], byte[]> key = SecurityOptUtils.makeCbcKey(password, "AES");
+        System.out.println(new String(key.getLeft()));
+        System.out.println(new String(key.getRight()));
+        System.out.println("解密成功");
+
+        key = SecurityOptUtils.makeCbcKey(
             "41414141414141414141414141414141" +
                       "000000000000000000000000000000000", "AES");
         System.out.println(key.getLeft());
