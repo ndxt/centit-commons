@@ -1,16 +1,25 @@
 package com.centit.support.network;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.security.Md5Encoder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -194,4 +203,70 @@ public abstract class UrlOptUtils {
         }
         return sbBuilder.toString();
     }
+
+    public static String objectToUrlString(Object objValue) {
+        if (objValue == null)
+            return null;
+        if (objValue instanceof String) {
+            return (String) objValue;
+        }
+        if (objValue instanceof byte[]) {
+            return new String((byte[]) objValue);
+        }
+        if (objValue instanceof java.util.Date){
+            return DatetimeOpt.convertTimestampToString((java.util.Date) objValue);
+        }
+        if (objValue instanceof InputStream){
+            try {
+                return FileIOOpt.readStringFromInputStream((InputStream)objValue);
+            } catch (IOException e) {
+                return "";
+            }
+        }
+        Class<?> clazz = objValue.getClass();
+
+        if (clazz.isEnum()) {
+            return ((Enum<?>) objValue).name();
+        }
+
+        if (ReflectionOpt.isScalarType(clazz)){
+            return objValue.toString();
+        }
+
+        if (clazz.isArray()) {
+            int len = Array.getLength(objValue);
+            StringBuilder sb = new StringBuilder();
+            if (len > 0) {
+                for (int i = 0; i < len; i++) {
+                    if (i > 0)
+                        sb.append('&');
+                    sb.append(objectToUrlString(Array.get(objValue, i)));
+                }
+                return sb.toString();
+            } else {
+                return null;
+            }
+        } else if (objValue instanceof Collection) {
+            StringBuilder sb = new StringBuilder();
+            int vc = 0;
+            Collection<?> valueList = (Collection<?>) objValue;
+            for (Object ov : valueList) {
+                if (ov != null) {
+                    if (vc > 0)
+                        sb.append("&");
+                    sb.append(objectToUrlString(ov));
+                    vc++;
+                }
+            }
+            return sb.toString();
+        } else {
+            Object object = JSON.toJSON(objValue);
+            if(object instanceof JSONObject){
+                return makeParamsToUrl((JSONObject)object);
+            }else{
+                return JSON.toJSONString(object);
+            }
+        }
+    }
+
 }
