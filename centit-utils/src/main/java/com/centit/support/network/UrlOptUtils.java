@@ -101,17 +101,8 @@ public abstract class UrlOptUtils {
         return curl.substring(nBpos, nEpos);
     }
 
-    public static String appendParamsToUrl(String uri, Map<String, Object> queryParam) {
-        if (queryParam == null) {
-            return uri;
-        }
-        StringBuilder urlBuilder = new StringBuilder(uri);
-        if (!uri.endsWith("?") && !uri.endsWith("&")) {
-            if (uri.indexOf('?') == -1)
-                urlBuilder.append('?');
-            else
-                urlBuilder.append('&');
-        }
+    public static String makeParamsToUrl(Map<String, Object> queryParam) {
+        StringBuilder urlBuilder = new StringBuilder();
         int n = 0;
         for (Map.Entry<String, Object> ent : queryParam.entrySet()) {
             if (n > 0)
@@ -125,8 +116,14 @@ public abstract class UrlOptUtils {
         return urlBuilder.toString();
     }
 
-    public static String makeParamsToUrl(Map<String, Object> queryParam) {
-        return appendParamsToUrl("", queryParam);
+    public static String appendParamsToUrl(String uri, Map<String, Object> queryParam) {
+        if (queryParam == null) {
+            return uri;
+        }
+        if(StringUtils.isBlank(uri)) return makeParamsToUrl(queryParam);
+        if (uri.endsWith("?") || uri.endsWith("&"))  return uri + makeParamsToUrl(queryParam);
+        if (uri.indexOf('?') == -1) return uri + '?' + makeParamsToUrl(queryParam);
+        return uri + '&' + makeParamsToUrl(queryParam);
     }
 
     public static String appendParamToUrl(String uri, String queryUrl) {
