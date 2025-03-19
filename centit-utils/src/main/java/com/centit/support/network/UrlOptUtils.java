@@ -238,9 +238,14 @@ public abstract class UrlOptUtils {
             StringBuilder sb = new StringBuilder();
             if (len > 0) {
                 for (int i = 0; i < len; i++) {
-                    if (i > 0)
-                        sb.append('&');
-                    sb.append(objectToUrlString(Array.get(objValue, i)));
+                    String objStr = objectToUrlString(Array.get(objValue, i));
+                    if (i > 0) {
+                        if(objStr.indexOf('=')>=0)
+                            sb.append('&');
+                        else
+                            sb.append(',');
+                    }
+                    sb.append(objStr);
                 }
                 return sb.toString();
             } else {
@@ -252,9 +257,14 @@ public abstract class UrlOptUtils {
             Collection<?> valueList = (Collection<?>) objValue;
             for (Object ov : valueList) {
                 if (ov != null) {
-                    if (vc > 0)
-                        sb.append("&");
-                    sb.append(objectToUrlString(ov));
+                    String objStr = objectToUrlString(ov);
+                    if (vc > 0) {
+                        if(objStr.indexOf('=')>=0)
+                            sb.append('&');
+                        else
+                            sb.append(',');
+                    }
+                    sb.append(objStr);
                     vc++;
                 }
             }
