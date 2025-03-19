@@ -89,6 +89,7 @@ public abstract class ConstDefine {
     public static final int FUNC_TO_JSON_STRING = 178;
     public static final int FUNC_ENCODE = 179;
     public static final int FUNC_DECODE = 180;
+    public static final int FUNC_TO_URL_STRING = 181;
     public static final int OP_BASE = 30;    // +
     public static final int OP_ADD = 30;    // +
     public static final int OP_SUB = 31;  // -

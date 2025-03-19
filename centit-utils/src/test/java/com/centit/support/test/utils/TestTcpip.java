@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class TestTcpip {
     public static void main(String arg[]) {
-        System.out.println( Pretreatment.mapUrlTemplate("http://locode.net?{.}",
+        System.out.println(Pretreatment.mapUrlTemplate("http://locode.net?{.}",
             CollectionsOpt.createHashMap("a",10 , "b", 20)));
 
         System.out.println( UrlOptUtils.appendParamsToUrl("http://locode.net?dasdf",
