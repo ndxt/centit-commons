@@ -26,7 +26,7 @@ import java.util.List;
 
 public class PowerPointUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(OfficeToPdf.class);
+    private static final Logger logger = LoggerFactory.getLogger(OfficeToPdf.class);
 
     private static PDRectangle mediaBox = PDRectangle.LETTER;
     private static boolean landscape = false;

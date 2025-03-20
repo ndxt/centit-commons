@@ -5,6 +5,8 @@ import com.centit.support.network.HttpExecutorContext;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TestFromPost {
+    protected static final Logger logger = LoggerFactory.getLogger(TestFromPost.class);
 
     public static void main(String[] args) {
         testUploadFile();
@@ -32,7 +35,7 @@ public class TestFromPost {
                 files);
             System.out.println(jsonStr);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
             System.out.println("ERROE");
         }
 
@@ -55,7 +58,7 @@ public class TestFromPost {
             System.out.println(s);
 
         } catch (Exception e) {
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
     }
 
@@ -103,7 +106,7 @@ public class TestFromPost {
                     "http://codefanbook:8180/framework-sys-module/service/sys/currentuser",null);
             System.out.println(s);*/
         } catch (Exception e) {
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
     }
 }

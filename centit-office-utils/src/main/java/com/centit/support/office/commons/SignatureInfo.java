@@ -6,6 +6,8 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfSignatureAppearance;
 import com.itextpdf.text.pdf.security.DigestAlgorithms;
 import lombok.Data;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.io.IOException;
@@ -14,6 +16,7 @@ import java.security.cert.Certificate;
 
 @Data
 public class SignatureInfo {
+    private static final Logger logger = LogManager.getLogger(SignatureInfo.class);
 
     private String reasonDesc; //签名的原因，显示在pdf签名属性中
     private String locationDesc;//签名的地点，显示在pdf签名属性中
@@ -91,7 +94,7 @@ public class SignatureInfo {
         try {
             this.signImage = Image.getInstance(imagePath);
         } catch (BadElementException | IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return this;
     }
@@ -100,7 +103,7 @@ public class SignatureInfo {
         try {
             this.signImage = Image.getInstance(image, new Color(255,255,255));
         } catch (BadElementException | IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return this;
     }

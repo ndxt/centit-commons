@@ -41,7 +41,7 @@ public class LobSerializer implements ObjectWriter<java.sql.Blob> {
                     jsonWriter.writeString(text);
                 }
             } catch (SQLException e) {
-                logger.error(e.getMessage(),e);//e.printStackTrace();
+                logger.error(e.getMessage(),e);//logger.error(e.getMessage(), e);
                 throw new IOException("write clob error", e);
             }
         }else */
@@ -54,7 +54,7 @@ public class LobSerializer implements ObjectWriter<java.sql.Blob> {
                 if (count > 0)
                     jsonWriter.writeString(new String(Base64.encodeBase64(readBytes)));
             } catch (SQLException | IOException e) {
-                logger.error(e.getMessage(), e);//e.printStackTrace();
+                logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
                 //throw new IOException("write blob error", e);
             }
         } else {

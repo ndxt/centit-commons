@@ -6,7 +6,7 @@ public interface JSONTransformDataSupport {
 
     String mapTemplateString(String templateString);
 
-    default void pushStackValue(Object value){
+    default void pushStackValue(Object value, int rowIndex, int rowCount) {
 
     }
 

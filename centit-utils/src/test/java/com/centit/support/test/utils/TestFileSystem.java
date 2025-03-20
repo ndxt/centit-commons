@@ -7,7 +7,6 @@ import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;

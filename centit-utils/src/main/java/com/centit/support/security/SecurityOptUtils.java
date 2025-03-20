@@ -5,30 +5,43 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 @SuppressWarnings("unused")
 public abstract class SecurityOptUtils {
 
     protected static final Logger logger = LoggerFactory.getLogger(SecurityOptUtils.class);
 
-    public static Pair<String, String> makeCbcKey(String password, String algorithm){
+    public static Pair<byte[], byte[]> makeCbcKey(String password, String algorithm){
         if(StringUtils.isBlank(password)){
             if(StringUtils.equalsIgnoreCase("SM4", algorithm)){
-                return new MutablePair<>(SM4Util.SM4_SECRET_KEY_SPEC, SM4Util.SM4_IV_PARAMETER_SPEC);
+                return new MutablePair<>(SM4Util.SM4_SECRET_KEY_SPEC.getBytes(),
+                    SM4Util.SM4_IV_PARAMETER_SPEC.getBytes());
             } else { //AES
-                return new ImmutablePair<>(AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC);
+                return new ImmutablePair<>(AESSecurityUtils.AES_SECRET_KEY_SPEC.getBytes(),
+                    AESSecurityUtils.AES_IV_PARAMETER_SPEC.getBytes());
             }
         }
         int strLen = password.length();
-        while (strLen < 32){
-            password = password + password;
+        if(strLen == 64){//HEX 编码
+            return new ImmutablePair<>(Hex.decode(password.substring(0,32)), Hex.decode(password.substring(32,64)));
+        }
+        if(strLen == 44 && password.endsWith("=")){ // base64 编码
+            byte[] pwdBytes = Base64.decodeBase64(password);
+            return new ImmutablePair<>( Arrays.copyOfRange(pwdBytes, 0, 16),
+                Arrays.copyOfRange(pwdBytes, 16, 32));
+        }
+        while (strLen < 32){ // 长度应该为 32
+            password += password;
             strLen *= 2;
         }
-        return new ImmutablePair<>(password.substring(0,16), password.substring(16,32));
+        return new ImmutablePair<>(password.substring(0,16).getBytes(StandardCharsets.UTF_8),
+            password.substring(16,32).getBytes(StandardCharsets.UTF_8));
     }
 
     public static String decodeSecurityString(String sStr){
@@ -40,10 +53,10 @@ public abstract class SecurityOptUtils {
         } if (sStr.startsWith("cipher:")) {
             return AESSecurityUtils.decryptBase64String(sStr.substring(7), AESSecurityUtils.AES_DEFAULT_KEY);
         } else if (sStr.startsWith("aescbc:")) {
-            return AESSecurityUtils.decryptAsCBCType(sStr.substring(7),
+            return AESSecurityUtils.decryptBase64AsCBCType(sStr.substring(7),
                 AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC);
         } else if (sStr.startsWith("sm4cbc:")) {
-            return SM4Util.decryptAsCBCType(sStr.substring(7),
+            return SM4Util.decryptBase64AsCBCType(sStr.substring(7),
                 SM4Util.SM4_SECRET_KEY_SPEC, SM4Util.SM4_IV_PARAMETER_SPEC);
         } else {
             return sStr;
@@ -60,10 +73,10 @@ public abstract class SecurityOptUtils {
             case "base64":
                 return "encode:" + Base64.encodeBase64String(sStr.getBytes(StandardCharsets.UTF_8));
             case "aescbc":
-                return "aescbc:" + AESSecurityUtils.encryptAsCBCType(sStr,
+                return "aescbc:" + AESSecurityUtils.encryptAsCBCTypeAsBase64(sStr,
                     AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC);
             case "sm4cbc":
-                return "sm4cbc:" + SM4Util.encryptAsCBCType(sStr,
+                return "sm4cbc:" + SM4Util.encryptAsCBCTypeAsBase64(sStr,
                     SM4Util.SM4_SECRET_KEY_SPEC, SM4Util.SM4_IV_PARAMETER_SPEC);
             default:
                 return sStr;

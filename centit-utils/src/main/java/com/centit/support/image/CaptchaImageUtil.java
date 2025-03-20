@@ -46,17 +46,26 @@ public abstract class CaptchaImageUtil {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static String getRandomString(int len) {
+    public static String getRandomString(int len, String codeRepo) {
         Random random = new Random();
         StringBuffer result = new StringBuffer();
+        int codeLen = codeRepo.length();
         for (int i = 0; i < len; i++) {
-            result.append(range.charAt(random.nextInt(range.length())));
+            result.append(codeRepo.charAt(random.nextInt(codeLen)));
         }
         return result.toString();
     }
 
+    public static String getRandomString(int len) {
+        return getRandomString(len, range);
+    }
+
+    public static String getRandomNumber(int len) {
+        return getRandomString(len, "0123456789");
+    }
+
     public static String getRandomString() {
-        return getRandomString(4);
+        return getRandomString(4, range);
     }
 
     public static boolean checkcodeMatch(String sessionCheckcode, String requestCheckcode) {

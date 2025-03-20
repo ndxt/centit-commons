@@ -1,5 +1,7 @@
 package com.centit.support.compiler;
 
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.algorithm.StringRegularOpt;
 import org.apache.commons.lang3.StringUtils;
@@ -7,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class Lexer {
 
     /**
@@ -75,6 +78,35 @@ public class Lexer {
         char e = seq.charAt(strLen-1);
         return strLen>1 && b == e && (b == '\'' || b=='"');
     }
+
+    public static Object toConstValue(final String seq) {
+        // null 也是为常量
+        if (seq == null || seq.isEmpty()) {
+            return null;
+        }
+        final int strLen = seq.length();
+        char b = seq.charAt(0);
+        //判断是否是数值
+        if (b == '.' || b == '+' || b == '-' ||
+            (b >= '0' && b <= '9')
+        ) {
+            if(seq.indexOf('.')>=0)
+                return NumberBaseOpt.castObjectToDouble(seq);
+            return NumberBaseOpt.castObjectToLong(seq);
+        }
+        //判断是否是字符串
+        char e = seq.charAt(strLen-1);
+        if(strLen>1 && b == e && (b == '\'' || b=='"'))
+            return seq.substring(1, strLen-1);
+        /*if(strLen>3) {
+            char c2 = seq.charAt(1);
+            if (b == 'D' && c2 == e && (c2 == '\'' || c2=='"')){
+                return DatetimeOpt.smartPraseDate(seq.substring(2, strLen-1));
+            }
+        }*/
+        return null;
+    }
+
     /**
      * isLabel 判断一个字符串是否符合标识符，是否可以作为字段名或者表名
      *
@@ -165,7 +197,6 @@ public class Lexer {
         //第二个单词一定要为空
         return StringUtils.isBlank(lexer.getAWord());
     }
-
 
     public void writeBackAWord(String preWord) {
         curWord = preWord;
@@ -357,7 +388,7 @@ public class Lexer {
             startPos++;
             canAcceptOpt = true;
             s = formulaSen.substring(bp, startPos);
-        } else if ("\'".equals(s)) {
+        } else if ("'".equals(s)) {
             int bp = startPos - 1;
             while (startPos < sl && formulaSen.charAt(startPos) != '\'') {
                 if (this.languageType == LANG_TYPE_JAVA && formulaSen.charAt(startPos) == '\\') {
@@ -399,9 +430,9 @@ public class Lexer {
 
         while (true) {
             curWord = getARegularWord();
-            if (curWord == null || "".equals(curWord))
+            if (curWord == null || curWord.isEmpty()) {
                 break;
-            else if ((this.languageType == LANG_TYPE_JAVA && "//".equals(curWord)) ||
+            } else if ((this.languageType == LANG_TYPE_JAVA && "//".equals(curWord)) ||
                 (this.languageType == LANG_TYPE_SQL && "--".equals(curWord)))
                 this.seekToLineEnd();
             else if (this.languageType != LANG_TYPE_DEFAULT && "/*".equals(curWord))
@@ -450,7 +481,7 @@ public class Lexer {
         int nBracket = 1;
         while (true) {
             String sWord = getAWord(false);
-            if (sWord == null || sWord.equals(""))
+            if (sWord == null || sWord.isEmpty())
                 return false;
             if (sWord.equals("("))
                 nBracket++;
@@ -470,7 +501,7 @@ public class Lexer {
         int nBracket = 1;
         while (true) {
             String sWord = getAWord(false);
-            if (sWord == null || sWord.equals(""))
+            if (sWord == null || sWord.isEmpty())
                 return false;
             if (sWord.equals("["))
                 nBracket++;
@@ -490,7 +521,7 @@ public class Lexer {
         int nBracket = 1;
         while (true) {
             String sWord = getAWord(false);
-            if (sWord == null || sWord.equals(""))
+            if (sWord == null || sWord.isEmpty())
                 return false;
             if (sWord.equals("{"))
                 nBracket++;
@@ -506,7 +537,7 @@ public class Lexer {
         String sWord;
         while (true) {
             sWord = getAWord();
-            if (sWord == null || sWord.equals(""))
+            if (sWord == null || sWord.isEmpty())
                 return;
             if (sWord.equals("("))
                 nBracket++;
@@ -529,15 +560,14 @@ public class Lexer {
 
     public String getStringUntil(String szBreak) {
         int bp = startPos;
-        int ep = startPos;
+        int ep;
         while (true) {
             ep = startPos;
             String sWord = getAWord(false);
-            if (sWord == null || sWord.equals("") || sWord.equals(szBreak))
+            if (sWord == null || sWord.isEmpty() || sWord.equals(szBreak))
                 break;
         }
-        String str = formulaSen.substring(bp, ep);
-        return str;
+        return formulaSen.substring(bp, ep);
     }
 
     public void resetToBegin() {
@@ -571,7 +601,7 @@ public class Lexer {
     public boolean seekTo(String aword, final boolean skipAnnotate) {
         while (true) {
             curWord = skipAnnotate ? this.getAWord() : this.getARegularWord();
-            if (curWord == null || "".equals(curWord))
+            if (curWord == null || curWord.isEmpty())
                 return false;
             if (curWord.equals(aword))
                 return true;

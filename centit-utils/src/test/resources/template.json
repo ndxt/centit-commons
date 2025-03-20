@@ -1,12 +1,16 @@
 {
-  "userName": "object.properties.osid.index",
-  "data": {
-    "#object.properties.array": {
-      "b": "count(${/object.properties.array})",
-      "a": "b",
-      "date" : "formatDate('yyyy-MM-dd HH:mm:ss',订单日期)",
-      "c": 5
+  "title": "testInfo.school+testInfo.subject+testInfo.name",
+  "title2" : "@本学期{testInfo.subject}结业测验",
+  "scores": {
+    "#students": {
+      "name": "no +':'+name",
+      "score": "round(sqrt(score)*10)",
+      "originalScore" : "score"
     }
   },
-  "@p": "object.properties"
+  "stat" : {
+    "students" : "count(students)",
+    "avgScore" : "ave(students.score)"
+  },
+  "@p": "testInfo"
 }

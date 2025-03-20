@@ -3,6 +3,7 @@ package com.centit.support.test.utils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.centit.support.algorithm.Snowflake;
+import com.centit.support.security.Md5Encoder;
 
 import java.io.UnsupportedEncodingException;
 
@@ -10,6 +11,9 @@ public class TestMD5 {
 
     public static void main(String[] args) throws UnsupportedEncodingException {
 
+        // 1392c730239402b38926b7c3c9944202
+        // 1392c730239402b38926b7c3c9944202
+        System.out.println(Md5Encoder.encode("Wilbur6038f2e6b04e4ca155aa46b4aa76c7f05824"));
         Snowflake sf = new Snowflake();
         System.out.println(sf.nextId());
         System.out.println(sf.nextId());

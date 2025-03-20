@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("unused")
 public abstract class XmlUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(XmlUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(XmlUtils.class);
 
     private XmlUtils() {
         throw new IllegalAccessError("Utility class");

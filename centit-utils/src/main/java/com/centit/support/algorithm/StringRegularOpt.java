@@ -12,6 +12,25 @@ public abstract class StringRegularOpt {
         throw new IllegalAccessError("Utility class");
     }
 
+    private static String innerTrimString(String szWord, int sl){
+        StringBuilder strBuilder = new StringBuilder();
+        int i=1;
+        while(i<sl-1){
+            char ac = szWord.charAt(i);
+            if(ac == '\\'){
+                i++;
+                ac = szWord.charAt(i);
+                switch (ac){
+                    case 'n': ac = '\n'; break;
+                    case 'r': ac = '\r'; break;
+                    case 't': ac = '\t'; break;
+                }
+            }
+            strBuilder.append(ac);
+            i++;
+        }
+        return strBuilder.toString();
+    }
     public static String trimString(String szWord) {
         if (szWord == null)
             return "";
@@ -22,7 +41,7 @@ public abstract class StringRegularOpt {
             (strWord.charAt(0) == '\'' && strWord.charAt(sl - 1) == '\'')||
             (strWord.charAt(0) == '`' && strWord.charAt(sl - 1) == '`'))) { // 96 控制字符
             if (sl > 2)
-                strWord = strWord.substring(1, sl - 1);
+                strWord = innerTrimString(strWord, sl);
             else
                 strWord = "";
         }

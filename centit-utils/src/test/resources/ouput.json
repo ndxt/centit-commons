@@ -1,0 +1,33 @@
+{
+  "title": "清华大学高等数据2024期末考试",
+  "title2": "本学期高等数据结业测验",
+  "scores": [
+    {
+      "name": "1:张三",
+      "score": 86,
+      "originalScore": 74
+    },
+    {
+      "name": "2:李四",
+      "score": 75,
+      "originalScore": 56
+    },
+    {
+      "name": "3:孙山",
+      "score": 91,
+      "originalScore": 82
+    },
+    {
+      "name": "4:王五",
+      "score": 61,
+      "originalScore": 37
+    }
+  ],
+  "stat": {
+    "students": 4,
+    "avgScore": 62.25
+  },
+  "school": "清华大学",
+  "name": "2024期末考试",
+  "subject": "高等数据"
+}

@@ -1,5 +1,6 @@
 package com.centit.search.service;
 
+import com.alibaba.fastjson2.JSONObject;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -84,4 +85,11 @@ public interface Searcher {
      */
     Pair<Long,List<Map<String, Object>>> searchUnits(String [] units, String optId, String queryWord, int pageNo, int pageSize);
 
+    /**
+     * 根据文档id来获取文档
+     * @param idFieldName id字段名
+     * @param docId id
+     * @return 文档数据
+     */
+    JSONObject getDocumentById(String idFieldName, String docId);
 }

@@ -6,9 +6,15 @@ import com.centit.support.algorithm.*;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.image.CaptchaImageUtil;
 import com.centit.support.json.JSONOpt;
+import com.centit.support.network.UrlOptUtils;
 import com.centit.support.security.HmacSha1Encoder;
 import com.centit.support.security.Md5Encoder;
+import com.centit.support.security.SM3Util;
 import com.centit.support.security.Sha1Encoder;
+import com.centit.support.xml.XMLObject;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -17,8 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 77;
-    protected static final FunctionInfo functionsList[] = {
+    public static final int functionsSum = 80;
+    protected static final FunctionInfo[] functionsList = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
         new FunctionInfo("capital", 1, ConstDefine.FUNC_CAPITAL, ConstDefine.TYPE_STR),  // capital (123.45)="一百二十三点四五"
@@ -86,7 +92,8 @@ public abstract class EmbedFunc {
         new FunctionInfo("lastofmonth", -1, ConstDefine.FUNC_LAST_OF_MONTH, ConstDefine.TYPE_ANY),//日期函数   求这个月的第一天
         new FunctionInfo("toDate", 1, ConstDefine.FUNC_TO_DATE, ConstDefine.TYPE_DATE),// 转换为日期
         new FunctionInfo("toString", 1, ConstDefine.FUNC_TO_STRING, ConstDefine.TYPE_STR),//转换为String
-        new FunctionInfo("toJsonString", 1, ConstDefine.FUNC_TO_JSON_STRING, ConstDefine.TYPE_STR),//转换为String
+        new FunctionInfo("toJsonString", 1, ConstDefine.FUNC_TO_JSON_STRING, ConstDefine.TYPE_STR),//转换为JSONString
+        new FunctionInfo("toUrlString", 1, ConstDefine.FUNC_TO_URL_STRING, ConstDefine.TYPE_STR),//转换为JSONString
         new FunctionInfo("toObject", 1, ConstDefine.FUNC_TO_OBJECT, ConstDefine.TYPE_ANY),//转换为json 对象
         new FunctionInfo("toNumber", 1, ConstDefine.FUNC_TO_NUMBER, ConstDefine.TYPE_NUM),//转换为数字
         new FunctionInfo("toByteArray", 1, ConstDefine.FUNC_TOBYTEARRAY, ConstDefine.TYPE_ANY),//转换为数字
@@ -95,9 +102,11 @@ public abstract class EmbedFunc {
         new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR),//取汉字拼音
         new FunctionInfo("random", -1, ConstDefine.FUNC_RANDOM, ConstDefine.TYPE_ANY), // 取随机数
         new FunctionInfo("hash", 1, ConstDefine.FUNC_HASH, ConstDefine.TYPE_STR), // 计算hash值
-        new FunctionInfo("eval", -1, ConstDefine.FUNC_EVAL, ConstDefine.TYPE_ANY) // 和 eval在外层运行
+        new FunctionInfo("eval", -1, ConstDefine.FUNC_EVAL, ConstDefine.TYPE_ANY), // 和 eval在外层运行
+        new FunctionInfo("encode", 1, ConstDefine.FUNC_ENCODE, ConstDefine.TYPE_STR), // 编码 目前仅支持 HEX base64 base64UrlSafe
+        new FunctionInfo("decode", 1, ConstDefine.FUNC_DECODE, ConstDefine.TYPE_ANY)// 解码 目前仅支持 HEX base64 base64UrlSafe
     };
-    private static double COMPARE_MIN_DOUBLE = 0.0000001;
+    private static final double COMPARE_MIN_DOUBLE = 0.0000001;
     private EmbedFunc() {
         throw new IllegalAccessError("Utility class");
     }
@@ -113,7 +122,7 @@ public abstract class EmbedFunc {
     private static LeftRightPair<Integer, List<Object>> flatOperands(List<Object> slOperand) {
         int nCount = 0;
         List<Object> ret = new ArrayList<>();
-        if (slOperand != null && slOperand.size() > 0) {
+        if (slOperand != null && !slOperand.isEmpty()) {
             for (Object obj : slOperand) {
                 if (obj instanceof Object[]) {
                     Object[] objs = (Object[]) obj;
@@ -122,8 +131,8 @@ public abstract class EmbedFunc {
                         nCount++;
                     }
                 } else if (obj instanceof Collection) {
-                    ret.addAll((Collection) obj);
-                    nCount += ((Collection) obj).size();
+                    ret.addAll((Collection<?>) obj);
+                    nCount += ((Collection<?>) obj).size();
                 } else {
                     ret.add(obj);
                     nCount++;
@@ -252,7 +261,7 @@ public abstract class EmbedFunc {
                 while (m.find()) {
                     matchValues.add(sValues.substring(m.start(), m.end()));
                 }
-                if(matchValues.size()==0)
+                if(matchValues.isEmpty())
                     return null;
                 if(matchValues.size()==1)
                     return matchValues.get(0);
@@ -435,7 +444,11 @@ public abstract class EmbedFunc {
 
                 Object obj = slOperand.get(0);
                 if (obj instanceof Collection) {
-                    return ((Collection) obj).contains(slOperand.get(1));
+                    if(obj instanceof List){
+                        List<?> list = (List<?>)obj;
+                        return list.indexOf(slOperand.get(1));
+                    }
+                    return ((Collection<?>) obj).contains(slOperand.get(1))?1:-1;
                 }
                 String tempStr = StringBaseOpt.objectToString(obj);
                 String findType = null; //C W
@@ -503,6 +516,9 @@ public abstract class EmbedFunc {
                     return null;
                 }
                 String splitStr = nOpSum > 1 ? StringBaseOpt.castObjectToString(slOperand.get(1),","):",";
+                if(StringUtils.equalsAny(splitStr, ".","*","?","$","+","|","\\")){
+                    splitStr = String.format("\\%s", splitStr);
+                }
                 return str.split(splitStr);
             }
 
@@ -773,6 +789,8 @@ public abstract class EmbedFunc {
                     dt = DatetimeOpt.currentUtilDate();
                 Calendar cal = new GregorianCalendar();
                 cal.setTime(dt);
+                //Calendar.DAY_OF_WEEK
+                //assert field <=17 && field >=0;
                 return cal.get(field);
             }
 
@@ -885,7 +903,7 @@ public abstract class EmbedFunc {
                 return null;
             }
 
-            case ConstDefine.FUNC_TO_JSON_STRING: {//
+            case ConstDefine.FUNC_TO_JSON_STRING: {//178
                 if (nOpSum < 1) {
                     return null;
                 }
@@ -893,6 +911,13 @@ public abstract class EmbedFunc {
                     return slOperand.get(0);
                 }
                 return JSON.toJSONString(slOperand.get(0));
+            }
+
+            case ConstDefine.FUNC_TO_URL_STRING: {// 181
+                if (nOpSum < 1) {
+                    return null;
+                }
+                return UrlOptUtils.objectToUrlString(slOperand.get(0));
             }
 
             case ConstDefine.FUNC_TOBYTEARRAY:{
@@ -907,6 +932,13 @@ public abstract class EmbedFunc {
                     return null;
                 }
                 if(slOperand.get(0) instanceof String){
+                    String objType = "json";
+                    if(nOpSum>1){
+                        objType = StringBaseOpt.castObjectToString(slOperand.get(1));
+                    }
+                    if("xml".equalsIgnoreCase(objType)){
+                        return XMLObject.xmlStringToObject((String) slOperand.get(0));
+                    }
                     return JSON.parse((String) slOperand.get(0));
                 }
                 return slOperand.get(0);
@@ -1000,67 +1032,123 @@ public abstract class EmbedFunc {
             }
 
             //hash(object)
-            //hash(object, "md5/sha", base64)
-            //hash(object, "hmac-sha1", "secret-key")
-            //hash(object, "hmac-sha1", "secret-key"，'base64')
+            //hash(object, "sm3/md5/sha", base64)
+            //hash(object, "sm3/hmac-sha1", "secret-key")
+            //hash(object, "sm3/hmac-sha1", "secret-key"，'base64')
             case ConstDefine.FUNC_HASH:{
                 if (nOpSum < 1) return null;
-                if (nOpSum < 2) {
-                    return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                String hashType = "MD5";//SHA SM3 HMAC-SHA HMAC-SM3
+                String encodeType = "HEX";
+                String secretKey = "";
+                if (nOpSum > 1) {
+                    String ht = StringBaseOpt.castObjectToString(slOperand.get(1));
+                    if(StringUtils.equalsAnyIgnoreCase(ht, "sha","sha1","sha-1")){
+                        hashType = "SHA";
+                    } else if(StringUtils.equalsAnyIgnoreCase(ht, "hmac-sha1","macsha","hmacsha","hmacsha1")){
+                        hashType = "HMAC-SHA";
+                    } else if(StringUtils.equalsAnyIgnoreCase(ht, "sm","sm3")){
+                        hashType = "SM3";
+                    } else if(StringUtils.equalsAnyIgnoreCase(ht, "hmac-sm3","sm3-hmac")){
+                        hashType = "HMAC-SM3";
+                    }
                 }
-                if (nOpSum < 3) {
-                    String encodeType = StringBaseOpt.castObjectToString(slOperand.get(1));
-                    if(StringUtils.equalsAnyIgnoreCase(encodeType, "sha","sha1","sha-1")){
-                        return Sha1Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                if (nOpSum == 3) {
+                    if(StringUtils.equalsAnyIgnoreCase(hashType, "SHA","MD5", "SM3")){
+                        String ec = StringBaseOpt.castObjectToString(slOperand.get(2));
+                        if(StringUtils.equalsAnyIgnoreCase(ec, "base64urlsafe","urlsafe")){
+                            encodeType = "BASE64URL";
+                        } else if(StringUtils.equalsIgnoreCase(ec,"base64")){
+                            encodeType = "BASE64";
+                        }
                     } else {
-                        if(StringUtils.equalsAnyIgnoreCase(encodeType, "base64urlsafe","urlsafe")){
-                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), true);
-                        } else if(StringUtils.equalsIgnoreCase(encodeType,"base64")){
-                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), false);
-                        } else {
-                            return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
-                        }
+                        secretKey = StringBaseOpt.castObjectToString(slOperand.get(2));
                     }
                 }
-                if(nOpSum < 4) {
-                    String encodeType = StringBaseOpt.castObjectToString(slOperand.get(1));
-                    String param = StringBaseOpt.castObjectToString(slOperand.get(2));
-                    if(StringUtils.equalsAnyIgnoreCase(encodeType, "sha","sha1","sha-1")){
-                        if(StringUtils.equalsAnyIgnoreCase(param, "base64urlsafe","urlsafe")){
-                            return Sha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), true);
-                        } else if(StringUtils.equalsIgnoreCase(param,"base64")){
-                            return Sha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), false);
-                        } else {
-                            return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
-                        }
-                    } else if(StringUtils.equalsAnyIgnoreCase(encodeType, "hmac-sha1","macsha","hmacsha","hmacsha1")){
-                        return HmacSha1Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)), param);
-                    } else { //md5
-                        if (StringUtils.equalsAnyIgnoreCase(param, "base64urlsafe", "urlsafe")) {
-                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), true);
-                        } else if (StringUtils.equalsIgnoreCase(param, "base64")) {
-                            return Md5Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), false);
-                        } else {
-                            return Md5Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)));
-                        }
+                if(nOpSum == 4) {
+                    String ec = StringBaseOpt.castObjectToString(slOperand.get(3));
+                    if(StringUtils.equalsAnyIgnoreCase(ec, "base64urlsafe","urlsafe")){
+                        encodeType = "BASE64URL";
+                    } else if(StringUtils.equalsIgnoreCase(ec,"base64")){
+                        encodeType = "BASE64";
                     }
                 }
-
-                String encodeType = StringBaseOpt.castObjectToString(slOperand.get(1));
-                String secretKey = StringBaseOpt.castObjectToString(slOperand.get(2));
-                String param = StringBaseOpt.castObjectToString(slOperand.get(3));
-                if(StringUtils.equalsAnyIgnoreCase(encodeType, "hmac-sha1","macsha","hmacsha","hmacsha1")){
-                    if (StringUtils.equalsAnyIgnoreCase(param, "base64urlsafe", "urlsafe")) {
-                        return HmacSha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), secretKey,  true);
-                    } else if (StringUtils.equalsIgnoreCase(param, "base64")) {
-                        return HmacSha1Encoder.encodeBase64(StringBaseOpt.castObjectToString(slOperand.get(0)), secretKey, false);
-                    } else {
-                        return HmacSha1Encoder.encode(StringBaseOpt.castObjectToString(slOperand.get(0)), secretKey);
-                    }
+                byte [] hashData;
+                switch (hashType){
+                    case "SM3":
+                        hashData = SM3Util.hash(ByteBaseOpt.castObjectToBytes(slOperand.get(0)));
+                        break;
+                    case "SHA":
+                        hashData = Sha1Encoder.rawEncode(ByteBaseOpt.castObjectToBytes(slOperand.get(0)));
+                        break;
+                    case "HMAC-SM3":
+                        hashData = SM3Util.hmac(ByteBaseOpt.castObjectToBytes(slOperand.get(0)), ByteBaseOpt.castObjectToBytes(secretKey));
+                        break;
+                    case "HMAC-SHA":
+                        hashData = HmacSha1Encoder.rawEncode(ByteBaseOpt.castObjectToBytes(slOperand.get(0)),secretKey);
+                        break;
+                    case "MD5":
+                    default:
+                        hashData = Md5Encoder.rawEncode(ByteBaseOpt.castObjectToBytes(slOperand.get(0)));
+                        break;
                 }
-                return null;
+                switch (encodeType){
+                    case "BASE64URL":
+                        return Base64.encodeBase64URLSafeString(hashData);
+                    case "BASE64":
+                        return Base64.encodeBase64String(hashData);
+                    case "HEX":
+                    default:
+                        return String.valueOf(Hex.encodeHex(hashData));
+                }
             }
 
+            case ConstDefine.FUNC_ENCODE: {
+                if (nOpSum < 1) return null;
+                String encodeType = "HEX";
+                if (nOpSum > 1) {
+                    String ec = StringBaseOpt.castObjectToString(slOperand.get(1));
+                    if(StringUtils.equalsAnyIgnoreCase(ec, "base64urlsafe","urlsafe")){
+                        encodeType = "BASE64URL";
+                    } else if(StringUtils.equalsIgnoreCase(ec,"base64")){
+                        encodeType = "BASE64";
+                    }
+                }
+                byte [] data = ByteBaseOpt.castObjectToBytes(slOperand.get(0));
+                if(data==null || data.length==0) {
+                    return null;
+                }
+                switch (encodeType) {
+                    case "BASE64URL":
+                        return Base64.encodeBase64URLSafeString(data);
+                    case "BASE64":
+                        return Base64.encodeBase64String(data);
+                    case "HEX":
+                    default:
+                        return String.valueOf(Hex.encodeHex(data));
+                }
+            }
+            case ConstDefine.FUNC_DECODE: {
+                if (nOpSum < 1) return null;
+                String encodeType = "HEX";
+                if (nOpSum > 1) {
+                    String ec = StringBaseOpt.castObjectToString(slOperand.get(1));
+                    if(StringUtils.equalsAnyIgnoreCase(ec, "base64urlsafe","urlsafe","base64")){
+                        encodeType = "BASE64";
+                    }
+                }
+
+                switch (encodeType) {
+                    case "BASE64":
+                        return Base64.decodeBase64(ByteBaseOpt.castObjectToBytes(slOperand.get(0)));
+                    case "HEX":
+                    default:
+                        try {
+                            return Hex.decodeHex(StringBaseOpt.castObjectToString(slOperand.get(0)));
+                        } catch (DecoderException e) {
+                            return "";
+                        }
+                }
+            }
             default:
                 break;
         }

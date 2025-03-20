@@ -5,8 +5,8 @@ public class OptStack {
      * @param args 数值越小优先级越低
      */
     final static private int optsPri[] =
-        {5, 5, 6, 6, 4, 4, 4, 4, 4, 4, 2, 3, 9, 8, 5, 5, 4,   7, 2, 3,  6, 6,   4, 4, 4, 4};
-        //+ -  *  /  == >  < <=  >= != |  &  !  ^  >> << like in or and % dbmod xor
+        {7, 7, 8, 8, 4, 5, 5, 5, 5, 4, 2, 3, 11, 10, 6, 6, 4,   9, 2, 3,  7, 7,   1, 4, 4, 4};
+        //+ -  *  /  == >  < <=  >= != |  &  !   ^   >> << like in or and % dbmod xor
     //5 is normal
     private int sourceLen;
     private int optsStack[];

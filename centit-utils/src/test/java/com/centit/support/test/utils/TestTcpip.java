@@ -1,7 +1,8 @@
 package com.centit.support.test.utils;
 
 import com.alibaba.fastjson2.JSON;
-import com.centit.support.network.HtmlFormUtils;
+import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.compiler.Pretreatment;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.UrlOptUtils;
@@ -13,11 +14,13 @@ import java.util.Map;
 
 public class TestTcpip {
     public static void main(String arg[]) {
-        System.out.println(UrlOptUtils.fetchFilenameFromUrl("abcedfg.pdf"));
-        System.out.println(UrlOptUtils.fetchFilenameFromUrl("abcedfg.pdf?ajax=true"));
-        System.out.println(UrlOptUtils.fetchFilenameFromUrl("http://baidu.com/abcedfg.pdf?ajax=true"));
-        System.out.println(UrlOptUtils.fetchFilenameFromUrl("http://baidu.com/abcedfg.pdf"));
+        System.out.println(Pretreatment.mapUrlTemplate("http://locode.net?{.}",
+            CollectionsOpt.createHashMap("a",10 , "b", 20)));
+
+        System.out.println( UrlOptUtils.appendParamsToUrl("http://locode.net?dasdf",
+            CollectionsOpt.createHashMap("a",10 , "b", 20)));
     }
+
     public static void testPosts() {
         Map<String, Object> formData = new HashMap<String, Object>();
         formData.put("catalogCode", "TestData");
@@ -38,7 +41,7 @@ public class TestTcpip {
             System.out.println(sRet);
         } catch (IOException e) {
 
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
     }
 
@@ -62,7 +65,7 @@ public class TestTcpip {
             System.out.println(sRet);
         } catch (IOException e) {
 
-            //e.printStackTrace();
+            //logger.error(e.getMessage(), e);
         }
 
     }

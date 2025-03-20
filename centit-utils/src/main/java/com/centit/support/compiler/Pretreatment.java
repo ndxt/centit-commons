@@ -1,6 +1,8 @@
 package com.centit.support.compiler;
 
+import com.centit.support.algorithm.GeneralAlgorithm;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.network.UrlOptUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -23,7 +25,7 @@ public abstract class Pretreatment {
      * @return 新的表达式
      */
     private static String innerMapTemplateString(String template, VariableTranslate varTrans,
-                                                 String nullValue, boolean canOmitDollar, boolean asFormula) {
+                                                 String nullValue, boolean canOmitDollar, boolean asFormula, boolean asUrl) {
         if (StringUtils.isBlank(template)) {
             return nullValue;
         }
@@ -69,11 +71,21 @@ public abstract class Pretreatment {
             if (bp - 1 > ep) {
                 String valueName = template.substring(ep, bp - 1);
                 if (asFormula) {
-                    mapString.append(StringBaseOpt.castObjectToString(
-                        VariableFormula.calculate(valueName, varTrans), nullValue));
+                    if (asUrl){
+                        mapString.append(UrlOptUtils.objectToUrlString(
+                            GeneralAlgorithm.nvl(VariableFormula.calculate(valueName, varTrans), nullValue) )) ;
+                    } else {
+                        mapString.append(StringBaseOpt.castObjectToString(
+                            VariableFormula.calculate(valueName, varTrans), nullValue));
+                    }
                 } else {
-                    mapString.append(StringBaseOpt.castObjectToString(
-                        varTrans.getVarValue(valueName), nullValue));
+                    if (asUrl){
+                        mapString.append(UrlOptUtils.objectToUrlString(
+                            GeneralAlgorithm.nvl(varTrans.getVarValue(valueName), nullValue) )) ;
+                    } else {
+                        mapString.append(StringBaseOpt.castObjectToString(
+                            varTrans.getVarValue(valueName), nullValue));
+                    }
                 }
                 /*ReflectionOpt.attainExpressionValue(object,valueName)*/
             }
@@ -96,9 +108,9 @@ public abstract class Pretreatment {
      */
     public static String mapTemplateString(String template, Object object, String nullValue, boolean canOmitDollar) {
         if (object instanceof VariableTranslate) {
-            return innerMapTemplateString(template, (VariableTranslate) object, nullValue, canOmitDollar, false);
+            return innerMapTemplateString(template, (VariableTranslate) object, nullValue, canOmitDollar, false, false);
         }
-        return innerMapTemplateString(template, new ObjectTranslate(object), nullValue, canOmitDollar, false);
+        return innerMapTemplateString(template, new ObjectTranslate(object), nullValue, canOmitDollar, false, false);
     }
 
 
@@ -153,16 +165,11 @@ public abstract class Pretreatment {
      */
     public static String mapTemplateStringAsFormula(String template, Object object, String nullValue, boolean canOmitDollar) {
         if (object instanceof VariableTranslate) {
-            return innerMapTemplateString(template, (VariableTranslate) object, nullValue, canOmitDollar, true);
+            return innerMapTemplateString(template, (VariableTranslate) object, nullValue, canOmitDollar, true, false);
         }
 
-        /*if (object instanceof JSONTransformDataSupport) {
-            return innerMapTemplateString(template, JSONTransformTranslate.create(
-                (JSONTransformDataSupport)object), nullValue, canOmitDollar, true);
-        }
-        */
         return innerMapTemplateString(template,
-            new ObjectTranslate(object), nullValue, canOmitDollar, true);
+            new ObjectTranslate(object), nullValue, canOmitDollar, true, false);
     }
 
 
@@ -204,4 +211,17 @@ public abstract class Pretreatment {
         return mapTemplateStringAsFormula(template, object, "", true);
     }
 
+    public static String mapUrlTemplateAsFormula(String template, Object object) {
+        if (object instanceof VariableTranslate) {
+            return innerMapTemplateString(template, (VariableTranslate) object, "", true, true, true);
+        }
+        return innerMapTemplateString(template, new ObjectTranslate(object), "", true, true, true);
+    }
+
+    public static String mapUrlTemplate(String template, Object object) {
+        if (object instanceof VariableTranslate) {
+            return innerMapTemplateString(template, (VariableTranslate) object, "", true, false, true);
+        }
+        return innerMapTemplateString(template, new ObjectTranslate(object), "", true, false, true);
+    }
 }

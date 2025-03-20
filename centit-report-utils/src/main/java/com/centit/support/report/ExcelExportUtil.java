@@ -6,11 +6,13 @@ import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.JavaBeanMetaData;
+import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -24,7 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.poi.ss.usermodel.CellType.NUMERIC;
+
 
 /**
  * 生成基本EXCEL工具类
@@ -52,12 +54,12 @@ public abstract class ExcelExportUtil {
      * @throws IOException 文件操作异常
      */
     public static void generateExcel(OutputStream outputStream, String sheetName,
-                                     List<? extends Object> objLists, String[] header, String[] property) throws IOException {
-        XSSFWorkbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet(sheetName);
-
-        generateExcelSheet(sheet, objLists, header, property);
-        wb.write(outputStream);
+                                     List<?> objLists, String[] header, String[] property) throws IOException {
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet(sheetName);
+            generateExcelSheet(sheet, objLists, header, property);
+            wb.write(outputStream);
+        }
     }
 
     /**
@@ -69,11 +71,12 @@ public abstract class ExcelExportUtil {
      * @param property     需要显示的属性
      * @throws IOException 文件操作异常
      */
-    public static void generateExcel(OutputStream outputStream, List<? extends Object> objLists, String[] header, String[] property) throws IOException {
-        XSSFWorkbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet();
-        generateExcelSheet(sheet, objLists, header, property);
-        wb.write(outputStream);
+    public static void generateExcel(OutputStream outputStream, List<?> objLists, String[] header, String[] property) throws IOException {
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            generateExcelSheet(sheet, objLists, header, property);
+            wb.write(outputStream);
+        }
     }
 
     /**
@@ -87,17 +90,19 @@ public abstract class ExcelExportUtil {
      */
     public static void generateExcel(OutputStream outputStream, String sheetName,
                                      List<Object[]> objLists, String[] header) throws IOException {
-        XSSFWorkbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet(sheetName);
-        generateExcelSheet(sheet, objLists, header);
-        wb.write(outputStream);
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet(sheetName);
+            generateExcelSheet(sheet, objLists, header);
+            wb.write(outputStream);
+        }
     }
 
     public static void generateExcel(OutputStream outputStream, List<Object[]> objLists, String[] header) throws IOException {
-        XSSFWorkbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet();
-        generateExcelSheet(sheet, objLists, header);
-        wb.write(outputStream);
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            generateExcelSheet(sheet, objLists, header);
+            wb.write(outputStream);
+        }
     }
 
     /**
@@ -110,18 +115,20 @@ public abstract class ExcelExportUtil {
      * @throws IOException 文件操作异常
      **/
     public static void generateExcel(OutputStream outputStream, String sheetName,
-                                     List<? extends Object> objLists, Class<?> objType) throws IOException {
-        XSSFWorkbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet(sheetName);
-        generateExcelSheet(sheet, objLists, objType);
-        wb.write(outputStream);
+                                     List<?> objLists, Class<?> objType) throws IOException {
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet(sheetName);
+            generateExcelSheet(sheet, objLists, objType);
+            wb.write(outputStream);
+        }
     }
 
-    public static void generateExcel(OutputStream outputStream, List<? extends Object> objLists, Class<?> objType) throws IOException {
-        XSSFWorkbook wb = new XSSFWorkbook();
-        Sheet sheet = wb.createSheet();
-        generateExcelSheet(sheet, objLists, objType);
-        wb.write(outputStream);
+    public static void generateExcel(OutputStream outputStream, List<?> objLists, Class<?> objType) throws IOException {
+        try(SXSSFWorkbook wb = new SXSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            generateExcelSheet(sheet, objLists, objType);
+            wb.write(outputStream);
+        }
     }
 
     /**
@@ -135,19 +142,21 @@ public abstract class ExcelExportUtil {
      * @throws IOException 文件操作异常
      **/
     public static void generateExcel2003(OutputStream outputStream, String sheetName,
-                                         List<? extends Object> objLists, String[] header, String[] property) throws IOException {
-        HSSFWorkbook wb = new HSSFWorkbook();
-        Sheet sheet = wb.createSheet(sheetName);
-        generateExcelSheet(sheet, objLists, header, property);
-        wb.write(outputStream);
+                                         List<?> objLists, String[] header, String[] property) throws IOException {
+        try(HSSFWorkbook wb = new HSSFWorkbook()) {
+            Sheet sheet = wb.createSheet(sheetName);
+            generateExcelSheet(sheet, objLists, header, property);
+            wb.write(outputStream);
+        }
     }
 
-    public static void generateExcel2003(OutputStream outputStream, List<? extends Object> objLists,
+    public static void generateExcel2003(OutputStream outputStream, List<?> objLists,
                                          String[] header, String[] property) throws IOException {
-        HSSFWorkbook wb = new HSSFWorkbook();
-        Sheet sheet = wb.createSheet();
-        generateExcelSheet(sheet, objLists, header, property);
-        wb.write(outputStream);
+        try(HSSFWorkbook wb = new HSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            generateExcelSheet(sheet, objLists, header, property);
+            wb.write(outputStream);
+        }
     }
 
     /**
@@ -161,17 +170,19 @@ public abstract class ExcelExportUtil {
      **/
     public static void generateExcel2003(OutputStream outputStream, String sheetName,
                                          List<Object[]> objLists, String[] header) throws IOException {
-        HSSFWorkbook wb = new HSSFWorkbook();
-        Sheet sheet = wb.createSheet(sheetName);
-        generateExcelSheet(sheet, objLists, header);
-        wb.write(outputStream);
+        try(HSSFWorkbook wb = new HSSFWorkbook()) {
+            Sheet sheet = wb.createSheet(sheetName);
+            generateExcelSheet(sheet, objLists, header);
+            wb.write(outputStream);
+        }
     }
 
     public static void generateExcel2003(OutputStream outputStream, List<Object[]> objLists, String[] header) throws IOException {
-        HSSFWorkbook wb = new HSSFWorkbook();
-        Sheet sheet = wb.createSheet();
-        generateExcelSheet(sheet, objLists, header);
-        wb.write(outputStream);
+        try(HSSFWorkbook wb = new HSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            generateExcelSheet(sheet, objLists, header);
+            wb.write(outputStream);
+        }
     }
 
     /**
@@ -184,18 +195,20 @@ public abstract class ExcelExportUtil {
      * @throws IOException 文件操作异常
      **/
     public static void generateExcel2003(OutputStream outputStream, String sheetName,
-                                         List<? extends Object> objLists, Class<?> objType) throws IOException {
-        HSSFWorkbook wb = new HSSFWorkbook();
-        Sheet sheet = wb.createSheet(sheetName);
-        generateExcelSheet(sheet, objLists, objType);
-        wb.write(outputStream);
+                                         List<?> objLists, Class<?> objType) throws IOException {
+        try(HSSFWorkbook wb = new HSSFWorkbook()) {
+            Sheet sheet = wb.createSheet(sheetName);
+            generateExcelSheet(sheet, objLists, objType);
+            wb.write(outputStream);
+        }
     }
 
-    public static void generateExcel2003(OutputStream outputStream, List<? extends Object> objLists, Class<?> objType) throws IOException {
-        HSSFWorkbook wb = new HSSFWorkbook();
-        Sheet sheet = wb.createSheet();
-        generateExcelSheet(sheet, objLists, objType);
-        wb.write(outputStream);
+    public static void generateExcel2003(OutputStream outputStream, List<?> objLists, Class<?> objType) throws IOException {
+        try(HSSFWorkbook wb = new HSSFWorkbook()) {
+            Sheet sheet = wb.createSheet();
+            generateExcelSheet(sheet, objLists, objType);
+            wb.write(outputStream);
+        }
     }
 //--------------------------------------------------------------------
 
@@ -210,14 +223,14 @@ public abstract class ExcelExportUtil {
      * @throws IOException 文件操作异常
      */
     public static InputStream generateExcelStream(String sheetName,
-                                                  List<? extends Object> objLists, String[] header, String[] property) throws IOException {
+                                                  List<?> objLists, String[] header, String[] property) throws IOException {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
             generateExcel(bout, sheetName, objLists, header, property);
             return new ByteArrayInputStream(bout.toByteArray());
         }
     }
 
-    public static InputStream generateExcelStream(List<? extends Object> objLists, String[] header, String[] property) throws IOException {
+    public static InputStream generateExcelStream(List<?> objLists, String[] header, String[] property) throws IOException {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
             generateExcel(bout, objLists, header, property);
             return new ByteArrayInputStream(bout.toByteArray());
@@ -258,14 +271,14 @@ public abstract class ExcelExportUtil {
      * @throws IOException 文件操作异常
      **/
     public static InputStream generateExcelStream(String sheetName,
-                                                  List<? extends Object> objLists, Class<?> objType) throws IOException {
+                                                  List<?> objLists, Class<?> objType) throws IOException {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
             generateExcel(bout, sheetName, objLists, objType);
             return new ByteArrayInputStream(bout.toByteArray());
         }
     }
 
-    public static InputStream generateExcelStream(List<? extends Object> objLists, Class<?> objType) throws IOException {
+    public static InputStream generateExcelStream(List<?> objLists, Class<?> objType) throws IOException {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
             generateExcel(bout, objLists, objType);
             return new ByteArrayInputStream(bout.toByteArray());
@@ -282,14 +295,14 @@ public abstract class ExcelExportUtil {
      * @return InputStream  输出文件流
      * @throws IOException 文件操作异常
      **/
-    public static InputStream generateExcel2003Stream(String sheetName, List<? extends Object> objLists, String[] header, String[] property) throws IOException {
+    public static InputStream generateExcel2003Stream(String sheetName, List<?> objLists, String[] header, String[] property) throws IOException {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
             generateExcel2003(bout, sheetName, objLists, header, property);
             return new ByteArrayInputStream(bout.toByteArray());
         }
     }
 
-    public static InputStream generateExcel2003Stream(List<? extends Object> objLists,
+    public static InputStream generateExcel2003Stream(List<?> objLists,
                                                       String[] header, String[] property) throws IOException {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
             generateExcel2003(bout, objLists, header, property);
@@ -331,14 +344,14 @@ public abstract class ExcelExportUtil {
      * @throws IOException 文件操作异常
      **/
     public static InputStream generateExcel2003Stream(String sheetName,
-                                                      List<? extends Object> objLists, Class<?> objType) throws IOException {
+                                                      List<?> objLists, Class<?> objType) throws IOException {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
             generateExcel2003(bout, sheetName, objLists, objType);
             return new ByteArrayInputStream(bout.toByteArray());
         }
     }
 
-    public static InputStream generateExcel2003Stream(List<? extends Object> objLists, Class<?> objType) throws IOException {
+    public static InputStream generateExcel2003Stream(List<?> objLists, Class<?> objType) throws IOException {
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
             generateExcel2003(bout, objLists, objType);
             return new ByteArrayInputStream(bout.toByteArray());
@@ -346,7 +359,7 @@ public abstract class ExcelExportUtil {
     }
 
     //---------------------------------------------------------------------
-    public static void generateExcelSheet(Sheet sheet, List<? extends Object> objLists, Class<?> objType) {
+    public static void generateExcelSheet(Sheet sheet, List<?> objLists, Class<?> objType) {
         JavaBeanMetaData metaData = JavaBeanMetaData.createBeanMetaDataFromType(objType);
 
         Row headerRow = sheet.createRow(0);
@@ -372,7 +385,6 @@ public abstract class ExcelExportUtil {
         }
     }
 
-
     /**
      * 生成Excel字节流
      *
@@ -381,7 +393,7 @@ public abstract class ExcelExportUtil {
      * @param header   Excel页头
      * @param property 需要显示的属性
      */
-    public static void generateExcelSheet(Sheet sheet, List<? extends Object> objLists,
+    public static void generateExcelSheet(Sheet sheet, List<?> objLists,
                                           String[] header, String[] property) {
 
         int beginRow = 0;
@@ -395,7 +407,7 @@ public abstract class ExcelExportUtil {
                 generateExcelText(sheet, objLists, property, beginRow);
             }
         } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | NoSuchFieldException e) {
-            throw new StatReportException(e);
+            throw new ObjectException(e);
         }
     }
 
@@ -423,13 +435,12 @@ public abstract class ExcelExportUtil {
         for (int i = 0; i < header.length; i++) {
             Cell cell = headerRow.createCell(i);
             setCellStyle(cell, cellStyle);
-
             cell.setCellValue(header[i]);
         }
     }
 
     //@SuppressWarnings("unchecked")
-    private static void generateExcelText(Sheet sheet, List<? extends Object> objLists, String[] property, int beginRow) throws NoSuchFieldException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private static void generateExcelText(Sheet sheet, List<?> objLists, String[] property, int beginRow) throws NoSuchFieldException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
         for (int i = 0; i < objLists.size(); i++) {
             Row textRow = sheet.createRow(i + beginRow);
@@ -480,7 +491,7 @@ public abstract class ExcelExportUtil {
             case "double":
             case "Double":
             case "BigDecimal":
-                cell.setCellType(NUMERIC);
+                cell.setCellType(CellType.NUMERIC);
                 break;
             case "String":
                 cell.setCellType(CellType.STRING);
@@ -491,7 +502,7 @@ public abstract class ExcelExportUtil {
                 break;
             case "Date":
             case "Timestamp":
-                cell.setCellType(NUMERIC);
+                cell.setCellType(CellType.NUMERIC);
                 DataFormat format = sheet.getWorkbook().createDataFormat();
                 cellStyle.setDataFormat(format.getFormat("yyyy-MM-dd"));
                 break;
@@ -619,7 +630,7 @@ public abstract class ExcelExportUtil {
             cell.setCellValue(StringBaseOpt.castObjectToString(value));
         }
     }
-    public static void saveObjectsToExcelSheet(Sheet sheet, List<? extends Object> objects, Map<Integer, String> fieldDesc, int beginRow,
+    public static void saveObjectsToExcelSheet(Sheet sheet, List<?> objects, Map<Integer, String> fieldDesc, int beginRow,
                                                boolean createRow, int mergeColCell) {
         int nRowCount = objects.size();
         //CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
@@ -685,7 +696,7 @@ public abstract class ExcelExportUtil {
      * @throws IOException 文件存储异常
      */
     public static void generateExcelByTemplate(String excelTemplateFilePath, String excelFilePath, String sheetName,
-                                               List<? extends Object> objects, Map<Integer, String> fieldDesc, int beginRow, boolean createRow) throws IOException {
+                                               List<?> objects, Map<Integer, String> fieldDesc, int beginRow, boolean createRow) throws IOException {
 
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(excelTemplateFilePath);
         Workbook wb;
@@ -715,7 +726,7 @@ public abstract class ExcelExportUtil {
      * @throws IOException 文件存储异常
      */
     public static void generateExcelByTemplate(String excelTemplateFilePath, String excelFilePath, int sheetIndex,
-                                               List<? extends Object> objects, Map<Integer, String> fieldDesc, int beginRow, boolean createRow) throws IOException {
+                                               List<?> objects, Map<Integer, String> fieldDesc, int beginRow, boolean createRow) throws IOException {
 
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(excelTemplateFilePath);
         Workbook wb;
@@ -789,7 +800,7 @@ public abstract class ExcelExportUtil {
     }
 
     public static void appendDataToExcelSheet(String excelFilePath, String sheetName,
-                                              List<? extends Object> objLists, String[] header, String[] property) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
+                                              List<?> objLists, String[] header, String[] property) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
 
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(excelFilePath);
         Workbook wb;
@@ -818,7 +829,7 @@ public abstract class ExcelExportUtil {
     }
 
     public static void appendDataToExcelSheet(String excelFilePath, int sheetIndex,
-                                              List<? extends Object> objLists, String[] header, String[] property) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
+                                              List<?> objLists, String[] header, String[] property) throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(excelFilePath);
         Workbook wb;
         Sheet sheet;
@@ -858,7 +869,7 @@ public abstract class ExcelExportUtil {
                 sheet=wb.createSheet(sheetName);
             }
         } else {
-            wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook() : new XSSFWorkbook();
+            wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook() : new SXSSFWorkbook();
             sheet = wb.createSheet(sheetName);
         }
         if (sheet.getLastRowNum() == 0) {
@@ -882,7 +893,7 @@ public abstract class ExcelExportUtil {
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             sheet = wb.getSheetAt(sheetIndex);
         } else {
-            wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook() : new XSSFWorkbook();
+            wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook() : new SXSSFWorkbook();
             sheet = wb.createSheet();
         }
         if (sheet.getLastRowNum() == 0) {
@@ -944,7 +955,6 @@ public abstract class ExcelExportUtil {
             distCell.setCellErrorValue(srcCell.getErrorCellValue());
         } else if (srcCellType == CellType.FORMULA) {
             distCell.setCellFormula(srcCell.getCellFormula());
-        } else {
         }
     }
 

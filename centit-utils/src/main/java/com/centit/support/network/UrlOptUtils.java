@@ -1,16 +1,25 @@
 package com.centit.support.network;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.centit.support.algorithm.DatetimeOpt;
+import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.security.Md5Encoder;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +69,7 @@ public abstract class UrlOptUtils {
                 try {
                     value = URLDecoder.decode(value, "utf-8");
                 } catch (UnsupportedEncodingException e) {
-                    logger.error(e.getMessage(), e);//e.printStackTrace();
+                    logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
                 }
                 params.put(name, value);
                 break;
@@ -69,7 +78,7 @@ public abstract class UrlOptUtils {
                 try {
                     value = URLDecoder.decode(value, "utf-8");
                 } catch (UnsupportedEncodingException e) {
-                    logger.error(e.getMessage(), e);//e.printStackTrace();
+                    logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
                 }
                 params.put(name, value);
                 bpos = n2 + 1;
@@ -88,7 +97,7 @@ public abstract class UrlOptUtils {
         try {
             return new URL(curl).getHost();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -101,17 +110,8 @@ public abstract class UrlOptUtils {
         return curl.substring(nBpos, nEpos);
     }
 
-    public static String appendParamsToUrl(String uri, Map<String, Object> queryParam) {
-        if (queryParam == null) {
-            return uri;
-        }
-        StringBuilder urlBuilder = new StringBuilder(uri);
-        if (!uri.endsWith("?") && !uri.endsWith("&")) {
-            if (uri.indexOf('?') == -1)
-                urlBuilder.append('?');
-            else
-                urlBuilder.append('&');
-        }
+    public static String makeParamsToUrl(Map<String, Object> queryParam) {
+        StringBuilder urlBuilder = new StringBuilder();
         int n = 0;
         for (Map.Entry<String, Object> ent : queryParam.entrySet()) {
             if (n > 0)
@@ -125,8 +125,14 @@ public abstract class UrlOptUtils {
         return urlBuilder.toString();
     }
 
-    public static String makeParamsToUrl(Map<String, Object> queryParam) {
-        return appendParamsToUrl("", queryParam);
+    public static String appendParamsToUrl(String uri, Map<String, Object> queryParam) {
+        if (queryParam == null) {
+            return uri;
+        }
+        if(StringUtils.isBlank(uri)) return makeParamsToUrl(queryParam);
+        if (uri.endsWith("?") || uri.endsWith("&"))  return uri + makeParamsToUrl(queryParam);
+        if (uri.indexOf('?') == -1) return uri + '?' + makeParamsToUrl(queryParam);
+        return uri + '&' + makeParamsToUrl(queryParam);
     }
 
     public static String appendParamToUrl(String uri, String queryUrl) {
@@ -197,4 +203,80 @@ public abstract class UrlOptUtils {
         }
         return sbBuilder.toString();
     }
+
+    public static String objectToUrlString(Object objValue) {
+        if (objValue == null)
+            return null;
+        if (objValue instanceof String) {
+            return (String) objValue;
+        }
+        if (objValue instanceof byte[]) {
+            return new String((byte[]) objValue);
+        }
+        if (objValue instanceof java.util.Date){
+            return DatetimeOpt.convertTimestampToString((java.util.Date) objValue);
+        }
+        if (objValue instanceof InputStream){
+            try {
+                return FileIOOpt.readStringFromInputStream((InputStream)objValue);
+            } catch (IOException e) {
+                return "";
+            }
+        }
+        Class<?> clazz = objValue.getClass();
+
+        if (clazz.isEnum()) {
+            return ((Enum<?>) objValue).name();
+        }
+
+        if (ReflectionOpt.isScalarType(clazz)){
+            return objValue.toString();
+        }
+
+        if (clazz.isArray()) {
+            int len = Array.getLength(objValue);
+            StringBuilder sb = new StringBuilder();
+            if (len > 0) {
+                for (int i = 0; i < len; i++) {
+                    String objStr = objectToUrlString(Array.get(objValue, i));
+                    if (i > 0) {
+                        if(objStr.indexOf('=')>=0)
+                            sb.append('&');
+                        else
+                            sb.append(',');
+                    }
+                    sb.append(objStr);
+                }
+                return sb.toString();
+            } else {
+                return null;
+            }
+        } else if (objValue instanceof Collection) {
+            StringBuilder sb = new StringBuilder();
+            int vc = 0;
+            Collection<?> valueList = (Collection<?>) objValue;
+            for (Object ov : valueList) {
+                if (ov != null) {
+                    String objStr = objectToUrlString(ov);
+                    if (vc > 0) {
+                        if(objStr.indexOf('=')>=0)
+                            sb.append('&');
+                        else
+                            sb.append(',');
+                    }
+                    sb.append(objStr);
+                    vc++;
+                }
+            }
+            return sb.toString();
+        } else {
+            Object object = JSON.toJSON(objValue);
+            if(object instanceof JSONObject){
+                return makeParamsToUrl((JSONObject)object);
+            }else{
+                return JSON.toJSONString(object);
+            }
+        }
+    }
+
 }

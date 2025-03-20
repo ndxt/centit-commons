@@ -21,8 +21,13 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author zhf
@@ -32,7 +37,7 @@ public abstract class OfficeToPdf {
         throw new IllegalAccessError("Utility class");
     }
 
-    private static Logger logger = LoggerFactory.getLogger(OfficeToHtml.class);
+    private static final Logger logger = LoggerFactory.getLogger(OfficeToPdf.class);
 
     final static String DOC = "doc";
     final static String DOCX = "docx";
@@ -56,17 +61,28 @@ public abstract class OfficeToPdf {
             if (DOCX.equalsIgnoreCase(suffix)) {
                 XWPFDocument docx = new XWPFDocument(inWordStream);
                 PdfOptions options = PdfOptions.create();
+                Map<String, BaseFont> fontMap = new HashMap<>();
                 // 中文字体处理
                 options.fontProvider((familyName, encoding, size, style, color) -> {
                     try {
-                        BaseFont bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                        Font fontChinese = new Font(bfChinese, size, style, color);
-                        if (familyName != null) {
-                            fontChinese.setFamily(familyName);
+                        BaseFont bfChinese = fontMap.get(familyName);
+                        if(bfChinese==null) {
+                            if (familyName.indexOf("仿") >= 0) { //仿宋
+                                bfChinese = BaseFont.createFont("simfang.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                            } else if (familyName.indexOf("宋") >= 0) { //宋体
+                                bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                            } else if (familyName.indexOf("楷") >= 0) { //楷体
+                                bfChinese = BaseFont.createFont("simkai.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                            } else { // 黑体
+                                bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                            }
+                            fontMap.put(familyName, bfChinese);
                         }
+                        Font fontChinese = new Font(bfChinese, size, style, color);
+                        fontChinese.setFamily(familyName);
                         return fontChinese;
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error(e.getMessage(), e);
                         return null;
                     }
                 });
@@ -90,8 +106,8 @@ public abstract class OfficeToPdf {
         String inputFile = CommonUtils.mapWidowsPathIfNecessary(inWordFile);
         String pdfFile = CommonUtils.mapWidowsPathIfNecessary(outPdfFile);
         try(InputStream inWordStream = Files.newInputStream(new File(inputFile).toPath());
-            OutputStream outPdfStram = Files.newOutputStream(new File(pdfFile).toPath())) {
-            return word2Pdf(inWordStream, outPdfStram, suffix);
+            OutputStream outPdfStream = Files.newOutputStream(new File(pdfFile).toPath())) {
+            return word2Pdf(inWordStream, outPdfStream, suffix);
         } catch (IOException e) {
             logger.error(e.getMessage());
             return false;
@@ -137,9 +153,9 @@ public abstract class OfficeToPdf {
     public static boolean excel2Pdf(String inExcelFile, String outPdfFile) {
         String inputFile = CommonUtils.mapWidowsPathIfNecessary(inExcelFile);
         String pdfFile = CommonUtils.mapWidowsPathIfNecessary(outPdfFile);
-        try(InputStream inExcelStream = new FileInputStream(new File(inputFile));
-            OutputStream outPdfStram = new FileOutputStream(new File(pdfFile))) {
-            return excel2Pdf(inExcelStream, outPdfStram);
+        try(InputStream inExcelStream = Files.newInputStream(new File(inputFile).toPath());
+            OutputStream outPdfStream = Files.newOutputStream(new File(pdfFile).toPath())) {
+            return excel2Pdf(inExcelStream, outPdfStream);
         } catch (IOException e) {
             logger.error(e.getMessage());
             return false;

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -30,12 +30,13 @@ public abstract class HmacSha1Encoder {
 
     public static byte[] rawEncode(byte[] data, String secret) {
         try {
-            SecretKey secretKey = new SecretKeySpec(secret.getBytes("US-ASCII"), "HmacSHA1");
+            SecretKey secretKey = new SecretKeySpec(
+                secret.getBytes(StandardCharsets.US_ASCII/*"US-ASCII"*/), "HmacSHA1");
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(secretKey);
             return mac.doFinal(data);
-        } catch (NoSuchAlgorithmException | InvalidKeyException | UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -49,12 +50,7 @@ public abstract class HmacSha1Encoder {
     }
 
     public static String encode(String data, String secret) {
-        try {
-            return encode(data.getBytes("utf8"), secret);
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
-            return null;
-        }
+        return encode(data.getBytes(), secret);
     }
 
     public static String encodeBase64(byte[] data, String secret, boolean urlSafe) {
@@ -68,12 +64,7 @@ public abstract class HmacSha1Encoder {
     }
 
     public static String encodeBase64(String data, String secret, boolean urlSafe) {
-        try {
-            return encodeBase64(data.getBytes("utf8"), secret, urlSafe);
-        } catch (UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
-            return null;
-        }
+        return encodeBase64(data.getBytes(), secret, urlSafe);
     }
 
 }

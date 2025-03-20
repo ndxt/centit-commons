@@ -6,10 +6,7 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.Consts;
-import org.apache.http.Header;
-import org.apache.http.HttpHost;
-import org.apache.http.NameValuePair;
+import org.apache.http.*;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -200,12 +197,12 @@ public abstract class HttpExecutor {
                 builder.setProxy(executorContext.getHttpProxy());
             }
             //设置超时时间
-            if(executorContext.getTimeout()!=-1){
-                builder.setConnectionRequestTimeout(5000)
+            if(executorContext.getTimeout()>1000){
+                builder.setConnectionRequestTimeout(executorContext.getTimeout())
                     .setConnectTimeout(executorContext.getTimeout())
                     .setSocketTimeout(executorContext.getTimeout());
             } else {
-                builder.setConnectionRequestTimeout(5000)
+                builder.setConnectionRequestTimeout(10000)
                     .setConnectTimeout(10000)
                     .setSocketTimeout(20000);
             }
@@ -465,7 +462,7 @@ public abstract class HttpExecutor {
 
                     }
                 } catch (Exception e) {
-                    logger.error(e.getMessage(), e);//e.printStackTrace();
+                    logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
                 }
             }
             return params;
@@ -473,41 +470,18 @@ public abstract class HttpExecutor {
         //return params;
     }
 
-    public static List<NameValuePair> makeRequectParams(Object obj) {
-        return makeRequectParams(obj, "");
+    private static HttpEntity buildEntity(Object formData){
+        EntityBuilder eb = EntityBuilder.create();
+        eb.setContentType(APPLICATION_FORM_URLENCODED);
+        eb.setContentEncoding("utf-8");
+        //FormBodyPartBuilder formBuilder = FormBodyPartBuilder.create(formName,null);
+        List<NameValuePair> params = makeRequectParams(formData, "");
+        eb.setParameters(params);
+        return eb.build();
     }
 
-    public static String formPut(HttpExecutorContext executorContext,
-                                 String uri, Object formData)
-        throws IOException {
-        HttpPut httpPut = new HttpPut(uri);
-        httpPut.setHeader("Content-Type", applicationFormHead);
-
-        if (formData != null) {
-
-            EntityBuilder eb = EntityBuilder.create();
-            eb.setContentType(APPLICATION_FORM_URLENCODED);
-            eb.setContentEncoding("utf-8");
-            //FormBodyPartBuilder formBuilder = FormBodyPartBuilder.create(formName,null);
-            List<NameValuePair> params = makeRequectParams(formData, "");
-
-            eb.setParameters(params);
-            httpPut.setEntity(eb.build());
-        }
-
-        return httpExecute(executorContext, httpPut);
-    }
-
-
-    public static String multiFormPut(HttpExecutorContext executorContext,
-                                      String uri, Object[] formObjects, Map<String, Object> extFormObjects)
-        throws IOException {
-
-        HttpPut httpPut = new HttpPut(uri);
-
-        httpPut.setHeader("Content-Type", applicationFormHead);
-
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
+    private static HttpEntity buildEntity(Object[] formObjects, Map<String, Object> extFormObjects){
+        List<NameValuePair> params = new ArrayList<>();
         if (formObjects != null) {
             for (int i = 0; i < formObjects.length; i++) {
                 if (formObjects[i] != null) {
@@ -520,15 +494,40 @@ public abstract class HttpExecutor {
             List<NameValuePair> subNP = makeRequectParams(extFormObjects, "");
             params.addAll(subNP);
         }
-
         EntityBuilder eb = EntityBuilder.create();
         eb.setContentType(APPLICATION_FORM_URLENCODED);
         eb.setContentEncoding("utf-8");
         //FormBodyPartBuilder formBuilder = FormBodyPartBuilder.create(formName,null);
         //List<NameValuePair> params = makeRequectParams(formData,"");
         eb.setParameters(params);
-        httpPut.setEntity(eb.build());
+        return eb.build();
 
+    }
+
+    public static List<NameValuePair> makeRequectParams(Object obj) {
+        return makeRequectParams(obj, "");
+    }
+
+    public static String formPut(HttpExecutorContext executorContext,
+                                 String uri, Object formData)
+        throws IOException {
+        HttpPut httpPut = new HttpPut(uri);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", applicationFormHead);
+        if (formData != null) {
+            httpPut.setEntity(buildEntity(formData));
+        }
+        return httpExecute(executorContext, httpPut);
+    }
+
+
+    public static String multiFormPut(HttpExecutorContext executorContext,
+                                      String uri, Object[] formObjects, Map<String, Object> extFormObjects)
+        throws IOException {
+        HttpPut httpPut = new HttpPut(uri);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", applicationFormHead);
+        httpPut.setEntity(buildEntity(formObjects, extFormObjects));
         return httpExecute(executorContext, httpPut);
     }
 
@@ -545,15 +544,13 @@ public abstract class HttpExecutor {
     public static String simplePost(HttpExecutorContext executorContext,
                                     String uri, String postEntity, final boolean asPutMethod)
         throws IOException {
-
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-        httpPost.setHeader("Content-Type", plainTextHead);
-
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", plainTextHead);
         if (postEntity != null) {
             StringEntity entity = new StringEntity(postEntity, Consts.UTF_8);
             httpPost.setEntity(entity);
         }
-
         return httpExecute(executorContext, httpPost);
     }
 
@@ -572,8 +569,8 @@ public abstract class HttpExecutor {
                                                 String uri, InputStream postIS)
         throws IOException {
         HttpPost httpPost = new HttpPost(uri);
-
-        httpPost.setHeader("Content-Type", applicationFormHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", applicationFormHead);
 
         if (postIS != null) {
             InputStreamEntity entity = new InputStreamEntity(postIS);
@@ -588,8 +585,8 @@ public abstract class HttpExecutor {
         throws IOException {
 
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-
-        httpPost.setHeader("Content-Type", applicationFormHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", applicationFormHead);
 
         if (bytes != null) {
             ByteArrayEntity entity = new ByteArrayEntity(bytes);
@@ -619,7 +616,8 @@ public abstract class HttpExecutor {
         }
 
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-        httpPost.setHeader("Content-Type", applicationJSONHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", applicationJSONHead);
         if (jsonString != null && ! "".equals(jsonString)) {
             StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
             httpPost.setEntity(entity);
@@ -634,7 +632,6 @@ public abstract class HttpExecutor {
         return jsonPost(executorContext, uri, obj, false);
     }
 
-
     public static String jsonPut(HttpExecutorContext executorContext,
                                  String uri, Object jsonObj)
         throws IOException {
@@ -647,7 +644,8 @@ public abstract class HttpExecutor {
             }
         }
         HttpPut httpPut = new HttpPut(uri);
-        httpPut.setHeader("Content-Type", applicationJSONHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", applicationJSONHead);
         if (jsonString != null && !"".equals(jsonString)) {
             StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
             httpPut.setEntity(entity);
@@ -660,7 +658,8 @@ public abstract class HttpExecutor {
         throws IOException {
 
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-        httpPost.setHeader("Content-Type", xmlTextHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", xmlTextHead);
 
         if (xmlEntity != null) {
             StringEntity entity = new StringEntity(xmlEntity, Consts.UTF_8);
@@ -679,9 +678,9 @@ public abstract class HttpExecutor {
     public static String xmlPut(HttpExecutorContext executorContext,
                                 String uri, String xmlEntity)
         throws IOException {
-
         HttpPut httpPut = new HttpPut(uri);
-        httpPut.setHeader("Content-Type", xmlTextHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", xmlTextHead);
         if (xmlEntity != null && !"".equals(xmlEntity)) {
             StringEntity entity = new StringEntity(xmlEntity, Consts.UTF_8);
             httpPut.setEntity(entity);
@@ -704,25 +703,14 @@ public abstract class HttpExecutor {
     public static String formPost(HttpExecutorContext executorContext,
                                   String uri, Object formData, final boolean asPutMethod)
         throws IOException {
-
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-
-        httpPost.setHeader("Content-Type", applicationFormHead);
-
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", applicationFormHead);
         if (formData != null) {
-
-            EntityBuilder eb = EntityBuilder.create();
-            eb.setContentType(APPLICATION_FORM_URLENCODED);
-            eb.setContentEncoding("utf-8");
-            //FormBodyPartBuilder formBuilder = FormBodyPartBuilder.create(formName,null);
-            List<NameValuePair> params = makeRequectParams(formData, "");
-            eb.setParameters(params);
-            httpPost.setEntity(eb.build());
+            httpPost.setEntity(buildEntity(formData));
         }
-
         return httpExecute(executorContext, httpPost);
     }
-
 
     public static String formPost(HttpExecutorContext executorContext,
                                   String uri, Object formData)
@@ -735,30 +723,9 @@ public abstract class HttpExecutor {
         throws IOException {
 
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
-
-        httpPost.setHeader("Content-Type", applicationFormHead);
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        if (formObjects != null) {
-            for (int i = 0; i < formObjects.length; i++) {
-                if (formObjects[i] != null) {
-                    List<NameValuePair> subNP = makeRequectParams(formObjects[i], "");
-                    params.addAll(subNP);
-                }
-            }//end of for
-        }
-        if (extFormObjects != null) {
-            List<NameValuePair> subNP = makeRequectParams(extFormObjects, "");
-            params.addAll(subNP);
-        }
-
-        EntityBuilder eb = EntityBuilder.create();
-        eb.setContentType(APPLICATION_FORM_URLENCODED);
-        eb.setContentEncoding("utf-8");
-        //FormBodyPartBuilder formBuilder = FormBodyPartBuilder.create(formName,null);
-        //List<NameValuePair> params = makeRequectParams(formData,"");
-        eb.setParameters(params);
-        httpPost.setEntity(eb.build());
-
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", applicationFormHead);
+        httpPost.setEntity(buildEntity(formObjects, extFormObjects));
         return httpExecute(executorContext, httpPost);
     }
 
@@ -785,6 +752,22 @@ public abstract class HttpExecutor {
             uri, new Object[]{formObject}, extFormObjects, false);
     }
 
+    public static String inputStreamUploadPut(HttpExecutorContext executorContext,
+                                           String uri, InputStream inputStream,
+                                           final String filedName, ContentType contentType, final String filename)
+        throws IOException {
+        HttpPut httpPut = new HttpPut(uri);
+        //httpPost.setHeader("Content-Type", applicationOctetStream);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", multiPartTypeHead);
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.setBoundary(BOUNDARY);
+        //builder.setMode(HttpMultipartMode.RFC6532);
+        builder.addBinaryBody(filedName, inputStream,contentType, filename);
+        httpPut.setEntity(builder.build());
+        return httpExecute(executorContext, httpPut);
+    }
+
     public static String inputStreamUpload(HttpExecutorContext executorContext,
                                            String uri, InputStream inputStream,
                                            final String filedName, ContentType contentType, final String filename)
@@ -792,7 +775,8 @@ public abstract class HttpExecutor {
 
         HttpPost httpPost = new HttpPost(uri);
         //httpPost.setHeader("Content-Type", applicationOctetStream);
-        httpPost.setHeader("Content-Type", multiPartTypeHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", multiPartTypeHead);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(BOUNDARY);
         //builder.setMode(HttpMultipartMode.RFC6532);
@@ -822,7 +806,8 @@ public abstract class HttpExecutor {
                                                 String uri, Map<String, Object> formObjects, Map<String, File> files)
         throws IOException {
         HttpPost httpPost = new HttpPost(uri);
-        httpPost.setHeader("Content-Type", multiPartTypeHead);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", multiPartTypeHead);
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(BOUNDARY);
         builder.setMode(HttpMultipartMode.RFC6532);
@@ -847,10 +832,9 @@ public abstract class HttpExecutor {
                                     String uri, File file)
         throws IOException {
         HttpPost httpPost = new HttpPost(uri);
-        httpPost.setHeader("Content-Type", multiPartTypeHead);
-
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", multiPartTypeHead);
         InputStreamEntity entity = new InputStreamEntity(new FileInputStream(file));
-
         httpPost.setEntity(entity);
         return httpExecute(executorContext, httpPost);
     }

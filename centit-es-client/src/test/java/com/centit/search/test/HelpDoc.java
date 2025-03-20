@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  * 系统帮助文档null
  */
 
-@ESType(indexName="helpdocs", replicas = 2, shards = 5)
+@ESType(indexName="helpdocs-2", replicas = 2, shards = 5)
 public class HelpDoc implements ESDocument, java.io.Serializable {
     private static final long serialVersionUID = 1L;
 

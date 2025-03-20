@@ -1,6 +1,8 @@
 package com.centit.test;
 
 import com.centit.support.office.PdfSignatureUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.security.KeyStore;
@@ -8,6 +10,7 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 
 public class TestPdfSign {
+    private static final Logger logger = LogManager.getLogger(TestPdfSign.class);
     public static final char[] PASSWORD = "123456".toCharArray();// keystory密码
 
     public static void main(String[] args) {
@@ -35,7 +38,7 @@ public class TestPdfSign {
                     .page(1)
                     .rect(200,650,300,750));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 }

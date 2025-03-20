@@ -1,20 +1,13 @@
 package com.centit.test;
 
-import com.centit.support.image.ImageOpt;
-import com.centit.support.office.PdfSignatureUtil;
 import com.centit.support.office.Watermark4Pdf;
-import com.itextpdf.text.Jpeg;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.net.URL;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class TestAddImage {
-    public static final char[] PASSWORD = "123456".toCharArray();// keystory密码
+    private static final Logger logger = LogManager.getLogger(TestAddImage.class);
 
+    public static final char[] PASSWORD = "123456".toCharArray();// keystory密码
     public static void main(String[] args) {
         try {
 
@@ -26,7 +19,7 @@ public class TestAddImage {
                 0.4f,
                 100, 200);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
     }
 }

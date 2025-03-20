@@ -86,7 +86,6 @@ public class HttpExecutorContext {
         return this.timeout;
     }
 
-
     public CloseableHttpClient getHttpclient() {
         return httpclient;
     }
@@ -105,5 +104,10 @@ public class HttpExecutorContext {
 
     public HttpHost getHttpProxy() {
         return httpProxy;
+    }
+
+    public boolean hasHeader(String headerName){
+        if(this.httpHeaders == null) return false;
+        return this.httpHeaders.containsKey(headerName);
     }
 }

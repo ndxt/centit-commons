@@ -13,7 +13,6 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public abstract class RSASecurityUtils {
-
     /**
      * 指定加密算法为RSA
      */
@@ -40,17 +39,13 @@ public abstract class RSASecurityUtils {
      * @throws NoSuchAlgorithmException 父类抛出的异常
      */
     public static KeyPair generateKeyPair(int keysize) throws NoSuchAlgorithmException {
-
         // /** RSA算法要求有一个可信任的随机数源 */
         // SecureRandom secureRandom = new SecureRandom();
-
         /** 为RSA算法创建一个KeyPairGenerator对象 */
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
-
         /** 利用上面的随机数据源初始化这个KeyPairGenerator对象 */
         // keyPairGenerator.initialize(KEYSIZE, secureRandom);
         keyPairGenerator.initialize(keysize);
-
         /** 生成密匙对 */
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         return keyPair;
@@ -73,7 +68,6 @@ public abstract class RSASecurityUtils {
         NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
         generateKeyPair();
         Key publicKey = key;
-
         /** 得到Cipher对象来实现对源数据的RSA加密 */
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -105,7 +99,6 @@ public abstract class RSASecurityUtils {
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
         //BASE64Decoder decoder = new BASE64Decoder();
         byte[] b1 = Base64.decodeBase64(cryptograph);
-
         /** 执行解密操作 */
         byte[] b = cipher.doFinal(b1);
         return new String(b);

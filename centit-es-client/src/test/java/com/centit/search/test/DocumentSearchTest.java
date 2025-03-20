@@ -2,10 +2,13 @@ package com.centit.search.test;
 
 import com.alibaba.fastjson2.JSON;
 import com.centit.search.service.ESServerConfig;
+import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
 import com.centit.support.algorithm.CollectionsOpt;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +22,8 @@ import java.util.Properties;
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration
 public class DocumentSearchTest {
+
+    private static final Logger logger = LogManager.getLogger(DocumentSearchTest.class);
 
     public static Properties loadProperties() {
         Properties prop = new Properties();
@@ -35,12 +40,27 @@ public class DocumentSearchTest {
                 prop.load(resource);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return prop;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        ESServerConfig esServerConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
+            loadProperties() );
+        ESIndexer docIndexer = IndexerSearcherFactory.obtainIndexer(esServerConfig, HelpDoc.class);
+        HelpDoc doc = new HelpDoc();
+        doc.setDocId("1");
+        doc.setDocLevel(2);
+        doc.setDocPath("file/doc-text.txt");
+        doc.setCatalogId("test");
+        doc.setOptId("test");
+        doc.setDocTitle("测试文档，用来测试索引的创建，类型是否正确！");
+        String id = docIndexer.saveNewDocument(doc);
+        System.out.println(id);
+    }
+
+    public static void query(String[] args) throws Exception {
 
         ESServerConfig esServerConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
                 loadProperties() );

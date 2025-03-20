@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ESIndexer implements Indexer{
 
-    private static Logger logger = LoggerFactory.getLogger(ESIndexer.class);
+    private static final Logger logger = LoggerFactory.getLogger(ESIndexer.class);
 
     private GenericObjectPool<RestHighLevelClient> clientPool;
     private String indexName;

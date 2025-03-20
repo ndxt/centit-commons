@@ -35,8 +35,8 @@ public abstract class IndexerSearcherFactory {
             clientPoolMap.get(config);
         if(clientPool==null && createNew) {
             GenericObjectPoolConfig<RestHighLevelClient> poolConfig = new GenericObjectPoolConfig<>();
-            poolConfig.setMaxTotal(30);
-            poolConfig.setMinIdle(3);
+            poolConfig.setMaxTotal(100);
+            poolConfig.setMinIdle(20);
             clientPool = new GenericObjectPool<>(new PooledRestClientFactory(config),
                 poolConfig);
             clientPoolMap.put(config, clientPool);

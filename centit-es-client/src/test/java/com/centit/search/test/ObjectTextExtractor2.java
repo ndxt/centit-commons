@@ -23,7 +23,7 @@ import java.util.*;
 @Deprecated
 public abstract class ObjectTextExtractor2 {
 
-    private static Logger logger = LogManager.getLogger(ObjectTextExtractor2.class);
+    private static final Logger logger = LogManager.getLogger(ObjectTextExtractor2.class);
 
     /**
      * 返回对象解析结果，includes和excludes参数为空则返回对象的所有非空属性的文本值

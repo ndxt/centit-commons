@@ -2,6 +2,8 @@ package com.centit.support.office;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ImagesToPdf {
+    private static final Logger logger = LogManager.getLogger(ImagesToPdf.class);
 
     public static Image bufferedImageToPdfImage(BufferedImage image){
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -97,7 +100,7 @@ public abstract class ImagesToPdf {
                 document.add(image);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }finally {
             document.close();
         }

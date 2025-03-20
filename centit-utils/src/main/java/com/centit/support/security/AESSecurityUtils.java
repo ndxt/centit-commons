@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 
 @SuppressWarnings("unused")
@@ -123,7 +124,7 @@ public abstract class AESSecurityUtils {
         try {
             return new String(Base64.encodeBase64(encrypt(str.getBytes(charsetName), keyValue)));
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
@@ -143,60 +144,79 @@ public abstract class AESSecurityUtils {
         try {
             return new String(decrypt(Base64.decodeBase64(str.getBytes()), keyValue), charsetName);
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
 
-    public static String encryptAsCBCType(String str, String keyValue, String ivParameter) {
+    public static String encryptAsCBCTypeAsBase64(String str, byte[] keyValue, byte[] ivParameter) {
         try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue.getBytes(), "AES");
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue, "AES");
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter);
             Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
             return new String(Base64.encodeBase64(cipher.doFinal(str.getBytes())));
         } catch (GeneralSecurityException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
 
-    public static String decryptAsCBCType(String str, String keyValue, String ivParameter) {
+    public static String encryptAsCBCTypeAsBase64(String str, String keyValue, String ivParameter) {
+        return encryptAsCBCTypeAsBase64(str, keyValue.getBytes(StandardCharsets.UTF_8),
+            ivParameter.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static String decryptBase64AsCBCType(String str, byte[] keyValue, byte[] ivParameter) {
         try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue.getBytes(), "AES");
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue, "AES");
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter);
             Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
             return new String(cipher.doFinal(Base64.decodeBase64(str)));
         } catch (GeneralSecurityException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
 
-    public static byte[] encryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+    public static String decryptBase64AsCBCType(String str, String keyValue, String ivParameter) {
+        return decryptBase64AsCBCType(str, keyValue.getBytes(StandardCharsets.UTF_8),
+            ivParameter.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static byte[] encryptAsCBCType(byte[] bytes, byte[]  keyValue, byte[]  ivParameter) {
         try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue.getBytes(), "AES");
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue, "AES");
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter);
             Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
             return cipher.doFinal(bytes);
         } catch (GeneralSecurityException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+    public static byte[]  encryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
+        return encryptAsCBCType(bytes, keyValue.getBytes(StandardCharsets.UTF_8),
+            ivParameter.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public static byte[] decryptAsCBCType(byte[] bytes, byte[] keyValue, byte[] ivParameter) {
+        try {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue, "AES");
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter);
+            Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+            return cipher.doFinal(bytes);
+        } catch (GeneralSecurityException e) {
+            logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
 
     public static byte[] decryptAsCBCType(byte[] bytes, String keyValue, String ivParameter) {
-        try {
-            SecretKeySpec secretKeySpec = new SecretKeySpec(keyValue.getBytes(), "AES");
-            IvParameterSpec ivParameterSpec = new IvParameterSpec(ivParameter.getBytes());
-            Cipher cipher = Cipher.getInstance(AESSecurityUtils.AES_CIPHER_TYPE_CBC);
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
-            return cipher.doFinal(bytes);
-        } catch (GeneralSecurityException e) {
-            logger.error(e.getMessage(), e);//e.printStackTrace();
-            return null;
-        }
+        return decryptAsCBCType(bytes, keyValue.getBytes(StandardCharsets.UTF_8),
+            ivParameter.getBytes(StandardCharsets.UTF_8));
     }
 }

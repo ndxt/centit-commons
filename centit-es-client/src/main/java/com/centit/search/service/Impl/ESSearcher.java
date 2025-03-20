@@ -1,5 +1,6 @@
 package com.centit.search.service.Impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.annotation.ESField;
 import com.centit.search.document.DocumentUtils;
 import com.centit.search.service.ESServerConfig;
@@ -20,6 +21,7 @@ import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -51,7 +53,7 @@ public class ESSearcher implements Searcher{
      */
     public static final String TABLE_SORT_ORDER = "order";
 
-    private static Logger logger = LoggerFactory.getLogger(ESSearcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(ESSearcher.class);
 
     private ESServerConfig config;
 
@@ -83,6 +85,22 @@ public class ESSearcher implements Searcher{
         this();
         this.config = config;
         this.clientPool = clientPool;
+    }
+
+    public RestHighLevelClient fetchClient() {
+        RestHighLevelClient client = null;
+        try {
+            client = clientPool.borrowObject();
+        } catch (Exception e) {
+            logger.error("获取ES客户端失败", e);
+        }
+        return client;
+    }
+
+    public void releaseClient(RestHighLevelClient client) {
+        if(client!=null) {
+            clientPool.returnObject(client);
+        }
     }
 
     public void setESServerConfig(ESServerConfig config){
@@ -124,7 +142,7 @@ public class ESSearcher implements Searcher{
         queryFields = CollectionsOpt.listToArray(qf);
     }
 
-    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
+    public Pair<Long, List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
                                                          String[] includes, String[] excludes,
                                                          int pageNo, int pageSize){
         RestHighLevelClient client = null;
@@ -230,11 +248,11 @@ public class ESSearcher implements Searcher{
         }
     }
 
-    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, int pageNo, int pageSize) {
+    public Pair<Long, List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, int pageNo, int pageSize) {
         return esSearch(queryBuilder, null,  null,null,  pageNo, pageSize);
     }
 
-    public Pair<Long,List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
+    public Pair<Long, List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
                                                          int pageNo, int pageSize) {
         return esSearch(queryBuilder, sortBuilders,  null,null,  pageNo, pageSize);
     }
@@ -288,7 +306,7 @@ public class ESSearcher implements Searcher{
      * @return 返回的list结果集
      */
     @Override
-    public Pair<Long,List<Map<String, Object>>> search(Map<String, Object> fieldFilter,
+    public Pair<Long, List<Map<String, Object>>> search(Map<String, Object> fieldFilter,
                                                        String queryWord, int pageNo, int pageSize){
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         if(fieldFilter!=null) {
@@ -346,7 +364,7 @@ public class ESSearcher implements Searcher{
      * @return 返回的list结果集
      */
     @Override
-    public Pair<Long,List<Map<String, Object>>> search(String queryWord, int pageNo, int pageSize) {
+    public Pair<Long, List<Map<String, Object>>> search(String queryWord, int pageNo, int pageSize) {
         return search(null, queryWord, pageNo, pageSize);
     }
 
@@ -359,7 +377,7 @@ public class ESSearcher implements Searcher{
      * @return 返回的list结果集
      */
     @Override
-    public Pair<Long,List<Map<String, Object>>> searchOpt(String optId,
+    public Pair<Long, List<Map<String, Object>>> searchOpt(String optId,
                                                           String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("optId", optId),
             queryWord, pageNo, pageSize);
@@ -374,7 +392,7 @@ public class ESSearcher implements Searcher{
      * @return 返回list结果集
      */
     @Override
-    public Pair<Long,List<Map<String, Object>>> searchOwner(String owner,
+    public Pair<Long, List<Map<String, Object>>> searchOwner(String owner,
                                                             String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("userCode", owner),
             queryWord, pageNo, pageSize);
@@ -390,7 +408,7 @@ public class ESSearcher implements Searcher{
      * @return 返回list结果集
      */
     @Override
-    public Pair<Long,List<Map<String, Object>>> searchOwner(String owner, String optId,
+    public Pair<Long, List<Map<String, Object>>> searchOwner(String owner, String optId,
                                                             String queryWord, int pageNo, int pageSize){
         return search(CollectionsOpt.createHashMap("userCode", owner,"optId", optId),
             queryWord, pageNo, pageSize);
@@ -405,7 +423,7 @@ public class ESSearcher implements Searcher{
      * @return 返回list结果集
      */
     @Override
-    public Pair<Long,List<Map<String, Object>>> searchUnits(String[] units,
+    public Pair<Long, List<Map<String, Object>>> searchUnits(String[] units,
                                                             String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("unitCode", units),
             queryWord, pageNo, pageSize);
@@ -421,7 +439,7 @@ public class ESSearcher implements Searcher{
      * @return 返回list结果集
      */
     @Override
-    public Pair<Long,List<Map<String, Object>>> searchUnits(String[] units,
+    public Pair<Long, List<Map<String, Object>>> searchUnits(String[] units,
                                                             String optId, String queryWord, int pageNo, int pageSize) {
         return search(CollectionsOpt.createHashMap("optId", optId, "unitCode", units),
             queryWord, pageNo, pageSize);
@@ -435,6 +453,34 @@ public class ESSearcher implements Searcher{
     public ESSearcher setHighlightPostTags(String[] highlightPostTags) {
         this.highlightPostTags = highlightPostTags;
         return this;
+    }
+
+    @Override
+    public JSONObject getDocumentById(String idFieldName, String docId) {
+        RestHighLevelClient restHighLevelClient = null;
+        try {
+            SearchRequest searchRequest = new SearchRequest(indexName);
+            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+            TermQueryBuilder termQuery = QueryBuilders.termQuery(idFieldName, docId);
+            searchSourceBuilder.query(termQuery);
+            searchRequest.source(searchSourceBuilder);
+            restHighLevelClient = clientPool.borrowObject();
+            SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHit[] hits = searchResponse.getHits().getHits();
+            if(hits.length > 0) {
+                String sourceAsString = hits[0].getSourceAsString();
+                return JSONObject.parseObject(sourceAsString);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            logger.error("查询异常,异常信息：" + e.getMessage());
+            return null;
+        } finally {
+            if (restHighLevelClient != null) {
+                clientPool.returnObject(restHighLevelClient);
+            }
+        }
     }
 
 }

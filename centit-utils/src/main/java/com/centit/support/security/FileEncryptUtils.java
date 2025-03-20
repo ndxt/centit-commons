@@ -51,15 +51,14 @@ public abstract class FileEncryptUtils {
                         :keyValue.getBytes(StandardCharsets.UTF_8));
                 break;
             case "AES_CBC": {
-                Pair<String, String> key =  SecurityOptUtils.makeCbcKey(keyValue, "AES");
-                cipher = AESSecurityUtils.createCbcEncryptCipher(key.getLeft().getBytes(StandardCharsets.UTF_8),
-                    key.getRight().getBytes(StandardCharsets.UTF_8));
+                Pair<byte[], byte[]> key =  SecurityOptUtils.makeCbcKey(keyValue, "AES");
+                cipher = AESSecurityUtils.createCbcEncryptCipher(key.getLeft(), key.getRight());
             }
             break;
             case "SM4_CBC": {
-                Pair<String, String> key =  SecurityOptUtils.makeCbcKey(keyValue, "SM4");
+                Pair<byte[], byte[]> key =  SecurityOptUtils.makeCbcKey(keyValue, "SM4");
                 cipher = SM4Util.generateCbcCipher(SM4Util.ALGORITHM_NAME_CBC_PADDING, Cipher.ENCRYPT_MODE,
-                    key.getLeft().getBytes(StandardCharsets.UTF_8), key.getRight().getBytes(StandardCharsets.UTF_8));
+                    key.getLeft(), key.getRight());
             }
             break;
             case "AES":
@@ -124,15 +123,14 @@ public abstract class FileEncryptUtils {
                         :keyValue.getBytes(StandardCharsets.UTF_8));
                 break;
             case "AES_CBC": {
-                Pair<String, String> key =  SecurityOptUtils.makeCbcKey(keyValue, "AES");
-                cipher = AESSecurityUtils.createCbcDencryptCipher(key.getLeft().getBytes(StandardCharsets.UTF_8),
-                    key.getRight().getBytes(StandardCharsets.UTF_8));
+                Pair<byte[], byte[]> key = SecurityOptUtils.makeCbcKey(keyValue, "AES");
+                cipher = AESSecurityUtils.createCbcDencryptCipher(key.getLeft(), key.getRight());
             }
             break;
             case "SM4_CBC": {
-                Pair<String, String> key =  SecurityOptUtils.makeCbcKey(keyValue, "SM4");
+                Pair<byte[], byte[]> key =  SecurityOptUtils.makeCbcKey(keyValue, "SM4");
                 cipher = SM4Util.generateCbcCipher(SM4Util.ALGORITHM_NAME_CBC_PADDING, Cipher.DECRYPT_MODE,
-                    key.getLeft().getBytes(StandardCharsets.UTF_8), key.getRight().getBytes(StandardCharsets.UTF_8));
+                    key.getLeft(), key.getRight());
             }
             break;
             case "AES":
