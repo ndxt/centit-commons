@@ -125,21 +125,18 @@ public abstract class UrlOptUtils {
         return urlBuilder.toString();
     }
 
-    public static String appendParamsToUrl(String uri, Map<String, Object> queryParam) {
-        if (queryParam == null) {
-            return uri;
-        }
-        if(StringUtils.isBlank(uri)) return makeParamsToUrl(queryParam);
-        if (uri.endsWith("?") || uri.endsWith("&"))  return uri + makeParamsToUrl(queryParam);
-        if (uri.indexOf('?') == -1) return uri + '?' + makeParamsToUrl(queryParam);
-        return uri + '&' + makeParamsToUrl(queryParam);
-    }
-
     public static String appendParamToUrl(String uri, String queryUrl) {
         if (StringUtils.isBlank(queryUrl))
             return uri;
         return (uri.endsWith("?") || uri.endsWith("&")) ? uri + queryUrl :
             (uri.indexOf('?') == -1 ? uri + '?' + queryUrl : uri + '&' + queryUrl);
+    }
+
+    public static String appendParamsToUrl(String uri, Map<String, Object> queryParam) {
+        if (queryParam == null) {
+            return uri;
+        }
+        return appendParamToUrl(uri, makeParamsToUrl(queryParam));
     }
 
     public static String urlDecode(String urlParam){
