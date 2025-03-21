@@ -133,7 +133,7 @@ public abstract class UrlOptUtils {
     }
 
     public static String appendParamsToUrl(String uri, Map<String, Object> queryParam) {
-        if (queryParam == null) {
+        if (queryParam == null || queryParam.isEmpty()) {
             return uri;
         }
         return appendParamToUrl(uri, makeParamsToUrl(queryParam));
