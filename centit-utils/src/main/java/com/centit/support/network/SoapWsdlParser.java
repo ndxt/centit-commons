@@ -1,5 +1,6 @@
 package com.centit.support.network;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.slf4j.Logger;
@@ -62,13 +63,62 @@ public abstract class SoapWsdlParser {
         return methods;
     }
 
+    public static Element findOperationElement(Element rootElement, String typeName) {
+        List<Element> portTypes = rootElement.elements( "portType");
+        for (Element portType : portTypes) {
+            for (Element operation : portType.elements( "operation")) {
+                Attribute nameAttr = operation.attribute("name");
+                if (nameAttr != null && typeName.equals(nameAttr.getValue())){
+                    return operation;
+                }
+            }
+        }
+        return null;
+    }
+
+    public static Element findElementByName(Element rootElement, String element , String nameValue) {
+        List<Element> messages = rootElement.elements( element);
+        for (Element message : messages){
+            Attribute nameAttr = message.attribute("name");
+            if (nameAttr != null && nameValue.equals(nameAttr.getValue())){
+                return message;
+            }
+        }
+        return null;
+    }
     public static Map<String, String> getSoapActionParams(Element rootElement, String actionName) {
         Map<String, String> params = new HashMap<>();
-        Element portTypes = rootElement.element( "types");
-        Element operationElem = findTypeElement(portTypes, actionName);
-        if(operationElem==null){
-            return params;
+        //默认类型和方法名一致
+        Element operationElem = findTypeElement(rootElement, actionName);
+        if(operationElem!=null){
+            return mapElementType(operationElem);
         }
+        // operation → input → message → part → element
+        operationElem = findOperationElement(rootElement, actionName);
+        if(operationElem == null) return params;
+        Element tempElm = operationElem.element("input");
+        if(tempElm == null) return params;
+        String msgName = tempElm.attribute("message").getValue();
+        if(StringUtils.isBlank(msgName)) return params;
+        int p = msgName.indexOf(":");
+        if(p>=0){
+            msgName = msgName.substring(p+1);
+        }
+        tempElm = findElementByName(rootElement, "message", msgName);
+        if(tempElm == null) return params;
+        tempElm = findElementByName(tempElm, "part", "parameters");
+        if(tempElm == null) return params;
+        String typeName = tempElm.attribute("element").getValue();
+        p = typeName.indexOf(":");
+        if(p>=0){
+            typeName = typeName.substring(p+1);
+        }
+        operationElem = findTypeElement(rootElement, typeName);
+        if(operationElem == null) return params;
         return mapElementType(operationElem);
     }
+
+
+
+
 }
