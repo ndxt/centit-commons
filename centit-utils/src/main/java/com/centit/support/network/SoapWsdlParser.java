@@ -48,7 +48,7 @@ public abstract class SoapWsdlParser {
         return "missing!";
     }
 
-    public List<String> getSoapActionList(Element rootElement) {
+    public static List<String> getSoapActionList(Element rootElement) {
         List<String> methods = new ArrayList<>();
         List<Element> portTypes = rootElement.elements( "portType");
         for (Element portType : portTypes) {
@@ -62,7 +62,7 @@ public abstract class SoapWsdlParser {
         return methods;
     }
 
-    public Map<String, String> getSoapActionParams(Element rootElement, String actionName) {
+    public static Map<String, String> getSoapActionParams(Element rootElement, String actionName) {
         Map<String, String> params = new HashMap<>();
         Element portTypes = rootElement.element( "types");
         Element operationElem = findTypeElement(portTypes, actionName);
