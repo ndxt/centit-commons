@@ -17,11 +17,12 @@ public abstract class SoapWsdlParser {
     public static Element findTypeElement(Element rootElement, String typeName) {
         Element portTypes = rootElement.element( "types");
         if(portTypes==null)  return null;
-        Element typeElement = portTypes.element( "schema");
-        if(typeElement==null)  return null;
-        for( Element schema : typeElement.elements("element")){
-            if( schema.attribute("name").getValue().equals(typeName)){
-                return schema;
+        List<Element> schemas = portTypes.elements( "schema");
+        for(Element schema : schemas) {
+            for (Element typeElm : schema.elements("element")) {
+                if (typeElm.attribute("name").getValue().equals(typeName)) {
+                    return typeElm;
+                }
             }
         }
         return null;
@@ -104,14 +105,21 @@ public abstract class SoapWsdlParser {
         if(p>=0){
             msgName = msgName.substring(p+1);
         }
+        String typeName = msgName;
         tempElm = findElementByName(rootElement, "message", msgName);
-        if(tempElm == null) return params;
-        tempElm = findElementByName(tempElm, "part", "parameters");
-        if(tempElm == null) return params;
-        String typeName = tempElm.attribute("element").getValue();
-        p = typeName.indexOf(":");
-        if(p>=0){
-            typeName = typeName.substring(p+1);
+        if(tempElm != null) {
+            Element partElm = findElementByName(tempElm, "part", "parameters");
+
+            if (partElm == null) {
+                partElm = tempElm.element("part");
+            }
+            if (partElm != null) {
+                typeName = partElm.attribute("element").getValue();
+                p = typeName.indexOf(":");
+                if (p >= 0) {
+                    typeName = typeName.substring(p + 1);
+                }
+            }
         }
         operationElem = findTypeElement(rootElement, typeName);
         if(operationElem == null) return params;
