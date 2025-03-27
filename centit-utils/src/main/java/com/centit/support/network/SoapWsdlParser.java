@@ -87,43 +87,57 @@ public abstract class SoapWsdlParser {
         return null;
     }
 
+    public static String getSoapActionInputName(Element rootElement, String actionName) {
+        Element operationElem = findOperationElement(rootElement, actionName);
+        if(operationElem == null) return actionName;
+        Element inputElm = operationElem.element("input");
+        if(inputElm == null) return actionName;
+        Attribute msgAttr = inputElm.attribute("message");
+        if(msgAttr != null){
+            String msgName = msgAttr.getValue();
+            if(!StringUtils.isBlank(msgName)) {
+                int p = msgName.indexOf(":");
+                if (p >= 0) {
+                    msgName = msgName.substring(p + 1);
+                }
+                return msgName;
+            }
+        }
+        Attribute nameAttr = inputElm.attribute("name");
+        if(nameAttr!= null) return nameAttr.getValue();
+        return actionName;
+    }
+
     public static Map<String, String> getSoapActionParams(Element rootElement, String actionName) {
         Map<String, String> params = new HashMap<>();
-        //默认类型和方法名一致
-        Element operationElem = findTypeElement(rootElement, actionName);
-        if(operationElem!=null){
-            return mapElementType(operationElem);
-        }
         // operation → input → message → part → element
-        operationElem = findOperationElement(rootElement, actionName);
-        if(operationElem == null) return params;
-        Element tempElm = operationElem.element("input");
-        if(tempElm == null) return params;
-        String msgName = tempElm.attribute("message").getValue();
-        if(StringUtils.isBlank(msgName)) return params;
-        int p = msgName.indexOf(":");
-        if(p>=0){
-            msgName = msgName.substring(p+1);
-        }
-        String typeName = msgName;
-        tempElm = findElementByName(rootElement, "message", msgName);
-        if(tempElm != null) {
-            Element partElm = findElementByName(tempElm, "part", "parameters");
-
+        String inputName = getSoapActionInputName(rootElement, actionName);
+        String typeName = inputName;
+        Element msgElm = findElementByName(rootElement, "message", inputName);
+        if(msgElm != null) {
+            Element partElm = findElementByName(msgElm, "part", "parameters");
             if (partElm == null) {
-                partElm = tempElm.element("part");
+                partElm = msgElm.element("part");
             }
             if (partElm != null) {
-                typeName = partElm.attribute("element").getValue();
-                p = typeName.indexOf(":");
-                if (p >= 0) {
-                    typeName = typeName.substring(p + 1);
+                Attribute partAttr = partElm.attribute("element");
+                if(partAttr != null) {
+                    String partName = partAttr.getValue();
+                    if(StringUtils.isNotBlank(partName)) {
+                        int p = partName.indexOf(":");
+                        if (p >= 0) {
+                            typeName = partName.substring(p + 1);
+                        } else {
+                            typeName = partName;
+                        }
+                    }
                 }
             }
         }
-        operationElem = findTypeElement(rootElement, typeName);
-        if(operationElem == null) return params;
-        return mapElementType(operationElem);
+
+        Element typeElem = findTypeElement(rootElement, typeName);
+        if(typeElem == null) return params;
+        return mapElementType(typeElem);
     }
 
     public static String buildSoapXml(String soapNameSpace, String actionName, Object requestBody){
