@@ -1,6 +1,7 @@
 package com.centit.support.test.utils;
 
 import com.alibaba.fastjson2.JSON;
+import com.centit.support.file.FileIOOpt;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.SoapWsdlParser;
@@ -14,10 +15,11 @@ import java.util.Map;
 public class TestSoap {
     public static void main(String arg[]) {
         try {
-            String wsdl = HttpExecutor.simpleGet(HttpExecutorContext.create(),
-                "http://192.168.132.70/WebService/DataExchange.asmx?wsdl");
+            //String wsdl = HttpExecutor.simpleGet(HttpExecutorContext.create(),
+             //   "http://192.168.132.70/WebService/DataExchange.asmx?wsdl");
+            String wsdl = FileIOOpt.readStringFromFile("/Users/codefan/Downloads/cmcc_mas_wbs.xml");
             Document doc = DocumentHelper.parseText(wsdl);
-            Map<String, String> stringMap = SoapWsdlParser.getSoapActionParams(doc.getRootElement(),"GetData");
+            Map<String, String> stringMap = SoapWsdlParser.getSoapActionParams(doc.getRootElement(),"sendSms");
             System.out.println(JSON.toJSONString(stringMap));
         } catch (IOException | DocumentException e) {
             throw new RuntimeException(e);
