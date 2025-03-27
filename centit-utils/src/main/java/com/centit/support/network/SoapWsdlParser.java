@@ -140,8 +140,8 @@ public abstract class SoapWsdlParser {
         return mapElementType(typeElem);
     }
 
-    public static String buildSoapXml(String soapNameSpace, String actionName, Object requestBody){
-        String xmlBoday = XMLObject.objectToXMLString("act:"+actionName, requestBody, false, false);
+    public static String buildSoapXml(String soapNameSpace, String inputName, Object requestBody){
+        String xmlBoday = XMLObject.objectToXMLString("act:"+inputName, requestBody, false, false);
         StringBuilder sb = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
         sb.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" ")
             .append("xmlns:act=\"").append(soapNameSpace).append("\" >")
