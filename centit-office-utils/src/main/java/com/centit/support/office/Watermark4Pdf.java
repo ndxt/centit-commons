@@ -183,17 +183,19 @@ public abstract class Watermark4Pdf {
     private static void adjustImagePositionAndSize(Image image, Rectangle pageSize,
                                                    final float xx, final float yy, final float ww, final float hh){
         float x = xx, y = yy, w = ww, h = hh;
-        if(x<=1.0f && y<=1.0f) {
+        if(x < 1.0f) {
             x = pageSize.getWidth() * x;
+        }
+        if(y < 1.0f) {
             y = pageSize.getHeight() * y;
         }
         image.setAbsolutePosition(x, y);
-        if(w<0){
+        if(w < 0.f){
             w = image.getWidth();
         } else if(w<1.0f){
             w = pageSize.getWidth() * w;
         }
-        if(h<0){
+        if(h < 0.f){
             h = image.getHeight();
         } else if(h<1.0f){
             h = pageSize.getHeight() * h;
