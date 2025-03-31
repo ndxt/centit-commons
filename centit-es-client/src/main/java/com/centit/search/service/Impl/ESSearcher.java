@@ -63,10 +63,10 @@ public class ESSearcher implements Searcher{
     private String[] highlightPostTags;
 
     private List<String> allFields;
-    private String[] queryFields;
+    private Map<String, Float> queryFields;
     private Set<String> highlightFields;
 
-    public String[] getQueryFields() {
+    public Map<String, Float> getQueryFields() {
         return queryFields;
     }
 
@@ -139,7 +139,10 @@ public class ESSearcher implements Searcher{
             }
         }//end of for
 
-        queryFields = CollectionsOpt.listToArray(qf);
+        queryFields = new HashMap<>();
+        for(String f :qf){
+            queryFields.put(f, 1.f);
+        }
     }
 
     public Pair<Long, List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
@@ -349,8 +352,10 @@ public class ESSearcher implements Searcher{
             }
         }
         if (StringUtils.isNotBlank(queryWord)) {
-            queryBuilder.filter(QueryBuilders.multiMatchQuery(
-                queryWord, queryFields));
+            //queryBuilder.filter(QueryBuilders.multiMatchQuery(
+            //               queryWord, queryFields));
+            queryBuilder.filter(QueryBuilders.queryStringQuery(
+                queryWord).fields(queryFields));
         }
 
         return esSearch(queryBuilder, mapSortBuilder(fieldFilter), pageNo, pageSize);
