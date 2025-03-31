@@ -186,7 +186,6 @@ public abstract class Watermark4Pdf {
             PdfReader pdfReader = new PdfReader(inputFile);
             PdfStamper pdfStamper = new PdfStamper(pdfReader, outputFile);
             //Image image = Image.getInstance(imageFile);
-            image.setAbsolutePosition(x,y);
             Rectangle rectangle = new Rectangle(0, 0,
                 w<=0?image.getWidth():w, h<=0?image.getHeight():h);
             image.scaleToFit(rectangle);
@@ -198,6 +197,14 @@ public abstract class Watermark4Pdf {
             if(page<0) {
                 for (int i = 1; i < pdfNumber; i++) {
                     //在内容下方加水印OverContent
+                    float absx = x;
+                    float absy = y;
+                    if(x<=1.0f && y<=1.0f) {
+                        Rectangle pageSize = pdfReader.getPageSizeWithRotation(i);
+                        absx = pageSize.getWidth() * x;
+                        absy = pageSize.getHeight() * y;
+                    }
+                    image.setAbsolutePosition(absx, absy);
                     pdfContentByte = pdfStamper.getOverContent(i);
                     pdfContentByte.setGState(pdfGState);
                     pdfContentByte.addImage(image);

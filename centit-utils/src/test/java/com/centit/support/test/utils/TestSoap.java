@@ -15,12 +15,13 @@ import java.util.Map;
 public class TestSoap {
     public static void main(String arg[]) {
         try {
-            //String wsdl = HttpExecutor.simpleGet(HttpExecutorContext.create(),
-             //   "http://192.168.132.70/WebService/DataExchange.asmx?wsdl");
-            String wsdl = FileIOOpt.readStringFromFile("/Users/codefan/Downloads/cmcc_mas_wbs.xml");
+            String wsdl = HttpExecutor.simpleGet(HttpExecutorContext.create(),
+                "http://192.168.132.70/WebService/DataExchange.asmx?wsdl");
+            //String wsdl = FileIOOpt.readStringFromFile("/Users/codefan/Downloads/cmcc_mas_wbs.xml");
             Document doc = DocumentHelper.parseText(wsdl);
-            Map<String, String> stringMap = SoapWsdlParser.getSoapActionParams(doc.getRootElement(),"sendSms");
+            Map<String, String> stringMap = SoapWsdlParser.getSoapActionParams(doc.getRootElement(),"GetData");
             System.out.println(JSON.toJSONString(stringMap));
+            System.out.println( SoapWsdlParser.getSoapActionInputName(doc.getRootElement(),"GetData"));
         } catch (IOException | DocumentException e) {
             throw new RuntimeException(e);
         }
