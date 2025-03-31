@@ -235,17 +235,31 @@ public abstract class Watermark4Pdf {
 
     public static void addImage2Pdf(String inputFile,
                                        String outputFile,
+                                       int page,
                                        String imageFile,
                                        float opacity,
-                                       float x, float y) throws DocumentException, IOException { // 图章路径
+                                       float x, float y, float w, float h) throws DocumentException, IOException { // 图章路径
             Image image = Image.getInstance(imageFile);
             addImage2Pdf(Files.newInputStream(Paths.get(inputFile)),
                 Files.newOutputStream(Paths.get(outputFile)),
-                -1,
+                page,
                 image, opacity,
-                x, y, -1, -1);
+                x, y, w, h);
     }
 
+    public static void addImage2Pdf(String inputFile,
+                                    String outputFile,
+                                    int page,
+                                    String imageFile,
+                                    float opacity,
+                                    float x, float y) throws DocumentException, IOException { // 图章路径
+        Image image = Image.getInstance(imageFile);
+        addImage2Pdf(Files.newInputStream(Paths.get(inputFile)),
+            Files.newOutputStream(Paths.get(outputFile)),
+            -1,
+            image, opacity,
+            x, y, -1, -1);
+    }
     public static Image createPdfImage(byte [] imageBytes) throws BadElementException, IOException {
         return Image.getInstance(imageBytes);
     }

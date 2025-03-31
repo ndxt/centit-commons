@@ -433,17 +433,17 @@ public abstract class ImageOpt {
     }
 
     public static class ImageTextInfo {
-        public int x;
-        public int y;
+        public float x;
+        public float y;
         public String text;
-        public ImageTextInfo(int x, int y, String t){
+        public ImageTextInfo(float x, float y, String t){
             this.x = x;
             this.y = y;
             this.text = t;
         }
     }
 
-    public static ImageTextInfo createImageText(int x, int y, String t){
+    public static ImageTextInfo createImageText(float x, float y, String t){
         return new ImageTextInfo(x, y ,t);
     }
 
@@ -459,8 +459,8 @@ public abstract class ImageOpt {
                                              Color color,
                                              int size,
                                              List<ImageTextInfo> textList) {
-        BufferedImage watermarkedImage = image;//new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = watermarkedImage.createGraphics();
+        //BufferedImage watermarkedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = image.createGraphics();
         // 绘制原始图片
         // g2d.drawImage(image, 0, 0, width, height, null);
         // 搞不懂为什么要设置两次 Composite ，否则 文字的颜色不纯粹，不知道原因
@@ -469,15 +469,17 @@ public abstract class ImageOpt {
         g2d.setFont(new Font(fontName, Font.PLAIN, size));
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1));
         for(ImageTextInfo iti : textList) {
-            g2d.drawString(iti.text, iti.x, iti.y);
+            int xx = iti.x >=1.f ? (int)iti.x : (int)(image.getWidth() * iti.x);
+            int yy = iti.y >=1.f ? (int)iti.y : (int)(image.getHeight() * iti.y);
+            g2d.drawString(iti.text, xx, yy);
         }
         g2d.dispose();
         //ImageIO.write(watermarkedImage, "jpg", new File(outputPath));
-        return watermarkedImage;
+        return image;
     }
 
     public static boolean addTextToImage(InputStream imageIS, String  imageType, OutputStream imageOS,
-                                       String waterMark, String fontName, Color color, int size, int x, int y) {
+                                       String waterMark, String fontName, Color color, int size, float x, float y) {
         try {
             BufferedImage image = ImageIO.read(imageIS);
             BufferedImage markImage = ImageOpt.addTextToImage(image, fontName, color, size,
