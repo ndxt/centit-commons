@@ -57,6 +57,9 @@ public abstract class Watermark4Pdf {
                 return false;
             }
             // 设置透明度为0.4
+            while (opacity >1f){
+                opacity = opacity / 10;
+            }
             gs.setFillOpacity(opacity);
             gs.setStrokeOpacity(opacity);
             int toPage = pdfStamper.getReader().getNumberOfPages();
@@ -213,6 +216,9 @@ public abstract class Watermark4Pdf {
         PdfContentByte pdfContentByte = null;
         PdfGState pdfGState = new PdfGState();
         //设置透明度
+        while(opacity>1){
+            opacity = opacity/10;
+        }
         pdfGState.setFillOpacity(opacity);
         if(page<0) {
             for (int i = 1; i <= pdfNumber; i++) {

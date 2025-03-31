@@ -17,7 +17,7 @@ public class TestAddImage {
                 base+"output2.pdf",
                 1,
                 base+"group1.png",
-                0.4f,
+                75f,
                 0.1f, 0.8f, 0.3f, 0.05f);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
