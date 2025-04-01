@@ -13,12 +13,12 @@ public class TestAddImage {
         try {
             String base="/Users/codefan/projects/centit/centit-commons/centit-office-utils/src/test/resources/template/";
             // 将证书文件放入指定路径，并读取keystore ，获得私钥和证书链
-            Watermark4Pdf.addImage2Pdf(base+"content.pdf",
+            Watermark4Pdf.addImage2Pdf(base+"286.pdf",
                 base+"output2.pdf",
-                1,
-                base+"group1.png",
-                75f,
-                0.1f, 0.8f, 0.3f, 0.05f);
+                -1,
+                base+"group2.png",
+                1f,
+                0.5f, 0.9f, 0.3f, 0.1f);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
