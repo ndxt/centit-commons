@@ -301,23 +301,25 @@ public class ESSearcher implements Searcher{
     }
 
     public static String buildWildcardQuery(String sMatch) {
-        StringBuilder sRes = new StringBuilder("*");
-        char preChar = '*', curChar;
+        StringBuilder sRes = new StringBuilder();
+        char preChar = '#', curChar;
+        boolean haveStar = false;
         int sL = sMatch.length();
         for (int i = 0; i < sL; i++) {
             curChar = sMatch.charAt(i);
-            if ((curChar == ' ') || (curChar == '\t') || (curChar == '%') || (curChar == '*') || (curChar == '?') || (curChar == '_')) {
-                curChar = '*';
+            if ((curChar == ' ') || (curChar == '\t') || (curChar == '%') ||
+                    (curChar == '*') || (curChar == '?') || (curChar == '_')) {
                 if (preChar != '*') {
-                    sRes.append(curChar);
-                    preChar = curChar;
+                    sRes.append('*');
+                    preChar = '*';
+                    haveStar = true;
                 }
             } else {
                 sRes.append(curChar);
                 preChar = curChar;
             }
         }
-        if (preChar != '*')
+        if (!haveStar)
             sRes.append('*');
         return sRes.toString();
     }
