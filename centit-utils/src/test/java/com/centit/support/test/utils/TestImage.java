@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -80,14 +81,20 @@ public class TestImage {
         try (InputStream image =  new FileInputStream(base+"group1.png");
              OutputStream image2 =  new FileOutputStream(base+"group2.png")) {
             //ImageOpt.captureScreen("/Users/codefan/appdata/RunData/screen.jpg");
-
+            Color markColor = ImageOpt.castObjectToColor("#010101", Color.RED);
+            List<ImageOpt.ImageTextInfo> textList = new ArrayList<>();
+            textList.add(ImageOpt.createImageText(17, 27 , "100"));
+            textList.add(ImageOpt.createImageText(85, 27 , "200"));
+            textList.add(ImageOpt.createImageText(175, 27 , "300"));
+            textList.add(ImageOpt.createImageText(17, 65 , "400"));
+            textList.add(ImageOpt.createImageText(85, 65 , "500"));
+            textList.add(ImageOpt.createImageText(175, 65 , "600"));
             // 将证书文件放入指定路径，并读取keystore ，获得私钥和证书链
             ImageOpt.addTextToImage(image, "png",
                 image2,
-                "hello 雅黑 world",
                 "雅黑",
-                Color.BLACK,
-                28, 50, 50);
+                markColor,
+                14, textList);
 
             System.out.println("Done!");
         } catch (Exception e) {

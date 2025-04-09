@@ -57,6 +57,9 @@ public abstract class Watermark4Pdf {
                 return false;
             }
             // 设置透明度为0.4
+            while (opacity >1f){
+                opacity = opacity / 10;
+            }
             gs.setFillOpacity(opacity);
             gs.setStrokeOpacity(opacity);
             int toPage = pdfStamper.getReader().getNumberOfPages();
@@ -177,54 +180,94 @@ public abstract class Watermark4Pdf {
             60f, isRepeat);
     }
 
+    private static void adjustImagePositionAndSize(Image image, Rectangle pageSize,
+                                                   final float xx, final float yy, final float ww, final float hh){
+        float x = xx, y = yy, w = ww, h = hh;
+        if(x < 1.f && x > -1.f) {
+            x = pageSize.getWidth() * x;
+        }
+        if(y < 1.f && y > -1.f) {
+            y = pageSize.getHeight() * y;
+        }
+        image.setAbsolutePosition(x, y);
+        if(w < 0.f){
+            w = image.getWidth();
+        } else if(w<1.0f){
+            w = pageSize.getWidth() * w;
+        }
+        if(h < 0.f){
+            h = image.getHeight();
+        } else if(h<1.0f){
+            h = pageSize.getHeight() * h;
+        }
+        image.scaleToFit(new Rectangle(w,h));
+    }
     public static void addImage2Pdf(InputStream inputFile,
                                        OutputStream outputFile,
                                        int page,
                                        Image image,
                                        float opacity,
                                        float x,  float y, float w, float h) throws DocumentException, IOException { // 图章路径
-            PdfReader pdfReader = new PdfReader(inputFile);
-            PdfStamper pdfStamper = new PdfStamper(pdfReader, outputFile);
-            //Image image = Image.getInstance(imageFile);
-            image.setAbsolutePosition(x,y);
-            Rectangle rectangle = new Rectangle(0, 0,
-                w<=0?image.getWidth():w, h<=0?image.getHeight():h);
-            image.scaleToFit(rectangle);
-            int pdfNumber = pdfReader.getNumberOfPages()+1;
-            PdfContentByte pdfContentByte = null;
-            PdfGState pdfGState = new PdfGState();
-            //设置透明度
-            pdfGState.setFillOpacity(opacity);
-            if(page<0) {
-                for (int i = 1; i < pdfNumber; i++) {
-                    //在内容下方加水印OverContent
-                    pdfContentByte = pdfStamper.getOverContent(i);
-                    pdfContentByte.setGState(pdfGState);
-                    pdfContentByte.addImage(image);
-                }
-            } else {
-                pdfContentByte = pdfStamper.getOverContent(page);
+        PdfReader pdfReader = new PdfReader(inputFile);
+        //Image image = Image.getInstance(imageFile);
+        int pdfNumber = pdfReader.getNumberOfPages();
+        if(page>pdfNumber || pdfNumber<1) { // 没有对应的页面
+            return ;
+        }
+        PdfStamper pdfStamper = new PdfStamper(pdfReader, outputFile);
+        PdfContentByte pdfContentByte = null;
+        PdfGState pdfGState = new PdfGState();
+        //设置透明度
+        while(opacity>1){
+            opacity = opacity/10;
+        }
+        pdfGState.setFillOpacity(opacity);
+        if(page<0) {
+            for (int i = 1; i <= pdfNumber; i++) {
+                //在内容下方加水印OverContent
+                adjustImagePositionAndSize(image, pdfReader.getPageSizeWithRotation(i), x, y, w, h);
+                pdfContentByte = pdfStamper.getOverContent(i);
                 pdfContentByte.setGState(pdfGState);
                 pdfContentByte.addImage(image);
             }
-            pdfStamper.close();
-            pdfReader.close();
+        } else {
+            adjustImagePositionAndSize(image, pdfReader.getPageSizeWithRotation(page), x, y, w, h);
+            pdfContentByte = pdfStamper.getOverContent(page);
+            pdfContentByte.setGState(pdfGState);
+            pdfContentByte.addImage(image);
+        }
+        pdfStamper.close();
+        pdfReader.close();
 
     }
 
     public static void addImage2Pdf(String inputFile,
                                        String outputFile,
+                                       int page,
                                        String imageFile,
                                        float opacity,
-                                       float x, float y) throws DocumentException, IOException { // 图章路径
+                                       float x, float y, float w, float h) throws DocumentException, IOException { // 图章路径
             Image image = Image.getInstance(imageFile);
             addImage2Pdf(Files.newInputStream(Paths.get(inputFile)),
                 Files.newOutputStream(Paths.get(outputFile)),
-                -1,
+                page,
                 image, opacity,
-                x, y, -1, -1);
+                x, y, w, h);
     }
 
+    public static void addImage2Pdf(String inputFile,
+                                    String outputFile,
+                                    int page,
+                                    String imageFile,
+                                    float opacity,
+                                    float x, float y) throws DocumentException, IOException { // 图章路径
+        Image image = Image.getInstance(imageFile);
+        addImage2Pdf(Files.newInputStream(Paths.get(inputFile)),
+            Files.newOutputStream(Paths.get(outputFile)),
+            -1,
+            image, opacity,
+            x, y, -1, -1);
+    }
     public static Image createPdfImage(byte [] imageBytes) throws BadElementException, IOException {
         return Image.getInstance(imageBytes);
     }

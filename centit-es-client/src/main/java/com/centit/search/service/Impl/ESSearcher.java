@@ -63,10 +63,10 @@ public class ESSearcher implements Searcher{
     private String[] highlightPostTags;
 
     private List<String> allFields;
-    private String[] queryFields;
+    private Map<String, Float> queryFields;
     private Set<String> highlightFields;
 
-    public String[] getQueryFields() {
+    public Map<String, Float> getQueryFields() {
         return queryFields;
     }
 
@@ -139,7 +139,10 @@ public class ESSearcher implements Searcher{
             }
         }//end of for
 
-        queryFields = CollectionsOpt.listToArray(qf);
+        queryFields = new HashMap<>();
+        for(String f :qf){
+            queryFields.put(f, 1.f);
+        }
     }
 
     public Pair<Long, List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
@@ -297,6 +300,30 @@ public class ESSearcher implements Searcher{
         return sortBuilders;
     }
 
+    public static String buildWildcardQuery(String sMatch) {
+        StringBuilder sRes = new StringBuilder();
+        char preChar = '#', curChar;
+        boolean haveStar = false;
+        int sL = sMatch.length();
+        for (int i = 0; i < sL; i++) {
+            curChar = sMatch.charAt(i);
+            if ((curChar == ' ') || (curChar == '\t') || (curChar == '%') ||
+                    (curChar == '*') || (curChar == '?') || (curChar == '_')) {
+                if (preChar != '*') {
+                    sRes.append('*');
+                    preChar = '*';
+                    haveStar = true;
+                }
+            } else {
+                sRes.append(curChar);
+                preChar = curChar;
+            }
+        }
+        if (!haveStar)
+            sRes.append('*');
+        return sRes.toString();
+    }
+
     /**
      * 检索所有文档
      * @param fieldFilter 过滤的文件
@@ -341,6 +368,10 @@ public class ESSearcher implements Searcher{
                         case "_le":
                             queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).lte(ent.getValue()));
                             break;
+                        case "_lk":
+                            queryBuilder.must(QueryBuilders.wildcardQuery(key.substring(0,keyLen-3),
+                                buildWildcardQuery(StringBaseOpt.castObjectToString(ent.getValue()))));
+                            break;
                         default:
                             queryBuilder.must(QueryBuilders.termQuery(ent.getKey(), ent.getValue()));
                             break;
@@ -349,8 +380,10 @@ public class ESSearcher implements Searcher{
             }
         }
         if (StringUtils.isNotBlank(queryWord)) {
-            queryBuilder.filter(QueryBuilders.multiMatchQuery(
-                queryWord, queryFields));
+            //queryBuilder.filter(QueryBuilders.multiMatchQuery(
+            //               queryWord, queryFields));
+            queryBuilder.filter(QueryBuilders.queryStringQuery(
+                queryWord).fields(queryFields));
         }
 
         return esSearch(queryBuilder, mapSortBuilder(fieldFilter), pageNo, pageSize);

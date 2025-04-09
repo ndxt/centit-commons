@@ -54,7 +54,7 @@ public abstract class UrlOptUtils {
         return sQuery;
     }
 
-    public static final Map<String, String> splitUrlParamter(
+    public static Map<String, String> splitUrlParamter(
         String szUrlParameter) {
         Map<String, String> params = new HashMap<>();
         int bpos = 0;
@@ -133,7 +133,7 @@ public abstract class UrlOptUtils {
     }
 
     public static String appendParamsToUrl(String uri, Map<String, Object> queryParam) {
-        if (queryParam == null) {
+        if (queryParam == null || queryParam.isEmpty()) {
             return uri;
         }
         return appendParamToUrl(uri, makeParamsToUrl(queryParam));
