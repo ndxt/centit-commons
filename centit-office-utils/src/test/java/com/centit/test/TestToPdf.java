@@ -10,8 +10,8 @@ public class TestToPdf {
 
         /*String waterMark = "杨淮生 codefan 2024-9-12";
         System.out.println(waterMark.length());*/
-        OfficeToPdf.word2Pdf("/Users/codefan/Documents/temp/testFont.docx",
-            "/Users/codefan/Documents/temp/testFont.pdf");
+        OfficeToPdf.word2Pdf("/Users/codefan/Documents/temp/meetnote.doc",
+            "/Users/codefan/Documents/temp/meetnote.docx");
         /*Watermark4Pdf.addWatermark4Pdf("d:\\Users\\2024.pdf",
             "d:\\Users\\2.pdf",
             "杨淮生 codefan 2024-9-12",

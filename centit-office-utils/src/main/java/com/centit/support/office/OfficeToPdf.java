@@ -5,8 +5,10 @@ import com.centit.support.office.commons.CommonUtils;
 import com.centit.support.office.commons.Excel2PdfUtils;
 import com.centit.support.office.commons.PDFPageEvent;
 import com.centit.support.office.commons.PowerPointUtils;
+import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -14,6 +16,7 @@ import com.lowagie.text.Font;
 import com.lowagie.text.pdf.BaseFont;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
+import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -88,11 +91,15 @@ public abstract class OfficeToPdf {
                 });
                 PdfConverter.getInstance().convert(docx, outPdfStram, options);
             } else if (DOC.equalsIgnoreCase(suffix)) {
-                //WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(inWordStream);
-                /*Source source = new StreamSource(inWordStream);
-                Word2003XmlConverter conv = new Word2003XmlConverter(source);
-                WordprocessingMLPackage wordMLPackage = conv.getWordprocessingMLPackage();
-                Docx4J.toPDF(wordMLPackage, outPdfStram);*/
+                // 读取DOC文件
+                HWPFDocument doc = new HWPFDocument(inWordStream);
+                String text = doc.getDocumentText();
+                // 创建PDF
+                Document pdf = new Document();
+                PdfWriter.getInstance(pdf, outPdfStram);
+                pdf.open();
+                pdf.add(new Paragraph(text));
+                pdf.close();
             }
             return true;
         } catch (Exception e) {
