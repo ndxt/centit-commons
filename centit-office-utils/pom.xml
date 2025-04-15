@@ -53,6 +53,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.ofdrw</groupId>
+            <artifactId>ofdrw-converter</artifactId>
+            <version>2.3.6</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.docx4j</groupId>
             <artifactId>docx4j-JAXB-Internal</artifactId>
         </dependency>
