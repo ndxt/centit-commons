@@ -10,8 +10,8 @@ public class TestToPdf {
 
         /*String waterMark = "杨淮生 codefan 2024-9-12";
         System.out.println(waterMark.length());*/
-        OfdUtils.ofd2Pdf("/Users/codefan/projects/RunData/temp/testOFD/f6.1.004.ofd",
-            "/Users/codefan/projects/RunData/temp/f6.1.004.pdf");
+        OfdUtils.ofd2Pdf("/Users/codefan/projects/RunData/temp/testOFD/4420.ofd",
+            "/Users/codefan/projects/RunData/temp/4420.pdf");
         /*Watermark4Pdf.addWatermark4Pdf("d:\\Users\\2024.pdf",
             "d:\\Users\\2.pdf",
             "杨淮生 codefan 2024-9-12",
