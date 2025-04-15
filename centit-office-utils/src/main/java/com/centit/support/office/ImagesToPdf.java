@@ -129,7 +129,7 @@ public abstract class ImagesToPdf {
         return PDImageXObject.createFromByteArray(document, imageData, imageName);
     }
 
-    public static boolean imagesToPdf(List<BufferedImage> imageList, OutputStream outPdfStram){
+    public static boolean imagesToPdf(List<BufferedImage> imageList, OutputStream outPdfStream){
         try (PDDocument doc = new PDDocument()) {
             int pageNumber = 0;
             for (BufferedImage imgFile : imageList) {
@@ -143,7 +143,7 @@ public abstract class ImagesToPdf {
                     contentStream.drawImage(pdImage, 0, 0, pdImage.getWidth(), pdImage.getHeight());
                 }
             }
-            doc.save(outPdfStram);
+            doc.save(outPdfStream);
             return true;
         } catch (IOException e) {
             logger.error(e.getMessage());
