@@ -1,5 +1,6 @@
 package com.centit.support.office;
 
+import org.ofdrw.converter.ConvertHelper;
 import org.ofdrw.converter.ImageMaker;
 import org.ofdrw.reader.OFDReader;
 import org.slf4j.Logger;
@@ -64,5 +65,20 @@ public abstract class OfdUtils {
     public static boolean ofd2Pdf(InputStream inOfdFile, OutputStream outPdfFile) {
         List<BufferedImage> images = ofd2Images(inOfdFile);
         return ImagesToPdf.imagesToPdf(images, outPdfFile);
+    }
+
+    public static boolean ofdToPdf(InputStream inOfdFile, OutputStream outPdfFile) {
+        ConvertHelper.toPdf(inOfdFile, outPdfFile);
+        return true;
+    }
+
+    public static boolean ofdToPdf(String inOfdFile, String outPdfFile) {
+        try {
+            ConvertHelper.toPdf(Files.newInputStream(Paths.get(inOfdFile)), Files.newOutputStream(Paths.get(outPdfFile)));
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return false;
+        }
     }
 }
