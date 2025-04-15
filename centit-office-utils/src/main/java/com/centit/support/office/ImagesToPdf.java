@@ -129,18 +129,20 @@ public abstract class ImagesToPdf {
         return PDImageXObject.createFromByteArray(document, imageData, imageName);
     }
 
-    public static boolean imagesToPdf(List<BufferedImage> imageList, OutputStream outPdfStream){
+    public static boolean imagesToPdf(List<BufferedImage> imageList, OutputStream outPdfStream, float zoom){
         try (PDDocument doc = new PDDocument()) {
             int pageNumber = 0;
             for (BufferedImage imgFile : imageList) {
                 // 创建PDF页面（与图片同尺寸）
                 PDImageXObject pdImage = convertToPDImageXObject(doc, imgFile, "PNG", "ODF-image-"+pageNumber+".png");
                 pageNumber ++;
-                PDPage page = new PDPage(new PDRectangle(pdImage.getWidth(), pdImage.getHeight()));
+                float width =  imgFile.getWidth() * zoom;
+                float height =  imgFile.getHeight() * zoom;
+                PDPage page = new PDPage(new PDRectangle(width, height));
                 doc.addPage(page);
                 // 将图片绘制到PDF页面
                 try (PDPageContentStream contentStream = new PDPageContentStream(doc, page)) {
-                    contentStream.drawImage(pdImage, 0, 0, pdImage.getWidth(), pdImage.getHeight());
+                    contentStream.drawImage(pdImage, 0, 0, width, height);
                 }
             }
             doc.save(outPdfStream);

@@ -63,8 +63,9 @@ public abstract class OfdUtils {
     }
 
     public static boolean ofd2Pdf(InputStream inOfdFile, OutputStream outPdfFile) {
-        List<BufferedImage> images = ofd2Images(inOfdFile);
-        return ImagesToPdf.imagesToPdf(images, outPdfFile);
+        List<BufferedImage> images = ofd2Images(inOfdFile, 11.81);
+        if(images == null) return false;
+        return ImagesToPdf.imagesToPdf(images, outPdfFile, 0.25f);
     }
 
     public static boolean ofdToPdf(InputStream inOfdFile, OutputStream outPdfFile) {
