@@ -680,7 +680,7 @@ public abstract class FileType {
         put("sv4crc", "application/x-sv4crc");
         put("svc", "application/vnd.dvb.service");
         put("svd", "application/vnd.svd");
-        put("svg", "image/svg+xml");
+        put("svg", "image/jpeg");
         put("swf", "application/x-shockwave-flash");
         put("swi", "application/vnd.aristanetworks.swi");
         put("sxc", "application/vnd.sun.xml.calc");
