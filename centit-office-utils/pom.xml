@@ -39,7 +39,7 @@
             <artifactId>poi-scratchpad</artifactId>
         </dependency>
 
-        <!--com.lowagie itext 4.2.1 相当有 itextpdf的5.5.6，同时
+        <!--com.lowagie itext 4.2.1 相当于 itextpdf的5.5.6，同时
          它将覆盖 com.lowagie 2.1.7 -->
         <dependency>
             <groupId>com.itextpdf</groupId>
