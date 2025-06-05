@@ -15,14 +15,16 @@ import java.util.Map;
 
 public class FormulaTest {
     public static void main(String[] args)  {
-        System.out.println(VariableFormula.calculate("concat('意见', '\\n', '征询')"));
 
-        Object s;
-        s = VariableFormula.calculate("split(a, '\\\\')",
-            CollectionsOpt.createHashMap("a", "qwef?asas+d\\fsfe+sfg|wdf\\$gdg*df?as.p*ng"));
+        System.out.println(VariableFormula.calculate("attr(toObject(a),b)",
+            CollectionsOpt.createHashMap("a", "{'hello':'world', 'greet':'are you ok!'}",
+             "b", "greet")
+            ));
+
+
         //String str = "qwefasdfas.png";
         //s = str.split("\\.");
-        System.out.println(StringBaseOpt.castObjectToString(s));
+       // System.out.println(StringBaseOpt.castObjectToString(s));
       /*  System.out.println(VariableFormula.calculate(
             "nvl(null2, no)"));
         System.out.println(VariableFormula.calculate(
