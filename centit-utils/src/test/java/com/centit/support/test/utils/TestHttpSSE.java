@@ -18,13 +18,21 @@ public class TestHttpSSE {
             HttpResponse response = httpClient.execute(request);
             InputStream inputStream = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
+            int n;
+            char [] buff = new char[128];
+            while ( (n=reader.read(buff)) > 0) {
+                System.out.print(String.valueOf(buff).substring(0,n)); // 处理每一行数据，通常是 JSON 格式的数据事件
+                //if ("event: error".equals(line)) { // 处理错误事件，如果有需要的话
+                //    break; // 可以根据需要决定是否退出循环或继续处理错误情况
+                //}
+            }
+            /*String line;
             while ((line = reader.readLine()) != null) {
                 System.out.println(line); // 处理每一行数据，通常是 JSON 格式的数据事件
                 if ("event: error".equals(line)) { // 处理错误事件，如果有需要的话
                     break; // 可以根据需要决定是否退出循环或继续处理错误情况
                 }
-            }
+            }*/
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
