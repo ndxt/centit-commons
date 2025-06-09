@@ -3,6 +3,7 @@ package com.centit.support.test.utils;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.network.HttpExecutor;
+import com.centit.support.security.SecurityOptUtils;
 import org.apache.http.Consts;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -21,7 +22,7 @@ public class TestHttpSSE2 {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost request = new HttpPost("https://cloud.centit.com/locode/api/llvm/chat/completions");
             request.setHeader("Content-Type", HttpExecutor.applicationJSONHead);
-            request.setHeader("authorization", "Bearer centit.1");
+            request.setHeader("authorization", SecurityOptUtils.decodeSecurityString("aescbc:yxc6oviLUXbWgWqz4us9rA=="));
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("model", "qwq");
             jsonObject.put("messages", CollectionsOpt.createList(
