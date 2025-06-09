@@ -47,20 +47,20 @@ public abstract class ByteBaseOpt {
             return JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8);
         }
 
-        if (obj instanceof ByteArrayInputStream){
+        if (obj instanceof ByteArrayInputStream) {
             ByteArrayInputStream byteInput = (ByteArrayInputStream) obj;
             byteInput.reset();
         }
 
-        if (obj instanceof InputStream){
+        if (obj instanceof InputStream) {
             try {
-                return FileIOOpt.readBytesFromInputStream((InputStream)obj);
+                return FileIOOpt.readBytesFromInputStream((InputStream) obj);
             } catch (IOException e) {
                 return null;
             }
         }
 
-        if (obj instanceof ByteArrayOutputStream){
+        if (obj instanceof ByteArrayOutputStream) {
             ByteArrayOutputStream byteOutput = (ByteArrayOutputStream) obj;
             return byteOutput.toByteArray();
         }
@@ -94,7 +94,9 @@ public abstract class ByteBaseOpt {
             writeDouble(buf, (Double) obj, 0);
             return buf;
         }
-
+        if (obj instanceof String) {
+            return ((String) obj).getBytes();
+        }
         return JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8);
     }
 
