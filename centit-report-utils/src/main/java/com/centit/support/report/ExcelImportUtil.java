@@ -128,34 +128,27 @@ public abstract class ExcelImportUtil {
             return null;
         }
 
-        Object value;
         CellType cellType = cell.getCellType();
         if(cellType == CellType.FORMULA){
             cellType = cell.getCachedFormulaResultType();
         }
+        Object value;
         switch (cellType) {
-
             case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) { //cell.getCellStyle().getDataFormatString()
-                    String dataFormat = cell.getCellStyle().getDataFormatString();
-                    if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
-                        value = cell.getDateCellValue();
-                    } else {
-                        value = DatetimeOpt.convertTimeWithSecondToString(cell.getDateCellValue());
-                    }
+                if (DateUtil.isCellDateFormatted(cell) || cell.getCellStyle().getDataFormat() == 31) {
+                    //String dataFormat = cell.getCellStyle().getDataFormatString();
+                    //if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
+                    value = cell.getDateCellValue();
                 } else {
                     value = cell.getNumericCellValue();
                 }
                 break;
-
             case BOOLEAN:
                 value = cell.getBooleanCellValue();
                 break;
-
             case STRING:
                 value = cell.getRichStringCellValue().getString();
                 break;
-
             case FORMULA: // 正常不会运行到这儿
             case ERROR:
             case BLANK:
@@ -173,25 +166,20 @@ public abstract class ExcelImportUtil {
         }
         return sheetRow.getCell(col);
     }
+
     public static String getCellString(Cell cell) {
         if (cell == null) {
             return null;
         }
-
-        String value;
         CellType cellType = cell.getCellType();
         if(cellType == CellType.FORMULA){
             cellType = cell.getCachedFormulaResultType();
         }
+        String value;
         switch (cellType) {
             case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    String dataFormat = cell.getCellStyle().getDataFormatString();
-                    if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
-                        value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
-                    } else {
-                        value = DatetimeOpt.convertTimeWithSecondToString(cell.getDateCellValue());
-                    }
+                if (DateUtil.isCellDateFormatted(cell) || cell.getCellStyle().getDataFormat() == 31) {
+                    value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
                 } else {
                     value = StringBaseOpt.castObjectToString(cell.getNumericCellValue());
                 }
@@ -199,14 +187,11 @@ public abstract class ExcelImportUtil {
             case BOOLEAN:
                 value = cell.getBooleanCellValue() ? BooleanBaseOpt.STRING_TRUE : BooleanBaseOpt.STRING_FALSE;
                 break;
-
             case STRING:
                 value = cell.getRichStringCellValue().getString().trim();
                 break;
-
             case ERROR:
                 return ErrorEval.getText(cell.getErrorCellValue());
-
             case FORMULA:
             case BLANK:
             default:
