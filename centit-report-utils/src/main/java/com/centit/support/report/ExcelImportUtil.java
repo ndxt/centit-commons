@@ -117,6 +117,16 @@ public abstract class ExcelImportUtil {
         return fieldIndexDesc;
     }
 
+    private static boolean isDateCellType(Cell cell) {
+        short formatIndex = cell.getCellStyle().getDataFormat();
+        if ((formatIndex >= 14 && formatIndex <= 22) ||
+            (formatIndex >= 27 && formatIndex <= 36) ||
+            (formatIndex >= 45 && formatIndex <= 47) ||
+            (formatIndex >= 50 && formatIndex <= 58)){
+            return true;
+        }
+        return DateUtil.isCellDateFormatted(cell);
+    }
     /**
      * 获取 excel 表格单元中的数据
      *
@@ -135,7 +145,7 @@ public abstract class ExcelImportUtil {
         Object value;
         switch (cellType) {
             case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell) || cell.getCellStyle().getDataFormat() == 31) {
+                if (isDateCellType(cell)) {
                     //String dataFormat = cell.getCellStyle().getDataFormatString();
                     //if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
                     value = cell.getDateCellValue();
@@ -178,7 +188,7 @@ public abstract class ExcelImportUtil {
         String value;
         switch (cellType) {
             case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell) || cell.getCellStyle().getDataFormat() == 31) {
+                if (isDateCellType(cell)) {
                     value = DatetimeOpt.convertTimestampToString(cell.getDateCellValue());
                 } else {
                     value = StringBaseOpt.castObjectToString(cell.getNumericCellValue());
