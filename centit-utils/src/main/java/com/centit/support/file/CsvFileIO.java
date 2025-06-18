@@ -122,6 +122,8 @@ public abstract class CsvFileIO {
                     JSONObject rowJson = (JSONObject) row;
                     for (int i = 0; i < columnNames.size(); i++) {
                         values[i] = StringBaseOpt.castObjectToString(rowJson.get(columnNames.get(i)), "");
+                        //处理nsbp格式空格
+                        values[i]=values[i].replaceAll("\\u00A0"," ");
                     }
                     csvPrinter.printRecord(values);
                 }
