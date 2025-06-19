@@ -1300,6 +1300,9 @@ public abstract class ExcelImportUtil {
         if (sheet == null)
             return null;
         int columns = fieldDesc.size();
+        if (endRow <= 0) {
+            endRow = sheet.getLastRowNum() + 1;
+        }
         List<Map<String, Object>> datas = new ArrayList<>(endRow - beginRow + 1);
         List<CellRangeAddress> cellRanges = userUpMergeCell? sheet.getMergedRegions():null;
         Map<String, Object> preRowObj = null;
