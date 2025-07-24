@@ -119,7 +119,7 @@ public abstract class UrlOptUtils {
             n++;
             urlBuilder.append(ent.getKey()).append('=').append(
                 urlEncode(//urlEncodeShareNotDuplicate(
-                    StringBaseOpt.objectToString(ent.getValue()))
+                    StringBaseOpt.castObjectToString(ent.getValue(), ""))
             );
         }
         return urlBuilder.toString();
