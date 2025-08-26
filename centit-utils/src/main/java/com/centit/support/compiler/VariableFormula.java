@@ -184,7 +184,7 @@ public class VariableFormula {
             if(!Lexer.isLabel(aWord)) continue;
             if(VariableFormula.isKeyWord(aWord) || EmbedFunc.getFuncNo(aWord)>0)
                  continue;
-            if(extendFuncMap !=null && extendFuncMap.get(aWord)!=null) continue;
+            if(extendFuncMap !=null && extendFuncMap.containsKey(aWord)) continue;
             variables.add(aWord);
         }
         return variables;
