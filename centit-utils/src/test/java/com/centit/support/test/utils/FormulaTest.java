@@ -16,10 +16,8 @@ import java.util.Map;
 public class FormulaTest {
     public static void main(String[] args)  {
 
-        System.out.println(VariableFormula.calculate("attr(toObject(a),b)",
-            CollectionsOpt.createHashMap("a", "{'hello':'world', 'greet':'are you ok!'}",
-             "b", "greet")
-            ));
+        System.out.println(
+            StringBaseOpt.castObjectToString(VariableFormula.attainFormulaVariable( "if(c,b+d,c, a323, aadf, \"12312\")", null)));
 
 
         //String str = "qwefasdfas.png";
