@@ -19,6 +19,11 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jxls</groupId>
+            <artifactId>jxls-poi</artifactId>
+        </dependency>
+
         <!-- word(docx)的格式报表 同时可以转换pdf -->
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -43,11 +48,6 @@
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.xdocreport.template.freemarker</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jxls</groupId>
-            <artifactId>jxls-poi</artifactId>
         </dependency>
 
         <dependency>
