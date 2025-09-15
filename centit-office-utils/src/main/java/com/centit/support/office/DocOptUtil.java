@@ -3,10 +3,10 @@ package com.centit.support.office;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.util.List;
 /**
@@ -63,7 +63,7 @@ public class DocOptUtil {
     }
 
     public static boolean pdfContainsJSAction(String pdfFilePath) {
-        try (PDDocument document = PDDocument.load(new File(pdfFilePath))){
+        try (PDDocument document = Loader.loadPDF(new File(pdfFilePath))){
             String cosName = document.getDocument().getTrailer().toString();
             if(cosName.contains("COSName{JS}")){
                 return true;
