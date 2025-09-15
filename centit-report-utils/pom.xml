@@ -22,14 +22,15 @@
         <dependency>
             <groupId>org.jxls</groupId>
             <artifactId>jxls-poi</artifactId>
+            <version>2.12.1</version>
         </dependency>
 
         <!-- word(docx)的格式报表 同时可以转换pdf -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
-
         </dependency>
+
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
