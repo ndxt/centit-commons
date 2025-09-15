@@ -2,6 +2,7 @@ package com.centit.support.test.utils;
 
 import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.file.FileType;
+import com.centit.support.image.SvgUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,12 +18,9 @@ public class TextSvgToJpg {
      * @param args
      */
     public static void main(String[] args) {
-        try {
-            System.out.println(FileType.getFileType(
-                new File("D:/WorkDoc/业务拓展/复星集团/星采网+技术标第二轮+评分标准+－供应商版.pdf")));
-        } catch (IOException e) {
-            //logger.error(e.getMessage(), e);
-        }
+        boolean b = SvgUtils.removeSvgJSAction("/Users/codefan/Documents/temp/test.svg",
+            "/Users/codefan/Documents/temp/test.svg");
+        System.out.println(b);
     }
 
     public static void testDate() {

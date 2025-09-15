@@ -1,6 +1,7 @@
 package com.centit.support.algorithm;
 
 import com.alibaba.fastjson2.util.TypeUtils;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -656,14 +657,18 @@ public abstract class GeneralAlgorithm {
         return TypeUtils.cast(obj, type);
     }
 
+    /**
+     * 功能：判断对象是否为空 类似于 CollectionUtils.isEmpty(Object obj)
+     * @param obj 被判断的对象
+     * @return 是否为空
+     */
     public static boolean isEmpty(Object obj) {
         if(obj == null)
             return true;
         if(obj instanceof String)
             return StringUtils.isBlank((String)obj);
         if (obj instanceof Map) {
-            @SuppressWarnings("unchecked")
-            Map<Object, Object> objMap = (Map<Object, Object>) obj;
+            Map<?, ?> objMap = (Map<?, ?>) obj;
             return objMap.isEmpty();
         } else  if (obj instanceof Collection) {
             Collection<?> objlist = (Collection<?>) obj;
@@ -682,9 +687,13 @@ public abstract class GeneralAlgorithm {
             }
             return true;
         } else if(obj instanceof Supplier){
-            Object retObj = ((Supplier)obj).get();
+            Object retObj = ((Supplier<?>)obj).get();
             return isEmpty(retObj);
-        } else{
+        } /*else if(obj instanceof ScriptObjectMirror){
+           //ScriptObjectMirror implements Map<String, Object>
+            ScriptObjectMirror jsObj = (ScriptObjectMirror) obj;
+            return jsObj.isEmpty();
+        }*/ else{
             return StringUtils.isBlank(StringBaseOpt.castObjectToString(obj));
         }
 

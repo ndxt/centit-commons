@@ -4,6 +4,11 @@ import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -106,4 +111,45 @@ public abstract class ImagesToPdf {
         }
     }
 
+    /**
+     * 将 BufferedImage 转换为 PDImageXObject
+     * @param document  关联的PDF文档对象
+     * @param image     输入的 BufferedImage
+     * @param format    图像格式（如 "PNG", "JPEG"）
+     * @return PDImageXObject
+     */
+    private static PDImageXObject convertToPDImageXObject(PDDocument document, BufferedImage image, String format, String imageName) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        // 将 BufferedImage 写入字节流（编码为指定格式）
+        if (!ImageIO.write(image, format, baos)) {
+            throw new IOException("无法编码图像，请检查支持的格式：" + format);
+        }
+        byte[] imageData = baos.toByteArray();
+        // 创建 PDImageXObject（参数3为资源名称，可自定义）
+        return PDImageXObject.createFromByteArray(document, imageData, imageName);
+    }
+
+    public static boolean imagesToPdf(List<BufferedImage> imageList, OutputStream outPdfStream, float zoom){
+        try (PDDocument doc = new PDDocument()) {
+            int pageNumber = 0;
+            for (BufferedImage imgFile : imageList) {
+                // 创建PDF页面（与图片同尺寸）
+                PDImageXObject pdImage = convertToPDImageXObject(doc, imgFile, "PNG", "ODF-image-"+pageNumber+".png");
+                pageNumber ++;
+                float width =  imgFile.getWidth() * zoom;
+                float height =  imgFile.getHeight() * zoom;
+                PDPage page = new PDPage(new PDRectangle(width, height));
+                doc.addPage(page);
+                // 将图片绘制到PDF页面
+                try (PDPageContentStream contentStream = new PDPageContentStream(doc, page)) {
+                    contentStream.drawImage(pdImage, 0, 0, width, height);
+                }
+            }
+            doc.save(outPdfStream);
+            return true;
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return false;
+        }
+    }
 }

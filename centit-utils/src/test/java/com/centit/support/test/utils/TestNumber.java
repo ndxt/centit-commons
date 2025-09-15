@@ -6,6 +6,7 @@ import com.centit.support.common.DoubleAspect;
 import com.centit.support.compiler.VariableFormula;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 
 public class TestNumber {
@@ -44,11 +45,10 @@ public class TestNumber {
 
 
     public static void main(String[] args) {
-        double[] ll = longLatOffset(30.f, 1000);
+        Date date = DatetimeOpt.createUtilDate(1949,1,1);
 
-//[0.01038383089076675,0.008992661340005603]
-        System.out.println(JSON.toJSONString(ll));
-
+        System.out.println(date.getTime());
+        System.out.println(DatetimeOpt.castObjectToDate( (44338 - 25569) * 24L *60L* 60L *1000L));
 
         Map<String, Object> llMap = CollectionsOpt.createHashMap("lon", 30.0, "lat", 30.0, "dst", 1000.0);
         Object lat = VariableFormula.calculate("dst * 180 / 6371393 / 3.14159265358979323846" , llMap);

@@ -3,12 +3,11 @@ package com.centit.support.office;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 /**
  * 未归类的文档操作，比如：文档合并
@@ -61,5 +60,17 @@ public class DocOptUtil {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    public static boolean pdfContainsJSAction(String pdfFilePath) {
+        try (PDDocument document = PDDocument.load(new File(pdfFilePath))){
+            String cosName = document.getDocument().getTrailer().toString();
+            if(cosName.contains("COSName{JS}")){
+                return true;
+            }
+        } catch (IOException  e) {
+            logger.error(e.getMessage(), e);
+        }
+        return false;
     }
 }

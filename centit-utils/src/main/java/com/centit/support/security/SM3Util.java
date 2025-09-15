@@ -18,11 +18,7 @@ public class SM3Util extends GMBaseUtil {
 
     public static boolean verify(byte[] srcData, byte[] sm3Hash) {
         byte[] newHash = hash(srcData);
-        if (Arrays.equals(newHash, sm3Hash)) {
-            return true;
-        } else {
-            return false;
-        }
+        return Arrays.equals(newHash, sm3Hash);
     }
 
     public static byte[] hmac(byte[] key, byte[] srcData) {
@@ -34,5 +30,10 @@ public class SM3Util extends GMBaseUtil {
         byte[] result = new byte[mac.getMacSize()];
         mac.doFinal(result, 0);
         return result;
+    }
+
+    public static boolean hmacVerify(byte[] key, byte[] srcData, byte[] sm3Hash) {
+        byte[] newHash = hmac(key, srcData);
+        return Arrays.equals(newHash, sm3Hash);
     }
 }

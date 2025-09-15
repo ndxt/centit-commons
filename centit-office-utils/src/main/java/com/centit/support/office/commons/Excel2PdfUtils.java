@@ -199,7 +199,7 @@ public class Excel2PdfUtils {
                     }*/
                 } else {
                     String dataFormat = cell.getCellStyle().getDataFormatString();
-                    int dotPos = dataFormat.indexOf(".");
+                    int dotPos = dataFormat==null?-1:dataFormat.indexOf(".");
                     if(dotPos>=0){
                         int ePos = dataFormat.indexOf("%");
                         if(ePos>=0){

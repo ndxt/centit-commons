@@ -119,7 +119,7 @@ public abstract class UrlOptUtils {
             n++;
             urlBuilder.append(ent.getKey()).append('=').append(
                 urlEncode(//urlEncodeShareNotDuplicate(
-                    StringBaseOpt.objectToString(ent.getValue()))
+                    StringBaseOpt.castObjectToString(ent.getValue(), ""))
             );
         }
         return urlBuilder.toString();
@@ -161,10 +161,10 @@ public abstract class UrlOptUtils {
 
     public static String appendParamToUrl(String uri, String paramName, Object paramValue) {
         return (uri.endsWith("?") || uri.endsWith("&")) ?
-            uri + paramName + "=" + StringBaseOpt.objectToString(paramValue) :
+            uri + paramName + "=" + urlEncode(StringBaseOpt.castObjectToString(paramValue, "")):
             uri + (uri.indexOf('?') == -1 ? '?' : '&')
                 + paramName + "=" +  urlEncode(//urlEncodeShareNotDuplicate(//StringEscapeUtils.escapeHtml4(
-                StringBaseOpt.objectToString(paramValue));
+                StringBaseOpt.castObjectToString(paramValue, ""));
     }
 
     /**

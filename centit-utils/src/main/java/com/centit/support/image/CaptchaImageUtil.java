@@ -41,7 +41,7 @@ public abstract class CaptchaImageUtil {
 
     public static final String SESSIONCHECKCODE = "session_checkcode";
     public static final String REQUESTCHECKCODE = "j_checkcode";
-    private static final String range = "0123456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSRUVWXYZ";
+    private static final String range = "0123456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ";
     private CaptchaImageUtil() {
         throw new IllegalAccessError("Utility class");
     }
