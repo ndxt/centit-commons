@@ -1,13 +1,9 @@
 package com.centit.support.test.utils;
 
-import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
-import com.centit.support.json.JSONOpt;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
-import com.centit.support.network.UrlOptUtils;
-import org.apache.http.Consts;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ContentType;
@@ -17,13 +13,9 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
 
 public class TestUploadFile {
 
