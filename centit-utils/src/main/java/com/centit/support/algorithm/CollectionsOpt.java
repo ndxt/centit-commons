@@ -956,7 +956,7 @@ public abstract class CollectionsOpt {
         if(objectMap==null){
             return null;
         }
-        Map<String, String> stringMap = new HashMap<>(objectMap.size());
+        Map<String, String> stringMap = new LinkedHashMap<>(objectMap.size());
         for(Map.Entry<?, ?> ent : objectMap.entrySet()){
             stringMap.put(StringBaseOpt.objectToString(ent.getKey()),
                 StringBaseOpt.objectToString(ent.getValue()));
