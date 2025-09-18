@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public abstract class AbstractRuntimeContext {
@@ -64,7 +65,7 @@ public abstract class AbstractRuntimeContext {
         if(object instanceof Map){
             Map<?,?> objMap = (Map<?,?>) object;
             JSONArray objArray = new JSONArray();
-            Map<Object,  Object> despMap = new HashMap<>();
+            Map<Object,  Object> despMap = new LinkedHashMap<>();
             boolean isArray = true;
             for(Map.Entry<?,?> ent : objMap.entrySet()){
                 Object key = ent.getKey();
