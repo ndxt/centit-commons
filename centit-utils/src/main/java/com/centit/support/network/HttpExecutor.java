@@ -801,13 +801,7 @@ public abstract class HttpExecutor {
             UrlOptUtils.appendParamToUrl(uri, paramsUrl), inputStream, filedName, contentType, filename);
     }
 
-
-    public static String formPostWithFileUpload(HttpExecutorContext executorContext,
-                                                String uri, Map<String, Object> formObjects, Map<String, File> files)
-        throws IOException {
-        HttpPost httpPost = new HttpPost(uri);
-        if(!executorContext.hasHeader("Content-Type"))
-            httpPost.setHeader("Content-Type", multiPartTypeHead);
+    private static MultipartEntityBuilder buildMultiPartEntity(Map<String, Object> formObjects, Map<String, File> files) {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(BOUNDARY);
         builder.setMode(HttpMultipartMode.RFC6532);
@@ -824,6 +818,27 @@ public abstract class HttpExecutor {
                 builder.addBinaryBody(file.getKey(), file.getValue());
             }
         }
+        return builder;
+    }
+
+    public static String formPutWithFileUpload(HttpExecutorContext executorContext,
+                                                String uri, Map<String, Object> formObjects, Map<String, File> files)
+        throws IOException {
+        HttpPut httpPut = new HttpPut(uri);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPut.setHeader("Content-Type", multiPartTypeHead);
+        MultipartEntityBuilder builder = buildMultiPartEntity(formObjects, files);
+        httpPut.setEntity(builder.build());
+        return httpExecute(executorContext, httpPut);
+    }
+
+    public static String formPostWithFileUpload(HttpExecutorContext executorContext,
+                                                String uri, Map<String, Object> formObjects, Map<String, File> files)
+        throws IOException {
+        HttpPost httpPost = new HttpPost(uri);
+        if(!executorContext.hasHeader("Content-Type"))
+            httpPost.setHeader("Content-Type", multiPartTypeHead);
+        MultipartEntityBuilder builder = buildMultiPartEntity(formObjects, files);
         httpPost.setEntity(builder.build());
         return httpExecute(executorContext, httpPost);
     }

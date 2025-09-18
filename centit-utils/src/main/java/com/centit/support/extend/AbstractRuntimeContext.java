@@ -12,6 +12,7 @@ import javax.script.ScriptException;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class AbstractRuntimeContext {
@@ -54,21 +55,34 @@ public abstract class AbstractRuntimeContext {
         return this;
     }
 
+    /**
+     * 检查js返回的对象是否是数组
+     * @param object js对象
+     * @return js对象
+     */
     public static Object checkArrayObject(Object object){
         if(object instanceof Map){
             Map<?,?> objMap = (Map<?,?>) object;
             JSONArray objArray = new JSONArray();
+            Map<Object,  Object> despMap = new HashMap<>();
             boolean isArray = true;
             for(Map.Entry<?,?> ent : objMap.entrySet()){
-                if(StringUtils.isNumeric(ent.getKey().toString())){
-                    objArray.add(ent.getValue());
-                } else {
-                    isArray = false;
-                    break;
+                Object key = ent.getKey();
+                if (key != null) {
+                    if(isArray){
+                        if(StringUtils.isNumeric(key.toString())) {
+                            objArray.add(checkArrayObject(ent.getValue()));
+                        } else {
+                            isArray = false;
+                        }
+                    }
+                    despMap.put(key, checkArrayObject(ent.getValue()));
                 }
             }
-            if(isArray && objArray.size()>0){
+            if(isArray && !objArray.isEmpty()){
                 return objArray;
+            } else {
+                return despMap;
             }
         }
         return object;
