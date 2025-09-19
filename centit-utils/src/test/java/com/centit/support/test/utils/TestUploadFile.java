@@ -31,6 +31,7 @@ public class TestUploadFile {
         return builder;
     }
     public static void main(String[] args) throws IOException {
+        String filePath = args.length == 0? "./IMG_20250911_153849840.jpg" : args[0];
         HttpClientContext context = HttpClientContext.create();
         BasicCookieStore cookieStore = new BasicCookieStore();
         CloseableHttpClient httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
@@ -39,7 +40,7 @@ public class TestUploadFile {
 
         HttpPost httpPost = new HttpPost("http://10.0.101.93/ccApi4gx/attach/uploadTaskPhotos");
         httpPost.setHeader("Content-Type", "multipart/form-data; boundary=" + HttpExecutor.BOUNDARY);
-        MultipartEntityBuilder builder = buildMultiPartEntity("D:/test/1.png");
+        MultipartEntityBuilder builder = buildMultiPartEntity( filePath);
         httpPost.setEntity(builder.build());
         String str = HttpExecutor.httpExecute(httpExecutorContext, httpPost);
         System.out.println(str);
