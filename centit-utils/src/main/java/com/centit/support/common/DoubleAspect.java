@@ -28,7 +28,7 @@ public enum DoubleAspect {
     FALSE(2),
     TRUE(1);
 
-    int intAspect;
+    final int intAspect;
 
     DoubleAspect(int intAspect) {
         this.intAspect = intAspect;
@@ -44,7 +44,6 @@ public enum DoubleAspect {
 
     /**
      * except NONE
-     *
      * @return this.intAspect != 0
      */
     public boolean anyAspect() {
