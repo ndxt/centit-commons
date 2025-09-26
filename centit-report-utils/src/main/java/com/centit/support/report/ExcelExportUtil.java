@@ -1,10 +1,7 @@
 package com.centit.support.report;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.algorithm.NumberBaseOpt;
-import com.centit.support.algorithm.ReflectionOpt;
-import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanMetaData;
 import com.centit.support.common.ObjectException;
 import org.apache.commons.lang3.StringUtils;
@@ -21,11 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 
 /**
@@ -583,9 +576,41 @@ public abstract class ExcelExportUtil {
         for(int i=1; i<nRowCount; i++)
             copyRow(sheet.getWorkbook(), sheet, beginRow, beginRow+i, 1,   nColCount);
     }
+    public static Set<Integer> praiseColsRangeDesc(String mergeColCellDesc){
+        if(StringUtils.isBlank(mergeColCellDesc) || "0".equals(mergeColCellDesc)) return null;
+        Set< Integer> mergeCols = new HashSet<>();
+        if(StringRegularOpt.isDigit(mergeColCellDesc)){
+            for(int i=0; i< Integer.parseInt(mergeColCellDesc); i++){
+                mergeCols.add(i);
+            }
+        }
+        String [] mergeCol= mergeColCellDesc.split(",");
+        for(String mergeColCell : mergeCol){
+            if(StringUtils.isBlank(mergeColCell)) continue;
+            if(mergeColCell.contains("-")){
+                String [] colRang = mergeColCell.split("-");
+                if(colRang.length==1){
+                    mergeCols.add(ExcelImportUtil.mapColumnIndex(colRang[0].trim()));
+                } else if(colRang.length>1){
+                    int beginCol = ExcelImportUtil.mapColumnIndex(colRang[0].trim());
+                    int endCol = ExcelImportUtil.mapColumnIndex(colRang[1].trim());
+                    if(beginCol<=endCol) {
+                        for (int i = beginCol; i <= endCol; i++) {
+                            mergeCols.add(i);
+                        }
+                    }
+                }
+            }else{
+                mergeCols.add(ExcelImportUtil.mapColumnIndex(mergeColCell.trim()));
+            }
+        }
 
-    private static void mergeColCell(Sheet sheet, int mergeColCell, int beginRow, int endRow){
-        for(int i=0; i<mergeColCell; i++){
+        return mergeCols;
+    }
+    private static void mergeColCell(Sheet sheet, String mergeColCell, int beginRow, int endRow){
+        Set<Integer> mergeCols  = praiseColsRangeDesc(mergeColCell);
+        if(mergeCols==null) return;
+        for(int i : mergeCols){
             String preCellText = "";// ExcelImportUtil.getCellString( )
             int preBeginRow = beginRow;
             for(int j=beginRow; j<endRow; j++){
@@ -608,7 +633,7 @@ public abstract class ExcelExportUtil {
                     preBeginRow = j;
                 }
             }
-            if(endRow-1 >preBeginRow) {
+            if(endRow-1 > preBeginRow) {
                 sheet.addMergedRegion(new CellRangeAddress(preBeginRow, endRow-1, i, i));
                 Cell newCell = ExcelImportUtil.getCell(sheet, preBeginRow, i);
                 newCell.setCellValue(preCellText);
@@ -631,7 +656,7 @@ public abstract class ExcelExportUtil {
         }
     }
     public static void saveObjectsToExcelSheet(Sheet sheet, List<?> objects, Map<Integer, String> fieldDesc, int beginRow,
-                                               boolean createRow, int mergeColCell) {
+                                               boolean createRow, String mergeColCell) {
         int nRowCount = objects.size();
         //CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
         if(createRow)
@@ -655,7 +680,7 @@ public abstract class ExcelExportUtil {
         mergeColCell(sheet, mergeColCell, beginRow, beginRow+nRowCount);
     }
 
-    public static void saveObjectsToExcelSheet(Sheet sheet, List<Object[]> objects, int beginCol, int beginRow, boolean createRow, int mergeColCell) {
+    public static void saveObjectsToExcelSheet(Sheet sheet, List<Object[]> objects, int beginCol, int beginRow, boolean createRow, String mergeColCell) {
         int nRowCount = objects.size();
         //CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
         if(createRow)
@@ -704,7 +729,7 @@ public abstract class ExcelExportUtil {
         try (InputStream excelFile = Files.newInputStream(new File(excelTemplateFilePath).toPath())) {
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             Sheet sheet = (StringUtils.isBlank(sheetName)) ? wb.getSheetAt(0) : wb.getSheet(sheetName);
-            saveObjectsToExcelSheet(sheet, objects, fieldDesc, beginRow, createRow, -1);
+            saveObjectsToExcelSheet(sheet, objects, fieldDesc, beginRow, createRow, "");
         }
 
         try (OutputStream newExcelFile = Files.newOutputStream(new File(excelFilePath).toPath())) {
@@ -734,7 +759,7 @@ public abstract class ExcelExportUtil {
         try (InputStream excelFile = Files.newInputStream(new File(excelTemplateFilePath).toPath())) {
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             Sheet sheet = wb.getSheetAt(sheetIndex);
-            saveObjectsToExcelSheet(sheet, objects, fieldDesc, beginRow, createRow, -1);
+            saveObjectsToExcelSheet(sheet, objects, fieldDesc, beginRow, createRow, "");
         }
 
         try (OutputStream newExcelFile = Files.newOutputStream(new File(excelFilePath).toPath())) {
@@ -763,7 +788,7 @@ public abstract class ExcelExportUtil {
         try (InputStream excelFile = Files.newInputStream(new File(excelTemplateFilePath).toPath())) {
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             Sheet sheet = (StringUtils.isBlank(sheetName)) ? wb.getSheetAt(0) : wb.getSheet(sheetName);
-            saveObjectsToExcelSheet(sheet, objects, beginCol, beginRow, createRow, -1);
+            saveObjectsToExcelSheet(sheet, objects, beginCol, beginRow, createRow, "");
         }
 
         try (OutputStream newExcelFile = Files.newOutputStream(new File(excelFilePath).toPath())) {
@@ -791,7 +816,7 @@ public abstract class ExcelExportUtil {
         try (InputStream excelFile = Files.newInputStream(new File(excelTemplateFilePath).toPath())) {
             wb = excelType == ExcelTypeEnum.HSSF ? new HSSFWorkbook(excelFile) : new XSSFWorkbook(excelFile);
             Sheet sheet = wb.getSheetAt(sheetIndex);
-            saveObjectsToExcelSheet(sheet, objects, beginCol, beginRow, createRow, -1);
+            saveObjectsToExcelSheet(sheet, objects, beginCol, beginRow, createRow, "");
         }
 
         try (OutputStream newExcelFile = Files.newOutputStream(new File(excelFilePath).toPath())) {
