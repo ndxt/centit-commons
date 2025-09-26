@@ -38,7 +38,7 @@ public class TestExcelExport {
         mapInfo.put(5, "行政编制");
         mapInfo.put(6, "事业编制");
 
-        ExcelExportUtil.saveObjectsToExcelSheet(sheet, ss, mapInfo, 3, true, -1);
+        ExcelExportUtil.saveObjectsToExcelSheet(sheet, ss, mapInfo, 3, true, null);
 
         Map<Integer, String> mapInfo2 = new HashMap<>();
         mapInfo2.put(0, "地区");
@@ -49,7 +49,7 @@ public class TestExcelExport {
         mapInfo2.put(5, "工作职责");
         mapInfo2.put(6, "编制数");
         sheet = xssfWorkbook.getSheetAt(1);
-        ExcelExportUtil.saveObjectsToExcelSheet(sheet, sheet2Objects, mapInfo2, 1, true, 1);
+        ExcelExportUtil.saveObjectsToExcelSheet(sheet, sheet2Objects, mapInfo2, 1, true, "");
 
         OutputStream os = new FileOutputStream( new File("/Users/codefan/Documents/temp/dest.xlsx"));
         xssfWorkbook.write(os);
