@@ -554,7 +554,7 @@ public abstract class ExcelExportUtil {
 
         return cellStyle;
     }
-    private static void createNewRowsForSaveData(Sheet sheet, int beginRow, int nRowCount){
+    public static void createNewRowsForSaveData(Sheet sheet, int beginRow, int nRowCount){
         Row excelRow = sheet.getRow(beginRow);
         if(excelRow==null){
             for(int i=0; i<nRowCount; i++ ){
@@ -940,6 +940,7 @@ public abstract class ExcelExportUtil {
             if(toRow==null){
                 toRow = sheet.createRow(toRowIndex + i);
             }
+            toRow.setHeight(fromRow.getHeight());
             for (int colIndex = 0; colIndex < (colNum != null ? colNum : fromRow.getLastCellNum()+1); colIndex++) {
                 Cell tmpCell = fromRow.getCell(colIndex);
                 if (tmpCell == null) {
