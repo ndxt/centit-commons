@@ -6,7 +6,6 @@ import com.centit.support.report.JxlsCommand.AutoRowHeightCommand;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
 import org.jxls.builder.xls.XlsCommentAreaBuilder;
-import org.jxls.command.IfCommand;
 import org.jxls.common.Context;
 import org.jxls.expression.JexlExpressionEvaluator;
 import org.jxls.transform.Transformer;
