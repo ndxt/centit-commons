@@ -63,7 +63,6 @@ public class ESTest {
         //config.setPassword("*********");
         /*config.setIndexName(
                 StringUtils.lowerCase(properties.getProperty("elasticsearch.index")));*/
-        config.setOsId("dde");
         config.setMinScore(0.5f);
 
 

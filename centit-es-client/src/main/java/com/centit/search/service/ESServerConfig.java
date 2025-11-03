@@ -9,7 +9,6 @@ import org.apache.http.HttpHost;
  */
 public class ESServerConfig {
 
-    private String osId ;
     private String serverHostIp ;
     private String serverHostPort;
     private String clusterName ;
@@ -17,6 +16,7 @@ public class ESServerConfig {
     private String password ;
     //#elasticsearch.filter.minScore
     private float minScore;
+
     private HttpHost[] httpHosts;
 
     public ESServerConfig(){
@@ -39,13 +39,7 @@ public class ESServerConfig {
         this.password = SecurityOptUtils.decodeSecurityString(password);
     }
 
-    public String getOsId() {
-        return osId;
-    }
 
-    public void setOsId(String osId) {
-        this.osId = osId;
-    }
 
     public String getServerHostIp() {
         return serverHostIp;
