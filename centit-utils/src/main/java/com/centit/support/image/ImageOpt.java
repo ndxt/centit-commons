@@ -272,7 +272,7 @@ public abstract class ImageOpt {
         return image;
     }
 
-    public static InputStream imageToInputStream(BufferedImage image) throws IOException {
+    public static ByteArrayInputStream imageToInputStream(BufferedImage image) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         //String imagePath = UuidOpt.randomString(6) + ".jpg";
         ImageIO.write(image, "jpg", os);
