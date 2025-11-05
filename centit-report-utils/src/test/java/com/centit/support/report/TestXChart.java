@@ -9,11 +9,12 @@ public class TestXChart {
     public static void main(String[] args) {
 
         JSONObject style = new JSONObject();
-        style.put("xAxisTitle", "年份");
-        style.put("yAxisTitle", "收入（百万元）");
+
 
         JSONObject data = new JSONObject();
         data.put("xData", new String[]{"2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"});
+        data.put("xAxisTitle", "年份");
+        data.put("yAxisTitle", "收入（百万元）");
 
         JSONArray seriesArray = new JSONArray();
         JSONObject series = new JSONObject();
@@ -36,7 +37,8 @@ public class TestXChart {
         data.put("series", seriesArray);
 
         // 创建图表
-        Chart<?,?> chart = ChartImageUtils.createChart(ChartImageUtils.CHART_TYPE_LINE,"公司年度收入构成分析", 1000, 700, style, data);
+        Chart<?,?> chart = ChartImageUtils.createChart(ChartImageUtils.CHART_TYPE_LINE,
+            "公司年度收入构成分析", 1000, 700, data, style);
         // 显示图表
         new SwingWrapper<>(chart).displayChart();
     }
