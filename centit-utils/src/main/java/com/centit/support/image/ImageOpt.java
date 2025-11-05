@@ -94,7 +94,7 @@ public abstract class ImageOpt {
      * @param subImageBounds 图片区域
      * @return 截图
      */
-    public static BufferedImage saveSubImage(BufferedImage image, Rectangle subImageBounds) {
+    public static BufferedImage cropImage(BufferedImage image, Rectangle subImageBounds) {
         BufferedImage subImage = new BufferedImage(subImageBounds.width, subImageBounds.height, 1);
         Graphics g = subImage.getGraphics();
 
@@ -308,6 +308,9 @@ public abstract class ImageOpt {
         }
     }
 
+    public static BufferedImage loadImage(InputStream  is) throws IOException {
+        return ImageIO.read(is);
+    }
     /**
      * 生成圆角图片
      * @param image        原始图片
