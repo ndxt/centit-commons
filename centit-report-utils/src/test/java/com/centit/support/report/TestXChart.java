@@ -1,58 +1,42 @@
 package com.centit.support.report;
 
-import org.knowm.xchart.CategoryChart;
-import org.knowm.xchart.CategoryChartBuilder;
-import org.knowm.xchart.CategorySeries;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import org.knowm.xchart.SwingWrapper;
-import org.knowm.xchart.style.Styler;
-import org.knowm.xchart.style.colors.ChartColor;
-
-import java.awt.*;
-import java.util.Arrays;
-import java.util.List;
+import org.knowm.xchart.internal.chartpart.Chart;
 
 public class TestXChart {
     public static void main(String[] args) {
 
+        JSONObject style = new JSONObject();
+        style.put("xAxisTitle", "年份");
+        style.put("yAxisTitle", "收入（百万元）");
+
+        JSONObject data = new JSONObject();
+        data.put("xData", new String[]{"2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025"});
+
+        JSONArray seriesArray = new JSONArray();
+        JSONObject series = new JSONObject();
+        series.put("name", "产品A收入");
+        series.put("data", new Double[]{1.0, 2.0, 3.0, 4.0, 5.0, 4.0, 3.0, 2.0, 1.0, 2.0, 3.0});
+        seriesArray.add(series);
+        JSONObject series2 = new JSONObject();
+        series2.put("name", "产品B收入");
+        series2.put("data", new Double[]{3.0, 2.0, 3.0, 1.0, 3.4, 4.5, 3.0, 2.0, 1.0, 2.0, 3.0});
+        seriesArray.add(series2);
+        JSONObject series3 = new JSONObject();
+        series3.put("name", "产品C收入");
+        series3.put("data", new Double[]{5.0, 2.0, 3.0, 4.0, 5.0, 4.0, 2.0, 2.0, 1.0, 2.0, 3.0});
+        seriesArray.add(series3);
+        JSONObject series4 = new JSONObject();
+        series4.put("name", "产品D收入");
+        series4.put("data", new Double[]{3.0, 2.0, 3.0, 4.0, 5.0, 4.0, 3.0, 1.0, 3.0, 2.0, 3.0});
+        seriesArray.add(series4);
+
+        data.put("series", seriesArray);
+
         // 创建图表
-        CategoryChart chart = new CategoryChartBuilder()
-            .width(1000)
-            .height(700)
-            .title("公司年度收入构成分析")
-            .xAxisTitle("年份")
-            .yAxisTitle("收入（百万元）")
-            .build();
-
-        // 自定义样式
-        chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideN);//OutsideE
-        chart.getStyler().setLegendLayout(Styler.LegendLayout.Horizontal);
-        chart.getStyler().setDefaultSeriesRenderStyle(CategorySeries.CategorySeriesRenderStyle.Bar);
-        chart.getStyler().setStacked(true);
-        chart.getStyler().setPlotBackgroundColor(ChartColor.DARK_GREY.getColor());
-        chart.getStyler().setChartBackgroundColor(Color.WHITE);
-        chart.getStyler().setPlotGridLinesVisible(true);
-        chart.getStyler().setPlotGridLinesColor(new Color(220, 220, 220));
-        chart.getStyler().setXAxisLabelRotation(45); // X轴标签旋转角度
-
-        // 数据
-        List<String> years = Arrays.asList("2020", "2021", "2022", "2023");
-
-        // 各业务线收入数据
-        List<Number> productSales = Arrays.asList(45, 52, 60, 68);
-        List<Number> serviceRevenue = Arrays.asList(25, 30, 35, 42);
-        List<Number> consultingRevenue = Arrays.asList(15, 18, 22, 28);
-        List<Number> otherRevenue = Arrays.asList(5, 8, 10, 12);
-
-        // 添加系列并自定义颜色
-        chart.addSeries("产品销售", years, productSales)
-            .setFillColor(new Color(65, 105, 225)); // 蓝色
-        chart.addSeries("服务收入", years, serviceRevenue)
-            .setFillColor(new Color(34, 139, 34)); // 绿色
-        chart.addSeries("咨询收入", years, consultingRevenue)
-            .setFillColor(new Color(255, 140, 0)); // 橙色
-        chart.addSeries("其他收入", years, otherRevenue)
-            .setFillColor(new Color(148, 0, 211)); // 紫色
-
+        Chart<?,?> chart = ChartImageUtils.createChart(ChartImageUtils.CHART_TYPE_LINE,"公司年度收入构成分析", 1000, 700, style, data);
         // 显示图表
         new SwingWrapper<>(chart).displayChart();
     }

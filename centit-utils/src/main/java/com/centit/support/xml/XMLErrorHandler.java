@@ -1,6 +1,7 @@
 package com.centit.support.xml;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.centit.support.algorithm.CollectionsOpt;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -27,30 +28,32 @@ public class XMLErrorHandler implements ErrorHandler {
         int fatalErrorCount = fatalErrorMessage.size();
         int warningCount = warningMessage.size();
         if(errorCount == 0){
-            if(warningCount==0){
-                errorJson.put("status", "success");
-            } else {
-                errorJson.put("status", "warning");
+            errorJson.put("code", "0");
+
+            if(warningCount>0){
+                errorJson.put("message", "XML文件格式验证通过，但是有" + warningCount + "个警告");
+            }else{
+                errorJson.put("message", "OK");
             }
         }else{
-            errorJson.put("status", "error");
+            errorJson.put("code", 701);
+            errorJson.put("message", "XML文件格式验证未通过，有" + errorCount + "个错误，和"+ fatalErrorCount + "个致命错误");
         }
-        errorJson.put("errorCount", errorCount);
-        errorJson.put("warningCount", warningCount);
-        errorJson.put("fatalErrorCount", fatalErrorCount);
-        errorJson.put("errorMessage", errorMessage);
-        errorJson.put("warningMessage", warningMessage);
-        errorJson.put("fatalErrorMessage", fatalErrorMessage);
+
+        errorJson.put("data", CollectionsOpt.createHashMap("errorCount", errorCount,
+            "warningCount", warningCount,"fatalErrorCount",  fatalErrorCount,
+            "errorMessage", errorMessage,"warningMessage", warningMessage,
+            "fatalErrorMessage", fatalErrorMessage) );
         return errorJson;
     }
 
     public static JSONObject createFatalError(String fatalMessage) {
         JSONObject errorJson = new JSONObject();
-        errorJson.put("status", "error");
-        errorJson.put("errorCount", 0);
-        errorJson.put("warningCount", 0);
-        errorJson.put("fatalErrorCount", 1);
-        errorJson.put("fatalErrorMessage", Collections.singletonList(fatalMessage));
+        errorJson.put("code", "0");
+        errorJson.put("message", "XML文件格式验证未通过，有 1 个致命错误");
+        errorJson.put("data", CollectionsOpt.createHashMap("errorCount", 0,
+            "warningCount", 0,"fatalErrorCount", 1,
+            "fatalErrorMessage",  Collections.singletonList(fatalMessage)) );
         return errorJson;
     }
     @Override

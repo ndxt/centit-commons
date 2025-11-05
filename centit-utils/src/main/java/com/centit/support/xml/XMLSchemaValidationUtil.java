@@ -11,9 +11,8 @@ import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class XMLSchemaValidationUtil {
-    public JSONObject validate(InputStream xsdPath, InputStream xmlPath) {
-
+public abstract class XMLSchemaValidationUtil {
+    public static JSONObject validate(InputStream xsdPath, InputStream xmlPath) {
         try {
             SchemaFactory factory =
                 SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -25,10 +24,8 @@ public class XMLSchemaValidationUtil {
             Validator validator = schema.newValidator();
             XMLErrorHandler validationErrors = new XMLErrorHandler();
             // 设置错误处理器
-            validator.setErrorHandler(validationErrors );
-
+            validator.setErrorHandler(validationErrors);
             validator.validate(new StreamSource(xmlPath));
-
             return validationErrors.toJSONObject();
 
         } catch (SAXException | IOException e) {
