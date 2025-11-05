@@ -2,8 +2,10 @@ package com.centit.support.report;
 
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.compiler.EmbedFuncUtils;
+import com.centit.support.report.JxlsCommand.AutoRowHeightCommand;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
+import org.jxls.builder.xls.XlsCommentAreaBuilder;
 import org.jxls.common.Context;
 import org.jxls.expression.JexlExpressionEvaluator;
 import org.jxls.transform.Transformer;
@@ -22,6 +24,10 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public abstract class ExcelReportUtil {
+
+    static {
+        XlsCommentAreaBuilder.addCommandMapping("autoRowHeight", AutoRowHeightCommand.class);
+    }
 
     private ExcelReportUtil() {
         throw new IllegalAccessError("Utility class");

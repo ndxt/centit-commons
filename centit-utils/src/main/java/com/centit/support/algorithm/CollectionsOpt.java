@@ -928,6 +928,7 @@ public abstract class CollectionsOpt {
     }
 
     public static List<Object> objectToList(Object object) {
+        if(object == null) return null;
         if(object instanceof List){
             return (List<Object>)object;
         } else if(object instanceof Collection){

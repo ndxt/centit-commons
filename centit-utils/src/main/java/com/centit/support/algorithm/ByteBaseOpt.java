@@ -2,7 +2,11 @@ package com.centit.support.algorithm;
 
 import com.alibaba.fastjson2.JSON;
 import com.centit.support.file.FileIOOpt;
+import com.centit.support.image.ImageOpt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,6 +17,8 @@ import java.util.Date;
 
 @SuppressWarnings("unused")
 public abstract class ByteBaseOpt {
+    protected static final Logger logger = LoggerFactory.getLogger(ByteBaseOpt.class);
+
     private ByteBaseOpt() {
         throw new IllegalAccessError("Utility class");
     }
@@ -35,7 +41,6 @@ public abstract class ByteBaseOpt {
                 }
                 return bytes;
             }
-
             if (firstObj instanceof Character) {
                 byte[] bytes = new byte[len];
                 for (int i = 0; i < len; i++) {
@@ -63,6 +68,16 @@ public abstract class ByteBaseOpt {
         if (obj instanceof ByteArrayOutputStream) {
             ByteArrayOutputStream byteOutput = (ByteArrayOutputStream) obj;
             return byteOutput.toByteArray();
+        }
+
+        if (obj instanceof BufferedImage) {
+            BufferedImage image = (BufferedImage) obj;
+            try {
+                return ImageOpt.imageToByteArray(image);
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+                return null;
+            }
         }
 
         if (obj instanceof Long) {

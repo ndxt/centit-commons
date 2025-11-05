@@ -20,7 +20,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.util.*;
 
-
 /**
  * 生成基本EXCEL工具类
  *
@@ -576,11 +575,12 @@ public abstract class ExcelExportUtil {
         for(int i=1; i<nRowCount; i++)
             copyRow(sheet.getWorkbook(), sheet, beginRow, beginRow+i, 1,   nColCount);
     }
+
     public static Set<Integer> praiseColsRangeDesc(String mergeColCellDesc){
         if(StringUtils.isBlank(mergeColCellDesc) || "0".equals(mergeColCellDesc)) return null;
-        Set< Integer> mergeCols = new HashSet<>();
+        Set<Integer> mergeCols = new HashSet<>();
         if(StringRegularOpt.isDigit(mergeColCellDesc)){
-            for(int i=0; i< Integer.parseInt(mergeColCellDesc); i++){
+            for(int i=0; i < Integer.parseInt(mergeColCellDesc); i++){
                 mergeCols.add(i);
             }
         }
@@ -609,7 +609,7 @@ public abstract class ExcelExportUtil {
     }
     private static void mergeColCell(Sheet sheet, String mergeColCell, int beginRow, int endRow){
         Set<Integer> mergeCols  = praiseColsRangeDesc(mergeColCell);
-        if(mergeCols==null) return;
+        if(mergeCols==null || mergeCols.isEmpty()) return;
         for(int i : mergeCols){
             String preCellText = "";// ExcelImportUtil.getCellString( )
             int preBeginRow = beginRow;

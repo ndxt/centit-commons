@@ -13,6 +13,8 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +68,7 @@ public abstract class ImageOpt {
 
     public static void saveBufferedImage(String filename, BufferedImage image,/*暂时没有用起来*/ int quality)
         throws IOException {
-        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(filename))) {
+        try (BufferedOutputStream out = new BufferedOutputStream(Files.newOutputStream(Paths.get(filename)))) {
             ImageIO.write(image, "jpg", out);
         }
     }
@@ -281,6 +283,12 @@ public abstract class ImageOpt {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         //String imagePath = UuidOpt.randomString(6) + ".jpg";
         ImageIO.write(image, "jpg", os);
+        return os.toByteArray();
+    }
+    public static byte[] imageToByteArray(BufferedImage image, String formatName) throws IOException {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        //String imagePath = UuidOpt.randomString(6) + ".jpg";
+        ImageIO.write(image, formatName, os);
         return os.toByteArray();
     }
 

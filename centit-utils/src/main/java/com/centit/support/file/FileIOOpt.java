@@ -1,9 +1,11 @@
 package com.centit.support.file;
 
 import com.alibaba.fastjson2.JSON;
+import com.centit.support.image.ImageOpt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -241,12 +243,30 @@ public abstract class FileIOOpt {
             return new ByteArrayInputStream(outputStream.toByteArray());
         }
 
+        if(data instanceof BufferedImage){
+            try {
+                return ImageOpt.imageToInputStream((BufferedImage) data);
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+                return null;
+            }
+        }
+
         if(data instanceof byte[]) {
             return new ByteArrayInputStream((byte[]) data);
         }
 
-        if(data instanceof String){
+        if(data instanceof String) {
             return new ByteArrayInputStream(((String) data).getBytes(StandardCharsets.UTF_8));
+        }
+
+        if (data instanceof File) {
+            try {
+                return new FileInputStream((File) data);
+            } catch (FileNotFoundException e) {
+                logger.error(e.getMessage(), e);
+                return null;
+            }
         }
         String dataStr = JSON.toJSONString(data);
         return new ByteArrayInputStream(dataStr.getBytes(StandardCharsets.UTF_8));
