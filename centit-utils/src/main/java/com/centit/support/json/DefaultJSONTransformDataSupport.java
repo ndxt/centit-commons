@@ -55,9 +55,9 @@ public class DefaultJSONTransformDataSupport
 
     @Override
     public Object getVarValue(String labelName) {
-        if(labelName.startsWith("__")){ // __. 代表root
+        if(labelName.startsWith("__.")){ // __. 代表root
             return ReflectionOpt.attainExpressionValue(data,
-                labelName.substring(1));
+                labelName.substring(3));
         } else if(labelName.startsWith("..")){
             return ReflectionOpt.attainExpressionValue(
                 peekStackValue(),
