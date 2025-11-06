@@ -17,7 +17,7 @@ public class FormulaTest {
     public static void main(String[] args)  {
 
         System.out.println(
-            StringBaseOpt.castObjectToString(VariableFormula.attainFormulaVariable( "if(c,b+d,c, a323, aadf, \"12312\")", null)));
+            StringBaseOpt.castObjectToString(VariableFormula.attainFormulaVariable( "if(c,b+d, ${__.hello[0].var}, __.hello , a323, aadf, \"12312\")", null)));
 
 
         //String str = "qwefasdfas.png";

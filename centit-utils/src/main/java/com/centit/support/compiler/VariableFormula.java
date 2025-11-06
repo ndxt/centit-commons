@@ -165,22 +165,20 @@ public class VariableFormula {
         return formula.checkFormula();
     }
 
-    /*public static Set<String> attainFormulaVariable(String szExpress, Map<String, Function<Object[], Object>> extendFuncMap) {
-        VariableFormula formula = new VariableFormula();
-        formula.setExtendFuncMap(extendFuncMap);
-        formula.setFormula(szExpress);
-        DummyTranslate translate = new DummyTranslate();
-        formula.setTrans(translate);
-        formula.calcFormula();
-        return translate.getVariableSet();
-    }*/
-
     public static Set<String> attainFormulaVariable(String szExpress, Map<String, Function<Object[], Object>> extendFuncMap) {
         Lexer lex = new Lexer(szExpress);
         Set<String> variables = new HashSet<>();
         while(true){
             String aWord = lex.getAWord();
             if(StringUtils.isBlank(aWord)) break;
+            if (aWord.charAt(0) == '$') {
+                String str = lex.getAWord();
+                if (str.equals("{")) {
+                    str = lex.getStringUntil("}");
+                    variables.add(str);
+                }
+                continue;
+            }
             if(!Lexer.isLabel(aWord)) continue;
             if(VariableFormula.isKeyWord(aWord) || EmbedFunc.getFuncNo(aWord)>0)
                  continue;

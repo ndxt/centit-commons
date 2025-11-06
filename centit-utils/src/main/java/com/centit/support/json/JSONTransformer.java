@@ -53,19 +53,18 @@ public class JSONTransformer {
         if(templateObj == null){
             return null;
         }
-        if(templateObj instanceof String){
-            String value = (String)templateObj;
+        if(templateObj instanceof String value){
             if(value.isEmpty()){
                 return null;
             }
-            if(value.charAt(0) == '@'){
-                return dataSupport.mapTemplateString(value.substring(1));
-            } else if(value.charAt(0) == '#'){ // 两次计算 map-> formula ； eval 函数也可以实现同样的功能
-                String formula = dataSupport.mapTemplateString(value.substring(1));
-                return dataSupport.attainExpressionValue(formula);
-            } else {
-                return dataSupport.attainExpressionValue(value);
-            }
+            return switch (value.charAt(0)) {
+                case '@' -> value.substring(1);
+                case '#' ->// 两次计算 map-> formula ； eval 函数也可以实现同样的功能
+                    dataSupport.attainExpressionValue(
+                        dataSupport.mapTemplateString(value.substring(1)));
+                case '=' -> dataSupport.attainExpressionValue(value.substring(1));
+                default -> dataSupport.mapTemplateString(value);
+            };
         } else if(templateObj instanceof Map){
             Map<String, Object> tempMap = CollectionsOpt.objectToMap(templateObj);
             JSONObject jObj = new JSONObject();
@@ -109,9 +108,8 @@ public class JSONTransformer {
                 }
             }
             return jObj.isEmpty() ? null : jObj;
-        } else if(templateObj instanceof Collection) {
+        } else if(templateObj instanceof Collection<?> valueList) {
             JSONArray array = new JSONArray();
-            Collection<?> valueList = (Collection<?>) templateObj;
             for (Object ov : valueList) {
                 if (ov != null) {
                     Object transValue = transformer(ov, dataSupport);

@@ -55,7 +55,7 @@ public class DefaultJSONTransformDataSupport
 
     @Override
     public Object getVarValue(String labelName) {
-        if(labelName.startsWith("/")){
+        if(labelName.startsWith("__")){ // __. 代表root
             return ReflectionOpt.attainExpressionValue(data,
                 labelName.substring(1));
         } else if(labelName.startsWith("..")){
