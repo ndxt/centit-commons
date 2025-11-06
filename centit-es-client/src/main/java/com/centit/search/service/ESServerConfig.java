@@ -9,17 +9,17 @@ import org.apache.http.HttpHost;
  */
 public class ESServerConfig {
 
-    private String serverHostIp ;
+    private String serverHostIp;
     private String serverHostPort;
-    private String clusterName ;
-    private String username ;
-    private String password ;
+    private String clusterName;
+    private String username;
+    private String password;
     //#elasticsearch.filter.minScore
     private float minScore;
 
     private HttpHost[] httpHosts;
 
-    public ESServerConfig(){
+    public ESServerConfig() {
 
     }
 
@@ -28,7 +28,7 @@ public class ESServerConfig {
     }
 
     public void setUsername(String username) {
-        this.username = SecurityOptUtils.decodeSecurityString(username);;
+        this.username = SecurityOptUtils.decodeSecurityString(username);
     }
 
     public String getPassword() {
@@ -38,9 +38,6 @@ public class ESServerConfig {
     public void setPassword(String password) {
         this.password = SecurityOptUtils.decodeSecurityString(password);
     }
-
-
-
     public String getServerHostIp() {
         return serverHostIp;
     }
@@ -64,14 +61,6 @@ public class ESServerConfig {
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
     }
-
-    /*public String getIndexName() {
-        return indexName;
-    }
-
-    public void setIndexName(String indexName) {
-        this.indexName = indexName;
-    }*/
 
     public float getMinScore() {
         return minScore;
@@ -99,7 +88,7 @@ public class ESServerConfig {
             .getClusterName() != null
             && castOther.getClusterName() != null && this
             .getClusterName().equals(castOther.getClusterName())))
-            && this.getServerHostPort() == castOther.getServerHostPort() ;
+            && this.getServerHostPort() == castOther.getServerHostPort();
     }
 
     @Override
@@ -108,22 +97,22 @@ public class ESServerConfig {
         result = 37 * result
             + (this.getServerHostIp() == null ? 0 : this.getServerHostIp().hashCode());
         result = 37 * result
-            +  Integer.valueOf(this.getServerHostPort()).hashCode();
+            + Integer.valueOf(this.getServerHostPort()).hashCode();
         result = 37 * result
             + (this.getClusterName() == null ? 0 : this.getClusterName().hashCode());
         return result;
     }
 
     public HttpHost[] getHttpHosts() {
-        if(httpHosts==null || httpHosts.length==0){
-            String [] hosts = serverHostIp.split(",");
-            String [] ports = serverHostPort.split(",");
-            if(hosts.length>0){
+        if (httpHosts == null || httpHosts.length == 0) {
+            String[] hosts = serverHostIp.split(",");
+            String[] ports = serverHostPort.split(",");
+            if (hosts.length > 0) {
                 httpHosts = new HttpHost[hosts.length];
-                for(int i=0; i<hosts.length; i++){
+                for (int i = 0; i < hosts.length; i++) {
                     int port = 9300;
-                    if(ports.length>i){
-                        port = NumberBaseOpt.castObjectToInteger(ports[i],port);
+                    if (ports.length > i) {
+                        port = NumberBaseOpt.castObjectToInteger(ports[i], port);
                     }
                     httpHosts[i] = new HttpHost(hosts[i], port);
                 }
