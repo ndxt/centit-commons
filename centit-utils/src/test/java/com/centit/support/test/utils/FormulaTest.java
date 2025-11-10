@@ -165,8 +165,8 @@ public class FormulaTest {
         System.out.println(VariableFormula.calculate("capital (123.45, true)"));
 
         VariableFormula formula = new VariableFormula();
-        formula.addExtendFunc("ex", (a) -> NumberBaseOpt.castObjectToInteger(a[0]) * NumberBaseOpt.castObjectToInteger(a[0]));
-        formula.addExtendFunc("pi", (a) -> 3.14159);
+        formula.addExtendFunc("ex", (trans,a) -> NumberBaseOpt.castObjectToInteger(a[0]) * NumberBaseOpt.castObjectToInteger(a[0]));
+        formula.addExtendFunc("pi", (trans,a) -> 3.14159);
         Object r = formula.calcFormula("ex(4) + pi()");
         System.out.println(r);
 
