@@ -1,7 +1,6 @@
 package com.centit.support.compiler;
 
 public interface VariableTranslate {
-    String THE_DATA_SELF_LABEL = "__";
     /**
      * 标识符名-》标识符值的转变
      * 标识符 是以 字母和下划线开头的 字符串

@@ -3,6 +3,7 @@ package com.centit.support.json;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.compiler.ObjectTranslate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,17 +16,16 @@ import java.util.Map;
 public class JSONTransformer {
     protected static final Logger logger = LoggerFactory.getLogger(JSONTransformer.class);
 
-    public static void putObjectToJson(JSONObject jobj, String key, Object value){
+    public static void putObjectToJson(JSONObject jObj, String key, Object value){
         if(value == null){
-            jobj.remove(key);
+            jObj.remove(key);
             return;
         }
         /*if(value instanceof Map && ((Map<?,?>)value).size()==0){
-            jobj.remove(key);
+            jObj.remove(key);
             return
         }*/
-
-        jobj.put(key, value);
+        jObj.put(key, value);
     }
 
     public static void addObjectToJson(JSONArray jArray, Object value){
@@ -142,6 +142,7 @@ public class JSONTransformer {
 
     public static Object transformer(Object templateObj,
                                      Object dataSupport){
-        return transformer(templateObj, new DefaultJSONTransformDataSupport(dataSupport));
+        return transformer(templateObj, new DefaultJSONTransformDataSupport(
+             new ObjectTranslate(dataSupport)));
     }
 }

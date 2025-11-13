@@ -8,8 +8,7 @@ import com.centit.support.compiler.VariableTranslate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultJSONTransformDataSupport
-    implements VariableTranslate, JSONTransformDataSupport{
+public class DefaultJSONTransformDataSupport implements JSONTransformDataSupport{
     static class StackData{
         Object data;
         int  index;
@@ -20,12 +19,12 @@ public class DefaultJSONTransformDataSupport
             this.count = count;
         }
     }
-    private Object data;
+    private final VariableTranslate varTrans;
     private int stackLength;
-    private List<StackData> stack;
+    private final List<StackData> stack;
 
-    public DefaultJSONTransformDataSupport(Object obj){
-        this.data = obj;
+    public DefaultJSONTransformDataSupport(VariableTranslate varTrans){
+        this.varTrans = varTrans;
         this.stackLength = 0;
         this.stack = new ArrayList<>(10);
     }
@@ -55,17 +54,16 @@ public class DefaultJSONTransformDataSupport
 
     @Override
     public Object getVarValue(String labelName) {
-        if(labelName.startsWith("__.")){ // __. 代表root
-            return ReflectionOpt.attainExpressionValue(data,
-                labelName.substring(3));
+        if(labelName.startsWith("__.")){ // __. 代表root varTrans
+            return varTrans.getVarValue(labelName.substring(3));
         } else if(labelName.startsWith("..")){
             return ReflectionOpt.attainExpressionValue(
                 peekStackValue(),
                 labelName.substring(2));
         } else if(labelName.startsWith(".")){
-            return ReflectionOpt.attainExpressionValue(
-                currentValue(),
-                labelName.substring(1));
+            return stackLength>0 ?
+                ReflectionOpt.attainExpressionValue(getTopStackData(),  labelName.substring(1)) :
+                varTrans.getVarValue(labelName.substring(1));
         } else {
             if(stackLength>0) {
                 if ("__row_index".equals(labelName)) {
@@ -75,9 +73,9 @@ public class DefaultJSONTransformDataSupport
                     return getTopStack().count;
                 }
             }
-            return ReflectionOpt.attainExpressionValue(
-                currentValue(),
-                labelName);
+            return stackLength>0 ?
+                ReflectionOpt.attainExpressionValue(getTopStackData(), labelName):
+                varTrans.getVarValue(labelName);
         }
     }
 
@@ -85,11 +83,6 @@ public class DefaultJSONTransformDataSupport
     public String mapTemplateString(String templateString) {
         return Pretreatment.mapTemplateStringAsFormula(templateString, this);
     }
-
-    private Object currentValue(){
-        return stackLength>0? getTopStackData() : data;
-    }
-
 
     @Override
     public void pushStackValue(Object value, int rowIndex, int rowCount) {
