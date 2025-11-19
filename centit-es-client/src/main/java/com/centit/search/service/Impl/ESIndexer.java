@@ -1,25 +1,21 @@
 package com.centit.search.service.Impl;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
+import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
+import co.elastic.clients.elasticsearch.indices.ExistsRequest;
+import co.elastic.clients.elasticsearch.indices.IndexSettings;
+import co.elastic.clients.json.JsonData;
 import com.centit.search.annotation.ESType;
 import com.centit.search.document.DocumentUtils;
 import com.centit.search.document.ESDocument;
 import com.centit.search.service.Indexer;
 import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.StringReader;
 
 /**
  * Created by codefan on 17-6-12.
@@ -28,12 +24,12 @@ public class ESIndexer implements Indexer{
 
     private static final Logger logger = LoggerFactory.getLogger(ESIndexer.class);
 
-    private GenericObjectPool<RestHighLevelClient> clientPool;
+    private final GenericObjectPool<ElasticsearchClient> clientPool;
     private String indexName;
     private boolean sureIndexExist;
-    private Class<?> objType ;
+    private final Class<?> objType ;
 
-    public ESIndexer(GenericObjectPool<RestHighLevelClient> clientPool,
+    public ESIndexer(GenericObjectPool<ElasticsearchClient> clientPool,
                      String indexName, Class<?> objType){
         this.clientPool = clientPool;
         this.indexName=indexName;
@@ -41,19 +37,15 @@ public class ESIndexer implements Indexer{
         this.sureIndexExist = false;
     }
 
-    public void setClientPool(GenericObjectPool<RestHighLevelClient> clientPool) {
-        this.clientPool = clientPool;
-    }
-
     private void makeSureIndexIsExist() {
         if(sureIndexExist){
             return;
         }
-        RestHighLevelClient client = null;
+        ElasticsearchClient client = null;
         try {
             client = clientPool.borrowObject();
-            GetIndexRequest request = new GetIndexRequest(indexName);
-            if (!client.indices().exists(request, RequestOptions.DEFAULT)) {
+            ExistsRequest request = ExistsRequest.of(e -> e.index(indexName));
+            if (!client.indices().exists(request).value()) {
                 createEsIndex(indexName, objType);
             }
             sureIndexExist = true;
@@ -70,22 +62,25 @@ public class ESIndexer implements Indexer{
     private void createEsIndex(String indexName, Class<?> objType) {
         this.indexName = indexName;
         //判断索引是否存在，不存在则新建
-        RestHighLevelClient client = null;
+        ElasticsearchClient client = null;
         try {
             client = clientPool.borrowObject();
-
-            CreateIndexRequest request = new CreateIndexRequest(indexName);
             ESType esType = objType.getAnnotation(ESType.class);
-            request.settings(Settings.builder()
-                .put("index.number_of_shards", esType.shards())
-                .put("index.number_of_replicas", esType.replicas()));
+            // 构建索引设置
+            IndexSettings settings = IndexSettings.of(s -> s
+                .numberOfShards(String.valueOf(esType.shards()))
+                .numberOfReplicas(String.valueOf(esType.replicas())));
 
-            request.mapping(
-                DocumentUtils.obtainDocumentMapping(objType).toJSONString(),
-                XContentType.JSON);
-            //client.admin().indices().putMapping(putMappingRequest).actionGet();
-            client.indices().create(request, RequestOptions.DEFAULT);
-        //return client;
+            // 构建映射
+            String mappingJson = DocumentUtils.obtainDocumentMapping(objType).toJSONString();
+            TypeMapping mapping = TypeMapping.of(m -> m.withJson(new StringReader(mappingJson)));
+
+            CreateIndexRequest request = CreateIndexRequest.of(c -> c
+                .index(indexName)
+                .settings(settings)
+                .mappings(mapping));
+
+            client.indices().create(request);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }finally {
@@ -103,17 +98,17 @@ public class ESIndexer implements Indexer{
     @Override
     public String saveNewDocument(ESDocument document) {
         makeSureIndexIsExist();
-        RestHighLevelClient client = null;
+        ElasticsearchClient client = null;
         try {
             client = clientPool.borrowObject();
-            /*String type = document.obtainDocumentType();
-            String docId = document.obtainDocumentId();*/
-            IndexRequest request = new IndexRequest(indexName)
-                            .id(document.obtainDocumentId())
-                            .source(document.toJSONObject());
 
-            IndexResponse indexResponse = client.index(request, RequestOptions.DEFAULT);
-            return indexResponse.getId();
+            IndexRequest<JsonData> request = IndexRequest.of(i -> i
+                .index(indexName)
+                .id(document.obtainDocumentId())
+                .document(JsonData.fromJson(document.toJSONObject().toJSONString())));
+
+            IndexResponse indexResponse = client.index(request);
+            return indexResponse.id();
         }
         catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -143,14 +138,16 @@ public class ESIndexer implements Indexer{
      */
     @Override
     public boolean deleteDocument(String docId) {
-        RestHighLevelClient client = null;
+        ElasticsearchClient client = null;
         try {
             client = clientPool.borrowObject();
-            /*DeleteResponse response = client.prepareDelete(
-                indexName, docType, docId).execute().actionGet();*/
-            DeleteRequest request = new DeleteRequest(indexName, docId);
-            DeleteResponse response = client.delete(request, RequestOptions.DEFAULT);
-            return response.status().getStatus() == 200;
+
+            DeleteRequest request = DeleteRequest.of(d -> d
+                .index(indexName)
+                .id(docId));
+
+            DeleteResponse response = client.delete(request);
+            return response.result().jsonValue().equals("deleted");
         }
         catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -183,17 +180,17 @@ public class ESIndexer implements Indexer{
      */
     @Override
     public int updateDocument(String docId, ESDocument document) {
-        RestHighLevelClient client = null;
+        ElasticsearchClient client = null;
         try {
             client = clientPool.borrowObject();
-            UpdateRequest request = new UpdateRequest()
-                        .index(indexName)
-                        //.type(type)
-                        .id(docId)
-                        .doc(document.toJSONObject());
-            UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
-            int ret = response.status().getStatus();
-            return (ret == 200)?1:0;
+
+            UpdateRequest<JsonData, JsonData> request = UpdateRequest.of(u -> u
+                .index(indexName)
+                .id(docId)
+                .doc(JsonData.fromJson(document.toJSONObject().toJSONString())));
+
+            UpdateResponse<JsonData> response = client.update(request, JsonData.class);
+            return response.result().jsonValue().equals("updated") ? 1 : 0;
         }
         catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -214,27 +211,41 @@ public class ESIndexer implements Indexer{
     @Override
     public String mergeDocument(ESDocument document) {
         makeSureIndexIsExist();
-        RestHighLevelClient client = null;
+        ElasticsearchClient client = null;
         try {
             client = clientPool.borrowObject();
             String docId = document.obtainDocumentId();
-            GetRequest request = new GetRequest(indexName)
-                        .id(docId);
-            if(client.exists(request, RequestOptions.DEFAULT)) {
-                UpdateRequest req = new UpdateRequest()
+
+            // 判断文档是否存在
+            GetRequest getRequest = GetRequest.of(g -> g
+                .index(indexName)
+                .id(docId));
+
+            boolean exists;
+            try {
+                GetResponse<JsonData> getResponse = client.get(getRequest, JsonData.class);
+                exists = getResponse.found();
+            } catch (Exception e) {
+                // 文档不存在时会抛出异常，设置exists为false
+                exists = false;
+            }
+
+            if(exists) {
+                UpdateRequest<JsonData, JsonData> updateReq = UpdateRequest.of(u -> u
                     .index(indexName)
-                    //.type(type)
                     .id(docId)
-                    .doc(document.toJSONObject());
-                UpdateResponse response = client.update(req, RequestOptions.DEFAULT);
-                int ret = response.status().getStatus();
-                return (ret == 200)? response.getId() : null;
-            }else {
-                IndexRequest req = new IndexRequest(indexName)
-                        .id(docId)
-                        .source(document.toJSONObject());
-                IndexResponse indexResponse = client.index(req, RequestOptions.DEFAULT);
-                return indexResponse.getId();
+                    .doc(JsonData.fromJson(document.toJSONObject().toJSONString())));
+
+                UpdateResponse<JsonData> response = client.update(updateReq, JsonData.class);
+                return response.result().jsonValue().equals("updated") ? response.id() : null;
+            } else {
+                IndexRequest<JsonData> indexReq = IndexRequest.of(i -> i
+                    .index(indexName)
+                    .id(docId)
+                    .document(JsonData.fromJson(document.toJSONObject().toJSONString())));
+
+                IndexResponse indexResponse = client.index(indexReq);
+                return indexResponse.id();
             }
         }
         catch (Exception e) {

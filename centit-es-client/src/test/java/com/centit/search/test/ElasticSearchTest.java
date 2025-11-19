@@ -1,27 +1,21 @@
 package com.centit.search.test;
 
-
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
+import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.json.JsonData;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.document.ObjectDocument;
 import com.centit.search.utils.TikaTextExtractor;
+import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.http.HttpHost;
 import org.apache.tika.exception.TikaException;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -34,139 +28,124 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by zhang_gd on 2017/6/12.
  */
-@SuppressWarnings("deprecated")
 public class ElasticSearchTest {
-    RestHighLevelClient client;
+    ElasticsearchClient client;
 
-    @SuppressWarnings({ "unchecked" })
     public void before() throws UnknownHostException, InterruptedException, ExecutionException {
-        Settings esSettings = Settings.builder()
-                //.put("cluster.name", "elasticsearch_zgd") //设置ES实例的名称
-                .put("client.transport.sniff", true) //自动嗅探整个集群的状态，把集群中其他ES节点的ip添加到本地的客户端列表中
-                .build();
-        //client = new PreBuiltTransportClient(esSettings);//初始化client较老版本发生了变化，此方法有几个重载方法，初始化插件等。
-        //此步骤添加IP，至少一个，其实一个就够了，因为添加了自动嗅探配置
-        //client.addTransportAddress(new TransportAddress(InetAddress.getByName("localhost"), 9300));
-        client = new RestHighLevelClient(
-            RestClient.builder(
-                new HttpHost("192.168.134.250", 32590, "http")) );
+        // 创建 REST 客户端
+        RestClient restClient = RestClient.builder(
+            new HttpHost("192.168.134.250", 32590, "http")).build();
+
+        // 创建传输层
+        RestClientTransport transport = new RestClientTransport(
+            restClient, new JacksonJsonpMapper());
+
+        // 创建 Elasticsearch 客户端
+        client = new ElasticsearchClient(transport);
         System.out.println("success connect");
     }
 
     //@Test
     public void index() throws Exception {
-        Map<String,Object> infoMap = new HashMap<String, Object>();
+        Map<String, Object> infoMap = new HashMap<>();
         infoMap.put("name", "广告信息11");
         infoMap.put("title", "我的广告22");
         infoMap.put("createTime", new Date());
         infoMap.put("count", 1022);
-        //IndexResponse indexResponse = client.prepareIndex("test", "info").setSource(infoMap).execute().actionGet();
-        IndexRequest request = new IndexRequest()
-                    .index("test")
-                    .type("info")
-                    .source(infoMap);
-        IndexResponse indexResponse = client.index(request, RequestOptions.DEFAULT);
-        System.out.println("id:"+indexResponse.getId());
+
+        IndexRequest<JsonData> request = IndexRequest.of(i -> i
+            .index("test")
+            .document(JsonData.of(infoMap)));
+
+        IndexResponse indexResponse = client.index(request);
+        System.out.println("id:" + indexResponse.id());
     }
 
     //@Test
     public void get() throws Exception {
-        GetRequest getRequest = new GetRequest("test", "info", "peVI2WoB192wz409binr");
-        /*GetResponse response = client.prepareGet("test", "info", "AVyf5lkJDq8ZfYxZWJfE")
-                .execute().actionGet();*/
-        GetResponse response = client.get(getRequest, RequestOptions.DEFAULT);
-        System.out.println("response.getId():"+response.getId());
-        System.out.println("response.getSourceAsString():"+response.getSourceAsString());
+        GetRequest getRequest = GetRequest.of(g -> g
+            .index("test")
+            .id("peVI2WoB192wz409binr"));
+
+        GetResponse<JsonData> response = client.get(getRequest, JsonData.class);
+        System.out.println("response.getId():" + response.id());
+        if (response.source() != null) {
+            System.out.println("response.getSourceAsString():" + response.source().toJson().toString());
+        }
     }
 
     //@Test
     public void testGet() throws IOException {
+        QueryStringQuery queryStringQuery = QueryStringQuery.of(q -> q.query(""));
 
-//        String fields = "content";
-//        QueryBuilder queryBuilder = QueryBuilders.queryStringQuery("git");
-//        SearchResponse sr = client.prepareSearch("test").setTypes("info").addDocValueField(fields).setQuery(queryBuilder).execute().actionGet();
-//        JSONArray array = new JSONArray();
-//        SearchHits hits = sr.getHits();
-//        for (SearchHit hit : hits.getHits()){
-//            hit.getFields().entrySet();
-//            System.out.println(hit.getSourceAsString());
-//        }
-        QueryBuilder queryBuilder2 = QueryBuilders.queryStringQuery("");
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(queryBuilder2);
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.indices("objects");
-        //searchRequest.types("info");
-       // searchRequest.source(searchSourceBuilder);
-        SearchResponse actionGet = client.search(searchRequest, RequestOptions.DEFAULT);
-        /*SearchResponse actionGet = client
-                .prepareSearch("test")
-                .setTypes("info")
-                .fields("content")
-                //.setTypes("info")
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+            .index("objects")
+            .query(queryStringQuery._toQuery()));
 
-                //.fields("content")
-//                .addDocValueField("content")
-//                .addStoredField("content")
-//                .addFieldDataField("content")
-                .setQuery(queryBuilder2)
-                .execute()
-                .actionGet();*/
-        SearchHits hits = actionGet.getHits();
-        System.out.println("查询到记录数=" + hits.getTotalHits());
-//        List<Map<String, Object>> matchRsult = new LinkedList<>();
-        for (SearchHit hit : hits.getHits()){
-            /*Set<Map.Entry<String, DocumentField>> fieldEntry =  hit.getFields().entrySet();
-            JSONObject json = new JSONObject();
-            for(Map.Entry<String, DocumentField> entry:fieldEntry){
-                json.put(entry.getValue().getName(), entry.getValue().getValue());
-            }*/
-            Map<String, Object> json = hit.getSourceAsMap();
-            if(json==null) {
-                json = new HashMap<>(4);
+        SearchResponse<JsonData> response = client.search(searchRequest, JsonData.class);
+
+        if (response.hits() != null && response.hits().total() != null) {
+            System.out.println("查询到记录数=" + response.hits().total().value());
+
+            for (Hit<JsonData> hit : response.hits().hits()) {
+                Map<String, Object> json = new HashMap<>();
+                if (hit.source() != null) {
+                    // 将 JsonData 转换为 Map
+                    json = hit.source().toJson().asJsonObject()
+                        .entrySet().stream()
+                        .collect(HashMap::new, (map, entry) -> {
+                            map.put(entry.getKey(), entry.getValue().toString());
+                        }, HashMap::putAll);
+                }
+                System.out.println(json.toString());
             }
-            System.out.println(json.toString());
-//            matchRsult.add(hit.getSource());
-//            System.out.println(hit.getSourceAsString());
         }
     }
 
     //@Test
     public void queryGet() throws Exception {
-        //term查询
-//        QueryBuilder queryBuilder = QueryBuilders.termQuery("age", 50) ;
-        //range查询
-        QueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("age").gt(50);
+        // range查询
+        RangeQuery rangeQuery = RangeQuery.of(r -> r
+            .field("age")
+            .gt(JsonData.of(50)));
 
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.query(rangeQueryBuilder);
-        searchSourceBuilder.sort("age", SortOrder.DESC);
-        searchSourceBuilder.size(20);
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+            .index("sxq")
+            .query(rangeQuery._toQuery())
+            .sort(sort -> sort.field(f -> f.field("age").order(SortOrder.Desc)))
+            .size(20));
 
-        SearchRequest searchRequest = new SearchRequest()
-                        .indices("sxq")
-                        .types("user");
-        searchRequest.source(searchSourceBuilder);
-        SearchResponse searchResponse = client.search(searchRequest,RequestOptions.DEFAULT);
-        /*SearchResponse searchResponse = client.prepareSearch("sxq")
-                .setTypes("user")
-                .setQuery(rangeQueryBuilder)
-                .addSort("age", SortOrder.DESC)
-                .setSize(20)
-                .execute()
-                .actionGet();*/
-        SearchHits hits = searchResponse.getHits();
-        System.out.println("查到记录数："+hits.getTotalHits());
-        SearchHit[] searchHists = hits.getHits();
-        if(searchHists.length>0){
-            for(SearchHit hit:searchHists){
-                String name =  (String)hit.getSourceAsMap().get("name");
-                Integer age = (Integer)hit.getSourceAsMap().get("age");
-                System.out.format("name:%s ,age :%d \n",name ,age);
+        SearchResponse<JsonData> searchResponse = client.search(searchRequest, JsonData.class);
+
+        if (searchResponse.hits() != null && searchResponse.hits().total() != null) {
+            System.out.println("查到记录数：" + searchResponse.hits().total().value());
+
+            for (Hit<JsonData> hit : searchResponse.hits().hits()) {
+                if (hit.source() != null) {
+                    Map<String, Object> sourceMap = hit.source().toJson().asJsonObject()
+                        .entrySet().stream()
+                        .collect(HashMap::new, (map, entry) -> {
+                            /*if (entry.getValue().isJsonPrimitive()) {
+                                if (entry.getValue().getAsJsonPrimitive().isString()) {
+                                    map.put(entry.getKey(), entry.getValue().getAsString());
+                                } else if (entry.getValue().getAsJsonPrimitive().isNumber()) {
+                                    map.put(entry.getKey(), entry.getValue().getAsNumber());
+                                }
+                            } else {*/
+                                map.put(entry.getKey(), entry.getValue());
+                            //}
+                        }, HashMap::putAll);
+
+                    String name = StringBaseOpt.castObjectToString(sourceMap.get("name"));
+                    Integer age = sourceMap.get("age") instanceof Number ?
+                        ((Number) sourceMap.get("age")).intValue() : null;
+                    if (name != null && age != null) {
+                        System.out.format("name:%s ,age :%d \n", name, age);
+                    }
+                }
             }
         }
     }
-
 
     public ObjectDocument setIndexDocument() throws IOException, SAXException, TikaException {
         ObjectDocument indexDocument = new ObjectDocument();
@@ -183,18 +162,19 @@ public class ElasticSearchTest {
     //@Test
     public void Obj2json() throws IOException, SAXException, TikaException {
         ObjectDocument indexDocument = setIndexDocument();
-        String aa = JSONObject.toJSONString(indexDocument);
-        IndexRequest request = new IndexRequest("test", "info");
-        //IndexResponse indexResponse = client.prepareIndex("test", "info").setSource(aa).execute().actionGet();
-        IndexResponse indexResponse = client.index(request, RequestOptions.DEFAULT);
-        System.out.println("id:"+indexResponse.getId());
+        String jsonString = JSONObject.toJSONString(indexDocument);
 
-        /*ImmutableOpenMap<String, MappingMetaData> mappings = client.admin().cluster().prepareState().execute()
-                .actionGet().getState().getMetaData().getIndices().get(config.getIndexName()).getMappings();
-        for (ObjectObjectCursor<String, MappingMetaData> cursor : mappings) {
-            System.out.println(cursor.key); // 索引下的每个type
-            System.out.println(cursor.value.getSourceAsMap()); // 每个type的mapping
-        }*/
+        IndexRequest<JsonData> request = IndexRequest.of(i -> i
+            .index("test")
+            .document(JsonData.fromJson(jsonString)));
+
+        IndexResponse indexResponse = client.index(request);
+        System.out.println("id:" + indexResponse.id());
     }
 
+    public void close() throws IOException {
+        if (client != null && client._transport() != null) {
+            client._transport().close();
+        }
+    }
 }

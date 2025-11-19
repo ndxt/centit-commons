@@ -1,5 +1,6 @@
 package com.centit.search.service;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import com.centit.search.document.DocumentUtils;
 import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.Impl.ESSearcher;
@@ -9,7 +10,6 @@ import com.centit.support.file.PropertiesReader;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.elasticsearch.client.RestHighLevelClient;
 
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,15 +26,15 @@ public abstract class IndexerSearcherFactory {
     private static ConcurrentHashMap<String, ESSearcher> searcherMap
             = new ConcurrentHashMap<>();
 
-    private static ConcurrentHashMap<ESServerConfig, GenericObjectPool<RestHighLevelClient>> clientPoolMap
+    private static ConcurrentHashMap<ElasticConfig, GenericObjectPool<ElasticsearchClient>> clientPoolMap
         = new ConcurrentHashMap<>();
 
 
-    public static GenericObjectPool<RestHighLevelClient> obtainclientPool(ESServerConfig config, boolean createNew){
-        GenericObjectPool<RestHighLevelClient> clientPool =
+    public static GenericObjectPool<ElasticsearchClient> obtainclientPool(ElasticConfig config, boolean createNew){
+        GenericObjectPool<ElasticsearchClient> clientPool =
             clientPoolMap.get(config);
         if(clientPool==null && createNew) {
-            GenericObjectPoolConfig<RestHighLevelClient> poolConfig = new GenericObjectPoolConfig<>();
+            GenericObjectPoolConfig<ElasticsearchClient> poolConfig = new GenericObjectPoolConfig<>();
             poolConfig.setMaxTotal(500);
             poolConfig.setMinIdle(50);
             clientPool = new GenericObjectPool<>(new PooledRestClientFactory(config),
@@ -44,7 +44,7 @@ public abstract class IndexerSearcherFactory {
         return clientPool;
     }
 
-    public static GenericObjectPool<RestHighLevelClient> obtainclientPool(ESServerConfig config){
+    public static GenericObjectPool<ElasticsearchClient> obtainclientPool(ElasticConfig config){
         return obtainclientPool(config, true);
     }
 
@@ -65,7 +65,7 @@ public abstract class IndexerSearcherFactory {
      * @return Indexer 索引器
      */
 
-    public static ESIndexer obtainIndexer(ESServerConfig config, Class<?> objType) {
+    public static ESIndexer obtainIndexer(ElasticConfig config, Class<?> objType) {
         String indexName = DocumentUtils.obtainDocumentIndexName(objType);
         if(StringUtils.isBlank(indexName)){
             return null;
@@ -99,7 +99,7 @@ public abstract class IndexerSearcherFactory {
      * @return Indexer 检索器
      */
 
-    public static ESSearcher obtainSearcher(ESServerConfig config, Class<?> objType) {
+    public static ESSearcher obtainSearcher(ElasticConfig config, Class<?> objType) {
         String indexName = DocumentUtils.obtainDocumentIndexName(objType);
         if(indexName==null){
             return null;
@@ -108,7 +108,7 @@ public abstract class IndexerSearcherFactory {
         if(search!=null) {
             return search;
         }
-        ESSearcher searcher = new ESSearcher(config, obtainclientPool(config));
+        ESSearcher searcher = new ESSearcher(obtainclientPool(config));
         searcher.initTypeFields(indexName, objType);
         searcher.setHighlightPreTags(new String[]{"<span class='highlight'>"});
         searcher.setHighlightPostTags(new String[]{"</span>"});
@@ -121,9 +121,9 @@ public abstract class IndexerSearcherFactory {
      * @param properties 属性文件
      * @return elastic search 服务器的配置信息
      */
-    public static ESServerConfig loadESServerConfigFormProperties(Properties properties){
+    public static ElasticConfig loadESServerConfigFormProperties(Properties properties){
 
-        ESServerConfig config = new ESServerConfig();
+        ElasticConfig config = new ElasticConfig();
         config.setServerHostIp(properties.getProperty("elasticsearch.server.ip"));
         config.setServerHostPort(properties.getProperty("elasticsearch.server.port"));
         config.setClusterName(properties.getProperty("elasticsearch.server.cluster"));
@@ -134,7 +134,7 @@ public abstract class IndexerSearcherFactory {
         return config;
     }
 
-    public static ESServerConfig loadESServerConfigFormProperties(String propertiesFile){
+    public static ElasticConfig loadESServerConfigFormProperties(String propertiesFile){
         Properties properties = PropertiesReader.getClassPathProperties(propertiesFile);
         return loadESServerConfigFormProperties(properties);
     }
