@@ -3,6 +3,8 @@ package com.centit.search.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.centit.support.algorithm.BooleanBaseOpt;
+import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.security.SecurityOptUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
@@ -25,21 +27,12 @@ public abstract class ElasticsearchClientFactory {
     public static ElasticsearchClient createClient(ElasticConfig config) {
         try {
             // 构建HttpHost数组
-            String[] urls = config.getServerUrls();
-            HttpHost[] httpHosts = new HttpHost[urls.length];
-            for (int i = 0; i < urls.length; i++) {
-                String url = urls[i];
-                if (url.startsWith("http://")) {
-                    String[] parts = url.substring(7).split(":");
-                    httpHosts[i] = new HttpHost(parts[0], Integer.parseInt(parts[1]), "http");
-                } else if (url.startsWith("https://")) {
-                    String[] parts = url.substring(8).split(":");
-                    httpHosts[i] = new HttpHost(parts[0], Integer.parseInt(parts[1]), "https");
-                }
-            }
+            HttpHost[] httpHosts = new HttpHost[1];
+            httpHosts[0] = new HttpHost(config.getServerHostIp(),
+                NumberBaseOpt.castObjectToInteger(config.getServerHostPort(), 9200),
+                BooleanBaseOpt.castObjectToBoolean(config.getUsingSSL(), false)?"https":"http");
 
             RestClientBuilder clientBuilder = RestClient.builder(httpHosts);
-
             // 添加用户认证
             if (StringUtils.isNotBlank(config.getUsername()) && StringUtils.isNotBlank(config.getPassword())) {
                 final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();

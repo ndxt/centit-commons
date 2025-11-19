@@ -36,27 +36,17 @@ public class ESTest {
     public static void main(String[] args) {
         try{
             testQuery();
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public static void testQuery() throws Exception {
-        //ESServerConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/src/test/resources/system.properties");
-        ElasticConfig config = new ElasticConfig();
-        config.setServerHostIp("192.168.134.250");
-        config.setServerHostPort("32590");
-        config.setClusterName("elastic");
-        //config.setUsername("elastic");
-        config.setPassword("********");
+        ElasticConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/system.properties");
         /*config.setIndexName(
                 StringUtils.lowerCase(properties.getProperty("elasticsearch.index")));*/
         config.setMinScore(0.5f);
-
-
         ElasticsearchClient esClient = ElasticsearchClientFactory.createClient(config);
-
         // 构建多字段匹配查询
         MultiMatchQuery multiMatchQuery = MultiMatchQuery.of(m -> m
             .query("交通")
@@ -82,7 +72,7 @@ public class ESTest {
 
         // 构建搜索请求
         SearchRequest searchRequest = SearchRequest.of(s -> s
-            .index("jsjtkj_index")
+            .index("objects")
             .query(boolQuery._toQuery())
             .from(0)
             .size(10)
@@ -93,6 +83,7 @@ public class ESTest {
 
         JSONArray jsonArray = returnHighlightResult(searchResponse, true);
         System.out.println(jsonArray.toJSONString());
+        ElasticsearchClientFactory.closeClient(esClient);
     }
     private static JSONArray returnHighlightResult(SearchResponse<JsonData> searchResponse, Boolean explain) {
         JSONArray jsonArray = new JSONArray();
@@ -134,13 +125,13 @@ public class ESTest {
     }
 
     public static void testESIndex3(){
-        ElasticConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/src/test/resources/system.properties");
+        ElasticConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/system.properties");
         ESIndexer indexer = IndexerSearcherFactory.obtainIndexer(config, ObjectDocument.class);
         //testESIndex2();
         ObjectDocument obj= new ObjectDocument();
         obj.setOptId("ABC");
         obj.setOptTag(UuidOpt.getUuidAsString22());
-        obj.setContent("测试我的索引，使用 elasticsearch-rest-high-level-client");
+        obj.setContent("测试我的索引，使用 elasticsearch-rest-high-level-client， 包括交通信息");
         indexer.saveNewDocument(obj);
         System.out.println("Done!");
     }

@@ -1,10 +1,7 @@
 package com.centit.search.service;
 
-import com.centit.support.algorithm.NumberBaseOpt;
 import com.centit.support.security.SecurityOptUtils;
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Setter;
 
 /**
  * Created by codefan on 17-6-22.
@@ -16,14 +13,8 @@ public class ElasticConfig {
     private String clusterName ;
     private String username ;
     private String password ;
+    private String usingSSL ;
     private float minScore;
-
-    @Setter(AccessLevel.NONE)
-    private String[] serverUrls;
-
-    public ElasticConfig(){
-
-    }
 
     public void setUsername(String username) {
         this.username = SecurityOptUtils.decodeSecurityString(username);;
@@ -58,21 +49,4 @@ public class ElasticConfig {
         return result;
     }
 
-    public String[] getServerUrls() {
-        if(serverUrls == null || serverUrls.length == 0){
-            String[] hosts = serverHostIp.split(",");
-            String[] ports = serverHostPort.split(",");
-            if(hosts.length > 0){
-                serverUrls = new String[hosts.length];
-                for(int i = 0; i < hosts.length; i++){
-                    int port = 9200;
-                    if(ports.length > i){
-                        port = NumberBaseOpt.castObjectToInteger(ports[i], port);
-                    }
-                    serverUrls[i] = "http://" + hosts[i] + ":" + port;
-                }
-            }
-        }
-        return serverUrls;
-    }
 }
