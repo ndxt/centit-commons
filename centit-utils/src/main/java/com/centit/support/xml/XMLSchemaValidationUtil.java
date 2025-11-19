@@ -10,6 +10,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public abstract class XMLSchemaValidationUtil {
     public static JSONObject validate(InputStream xsdPath, InputStream xmlPath) {
@@ -17,8 +18,6 @@ public abstract class XMLSchemaValidationUtil {
             SchemaFactory factory =
                 SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             // 禁用外部实体访问，提高安全性
-            factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 
             Schema schema = factory.newSchema(new StreamSource(xsdPath));
             Validator validator = schema.newValidator();
