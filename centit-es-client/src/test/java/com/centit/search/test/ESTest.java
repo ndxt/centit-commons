@@ -55,7 +55,7 @@ public class ESTest {
         config.setMinScore(0.5f);
 
 
-        ElasticsearchClient esClient = ElasticsearchClientManager.getClient(config);
+        ElasticsearchClient esClient = ElasticsearchClientFactory.createClient(config);
 
         // 构建多字段匹配查询
         MultiMatchQuery multiMatchQuery = MultiMatchQuery.of(m -> m
@@ -151,7 +151,7 @@ public class ESTest {
             config.setServerHostIp("192.168.134.250");
             config.setServerHostPort("32404");
 
-            ElasticsearchClient client = ElasticsearchClientManager.getClient(config);
+            ElasticsearchClient client = ElasticsearchClientFactory.createClient(config);
 
             // 构建文档数据
             final Map<String, Object> map = new HashMap<>();

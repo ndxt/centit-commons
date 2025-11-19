@@ -10,6 +10,7 @@ import co.elastic.clients.json.JsonData;
 import com.centit.search.annotation.ESType;
 import com.centit.search.document.DocumentUtils;
 import com.centit.search.document.ESDocument;
+import com.centit.search.service.ElasticsearchClientFactory;
 import com.centit.search.service.Indexer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,14 @@ public class ESIndexer implements Indexer{
         this.indexName = indexName;
         this.objType = objType;
         this.sureIndexExist = false;
+    }
+
+    public ElasticsearchClient fetchClient() {
+        return client;
+    }
+
+    public void releaseClient(){
+        ElasticsearchClientFactory.closeClient(client);
     }
 
     private void makeSureIndexIsExist() {

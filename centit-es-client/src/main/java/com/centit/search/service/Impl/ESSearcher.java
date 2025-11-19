@@ -14,6 +14,7 @@ import co.elastic.clients.json.JsonData;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.annotation.ESField;
 import com.centit.search.document.DocumentUtils;
+import com.centit.search.service.ElasticsearchClientFactory;
 import com.centit.search.service.Searcher;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
@@ -65,6 +66,10 @@ public class ESSearcher implements Searcher{
 
     public ElasticsearchClient fetchClient() {
         return client;
+    }
+
+    public void releaseClient(){
+        ElasticsearchClientFactory.closeClient(client);
     }
 
     public void initTypeFields(Class<?> objType) {

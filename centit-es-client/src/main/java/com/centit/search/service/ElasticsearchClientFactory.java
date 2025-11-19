@@ -13,30 +13,16 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Elasticsearch 客户端管理器 - 使用单例模式
  * ElasticsearchClient 是线程安全的，建议应用程序中使用单个实例
  */
-public abstract class ElasticsearchClientManager {
-
-    private static final ConcurrentHashMap<ElasticConfig, ElasticsearchClient> clientCache
-        = new ConcurrentHashMap<>();
-
-    /**
-     * 获取 ElasticsearchClient 实例（单例）
-     * @param config ES配置
-     * @return ElasticsearchClient 实例
-     */
-    public static ElasticsearchClient getClient(ElasticConfig config) {
-        return clientCache.computeIfAbsent(config, ElasticsearchClientManager::createClient);
-    }
-
+public abstract class ElasticsearchClientFactory {
     /**
      * 创建新的 ElasticsearchClient
      */
-    private static ElasticsearchClient createClient(ElasticConfig config) {
+    public static ElasticsearchClient createClient(ElasticConfig config) {
         try {
             // 构建HttpHost数组
             String[] urls = config.getServerUrls();
@@ -93,8 +79,7 @@ public abstract class ElasticsearchClientManager {
     /**
      * 关闭指定配置的客户端
      */
-    public static void closeClient(ElasticConfig config) {
-        ElasticsearchClient client = clientCache.remove(config);
+    public static void closeClient(ElasticsearchClient client) {
         if (client != null) {
             try {
                 client._transport().close();
@@ -102,26 +87,5 @@ public abstract class ElasticsearchClientManager {
                 // ignore
             }
         }
-    }
-
-    /**
-     * 关闭所有客户端
-     */
-    public static void closeAllClients() {
-        for (ElasticsearchClient client : clientCache.values()) {
-            try {
-                client._transport().close();
-            } catch (IOException e) {
-                // ignore
-            }
-        }
-        clientCache.clear();
-    }
-
-    /**
-     * 获取客户端缓存大小
-     */
-    public static int getCacheSize() {
-        return clientCache.size();
     }
 }

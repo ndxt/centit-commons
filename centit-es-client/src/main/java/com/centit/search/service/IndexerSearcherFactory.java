@@ -50,7 +50,7 @@ public abstract class IndexerSearcherFactory {
         if(index!=null) {
             return index;
         }
-        ESIndexer indexer = new ESIndexer(ElasticsearchClientManager.getClient(config), indexName, objType);
+        ESIndexer indexer = new ESIndexer(ElasticsearchClientFactory.createClient(config), indexName, objType);
         //indexer.createIndexIfNotExist(indexName, objType);
         indexerMap.put(indexName,indexer);
         return indexer;
@@ -83,7 +83,7 @@ public abstract class IndexerSearcherFactory {
         if(search!=null) {
             return search;
         }
-        ESSearcher searcher = new ESSearcher(ElasticsearchClientManager.getClient(config));
+        ESSearcher searcher = new ESSearcher(ElasticsearchClientFactory.createClient(config));
         searcher.initTypeFields(indexName, objType);
         searcher.setHighlightPreTags(new String[]{"<span class='highlight'>"});
         searcher.setHighlightPostTags(new String[]{"</span>"});

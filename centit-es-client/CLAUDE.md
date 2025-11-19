@@ -99,7 +99,7 @@ ESSearcher searcher = IndexerSearcherFactory.obtainSearcher(config, DocumentClas
 
 ## 迁移说明
 
-项目已从 Elasticsearch Rest High Level Client 7.17.21 迁移至 Elasticsearch Java Client 7.17.29：
+项目已从 Elasticsearch Rest High Level Client 7.17.21 迁移至 Elasticsearch Java Client 7.17.27：
 
 **主要变更：**
 1. **客户端类型**：`RestHighLevelClient` → `ElasticsearchClient`
