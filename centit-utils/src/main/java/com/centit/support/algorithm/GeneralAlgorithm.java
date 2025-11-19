@@ -1,7 +1,6 @@
 package com.centit.support.algorithm;
 
 import com.alibaba.fastjson2.util.TypeUtils;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -97,6 +96,7 @@ public abstract class GeneralAlgorithm {
                 Comparator<Object> compare = Collator.getInstance(java.util.Locale.CHINA);
                 return compare.compare(operand, operand2);
             }
+            //noinspection unchecked
             return ObjectUtils.compare((Comparable)operand , (Comparable)operand2);
         }
 
