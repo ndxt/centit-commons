@@ -65,12 +65,29 @@ mvn clean package
 
 ## 开发注意事项
 
-1. **连接配置**: ES服务器配置通过 `ESServerConfig` 管理，支持集群模式
-2. **连接池**: 使用 `PooledRestClientFactory` 管理ES客户端连接池
+1. **连接配置**: ES服务器配置通过 `ElasticConfig` 管理，支持集群模式
+2. **客户端管理**: 使用 `ElasticsearchClientManager` 单例模式管理客户端，ElasticsearchClient 本身是线程安全的
 3. **文档映射**: 使用注解定义ES字段映射关系
 4. **文本提取**: 支持多种文档格式的文本提取（PDF、Word、图片等）
 5. **搜索功能**: 支持按业务、用户、机构等多维度搜索
 6. **高亮显示**: 搜索结果支持高亮显示匹配内容
+
+## 客户端管理
+
+**推荐使用方式**：
+```java
+// 获取客户端实例（单例，线程安全）
+ElasticsearchClient client = IndexerSearcherFactory.getElasticsearchClient(config);
+
+// 或者使用高级API
+ESIndexer indexer = IndexerSearcherFactory.obtainIndexer(config, DocumentClass.class);
+ESSearcher searcher = IndexerSearcherFactory.obtainSearcher(config, DocumentClass.class);
+```
+
+**性能优势**：
+- ElasticsearchClient 是线程安全的，可在多线程环境下共享使用
+- 底层 RestClient 已实现连接池，无需额外连接池管理
+- 减少了客户端创建/销毁的开销
 
 ## 主要依赖
 

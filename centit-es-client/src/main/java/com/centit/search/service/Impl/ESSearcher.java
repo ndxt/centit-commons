@@ -24,7 +24,6 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +42,7 @@ public class ESSearcher implements Searcher{
 
     private static final Logger logger = LoggerFactory.getLogger(ESSearcher.class);
 
-    @Setter
-    private GenericObjectPool<ElasticsearchClient> clientPool;
+    private ElasticsearchClient client;
 
     @Getter
     private String indexName;
@@ -57,33 +55,16 @@ public class ESSearcher implements Searcher{
     private Map<String, Float> queryFields;
     private final Set<String> highlightFields;
 
-    public ESSearcher(){
+    public ESSearcher(ElasticsearchClient client){
         this.highlightFields = new HashSet<>();
         this.highlightPreTags = new String[]{"<strong>"};
         this.highlightPostTags = new String[]{"</strong>"};
         this.allFields = new ArrayList<>();
-    }
-
-    public ESSearcher(GenericObjectPool<ElasticsearchClient> clientPool){
-        this();
-        this.clientPool = clientPool;
+        this.client = client;
     }
 
     public ElasticsearchClient fetchClient() {
-        ElasticsearchClient client = null;
-        try {
-            client = clientPool.borrowObject();
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("获取ES客户端失败", e);
-        }
         return client;
-    }
-
-    public void releaseClient(ElasticsearchClient client) {
-        if(client!=null) {
-            clientPool.returnObject(client);
-        }
     }
 
     public void initTypeFields(Class<?> objType) {
@@ -120,10 +101,8 @@ public class ESSearcher implements Searcher{
     public Pair<Long, List<Map<String, Object>>> esSearch(Query query, List<SortOptions> sortOptions,
                                                          String[] includes, String[] excludes,
                                                          int pageNo, int pageSize){
-        ElasticsearchClient client = null;
         long totalHits = 0;
         try {
-            client = clientPool.borrowObject();
             List<Map<String, Object>> retList = new ArrayList<>(pageSize + 5);
 
             SearchRequest.Builder searchBuilder = new SearchRequest.Builder()
@@ -205,10 +184,6 @@ public class ESSearcher implements Searcher{
         } catch (Exception e) {
             throw new ObjectException(ObjectException.UNKNOWN_EXCEPTION,
                 "查询ES失败:" + e.getMessage(), e);
-        } finally {
-            if(client != null) {
-                clientPool.returnObject(client);
-            }
         }
     }
 
@@ -389,10 +364,7 @@ public class ESSearcher implements Searcher{
 
     @Override
     public JSONObject getDocumentById(String idFieldName, String docId) {
-        ElasticsearchClient client = null;
         try {
-            client = clientPool.borrowObject();
-
             TermQuery termQuery = TermQuery.of(t -> t.field(idFieldName).value(docId));
             SearchRequest searchRequest = SearchRequest.of(s -> s
                 .index(indexName)
@@ -410,10 +382,6 @@ public class ESSearcher implements Searcher{
         } catch (Exception e) {
             logger.error("查询异常,异常信息：" + e.getMessage());
             return null;
-        } finally {
-            if (client != null) {
-                clientPool.returnObject(client);
-            }
         }
     }
 }

@@ -76,23 +76,21 @@ public class TestStatLog {
 
         List<Map<String, Object>> retList = new ArrayList<>();
         ElasticsearchClient client = createSearch().fetchClient();
-        try {
-            SearchResponse<JsonData> response = client.search(searchRequest, JsonData.class);
-            if (response.hits() != null) {
-                for (Hit<JsonData> hit : response.hits().hits()) {
-                    if (hit.source() != null) {
-                        Map<String, Object> sourceMap = hit.source().toJson().asJsonObject()
-                            .entrySet().stream()
-                            .collect(HashMap::new, (map, entry) -> {
-                                map.put(entry.getKey(), entry.getValue().toString());
-                            }, HashMap::putAll);
-                        retList.add(sourceMap);
-                    }
+
+        SearchResponse<JsonData> response = client.search(searchRequest, JsonData.class);
+        if (response.hits() != null) {
+            for (Hit<JsonData> hit : response.hits().hits()) {
+                if (hit.source() != null) {
+                    Map<String, Object> sourceMap = hit.source().toJson().asJsonObject()
+                        .entrySet().stream()
+                        .collect(HashMap::new, (map, entry) -> {
+                            map.put(entry.getKey(), entry.getValue().toString());
+                        }, HashMap::putAll);
+                    retList.add(sourceMap);
                 }
             }
-        } finally {
-            createSearch().releaseClient(client);
         }
+
         return retList;
     }
 
@@ -128,24 +126,20 @@ public class TestStatLog {
 
         Map<String, Long> result = new HashMap<>();
         ElasticsearchClient client = createSearch().fetchClient();
-        try {
-            SearchResponse<JsonData> response = client.search(searchRequest, JsonData.class);
+        SearchResponse<JsonData> response = client.search(searchRequest, JsonData.class);
 
-            if (response.aggregations() != null) {
-                DateHistogramAggregate hourlyAgg = response.aggregations()
-                    .get("hourly")
-                    .dateHistogram();
+        if (response.aggregations() != null) {
+            DateHistogramAggregate hourlyAgg = response.aggregations()
+                .get("hourly")
+                .dateHistogram();
 
-                for (DateHistogramBucket bucket : hourlyAgg.buckets().array()) {
-                    String keyAsString = bucket.keyAsString();
-                    ValueCountAggregate countAgg = bucket.aggregations()
-                        .get("count")
-                        .valueCount();
-                    result.put(keyAsString, NumberBaseOpt.castObjectToLong(countAgg.value()));
-                }
+            for (DateHistogramBucket bucket : hourlyAgg.buckets().array()) {
+                String keyAsString = bucket.keyAsString();
+                ValueCountAggregate countAgg = bucket.aggregations()
+                    .get("count")
+                    .valueCount();
+                result.put(keyAsString, NumberBaseOpt.castObjectToLong(countAgg.value()));
             }
-        } finally {
-            createSearch().releaseClient(client);
         }
         return result;
     }
@@ -182,22 +176,19 @@ public class TestStatLog {
                 .size(0));
 
             ElasticsearchClient client = createSearch().fetchClient();
-            try {
-                SearchResponse<JsonData> response = client.search(searchRequest, JsonData.class);
 
-                if (response.aggregations() != null) {
-                    StringTermsAggregate topTaskIds = response.aggregations()
-                        .get("top_task_ids")
-                        .sterms();
+            SearchResponse<JsonData> response = client.search(searchRequest, JsonData.class);
 
-                    for (StringTermsBucket bucket : topTaskIds.buckets().array()) {
-                        String keyAsString = bucket.key().stringValue();
-                        long docCount = bucket.docCount();
-                        result.add(CollectionsOpt.createHashMap("taskId", keyAsString, "callSum", docCount));
-                    }
+            if (response.aggregations() != null) {
+                StringTermsAggregate topTaskIds = response.aggregations()
+                    .get("top_task_ids")
+                    .sterms();
+
+                for (StringTermsBucket bucket : topTaskIds.buckets().array()) {
+                    String keyAsString = bucket.key().stringValue();
+                    long docCount = bucket.docCount();
+                    result.add(CollectionsOpt.createHashMap("taskId", keyAsString, "callSum", docCount));
                 }
-            } finally {
-                createSearch().releaseClient(client);
             }
         } catch (Exception e) {
             logger.error("Error occurred while processing application: {}, countType: {}, start date: {}, end date: {}",
@@ -239,26 +230,24 @@ public class TestStatLog {
                 .size(0));
 
             ElasticsearchClient client = createSearch().fetchClient();
-            try {
-                SearchResponse<JsonData> response = client.search(searchRequest, JsonData.class);
 
-                if (response.aggregations() != null) {
-                    DateHistogramAggregate dailyAgg = response.aggregations()
-                        .get("daily")
-                        .dateHistogram();
+            SearchResponse<JsonData> response = client.search(searchRequest, JsonData.class);
 
-                    for (DateHistogramBucket bucket : dailyAgg.buckets().array()) {
-                        String keyAsString = bucket.keyAsString();
-                        long docCount = bucket.docCount();
-                        JSONObject sums = new JSONObject();
-                        sums.put("runBeginTime", keyAsString);
-                        sums.put("callSum", docCount);
-                        result.add(sums);
-                    }
+            if (response.aggregations() != null) {
+                DateHistogramAggregate dailyAgg = response.aggregations()
+                    .get("daily")
+                    .dateHistogram();
+
+                for (DateHistogramBucket bucket : dailyAgg.buckets().array()) {
+                    String keyAsString = bucket.keyAsString();
+                    long docCount = bucket.docCount();
+                    JSONObject sums = new JSONObject();
+                    sums.put("runBeginTime", keyAsString);
+                    sums.put("callSum", docCount);
+                    result.add(sums);
                 }
-            } finally {
-                createSearch().releaseClient(client);
             }
+
         } catch (Exception e) {
             logger.error("Error occurred while processing application: {}, start date: {}, end date: {}",
                 osId, startDate, endDate, e);

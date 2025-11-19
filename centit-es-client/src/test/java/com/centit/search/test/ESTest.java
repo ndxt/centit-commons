@@ -15,11 +15,8 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.document.ObjectDocument;
-import com.centit.search.service.ElasticConfig;
+import com.centit.search.service.*;
 import com.centit.search.service.Impl.ESIndexer;
-import com.centit.search.service.Indexer;
-import com.centit.search.service.IndexerSearcherFactory;
-import com.centit.search.service.Searcher;
 import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.UuidOpt;
 import org.apache.tika.exception.TikaException;
@@ -58,7 +55,7 @@ public class ESTest {
         config.setMinScore(0.5f);
 
 
-        ElasticsearchClient esClient = IndexerSearcherFactory.obtainclientPool(config).borrowObject();
+        ElasticsearchClient esClient = ElasticsearchClientManager.getClient(config);
 
         // 构建多字段匹配查询
         MultiMatchQuery multiMatchQuery = MultiMatchQuery.of(m -> m
@@ -154,7 +151,7 @@ public class ESTest {
             config.setServerHostIp("192.168.134.250");
             config.setServerHostPort("32404");
 
-            ElasticsearchClient client = IndexerSearcherFactory.obtainclientPool(config).borrowObject();
+            ElasticsearchClient client = ElasticsearchClientManager.getClient(config);
 
             // 构建文档数据
             final Map<String, Object> map = new HashMap<>();
@@ -172,7 +169,6 @@ public class ESTest {
             System.out.println("ID: " + response.id());
             System.out.println("Result: " + response.result());
 
-            IndexerSearcherFactory.obtainclientPool(config).returnObject(client);
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

@@ -15,10 +15,6 @@
     <description>elasticsearch 客户端</description>
     <url>https://github.com/ndxt/centit-search</url>
     <dependencies>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>com.centit.support</groupId>

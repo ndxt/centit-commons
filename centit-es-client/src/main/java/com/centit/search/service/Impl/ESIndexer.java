@@ -11,7 +11,6 @@ import com.centit.search.annotation.ESType;
 import com.centit.search.document.DocumentUtils;
 import com.centit.search.document.ESDocument;
 import com.centit.search.service.Indexer;
-import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,15 +23,14 @@ public class ESIndexer implements Indexer{
 
     private static final Logger logger = LoggerFactory.getLogger(ESIndexer.class);
 
-    private final GenericObjectPool<ElasticsearchClient> clientPool;
+    private final ElasticsearchClient client;
     private String indexName;
     private boolean sureIndexExist;
     private final Class<?> objType ;
 
-    public ESIndexer(GenericObjectPool<ElasticsearchClient> clientPool,
-                     String indexName, Class<?> objType){
-        this.clientPool = clientPool;
-        this.indexName=indexName;
+    public ESIndexer(ElasticsearchClient client, String indexName, Class<?> objType){
+        this.client = client;
+        this.indexName = indexName;
         this.objType = objType;
         this.sureIndexExist = false;
     }
@@ -41,9 +39,7 @@ public class ESIndexer implements Indexer{
         if(sureIndexExist){
             return;
         }
-        ElasticsearchClient client = null;
         try {
-            client = clientPool.borrowObject();
             ExistsRequest request = ExistsRequest.of(e -> e.index(indexName));
             if (!client.indices().exists(request).value()) {
                 createEsIndex(indexName, objType);
@@ -51,20 +47,13 @@ public class ESIndexer implements Indexer{
             sureIndexExist = true;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-        }finally {
-            if(client!=null) {
-                clientPool.returnObject(client);
-            }
         }
     }
 
     // 定义索引的映射类型
     private void createEsIndex(String indexName, Class<?> objType) {
         this.indexName = indexName;
-        //判断索引是否存在，不存在则新建
-        ElasticsearchClient client = null;
         try {
-            client = clientPool.borrowObject();
             ESType esType = objType.getAnnotation(ESType.class);
             // 构建索引设置
             IndexSettings settings = IndexSettings.of(s -> s
@@ -83,10 +72,6 @@ public class ESIndexer implements Indexer{
             client.indices().create(request);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-        }finally {
-            if(client!=null) {
-                clientPool.returnObject(client);
-            }
         }
     }
 
@@ -98,10 +83,7 @@ public class ESIndexer implements Indexer{
     @Override
     public String saveNewDocument(ESDocument document) {
         makeSureIndexIsExist();
-        ElasticsearchClient client = null;
         try {
-            client = clientPool.borrowObject();
-
             IndexRequest<JsonData> request = IndexRequest.of(i -> i
                 .index(indexName)
                 .id(document.obtainDocumentId())
@@ -113,10 +95,6 @@ public class ESIndexer implements Indexer{
         catch (Exception e) {
             logger.error(e.getMessage(), e);
             return null;
-        }finally {
-            if(client!=null) {
-                clientPool.returnObject(client);
-            }
         }
     }
 
@@ -138,9 +116,8 @@ public class ESIndexer implements Indexer{
      */
     @Override
     public boolean deleteDocument(String docId) {
-        ElasticsearchClient client = null;
+
         try {
-            client = clientPool.borrowObject();
 
             DeleteRequest request = DeleteRequest.of(d -> d
                 .index(indexName)
@@ -152,10 +129,6 @@ public class ESIndexer implements Indexer{
         catch (Exception e) {
             logger.error(e.getMessage(), e);
             return false;
-        }finally {
-            if(client!=null) {
-                clientPool.returnObject(client);
-            }
         }
     }
 
@@ -180,9 +153,8 @@ public class ESIndexer implements Indexer{
      */
     @Override
     public int updateDocument(String docId, ESDocument document) {
-        ElasticsearchClient client = null;
+
         try {
-            client = clientPool.borrowObject();
 
             UpdateRequest<JsonData, JsonData> request = UpdateRequest.of(u -> u
                 .index(indexName)
@@ -195,10 +167,6 @@ public class ESIndexer implements Indexer{
         catch (Exception e) {
             logger.error(e.getMessage(), e);
             return 0;
-        }finally {
-            if(client!=null) {
-                clientPool.returnObject(client);
-            }
         }
     }
 
@@ -211,9 +179,8 @@ public class ESIndexer implements Indexer{
     @Override
     public String mergeDocument(ESDocument document) {
         makeSureIndexIsExist();
-        ElasticsearchClient client = null;
+
         try {
-            client = clientPool.borrowObject();
             String docId = document.obtainDocumentId();
 
             // 判断文档是否存在
@@ -251,10 +218,6 @@ public class ESIndexer implements Indexer{
         catch (Exception e) {
             logger.error(e.getMessage(), e);
             return null;
-        }finally {
-            if(client!=null) {
-                clientPool.returnObject(client);
-            }
         }
     }
 }
