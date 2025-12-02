@@ -117,12 +117,12 @@ public abstract class RSASecurityUtils {
         return JSON.toJSONString(keyJson);
     }
 
-    public static KeyPair keyPairFromJson(String keyJsonString) throws InvalidKeyException{
+    /*public static KeyPair keyPairFromJson(String keyJsonString) throws InvalidKeyException{
         JSONObject keyJson =  JSON.parseObject(keyJsonString);
         return new KeyPair(
                 new RSAPublicKeyImpl(Base64.decodeBase64(keyJson.getString("public"))),
                 RSAPrivateCrtKeyImpl.newKey(
                         Base64.decodeBase64(keyJson.getString("private"))));
-    }
+    }*/
 
 }
