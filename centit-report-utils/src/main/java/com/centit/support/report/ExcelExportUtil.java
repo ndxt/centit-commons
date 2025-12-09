@@ -607,8 +607,8 @@ public abstract class ExcelExportUtil {
 
         return mergeCols;
     }
-    private static void mergeColCell(Sheet sheet, String mergeColCell, int beginRow, int endRow){
-        Set<Integer> mergeCols  = praiseColsRangeDesc(mergeColCell);
+    private static void mergeColCell(Sheet sheet, String mergeColCellDesc, int beginRow, int endRow){
+        Set<Integer> mergeCols  = praiseColsRangeDesc(mergeColCellDesc);
         if(mergeCols==null || mergeCols.isEmpty()) return;
         for(int i : mergeCols){
             String preCellText = "";// ExcelImportUtil.getCellString( )
@@ -656,7 +656,7 @@ public abstract class ExcelExportUtil {
         }
     }
     public static void saveObjectsToExcelSheet(Sheet sheet, List<?> objects, Map<Integer, String> fieldDesc, int beginRow,
-                                               boolean createRow, String mergeColCell) {
+                                               boolean createRow, String mergeColCellDesc) {
         int nRowCount = objects.size();
         //CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
         if(createRow)
@@ -677,10 +677,10 @@ public abstract class ExcelExportUtil {
             }
         }
         //mergeColCell;
-        mergeColCell(sheet, mergeColCell, beginRow, beginRow+nRowCount);
+        mergeColCell(sheet, mergeColCellDesc, beginRow, beginRow+nRowCount);
     }
 
-    public static void saveObjectsToExcelSheet(Sheet sheet, List<Object[]> objects, int beginCol, int beginRow, boolean createRow, String mergeColCell) {
+    public static void saveObjectsToExcelSheet(Sheet sheet, List<Object[]> objects, int beginCol, int beginRow, boolean createRow, String mergeColCellDesc) {
         int nRowCount = objects.size();
         //CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
         if(createRow)
@@ -705,7 +705,7 @@ public abstract class ExcelExportUtil {
                 }
             }
         }
-        mergeColCell(sheet, mergeColCell, beginRow, beginRow + nRowCount);
+        mergeColCell(sheet, mergeColCellDesc, beginRow, beginRow + nRowCount);
     }
 
     /**
