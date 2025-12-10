@@ -79,6 +79,7 @@ public abstract class QrCodeGenerator {
         }
         return qrCode;
     }
+
     /**
      * 增加底部的说明文字
      * @param source 二维码
@@ -127,11 +128,9 @@ public abstract class QrCodeGenerator {
         graph.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         // 画文字到新的面板
         graph.setBackground(qrCodeConfig.getFrameColor());
-        graph.setColor(qrCodeConfig.getTextColor());
-
         graph.clearRect(0, 0, newQrWidth,newHeight);
-
         if(StringUtils.isNotBlank(topText)){
+            graph.setColor(qrCodeConfig.getTopTextColor());
             graph.setFont(topTextFont);
             //drawString(文字信息、x轴、y轴)方法根据参数设置文字的坐标轴 ，根据需要来进行调整
             float x = (float) (newQrWidth - topTextWidth) / 2;
@@ -140,6 +139,7 @@ public abstract class QrCodeGenerator {
         }
 
         if(StringUtils.isNotBlank(downText)){
+            graph.setColor(qrCodeConfig.getDownTextColor());
             graph.setFont(downTextFont);
             int x = (int) (newQrWidth - downTextWidth) / 2;
             int y = (int) (newHeight -  downTextHeight);
@@ -173,7 +173,7 @@ public abstract class QrCodeGenerator {
      * */
     public static BufferedImage createQRImage(String message) throws IOException, WriterException {
         QrCodeConfig config = new QrCodeConfig();
-        config.setMsg(message);
+        config.setContent(message);
         return createQRImage(config);
     }
 
@@ -190,21 +190,20 @@ public abstract class QrCodeGenerator {
         } else if (quietZone < 0) {
             quietZone = 0;
         }
-        QRCode code = Encoder.encode(qrCodeConfig.getMsg(), errorCorrectionLevel, qrCodeConfig.getHints());
+        QRCode code = Encoder.encode(qrCodeConfig.getContent(), errorCorrectionLevel, qrCodeConfig.getHints());
         return renderResult(code, qrCodeConfig.getQrWidth(), qrCodeConfig.getQrHeight(), quietZone);
     }
-
 
     /**
      * 对 zxing 的 QRCodeWriter 进行扩展, 解决白边过多的问题
      * <p/>
      * 源码参考 {@link com.google.zxing.qrcode.QRCodeWriter #renderResult(QRCode, int, int, int)}
      *
-     * @param code
-     * @param width
-     * @param height
+     * @param code 二维码
+     * @param width 二维码宽度
+     * @param height 二维码高度
      * @param quietZone 取值 [0, 4]
-     * @return
+     * @return 二维码矩阵
      */
     private static BitMatrix renderResult(QRCode code, int width, int height, int quietZone) {
         ByteMatrix input = code.getMatrix();

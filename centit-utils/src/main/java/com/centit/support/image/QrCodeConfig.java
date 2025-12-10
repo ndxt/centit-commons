@@ -16,22 +16,34 @@ public class QrCodeConfig {
     /**
      * 塞入二维码的信息
      */
-    private String msg;
+    private String content;
 
     /**
      * 二维码顶部文字
      */
     private String topText;
-
+    /**
+     * 顶部部字体类型
+     */
+    private String topTextFontType;
     /**
      * 二维码顶部文字大小
      */
     private Integer topTextFontSize;
 
     /**
+     * 二维码顶部文字颜色
+     */
+    private Color topTextColor;
+    /**
      * 二维码底部文字
      */
     private String downText;
+
+    /**
+     * 底部部字体类型
+     */
+    private String downTextFontType;
 
     /**
      * 二维码底部文字大小
@@ -39,14 +51,9 @@ public class QrCodeConfig {
     private Integer downTextFontSize;
 
     /**
-     * 顶部部字体类型
+     * 二维码底部文字颜色
      */
-    private String topTextFontType;
-
-    /**
-     * 底部部字体类型
-     */
-    private String downTextFontType;
+    private Color downTextColor;
 
     /**
      * 二维码中间的logo
@@ -64,7 +71,7 @@ public class QrCodeConfig {
     /**
      * qrcode message's code, default UTF-8
      */
-    private String code;
+    private String charset;
 
     /**
      * 二维码白边预留参数
@@ -92,8 +99,9 @@ public class QrCodeConfig {
      */
     private String picType;
 
-    private Color textColor;
-
+    /**
+     * 边框颜色
+     */
     private Color frameColor;
 
     public QrCodeConfig(){
@@ -105,26 +113,27 @@ public class QrCodeConfig {
         this.downTextFontType = "雅黑";
         this.qrWidth = 200;
         this.qrHeight = 200;
-        this.code = "UTF-8";
+        this.charset = "UTF-8";
         this.picType = "png";
         this.errorCorrection = ErrorCorrectionLevel.Q;
         this.onColor = MatrixToImageConfig.BLACK;
         this.offColor = MatrixToImageConfig.WHITE;
         this.logoImage = null;
         this.frameColor = Color.white;
-        this.textColor = Color.black;
+        this.topTextColor = Color.black;
+        this.downTextColor = Color.black;
     }
 
-    public String getMsg() {
-        return msg;
+    public String getContent() {
+        return content;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     private void validate() {
-        if (msg == null || msg.length() == 0) {
+        if (content == null || content.isEmpty()) {
             throw new IllegalArgumentException("二维码内容不能为空!");
         }
     }
@@ -236,12 +245,20 @@ public class QrCodeConfig {
         return offColor;
     }
 
-    public Color getTextColor() {
-        return textColor;
+    public Color getTopTextColor() {
+        return topTextColor;
     }
 
-    public void setTextColor(Color textColor) {
-        this.textColor = textColor;
+    public void setTopTextColor(Color topTextColor) {
+        this.topTextColor = topTextColor;
+    }
+
+    public Color getDownTextColor() {
+        return downTextColor;
+    }
+
+    public void setDownTextColor(Color downTextColor) {
+        this.downTextColor = downTextColor;
     }
 
     public Color getFrameColor() {
@@ -266,14 +283,14 @@ public class QrCodeConfig {
         this.picType = picType;
     }
 
-    public String getCode() {
-        return code;
+    public String getCharset() {
+        return charset;
     }
 
-    public void setCode(String code) {
-        if(StringUtils.isBlank(code))
+    public void setCharset(String charset) {
+        if(StringUtils.isBlank(charset))
             return;
-        this.code = code;
+        this.charset = charset;
     }
 
     public int getPadding() {
@@ -299,7 +316,7 @@ public class QrCodeConfig {
     public Map<EncodeHintType, Object> getHints() {
         Map<EncodeHintType, Object> hints = new HashMap<>(3);
         hints.put(EncodeHintType.ERROR_CORRECTION, this.getErrorCorrection());
-        hints.put(EncodeHintType.CHARACTER_SET, this.getCode());
+        hints.put(EncodeHintType.CHARACTER_SET, this.getCharset());
         hints.put(EncodeHintType.MARGIN, this.getPadding());
         return hints;
     }
