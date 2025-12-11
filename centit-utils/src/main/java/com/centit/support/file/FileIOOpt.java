@@ -193,8 +193,7 @@ public abstract class FileIOOpt {
     }
 
     public static void writeObjectAsJsonToFile(Object obj, String fileName) throws IOException {
-        String sjson = JSON.toJSONString(obj);
-        writeStringToFile(sjson, fileName);
+        writeStringToFile(JSON.toJSONString(obj), fileName);
     }
 
     public static void writeBytesToFile(byte[] bytes, String fileName) throws IOException {
@@ -219,50 +218,40 @@ public abstract class FileIOOpt {
 
     public static <T> T readObjectAsJsonFromFile(String fileName, Class<T> clazz)
         throws IOException {
-        String sjson = readStringFromFile(fileName);
-        return JSON.parseObject(sjson, clazz);
+        return JSON.parseObject(readStringFromFile(fileName), clazz);
     }
 
     public static InputStream castObjectToInputStream(Object data){
         if(data == null) {
             return null;
         }
-
-        if (data instanceof ByteArrayInputStream) {
-            ByteArrayInputStream inputStream = (ByteArrayInputStream) data;
+        if (data instanceof ByteArrayInputStream inputStream) {
             inputStream.reset();
             return inputStream;
         }
-
-        if (data instanceof InputStream) {
-            return (InputStream)data;
+        if (data instanceof InputStream inputStream) {
+            return inputStream;
         }
-
-        if (data instanceof ByteArrayOutputStream) {
-            ByteArrayOutputStream outputStream = (ByteArrayOutputStream) data;
+        if (data instanceof ByteArrayOutputStream outputStream) {
             return new ByteArrayInputStream(outputStream.toByteArray());
         }
-
-        if(data instanceof BufferedImage){
+        if(data instanceof BufferedImage image){
             try {
-                return ImageOpt.imageToInputStream((BufferedImage) data);
+                return ImageOpt.imageToInputStream(image);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 return null;
             }
         }
-
-        if(data instanceof byte[]) {
-            return new ByteArrayInputStream((byte[]) data);
+        if(data instanceof byte[] bytes) {
+            return new ByteArrayInputStream(bytes);
         }
-
-        if(data instanceof String) {
-            return new ByteArrayInputStream(((String) data).getBytes(StandardCharsets.UTF_8));
+        if(data instanceof String str) {
+            return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
         }
-
-        if (data instanceof File) {
+        if (data instanceof File file) {
             try {
-                return new FileInputStream((File) data);
+                return new FileInputStream(file);
             } catch (FileNotFoundException e) {
                 logger.error(e.getMessage(), e);
                 return null;
@@ -273,7 +262,6 @@ public abstract class FileIOOpt {
     }
     /**
      * close the IO stream.
-     *
      * @param closeable closeable
      */
     public static void close(Closeable closeable) {
