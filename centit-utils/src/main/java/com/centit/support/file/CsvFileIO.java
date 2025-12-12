@@ -56,30 +56,26 @@ public abstract class CsvFileIO {
     public static void saveData2OutputStream(List<Map<String, Object>> listData, OutputStream outs,
                                           boolean firstRowAsHeader, List<String> columnNames,
                                           String charsetType) throws IOException {
-
         if (listData==null || listData.isEmpty()) {
             return;
         }
         if (columnNames == null || columnNames.isEmpty()) {
-            Set<String> headers = new HashSet<>(20);
+            Set<String> headers = new LinkedHashSet<>(50);
             for (Map<String, Object> row : listData) {
                 headers.addAll(row.keySet());
             }
             columnNames = CollectionsOpt.cloneList(headers);
         }
-
         if (columnNames == null || columnNames.isEmpty()) {
             return;
         }
-
         try (
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outs, Charset.forName(charsetType)))) {
             CSVPrinter csvPrinter = CSVFormat.EXCEL.print(writer);
             if(firstRowAsHeader){
                 csvPrinter.printRecord(columnNames);
             }
-
-            String[] values = new String[columnNames.size()];
+            Object[] values = new String[columnNames.size()];
             for (Map<String, Object> row : listData) {
                 for (int i = 0; i < columnNames.size(); i++) {
                     values[i] = StringBaseOpt.castObjectToString(row.get(columnNames.get(i)), "");
