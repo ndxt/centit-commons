@@ -259,7 +259,10 @@ public abstract class EmbedFunc {
                 Matcher m = p.matcher(sValues); // 获取 matcher 对象
                 List<String> matchValues = new ArrayList<>();
                 while (m.find()) {
-                    matchValues.add(sValues.substring(m.start(), m.end()));
+                    //for (int i = 0; i <= m.groupCount(); i++) {
+                    //    matchValues.add(m.group(i));  // i=0完整, i=1键, i=2值
+                    //}
+                    matchValues.add(m.group(0));//等价于：matchValues.add(sValues.substring(m.start(), m.end()));
                 }
                 if(matchValues.isEmpty())
                     return null;
