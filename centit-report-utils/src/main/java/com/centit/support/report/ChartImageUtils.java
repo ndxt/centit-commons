@@ -41,13 +41,13 @@ public abstract class ChartImageUtils {
 
     public  static Chart<?, ?> createChart(String chartType, String chartTitle, int width, int height, JSONObject data, JSONObject style) {
         if(CHART_TYPE_BAR.equals(chartType)) {
-            return createBarChart(chartTitle, width, height, style, data);
+            return createBarChart(chartTitle, width, height, data, style);
         }
         if(CHART_TYPE_LINE.equals(chartType)) {
-            return createLineChart(chartTitle, width, height, style, data);
+            return createLineChart(chartTitle, width, height, data, style);
         }
         if(CHART_TYPE_PIE.equals(chartType)) {
-            return createPieChart(chartTitle, width, height, style, data);
+            return createPieChart(chartTitle, width, height, data, style);
         }
         return null;
     }
