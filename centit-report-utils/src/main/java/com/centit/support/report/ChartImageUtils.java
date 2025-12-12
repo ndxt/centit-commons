@@ -39,15 +39,15 @@ public abstract class ChartImageUtils {
         new Color(0xFF, 0xFF, 0x00)
     };
 
-    public  static Chart<?, ?> createChart(String chartType, String chartTitle, int width, int height, JSONObject data, JSONObject style) {
+    public  static Chart<?, ?> createChart(String chartType, String chartTitle, int width, int height, JSONObject data, Map<String, Object> style) {
         if(CHART_TYPE_BAR.equals(chartType)) {
-            return createBarChart(chartTitle, width, height, style, data);
+            return createBarChart(chartTitle, width, height, data, style);
         }
         if(CHART_TYPE_LINE.equals(chartType)) {
-            return createLineChart(chartTitle, width, height, style, data);
+            return createLineChart(chartTitle, width, height, data, style);
         }
         if(CHART_TYPE_PIE.equals(chartType)) {
-            return createPieChart(chartTitle, width, height, style, data);
+            return createPieChart(chartTitle, width, height, data, style);
         }
         return null;
     }
@@ -64,7 +64,7 @@ public abstract class ChartImageUtils {
         return numbers;
     }
 
-    public  static XYChart createLineChart(String chartTitle, int width, int height, JSONObject data, JSONObject style){
+    public  static XYChart createLineChart(String chartTitle, int width, int height, JSONObject data, Map<String, Object> style){
         XYChart chart = new XYChartBuilder()
             .width(width)
             .height(height)
@@ -160,7 +160,7 @@ public abstract class ChartImageUtils {
         return chart;
     }
 
-    public  static PieChart createPieChart(String chartTitle, int width, int height, JSONObject data, JSONObject style){
+    public  static PieChart createPieChart(String chartTitle, int width, int height, JSONObject data, Map<String, Object> style){
         // 创建饼状图
         PieChart chart = new PieChartBuilder()
             .width(width)
@@ -220,7 +220,7 @@ public abstract class ChartImageUtils {
         return chart;
     }
 
-    public  static CategoryChart createBarChart(String chartTitle, int width, int height, JSONObject data, JSONObject style){
+    public  static CategoryChart createBarChart(String chartTitle, int width, int height, JSONObject data, Map<String, Object> style){
         // 创建图表
         CategoryChart chart = new CategoryChartBuilder()
             .width(width)
@@ -322,7 +322,7 @@ public abstract class ChartImageUtils {
         return chart;
     }
 
-    public static BufferedImage createChartImage(String chartType, String chartTitle, int width, int height, JSONObject data, JSONObject style) {
+    public static BufferedImage createChartImage(String chartType, String chartTitle, int width, int height, JSONObject data, Map<String, Object> style) {
         Chart<?,?> chart = createChart(chartType, chartTitle, width, height, data, style);
         if(chart == null) return null;
         return BitmapEncoder.getBufferedImage(chart);
