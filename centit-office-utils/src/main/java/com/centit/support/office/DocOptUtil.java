@@ -1,6 +1,5 @@
 package com.centit.support.office;
 
-import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -15,7 +14,6 @@ import com.itextpdf.kernel.pdf.canvas.parser.listener.LocationTextExtractionStra
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,11 +88,15 @@ public class DocOptUtil {
         return false;
     }
 
-    public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords) throws IOException {
+    public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
         PdfDocument pdfDoc = new PdfDocument(
             new com.itextpdf.kernel.pdf.PdfReader(inputPath),
             new PdfWriter(outputPath)
         );
+        DeviceRgb highlightColor = new DeviceRgb(
+            color.getRed() / 255f,
+            color.getGreen() / 255f,
+            color.getBlue() / 255f);
 
         for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
             PdfPage page = pdfDoc.getPage(i);
@@ -116,7 +118,6 @@ public class DocOptUtil {
                                         if (index + keyword.length() <= charInfos.size()) {
                                             TextRenderInfo firstChar = charInfos.get(index);
                                             TextRenderInfo lastChar = charInfos.get(index + keyword.length() - 1);
-
                                             Rectangle firstBase = firstChar.getBaseline().getBoundingRectangle();
                                             Rectangle lastBase = lastChar.getBaseline().getBoundingRectangle();
                                             Rectangle firstAscent = firstChar.getAscentLine().getBoundingRectangle();
@@ -152,8 +153,7 @@ public class DocOptUtil {
                     page.getResources(), pdfDoc);
 
                 canvas.saveState();
-                canvas.setFillColor(ColorConstants.YELLOW);
-
+                canvas.setFillColor(highlightColor);
                 for (Rectangle rect : highlightRects) {
                     canvas.rectangle(rect.getLeft(), rect.getBottom(),
                         rect.getWidth(), rect.getHeight());
@@ -162,10 +162,10 @@ public class DocOptUtil {
                 canvas.restoreState();
             }
         }
-
         pdfDoc.close();
     }
-    public static void pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords) throws IOException {
-        pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords);
+    public static void pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords, java.awt.Color color) throws IOException {
+        pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords, color);
     }
+
 }
