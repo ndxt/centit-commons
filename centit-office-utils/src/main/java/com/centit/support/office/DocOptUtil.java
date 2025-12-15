@@ -90,16 +90,6 @@ public class DocOptUtil {
         return false;
     }
 
-    private static boolean containsAnyKeyWords(final String cs, final List<String> keywords) {
-        if (StringUtils.isBlank(cs) || keywords== null || keywords.isEmpty()) {
-            return false;
-        }
-        for(String keyword : keywords){
-            if(cs.contains( keyword)) return true;
-        }
-        return false;
-    }
-
     public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords) throws IOException {
         PdfDocument pdfDoc = new PdfDocument(
             new com.itextpdf.kernel.pdf.PdfReader(inputPath),
@@ -117,19 +107,37 @@ public class DocOptUtil {
                         TextRenderInfo renderInfo = (TextRenderInfo) data;
                         String text = renderInfo.getText();
 
-                        if (containsAnyKeyWords(text, keywords)) {
-                            Rectangle baseRect = renderInfo.getBaseline().getBoundingRectangle();
-                            Rectangle ascentRect = renderInfo.getAscentLine().getBoundingRectangle();
-                            Rectangle descentRect = renderInfo.getDescentLine().getBoundingRectangle();
+                        for (String keyword : keywords) {
+                            if (text.contains(keyword)) {
+                                int index = text.indexOf(keyword);
+                                while (index >= 0) {
+                                    try {
+                                        List<TextRenderInfo> charInfos = renderInfo.getCharacterRenderInfos();
+                                        if (index + keyword.length() <= charInfos.size()) {
+                                            TextRenderInfo firstChar = charInfos.get(index);
+                                            TextRenderInfo lastChar = charInfos.get(index + keyword.length() - 1);
 
-                            Rectangle fullRect = new Rectangle(
-                                baseRect.getLeft(),
-                                descentRect.getBottom(),
-                                baseRect.getWidth(),
-                                ascentRect.getTop() - descentRect.getBottom()
-                            );
+                                            Rectangle firstBase = firstChar.getBaseline().getBoundingRectangle();
+                                            Rectangle lastBase = lastChar.getBaseline().getBoundingRectangle();
+                                            Rectangle firstAscent = firstChar.getAscentLine().getBoundingRectangle();
+                                            Rectangle firstDescent = firstChar.getDescentLine().getBoundingRectangle();
 
-                            highlightRects.add(fullRect);
+                                            Rectangle keywordRect = new Rectangle(
+                                                firstBase.getLeft(),
+                                                firstDescent.getBottom(),
+                                                lastBase.getRight() - firstBase.getLeft(),
+                                                firstAscent.getTop() - firstDescent.getBottom()
+                                            );
+
+                                            highlightRects.add(keywordRect);
+                                        }
+                                    } catch (Exception e) {
+                                        logger.warn("Error processing keyword highlight: {}", e.getMessage());
+                                    }
+
+                                    index = text.indexOf(keyword, index + 1);
+                                }
+                            }
                         }
                     }
                     super.eventOccurred(data, type);
