@@ -11,18 +11,18 @@ import com.itextpdf.kernel.pdf.canvas.parser.PdfCanvasProcessor;
 import com.itextpdf.kernel.pdf.canvas.parser.data.IEventData;
 import com.itextpdf.kernel.pdf.canvas.parser.data.TextRenderInfo;
 import com.itextpdf.kernel.pdf.canvas.parser.listener.LocationTextExtractionStrategy;
-import com.itextpdf.kernel.pdf.extgstate.PdfExtGState;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 /**
  * 未归类的文档操作，比如：文档合并
@@ -89,28 +89,20 @@ public class DocOptUtil {
         return false;
     }
 
-    private static boolean containsAnyKeyWords(final String cs, final List<String> keywords) {
-        if (StringUtils.isBlank(cs) || keywords== null || keywords.isEmpty()) {
-            return false;
-        }
-        for(String keyword : keywords){
-            if(cs.contains( keyword)) return true;
-        }
-        return false;
-    }
-
-    public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords) throws IOException {
+    public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
         PdfDocument pdfDoc = new PdfDocument(
             new com.itextpdf.kernel.pdf.PdfReader(inputPath),
             new PdfWriter(outputPath)
         );
+        DeviceRgb highlightColor = new DeviceRgb(
+            color.getRed() / 255f,
+            color.getGreen() / 255f,
+            color.getBlue() / 255f);
 
         for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
             PdfPage page = pdfDoc.getPage(i);
-            PdfCanvas pdfCanvas = new PdfCanvas(page.newContentStreamAfter(),
-                page.getResources(), pdfDoc);
+            List<Rectangle> highlightRects = new ArrayList<>();
 
-            // 使用位置监听器获取文本位置
             LocationTextExtractionStrategy strategy = new LocationTextExtractionStrategy() {
                 @Override
                 public void eventOccurred(IEventData data, EventType type) {
@@ -118,20 +110,36 @@ public class DocOptUtil {
                         TextRenderInfo renderInfo = (TextRenderInfo) data;
                         String text = renderInfo.getText();
 
-                        if (containsAnyKeyWords(text, keywords)) {
-                            // 获取文本边界
-                            Rectangle rect = renderInfo.getBaseline().getBoundingRectangle();
+                        for (String keyword : keywords) {
+                            if (text.contains(keyword)) {
+                                int index = text.indexOf(keyword);
+                                while (index >= 0) {
+                                    try {
+                                        List<TextRenderInfo> charInfos = renderInfo.getCharacterRenderInfos();
+                                        if (index + keyword.length() <= charInfos.size()) {
+                                            TextRenderInfo firstChar = charInfos.get(index);
+                                            TextRenderInfo lastChar = charInfos.get(index + keyword.length() - 1);
+                                            Rectangle firstBase = firstChar.getBaseline().getBoundingRectangle();
+                                            Rectangle lastBase = lastChar.getBaseline().getBoundingRectangle();
+                                            Rectangle firstAscent = firstChar.getAscentLine().getBoundingRectangle();
+                                            Rectangle firstDescent = firstChar.getDescentLine().getBoundingRectangle();
 
-                            // 设置高亮颜色
-                            pdfCanvas.saveState();
-                            pdfCanvas.setFillColor(new DeviceRgb(255, 255, 0));
-                            pdfCanvas.setExtGState(new PdfExtGState().setFillOpacity(0.3f));
+                                            Rectangle keywordRect = new Rectangle(
+                                                firstBase.getLeft(),
+                                                firstDescent.getBottom(),
+                                                lastBase.getRight() - firstBase.getLeft(),
+                                                firstAscent.getTop() - firstDescent.getBottom()
+                                            );
 
-                            // 绘制高亮矩形
-                            pdfCanvas.rectangle(rect.getLeft(), rect.getBottom(),
-                                rect.getWidth(), rect.getHeight());
-                            pdfCanvas.fill();
-                            pdfCanvas.restoreState();
+                                            highlightRects.add(keywordRect);
+                                        }
+                                    } catch (Exception e) {
+                                        logger.warn("Error processing keyword highlight: {}", e.getMessage());
+                                    }
+
+                                    index = text.indexOf(keyword, index + 1);
+                                }
+                            }
                         }
                     }
                     super.eventOccurred(data, type);
@@ -140,11 +148,25 @@ public class DocOptUtil {
 
             PdfCanvasProcessor parser = new PdfCanvasProcessor(strategy);
             parser.processPageContent(page);
-        }
 
+            if (!highlightRects.isEmpty()) {
+                PdfCanvas canvas = new PdfCanvas(page.newContentStreamBefore(),
+                    page.getResources(), pdfDoc);
+
+                canvas.saveState();
+                canvas.setFillColor(highlightColor);
+                for (Rectangle rect : highlightRects) {
+                    canvas.rectangle(rect.getLeft(), rect.getBottom(),
+                        rect.getWidth(), rect.getHeight());
+                    canvas.fill();
+                }
+                canvas.restoreState();
+            }
+        }
         pdfDoc.close();
     }
-    public static void pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords) throws IOException {
-        pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords);
+    public static void pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords, java.awt.Color color) throws IOException {
+        pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords, color);
     }
+
 }
