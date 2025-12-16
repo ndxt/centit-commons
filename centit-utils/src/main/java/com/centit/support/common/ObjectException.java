@@ -188,7 +188,7 @@ public class ObjectException extends RuntimeException {
     }
 
     public static String extortExceptionMessage(Throwable ex, int maxStacks) {
-        return extortExceptionOriginMessage(ex) +"\r\n"
+        return extortExceptionOriginMessage(ex) +"\r\nTrace info:"
             + extortExceptionTraceMessage(ex, maxStacks);
     }
 
