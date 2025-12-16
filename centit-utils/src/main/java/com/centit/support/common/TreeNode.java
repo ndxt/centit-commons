@@ -1,6 +1,5 @@
 package com.centit.support.common;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.ReflectionOpt;
@@ -18,7 +17,7 @@ public class TreeNode<T> {
     /**
      * 指向父节点，null表示根节点
      */
-    private TreeNode<T> praent;
+    private TreeNode<T> parent;
     /**
      * 子节点列表
      */
@@ -26,13 +25,13 @@ public class TreeNode<T> {
 
     public TreeNode() {
         this.children = null;
-        this.praent = null;
+        this.parent = null;
     }
 
     public TreeNode(T value) {
         this.value = value;
         this.children = null;
-        this.praent = null;
+        this.parent = null;
     }
 
     public T getValue() {
@@ -60,20 +59,20 @@ public class TreeNode<T> {
     public void addChild(TreeNode<T> child) {
         if (this.children == null)
             this.children = new ArrayList<>();
-        child.praent = this;
+        child.parent = this;
         this.children.add(child);
     }
 
-    public TreeNode<T> getPraent() {
-        return praent;
+    public TreeNode<T> getParent() {
+        return parent;
     }
 
-    public void setPraent(TreeNode<T> praent) {
-        this.praent = praent;
+    public void setParent(TreeNode<T> parent) {
+        this.parent = parent;
     }
 
     public boolean isLeaf() {
-        return children == null || children.size() == 0;
+        return children == null || children.isEmpty();
     }
 
     /**
@@ -82,7 +81,7 @@ public class TreeNode<T> {
      * @return boolean 是否为跟节点
      */
     public boolean isRoot() {
-        return praent == null;
+        return parent == null;
     }
 
     public JSONObject toJSONObject(String childrenPropertyName) {
@@ -92,11 +91,11 @@ public class TreeNode<T> {
             jo = new JSONObject();
             jo.put("value", StringBaseOpt.objectToString(this.getValue()));
         } else
-            jo = (JSONObject) JSON.toJSON(this.getValue());
+            jo = JSONObject.from(this.getValue());
 
-        if (this.children != null && this.children.size() > 0) {
+        if (this.children != null && !this.children.isEmpty()) {
             JSONArray ja = new JSONArray();
-            for (TreeNode c : this.children) {
+            for (TreeNode<?> c : this.children) {
                 ja.add(c.toJSONObject(childrenPropertyName));
             }
             jo.put(childrenPropertyName, ja);
@@ -107,7 +106,7 @@ public class TreeNode<T> {
 
     public static JSONArray toJSONArray(List<? extends TreeNode<?>> forest, String childrenPropertyName){
         JSONArray ja = new JSONArray();
-        for (TreeNode c : forest) {
+        for (TreeNode<?> c : forest) {
             ja.add(c.toJSONObject(childrenPropertyName));
         }
         return ja;
@@ -132,7 +131,7 @@ public class TreeNode<T> {
      */
     public int getPathCount() {
         int result = 0;
-        for (TreeNode<T> path = this; path != null; path = path.getPraent()) {
+        for (TreeNode<T> path = this; path != null; path = path.getParent()) {
             result++;
         }
         return result;
@@ -147,7 +146,7 @@ public class TreeNode<T> {
         int i = getPathCount();
         @SuppressWarnings("unchecked")
         TreeNode<T>[] result = new TreeNode[i--];
-        for (TreeNode<T> path = this; path != null; path = path.getPraent()) {
+        for (TreeNode<T> path = this; path != null; path = path.getParent()) {
             result[i--] = path;
         }
         return result;
@@ -159,7 +158,7 @@ public class TreeNode<T> {
      * @return 根节点
      */
     public TreeNode<T> getRootTreeNode() {
-        for (TreeNode<T> path = this; path != null; path = path.getPraent()) {
+        for (TreeNode<T> path = this; path != null; path = path.getParent()) {
             if (path.isRoot())
                 return path;
         }
@@ -175,7 +174,7 @@ public class TreeNode<T> {
         int i = getPathCount();
         @SuppressWarnings("unchecked")
         T[] result = (T[]) new Object[i--];
-        for (TreeNode<T> path = this; path != null; path = path.getPraent()) {
+        for (TreeNode<T> path = this; path != null; path = path.getParent()) {
             result[i--] = path.getValue();
         }
         return result;
@@ -189,10 +188,10 @@ public class TreeNode<T> {
     public T getRootValue() {
 
         T rootValue = this.getValue();
-        TreeNode<T> path = this.getPraent();
+        TreeNode<T> path = this.getParent();
         while (path != null) {
             rootValue = path.getValue();
-            path = path.getPraent();
+            path = path.getParent();
         }
         return rootValue;
     }
