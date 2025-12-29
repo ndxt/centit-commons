@@ -106,6 +106,13 @@
             <artifactId>pdfbox</artifactId>
         </dependency>
 
+        <!-- 显式声明 fontbox 版本，确保与 pdfbox 3.0.0 兼容 -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>fontbox</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
