@@ -1,6 +1,6 @@
 package com.centit.test;
 
-import com.centit.support.office.PdfSignatureUtil;
+import com.centit.support.office.SignatureUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,8 +28,8 @@ public class TestPdfSign {
             //需要进行签章的pdf
             String path = "sec.pdf";
             //签章后的pdf路径
-            PdfSignatureUtil.sign(base+path, base+"output.pdf",
-                PdfSignatureUtil.createSingInfo().reason("我给你的权限，就是这么牛B！")
+            SignatureUtil.signPdf(base+path, base+"output.pdf",
+                SignatureUtil.createSingInfo().reason("我给你的权限，就是这么牛B！")
                     .location("江苏南京雨花台区")
                     .image(base+"yinzhang.jpg")
                     .privateKey(pk)

@@ -15,7 +15,13 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
 import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.graphics.PDXObject;
+import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,6 +178,17 @@ public class PdfUtil {
     }
 
 
+    public static PDDocument loadPDFDocument(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] data = new byte[8192];
+        int nRead;
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+
+        return Loader.loadPDF(buffer.toByteArray());
+    }
+
     /**
      * pdf 转图片，每一页一个图片
      * @param inPdfFile 输入pdf文件流
@@ -180,28 +197,19 @@ public class PdfUtil {
      */
     public static List<BufferedImage> pdf2Images(InputStream inPdfFile, double ppm) {
         List<BufferedImage> images = new ArrayList<>();
-        try {
-            // 将 InputStream 转换为 byte array
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            byte[] data = new byte[8192];
-            int nRead;
-            while ((nRead = inPdfFile.read(data, 0, data.length)) != -1) {
-                buffer.write(data, 0, nRead);
+        try (PDDocument document = loadPDFDocument(inPdfFile)) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            int pageCount = document.getNumberOfPages();
+
+            // 将 ppm (每毫米像素数) 转换为 dpi (每英寸像素数)
+            // 1 英寸 = 25.4 毫米
+            float dpi = (float) (ppm * 25.4);
+
+            for (int page = 0; page < pageCount; page++) {
+                BufferedImage image = pdfRenderer.renderImageWithDPI(page, dpi);
+                images.add(image);
             }
 
-            try (PDDocument document = Loader.loadPDF(buffer.toByteArray())) {
-                PDFRenderer pdfRenderer = new PDFRenderer(document);
-                int pageCount = document.getNumberOfPages();
-
-                // 将 ppm (每毫米像素数) 转换为 dpi (每英寸像素数)
-                // 1 英寸 = 25.4 毫米
-                float dpi = (float) (ppm * 25.4);
-
-                for (int page = 0; page < pageCount; page++) {
-                    BufferedImage image = pdfRenderer.renderImageWithDPI(page, dpi);
-                    images.add(image);
-                }
-            }
         } catch (IOException e) {
             logger.error("PDF转图片失败: {}", e.getMessage(), e);
         }
@@ -223,5 +231,67 @@ public class PdfUtil {
         }
     }
 
+
+    /**
+     *  从 pdf 中获取图片
+     * @param inPdfFile 输入pdf文件流
+     * @return pdf中的图片列表
+     */
+    public static List<BufferedImage> fetchPdfImages(InputStream inPdfFile) {
+        List<BufferedImage> images = new ArrayList<>();
+        try (PDDocument document = loadPDFDocument(inPdfFile)) {
+            for (PDPage page : document.getPages()) {
+                PDResources resources = page.getResources();
+                if (resources != null) {
+                    extractImagesFromResources(resources, images);
+                }
+            }
+        } catch (IOException e) {
+            logger.error("从PDF提取图片失败: {}", e.getMessage(), e);
+        }
+        return images;
+    }
+
+    /**
+     * 从 pdf 中获取图片
+     * @param pdfFilePath PDF文件路径
+     * @return pdf中的图片列表
+     */
+    public static List<BufferedImage> fetchPdfImages(String pdfFilePath) {
+        try (InputStream inputStream = Files.newInputStream(Paths.get(pdfFilePath))) {
+            return fetchPdfImages(inputStream);
+        } catch (IOException e) {
+            logger.error("PDF文件读取失败: {}", e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * 从PDF资源中提取图片（递归处理，支持表单对象中的图片）
+     * @param resources PDF资源对象
+     * @param images 图片列表（输出参数）
+     */
+    private static void extractImagesFromResources(PDResources resources, List<BufferedImage> images) {
+        try {
+            for (COSName key : resources.getXObjectNames()) {
+                PDXObject xObject = resources.getXObject(key);
+                if (xObject instanceof PDImageXObject imageXObject) {
+                    // 直接图片对象
+                    BufferedImage image = imageXObject.getImage();
+                    if (image != null) {
+                        images.add(image);
+                    }
+                } else if (xObject instanceof PDFormXObject formXObject) {
+                    // 表单对象，可能包含图片，递归处理
+                    PDResources formResources = formXObject.getResources();
+                    if (formResources != null) {
+                        extractImagesFromResources(formResources, images);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            logger.error("提取图片资源失败: {}", e.getMessage(), e);
+        }
+    }
 
 }

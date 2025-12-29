@@ -15,9 +15,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class OfdUtils {
+public abstract class OfdUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(OfdUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(OfdUtil.class);
 
     public static List<BufferedImage> ofd2Images(InputStream inOfdFile, double ppm) {
         try {
