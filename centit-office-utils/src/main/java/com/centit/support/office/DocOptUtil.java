@@ -1,5 +1,6 @@
 package com.centit.support.office;
 
+import com.centit.support.image.ImageOpt;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -208,6 +209,20 @@ public class DocOptUtil {
         } catch (IOException e) {
             logger.error("PDF文件读取失败: {}", e.getMessage(), e);
             return new ArrayList<>();
+        }
+    }
+
+    public static BufferedImage pdf2OneImage(InputStream inPdfFile, double ppm) {
+        List<BufferedImage> images = pdf2Images(inPdfFile, ppm);
+        return ImageOpt.mergeImages(images, 1, 0);
+    }
+
+    public static BufferedImage pdf2OneImage(String pdfFilePath, double ppm) {
+        try (InputStream inputStream = Files.newInputStream(Paths.get(pdfFilePath))) {
+            return pdf2OneImage(inputStream, ppm);
+        } catch (IOException e) {
+            logger.error("PDF文件读取失败: {}", e.getMessage(), e);
+            return null;
         }
     }
 
