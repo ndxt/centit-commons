@@ -15,9 +15,11 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -166,6 +168,47 @@ public class DocOptUtil {
     }
     public static void pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords, java.awt.Color color) throws IOException {
         pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords, color);
+    }
+
+    /**
+     * pdf 转图片，每一页一个图片
+     * @param inPdfFile 输入pdf文件流
+     * @param ppm 每毫米像素数量
+     * @return 图片列表
+     */
+    public static List<BufferedImage> pdf2Images(InputStream inPdfFile, double ppm) {
+        List<BufferedImage> images = new ArrayList<>();
+        try (PDDocument document = PDDocument.load(inPdfFile)) {
+            PDFRenderer pdfRenderer = new PDFRenderer(document);
+            int pageCount = document.getNumberOfPages();
+
+            // 将 ppm (每毫米像素数) 转换为 dpi (每英寸像素数)
+            // 1 英寸 = 25.4 毫米
+            float dpi = (float) (ppm * 25.4);
+
+            for (int page = 0; page < pageCount; page++) {
+                BufferedImage image = pdfRenderer.renderImageWithDPI(page, dpi);
+                images.add(image);
+            }
+        } catch (IOException e) {
+            logger.error("PDF转图片失败: {}", e.getMessage(), e);
+        }
+        return images;
+    }
+
+    /**
+     * pdf 转图片，每一页一个图片
+     * @param pdfFilePath PDF文件路径
+     * @param ppm 每毫米像素数量
+     * @return 图片列表
+     */
+    public static List<BufferedImage> pdf2Images(String pdfFilePath, double ppm) {
+        try (InputStream inputStream = Files.newInputStream(Paths.get(pdfFilePath))) {
+            return pdf2Images(inputStream, ppm);
+        } catch (IOException e) {
+            logger.error("PDF文件读取失败: {}", e.getMessage(), e);
+            return new ArrayList<>();
+        }
     }
 
 }
