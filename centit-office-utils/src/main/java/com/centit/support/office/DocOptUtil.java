@@ -1,6 +1,5 @@
 package com.centit.support.office;
 
-import com.centit.support.image.ImageOpt;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -15,7 +14,13 @@ import com.itextpdf.kernel.pdf.canvas.parser.listener.LocationTextExtractionStra
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.graphics.PDXObject;
+import org.apache.pdfbox.pdmodel.graphics.form.PDFormXObject;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,17 +217,67 @@ public class DocOptUtil {
         }
     }
 
-    public static BufferedImage pdf2OneImage(InputStream inPdfFile, double ppm) {
-        List<BufferedImage> images = pdf2Images(inPdfFile, ppm);
-        return ImageOpt.mergeImages(images, 1, 0);
+    /**
+     *  从 pdf 中获取图片
+     * @param inPdfFile 输入pdf文件流
+     * @return pdf中的图片列表
+     */
+    public static List<BufferedImage> fetchPdfImages(InputStream inPdfFile) {
+        List<BufferedImage> images = new ArrayList<>();
+        try (PDDocument document = PDDocument.load(inPdfFile)) {
+            for (PDPage page : document.getPages()) {
+                PDResources resources = page.getResources();
+                if (resources != null) {
+                    extractImagesFromResources(resources, images);
+                }
+            }
+        } catch (IOException e) {
+            logger.error("从PDF提取图片失败: {}", e.getMessage(), e);
+        }
+        return images;
     }
 
-    public static BufferedImage pdf2OneImage(String pdfFilePath, double ppm) {
+    /**
+     * 从 pdf 中获取图片
+     * @param pdfFilePath PDF文件路径
+     * @return pdf中的图片列表
+     */
+    public static List<BufferedImage> fetchPdfImages(String pdfFilePath) {
         try (InputStream inputStream = Files.newInputStream(Paths.get(pdfFilePath))) {
-            return pdf2OneImage(inputStream, ppm);
+            return fetchPdfImages(inputStream);
         } catch (IOException e) {
             logger.error("PDF文件读取失败: {}", e.getMessage(), e);
-            return null;
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * 从PDF资源中提取图片（递归处理，支持表单对象中的图片）
+     * @param resources PDF资源对象
+     * @param images 图片列表（输出参数）
+     */
+    private static void extractImagesFromResources(PDResources resources, List<BufferedImage> images) {
+        try {
+            for (COSName key : resources.getXObjectNames()) {
+                PDXObject xObject = resources.getXObject(key);
+                if (xObject instanceof PDImageXObject) {
+                    // 直接图片对象
+                    PDImageXObject imageXObject = (PDImageXObject) xObject;
+                    BufferedImage image = imageXObject.getImage();
+                    if (image != null) {
+                        images.add(image);
+                    }
+                } else if (xObject instanceof PDFormXObject) {
+                    // 表单对象，可能包含图片，递归处理
+                    PDFormXObject formXObject = (PDFormXObject) xObject;
+                    PDResources formResources = formXObject.getResources();
+                    if (formResources != null) {
+                        extractImagesFromResources(formResources, images);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            logger.error("提取图片资源失败: {}", e.getMessage(), e);
         }
     }
 
