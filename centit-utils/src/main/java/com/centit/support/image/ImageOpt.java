@@ -519,4 +519,56 @@ public abstract class ImageOpt {
             return false;
         }
     }
+
+    /**
+     * 图片旋转函数，支持任意角度旋转
+     * @param image 要旋转的图片
+     * @param angle 旋转角度（度）
+     * @return 旋转后的图片
+     */
+    public static BufferedImage rotateImage(BufferedImage image, double angle) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        // 将角度转换为弧度
+        double radian = Math.toRadians(angle);
+
+        // 计算旋转后图片的边界框大小
+        double sin = Math.abs(Math.sin(radian));
+        double cos = Math.abs(Math.cos(radian));
+        int newWidth = (int) Math.floor(width * cos + height * sin);
+        int newHeight = (int) Math.floor(height * cos + width * sin);
+
+        // 创建新图片
+        BufferedImage rotatedImage = new BufferedImage(newWidth, newHeight, image.getType());
+        Graphics2D g2d = rotatedImage.createGraphics();
+
+        // 设置高质量渲染
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // 移动到新图片的中心点
+        g2d.translate(newWidth / 2.0, newHeight / 2.0);
+
+        // 执行旋转
+        g2d.rotate(radian);
+
+        // 绘制原始图片（以原图中心为旋转点）
+        g2d.drawImage(image, -width / 2, -height / 2, null);
+
+        g2d.dispose();
+        return rotatedImage;
+    }
+
+    /**
+     * 图片旋转函数，支持任意角度旋转（兼容性重载方法）
+     * @param image 要旋转的图片
+     * @param angle 旋转角度（度）
+     * @return 旋转后的图片
+     */
+    public static BufferedImage rotateImage(BufferedImage image, int angle) {
+        return rotateImage(image, (double) angle);
+    }
+
 }
