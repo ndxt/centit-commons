@@ -1,7 +1,7 @@
 package com.centit.test;
 
 import com.centit.support.image.ImageOpt;
-import com.centit.support.office.DocOptUtil;
+import com.centit.support.office.PdfUtil;
 
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
@@ -16,7 +16,7 @@ public class TestPdf2Images {
             FileInputStream pdfInput = new FileInputStream("/Users/codefan/projects/centit/centit-commons/centit-office-utils/src/test/resources/template/content.pdf");
             // 设置为每毫米3像素（约72 DPI）
             double ppm = 10.0;
-            List<BufferedImage> images = DocOptUtil.pdf2Images(pdfInput, ppm);
+            List<BufferedImage> images = PdfUtil.pdf2Images(pdfInput, ppm);
 
             System.out.println("PDF转换完成，共生成 " + images.size() + " 张图片");
 

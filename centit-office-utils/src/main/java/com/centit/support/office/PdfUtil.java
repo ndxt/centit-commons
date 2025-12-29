@@ -37,8 +37,8 @@ import java.util.List;
  * &lt;/dependency&gt;
  */
 
-public class DocOptUtil {
-    private static final Logger logger = LoggerFactory.getLogger(DocOptUtil.class);
+public class PdfUtil {
+    private static final Logger logger = LoggerFactory.getLogger(PdfUtil.class);
 
     public static void mergePdfFiles(String outputPath, List<String> inputPaths) {
         try (FileOutputStream fos = new FileOutputStream(outputPath)) {
@@ -222,4 +222,6 @@ public class DocOptUtil {
             return new ArrayList<>();
         }
     }
+
+
 }
