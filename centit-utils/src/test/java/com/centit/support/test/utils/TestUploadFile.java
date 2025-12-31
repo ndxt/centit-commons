@@ -4,14 +4,14 @@ import com.centit.support.file.FileSystemOpt;
 import com.centit.support.file.FileType;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.ContentType;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,7 +22,7 @@ public class TestUploadFile {
     private static MultipartEntityBuilder buildMultiPartEntity(String filePath) throws IOException {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(HttpExecutor.BOUNDARY);
-        builder.setMode(HttpMultipartMode.RFC6532);
+        builder.setMode(HttpMultipartMode.LEGACY);
         //builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
         String fileName = FileSystemOpt.extractFullFileName(filePath);
         builder.addBinaryBody("file", Files.newInputStream(Paths.get(filePath)),

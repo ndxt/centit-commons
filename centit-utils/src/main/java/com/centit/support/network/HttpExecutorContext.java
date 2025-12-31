@@ -1,15 +1,15 @@
 package com.centit.support.network;
 
-import org.apache.http.HttpHost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.HttpHost;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpExecutorContext {
     private CloseableHttpClient httpclient;
-    private HttpContext httpContext;
+    private HttpClientContext httpContext;
     private Map<String, String> httpHeaders;
     private Map<String, String> httpCookies;
     private HttpHost httpProxy;
@@ -43,7 +43,7 @@ public class HttpExecutorContext {
         return this;
     }
 
-    public HttpExecutorContext context(HttpContext httpContext) {
+    public HttpExecutorContext context(HttpClientContext httpContext) {
         this.httpContext = httpContext;
         return this;
     }
@@ -90,7 +90,7 @@ public class HttpExecutorContext {
         return httpclient;
     }
 
-    public HttpContext getHttpContext() {
+    public HttpClientContext getHttpContext() {
         return httpContext;
     }
 

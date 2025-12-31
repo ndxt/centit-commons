@@ -1,26 +1,25 @@
 package com.centit.support.network;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.HttpResponseException;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public class InputStreamResponseHandler implements ResponseHandler<InputStream> {
+public class InputStreamResponseHandler implements HttpClientResponseHandler<InputStream> {
 
-    public static final ResponseHandler<InputStream> INSTANCE = new InputStreamResponseHandler();
+    public static final HttpClientResponseHandler<InputStream> INSTANCE = new InputStreamResponseHandler();
 
     @Override
-    public InputStream handleResponse(final HttpResponse response) throws IOException {
-        final StatusLine statusLine = response.getStatusLine();
+    public InputStream handleResponse(final ClassicHttpResponse response) throws IOException {
+        final int statusCode = response.getCode();
         final HttpEntity entity = response.getEntity();
-        if (statusLine.getStatusCode() >= 300) {
+        if (statusCode >= 300) {
             EntityUtils.consume(entity);
-            throw new HttpResponseException(statusLine.getStatusCode(), statusLine.getReasonPhrase());
+            throw new HttpResponseException(statusCode, response.getReasonPhrase());
         }
         return entity == null ? null : entity.getContent();
     }

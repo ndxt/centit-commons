@@ -6,35 +6,34 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.*;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.EntityBuilder;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.*;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.entity.EntityBuilder;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
+import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.ssl.SSLContexts;
+import org.apache.hc.core5.ssl.TrustStrategy;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.File;
@@ -43,7 +42,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -58,7 +59,7 @@ import java.util.regex.Pattern;
 public abstract class HttpExecutor {
 
     public static final ContentType APPLICATION_FORM_URLENCODED = ContentType.create(
-        "application/x-www-form-urlencoded", Consts.UTF_8);
+        "application/x-www-form-urlencoded", StandardCharsets.UTF_8);
     public static final String BOUNDARY = "------1cC9oE7dN8eT1fI0aT2n4------";
     public static final String multiPartTypeHead =
         "multipart/form-data; charset=UTF-8; boundary=" + BOUNDARY;
@@ -77,11 +78,11 @@ public abstract class HttpExecutor {
             new BasicNameValuePair("boundary",BOUNDARY)
     })).toString();    */
     public static final String applicationJSONHead = ContentType.create(
-        "application/json", Consts.UTF_8).toString();
+        "application/json", StandardCharsets.UTF_8).toString();
     public static final String plainTextHead = ContentType.create(
-        "text/plain", Consts.UTF_8).toString();
+        "text/plain", StandardCharsets.UTF_8).toString();
     public static final String xmlTextHead = ContentType.create(
-        "text/xml", Consts.UTF_8).toString();
+        "text/xml", StandardCharsets.UTF_8).toString();
     public static final String applicationOctetStream = ContentType.create(
         "application/octet-stream", (Charset) null).toString();
     protected static final Logger logger = LoggerFactory.getLogger(HttpExecutor.class);
@@ -105,24 +106,20 @@ public abstract class HttpExecutor {
     }
 
     public static CloseableHttpClient createHttpClient(HttpHost httpProxy, boolean keepSession, boolean useSSL)
-        throws NoSuchAlgorithmException, KeyManagementException {
+        throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
         HttpClientBuilder clientBuilder = HttpClients.custom();
         if (useSSL) {
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, new TrustManager[]{manager}, null);
-            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(context, NoopHostnameVerifier.INSTANCE);
-            //RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).build();
-            Registry<ConnectionSocketFactory> socketFactoryRegistry =
-                RegistryBuilder.<ConnectionSocketFactory>create()
-                    .register("http", PlainConnectionSocketFactory.INSTANCE)
-                    .register("https", socketFactory)
-                    .build();
-            PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+            TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+            javax.net.ssl.SSLContext sslContext = SSLContexts.custom()
+                .loadTrustMaterial(null, acceptingTrustStrategy)
+                .build();
+            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+            PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+            connectionManager.setDefaultSocketConfig(SocketConfig.custom()
+                .setSoTimeout(Timeout.ofMinutes(1))
+                .build());
             clientBuilder.setConnectionManager(connectionManager);
-        }
-        if (keepSession) {
-            RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).build();
-            clientBuilder.setDefaultRequestConfig(config);
+            clientBuilder.setConnectionManagerShared(false);
         }
         if (httpProxy != null)
             clientBuilder.setProxy(httpProxy);
@@ -138,30 +135,28 @@ public abstract class HttpExecutor {
     }
 
     /*
-     * 设置cookie的保存策略为CookieSpecs.NETSCAPE，这样可以保持session
+     * 创建保持session的HttpClient
      */
     public static CloseableHttpClient createKeepSessionHttpClient() {
-        RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).build();
-        return HttpClients.custom().setDefaultRequestConfig(config).build();
+        return HttpClients.custom().build();
     }
 
     public static CloseableHttpClient createKeepSessionHttpClient(HttpHost httpProxy) {
-        RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).build();
-        return HttpClients.custom().setDefaultRequestConfig(config).setProxy(httpProxy).build();
+        return HttpClients.custom().setProxy(httpProxy).build();
     }
 
     public static CloseableHttpClient createHttpsClient()
-        throws NoSuchAlgorithmException, KeyManagementException {
+        throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
         return createHttpClient(null, false, true);
     }
 
     public static CloseableHttpClient createKeepSessionHttpsClient()
-        throws NoSuchAlgorithmException, KeyManagementException {
+        throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
         return createHttpClient(null, true, true);
     }
 
     public static void prepareHttpRequest(HttpExecutorContext executorContext,
-                                   HttpRequestBase httpRequest){
+                                   ClassicHttpRequest httpRequest){
         if (executorContext.getHttpHeaders() != null) {
             for (Map.Entry<String, String> entHeader : executorContext.getHttpHeaders().entrySet())
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
@@ -198,21 +193,22 @@ public abstract class HttpExecutor {
             }
             //设置超时时间
             if(executorContext.getTimeout()>1000){
-                builder.setConnectionRequestTimeout(executorContext.getTimeout())
-                    .setConnectTimeout(executorContext.getTimeout())
-                    .setSocketTimeout(executorContext.getTimeout());
+                builder.setConnectionRequestTimeout(Timeout.ofMilliseconds(executorContext.getTimeout()))
+                    .setConnectTimeout(Timeout.ofMilliseconds(executorContext.getTimeout()))
+                    .setResponseTimeout(Timeout.ofMilliseconds(executorContext.getTimeout()));
             } else {
-                builder.setConnectionRequestTimeout(10000)
-                    .setConnectTimeout(10000)
-                    .setSocketTimeout(20000);
+                builder.setConnectionRequestTimeout(Timeout.ofMilliseconds(10000))
+                    .setConnectTimeout(Timeout.ofMilliseconds(10000))
+                    .setResponseTimeout(Timeout.ofMilliseconds(20000));
             }
-            httpRequest.setConfig(builder.build());
+            // HttpClient5 中通过HttpClientBuilder配置，不再在request上设置
+            // httpRequest.setConfig(builder.build());
         }else {
-            httpRequest.setConfig(builder.build());
+            // httpRequest.setConfig(builder.build());
         }
     }
     public static <T> T httpExecute(HttpExecutorContext executorContext,
-                                    HttpRequestBase httpRequest, ResponseHandler<T> responseHandler)
+                                    ClassicHttpRequest httpRequest, org.apache.hc.core5.http.io.HttpClientResponseHandler<T> responseHandler)
         throws IOException {
 
         prepareHttpRequest(executorContext, httpRequest);
@@ -227,8 +223,8 @@ public abstract class HttpExecutor {
             httpClient = executorContext.getHttpclient();
         }
 
-        try (CloseableHttpResponse response = httpClient.execute(httpRequest, executorContext.getHttpContext())) {
-            return responseHandler.handleResponse(response);
+        try {
+            return httpClient.execute(httpRequest, executorContext.getHttpContext(), responseHandler);
         } finally {
             if (createSelfClient) {
                 httpClient.close();
@@ -237,7 +233,7 @@ public abstract class HttpExecutor {
     }
 
     public static String httpExecute(HttpExecutorContext executorContext,
-                                     HttpRequestBase httpRequest)
+                                     ClassicHttpRequest httpRequest)
         throws IOException {
         return httpExecute(executorContext, httpRequest, Utf8ResponseHandler.INSTANCE);
     }
@@ -288,7 +284,7 @@ public abstract class HttpExecutor {
 
         httpPut.setHeader("Content-Type", plainTextHead);
         if (putEntity != null) {
-            StringEntity entity = new StringEntity(putEntity, Consts.UTF_8);
+            StringEntity entity = new StringEntity(putEntity, StandardCharsets.UTF_8);
             httpPut.setEntity(entity);
         }
         return httpExecute(executorContext, httpPut);
@@ -304,7 +300,7 @@ public abstract class HttpExecutor {
 
 
         if (bytes != null) {
-            ByteArrayEntity entity = new ByteArrayEntity(bytes);
+            ByteArrayEntity entity = new ByteArrayEntity(bytes, ContentType.APPLICATION_OCTET_STREAM);
             httpPut.setEntity(entity);
         }
 
@@ -324,7 +320,7 @@ public abstract class HttpExecutor {
         httpPut.setHeader("Content-Type", applicationFormHead);
 
         if (putIS != null) {
-            InputStreamEntity entity = new InputStreamEntity(putIS);
+            InputStreamEntity entity = new InputStreamEntity(putIS, ContentType.APPLICATION_OCTET_STREAM);
             httpPut.setEntity(entity);
         }
 
@@ -548,7 +544,7 @@ public abstract class HttpExecutor {
         if(!executorContext.hasHeader("Content-Type"))
             httpPost.setHeader("Content-Type", plainTextHead);
         if (postEntity != null) {
-            StringEntity entity = new StringEntity(postEntity, Consts.UTF_8);
+            StringEntity entity = new StringEntity(postEntity, StandardCharsets.UTF_8);
             httpPost.setEntity(entity);
         }
         return httpExecute(executorContext, httpPost);
@@ -573,7 +569,7 @@ public abstract class HttpExecutor {
             httpPost.setHeader("Content-Type", applicationFormHead);
 
         if (postIS != null) {
-            InputStreamEntity entity = new InputStreamEntity(postIS);
+            InputStreamEntity entity = new InputStreamEntity(postIS, ContentType.APPLICATION_OCTET_STREAM);
             httpPost.setEntity(entity);
         }
 
@@ -589,7 +585,7 @@ public abstract class HttpExecutor {
             httpPost.setHeader("Content-Type", applicationFormHead);
 
         if (bytes != null) {
-            ByteArrayEntity entity = new ByteArrayEntity(bytes);
+            ByteArrayEntity entity = new ByteArrayEntity(bytes, ContentType.APPLICATION_OCTET_STREAM);
             httpPost.setEntity(entity);
         }
 
@@ -618,7 +614,7 @@ public abstract class HttpExecutor {
         if(!executorContext.hasHeader("Content-Type"))
             httpPost.setHeader("Content-Type", applicationJSONHead);
         if (jsonString != null && ! "".equals(jsonString)) {
-            StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
+            StringEntity entity = new StringEntity(jsonString, StandardCharsets.UTF_8);
             httpPost.setEntity(entity);
         }
 
@@ -646,7 +642,7 @@ public abstract class HttpExecutor {
         if(!executorContext.hasHeader("Content-Type"))
             httpPut.setHeader("Content-Type", applicationJSONHead);
         if (jsonString != null && !"".equals(jsonString)) {
-            StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
+            StringEntity entity = new StringEntity(jsonString, StandardCharsets.UTF_8);
             httpPut.setEntity(entity);
         }
         return httpExecute(executorContext, httpPut);
@@ -661,7 +657,7 @@ public abstract class HttpExecutor {
             httpPost.setHeader("Content-Type", xmlTextHead);
 
         if (xmlEntity != null) {
-            StringEntity entity = new StringEntity(xmlEntity, Consts.UTF_8);
+            StringEntity entity = new StringEntity(xmlEntity, StandardCharsets.UTF_8);
             httpPost.setEntity(entity);
         }
 
@@ -681,7 +677,7 @@ public abstract class HttpExecutor {
         if(!executorContext.hasHeader("Content-Type"))
             httpPut.setHeader("Content-Type", xmlTextHead);
         if (xmlEntity != null && !"".equals(xmlEntity)) {
-            StringEntity entity = new StringEntity(xmlEntity, Consts.UTF_8);
+            StringEntity entity = new StringEntity(xmlEntity, StandardCharsets.UTF_8);
             httpPut.setEntity(entity);
         }
         return httpExecute(executorContext, httpPut);
@@ -793,8 +789,11 @@ public abstract class HttpExecutor {
         String paramsUrl = null;
         if (formObjects != null) {
             List<NameValuePair> params = makeRequectParams(formObjects, "");
-            paramsUrl =
-                EntityUtils.toString(new UrlEncodedFormEntity(params, Consts.UTF_8));
+            try {
+                paramsUrl = EntityUtils.toString(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
+            } catch (org.apache.hc.core5.http.ParseException e) {
+                throw new RuntimeException(e);
+            }
         }
         return inputStreamUpload(executorContext,
             UrlOptUtils.appendParamToUrl(uri, paramsUrl), inputStream, filedName, contentType, filename);
@@ -803,10 +802,10 @@ public abstract class HttpExecutor {
     private static MultipartEntityBuilder createMultipartEntityFromFormAndFiles(Map<String, Object> formObjects, Map<String, File> files) {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(BOUNDARY);
-        builder.setMode(HttpMultipartMode.RFC6532);
+        builder.setMode(HttpMultipartMode.LEGACY);
 
         if (formObjects != null) {
-            ContentType contentType = ContentType.create("text/plain",Consts.UTF_8);
+            ContentType contentType = ContentType.create("text/plain",StandardCharsets.UTF_8);
             for (Map.Entry<String, Object> param : formObjects.entrySet()) {
                 builder.addTextBody(param.getKey(),
                     JSONOpt.objectToJSONString(param.getValue()),contentType);
@@ -848,7 +847,7 @@ public abstract class HttpExecutor {
         HttpPost httpPost = new HttpPost(uri);
         if(!executorContext.hasHeader("Content-Type"))
             httpPost.setHeader("Content-Type", multiPartTypeHead);
-        InputStreamEntity entity = new InputStreamEntity(new FileInputStream(file));
+        InputStreamEntity entity = new InputStreamEntity(new FileInputStream(file), ContentType.APPLICATION_OCTET_STREAM);
         httpPost.setEntity(entity);
         return httpExecute(executorContext, httpPost);
     }
@@ -859,14 +858,17 @@ public abstract class HttpExecutor {
         String paramsUrl = null;
         if (formObjects != null) {
             List<NameValuePair> params = makeRequectParams(formObjects, "");
-            paramsUrl =
-                EntityUtils.toString(new UrlEncodedFormEntity(params, Consts.UTF_8));
+            try {
+                paramsUrl = EntityUtils.toString(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
+            } catch (org.apache.hc.core5.http.ParseException e) {
+                throw new RuntimeException(e);
+            }
         }
         return fileUpload(executorContext,
             UrlOptUtils.appendParamToUrl(uri, paramsUrl), file);
     }
 
-    public static String extraFileName(CloseableHttpResponse response) {
+    public static String extraFileName(ClassicHttpResponse response) {
         Header[] contentDispositionHeader = response
             .getHeaders("Content-Disposition");
         if(contentDispositionHeader == null || contentDispositionHeader.length == 0){
@@ -884,7 +886,7 @@ public abstract class HttpExecutor {
 
         HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamToUrl(uri, queryParam));
         CloseableHttpClient httpClient = null;
-        boolean createSelfClient = executorContext.getHttpclient() == null;
+        final boolean createSelfClient = executorContext.getHttpclient() == null;
         if (createSelfClient) {
             httpClient = executorContext.getHttpProxy() == null ?
                 HttpExecutor.createHttpClient() :
@@ -894,26 +896,28 @@ public abstract class HttpExecutor {
         }
         prepareHttpRequest(executorContext, httpGet);
 
-        try (CloseableHttpResponse response = httpClient.execute(httpGet, executorContext.getHttpContext())) {
-
-            Header[] contentTypeHeader = response.getHeaders("Content-Type");
-            if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
-                StringUtils.indexOf(
-                    contentTypeHeader[0].getValue(), "text/") >= 0
-            ) {
-                String responseContent = Utf8ResponseHandler.INSTANCE
-                    .handleResponse(response);
-                throw new RuntimeException(responseContent);
-            }
-            try (InputStream inputStream = InputStreamResponseHandler.INSTANCE
-                .handleResponse(response)) {
-                // 视频文件不支持下载
-                //fileName = extraFileName(response);
-                return operate.doOperate(inputStream);
-            }
+        final CloseableHttpClient finalHttpClient = httpClient;
+        try {
+            return httpClient.execute(httpGet, executorContext.getHttpContext(), response -> {
+                Header[] contentTypeHeader = response.getHeaders("Content-Type");
+                if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
+                    StringUtils.indexOf(
+                        contentTypeHeader[0].getValue(), "text/") >= 0
+                ) {
+                    String responseContent = Utf8ResponseHandler.INSTANCE
+                        .handleResponse(response);
+                    throw new RuntimeException(responseContent);
+                }
+                try (InputStream inputStream = InputStreamResponseHandler.INSTANCE
+                    .handleResponse(response)) {
+                    // 视频文件不支持下载
+                    //fileName = extraFileName(response);
+                    return operate.doOperate(inputStream);
+                }
+            });
         } finally {
-            if (createSelfClient) {
-                httpClient.close();
+            if (createSelfClient && finalHttpClient != null) {
+                finalHttpClient.close();
             }
         }
     }
