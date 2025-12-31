@@ -66,7 +66,7 @@ public class TestFromPost {
         //CloseableHttpClient client2 = HttpClients.createDefault();
         HttpClientContext context = HttpClientContext.create();
 
-        CloseableHttpClient httpClient = HttpExecutor.createKeepSessionHttpClient();
+        CloseableHttpClient httpClient = HttpExecutor.createHttpClient();
 
         HttpExecutorContext executorContext = HttpExecutorContext.create(httpClient).context(context);
         try {

@@ -14,7 +14,7 @@ public class HttpExecutorContext {
     private Map<String, String> httpCookies;
     private HttpHost httpProxy;
     private int timeout;
-    private boolean keepSession;
+    private boolean storeCookie;
     private boolean useSSL;
 
     public HttpExecutorContext() {
@@ -23,6 +23,8 @@ public class HttpExecutorContext {
         httpContext = null;
         httpclient = null;
         httpProxy = null;
+        useSSL = false;
+        storeCookie = false;
         timeout=-1;
     }
 
@@ -85,8 +87,8 @@ public class HttpExecutorContext {
         return  this;
     }
 
-    public HttpExecutorContext enableSession(boolean keepSession){
-        this.keepSession=keepSession;
+    public HttpExecutorContext enableCookie(boolean storeCookie){
+        this.storeCookie = storeCookie;
         return  this;
     }
 
@@ -103,8 +105,8 @@ public class HttpExecutorContext {
         return this.useSSL;
     }
 
-    public boolean isKeepSession(){
-        return this.keepSession;
+    public boolean isStoreCookie(){
+        return this.storeCookie;
     }
 
     public CloseableHttpClient getHttpclient() {

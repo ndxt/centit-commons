@@ -10,6 +10,7 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.entity.EntityBuilder;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
@@ -18,6 +19,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
@@ -105,6 +107,14 @@ public abstract class HttpExecutor {
                 logger.error("SSL配置失败，使用默认配置", e);
             }
         }
+        if (executorContext.isStoreCookie()){
+            BasicCookieStore cookieStore = new BasicCookieStore();
+            clientBuilder.setDefaultCookieStore(cookieStore);
+            if(executorContext.getHttpContext() == null) {
+                executorContext.context(HttpClientContext.create());
+            }
+            executorContext.getHttpContext().setCookieStore(cookieStore);
+        }
         if (executorContext.getHttpProxy() != null)
             clientBuilder.setProxy(executorContext.getHttpProxy());
         return clientBuilder.build();
@@ -114,16 +124,6 @@ public abstract class HttpExecutor {
         return HttpClients.createDefault();
     }
 
-    /*
-     * 创建保持session的HttpClient
-     */
-    public static CloseableHttpClient createKeepSessionHttpClient() {
-        return HttpClients.custom().build();
-    }
-
-    public static CloseableHttpClient createKeepSessionHttpClient(HttpHost httpProxy) {
-        return HttpClients.custom().setProxy(httpProxy).build();
-    }
 
     public static void prepareHttpRequest(HttpExecutorContext executorContext,
                                    ClassicHttpRequest httpRequest){
