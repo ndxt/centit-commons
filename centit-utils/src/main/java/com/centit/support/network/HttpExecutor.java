@@ -38,9 +38,6 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -84,9 +81,9 @@ public abstract class HttpExecutor {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static CloseableHttpClient createHttpClient(HttpHost httpProxy, boolean keepSession, boolean useSSL) {
+    public static CloseableHttpClient createHttpClient(HttpExecutorContext executorContext) {
         HttpClientBuilder clientBuilder = HttpClients.custom();
-        if (useSSL) {
+        if (executorContext.isUseSSL()) {
             // HttpClient5中为了兼容老版本的SSL信任所有证书功能
             // 在生产环境中应该使用正确的SSL证书验证
             try {
@@ -108,17 +105,13 @@ public abstract class HttpExecutor {
                 logger.error("SSL配置失败，使用默认配置", e);
             }
         }
-        if (httpProxy != null)
-            clientBuilder.setProxy(httpProxy);
+        if (executorContext.getHttpProxy() != null)
+            clientBuilder.setProxy(executorContext.getHttpProxy());
         return clientBuilder.build();
     }
 
     public static CloseableHttpClient createHttpClient() {
         return HttpClients.createDefault();
-    }
-
-    public static CloseableHttpClient createHttpClient(HttpHost httpProxy) {
-        return HttpClients.custom().setProxy(httpProxy).build();
     }
 
     /*
@@ -130,16 +123,6 @@ public abstract class HttpExecutor {
 
     public static CloseableHttpClient createKeepSessionHttpClient(HttpHost httpProxy) {
         return HttpClients.custom().setProxy(httpProxy).build();
-    }
-
-    public static CloseableHttpClient createHttpsClient()
-        throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
-        return createHttpClient(null, false, true);
-    }
-
-    public static CloseableHttpClient createKeepSessionHttpsClient()
-        throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
-        return createHttpClient(null, true, true);
     }
 
     public static void prepareHttpRequest(HttpExecutorContext executorContext,
@@ -174,9 +157,7 @@ public abstract class HttpExecutor {
         CloseableHttpClient httpClient = null;
         boolean createSelfClient = executorContext.getHttpclient() == null;
         if (createSelfClient) {
-            httpClient = executorContext.getHttpProxy() == null ?
-                HttpExecutor.createHttpClient() :
-                HttpExecutor.createHttpClient(executorContext.getHttpProxy());
+            httpClient = HttpExecutor.createHttpClient(executorContext);
         } else {
             httpClient = executorContext.getHttpclient();
         }
@@ -844,9 +825,7 @@ public abstract class HttpExecutor {
         CloseableHttpClient httpClient = null;
         final boolean createSelfClient = executorContext.getHttpclient() == null;
         if (createSelfClient) {
-            httpClient = executorContext.getHttpProxy() == null ?
-                HttpExecutor.createHttpClient() :
-                HttpExecutor.createHttpClient(executorContext.getHttpProxy());
+            httpClient = HttpExecutor.createHttpClient(executorContext);
         } else {
             httpClient = executorContext.getHttpclient();
         }
