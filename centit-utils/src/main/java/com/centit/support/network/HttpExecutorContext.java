@@ -78,7 +78,7 @@ public class HttpExecutorContext {
         httpCookies.put(name, value);
         return this;
     }
-    public HttpExecutorContext timout(int timeout){
+    public HttpExecutorContext timeout(int timeout){
         this.timeout=timeout;
         return  this;
     }

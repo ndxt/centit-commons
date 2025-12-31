@@ -36,7 +36,8 @@ public class TestUploadFile {
         BasicCookieStore cookieStore = new BasicCookieStore();
         CloseableHttpClient httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
         context.setCookieStore(cookieStore);
-        HttpExecutorContext httpExecutorContext = HttpExecutorContext.create(httpClient).context(context).header("Connection", "close").timout(10000);
+        HttpExecutorContext httpExecutorContext = HttpExecutorContext.create(httpClient).context(context)
+            .header("Connection", "close").timeout(10000);
 
         HttpPost httpPost = new HttpPost("http://10.0.101.93/ccApi4gx/attach/uploadTaskPhotos");
         httpPost.setHeader("Content-Type", "multipart/form-data; boundary=" + HttpExecutor.BOUNDARY);

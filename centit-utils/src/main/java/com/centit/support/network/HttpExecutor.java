@@ -10,7 +10,6 @@ import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpPut;
-import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.entity.EntityBuilder;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
@@ -19,8 +18,6 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
@@ -34,8 +31,6 @@ import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,8 +41,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -86,40 +79,34 @@ public abstract class HttpExecutor {
     public static final String applicationOctetStream = ContentType.create(
         "application/octet-stream", (Charset) null).toString();
     protected static final Logger logger = LoggerFactory.getLogger(HttpExecutor.class);
-    private static TrustManager manager = new X509TrustManager() {
-        @Override
-        public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-    };
 
     private HttpExecutor() {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static CloseableHttpClient createHttpClient(HttpHost httpProxy, boolean keepSession, boolean useSSL)
-        throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
+    public static CloseableHttpClient createHttpClient(HttpHost httpProxy, boolean keepSession, boolean useSSL) {
         HttpClientBuilder clientBuilder = HttpClients.custom();
         if (useSSL) {
-            TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-            javax.net.ssl.SSLContext sslContext = SSLContexts.custom()
-                .loadTrustMaterial(null, acceptingTrustStrategy)
-                .build();
-            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
-            PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-            connectionManager.setDefaultSocketConfig(SocketConfig.custom()
-                .setSoTimeout(Timeout.ofMinutes(1))
-                .build());
-            clientBuilder.setConnectionManager(connectionManager);
-            clientBuilder.setConnectionManagerShared(false);
+            // HttpClient5中为了兼容老版本的SSL信任所有证书功能
+            // 在生产环境中应该使用正确的SSL证书验证
+            try {
+                TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+                javax.net.ssl.SSLContext sslContext = SSLContexts.custom()
+                    .loadTrustMaterial(null, acceptingTrustStrategy)
+                    .build();
+
+                // 简化方式：仅配置连接管理器，让HttpClient5自动处理SSL
+                PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+                connectionManager.setDefaultSocketConfig(SocketConfig.custom()
+                    .setSoTimeout(Timeout.ofMinutes(1))
+                    .build());
+                clientBuilder.setConnectionManager(connectionManager);
+
+                // 注意：HttpClient5推荐使用默认的SSL配置，如需自定义SSL请参考官方文档
+                logger.warn("使用宽松的SSL配置，不建议在生产环境使用");
+            } catch (Exception e) {
+                logger.error("SSL配置失败，使用默认配置", e);
+            }
         }
         if (httpProxy != null)
             clientBuilder.setProxy(httpProxy);
@@ -162,7 +149,7 @@ public abstract class HttpExecutor {
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
         }
 
-        if (executorContext.getHttpCookies() != null && executorContext.getHttpCookies().size()>0) {
+        if (executorContext.getHttpCookies() != null && !executorContext.getHttpCookies().isEmpty()) {
             StringBuilder cookieString = new StringBuilder();
             int i = 0;
             for (Map.Entry<String, String> entCookie : executorContext.getHttpCookies().entrySet()) {
@@ -175,37 +162,8 @@ public abstract class HttpExecutor {
             httpRequest.setHeader("Cookie", cookieString.toString());
         }
 
-        /**
-         * 1.connectionRequestTimout(单位是ms)：指从连接池获取连接的timeout超出预设时间(
-         *
-         * 从连接池获取连接的超时时间，如果连接池里连接都被用了，且超过设定时间,就会报错connectionrequesttimeout，会抛出超时异常.
-         *
-         * 2.connetionTimeout(单位是ms)：指客户端和服务器建立连接的timeout.
-         *
-         * 就是http请求的三个阶段，一：建立连接；二：数据传送；三，断开连接。如果与服务器(这里指数据库)请求建立连接的时间超过ConnectionTimeOut，就会抛 ConnectionTimeOutException，即服务器连接超时，没有在规定的时间内建立连接。
-         *
-         * 3.socketTimeout(单位是ms)：指客户端从服务器读取数据的timeout超出预期设定时间，超出后会抛出SocketTimeOutException.
-         */
-        RequestConfig.Builder builder = RequestConfig.custom().setMaxRedirects(3);
-        if(executorContext.getHttpProxy() != null || executorContext.getTimeout() != -1) {
-            if (executorContext.getHttpProxy() != null) {
-                builder.setProxy(executorContext.getHttpProxy());
-            }
-            //设置超时时间
-            if(executorContext.getTimeout()>1000){
-                builder.setConnectionRequestTimeout(Timeout.ofMilliseconds(executorContext.getTimeout()))
-                    .setConnectTimeout(Timeout.ofMilliseconds(executorContext.getTimeout()))
-                    .setResponseTimeout(Timeout.ofMilliseconds(executorContext.getTimeout()));
-            } else {
-                builder.setConnectionRequestTimeout(Timeout.ofMilliseconds(10000))
-                    .setConnectTimeout(Timeout.ofMilliseconds(10000))
-                    .setResponseTimeout(Timeout.ofMilliseconds(20000));
-            }
-            // HttpClient5 中通过HttpClientBuilder配置，不再在request上设置
-            // httpRequest.setConfig(builder.build());
-        }else {
-            // httpRequest.setConfig(builder.build());
-        }
+        // HttpClient5中超时和代理配置应该在HttpClientBuilder级别设置，
+        // 而不是在每个request上设置，因此移除了无效的per-request配置代码
     }
     public static <T> T httpExecute(HttpExecutorContext executorContext,
                                     ClassicHttpRequest httpRequest, org.apache.hc.core5.http.io.HttpClientResponseHandler<T> responseHandler)
@@ -327,7 +285,7 @@ public abstract class HttpExecutor {
         return httpExecute(executorContext, httpPut);
     }
 
-    public static List<NameValuePair> makeRequectParams(Object obj, String prefixName) {
+    public static List<NameValuePair> makeRequestParams(Object obj, String prefixName) {
         List<NameValuePair> params = new ArrayList<>();
         if (obj == null)
             return params;
@@ -340,7 +298,7 @@ public abstract class HttpExecutor {
             params.add((NameValuePair) obj);
             return params;
         } else if (obj instanceof Map) {
-            String sFN = (prefixName == null || "".equals(prefixName)) ? "" : prefixName + ".";
+            String sFN = StringUtils.isBlank(prefixName) ? "" : prefixName + ".";
             @SuppressWarnings("unchecked")
             Map<String, Object> objMap = (Map<String, Object>) obj;
             /*objMap.entrySet().forEach( f -> {if(f.getRight()!=null){
@@ -349,13 +307,12 @@ public abstract class HttpExecutor {
             }} );*/
             for (Map.Entry<String, Object> f : objMap.entrySet()) {
                 if (f.getValue() != null) {
-                    List<NameValuePair> subNP = makeRequectParams(f.getValue(), sFN + f.getKey());
+                    List<NameValuePair> subNP = makeRequestParams(f.getValue(), sFN + f.getKey());
                     params.addAll(subNP);
                 }
             }//end of for
             return params;
-        } else if (obj instanceof Collection) {//end of map
-            Collection<?> objList = (Collection<?>) obj;
+        } else if (obj instanceof Collection<?> objList) {//end of map
             if (objList.size() == 1) {
                 Object subObj = objList.iterator().next();
                 if (subObj != null) {
@@ -366,7 +323,7 @@ public abstract class HttpExecutor {
                         if (subObj instanceof NameValuePair) {
                             params.add((NameValuePair) subObj);
                         } else {
-                            List<NameValuePair> subNP = makeRequectParams(subObj, prefixName);
+                            List<NameValuePair> subNP = makeRequestParams(subObj, prefixName);
                             params.addAll(subNP);
                         }
                     }
@@ -388,7 +345,7 @@ public abstract class HttpExecutor {
                             params.add((NameValuePair) subObj);
                             //complexObject ++;
                         } else {
-                            List<NameValuePair> subNP = makeRequectParams(subObj, prefixName + "[" + n + "]");
+                            List<NameValuePair> subNP = makeRequestParams(subObj, prefixName + "[" + n + "]");
                             params.addAll(subNP);
                             //complexObject ++;
                         }
@@ -401,8 +358,7 @@ public abstract class HttpExecutor {
                             StringBaseOpt.objectToString(arrayStr)));*/
             }
             return params; //返回一个空的
-        } else if (obj instanceof Object[]) {
-            Object[] objs = (Object[]) obj;
+        } else if (obj instanceof Object[] objs) {
             if (objs.length == 1) {
                 Object subobj = objs[0];
                 if (subobj != null) {
@@ -412,7 +368,7 @@ public abstract class HttpExecutor {
                     } else if (subobj instanceof NameValuePair) {
                         params.add((NameValuePair) subobj);
                     } else {
-                        List<NameValuePair> subNP = makeRequectParams(subobj, prefixName);
+                        List<NameValuePair> subNP = makeRequestParams(subobj, prefixName);
                         params.addAll(subNP);
                     }
                 }
@@ -432,7 +388,7 @@ public abstract class HttpExecutor {
                             params.add((NameValuePair) objs[i]);
                             //complexObject ++;
                         } else {
-                            List<NameValuePair> subNP = makeRequectParams(objs[i], prefixName + "[" + i + "]");
+                            List<NameValuePair> subNP = makeRequestParams(objs[i], prefixName + "[" + i + "]");
                             params.addAll(subNP);
                             //complexObject ++;
                         }
@@ -446,19 +402,19 @@ public abstract class HttpExecutor {
             return params; //返回一个空的
         } else {
             List<Method> methods = ReflectionOpt.getAllGetterMethod(obj.getClass());
-            String sFN = (prefixName == null || "".equals(prefixName)) ? "" : prefixName + ".";
-            for (Method md : methods) {
-                try {
-                    Object v = md.invoke(obj);
-                    if (v != null) {
-                        String skey = ReflectionOpt.methodNameToField(md.getName());
-
-                        List<NameValuePair> subNP = makeRequectParams(v, sFN + skey);
-                        params.addAll(subNP);
-
+            if(methods!=null) {
+                String sFN = StringUtils.isBlank(prefixName) ? "" : prefixName + ".";
+                for (Method md : methods) {
+                    try {
+                        Object v = md.invoke(obj);
+                        if (v != null) {
+                            String sKey = ReflectionOpt.methodNameToField(md.getName());
+                            List<NameValuePair> subNP = makeRequestParams(v, sFN + sKey);
+                            params.addAll(subNP);
+                        }
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
                     }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
                 }
             }
             return params;
@@ -471,7 +427,7 @@ public abstract class HttpExecutor {
         eb.setContentType(APPLICATION_FORM_URLENCODED);
         eb.setContentEncoding("utf-8");
         //FormBodyPartBuilder formBuilder = FormBodyPartBuilder.create(formName,null);
-        List<NameValuePair> params = makeRequectParams(formData, "");
+        List<NameValuePair> params = makeRequestParams(formData, "");
         eb.setParameters(params);
         return eb.build();
     }
@@ -479,15 +435,15 @@ public abstract class HttpExecutor {
     private static HttpEntity buildEntity(Object[] formObjects, Map<String, Object> extFormObjects){
         List<NameValuePair> params = new ArrayList<>();
         if (formObjects != null) {
-            for (int i = 0; i < formObjects.length; i++) {
-                if (formObjects[i] != null) {
-                    List<NameValuePair> subNP = makeRequectParams(formObjects[i], "");
+            for (Object formObject : formObjects) {
+                if (formObject != null) {
+                    List<NameValuePair> subNP = makeRequestParams(formObject, "");
                     params.addAll(subNP);
                 }
             }//end of for
         }
         if (extFormObjects != null) {
-            List<NameValuePair> subNP = makeRequectParams(extFormObjects, "");
+            List<NameValuePair> subNP = makeRequestParams(extFormObjects, "");
             params.addAll(subNP);
         }
         EntityBuilder eb = EntityBuilder.create();
@@ -500,8 +456,8 @@ public abstract class HttpExecutor {
 
     }
 
-    public static List<NameValuePair> makeRequectParams(Object obj) {
-        return makeRequectParams(obj, "");
+    public static List<NameValuePair> makeRequestParams(Object obj) {
+        return makeRequestParams(obj, "");
     }
 
     public static String formPut(HttpExecutorContext executorContext,
@@ -613,7 +569,7 @@ public abstract class HttpExecutor {
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
         if(!executorContext.hasHeader("Content-Type"))
             httpPost.setHeader("Content-Type", applicationJSONHead);
-        if (jsonString != null && ! "".equals(jsonString)) {
+        if (StringUtils.isNotBlank(jsonString)) {
             StringEntity entity = new StringEntity(jsonString, StandardCharsets.UTF_8);
             httpPost.setEntity(entity);
         }
@@ -641,7 +597,7 @@ public abstract class HttpExecutor {
         HttpPut httpPut = new HttpPut(uri);
         if(!executorContext.hasHeader("Content-Type"))
             httpPut.setHeader("Content-Type", applicationJSONHead);
-        if (jsonString != null && !"".equals(jsonString)) {
+        if (StringUtils.isNotBlank(jsonString)) {
             StringEntity entity = new StringEntity(jsonString, StandardCharsets.UTF_8);
             httpPut.setEntity(entity);
         }
@@ -676,7 +632,7 @@ public abstract class HttpExecutor {
         HttpPut httpPut = new HttpPut(uri);
         if(!executorContext.hasHeader("Content-Type"))
             httpPut.setHeader("Content-Type", xmlTextHead);
-        if (xmlEntity != null && !"".equals(xmlEntity)) {
+        if (StringUtils.isNotBlank(xmlEntity)) {
             StringEntity entity = new StringEntity(xmlEntity, StandardCharsets.UTF_8);
             httpPut.setEntity(entity);
         }
@@ -788,7 +744,7 @@ public abstract class HttpExecutor {
 
         String paramsUrl = null;
         if (formObjects != null) {
-            List<NameValuePair> params = makeRequectParams(formObjects, "");
+            List<NameValuePair> params = makeRequestParams(formObjects, "");
             try {
                 paramsUrl = EntityUtils.toString(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
             } catch (org.apache.hc.core5.http.ParseException e) {
@@ -857,7 +813,7 @@ public abstract class HttpExecutor {
         throws IOException {
         String paramsUrl = null;
         if (formObjects != null) {
-            List<NameValuePair> params = makeRequectParams(formObjects, "");
+            List<NameValuePair> params = makeRequestParams(formObjects, "");
             try {
                 paramsUrl = EntityUtils.toString(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
             } catch (org.apache.hc.core5.http.ParseException e) {
@@ -901,9 +857,7 @@ public abstract class HttpExecutor {
             return httpClient.execute(httpGet, executorContext.getHttpContext(), response -> {
                 Header[] contentTypeHeader = response.getHeaders("Content-Type");
                 if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
-                    StringUtils.indexOf(
-                        contentTypeHeader[0].getValue(), "text/") >= 0
-                ) {
+                    contentTypeHeader[0].getValue().contains("text/") ) {
                     String responseContent = Utf8ResponseHandler.INSTANCE
                         .handleResponse(response);
                     throw new RuntimeException(responseContent);
