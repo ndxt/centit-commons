@@ -7,12 +7,18 @@ import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class Utf8ResponseHandler implements HttpClientResponseHandler<String> {
+public class StringResponseHandler implements HttpClientResponseHandler<String> {
 
-    public static final HttpClientResponseHandler<String> INSTANCE = new Utf8ResponseHandler();
+    public static final HttpClientResponseHandler<String> UTF8StringHandler
+        = new StringResponseHandler(StandardCharsets.UTF_8);
 
+    private final Charset charset;
+    public StringResponseHandler(Charset charset) {
+        this.charset = charset;
+    }
     @Override
     public String handleResponse(final ClassicHttpResponse response) throws IOException {
         final int statusCode = response.getCode();
@@ -23,7 +29,7 @@ public class Utf8ResponseHandler implements HttpClientResponseHandler<String> {
                 statusCode + ", " + response.getReasonPhrase() + "。");
         }
         try {
-            return entity == null ? null : EntityUtils.toString(entity, StandardCharsets.UTF_8);
+            return entity == null ? null : EntityUtils.toString(entity, this.charset);
         } catch (org.apache.hc.core5.http.ParseException e) {
             throw new IOException(e);
         }

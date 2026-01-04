@@ -6,10 +6,9 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.classic.methods.HttpDelete;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.classic.methods.*;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.entity.EntityBuilder;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
@@ -21,6 +20,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.SocketConfig;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -85,6 +85,18 @@ public abstract class HttpExecutor {
 
     public static CloseableHttpClient createHttpClient(HttpExecutorContext executorContext) {
         HttpClientBuilder clientBuilder = HttpClients.custom();
+        // 配置连接管理器和连接超时
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setDefaultSocketConfig(SocketConfig.custom()
+            .setSoTimeout(Timeout.ofMinutes(1))
+            .build());
+        // 设置连接超时时间
+        if(executorContext.getTimeout() > 0) {
+            connectionManager.setConnectionConfigResolver(route -> ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.ofSeconds(executorContext.getTimeout()))
+                .build());
+        }
+        clientBuilder.setConnectionManager(connectionManager);
         if (executorContext.isUseSSL()) {
             // HttpClient5中为了兼容老版本的SSL信任所有证书功能
             // 在生产环境中应该使用正确的SSL证书验证
@@ -93,14 +105,6 @@ public abstract class HttpExecutor {
                 javax.net.ssl.SSLContext sslContext = SSLContexts.custom()
                     .loadTrustMaterial(null, acceptingTrustStrategy)
                     .build();
-
-                // 简化方式：仅配置连接管理器，让HttpClient5自动处理SSL
-                PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-                connectionManager.setDefaultSocketConfig(SocketConfig.custom()
-                    .setSoTimeout(Timeout.ofMinutes(1))
-                    .build());
-                clientBuilder.setConnectionManager(connectionManager);
-
                 // 注意：HttpClient5推荐使用默认的SSL配置，如需自定义SSL请参考官方文档
                 logger.warn("使用宽松的SSL配置，不建议在生产环境使用");
             } catch (Exception e) {
@@ -117,6 +121,7 @@ public abstract class HttpExecutor {
         }
         if (executorContext.getHttpProxy() != null)
             clientBuilder.setProxy(executorContext.getHttpProxy());
+
         return clientBuilder.build();
     }
 
@@ -124,9 +129,15 @@ public abstract class HttpExecutor {
         return HttpClients.createDefault();
     }
 
-
     public static void prepareHttpRequest(HttpExecutorContext executorContext,
-                                   ClassicHttpRequest httpRequest){
+                                          HttpUriRequestBase httpRequest){
+        if(executorContext.getTimeout()>0) {
+            httpRequest.setConfig(RequestConfig.custom()
+                //.setConnectTimeout(Timeout.ofSeconds(60))
+                .setResponseTimeout(Timeout.ofSeconds(executorContext.getTimeout()))
+                .build());
+        }
+
         if (executorContext.getHttpHeaders() != null) {
             for (Map.Entry<String, String> entHeader : executorContext.getHttpHeaders().entrySet())
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
@@ -144,17 +155,15 @@ public abstract class HttpExecutor {
             }
             httpRequest.setHeader("Cookie", cookieString.toString());
         }
-
         // HttpClient5中超时和代理配置应该在HttpClientBuilder级别设置，
         // 而不是在每个request上设置，因此移除了无效的per-request配置代码
     }
     public static <T> T httpExecute(HttpExecutorContext executorContext,
-                                    ClassicHttpRequest httpRequest, org.apache.hc.core5.http.io.HttpClientResponseHandler<T> responseHandler)
+                                    HttpUriRequestBase httpRequest,
+                                    HttpClientResponseHandler<T> responseHandler)
         throws IOException {
-
         prepareHttpRequest(executorContext, httpRequest);
-
-        CloseableHttpClient httpClient = null;
+        CloseableHttpClient httpClient;
         boolean createSelfClient = executorContext.getHttpclient() == null;
         if (createSelfClient) {
             httpClient = HttpExecutor.createHttpClient(executorContext);
@@ -172,9 +181,9 @@ public abstract class HttpExecutor {
     }
 
     public static String httpExecute(HttpExecutorContext executorContext,
-                                     ClassicHttpRequest httpRequest)
+                                     HttpUriRequestBase httpRequest)
         throws IOException {
-        return httpExecute(executorContext, httpRequest, Utf8ResponseHandler.INSTANCE);
+        return httpExecute(executorContext, httpRequest, StringResponseHandler.UTF8StringHandler);
     }
 
     public static String simpleGet(HttpExecutorContext executorContext, String uri, String queryParam)
@@ -837,7 +846,7 @@ public abstract class HttpExecutor {
                 Header[] contentTypeHeader = response.getHeaders("Content-Type");
                 if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
                     contentTypeHeader[0].getValue().contains("text/") ) {
-                    String responseContent = Utf8ResponseHandler.INSTANCE
+                    String responseContent = StringResponseHandler.UTF8StringHandler
                         .handleResponse(response);
                     throw new RuntimeException(responseContent);
                 }
@@ -865,7 +874,6 @@ public abstract class HttpExecutor {
     public static <T> T fetchInputStreamByUrl(String uri,
                                               DoOperateInputStream<T> operate) throws IOException {
         try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
-
             return fetchInputStreamByUrl(HttpExecutorContext.create(httpClient),
                 uri, null, operate);
         }
