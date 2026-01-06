@@ -86,7 +86,7 @@ public abstract class CollectionsOpt {
         //Objects.requireNonNull(parentExtractor);
         //Objects.requireNonNull(childExtractor);
         return (p, c) ->
-            GeneralAlgorithm.equals(pkExtractor.apply(p), parentPkExtractor.apply(c));
+            GeneralAlgorithm.equals(pkExtractor.apply(p), parentPkExtractor.apply(c), false);
     }
 
     /**
