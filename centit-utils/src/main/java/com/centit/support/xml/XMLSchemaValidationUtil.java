@@ -16,9 +16,9 @@ public abstract class XMLSchemaValidationUtil {
         try {
             SchemaFactory factory =
                 SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            // 禁用外部实体访问，提高安全性
-            factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            // 下面注释的语句禁用外部实体访问，提高安全性， 禁用会导致错误
+            // factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            // factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 
             Schema schema = factory.newSchema(new StreamSource(xsdPath));
             Validator validator = schema.newValidator();

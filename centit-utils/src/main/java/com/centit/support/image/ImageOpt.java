@@ -147,6 +147,12 @@ public abstract class ImageOpt {
      * @return BufferedImage 返回图片
      */
     public static BufferedImage mergeImages(List<BufferedImage> imageList, int imagesPreRow, int whiteSpace){
+        if(imageList == null || imageList.isEmpty()){
+            return null;
+        }
+        if(imageList.size()==1){
+            return imageList.get(0);
+        }
         BufferedImage image = imageList.get(0);
         int w = image.getWidth();
         int h = image.getHeight();

@@ -96,6 +96,7 @@ public abstract class GeneralAlgorithm {
                 Comparator<Object> compare = Collator.getInstance(java.util.Locale.CHINA);
                 return compare.compare(operand, operand2);
             }
+            //noinspection unchecked
             return ObjectUtils.compare((Comparable)operand , (Comparable)operand2);
         }
 
