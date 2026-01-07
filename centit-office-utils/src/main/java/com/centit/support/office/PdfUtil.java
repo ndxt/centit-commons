@@ -14,7 +14,6 @@ import com.itextpdf.kernel.pdf.canvas.parser.listener.LocationTextExtractionStra
 import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
-import lombok.Getter;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -176,16 +175,13 @@ public class PdfUtil {
             }
         }
 
-
         // 在页面处理完成后执行关键词匹配
         public void processKeywords() {
             if (keywords.isEmpty() || textPositions.isEmpty()) {
                 return;
             }
-
             // 将文本位置信息重构为连续文本
             PdfUtil.ReconstructedTextInfo reconstructed = reconstructText();
-
             // 对每个关键词进行匹配
             for (String keyword : keywords) {
                 if (keyword != null && !keyword.isEmpty()) {
@@ -201,7 +197,7 @@ public class PdfUtil {
 
             for (int i = 0; i < textPositions.size(); i++) {
                 PdfUtil.TextPositionInfo info = textPositions.get(i);
-                String charText = info.getText();
+                String charText = info.text();
                 fullText.append(charText);
 
                 // 记录每个字符在重构文本中的位置对应原始位置
@@ -209,47 +205,41 @@ public class PdfUtil {
                     charToPositionMap.add(i);
                 }
             }
-
             return new PdfUtil.ReconstructedTextInfo(fullText.toString(), charToPositionMap);
         }
 
         // 查找关键词位置并生成高亮矩形
         private void findKeywordPositions(PdfUtil.ReconstructedTextInfo reconstructed, String keyword) {
-            String fullText = reconstructed.getText().toLowerCase();
+            String fullText = reconstructed.text().toLowerCase();
             String searchKeyword = keyword.toLowerCase();
 
             int startIndex = 0;
             while ((startIndex = fullText.indexOf(searchKeyword, startIndex)) >= 0) {
                 try {
                     // 获取关键词在原始位置列表中的起始和结束索引
-                    int startPosIndex = reconstructed.getCharToPositionMap().get(startIndex);
-                    int endPosIndex = reconstructed.getCharToPositionMap().get(
-                        Math.min(startIndex + keyword.length() - 1, reconstructed.getCharToPositionMap().size() - 1)
+                    int startPosIndex = reconstructed.charToPositionMap().get(startIndex);
+                    int endPosIndex = reconstructed.charToPositionMap().get(
+                        Math.min(startIndex + keyword.length() - 1, reconstructed.charToPositionMap().size() - 1)
                     );
-
                     // 获取起始和结束字符的位置信息
                     PdfUtil.TextPositionInfo startInfo = textPositions.get(startPosIndex);
                     PdfUtil.TextPositionInfo endInfo = textPositions.get(endPosIndex);
-
                     // 创建跨越多个字符的高亮矩形
                     Rectangle combinedRect = createCombinedRectangle(startInfo, endInfo);
                     highlightRectangles.add(combinedRect);
-
                 } catch (IndexOutOfBoundsException e) {
                     logger.warn("索引越界，跳过关键词匹配: {}", e.getMessage());
                 }
-
                 startIndex++;
             }
         }
 
         // 创建跨越多个字符的矩形
         private Rectangle createCombinedRectangle(PdfUtil.TextPositionInfo startInfo, PdfUtil.TextPositionInfo endInfo) {
-            float left = Math.min(startInfo.getBaseline().getLeft(), endInfo.getBaseline().getLeft());
-            float right = Math.max(startInfo.getBaseline().getRight(), endInfo.getBaseline().getRight());
-            float bottom = Math.min(startInfo.getDescent().getBottom(), endInfo.getDescent().getBottom());
-            float top = Math.max(startInfo.getAscent().getTop(), endInfo.getAscent().getTop());
-
+            float left = Math.min(startInfo.baseline().getLeft(), endInfo.baseline().getLeft());
+            float right = Math.max(startInfo.baseline().getRight(), endInfo.baseline().getRight());
+            float bottom = Math.min(startInfo.descent().getBottom(), endInfo.descent().getBottom());
+            float top = Math.max(startInfo.ascent().getTop(), endInfo.ascent().getTop());
             // 添加一些边距以确保完全覆盖
             float margin = 1.0f;
             return new Rectangle(left - margin, bottom - margin,
@@ -263,41 +253,19 @@ public class PdfUtil {
         }
     }
 
-    // 文本位置信息类
-    @Getter
-    private static class TextPositionInfo {
-        // getter方法
-        private final String text;
-        private final Rectangle baseline;
-        private final Rectangle ascent;
-        private final Rectangle descent;
-
-        public TextPositionInfo(String text, Rectangle baseline, Rectangle ascent, Rectangle descent) {
-            this.text = text;
-            this.baseline = baseline;
-            this.ascent = ascent;
-            this.descent = descent;
-        }
-
+    /**
+     * @param text getter方法
+     */ // 文本位置信息类
+    private record TextPositionInfo(String text, Rectangle baseline, Rectangle ascent, Rectangle descent) {
     }
 
     // 重构文本信息类
-    @Getter
-    private static class ReconstructedTextInfo {
-        private final String text;
-        private final List<Integer> charToPositionMap;
-
-        public ReconstructedTextInfo(String text, List<Integer> charToPositionMap) {
-            this.text = text;
-            this.charToPositionMap = charToPositionMap;
-        }
-
+    private record ReconstructedTextInfo(String text, List<Integer> charToPositionMap) {
     }
 
     public static void pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords, java.awt.Color color) throws IOException {
         pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords, color);
     }
-
 
     public static PDDocument loadPDFDocument(InputStream inputStream) throws IOException {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -306,7 +274,6 @@ public class PdfUtil {
         while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
             buffer.write(data, 0, nRead);
         }
-
         return Loader.loadPDF(buffer.toByteArray());
     }
 
