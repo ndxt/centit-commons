@@ -13,8 +13,7 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.formula.eval.ErrorEval;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -112,7 +111,7 @@ public class Excel2PdfUtils {
      *
      * @param dataFormat       来自Cell.getCellStyle().getDataFormat()的值
      * @param dataFormatString 来自Cell.getCellStyle().getDataFormatString()的值
-     * @param date            来自Cell.getDateCellValue()的值
+     * @param date             来自Cell.getDateCellValue()的值
      * @return
      */
     private static String getFormatDateStringValue(Short dataFormat, String dataFormatString, Date date) {
@@ -183,13 +182,13 @@ public class Excel2PdfUtils {
         }
         String value;
         CellType cellType = cell.getCellType();
-        if(cellType == CellType.FORMULA){
+        if (cellType == CellType.FORMULA) {
             cellType = cell.getCachedFormulaResultType();
         }
         switch (cellType) {
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    value =  getFormatDateStringValue(cell.getCellStyle().getDataFormat(),
+                    value = getFormatDateStringValue(cell.getCellStyle().getDataFormat(),
                         cell.getCellStyle().getDataFormatString(), cell.getDateCellValue());
                     /*String dataFormat = cell.getCellStyle().getDataFormatString();
                     if(StringUtils.containsIgnoreCase(dataFormat, "yy")) {
@@ -199,21 +198,21 @@ public class Excel2PdfUtils {
                     }*/
                 } else {
                     String dataFormat = cell.getCellStyle().getDataFormatString();
-                    int dotPos = dataFormat==null?-1:dataFormat.indexOf(".");
-                    if(dotPos>=0){
+                    int dotPos = dataFormat == null ? -1 : dataFormat.indexOf(".");
+                    if (dotPos >= 0) {
                         int ePos = dataFormat.indexOf("%");
-                        if(ePos>=0){
-                            value = new DecimalFormat(StringUtils.rightPad("#.",ePos-dotPos+1, '0'))
-                                .format(cell.getNumericCellValue()*100)+"%";
-                        }else{
+                        if (ePos >= 0) {
+                            value = new DecimalFormat(StringUtils.rightPad("#.", ePos - dotPos + 1, '0'))
+                                .format(cell.getNumericCellValue() * 100) + "%";
+                        } else {
                             ePos = dataFormat.indexOf("_");
-                            if(ePos<0){
+                            if (ePos < 0) {
                                 ePos = dataFormat.length();
                             }
-                            value = new DecimalFormat(StringUtils.rightPad("#.",ePos-dotPos+1, '0'))
+                            value = new DecimalFormat(StringUtils.rightPad("#.", ePos - dotPos + 1, '0'))
                                 .format(cell.getNumericCellValue());
                         }
-                    }else {
+                    } else {
                         value = new DecimalFormat("#.00000000000").format(cell.getNumericCellValue());
                         value = StringRegularOpt.trimRightZeroInNumber(value);
                     }
@@ -240,7 +239,7 @@ public class Excel2PdfUtils {
     }
 
     public static Phrase getPhrase(Workbook wb, Cell cell, boolean hasAnchor, int sheetIndex) {
-        if(hasAnchor){
+        if (hasAnchor) {
             return new Phrase(getCellString(cell),
                 getFontByExcel(wb, cell.getCellStyle()));
         } else {
@@ -254,19 +253,19 @@ public class Excel2PdfUtils {
     public static PdfPTable toParseContent(Workbook wb, Sheet sheet, int sheetIndex) throws BadElementException, IOException {
 
         List<List<PdfPCell>> cells = new ArrayList<>();
-        List<Integer> colRanges= new ArrayList<>(100);
-        float[] widths = {30F,400F};
+        List<Integer> colRanges = new ArrayList<>(100);
+        float[] widths = {30F, 400F};
         float mw = 0;
         boolean hasAnchor = false;
         for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
-            if(row==null){
+            if (row == null) {
                 continue;
             }
             List<PdfPCell> rowCells = new ArrayList<>();
             int columns = row.getLastCellNum();
-            if(columns <= 0){
-                for(int k=0; k<colRanges.size(); k++){
+            if (columns <= 0) {
+                for (int k = 0; k < colRanges.size(); k++) {
                     PdfPCell pdfpCell = new PdfPCell();
                     pdfpCell.setBorder(Rectangle.NO_BORDER);
                     pdfpCell.setFixedHeight(20);
@@ -275,13 +274,13 @@ public class Excel2PdfUtils {
                 cells.add(rowCells);
                 continue;
             }
-            for(int j=colRanges.size();j<columns; j++){
+            for (int j = colRanges.size(); j < columns; j++) {
                 colRanges.add(i);
             }
             float[] cws = new float[columns];
             for (int j = 0; j < columns; j++) {
                 int lastRow = colRanges.get(j);
-                if(i<lastRow) {
+                if (i < lastRow) {
                     continue;
                 }
                 Cell cell = row.getCell(j);
@@ -298,12 +297,12 @@ public class Excel2PdfUtils {
                     if (range != null) {
                         rowspan = range.getLastRow() - range.getFirstRow() + 1;
                         colspan = range.getLastColumn() - range.getFirstColumn() + 1;
-                        if(rowspan>1){
-                            for(int k=0; k<colspan; k++){
-                                colRanges.set(j+k, i+rowspan);
+                        if (rowspan > 1) {
+                            for (int k = 0; k < colspan; k++) {
+                                colRanges.set(j + k, i + rowspan);
                             }
                         }
-                        if(colspan>1){
+                        if (colspan > 1) {
                             j += colspan - 1;
                         }
                     }
@@ -349,16 +348,16 @@ public class Excel2PdfUtils {
         return table;
     }
 
-    public static void toCreateContentIndexes(Document document, int sheetSize) throws DocumentException{
+    public static void toCreateContentIndexes(Document document, int sheetSize) throws DocumentException {
         PdfPTable table = new PdfPTable(1);
         table.setKeepTogether(true);
         table.getDefaultCell().setBorder(PdfPCell.NO_BORDER);
         //
-        Font font = new Font(PDFPageEvent.BASE_FONT_CHINESE , 12 , Font.NORMAL);
-        font.setColor(new BaseColor(0,0,255));
+        Font font = new Font(PDFPageEvent.BASE_FONT_CHINESE, 12, Font.NORMAL);
+        font.setColor(new BaseColor(0, 0, 255));
         //
         for (int i = 0; i < sheetSize; i++) {
-            Anchor anchor = new Anchor("excel_sheet_" + i , font);
+            Anchor anchor = new Anchor("excel_sheet_" + i, font);
             anchor.setReference("#excel_sheet_" + i);
             //
             PdfPCell cell = new PdfPCell(anchor);
@@ -370,14 +369,14 @@ public class Excel2PdfUtils {
         document.add(table);
     }
 
-    public static float getPixelHeight(float poiHeight){
+    public static float getPixelHeight(float poiHeight) {
         float pixel = poiHeight / 28.6f * 26f;
         return pixel;
     }
 
 
     public static void addImageByPOICell(Sheet sheet,
-                                     PdfPCell pdfpCell , Cell cell) throws BadElementException, IOException{
+                                         PdfPCell pdfpCell, Cell cell) throws BadElementException, IOException {
         if (sheet instanceof HSSFSheet) {
             HSSFSheet hssfSheet = (HSSFSheet) sheet;
             if (hssfSheet.getDrawingPatriarch() != null) {
@@ -396,7 +395,30 @@ public class Excel2PdfUtils {
                             //Dimension dimension = pic.getImageDimension();
                             //this.anchor = anchor;
                             byte[] bytes = data.getData();
-                            if(bytes != null){
+                            if (bytes != null) {
+                                pdfpCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                                pdfpCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                                Image image = Image.getInstance(bytes);
+                                pdfpCell.setImage(image);
+                            }
+                        }
+                    }
+                }
+            }
+        } else if (sheet instanceof XSSFSheet) {
+            XSSFSheet xssfSheet = (XSSFSheet) sheet;
+            XSSFDrawing drawing = xssfSheet.getDrawingPatriarch();
+            if (drawing != null) {
+                List<XSSFShape> shapes = drawing.getShapes();
+                for (XSSFShape shape : shapes) {
+                    if (shape instanceof XSSFPicture) {
+                        XSSFPicture pic = (XSSFPicture) shape;
+                        XSSFClientAnchor anchor = (XSSFClientAnchor) pic.getAnchor();
+                        int row1 = anchor.getRow1();
+                        int col1 = anchor.getCol1();
+                        if (row1 == cell.getRowIndex() && col1 == cell.getColumnIndex()) {
+                            byte[] bytes = pic.getPictureData().getData();
+                            if (bytes != null) {
                                 pdfpCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                                 pdfpCell.setHorizontalAlignment(Element.ALIGN_CENTER);
                                 Image image = Image.getInstance(bytes);
@@ -445,33 +467,33 @@ public class Excel2PdfUtils {
 
 
     public static Font getFontByExcel(Workbook wb, CellStyle style) {
-        Font result = new Font(PDFPageEvent.BASE_FONT_CHINESE , 8 , Font.NORMAL);
+        Font result = new Font(PDFPageEvent.BASE_FONT_CHINESE, 8, Font.NORMAL);
         int index = style.getFontIndex();
         org.apache.poi.ss.usermodel.Font font = wb.getFontAt(index);
 
-        if(font.getBold()){
+        if (font.getBold()) {
             result.setStyle(Font.BOLD);
         }
 
         HSSFColor color = HSSFColor.getIndexHash().get(font.getColor());
 
-        if(color != null){
+        if (color != null) {
             int rbg = getRGB(color);
             result.setColor(new BaseColor(rbg));
         }
 
         FontUnderline underline = FontUnderline.valueOf(font.getUnderline());
-        if(underline == FontUnderline.SINGLE){
+        if (underline == FontUnderline.SINGLE) {
             String ulString = Font.FontStyle.UNDERLINE.getValue();
             result.setStyle(ulString);
         }
         return result;
     }
 
-    public static void addBorderByExcel(Workbook wb, PdfPCell cell , CellStyle style) {
-        cell.setBorderColorLeft(new BaseColor(getBorderRBG(wb,style.getLeftBorderColor())));
-        cell.setBorderColorRight(new BaseColor(getBorderRBG(wb,style.getRightBorderColor())));
-        cell.setBorderColorTop(new BaseColor(getBorderRBG(wb,style.getTopBorderColor())));
-        cell.setBorderColorBottom(new BaseColor(getBorderRBG(wb,style.getBottomBorderColor())));
+    public static void addBorderByExcel(Workbook wb, PdfPCell cell, CellStyle style) {
+        cell.setBorderColorLeft(new BaseColor(getBorderRBG(wb, style.getLeftBorderColor())));
+        cell.setBorderColorRight(new BaseColor(getBorderRBG(wb, style.getRightBorderColor())));
+        cell.setBorderColorTop(new BaseColor(getBorderRBG(wb, style.getTopBorderColor())));
+        cell.setBorderColorBottom(new BaseColor(getBorderRBG(wb, style.getBottomBorderColor())));
     }
 }
