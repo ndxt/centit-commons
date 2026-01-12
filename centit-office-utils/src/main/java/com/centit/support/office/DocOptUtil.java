@@ -36,7 +36,6 @@ import java.util.List;
 /**
  * 未归类的文档操作，比如：文档合并
  * OFD 操作指南
- * http://www.kler.cn/a/414463.html?action=onClick
  * &lt;dependency&gt;
  * &lt;groupId&gt;org.ofdrw&lt;/groupId&gt;
  * &lt;artifactId&gt;ofdrw-tool&lt;/artifactId&gt;
@@ -98,7 +97,135 @@ public class DocOptUtil {
         return false;
     }
 
+    /**
+     * 检测 PDF 是否为扫描件（主要是图片，无有效文本层）
+     *
+     * @param inputStream PDF 文件流
+     * @return true 表示是扫描件，false 表示有文本层
+     */
+    public static boolean isScannedPdf(InputStream inputStream) {
+        try (PDDocument document = PDDocument.load(inputStream)) {
+            return isScannedPdf(document);
+        } catch (IOException e) {
+            logger.error("检测扫描件失败: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * 检测 PDF 是否为扫描件的内部实现
+     * 综合判断：图片数量 + 文本质量
+     */
+    private static boolean isScannedPdf(PDDocument document) {
+        try {
+            // 1. 检查图片数量（扫描件通常每页都有图片）
+            int totalImages = 0;
+            int totalPages = document.getNumberOfPages();
+
+            for (PDPage page : document.getPages()) {
+                PDResources resources = page.getResources();
+                if (resources != null) {
+                    int pageImages = countImages(resources);
+                    totalImages += pageImages;
+                }
+            }
+
+            // 2. 提取文本并分析质量
+            org.apache.pdfbox.text.PDFTextStripper stripper = new org.apache.pdfbox.text.PDFTextStripper();
+            String text = stripper.getText(document).trim();
+
+            // 3. 综合判断
+            // 如果图片数量 >= 页数，且文本质量差，判定为扫描件
+            boolean hasManyImages = totalImages >= totalPages;
+
+            // 计算有效字符比例
+            int totalChars = text.length();
+            if (totalChars < 20) {
+                // 文本太少，结合图片判断
+                return hasManyImages;
+            }
+
+            int validChars = 0;
+            for (char c : text.toCharArray()) {
+                if (c >= '\u4e00' && c <= '\u9fff') { // 中文
+                    validChars++;
+                } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) { // 英文
+                    validChars++;
+                } else if (c >= '0' && c <= '9') { // 数字
+                    validChars++;
+                } else if (Character.isWhitespace(c)) { // 空格
+                    validChars++;
+                }
+            }
+
+            double validRatio = (double) validChars / totalChars;
+
+            // 判断逻辑：
+            // 1. 有大量图片 + 文本质量差 = 扫描件（隐藏文本层通常是乱码）
+            // 2. 文本质量极差（< 10%）= 扫描件
+            // 3. 其他情况 = 普通文本 PDF
+            if (hasManyImages && validRatio < 0.9) {
+                return true;
+            }
+            return validRatio < 0.1;
+
+        } catch (IOException e) {
+            logger.error("提取 PDF 文本失败: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * 递归统计资源中的图片数量
+     */
+    private static int countImages(PDResources resources) throws IOException {
+        int count = 0;
+        for (COSName name : resources.getXObjectNames()) {
+            PDXObject xobject = resources.getXObject(name);
+            if (xobject instanceof PDImageXObject) {
+                count++;
+            } else if (xobject instanceof PDFormXObject) {
+                PDFormXObject form = (PDFormXObject) xobject;
+                if (form.getResources() != null) {
+                    count += countImages(form.getResources());
+                }
+            }
+        }
+        return count;
+    }
+
     public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
+        // 将输入流缓存到字节数组，因为需要读取两次（检测和高亮）
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] data = new byte[8192];
+        int nRead;
+        while ((nRead = inputPath.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+        byte[] pdfBytes = buffer.toByteArray();
+
+        // 检测是否是扫描件
+        boolean isScanned;
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(pdfBytes)) {
+            isScanned = isScannedPdf(bais);
+        }
+
+        logger.info("PDF 检测结果: {}", isScanned ? "扫描件" : "有文本层");
+
+        if (isScanned) {
+            // 扫描件：使用 newContentStreamAfter() 确保高亮不被图片覆盖
+            pdfHighlightKeywordsOnScanned(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color);
+        } else {
+            // 有文本层：使用正常的文本高亮方式
+            pdfHighlightKeywordsOnTextLayer(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color);
+        }
+    }
+
+    /**
+     * 对有文本层的 PDF 进行关键词高亮
+     */
+    private static void pdfHighlightKeywordsOnTextLayer(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
         PdfDocument pdfDoc = new PdfDocument(
             new com.itextpdf.kernel.pdf.PdfReader(inputPath),
             new PdfWriter(outputPath)
@@ -121,17 +248,86 @@ public class DocOptUtil {
             List<Rectangle> highlightRects = strategy.getHighlightRectangles();
 
             if (!highlightRects.isEmpty()) {
+                // 使用 newContentStreamBefore() 在内容流之前绘制高亮
                 PdfCanvas canvas = new PdfCanvas(page.newContentStreamBefore(),
                     page.getResources(), pdfDoc);
 
                 canvas.saveState();
+
+                // 创建扩展图形状态设置透明度
+                com.itextpdf.kernel.pdf.extgstate.PdfExtGState gState =
+                    new com.itextpdf.kernel.pdf.extgstate.PdfExtGState();
+                gState.setFillOpacity(0.3f); // 30% 透明度
+                canvas.setExtGState(gState);
+
                 canvas.setFillColor(highlightColor);
+
                 for (Rectangle rect : highlightRects) {
                     canvas.rectangle(rect.getLeft(), rect.getBottom(),
                         rect.getWidth(), rect.getHeight());
                     canvas.fill();
                 }
                 canvas.restoreState();
+
+                logger.debug("页面 {} 添加了 {} 个高亮矩形", i, highlightRects.size());
+            } else {
+                logger.debug("页面 {} 未找到匹配的关键词", i);
+            }
+        }
+        pdfDoc.close();
+    }
+
+    /**
+     * 对扫描件 PDF 进行关键词高亮
+     * 使用 newContentStreamAfter() 确保高亮显示在图片上方
+     */
+    private static void pdfHighlightKeywordsOnScanned(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
+        PdfDocument pdfDoc = new PdfDocument(
+            new com.itextpdf.kernel.pdf.PdfReader(inputPath),
+            new PdfWriter(outputPath)
+        );
+        DeviceRgb highlightColor = new DeviceRgb(
+            color.getRed() / 255f,
+            color.getGreen() / 255f,
+            color.getBlue() / 255f);
+
+        for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
+            PdfPage page = pdfDoc.getPage(i);
+
+            // 使用增强的关键词提取策略
+            AdvancedKeywordTextExtractionStrategy strategy = new AdvancedKeywordTextExtractionStrategy(keywords);
+
+            PdfCanvasProcessor parser = new PdfCanvasProcessor(strategy);
+            parser.processPageContent(page);
+
+            // 获取处理后的高亮矩形
+            List<Rectangle> highlightRects = strategy.getHighlightRectangles();
+
+            if (!highlightRects.isEmpty()) {
+                // 扫描件使用 newContentStreamAfter() 确保高亮显示在图片上方
+                PdfCanvas canvas = new PdfCanvas(page.newContentStreamAfter(),
+                    page.getResources(), pdfDoc);
+
+                canvas.saveState();
+
+                // 创建扩展图形状态设置透明度
+                com.itextpdf.kernel.pdf.extgstate.PdfExtGState gState =
+                    new com.itextpdf.kernel.pdf.extgstate.PdfExtGState();
+                gState.setFillOpacity(0.4f); // 40% 透明度，更明显
+                canvas.setExtGState(gState);
+
+                canvas.setFillColor(highlightColor);
+
+                for (Rectangle rect : highlightRects) {
+                    canvas.rectangle(rect.getLeft(), rect.getBottom(),
+                        rect.getWidth(), rect.getHeight());
+                    canvas.fill();
+                }
+                canvas.restoreState();
+
+                logger.debug("扫描件页面 {} 添加了 {} 个高亮矩形", i, highlightRects.size());
+            } else {
+                logger.debug("扫描件页面 {} 未找到匹配的关键词", i);
             }
         }
         pdfDoc.close();
