@@ -46,13 +46,13 @@ public class JsonPropertyPreFilters implements PropertyPreFilter {
         return true;
     }
 
-    public void addExclude(Class<?> clazz, String exclude) {
+    public void addExclude(Class<?> clazz, String ... excludeFields) {
         if (this.excludes.get(clazz) == null) {
             Set<String> fields = new HashSet<>();
             this.excludes.put(clazz, fields);
         }
 
         Set<String> fields = this.excludes.get(clazz);
-        fields.add(exclude);
+        fields.addAll(Arrays.asList(excludeFields));
     }
 }
