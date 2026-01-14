@@ -15,6 +15,7 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
 import lombok.Getter;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -43,8 +44,8 @@ import java.util.List;
  * &lt;/dependency&gt;
  */
 
-public class DocOptUtil {
-    private static final Logger logger = LoggerFactory.getLogger(DocOptUtil.class);
+public class PdfUtil {
+    private static final Logger logger = LoggerFactory.getLogger(PdfUtil.class);
 
     public static void mergePdfFiles(String outputPath, List<String> inputPaths) {
         try (FileOutputStream fos = new FileOutputStream(outputPath)) {
@@ -86,7 +87,7 @@ public class DocOptUtil {
     }
 
     public static boolean pdfContainsJSAction(String pdfFilePath) {
-        try (PDDocument document = PDDocument.load(new File(pdfFilePath))) {
+        try (PDDocument document = Loader.loadPDF(new File(pdfFilePath))){
             String cosName = document.getDocument().getTrailer().toString();
             if (cosName.contains("COSName{JS}")) {
                 return true;
@@ -104,7 +105,7 @@ public class DocOptUtil {
      * @return true 表示是扫描件，false 表示有文本层
      */
     public static boolean isScannedPdf(InputStream inputStream) {
-        try (PDDocument document = PDDocument.load(inputStream)) {
+        try (PDDocument document = loadPDFDocument(inputStream)) {
             return isScannedPdf(document);
         } catch (IOException e) {
             logger.error("检测扫描件失败: {}", e.getMessage(), e);
@@ -184,8 +185,7 @@ public class DocOptUtil {
             PDXObject xobject = resources.getXObject(name);
             if (xobject instanceof PDImageXObject) {
                 count++;
-            } else if (xobject instanceof PDFormXObject) {
-                PDFormXObject form = (PDFormXObject) xobject;
+            } else if (xobject instanceof PDFormXObject form) {
                 if (form.getResources() != null) {
                     count += countImages(form.getResources());
                 }
@@ -495,6 +495,15 @@ public class DocOptUtil {
         pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords, color);
     }
 
+    public static PDDocument loadPDFDocument(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] data = new byte[8192];
+        int nRead;
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        return Loader.loadPDF(buffer.toByteArray());
+    }
     /**
      * pdf 转图片，每一页一个图片
      *
@@ -504,7 +513,7 @@ public class DocOptUtil {
      */
     public static List<BufferedImage> pdf2Images(InputStream inPdfFile, double ppm) {
         List<BufferedImage> images = new ArrayList<>();
-        try (PDDocument document = PDDocument.load(inPdfFile)) {
+        try (PDDocument document = loadPDFDocument(inPdfFile)) {
             PDFRenderer pdfRenderer = new PDFRenderer(document);
             int pageCount = document.getNumberOfPages();
 
@@ -546,7 +555,7 @@ public class DocOptUtil {
      */
     public static List<BufferedImage> fetchPdfImages(InputStream inPdfFile) {
         List<BufferedImage> images = new ArrayList<>();
-        try (PDDocument document = PDDocument.load(inPdfFile)) {
+        try (PDDocument document = loadPDFDocument(inPdfFile)) {
             for (PDPage page : document.getPages()) {
                 PDResources resources = page.getResources();
                 if (resources != null) {
@@ -584,16 +593,14 @@ public class DocOptUtil {
         try {
             for (COSName key : resources.getXObjectNames()) {
                 PDXObject xObject = resources.getXObject(key);
-                if (xObject instanceof PDImageXObject) {
+                if (xObject instanceof PDImageXObject imageXObject) {
                     // 直接图片对象
-                    PDImageXObject imageXObject = (PDImageXObject) xObject;
                     BufferedImage image = imageXObject.getImage();
                     if (image != null) {
                         images.add(image);
                     }
-                } else if (xObject instanceof PDFormXObject) {
+                } else if (xObject instanceof PDFormXObject formXObject) {
                     // 表单对象，可能包含图片，递归处理
-                    PDFormXObject formXObject = (PDFormXObject) xObject;
                     PDResources formResources = formXObject.getResources();
                     if (formResources != null) {
                         extractImagesFromResources(formResources, images);
