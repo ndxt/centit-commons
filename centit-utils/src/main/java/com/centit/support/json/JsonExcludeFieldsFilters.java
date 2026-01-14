@@ -14,19 +14,13 @@ import java.util.*;
  * 可以同时过滤多个对象的多个属性
  */
 @SuppressWarnings("unused")
-public class JsonPropertyPreFilters implements PropertyPreFilter {
+public class JsonExcludeFieldsFilters implements PropertyPreFilter {
 
-    private Set<Class<?>> clazzs;
-    private Map<Class<?>, Set<String>> excludes = new HashMap<Class<?>, Set<String>>();
+    private final Map<Class<?>, Set<String>> excludes = new HashMap<>();
 
 
-    public JsonPropertyPreFilters(Class<?>[] clazzs) {
-        super();
-        this.clazzs = new HashSet<>();
-        this.clazzs.addAll(Arrays.asList(clazzs));
-    }
 
-    public JsonPropertyPreFilters() {
+    public JsonExcludeFieldsFilters() {
     }
 
     @Override
@@ -35,7 +29,7 @@ public class JsonPropertyPreFilters implements PropertyPreFilter {
             return true;
         }
 
-        for (Class<?> clazz : clazzs) {
+        for (Class<?> clazz : excludes.keySet()) {
             if (clazz.isInstance(object)) {
                 if (this.excludes.get(clazz).contains(name)) {
                     return false;
@@ -54,5 +48,11 @@ public class JsonPropertyPreFilters implements PropertyPreFilter {
 
         Set<String> fields = this.excludes.get(clazz);
         fields.addAll(Arrays.asList(excludeFields));
+    }
+
+    public static JsonExcludeFieldsFilters create(Class<?> clazz, String ... excludeFields) {
+        JsonExcludeFieldsFilters filters = new JsonExcludeFieldsFilters();
+        filters.addExclude(clazz, excludeFields);
+        return filters;
     }
 }

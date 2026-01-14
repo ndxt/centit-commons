@@ -19,14 +19,24 @@
         </dependency>
 
         <dependency>
-            <groupId>com.centit.support</groupId>
-            <artifactId>centit-utils</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
         </dependency>
 
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.xdocreport.converter.docx.xwpf</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-utils</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -39,11 +49,6 @@
             <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-scratchpad</artifactId>
-        </dependency>
-
         <!--com.lowagie itext 4.2.1 相当有 itextpdf的5.5.6，同时
          它将覆盖 com.lowagie 2.1.7 -->
         <dependency>
@@ -54,7 +59,6 @@
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itext-asian</artifactId>
-            <version>5.2.0</version>
         </dependency>
 
         <dependency>
@@ -73,44 +77,20 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>org.docx4j</groupId>
-            <artifactId>docx4j-JAXB-Internal</artifactId>
-        </dependency>
-
-        <!--<dependency>
-            <groupId>org.docx4j</groupId>
-            <artifactId>docx4j-export-fo</artifactId>
-            <version>8.2.3</version>
-        </dependency>-->
-
-        <!--<dependency>
-            <groupId>org.docx4j</groupId>
-            <artifactId>docx4j</artifactId>
-            <version>6.1.2</version>
-        </dependency>-->
-
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.converter.docx.xwpf</artifactId>
-        </dependency>
-
-        <!--<dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>org.apache.poi.xwpf.converter.xhtml</artifactId>
-            <version>1.0.6</version>
-        </dependency>-->
-
+        <!-- 显式声明 fontbox 版本，确保与 pdfbox 3.0.6 兼容 -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
         </dependency>
 
-        <!-- 显式声明 fontbox 版本，确保与 pdfbox 3.0.0 兼容 -->
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>fontbox</artifactId>
-            <version>3.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j-JAXB-Internal</artifactId>
         </dependency>
 
         <dependency>
