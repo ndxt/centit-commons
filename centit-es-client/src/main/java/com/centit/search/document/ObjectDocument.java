@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.annotation.ESField;
 import com.centit.search.annotation.ESType;
+import com.centit.search.utils.IndexContentUtil;
 import com.centit.search.utils.ObjectTextExtractor;
 import com.centit.support.security.Md5Encoder;
 import lombok.Data;
@@ -121,8 +122,12 @@ public class ObjectDocument implements ESDocument, Serializable {
         return (JSONObject)JSON.toJSON(this);
     }
 
+    public void setContent(String content){
+        this.content = IndexContentUtil.truncateContent(content);
+    }
+
     public ObjectDocument contentObject(Object obj){
-        this.content = ObjectTextExtractor.extractText(obj);
+        this.setContent(ObjectTextExtractor.extractText(obj));
         return this;
     }
 }

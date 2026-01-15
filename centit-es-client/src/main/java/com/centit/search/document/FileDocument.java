@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.annotation.ESField;
 import com.centit.search.annotation.ESType;
+import com.centit.search.utils.IndexContentUtil;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -132,6 +133,9 @@ public class FileDocument implements ESDocument, Serializable {
         return fileId;
     }
 
+    public void setContent(String content){
+        this.content = IndexContentUtil.truncateContent(content);
+    }
 
     @Override
     public JSONObject toJSONObject() {

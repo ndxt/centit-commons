@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -114,6 +115,53 @@ public class PdfUtil {
     }
 
     /**
+     * 检测 PDF 是否加密且无法访问（未提供密码或密码错误）
+     *
+     * @param pdfBytes PDF 文件字节数组
+     * @param password PDF 密码，可为 null
+     * @return true 表示PDF已加密且无法访问（应返回原文），false 表示可以正常处理
+     */
+    private static boolean isPdfEncrypted(byte[] pdfBytes, String password) {
+        // 尝试使用 iText 打开 PDF 文档（使用 writer 模拟实际修改场景）
+        ByteArrayOutputStream dummyOutput = new ByteArrayOutputStream();
+        if (password != null && !password.isEmpty()) {
+            // 提供了密码，尝试使用密码打开
+            com.itextpdf.kernel.pdf.ReaderProperties readerProperties = new com.itextpdf.kernel.pdf.ReaderProperties();
+            readerProperties.setPassword(password.getBytes(StandardCharsets.UTF_8));
+            try {
+                com.itextpdf.kernel.pdf.PdfReader reader = new com.itextpdf.kernel.pdf.PdfReader(new ByteArrayInputStream(pdfBytes), readerProperties);
+                PdfDocument pdfDoc = new PdfDocument(reader, new PdfWriter(dummyOutput));
+                // 密码正确，可以正常处理
+                pdfDoc.close();
+                return false;
+            } catch (com.itextpdf.kernel.exceptions.BadPasswordException e) {
+                // 密码错误，无法处理
+                logger.warn("PDF密码错误，无法打开文件");
+                return true;
+            } catch (IOException e) {
+                logger.error("检测PDF加密状态失败: {}", e.getMessage(), e);
+                return false;
+            }
+        } else {
+            // 没有提供密码，尝试直接打开
+            try {
+                com.itextpdf.kernel.pdf.PdfReader reader = new com.itextpdf.kernel.pdf.PdfReader(new ByteArrayInputStream(pdfBytes));
+                PdfDocument pdfDoc = new PdfDocument(reader, new PdfWriter(dummyOutput));
+                // 成功打开，说明未加密或可以不需要密码打开
+                pdfDoc.close();
+                return false;
+            } catch (com.itextpdf.kernel.exceptions.BadPasswordException e) {
+                // PDF 加密了但没有提供密码
+                logger.warn("PDF文件已加密但未提供密码");
+                return true;
+            } catch (IOException e) {
+                logger.error("检测PDF加密状态失败: {}", e.getMessage(), e);
+                return false;
+            }
+        }
+    }
+
+    /**
      * 检测 PDF 是否为扫描件的内部实现
      * 综合判断：图片数量 + 文本质量
      */
@@ -194,7 +242,7 @@ public class PdfUtil {
         return count;
     }
 
-    public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
+    public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
         // 将输入流缓存到字节数组，因为需要读取两次（检测和高亮）
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         byte[] data = new byte[8192];
@@ -204,6 +252,16 @@ public class PdfUtil {
         }
         buffer.flush();
         byte[] pdfBytes = buffer.toByteArray();
+
+        // 检测PDF是否加密且无法访问（未提供密码或密码错误）
+        boolean isEncrypted = isPdfEncrypted(pdfBytes, password);
+        if (isEncrypted) {
+            logger.info("PDF文件已加密且无法访问，直接返回原文，不进行高亮处理");
+            // 直接返回原文
+            outputPath.write(pdfBytes);
+            outputPath.flush();
+            return;
+        }
 
         // 检测是否是扫描件
         boolean isScanned;
@@ -215,21 +273,26 @@ public class PdfUtil {
 
         if (isScanned) {
             // 扫描件：使用 newContentStreamAfter() 确保高亮不被图片覆盖
-            pdfHighlightKeywordsOnScanned(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color);
+            pdfHighlightKeywordsOnScanned(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color, password);
         } else {
             // 有文本层：使用正常的文本高亮方式
-            pdfHighlightKeywordsOnTextLayer(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color);
+            pdfHighlightKeywordsOnTextLayer(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color, password);
         }
     }
 
     /**
      * 对有文本层的 PDF 进行关键词高亮
      */
-    private static void pdfHighlightKeywordsOnTextLayer(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
-        PdfDocument pdfDoc = new PdfDocument(
-            new com.itextpdf.kernel.pdf.PdfReader(inputPath),
-            new PdfWriter(outputPath)
-        );
+    private static void pdfHighlightKeywordsOnTextLayer(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
+        com.itextpdf.kernel.pdf.PdfReader reader;
+        if (password != null && !password.isEmpty()) {
+            com.itextpdf.kernel.pdf.ReaderProperties readerProperties = new com.itextpdf.kernel.pdf.ReaderProperties();
+            readerProperties.setPassword(password.getBytes(StandardCharsets.UTF_8));
+            reader = new com.itextpdf.kernel.pdf.PdfReader(inputPath, readerProperties);
+        } else {
+            reader = new com.itextpdf.kernel.pdf.PdfReader(inputPath);
+        }
+        PdfDocument pdfDoc = new PdfDocument(reader, new PdfWriter(outputPath));
         DeviceRgb highlightColor = new DeviceRgb(
             color.getRed() / 255f,
             color.getGreen() / 255f,
@@ -281,11 +344,16 @@ public class PdfUtil {
      * 对扫描件 PDF 进行关键词高亮
      * 使用 newContentStreamAfter() 确保高亮显示在图片上方
      */
-    private static void pdfHighlightKeywordsOnScanned(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
-        PdfDocument pdfDoc = new PdfDocument(
-            new com.itextpdf.kernel.pdf.PdfReader(inputPath),
-            new PdfWriter(outputPath)
-        );
+    private static void pdfHighlightKeywordsOnScanned(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
+        com.itextpdf.kernel.pdf.PdfReader reader;
+        if (password != null && !password.isEmpty()) {
+            com.itextpdf.kernel.pdf.ReaderProperties readerProperties = new com.itextpdf.kernel.pdf.ReaderProperties();
+            readerProperties.setPassword(password.getBytes(StandardCharsets.UTF_8));
+            reader = new com.itextpdf.kernel.pdf.PdfReader(inputPath, readerProperties);
+        } else {
+            reader = new com.itextpdf.kernel.pdf.PdfReader(inputPath);
+        }
+        PdfDocument pdfDoc = new PdfDocument(reader, new PdfWriter(outputPath));
         DeviceRgb highlightColor = new DeviceRgb(
             color.getRed() / 255f,
             color.getGreen() / 255f,
@@ -492,7 +560,11 @@ public class PdfUtil {
     }
 
     public static void pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords, java.awt.Color color) throws IOException {
-        pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords, color);
+        pdfHighlightKeywords(inputPath, outputPath, keywords, color, null);
+    }
+
+    public static void pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
+        pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords, color, password);
     }
 
     public static PDDocument loadPDFDocument(InputStream inputStream) throws IOException {
