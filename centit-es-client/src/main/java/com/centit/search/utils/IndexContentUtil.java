@@ -27,7 +27,8 @@ public abstract class IndexContentUtil {
         StringBuilder summary = new StringBuilder();
 
         // 优先选择包含关键词的句子
-        String[] keywords = {"重要", "关键", "主要", "核心", "总结", "结论", "目标", "问题", "解决", "方案", "结果"};
+        String[] keywords = {"重要", "关键", "主要", "核心", "总结", "结论", "目标", "问题", "解决", "方案", "结果", "思路",
+            "分析", "讨论", "建议", "首先", "第一", "重点", "关注", "注意", "中心", "领导", "资质", "材料", "保障", "文件"};
 
         // 第一轮：选择包含关键词的句子
         for (String sentence : sentences) {
