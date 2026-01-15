@@ -43,12 +43,12 @@ public abstract class IndexContentUtil {
             }
 
             if (hasKeyword) {
-                String testSummary = summary.length() == 0 ? trimmedSentence : summary + "。" + trimmedSentence;
+                String testSummary = summary.isEmpty() ? trimmedSentence : summary + "。" + trimmedSentence;
                 if (testSummary.length() > MAX_CONTENT_LENGTH) {
                     break;
                 }
 
-                if (summary.length() > 0) {
+                if (!summary.isEmpty()) {
                     summary.append("。");
                 }
                 summary.append(trimmedSentence);
@@ -64,12 +64,12 @@ public abstract class IndexContentUtil {
                 // 跳过已经添加的句子
                 if (summary.toString().contains(trimmedSentence)) continue;
 
-                String testSummary = summary.length() == 0 ? trimmedSentence : summary + "。" + trimmedSentence;
+                String testSummary = summary.isEmpty() ? trimmedSentence : summary + "。" + trimmedSentence;
                 if (testSummary.length() > MAX_CONTENT_LENGTH) {
                     break;
                 }
 
-                if (summary.length() > 0) {
+                if (!summary.isEmpty()) {
                     summary.append("。");
                 }
                 summary.append(trimmedSentence);
@@ -77,7 +77,7 @@ public abstract class IndexContentUtil {
         }
 
         // 如果没有找到合适的句子，取前面部分
-        if (summary.length() == 0) {
+        if (summary.isEmpty()) {
             return cleaned.substring(0, MAX_CONTENT_LENGTH);
         }
 
