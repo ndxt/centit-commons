@@ -5,12 +5,11 @@ import java.util.Map;
 public abstract class IndexContentUtil {
     public static final int MAX_CONTENT_LENGTH = 32000;
     public static String truncateContent(String content){
-        //elastic search 中的text字段最大长度为32766， 所以这里限制一下长度，如果长度大于 MAX_CONTENT_LENGTH
-        // 1. 删除字符串中 没有意义的符号 、连续的空格 、连续的换行 和 非现实字符
-        // 2. 如果仍然超过 MAX_CONTENT_LENGTH 则截断掉
+        //根据 content 创建一个不超过 MAX_CONTENT_LENGTH 长度的语义摘要，主要处理中文
         if (content == null || content.length() <= MAX_CONTENT_LENGTH) {
             return content;
         }
+
         // 删除无意义符号、连续空格、连续换行和非显示字符
         String cleaned = content
             .replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "") // 删除控制字符，保留回车、换行、制表符
@@ -19,11 +18,70 @@ public abstract class IndexContentUtil {
             .replaceAll("[\\p{So}\\p{Sk}\\p{Sm}\\p{Sc}&&[^\\p{L}\\p{N}\\p{P}\\s]]", "") // 删除特殊符号，保留字母、数字、标点、空格
             .trim();
 
-        // 如果长度超过限制则截断
-        if (cleaned.length() > MAX_CONTENT_LENGTH) {
-            return cleaned.substring(0, MAX_CONTENT_LENGTH);
+        if (cleaned.length() <= MAX_CONTENT_LENGTH) {
+            return cleaned;
         }
-        return cleaned;
+
+        // 语义摘要：提取关键信息
+        String[] sentences = cleaned.split("[。！？\\.]");
+        StringBuilder summary = new StringBuilder();
+
+        // 优先选择包含关键词的句子
+        String[] keywords = {"重要", "关键", "主要", "核心", "总结", "结论", "目标", "问题", "解决", "方案", "结果"};
+
+        // 第一轮：选择包含关键词的句子
+        for (String sentence : sentences) {
+            String trimmedSentence = sentence.trim();
+            if (trimmedSentence.length() < 10) continue;
+
+            boolean hasKeyword = false;
+            for (String keyword : keywords) {
+                if (trimmedSentence.contains(keyword)) {
+                    hasKeyword = true;
+                    break;
+                }
+            }
+
+            if (hasKeyword) {
+                String testSummary = summary.length() == 0 ? trimmedSentence : summary + "。" + trimmedSentence;
+                if (testSummary.length() > MAX_CONTENT_LENGTH) {
+                    break;
+                }
+
+                if (summary.length() > 0) {
+                    summary.append("。");
+                }
+                summary.append(trimmedSentence);
+            }
+        }
+
+        // 第二轮：如果摘要还有空间，添加其他较长的句子
+        if (summary.length() < MAX_CONTENT_LENGTH * 0.7) {
+            for (String sentence : sentences) {
+                String trimmedSentence = sentence.trim();
+                if (trimmedSentence.length() < 20) continue;
+
+                // 跳过已经添加的句子
+                if (summary.toString().contains(trimmedSentence)) continue;
+
+                String testSummary = summary.length() == 0 ? trimmedSentence : summary + "。" + trimmedSentence;
+                if (testSummary.length() > MAX_CONTENT_LENGTH) {
+                    break;
+                }
+
+                if (summary.length() > 0) {
+                    summary.append("。");
+                }
+                summary.append(trimmedSentence);
+            }
+        }
+
+        // 如果没有找到合适的句子，取前面部分
+        if (summary.length() == 0) {
+            return cleaned.substring(0, Math.min(MAX_CONTENT_LENGTH, cleaned.length()));
+        }
+
+        return summary.toString();
     }
 
     public static void truncateIndexObject(Map<String, Object> indexedObject){
