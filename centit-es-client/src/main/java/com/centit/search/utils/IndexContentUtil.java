@@ -9,7 +9,6 @@ public abstract class IndexContentUtil {
         if (content == null || content.length() <= MAX_CONTENT_LENGTH) {
             return content;
         }
-
         // 删除无意义符号、连续空格、连续换行和非显示字符
         String cleaned = content
             .replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "") // 删除控制字符，保留回车、换行、制表符
@@ -21,15 +20,12 @@ public abstract class IndexContentUtil {
         if (cleaned.length() <= MAX_CONTENT_LENGTH) {
             return cleaned;
         }
-
         // 语义摘要：提取关键信息
         String[] sentences = cleaned.split("[。！？\\.]");
         StringBuilder summary = new StringBuilder();
-
         // 优先选择包含关键词的句子
         String[] keywords = {"重要", "关键", "主要", "核心", "总结", "结论", "目标", "问题", "解决", "方案", "结果", "思路",
             "分析", "讨论", "建议", "首先", "第一", "重点", "关注", "注意", "中心", "领导", "资质", "材料", "保障", "文件"};
-
         // 第一轮：选择包含关键词的句子
         for (String sentence : sentences) {
             String trimmedSentence = sentence.trim();
@@ -42,46 +38,38 @@ public abstract class IndexContentUtil {
                     break;
                 }
             }
-
             if (hasKeyword) {
                 String testSummary = summary.isEmpty() ? trimmedSentence : summary + "。" + trimmedSentence;
                 if (testSummary.length() > MAX_CONTENT_LENGTH) {
                     break;
                 }
-
                 if (!summary.isEmpty()) {
                     summary.append("。");
                 }
                 summary.append(trimmedSentence);
             }
         }
-
         // 第二轮：如果摘要还有空间，添加其他较长的句子
         if (summary.length() < MAX_CONTENT_LENGTH * 0.7) {
             for (String sentence : sentences) {
                 String trimmedSentence = sentence.trim();
                 if (trimmedSentence.length() < 20) continue;
-
                 // 跳过已经添加的句子
                 if (summary.toString().contains(trimmedSentence)) continue;
-
                 String testSummary = summary.isEmpty() ? trimmedSentence : summary + "。" + trimmedSentence;
                 if (testSummary.length() > MAX_CONTENT_LENGTH) {
                     break;
                 }
-
                 if (!summary.isEmpty()) {
                     summary.append("。");
                 }
                 summary.append(trimmedSentence);
             }
         }
-
         // 如果没有找到合适的句子，取前面部分
         if (summary.isEmpty()) {
             return cleaned.substring(0, MAX_CONTENT_LENGTH);
         }
-
         return summary.toString();
     }
 
@@ -92,8 +80,8 @@ public abstract class IndexContentUtil {
         }
         for (Map.Entry<String, Object> entry : indexedObject.entrySet()) {
             Object value = entry.getValue();
-            if (value instanceof String) {
-                String truncated = truncateContent((String) value);
+            if (value instanceof String strValue) {
+                String truncated = truncateContent(strValue);
                 entry.setValue(truncated);
             }
         }
