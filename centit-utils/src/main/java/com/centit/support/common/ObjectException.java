@@ -41,6 +41,8 @@ public class ObjectException extends RuntimeException {
     // 系统调用不正确。
     public static final int SYSTEM_CALL_NOT_CORRECT = 615;
 
+    public static final int RESULT_FORMAT_EXCEPTION = 629;
+
     public static final int DATABASE_OPERATE_EXCEPTION = 620;
     public static final int DATABASE_OUT_SYNC_EXCEPTION = 621;
     public static final int DATABASE_SQL_EXCEPTION = 622;
