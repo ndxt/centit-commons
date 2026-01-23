@@ -23,9 +23,9 @@ public class ObjectException extends RuntimeException {
     public static final int EMPTY_RESULT_EXCEPTION = 605;
     public static final int FORMAT_DATE_EXCEPTION = 606;
     public static final int FORMAT_NUMBER_EXCEPTION = 607;
-    public static final int FORMULA_GRAMMAR_ERROE = 608;
+    public static final int FORMULA_GRAMMAR_ERROR = 608;
     //业务逻辑错误
-    public static final int LOGICAL_RULE_ERROE = 609;
+    public static final int LOGICAL_RULE_ERROR = 609;
     //数据不完整
     public static final int DATA_NOT_INTEGRATED = 610;
     //数据校验不通过，不合法
@@ -40,8 +40,12 @@ public class ObjectException extends RuntimeException {
     public static final int RUN_FUNC_NOT_CORRECT = 615;
     // 系统调用不正确。
     public static final int SYSTEM_CALL_NOT_CORRECT = 615;
-
+    // 结果格式错误
     public static final int RESULT_FORMAT_EXCEPTION = 629;
+    // 结果数据不完整
+    public static final int RESULT_NOT_INTEGRATED = 630;
+    // 内部逻辑错误
+    public static final int RUN_LOGICAL_ERROR = 631;
 
     public static final int DATABASE_OPERATE_EXCEPTION = 620;
     public static final int DATABASE_OUT_SYNC_EXCEPTION = 621;
