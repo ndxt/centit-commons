@@ -51,15 +51,18 @@ public abstract class WordReportUtil {
     public static void convertDocxToPdf(String docxFilePath, String pdfFilePath) throws Exception {
 
         // 1) Load docx with POI XWPFDocument
-        XWPFDocument document = new XWPFDocument(new FileInputStream(new File(docxFilePath)));
+        try (InputStream in = new FileInputStream(new File(docxFilePath));
+             XWPFDocument document = new XWPFDocument(in)) {
 
-        // 2) Convert POI XWPFDocument 2 PDF with iText
-        File outFile = new File(pdfFilePath);
-        outFile.getParentFile().mkdirs();
+            // 2) Convert POI XWPFDocument 2 PDF with iText
+            File outFile = new File(pdfFilePath);
+            outFile.getParentFile().mkdirs();
 
-        OutputStream out = new FileOutputStream(outFile);
-        PdfOptions options = PdfOptions.create()/*.fontEncoding( "UTF-8" )*/;
-        PdfConverter.getInstance().convert(document, out, options);
+            try (OutputStream out = new FileOutputStream(outFile)) {
+                PdfOptions options = PdfOptions.create()/*.fontEncoding( "UTF-8" )*/;
+                PdfConverter.getInstance().convert(document, out, options);
+            }
+        }
     }
 
 

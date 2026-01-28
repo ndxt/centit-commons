@@ -77,34 +77,36 @@ public abstract class LargeExcelImportUtil {
 
     public static void parserXSSFSheet(String xlsxFile, String sheetName, int beginRow, int endRow, Consumer<Map<Integer, Object>> consumer)
         throws IOException, OpenXML4JException, SAXException {
-        OPCPackage pkg = OPCPackage.open(new FileInputStream(new File(xlsxFile)));
-        ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
-        XSSFReader xssfReader = new XSSFReader(pkg);
-        StylesTable styles = xssfReader.getStylesTable();
-        XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
-        InputStream stream = null;
-        int sheetIndex=0;
-        while (iter.hasNext()) {
-            try {
-                stream = iter.next();
-                String currSheetName = iter.getSheetName();
-                if( StringUtils.isBlank(sheetName)
-                    || StringUtils.equals(sheetName,currSheetName)
-                    || StringUtils.equals(sheetName,Integer.toString(sheetIndex))) {
-                    //stream = iter.next();
-                    XMLReader sheetParser = SAXHelper.newXMLReader();
-                    ContentHandler handler = new XSSFSheetXMLHandler(styles, null, strings,
-                        new XSSFSheetToMapHandler(beginRow, endRow, consumer) , new DataFormatter(), false);
-                    sheetParser.setContentHandler(handler);
-                    sheetParser.parse(new InputSource(stream));
-                    return ;
-                }
-                sheetIndex ++;
-            } catch (Exception e) {
-                logger.error("parserSheetXml error: ", e);
-            } finally {
-                if(stream!=null) {
-                    stream.close();
+        try (InputStream fileInputStream = new FileInputStream(new File(xlsxFile));
+             OPCPackage pkg = OPCPackage.open(fileInputStream)) {
+            ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
+            XSSFReader xssfReader = new XSSFReader(pkg);
+            StylesTable styles = xssfReader.getStylesTable();
+            XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
+            InputStream stream = null;
+            int sheetIndex = 0;
+            while (iter.hasNext()) {
+                try {
+                    stream = iter.next();
+                    String currSheetName = iter.getSheetName();
+                    if (StringUtils.isBlank(sheetName)
+                        || StringUtils.equals(sheetName, currSheetName)
+                        || StringUtils.equals(sheetName, Integer.toString(sheetIndex))) {
+                        //stream = iter.next();
+                        XMLReader sheetParser = SAXHelper.newXMLReader();
+                        ContentHandler handler = new XSSFSheetXMLHandler(styles, null, strings,
+                            new XSSFSheetToMapHandler(beginRow, endRow, consumer), new DataFormatter(), false);
+                        sheetParser.setContentHandler(handler);
+                        sheetParser.parse(new InputSource(stream));
+                        return;
+                    }
+                    sheetIndex++;
+                } catch (Exception e) {
+                    logger.error("parserSheetXml error: ", e);
+                } finally {
+                    if (stream != null) {
+                        stream.close();
+                    }
                 }
             }
         }
@@ -125,34 +127,36 @@ public abstract class LargeExcelImportUtil {
     public static void parserXSSFSheetWithHead(String xlsxFile, String sheetName, int headRow,
                                        int beginRow, int endRow, Consumer<Map<String, Object>> consumer)
         throws IOException, OpenXML4JException, SAXException {
-        OPCPackage pkg = OPCPackage.open(new FileInputStream(new File(xlsxFile)));
-        ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
-        XSSFReader xssfReader = new XSSFReader(pkg);
-        StylesTable styles = xssfReader.getStylesTable();
-        XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
-        InputStream stream = null;
-        int sheetIndex=0;
-        while (iter.hasNext()) {
-            try {
-                stream = iter.next();
-                String currSheetName = iter.getSheetName();
-                if( StringUtils.isBlank(sheetName)
-                    || StringUtils.equals(sheetName,currSheetName)
-                    || StringUtils.equals(sheetName,Integer.toString(sheetIndex))) {
-                    //stream = iter.next();
-                    XMLReader sheetParser = SAXHelper.newXMLReader();
-                    ContentHandler handler = new XSSFSheetXMLHandler(styles, null, strings,
-                        new XSSFSheetWithHeadToMapHandler(headRow, beginRow, endRow, consumer) , new DataFormatter(), false);
-                    sheetParser.setContentHandler(handler);
-                    sheetParser.parse(new InputSource(stream));
-                    return ;
-                }
-                sheetIndex ++;
-            } catch (Exception e) {
-                logger.error("parserSheetXml error: ", e);
-            } finally {
-                if(stream!=null) {
-                    stream.close();
+        try (InputStream fileInputStream = new FileInputStream(new File(xlsxFile));
+             OPCPackage pkg = OPCPackage.open(fileInputStream)) {
+            ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(pkg);
+            XSSFReader xssfReader = new XSSFReader(pkg);
+            StylesTable styles = xssfReader.getStylesTable();
+            XSSFReader.SheetIterator iter = (XSSFReader.SheetIterator) xssfReader.getSheetsData();
+            InputStream stream = null;
+            int sheetIndex = 0;
+            while (iter.hasNext()) {
+                try {
+                    stream = iter.next();
+                    String currSheetName = iter.getSheetName();
+                    if (StringUtils.isBlank(sheetName)
+                        || StringUtils.equals(sheetName, currSheetName)
+                        || StringUtils.equals(sheetName, Integer.toString(sheetIndex))) {
+                        //stream = iter.next();
+                        XMLReader sheetParser = SAXHelper.newXMLReader();
+                        ContentHandler handler = new XSSFSheetXMLHandler(styles, null, strings,
+                            new XSSFSheetWithHeadToMapHandler(headRow, beginRow, endRow, consumer), new DataFormatter(), false);
+                        sheetParser.setContentHandler(handler);
+                        sheetParser.parse(new InputSource(stream));
+                        return;
+                    }
+                    sheetIndex++;
+                } catch (Exception e) {
+                    logger.error("parserSheetXml error: ", e);
+                } finally {
+                    if (stream != null) {
+                        stream.close();
+                    }
                 }
             }
         }

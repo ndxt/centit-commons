@@ -34,27 +34,27 @@ public class PowerPointUtils {
     private static boolean resize = true;
 
     private static void createPDFFromImages(List<ByteArrayOutputStream> imageFilenames, String targetFilePath) throws IOException {
-        PDDocument doc = new PDDocument();
-        for (ByteArrayOutputStream imageFileName : imageFilenames) {
-            PDImageXObject pdImage = PDImageXObject.createFromByteArray(doc, imageFileName.toByteArray(), "");
+        try (PDDocument doc = new PDDocument()) {
+            for (ByteArrayOutputStream imageFileName : imageFilenames) {
+                PDImageXObject pdImage = PDImageXObject.createFromByteArray(doc, imageFileName.toByteArray(), "");
 
-            PDRectangle actualMediaBox = mediaBox;
-            if ((autoOrientation && pdImage.getWidth() > pdImage.getHeight()) || landscape) {
-                actualMediaBox = new PDRectangle(mediaBox.getHeight(), mediaBox.getWidth());
-            }
-            PDPage page = new PDPage(actualMediaBox);
-            doc.addPage(page);
+                PDRectangle actualMediaBox = mediaBox;
+                if ((autoOrientation && pdImage.getWidth() > pdImage.getHeight()) || landscape) {
+                    actualMediaBox = new PDRectangle(mediaBox.getHeight(), mediaBox.getWidth());
+                }
+                PDPage page = new PDPage(actualMediaBox);
+                doc.addPage(page);
 
-            PDPageContentStream contents = new PDPageContentStream(doc, page);
-            if (resize) {
-                contents.drawImage(pdImage, 0, 0, actualMediaBox.getWidth(), actualMediaBox.getHeight());
-            } else {
-                contents.drawImage(pdImage, 0, 0, pdImage.getWidth(), pdImage.getHeight());
+                PDPageContentStream contents = new PDPageContentStream(doc, page);
+                if (resize) {
+                    contents.drawImage(pdImage, 0, 0, actualMediaBox.getWidth(), actualMediaBox.getHeight());
+                } else {
+                    contents.drawImage(pdImage, 0, 0, pdImage.getWidth(), pdImage.getHeight());
+                }
+                contents.close();
             }
-            contents.close();
+            doc.save(targetFilePath);
         }
-        doc.save(targetFilePath);
-        doc.close();
     }
 
     private static void createHTMLFromImages(List<ByteArrayOutputStream> imageFilenames, String targetFilePath) throws IOException {
@@ -122,38 +122,38 @@ public class PowerPointUtils {
 
     private static List<ByteArrayOutputStream> toImage2007(String sourcePath) throws Exception {
         List<ByteArrayOutputStream> htmlStr = new ArrayList<>();
-        FileInputStream is = new FileInputStream(sourcePath);
-        XMLSlideShow ppt = new XMLSlideShow(is);
-        is.close();
-        Dimension pgsize = ppt.getPageSize();
-        for (int i = 0; i < ppt.getSlides().size(); i++) {
-            try {
-                for (XSLFShape shape : ppt.getSlides().get(i).getShapes()) {
-                    if (shape instanceof XSLFTextShape) {
-                        XSLFTextShape tsh = (XSLFTextShape) shape;
-                        for (XSLFTextParagraph p : tsh) {
-                            for (XSLFTextRun r : p) {
-                                r.setFontFamily("宋体");
+        try (FileInputStream is = new FileInputStream(sourcePath);
+             XMLSlideShow ppt = new XMLSlideShow(is)) {
+            Dimension pgsize = ppt.getPageSize();
+            for (int i = 0; i < ppt.getSlides().size(); i++) {
+                try {
+                    for (XSLFShape shape : ppt.getSlides().get(i).getShapes()) {
+                        if (shape instanceof XSLFTextShape) {
+                            XSLFTextShape tsh = (XSLFTextShape) shape;
+                            for (XSLFTextParagraph p : tsh) {
+                                for (XSLFTextRun r : p) {
+                                    r.setFontFamily("宋体");
+                                }
                             }
                         }
                     }
+                    BufferedImage img = new BufferedImage(pgsize.width, pgsize.height, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D graphics = img.createGraphics();
+                    // clear the drawing area
+                    graphics.setPaint(Color.white);
+                    graphics.fill(new Rectangle2D.Float(0, 0, pgsize.width, pgsize.height));
+                    // render
+                    ppt.getSlides().get(i).draw(graphics);
+                    // save the output
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    ImageIO.write(img, "png", out);
+                    out.close();
+                    htmlStr.add(out);
+                } catch (Exception e) {
+                    logger.error("ppt转换为pdf,发生异常,源文件={}", sourcePath, e);
+                    System.out.println("第" + i + "张ppt转换出错");
+                    return null;
                 }
-                BufferedImage img = new BufferedImage(pgsize.width, pgsize.height, BufferedImage.TYPE_INT_RGB);
-                Graphics2D graphics = img.createGraphics();
-                // clear the drawing area
-                graphics.setPaint(Color.white);
-                graphics.fill(new Rectangle2D.Float(0, 0, pgsize.width, pgsize.height));
-                // render
-                ppt.getSlides().get(i).draw(graphics);
-                // save the output
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                ImageIO.write(img, "png", out);
-                out.close();
-                htmlStr.add(out);
-            } catch (Exception e) {
-                logger.error("ppt转换为pdf,发生异常,源文件={}", sourcePath, e);
-                System.out.println("第" + i + "张ppt转换出错");
-                return null;
             }
         }
         return htmlStr;
@@ -161,8 +161,7 @@ public class PowerPointUtils {
 
     private static List<ByteArrayOutputStream> toImage2003(String sourcePath) {
         List<ByteArrayOutputStream> htmlStr = new ArrayList<>();
-        try {
-            HSLFSlideShow ppt = new HSLFSlideShow(new HSLFSlideShowImpl(sourcePath));
+        try (HSLFSlideShow ppt = new HSLFSlideShow(new HSLFSlideShowImpl(sourcePath))) {
             Dimension pgsize = ppt.getPageSize();
             for (int i = 0; i < ppt.getSlides().size(); i++) {
                 for (HSLFShape shape : ppt.getSlides().get(i).getShapes()) {

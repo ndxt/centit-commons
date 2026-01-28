@@ -30,7 +30,10 @@ public class WordTableToPdfUtils {
     /**
      * 从HWPFDocument中提取所有内容（文本和表格），按原始顺序返回
      *
-     * @param doc      HWPFDocument文档
+     * 注意：此方法不负责关闭HWPFDocument，调用者需要确保在使用后关闭文档对象
+     * 建议使用 try-with-resources 或 try-finally 确保资源释放
+     *
+     * @param doc      HWPFDocument文档（调用者负责关闭）
      * @param baseFont 中文字体
      * @return 内容元素列表
      */

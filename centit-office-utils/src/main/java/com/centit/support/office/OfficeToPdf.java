@@ -60,56 +60,57 @@ public abstract class OfficeToPdf {
     public static boolean word2Pdf(InputStream inWordStream, OutputStream outPdfStram, String suffix) {
         try {
             if (DOCX.equalsIgnoreCase(suffix)) {
-                XWPFDocument docx = new XWPFDocument(inWordStream);
-                PdfOptions options = PdfOptions.create();
-                Map<String, BaseFont> fontMap = new HashMap<>();
-                // 中文字体处理
-                options.fontProvider((familyName, encoding, size, style, color) -> {
-                    try {
-                        BaseFont bfChinese = fontMap.get(familyName);
-                        if (bfChinese == null) {
-                            if (familyName.indexOf("仿") >= 0) { //仿宋
-                                bfChinese = BaseFont.createFont("simfang.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                            } else if (familyName.indexOf("宋") >= 0) { //宋体
-                                bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                            } else if (familyName.indexOf("楷") >= 0) { //楷体
-                                bfChinese = BaseFont.createFont("simkai.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                            } else { // 黑体
-                                bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                try (XWPFDocument docx = new XWPFDocument(inWordStream)) {
+                    PdfOptions options = PdfOptions.create();
+                    Map<String, BaseFont> fontMap = new HashMap<>();
+                    // 中文字体处理
+                    options.fontProvider((familyName, encoding, size, style, color) -> {
+                        try {
+                            BaseFont bfChinese = fontMap.get(familyName);
+                            if (bfChinese == null) {
+                                if (familyName.indexOf("仿") >= 0) { //仿宋
+                                    bfChinese = BaseFont.createFont("simfang.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                                } else if (familyName.indexOf("宋") >= 0) { //宋体
+                                    bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                                } else if (familyName.indexOf("楷") >= 0) { //楷体
+                                    bfChinese = BaseFont.createFont("simkai.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                                } else { // 黑体
+                                    bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                                }
+                                fontMap.put(familyName, bfChinese);
                             }
-                            fontMap.put(familyName, bfChinese);
+                            Font fontChinese = new Font(bfChinese, size, style, color);
+                            fontChinese.setFamily(familyName);
+                            return fontChinese;
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
+                            return null;
                         }
-                        Font fontChinese = new Font(bfChinese, size, style, color);
-                        fontChinese.setFamily(familyName);
-                        return fontChinese;
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
-                        return null;
-                    }
-                });
-                PdfConverter.getInstance().convert(docx, outPdfStram, options);
+                    });
+                    PdfConverter.getInstance().convert(docx, outPdfStram, options);
+                }
             } else if (DOC.equalsIgnoreCase(suffix)) {
                 // 读取DOC文件
-                HWPFDocument doc = new HWPFDocument(inWordStream);
+                try (HWPFDocument doc = new HWPFDocument(inWordStream)) {
+                    // 创建PDF
+                    Document pdf = new Document();
+                    PdfWriter writer = PdfWriter.getInstance(pdf, outPdfStram);
+                    writer.setPageEvent(new PDFPageEvent());
 
-                // 创建PDF
-                Document pdf = new Document();
-                PdfWriter writer = PdfWriter.getInstance(pdf, outPdfStram);
-                writer.setPageEvent(new PDFPageEvent());
+                    // 设置中文字体支持
+                    com.itextpdf.text.pdf.BaseFont bfChinese = com.itextpdf.text.pdf.BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
 
-                // 设置中文字体支持
-                com.itextpdf.text.pdf.BaseFont bfChinese = com.itextpdf.text.pdf.BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+                    pdf.open();
 
-                pdf.open();
+                    // 使用新的工具类提取内容（包括文本和表格），按原始顺序合并
+                    List<Element> elements = WordTableToPdfUtils.extractContentFromDoc(doc, bfChinese);
 
-                // 使用新的工具类提取内容（包括文本和表格），按原始顺序合并
-                List<Element> elements = WordTableToPdfUtils.extractContentFromDoc(doc, bfChinese);
+                    for (Element element : elements) {
+                        pdf.add(element);
+                    }
 
-                for (Element element : elements) {
-                    pdf.add(element);
+                    pdf.close();
                 }
-
-                pdf.close();
             }
             return true;
         } catch (Exception e) {

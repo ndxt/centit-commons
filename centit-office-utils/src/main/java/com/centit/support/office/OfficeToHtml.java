@@ -119,7 +119,9 @@ public abstract class OfficeToHtml {
                 wordToHtmlConverter.processDocument(wordDocument);
                 List<Picture> pics = wordDocument.getPicturesTable().getAllPictures();;
                 for(Picture pic:pics){
-                    pic.writeImageContent(new FileOutputStream(imagePath+File.separator+pic.suggestFullFileName()));
+                    try (FileOutputStream fos = new FileOutputStream(imagePath+File.separator+pic.suggestFullFileName())) {
+                        pic.writeImageContent(fos);
+                    }
                 }
                 Transformer serializer = CommonUtils.createTransformer();
                 serializer.transform(new DOMSource(wordToHtmlConverter.getDocument()),

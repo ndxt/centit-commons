@@ -250,6 +250,19 @@ public class Excel2PdfUtils {
         }
     }
 
+    /**
+     * 解析Excel内容并转换为PDF表格
+     *
+     * 注意：此方法不负责关闭Workbook，调用者需要确保在使用后关闭工作簿
+     * 建议使用 try-with-resources 或 try-finally 确保资源释放
+     *
+     * @param wb         Workbook对象（调用者负责关闭）
+     * @param sheet      Excel工作表
+     * @param sheetIndex 工作表索引
+     * @return PDF表格
+     * @throws BadElementException 异常
+     * @throws IOException         异常
+     */
     public static PdfPTable toParseContent(Workbook wb, Sheet sheet, int sheetIndex) throws BadElementException, IOException {
 
         List<List<PdfPCell>> cells = new ArrayList<>();

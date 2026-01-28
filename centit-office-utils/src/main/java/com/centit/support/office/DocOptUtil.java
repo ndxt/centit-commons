@@ -242,6 +242,10 @@ public class DocOptUtil {
         return count;
     }
 
+    public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
+        pdfHighlightKeywords(inputPath, outputPath, keywords, color, null);
+    }
+
     public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
         // 将输入流缓存到字节数组，因为需要读取两次（检测和高亮）
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
