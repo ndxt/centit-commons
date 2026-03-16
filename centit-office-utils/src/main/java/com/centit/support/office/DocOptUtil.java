@@ -266,15 +266,6 @@ public class DocOptUtil {
             outputPath.flush();
             return;
         }
-
-        // 检测是否是扫描件（仅用于日志）
-        boolean isScanned;
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(pdfBytes)) {
-            isScanned = isScannedPdf(bais);
-        }
-
-        logger.info("PDF 检测结果: {}", isScanned ? "扫描件" : "有文本层");
-
         // 统一使用最上层绘制高亮，确保高亮不被其他图层覆盖
         pdfHighlightKeywordsOnTopLayer(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color, password);
     }
