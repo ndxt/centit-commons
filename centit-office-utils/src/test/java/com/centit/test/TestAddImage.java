@@ -1,7 +1,6 @@
 package com.centit.test;
 
 import com.centit.support.office.Watermark4Pdf;
-import com.itextpdf.text.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

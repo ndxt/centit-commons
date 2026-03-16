@@ -267,7 +267,7 @@ public class DocOptUtil {
             return;
         }
 
-        // 检测是否是扫描件
+        // 检测是否是扫描件（仅用于日志）
         boolean isScanned;
         try (ByteArrayInputStream bais = new ByteArrayInputStream(pdfBytes)) {
             isScanned = isScannedPdf(bais);
@@ -275,19 +275,14 @@ public class DocOptUtil {
 
         logger.info("PDF 检测结果: {}", isScanned ? "扫描件" : "有文本层");
 
-        if (isScanned) {
-            // 扫描件：使用 newContentStreamAfter() 确保高亮不被图片覆盖
-            pdfHighlightKeywordsOnScanned(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color, password);
-        } else {
-            // 有文本层：使用正常的文本高亮方式
-            pdfHighlightKeywordsOnTextLayer(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color, password);
-        }
+        // 统一使用最上层绘制高亮，确保高亮不被其他图层覆盖
+        pdfHighlightKeywordsOnTopLayer(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color, password);
     }
 
     /**
-     * 对有文本层的 PDF 进行关键词高亮
+     * 对 PDF 进行关键词高亮，高亮绘制在最上层
      */
-    private static void pdfHighlightKeywordsOnTextLayer(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
+    private static void pdfHighlightKeywordsOnTopLayer(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
         com.itextpdf.kernel.pdf.PdfReader reader;
         if (password != null && !password.isEmpty()) {
             com.itextpdf.kernel.pdf.ReaderProperties readerProperties = new com.itextpdf.kernel.pdf.ReaderProperties();
@@ -315,8 +310,8 @@ public class DocOptUtil {
             List<Rectangle> highlightRects = strategy.getHighlightRectangles();
 
             if (!highlightRects.isEmpty()) {
-                // 使用 newContentStreamBefore() 在内容流之前绘制高亮
-                PdfCanvas canvas = new PdfCanvas(page.newContentStreamBefore(),
+                // 使用 newContentStreamAfter() 在内容流之后绘制高亮，确保高亮显示在最上层
+                PdfCanvas canvas = new PdfCanvas(page.newContentStreamAfter(),
                     page.getResources(), pdfDoc);
 
                 canvas.saveState();
@@ -339,67 +334,6 @@ public class DocOptUtil {
                 logger.debug("页面 {} 添加了 {} 个高亮矩形", i, highlightRects.size());
             } else {
                 logger.debug("页面 {} 未找到匹配的关键词", i);
-            }
-        }
-        pdfDoc.close();
-    }
-
-    /**
-     * 对扫描件 PDF 进行关键词高亮
-     * 使用 newContentStreamAfter() 确保高亮显示在图片上方
-     */
-    private static void pdfHighlightKeywordsOnScanned(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
-        com.itextpdf.kernel.pdf.PdfReader reader;
-        if (password != null && !password.isEmpty()) {
-            com.itextpdf.kernel.pdf.ReaderProperties readerProperties = new com.itextpdf.kernel.pdf.ReaderProperties();
-            readerProperties.setPassword(password.getBytes(StandardCharsets.UTF_8));
-            reader = new com.itextpdf.kernel.pdf.PdfReader(inputPath, readerProperties);
-        } else {
-            reader = new com.itextpdf.kernel.pdf.PdfReader(inputPath);
-        }
-        PdfDocument pdfDoc = new PdfDocument(reader, new PdfWriter(outputPath));
-        DeviceRgb highlightColor = new DeviceRgb(
-            color.getRed() / 255f,
-            color.getGreen() / 255f,
-            color.getBlue() / 255f);
-
-        for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
-            PdfPage page = pdfDoc.getPage(i);
-
-            // 使用增强的关键词提取策略
-            AdvancedKeywordTextExtractionStrategy strategy = new AdvancedKeywordTextExtractionStrategy(keywords);
-
-            PdfCanvasProcessor parser = new PdfCanvasProcessor(strategy);
-            parser.processPageContent(page);
-
-            // 获取处理后的高亮矩形
-            List<Rectangle> highlightRects = strategy.getHighlightRectangles();
-
-            if (!highlightRects.isEmpty()) {
-                // 扫描件使用 newContentStreamAfter() 确保高亮显示在图片上方
-                PdfCanvas canvas = new PdfCanvas(page.newContentStreamAfter(),
-                    page.getResources(), pdfDoc);
-
-                canvas.saveState();
-
-                // 创建扩展图形状态设置透明度
-                com.itextpdf.kernel.pdf.extgstate.PdfExtGState gState =
-                    new com.itextpdf.kernel.pdf.extgstate.PdfExtGState();
-                gState.setFillOpacity(0.4f); // 40% 透明度，更明显
-                canvas.setExtGState(gState);
-
-                canvas.setFillColor(highlightColor);
-
-                for (Rectangle rect : highlightRects) {
-                    canvas.rectangle(rect.getLeft(), rect.getBottom(),
-                        rect.getWidth(), rect.getHeight());
-                    canvas.fill();
-                }
-                canvas.restoreState();
-
-                logger.debug("扫描件页面 {} 添加了 {} 个高亮矩形", i, highlightRects.size());
-            } else {
-                logger.debug("扫描件页面 {} 未找到匹配的关键词", i);
             }
         }
         pdfDoc.close();

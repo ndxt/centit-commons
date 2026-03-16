@@ -1,11 +1,8 @@
 package com.centit.support.test.utils;
 
 import com.centit.support.algorithm.DatetimeOpt;
-import com.centit.support.file.FileType;
 import com.centit.support.image.SvgUtils;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;

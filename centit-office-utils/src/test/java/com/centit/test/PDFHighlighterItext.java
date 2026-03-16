@@ -11,7 +11,7 @@ public class PDFHighlighterItext {
     public static void main(String[] args) throws IOException {
         DocOptUtil.pdfHighlightKeywords("/Users/codefan/Documents/temp/developerTest.pdf",
                 "/Users/codefan/Documents/temp/HighLigher.pdf",
-                CollectionsOpt.createList("道路","管养"), Color.YELLOW);
+                CollectionsOpt.createList("道路","管养","市长"), Color.YELLOW);
         System.out.println("Done!");
     }
 }
