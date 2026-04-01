@@ -45,7 +45,7 @@ public class TestOperationLog {
 
     public static void main(String[] args)  throws IOException {
         ESSearcher searcher = createSearch();
-        Pair<Long, List<Map<String, Object>>>  p = searcher.search("地图", 1, 10);
+        Pair<Long, List<Map<String, Object>>>  p = searcher.searchOwner("U0000000","地图", 1, 10);
         System.out.println(JSON.toJSONString(p.getRight(), JSONWriter.Feature.PrettyFormat));
     }
 }

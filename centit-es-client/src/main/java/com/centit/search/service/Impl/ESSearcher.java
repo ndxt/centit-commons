@@ -273,6 +273,71 @@ public class ESSearcher implements Searcher{
         return sRes.toString();
     }
 
+    public static void makeFilterCondition(String field, Object filterValue, BoolQuery.Builder boolQueryBuilder){
+        String fieldSuffix = "_UN";
+        if(StringUtils.endsWithAny(field, "_gt", "_ge", "_lt", "_le", "_in", "_ni", "_eq", "_ne", "_lk")) {
+            fieldSuffix = field.substring(field.length() - 3).toLowerCase();
+            field = field.substring(0,field.length() - 3);
+        }
+
+        final String finalField = field;
+        switch (fieldSuffix) {
+            case "_gt":
+                boolQueryBuilder.must(q -> q.range(r -> r.field(finalField).gt(JsonData.of(filterValue))));
+                break;
+            case "_ge":
+                boolQueryBuilder.must(q -> q.range(r -> r.field(finalField).gte(JsonData.of(filterValue))));
+                break;
+            case "_lt":
+                boolQueryBuilder.must(q -> q.range(r -> r.field(finalField).lt(JsonData.of(filterValue))));
+                break;
+            case "_le":
+                boolQueryBuilder.must(q -> q.range(r -> r.field(finalField).lte(JsonData.of(filterValue))));
+                break;
+            case "_ne":
+                if (filterValue == null || "null".equals(String.valueOf(filterValue)) || StringUtils.isBlank(String.valueOf(filterValue))) {
+                    boolQueryBuilder.must(q -> q.exists(e -> e.field(finalField)));
+                } else {
+                    boolQueryBuilder.mustNot(q -> q.term(t -> t.field(finalField).value(String.valueOf(filterValue))));
+                }
+                break;
+            case "_ni":
+                if (filterValue == null || "null".equals(String.valueOf(filterValue)) || StringUtils.isBlank(String.valueOf(filterValue))) {
+                    boolQueryBuilder.must(q -> q.exists(e -> e.field(finalField)));
+                } else {
+                    String[] values = StringBaseOpt.objectToStringArray(filterValue);
+                    List<FieldValue> valueList = new ArrayList<>();
+                    for (String value : values) {
+                        valueList.add(FieldValue.of(value));
+                    }
+                    boolQueryBuilder.mustNot(q -> q.terms(t -> t.field(finalField).terms(f -> f.value(valueList))));
+                }
+                break;
+            case "_lk":{ // like 模糊查询
+                String value = StringBaseOpt.objectToString(filterValue);
+                // 使用通配符查询，支持 * 和 ? 通配符
+                boolQueryBuilder.must(q -> q.wildcard(w -> w.field(finalField).value(value)));
+                break;
+            }
+            case "_in":
+            default: // _eq
+                if (filterValue == null || "null".equals(String.valueOf(filterValue)) || StringUtils.isBlank(String.valueOf(filterValue))) {
+                    boolQueryBuilder.mustNot(q -> q.exists(e -> e.field(finalField)));
+                } else {
+                    String[] values = StringBaseOpt.objectToStringArray(filterValue);
+                    if (values.length > 1) {
+                        List<FieldValue> valueList = new ArrayList<>();
+                        for (String value : values) {
+                            valueList.add(FieldValue.of(value));
+                        }
+                        boolQueryBuilder.must(q -> q.terms(t -> t.field(finalField).terms(f -> f.value(valueList))));
+                    } else if (values.length == 1) {
+                        boolQueryBuilder.must(q -> q.term(t -> t.field(finalField).value(values[0])));
+                    }
+                }
+        }
+    }
+
     @Override
     public Pair<Long, List<Map<String, Object>>> search(Map<String, Object> fieldFilter,
                                                        String queryWord, int pageNo, int pageSize){
@@ -288,45 +353,7 @@ public class ESSearcher implements Searcher{
                     }
                 }
                 if(!isField) continue;
-
-                if (ent.getValue().getClass().isArray()) {
-                    List<FieldValue> values = new ArrayList<>();
-                    for (String val : (String[]) ent.getValue()) {
-                        values.add(FieldValue.of(val));
-                    }
-                    boolBuilder.must(TermsQuery.of(t -> t.field(ent.getKey()).terms(ts -> ts.value(values)))._toQuery());
-                } else if (ent.getValue() instanceof Collection) {
-                    List<FieldValue> values = new ArrayList<>();
-                    for (Object val : (Collection<?>) ent.getValue()) {
-                        values.add(FieldValue.of(val.toString()));
-                    }
-                    boolBuilder.must(TermsQuery.of(t -> t.field(ent.getKey()).terms(ts -> ts.value(values)))._toQuery());
-                } else {
-                    String key = ent.getKey();
-                    int keyLen = key.length();
-                    String optSuffix = keyLen > 3 ? key.substring(keyLen - 3).toLowerCase() : "_eq";
-                    switch (optSuffix) {
-                        case "_gt":
-                            boolBuilder.must(RangeQuery.of(r -> r.field(key.substring(0, keyLen-3)).gt(JsonData.of(ent.getValue())))._toQuery());
-                            break;
-                        case "_ge":
-                            boolBuilder.must(RangeQuery.of(r -> r.field(key.substring(0, keyLen-3)).gte(JsonData.of(ent.getValue())))._toQuery());
-                            break;
-                        case "_lt":
-                            boolBuilder.must(RangeQuery.of(r -> r.field(key.substring(0, keyLen-3)).lt(JsonData.of(ent.getValue())))._toQuery());
-                            break;
-                        case "_le":
-                            boolBuilder.must(RangeQuery.of(r -> r.field(key.substring(0, keyLen-3)).lte(JsonData.of(ent.getValue())))._toQuery());
-                            break;
-                        case "_lk":
-                            boolBuilder.must(WildcardQuery.of(w -> w.field(key.substring(0, keyLen-3))
-                                .value(buildWildcardQuery(StringBaseOpt.castObjectToString(ent.getValue()))))._toQuery());
-                            break;
-                        default:
-                            boolBuilder.must(TermQuery.of(t -> t.field(ent.getKey()).value(ent.getValue().toString()))._toQuery());
-                            break;
-                    }
-                }
+                ESSearcher.makeFilterCondition(ent.getKey(), ent.getValue(), boolBuilder);
             }
         }
 
