@@ -158,14 +158,8 @@ public class ESSearcher implements Searcher{
                 for (Hit<JsonData> hit : response.hits().hits()) {
                     Map<String, Object> json = new HashMap<>();
                     if (hit.source() != null) {
-                        json = hit.source().toJson().asJsonObject().entrySet().stream()
-                            .collect(HashMap::new, (map, entry) -> {
-                                //if (entry.getValue().isJsonPrimitive()) {
-                                //    map.put(entry.getKey(), entry.getValue().getAsString());
-                                //} else {
-                                    map.put(entry.getKey(), StringBaseOpt.castObjectToString(entry.getValue()));
-                                //}
-                            }, HashMap::putAll);
+                        // 使用 JsonData.to() 方法转换为 Map，需要传入 client 的 JsonpMapper
+                        json = hit.source().to(Map.class);
                     }
 
                     // 添加高亮信息
