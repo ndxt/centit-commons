@@ -17,6 +17,7 @@ import com.centit.search.document.DocumentUtils;
 import com.centit.search.service.ElasticsearchClientFactory;
 import com.centit.search.service.Searcher;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Lexer;
@@ -55,12 +56,14 @@ public class ESSearcher implements Searcher{
     private final List<String> allFields;
     private Map<String, Float> queryFields;
     private final Set<String> highlightFields;
+    private final Set<String> dateFields; // 存储日期类型字段
 
     public ESSearcher(ElasticsearchClient client){
         this.highlightFields = new HashSet<>();
         this.highlightPreTags = new String[]{"<strong>"};
         this.highlightPostTags = new String[]{"</strong>"};
         this.allFields = new ArrayList<>();
+        this.dateFields = new HashSet<>();
         this.client = client;
     }
 
@@ -92,6 +95,10 @@ public class ESSearcher implements Searcher{
                 }
                 if(esType.highlight()){
                     highlightFields.add(field.getName());
+                }
+                // 记录日期类型字段
+                if("date".equals(esType.type())){
+                    dateFields.add(field.getName());
                 }
                 allFields.add(field.getName());
             }
@@ -156,12 +163,27 @@ public class ESSearcher implements Searcher{
                 totalHits = response.hits().total().value();
 
                 for (Hit<JsonData> hit : response.hits().hits()) {
-                    Map<String, Object> json = new HashMap<>();
+                    Map<String, Object> json;
                     if (hit.source() != null) {
-                        // 使用 JsonData.to() 方法转换为 Map，需要传入 client 的 JsonpMapper
-                        json = hit.source().to(Map.class);
+                        // 将 JsonData 转换为 JSON 字符串，然后使用 fastjson 解析
+                        // 这样可以保持日期字段的原始格式（ISO 8601字符串），而不是转换为 long
+                        String jsonStr = hit.source().toJson().toString();
+                        json = JSONObject.parseObject(jsonStr);
+                        // 将日期类型字段从 long 转换为日期字符串
+                        if (!dateFields.isEmpty()) {
+                            for (String dateFieldName : dateFields) {
+                                Object value = json.get(dateFieldName);
+                                if (value instanceof Number) {
+                                    long timestamp = ((Number) value).longValue();
+                                    // 转换为 ISO 8601 格式的日期字符串
+                                    json.put(dateFieldName,
+                                        DatetimeOpt.convertDateToString(new Date(timestamp), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+                                }
+                            }
+                        }
+                    } else {
+                        json = new HashMap<>();
                     }
-
                     // 添加高亮信息
                     if (hit.highlight() != null && !hit.highlight().isEmpty()) {
                         StringBuilder content = new StringBuilder();
