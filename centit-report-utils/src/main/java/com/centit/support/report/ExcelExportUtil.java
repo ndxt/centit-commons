@@ -356,7 +356,7 @@ public abstract class ExcelExportUtil {
 
         Row headerRow = sheet.createRow(0);
         CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
-        List<String> header = new ArrayList<>(metaData.getFileds().keySet());
+        List<String> header = new ArrayList<>(metaData.getFields().keySet());
         int i = 0;
         for (String headStr : header) {
             Cell cell = headerRow.createCell(i);

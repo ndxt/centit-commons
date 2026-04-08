@@ -109,7 +109,7 @@ public abstract class XMLObject {
             }
             hasSerialized.add(object);
             JavaBeanMetaData jbm = JavaBeanMetaData.createBeanMetaDataFromType(object.getClass());
-            Map<String, JavaBeanField> fields = jbm.getFileds();
+            Map<String, JavaBeanField> fields = jbm.getFields();
             if (fields == null)
                 return createXMLElement(elementName, "String", object, addTypeAttr);
 
