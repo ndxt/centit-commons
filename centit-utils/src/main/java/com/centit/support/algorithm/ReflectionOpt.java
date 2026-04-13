@@ -94,20 +94,7 @@ public abstract class ReflectionOpt {
      * 获得get field value by getter
      */
     public static Object getFieldValue(Object obj, String fieldName) {
-        Method md = null;
-        try {
-            md = obj.getClass().getMethod("get" + StringUtils.capitalize(fieldName));
-        } catch (NoSuchMethodException noGet) {
-            try {
-                md = obj.getClass().getMethod("is" + StringUtils.capitalize(fieldName));
-            } catch (Exception e) {
-                logger.error(noGet.getMessage() + ", " + e.getMessage());
-                //logger.error(ObjectException.extortExceptionTraceMessage(noGet));
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-        }
-
+        Method md = getGetterMethod(obj.getClass(), fieldName);
         if (md == null) {
             try {
                 return forceGetProperty(obj, fieldName);
@@ -270,7 +257,6 @@ public abstract class ReflectionOpt {
         return getDeclaredField(type, name).getType();
     }
 
-
     /*
      * 获得field的getter函数名称.
      */
@@ -290,36 +276,47 @@ public abstract class ReflectionOpt {
 
     /*
      * 获得field的getter函数,如果找不到该方法,返回null.
+     * boolean/Boolean 类型优先尝试 is 前缀，其他类型优先尝试 get 前缀，失败后互换重试.
      */
     public static Method getGetterMethod(Class<?> classType, Class<?> propertyType, String fieldName) {
+        boolean isBoolType = boolean.class.equals(propertyType) || Boolean.class.isAssignableFrom(propertyType);
+        String firstName = isBoolType ? "is" + StringUtils.capitalize(fieldName) : "get" + StringUtils.capitalize(fieldName);
         try {
-            String getFuncName = boolean.class.equals(propertyType) ?/*|| Boolean.class.isAssignableFrom(propertyType)*/
-                "is" + StringUtils.capitalize(fieldName) : "get" + StringUtils.capitalize(fieldName);
-            Method md = classType.getMethod(getFuncName);
+            Method md = classType.getMethod(firstName);
             if (propertyType.isAssignableFrom(md.getReturnType()))
                 return md;
-            else
-                return null;
+        } catch (NoSuchMethodException ignored) {
+        }
+        String secondName = isBoolType ? "get" + StringUtils.capitalize(fieldName) : "is" + StringUtils.capitalize(fieldName);
+        try {
+            Method md = classType.getMethod(secondName);
+            if (propertyType.isAssignableFrom(md.getReturnType()))
+                return md;
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage());
-            return null;
         }
+        return null;
     }
 
     /*
      * 获得field的getter函数,如果找不到该方法,返回null.
+     * 优先尝试 get 前缀，失败后尝试 is 前缀.
      */
     public static Method getGetterMethod(Class<?> classType, String fieldName) {
         try {
             Method md = classType.getMethod("get" + StringUtils.capitalize(fieldName));
-            if (void.class.equals(md.getReturnType()))
-                return null;
-            else
+            if (!void.class.equals(md.getReturnType()))
+                return md;
+        } catch (NoSuchMethodException ignored) {
+        }
+        try {
+            Method md = classType.getMethod("is" + StringUtils.capitalize(fieldName));
+            if (!void.class.equals(md.getReturnType()))
                 return md;
         } catch (NoSuchMethodException e) {
             logger.error(e.getMessage());
-            return null;
         }
+        return null;
     }
 
     /*
