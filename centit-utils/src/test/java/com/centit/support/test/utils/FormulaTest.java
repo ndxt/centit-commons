@@ -12,12 +12,16 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class FormulaTest {
     public static void main(String[] args)  {
 
+        System.out.println( Pattern.compile("^1[3-9]\\d{9}$").matcher("15156334567").find() );
+
         System.out.println(
-            StringBaseOpt.castObjectToString(VariableFormula.attainFormulaVariable( "if(c,b+d, ${__.hello[0].var}, __.hello , a323, aadf, \"12312\")", null)));
+            StringBaseOpt.castObjectToString(VariableFormula.calculate( "regexMatch('^1[3-9]\\\\d{9}$', checkValue)",
+                Map.of("checkValue", 15156334567L))));
 
 
         //String str = "qwefasdfas.png";
