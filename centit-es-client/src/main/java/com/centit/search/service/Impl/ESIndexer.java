@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
+import java.util.List;
 
 /**
  * Created by codefan on 17-6-12.
@@ -104,6 +105,72 @@ public class ESIndexer implements Indexer{
         catch (Exception e) {
             logger.error(e.getMessage(), e);
             return null;
+        }
+    }
+
+    /**
+     * 批量新建文档 - 使用 ES Bulk API 提高性能
+     * @param documents 文档列表
+     * @return 返回成功写入的文档数量
+     */
+    @Override
+    public int saveNewDocuments(List<? extends ESDocument> documents) {
+        if (documents == null || documents.isEmpty()) {
+            return 0;
+        }
+
+        makeSureIndexIsExist();
+        int[] successCount = {0};
+
+        try {
+            BulkRequest.Builder bulkBuilder = new BulkRequest.Builder();
+
+            for (ESDocument document : documents) {
+                try {
+                    bulkBuilder.operations(op -> op
+                        .index(idx -> idx
+                            .index(indexName)
+                            .id(document.obtainDocumentId())
+                            .document(JsonData.fromJson(document.toJSONObject().toJSONString()))
+                        )
+                    );
+                } catch (Exception e) {
+                    logger.error("构建批量请求失败，文档ID: {}", document.obtainDocumentId(), e);
+                }
+            }
+
+            BulkResponse response = client.bulk(bulkBuilder.build());
+
+            if (response.errors()) {
+                logger.warn("批量写入存在错误，详情如下：");
+                response.items().forEach(item -> {
+                    if (item.error() != null) {
+                        logger.warn("文档ID: {}, 错误: {}", item.id(), item.error().reason());
+                    } else {
+                        successCount[0]++;
+                    }
+                });
+            } else {
+                successCount[0] = documents.size();
+                logger.info("成功批量写入 {} 条文档到索引 {}", successCount[0], indexName);
+            }
+
+            return successCount[0];
+        } catch (Exception e) {
+            logger.error("批量写入文档失败", e);
+            // 降级：逐条写入
+            logger.info("尝试逐条写入 {} 条文档", documents.size());
+            for (ESDocument document : documents) {
+                try {
+                    String result = saveNewDocument(document);
+                    if (result != null) {
+                        successCount[0]++;
+                    }
+                } catch (Exception ex) {
+                    logger.error("逐条写入文档失败，文档ID: {}", document.obtainDocumentId(), ex);
+                }
+            }
+            return successCount[0];
         }
     }
 
