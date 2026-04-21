@@ -1,7 +1,6 @@
 package com.centit.support.test.utils;
 
 import com.alibaba.fastjson2.JSON;
-import com.centit.support.file.FileIOOpt;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.network.HttpExecutorContext;
 import com.centit.support.network.SoapWsdlParser;

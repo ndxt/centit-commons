@@ -250,11 +250,12 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_REG_MATCH:
                 if (nOpSum < 2)
                     return false;
-                return Pattern.compile(StringBaseOpt.objectToString(slOperand.get(0))).matcher(StringBaseOpt.objectToString(slOperand.get(1))).find();
+                return Pattern.compile(StringBaseOpt.objectToString(slOperand.get(0))).matcher(
+                    StringBaseOpt.castObjectToString(slOperand.get(1),"")).find();
             case ConstDefine.FUNC_REG_MATCH_VALUES: {
                 if (nOpSum < 2)
                     return false;
-                String sValues = StringBaseOpt.objectToString(slOperand.get(1));
+                String sValues = StringBaseOpt.castObjectToString(slOperand.get(1), "");
                 Pattern p = Pattern.compile(StringBaseOpt.objectToString(slOperand.get(0)));
                 Matcher m = p.matcher(sValues); // 获取 matcher 对象
                 List<String> matchValues = new ArrayList<>();
