@@ -50,6 +50,31 @@ public class XsdErrorTranslator {
         Pattern.CASE_INSENSITIVE
     );
     
+    private static final Pattern CVc_DATATYPE_VALID_1_2_1 = Pattern.compile(
+        "cvc-datatype-valid\\.1\\.2\\.1:\\s*'([^']*)'\\s+is\\s+.+?\\s+for\\s+'([^']+)'",
+        Pattern.CASE_INSENSITIVE
+    );
+    
+    private static final Pattern CVc_ENUMERATION_VALID = Pattern.compile(
+        "cvc-enumeration-valid:\\s*Value\\s+'([^']+)'\\s+is\\s+not\\s+facet-valid\\s+with\\s+respect\\s+to\\s+enumeration\\s+'\\[([^\\]]+)\\]'",
+        Pattern.CASE_INSENSITIVE
+    );
+    
+    private static final Pattern CVc_IDENTITY_CONSTRAINT_4_1 = Pattern.compile(
+        "cvc-identity-constraint\\.4\\.1:\\s*Duplicate\\s+unique\\s+value\\s+\\[([^\\]]+)\\]\\s+found\\s+for\\s+identity\\s+constraint\\s+\"([^\"]+)\"\\s+of\\s+element\\s+\"([^\"]+)\"",
+        Pattern.CASE_INSENSITIVE
+    );
+    
+    private static final Pattern CVc_MIN_LENGTH_VALID = Pattern.compile(
+        "cvc-minLength-valid:\\s*Value\\s+'([^']*)'\\s+with\\s+length\\s*=\\s*'?(\\d+)'?\\s+is\\s+not\\s+facet-valid\\s+with\\s+respect\\s+to\\s+minLength\\s+'?(\\d+)'?\\s+for\\s+type\\s+'([^']+)'",
+        Pattern.CASE_INSENSITIVE
+    );
+    
+    private static final Pattern CVc_LENGTH_VALID = Pattern.compile(
+        "cvc-length-valid:\\s*Value\\s+'([^']*)'\\s+with\\s+length\\s*=\\s*'?(\\d+)'?\\s+is\\s+not\\s+facet-valid\\s+with\\s+respect\\s+to\\s+length\\s+'?(\\d+)'?\\s+for\\s+type\\s+'([^']+)'",
+        Pattern.CASE_INSENSITIVE
+    );
+    
     /**
      * 翻译XSD验证错误消息
      * @param originalMessage 原始错误消息
@@ -74,11 +99,26 @@ public class XsdErrorTranslator {
      * 基于正则模式匹配翻译
      */
     private static String translateByPattern(String message) {
-        // cvc-complex-type.2.4.a: 元素缺失
-        Matcher matcher = CVc_COMPLEX_TYPE_2_4.matcher(message);
-        if (matcher.find()) {
-            String elementName = matcher.group(1);
-            return "元素 '" + extractLocalName(elementName) + "' 的内容不完整，缺少必需的子元素";
+        Matcher matcher;
+        // cvc-complex-type.2.4.a: 元素缺失或无效内容
+        if (message.startsWith("cvc-complex-type.2.4.a")) {
+            // 匹配: 无效的内容 was found starting with element 'X'. One of '{Y}' is expected.
+            Pattern pattern24a = Pattern.compile(
+                "(?:无效的内容|Invalid content).*(?:starting with element|element) '([^']+)'[^']*One of '\\{([^}]+)\\}' is expected",
+                Pattern.CASE_INSENSITIVE
+            );
+            Matcher m = pattern24a.matcher(message);
+            if (m.find()) {
+                String elementName = m.group(1);
+                String expectedElements = m.group(2);
+                return "元素 '" + extractLocalName(elementName) + "' 处发现无效内容，期望的元素是: " + expectedElements;
+            }
+            // 简化匹配: 只提取元素名
+            Matcher matcher24a = CVc_COMPLEX_TYPE_2_4.matcher(message);
+            if (matcher24a.find()) {
+                String elementName = matcher24a.group(1);
+                return "元素 '" + extractLocalName(elementName) + "' 的内容不完整，缺少必需的子元素";
+            }
         }
         
         // cvc-complex-type.3.2.1: 缺少必需属性
@@ -131,6 +171,90 @@ public class XsdErrorTranslator {
         if (matcher.find()) {
             String elementName = matcher.group(1);
             return "元素 '" + extractLocalName(elementName) + "' 在schema中未定义";
+        }
+        
+        // cvc-datatype-valid.1.2.1: 数据类型格式无效(如空值)
+        matcher = CVc_DATATYPE_VALID_1_2_1.matcher(message);
+        if (matcher.find()) {
+            String value = matcher.group(1);
+            String dataType = matcher.group(2);
+            String chineseDataType = translateDataType(dataType);
+            if (value == null || value.isEmpty()) {
+                return "元素 '" + extractLocalName(dataType) + "' 的值不能为空";
+            } else {
+                return "值 '" + value + "' 不是有效的" + chineseDataType + "格式";
+            }
+        }
+        
+        // cvc-enumeration-valid: 枚举值验证失败
+        matcher = CVc_ENUMERATION_VALID.matcher(message);
+        if (matcher.find()) {
+            String invalidValue = matcher.group(1);
+            String validValues = matcher.group(2);
+            return "值 '" + invalidValue + "' 不在允许的枚举值范围 [" + validValues + "] 内";
+        }
+        
+        // cvc-identity-constraint.4.1: 唯一性约束冲突
+        matcher = CVc_IDENTITY_CONSTRAINT_4_1.matcher(message);
+        if (matcher.find()) {
+            String duplicateValue = matcher.group(1);
+            String constraintName = matcher.group(2);
+            String elementName = matcher.group(3);
+            return "元素 '" + extractLocalName(elementName) + "' 的唯一性约束 '" + constraintName + 
+                   "' 发现重复值 [" + duplicateValue + "]";
+        }
+        
+        // cvc-complex-type.2.4.b: 元素内容不完整(带期望元素列表)
+        if (message.startsWith("cvc-complex-type.2.4.b")) {
+            // 匹配: The content of element 'X' is not complete. One of '{Y}' is expected.
+            Pattern pattern24b = Pattern.compile(
+                "The content of element '([^']+)'[^']*One of '\\{([^}]+)\\}' is expected",
+                Pattern.CASE_INSENSITIVE
+            );
+            Matcher m = pattern24b.matcher(message);
+            if (m.find()) {
+                String elementName = m.group(1);
+                String expectedElements = m.group(2);
+                return "元素 '" + extractLocalName(elementName) + "' 的内容不完整，缺少必需的子元素: " + expectedElements;
+            }
+            // 如果无法解析详细信息,返回通用消息
+            Pattern pattern24bSimple = Pattern.compile(
+                "The content of element '([^']+)'[^不]*不完整",
+                Pattern.CASE_INSENSITIVE
+            );
+            m = pattern24bSimple.matcher(message);
+            if (m.find()) {
+                String elementName = m.group(1);
+                return "元素 '" + extractLocalName(elementName) + "' 的内容不完整";
+            }
+        }
+        
+        // cvc-minLength-valid: 最小长度验证失败
+        matcher = CVc_MIN_LENGTH_VALID.matcher(message);
+        if (matcher.find()) {
+            String value = matcher.group(1);
+            String actualLength = matcher.group(2);
+            String minLength = matcher.group(3);
+            String typeName = matcher.group(4);
+            if (value == null || value.isEmpty() || "0".equals(actualLength)) {
+                return "元素 '" + extractLocalName(typeName) + "' 的值不能为空，至少需要" + minLength + "个字符";
+            } else {
+                return "值 '" + value + "' 的长度(" + actualLength + ")小于要求的最小长度(" + minLength + ")";
+            }
+        }
+        
+        // cvc-length-valid: 固定长度验证失败
+        matcher = CVc_LENGTH_VALID.matcher(message);
+        if (matcher.find()) {
+            String value = matcher.group(1);
+            String actualLength = matcher.group(2);
+            String requiredLength = matcher.group(3);
+            String typeName = matcher.group(4);
+            if (value == null || value.isEmpty() || "0".equals(actualLength)) {
+                return "元素 '" + extractLocalName(typeName) + "' 的值不能为空，需要" + requiredLength + "个字符";
+            } else {
+                return "值 '" + value + "' 的长度(" + actualLength + ")不符合要求的长度(" + requiredLength + ")";
+            }
         }
         
         return null;
@@ -190,5 +314,38 @@ public class XsdErrorTranslator {
             return qualifiedName.substring(colonIndex + 1);
         }
         return qualifiedName;
+    }
+    
+    /**
+     * 翻译数据类型名称为中文
+     */
+    private static String translateDataType(String dataType) {
+        if (dataType == null || dataType.isEmpty()) {
+            return "数据";
+        }
+        
+        String lowerType = dataType.toLowerCase();
+        switch (lowerType) {
+            case "date":
+                return "日期";
+            case "datetime":
+            case "date-time":
+                return "日期时间";
+            case "time":
+                return "时间";
+            case "integer":
+            case "int":
+                return "整数";
+            case "decimal":
+            case "double":
+            case "float":
+                return "数字";
+            case "string":
+                return "字符串";
+            case "boolean":
+                return "布尔值";
+            default:
+                return dataType;
+        }
     }
 }

@@ -59,18 +59,18 @@ public class XMLErrorHandler implements ErrorHandler {
     @Override
     public void warning(SAXParseException exception) throws SAXException {
         String translatedMessage = XsdErrorTranslator.translate(exception.getMessage());
-        warningMessage.add(translatedMessage + " at " + exception.getLineNumber() + ":" + exception.getColumnNumber());
+        warningMessage.add(translatedMessage + " 位置在" + exception.getLineNumber() + "行" + exception.getColumnNumber()+"列");
     }
 
     @Override
     public void error(SAXParseException exception) throws SAXException {
         String translatedMessage = XsdErrorTranslator.translate(exception.getMessage());
-        errorMessage.add(translatedMessage + " at " + exception.getLineNumber() + ":" + exception.getColumnNumber());
+        errorMessage.add(translatedMessage + " 位置在" + exception.getLineNumber() + "行" + exception.getColumnNumber()+"列");
     }
 
     @Override
     public void fatalError(SAXParseException exception) throws SAXException {
         String translatedMessage = XsdErrorTranslator.translate(exception.getMessage());
-        fatalErrorMessage.add(translatedMessage + " at " + exception.getLineNumber() + ":" + exception.getColumnNumber());
+        fatalErrorMessage.add(translatedMessage + " 位置在" + exception.getLineNumber() + "行" + exception.getColumnNumber()+"列");
     }
 }
