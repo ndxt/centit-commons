@@ -35,7 +35,7 @@ public class JSONTransformer {
     }
     /**
      * value | key:value
-     * value : 非字符串常量 | string 常量  "@" + 常量 | 引用 ref
+     * value : 非字符串常量 | string 常量  "@" + 常量 | 引用 ref | $ 模版 | # 两次计算
      *        value分两种形式，默认的是表达式，
      * ref : /rootPath | .currentPath | ..ParentPath | path == currentPath
      *      ref是一个对应的表达式，用于指向原始json中的具体的属性，或者多个属性计算值
