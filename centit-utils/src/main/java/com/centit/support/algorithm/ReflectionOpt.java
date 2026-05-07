@@ -257,7 +257,6 @@ public abstract class ReflectionOpt {
         return getDeclaredField(type, name).getType();
     }
 
-
     /*
      * 获得field的getter函数名称.
      */

@@ -165,7 +165,7 @@ public class PdfUtil {
      * 检测 PDF 是否为扫描件的内部实现
      * 综合判断：图片数量 + 文本质量
      */
-    private static boolean isScannedPdf(PDDocument document) {
+    public static boolean isScannedPdf(PDDocument document) {
         try {
             // 1. 检查图片数量（扫描件通常每页都有图片）
             int totalImages = 0;

@@ -91,6 +91,13 @@
             <artifactId>bcpkix-jdk18on</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Xerces2 for XSD 1.1 support -->
+        <dependency>
+            <groupId>xerces</groupId>
+            <artifactId>xercesImpl</artifactId>
+            <version>2.12.2</version>
+        </dependency>
         <!-- test -->
         <!-- 获取汉字首字母的类库  -->
         <dependency>
