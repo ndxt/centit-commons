@@ -103,7 +103,7 @@ public class JSONTransformer {
                         dataSupport.popStackValue();
                         index++;
                     }
-                    return array.isEmpty() ? null : array;
+                    return /*array.isEmpty() ? null :*/ array;
                 } else {
                     putObjectToJson(jObj, sKey, transformer(ent.getValue(), dataSupport));
                 }
@@ -123,7 +123,7 @@ public class JSONTransformer {
                     }
                 }
             }
-            return array.isEmpty() ? null : array;
+            return /*array.isEmpty() ? null :*/ array;
         } else {
             Class<?> clazz = templateObj.getClass();
             if (clazz.isArray()) {
@@ -135,7 +135,7 @@ public class JSONTransformer {
                         addObjectToJson(array, transformer(Array.get(templateObj, i), dataSupport));
                     }
                 }
-                return array.isEmpty() ? null : array;
+                return /*array.isEmpty() ? null :*/ array;
             } else {
                 return templateObj;
             }
