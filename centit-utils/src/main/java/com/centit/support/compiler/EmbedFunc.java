@@ -250,7 +250,11 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_REG_MATCH:
                 if (nOpSum < 2)
                     return false;
-                return Pattern.compile(StringBaseOpt.objectToString(slOperand.get(0))).matcher(
+                String patternStr = StringBaseOpt.castObjectToString(slOperand.get(0), "");
+                if (StringUtils.isBlank(patternStr)) {
+                    return false;
+                }
+                return Pattern.compile(patternStr).matcher(
                     StringBaseOpt.castObjectToString(slOperand.get(1),"")).find();
             case ConstDefine.FUNC_REG_MATCH_VALUES: {
                 if (nOpSum < 2)
