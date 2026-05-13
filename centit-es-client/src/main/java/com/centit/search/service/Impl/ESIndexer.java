@@ -3,6 +3,7 @@ package com.centit.search.service.Impl;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
 import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import co.elastic.clients.elasticsearch.indices.ExistsRequest;
 import co.elastic.clients.elasticsearch.indices.IndexSettings;
@@ -118,13 +119,10 @@ public class ESIndexer implements Indexer{
         if (documents == null || documents.isEmpty()) {
             return 0;
         }
-
         makeSureIndexIsExist();
-        int[] successCount = {0};
-
+        int successCount = 0;
         try {
             BulkRequest.Builder bulkBuilder = new BulkRequest.Builder();
-
             for (ESDocument document : documents) {
                 try {
                     bulkBuilder.operations(op -> op
@@ -138,24 +136,21 @@ public class ESIndexer implements Indexer{
                     logger.error("构建批量请求失败，文档ID: {}", document.obtainDocumentId(), e);
                 }
             }
-
             BulkResponse response = client.bulk(bulkBuilder.build());
-
             if (response.errors()) {
                 logger.warn("批量写入存在错误，详情如下：");
-                response.items().forEach(item -> {
+                for (BulkResponseItem item : response.items()) {
                     if (item.error() != null) {
                         logger.warn("文档ID: {}, 错误: {}", item.id(), item.error().reason());
                     } else {
-                        successCount[0]++;
+                        successCount++;
                     }
-                });
+                }
             } else {
-                successCount[0] = documents.size();
-                logger.info("成功批量写入 {} 条文档到索引 {}", successCount[0], indexName);
+                successCount = documents.size();
+                logger.info("成功批量写入 {} 条文档到索引 {}", successCount, indexName);
             }
-
-            return successCount[0];
+            return successCount;
         } catch (Exception e) {
             logger.error("批量写入文档失败", e);
             // 降级：逐条写入
@@ -164,13 +159,13 @@ public class ESIndexer implements Indexer{
                 try {
                     String result = saveNewDocument(document);
                     if (result != null) {
-                        successCount[0]++;
+                        successCount++;
                     }
                 } catch (Exception ex) {
                     logger.error("逐条写入文档失败，文档ID: {}", document.obtainDocumentId(), ex);
                 }
             }
-            return successCount[0];
+            return successCount;
         }
     }
 
