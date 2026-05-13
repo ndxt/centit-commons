@@ -4,6 +4,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
+import com.alibaba.fastjson2.JSONArray;
+import com.centit.support.algorithm.ReflectionOpt;
 import org.jxls.area.Area;
 import org.jxls.command.AbstractCommand;
 import org.jxls.common.CellRef;
@@ -34,9 +36,9 @@ public class MergeEachCommand extends AbstractCommand {
             throw new IllegalArgumentException("items and var attributes are required");
         }
 
-        Object collection = context.getVar(items);
-        if (!(collection instanceof Iterable)) {
-            throw new IllegalArgumentException("items must be an iterable collection");
+        Object collection = resolveItems(context, items);
+        if (!(collection instanceof Iterable) && !(collection instanceof JSONArray)) {
+            throw new IllegalArgumentException("items must be an iterable collection or JSONArray");
         }
 
         Transformer transformer = getTransformer();
@@ -56,6 +58,20 @@ public class MergeEachCommand extends AbstractCommand {
         int rowIndex = startRow;
         Size size = null;
 
+        if (collection instanceof JSONArray) {
+            JSONArray jsonArray = (JSONArray) collection;
+            for (int i = 0; i < jsonArray.size(); i++) {
+                context.putVar(var, jsonArray.get(i));
+                Area area = getAreaList().get(0);
+                size = area.applyAt(new CellRef(cellRef.getSheetName(), rowIndex, startCol), context);
+                if (mergeCols != null && mergeCols.length > 0 && rowIndex > startRow) {
+                    mergeCellsIfNeeded(sheet, rowIndex, startRow, startCol, mergeCols, size.getWidth());
+                }
+                rowIndex += size.getHeight();
+            }
+            return size != null ? new Size(size.getWidth(), rowIndex - startRow) : new Size(0, 0);
+        }
+
         for (Object item : (Iterable<?>) collection) {
             context.putVar(var, item);
 
@@ -72,6 +88,22 @@ public class MergeEachCommand extends AbstractCommand {
         }
 
         return size != null ? new Size(size.getWidth(), rowIndex - startRow) : new Size(0, 0);
+    }
+
+    /**
+     * 解析 items 属性，支持点号分隔的嵌套路径（如 "list.data"）
+     */
+    private Object resolveItems(Context context, String itemsExpr) {
+        if (itemsExpr == null) return null;
+        int dotIndex = itemsExpr.indexOf('.');
+        if (dotIndex < 0) {
+            return context.getVar(itemsExpr);
+        }
+        String rootVar = itemsExpr.substring(0, dotIndex);
+        String path = itemsExpr.substring(dotIndex + 1);
+        Object root = context.getVar(rootVar);
+        if (root == null) return null;
+        return ReflectionOpt.attainExpressionValue(root, path);
     }
 
     /**
@@ -130,29 +162,27 @@ public class MergeEachCommand extends AbstractCommand {
             // 查找包含上一行的合并区域
             CellRangeAddress existingRegion = findMergedRegion(sheet, currentRow - 1, absoluteCol);
 
+            // 检查当前单元格和上一行单元格的值是否相同
+            Row prevRow = sheet.getRow(currentRow - 1);
+            Row currRow = sheet.getRow(currentRow);
+
+            if (prevRow == null || currRow == null) continue;
+
+            Cell prevCell = prevRow.getCell(absoluteCol);
+            Cell currCell = currRow.getCell(absoluteCol);
+
+            if (prevCell == null || currCell == null) continue;
+
+            String prevValue = getCellValueAsString(prevCell);
+            String currValue = getCellValueAsString(currCell);
+
+            if (prevValue == null || !prevValue.equals(currValue)) continue;
+
             if (existingRegion != null) {
-                // 如果上一行已经在合并区域中，扩展该区域
                 expandMergedRegion(sheet, existingRegion, currentRow);
             } else {
-                // 检查当前单元格和上一行单元格的值是否相同
-                Row prevRow = sheet.getRow(currentRow - 1);
-                Row currRow = sheet.getRow(currentRow);
-
-                if (prevRow != null && currRow != null) {
-                    Cell prevCell = prevRow.getCell(absoluteCol);
-                    Cell currCell = currRow.getCell(absoluteCol);
-
-                    if (prevCell != null && currCell != null) {
-                        String prevValue = getCellValueAsString(prevCell);
-                        String currValue = getCellValueAsString(currCell);
-
-                        if (prevValue != null && prevValue.equals(currValue)) {
-                            // 创建新的合并区域
-                            sheet.addMergedRegion(new CellRangeAddress(
-                                    currentRow - 1, currentRow, absoluteCol, absoluteCol));
-                        }
-                    }
-                }
+                sheet.addMergedRegion(new CellRangeAddress(
+                        currentRow - 1, currentRow, absoluteCol, absoluteCol));
             }
         }
     }
