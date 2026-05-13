@@ -425,23 +425,22 @@ public abstract class ImageOpt {
             }
         }
         colorStr = colorStr.toLowerCase();
-        switch (colorStr){
-            case "white":       return Color.white;
-            case "lightgray":   return Color.lightGray;
-            case "gray":        return Color.gray;
-            case "darkgray":    return Color.darkGray;
-            case "black":       return Color.black;
-            case "red":         return Color.red;
-            case "pink":        return Color.pink;
-            case "orange":      return Color.orange;
-            case "yellow":      return Color.yellow;
-            case "green":       return Color.green;
-            case "magenta":     return Color.magenta;
-            case "cyan":        return Color.cyan;
-            case "blue":        return Color.blue;
-            default:
-                return null;
-        }
+        return switch (colorStr) {
+            case "white" -> Color.white;
+            case "lightgray" -> Color.lightGray;
+            case "gray" -> Color.gray;
+            case "darkgray" -> Color.darkGray;
+            case "black" -> Color.black;
+            case "red" -> Color.red;
+            case "pink" -> Color.pink;
+            case "orange" -> Color.orange;
+            case "yellow" -> Color.yellow;
+            case "green" -> Color.green;
+            case "magenta" -> Color.magenta;
+            case "cyan" -> Color.cyan;
+            case "blue" -> Color.blue;
+            default -> null;
+        };
     }
 
     public static Color castObjectToColor(Object obj, Color defaultColor) {
