@@ -319,13 +319,17 @@ public abstract class DatetimeOpt {
                 Locale local = fetchLangLocal(sMask.substring(5,7));
                 df = new SimpleDateFormat(sMask.substring(7).trim(), local);
             } else if(sMask.startsWith("zone")){
+                //格式示例zone:en+07yyyy-MM-dd HH:mm:ss
                 Locale local = fetchLangLocal(sMask.substring(5,7));
-                String zone = sMask.substring(8,11);
-                df = new SimpleDateFormat(sMask.substring(11).trim(), local);
-                if("END".equals(zone) || StringUtils.isNotBlank(strDate)){
+                String zone = sMask.substring(7,10);
+                df = new SimpleDateFormat(sMask.substring(10).trim(), local);
+                // 只有当 zone 为 "END" 时，才从日期字符串末尾提取时区
+                if("END".equals(zone)){
                     int lastInd = strDate.lastIndexOf(' ');
-                    zone = strDate.substring(lastInd+1);
-                    strDate = strDate.substring(0, lastInd);
+                    if(lastInd > 0){
+                        zone = strDate.substring(lastInd+1);
+                        strDate = strDate.substring(0, lastInd);
+                    }
                 }
                 df.setTimeZone(DatetimeOpt.fetchTimeZone(zone));
             }  else {

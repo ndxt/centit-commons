@@ -242,11 +242,11 @@ public class PdfUtil {
         return count;
     }
 
-    public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
-        pdfHighlightKeywords(inputPath, outputPath, keywords, color, null);
+    public static boolean pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
+        return pdfHighlightKeywords(inputPath, outputPath, keywords, color, null);
     }
 
-    public static void pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
+    public static boolean pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
         // 将输入流缓存到字节数组，因为需要读取两次（检测和高亮）
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         byte[] data = new byte[8192];
@@ -264,16 +264,17 @@ public class PdfUtil {
             // 直接返回原文
             outputPath.write(pdfBytes);
             outputPath.flush();
-            return;
+            return false;
         }
         // 统一使用最上层绘制高亮，确保高亮不被其他图层覆盖
-        pdfHighlightKeywordsOnTopLayer(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color, password);
+        return pdfHighlightKeywordsOnTopLayer(new ByteArrayInputStream(pdfBytes), outputPath, keywords, color, password);
     }
 
     /**
      * 对 PDF 进行关键词高亮，高亮绘制在最上层
+     * @return true 表示成功高亮至少一个关键词，false 表示未找到匹配的关键词
      */
-    private static void pdfHighlightKeywordsOnTopLayer(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
+    private static boolean pdfHighlightKeywordsOnTopLayer(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
         com.itextpdf.kernel.pdf.PdfReader reader;
         if (password != null && !password.isEmpty()) {
             com.itextpdf.kernel.pdf.ReaderProperties readerProperties = new com.itextpdf.kernel.pdf.ReaderProperties();
@@ -288,6 +289,8 @@ public class PdfUtil {
             color.getGreen() / 255f,
             color.getBlue() / 255f);
 
+        boolean hasHighlighted = false;
+
         for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
             PdfPage page = pdfDoc.getPage(i);
 
@@ -301,6 +304,7 @@ public class PdfUtil {
             List<Rectangle> highlightRects = strategy.getHighlightRectangles();
 
             if (!highlightRects.isEmpty()) {
+                hasHighlighted = true;
                 // 使用 newContentStreamAfter() 在内容流之后绘制高亮，确保高亮显示在最上层
                 PdfCanvas canvas = new PdfCanvas(page.newContentStreamAfter(),
                     page.getResources(), pdfDoc);
@@ -328,6 +332,8 @@ public class PdfUtil {
             }
         }
         pdfDoc.close();
+        
+        return hasHighlighted;
     }
 
     // 增强版关键词提取策略，处理一字一行的情况
@@ -488,12 +494,12 @@ public class PdfUtil {
 
     }
 
-    public static void pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords, java.awt.Color color) throws IOException {
-        pdfHighlightKeywords(inputPath, outputPath, keywords, color, null);
+    public static boolean pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords, java.awt.Color color) throws IOException {
+        return pdfHighlightKeywords(inputPath, outputPath, keywords, color, null);
     }
 
-    public static void pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
-        pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords, color, password);
+    public static boolean pdfHighlightKeywords(String inputPath, String outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
+        return pdfHighlightKeywords(Files.newInputStream(Paths.get(inputPath)), Files.newOutputStream(Paths.get(outputPath)), keywords, color, password);
     }
 
     public static PDDocument loadPDFDocument(InputStream inputStream) throws IOException {
