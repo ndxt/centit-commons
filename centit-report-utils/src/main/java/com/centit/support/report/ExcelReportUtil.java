@@ -3,6 +3,7 @@ package com.centit.support.report;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.compiler.EmbedFuncUtils;
 import com.centit.support.report.JxlsCommand.AutoRowHeightCommand;
+import com.centit.support.report.JxlsCommand.MergeEachCommand;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlEngine;
 import org.jxls.builder.xls.XlsCommentAreaBuilder;
@@ -27,6 +28,7 @@ public abstract class ExcelReportUtil {
 
     static {
         XlsCommentAreaBuilder.addCommandMapping("autoRowHeight", AutoRowHeightCommand.class);
+        XlsCommentAreaBuilder.addCommandMapping("mergeEach", MergeEachCommand.class);
     }
 
     private ExcelReportUtil() {
