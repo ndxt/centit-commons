@@ -1,6 +1,7 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.*;
+import com.centit.support.common.DateTimeSpan;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -348,6 +349,10 @@ public class VariableFormula {
             }
 
             case ConstDefine.OP_ADD: {
+                //date + timeSpan
+                if(operand instanceof Date d1){
+                    return DatetimeOpt.addTimeSpan(d1, operand2);
+                }
                 return GeneralAlgorithm.addTwoObject(operand, operand2);
             }
             case ConstDefine.OP_MUL: {
@@ -407,6 +412,14 @@ public class VariableFormula {
                 return StringRegularOpt.isMatch(StringBaseOpt.objectToString(operand2),
                     StringBaseOpt.objectToString(operand), 2);
             case ConstDefine.OP_SUB:
+                // date - date = timeSpan
+                if(operand instanceof Date d1 && operand2 instanceof Date d2){
+                    return new DateTimeSpan(d2, d1);
+                }
+                // date - timeSpan = date
+                if(operand instanceof Date d1){
+                    return DatetimeOpt.subTimeSpan(d1, operand2);
+                }
                 return GeneralAlgorithm.subtractTwoObject(operand, operand2);
             case ConstDefine.OP_DIV: {
                 return GeneralAlgorithm.divideTwoObject(operand, operand2);

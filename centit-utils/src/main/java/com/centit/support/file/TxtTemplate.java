@@ -1,11 +1,15 @@
 package com.centit.support.file;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.util.*;
-import java.util.regex.*;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * 基于模板的文本内容核对：比对两个文件，模板中用占位符标记的可变区域自动跳过

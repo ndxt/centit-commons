@@ -1,5 +1,6 @@
 package com.centit.support.algorithm;
 
+import com.centit.support.common.DateTimeSpan;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -755,6 +756,38 @@ public abstract class DatetimeOpt {
         return cal.getTime();
     }
 
+    public static java.util.Date addTimeSpan(java.util.Date date, Object timeSpan) {
+        Calendar cal = new GregorianCalendar();
+        if(timeSpan instanceof DateTimeSpan dts){
+            cal.setTimeInMillis(date.getTime() + dts.longValue());
+        } else if(timeSpan instanceof Number nDays) {
+            cal.setTimeInMillis(date.getTime() +
+                Double.valueOf(nDays.doubleValue() * 86400000.0).longValue());
+        } else {
+            DateTimeSpan dts = DateTimeSpan.from(timeSpan);
+            if(dts != null) {
+                cal.setTimeInMillis(date.getTime() + dts.longValue());
+            }
+        }
+        return cal.getTime();
+    }
+
+    public static java.util.Date subTimeSpan(java.util.Date date, Object timeSpan) {
+        Calendar cal = new GregorianCalendar();
+        if(timeSpan instanceof DateTimeSpan dts){
+            cal.setTimeInMillis(date.getTime() - dts.longValue());
+        } else if(timeSpan instanceof Number nDays) {
+            cal.setTimeInMillis(date.getTime() -
+                Double.valueOf(nDays.doubleValue() * 86400000.0).longValue());
+        } else {
+            DateTimeSpan dts = DateTimeSpan.from(timeSpan);
+            if(dts != null) {
+                cal.setTimeInMillis(date.getTime() - dts.longValue());
+            }
+        }
+        return cal.getTime();
+    }
+
     public static java.util.Date addMonths(java.util.Date date, int nMonths) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(date);
@@ -779,7 +812,7 @@ public abstract class DatetimeOpt {
         //System.out.println(endDate.getTime());
         java.util.Date bD = (beginDate.getTime() > endDate.getTime()) ? truncateToDay(endDate) : truncateToDay(beginDate);
         java.util.Date eD = (beginDate.getTime() > endDate.getTime()) ? beginDate : endDate;
-        return (int) (( eD.getTime() - bD.getTime()) / 86400000 + 1);
+        return (int) (( eD.getTime() - bD.getTime() - 1L) / 86400000 + 1);
     }
 
     /**

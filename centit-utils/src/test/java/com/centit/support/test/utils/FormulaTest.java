@@ -19,9 +19,10 @@ public class FormulaTest {
 
         System.out.println( Pattern.compile("^1[3-9]\\d{9}$").matcher("15156334567").find() );
 
-        System.out.println(
-            StringBaseOpt.castObjectToString(VariableFormula.calculate( "regexMatch('^1[3-9]\\\\d{9}$', checkValue)",
-                Map.of("checkValue", 15156334567L))));
+        System.out.println(VariableFormula.calculate( "addTime(today(), timeSpan('5D3H'))"));
+        System.out.println(VariableFormula.calculate( "today() - '5D3H'"));
+        System.out.println(VariableFormula.calculate( "today() + '5D3H'"));
+        System.out.println(VariableFormula.calculate( "addTime(today(), timeSpan('5D3H')) - today()"));
 
 
         //String str = "qwefasdfas.png";

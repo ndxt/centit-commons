@@ -238,7 +238,7 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
      */
     @Override
     public String toString() {
-        return toStringAsMinute();
+        return toStringAsSecond();
     }
 
     public String toStringAsMinute() {
@@ -384,5 +384,20 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
     @Override
     public int compareTo(Number o) {
         return Long.compare(this.timeSpan, o.longValue());
+    }
+
+    public static DateTimeSpan from(Object  obj){
+        if(obj == null) return null;
+        if(obj instanceof DateTimeSpan dts)
+            return dts;
+        if(obj instanceof Date d)
+            return calcDateTimeSpan(d, new Date());
+        if(obj instanceof Number n)
+            return new DateTimeSpan(n.longValue());
+        if(obj instanceof String s)
+            return new DateTimeSpan(s);
+        if(obj instanceof CharSequence cs)
+            return new DateTimeSpan(cs.toString());
+       return null;
     }
 }
