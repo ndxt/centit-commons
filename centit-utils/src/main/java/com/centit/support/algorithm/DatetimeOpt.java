@@ -758,26 +758,18 @@ public abstract class DatetimeOpt {
 
     public static java.util.Date addTimeSpan(java.util.Date date, Object timeSpan) {
         Calendar cal = new GregorianCalendar();
-        if(timeSpan instanceof DateTimeSpan dts){
+        DateTimeSpan dts = DateTimeSpan.from(timeSpan);
+        if(dts != null) {
             cal.setTimeInMillis(date.getTime() + dts.longValue());
-        } else {
-            DateTimeSpan dts = DateTimeSpan.from(timeSpan);
-            if(dts != null) {
-                cal.setTimeInMillis(date.getTime() + dts.longValue());
-            }
         }
         return cal.getTime();
     }
 
     public static java.util.Date subTimeSpan(java.util.Date date, Object timeSpan) {
         Calendar cal = new GregorianCalendar();
-        if(timeSpan instanceof DateTimeSpan dts){
+        DateTimeSpan dts = DateTimeSpan.from(timeSpan);
+        if(dts != null) {
             cal.setTimeInMillis(date.getTime() - dts.longValue());
-        } else {
-            DateTimeSpan dts = DateTimeSpan.from(timeSpan);
-            if(dts != null) {
-                cal.setTimeInMillis(date.getTime() - dts.longValue());
-            }
         }
         return cal.getTime();
     }
