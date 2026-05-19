@@ -760,9 +760,6 @@ public abstract class DatetimeOpt {
         Calendar cal = new GregorianCalendar();
         if(timeSpan instanceof DateTimeSpan dts){
             cal.setTimeInMillis(date.getTime() + dts.longValue());
-        } else if(timeSpan instanceof Number nDays) {
-            cal.setTimeInMillis(date.getTime() +
-                Double.valueOf(nDays.doubleValue() * 86400000.0).longValue());
         } else {
             DateTimeSpan dts = DateTimeSpan.from(timeSpan);
             if(dts != null) {
@@ -776,9 +773,6 @@ public abstract class DatetimeOpt {
         Calendar cal = new GregorianCalendar();
         if(timeSpan instanceof DateTimeSpan dts){
             cal.setTimeInMillis(date.getTime() - dts.longValue());
-        } else if(timeSpan instanceof Number nDays) {
-            cal.setTimeInMillis(date.getTime() -
-                Double.valueOf(nDays.doubleValue() * 86400000.0).longValue());
         } else {
             DateTimeSpan dts = DateTimeSpan.from(timeSpan);
             if(dts != null) {
