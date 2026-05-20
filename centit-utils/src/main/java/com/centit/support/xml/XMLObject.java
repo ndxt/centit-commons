@@ -177,9 +177,12 @@ public abstract class XMLObject {
                 return null;
             List<Object> objs = new ArrayList<>(subElements.size());
             for (Element subE : subElements) {
-                if (StringUtils.equals("item", element.getName())) {
+                if (StringUtils.equals("item", subE.getName())) {
                     objs.add(
                         elementToObject(subE));
+                } else {
+                    objs.add(CollectionsOpt.createHashMap(subE.getName(),
+                        elementToObject(subE)));
                 }
             }
             return objs;
