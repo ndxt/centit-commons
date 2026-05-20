@@ -213,8 +213,18 @@ public abstract class XMLObject {
                 if(attr != null) {
                     keyName = attr.getValue();
                 }
-                objectMap.put(keyName,
-                    elementToObject(subE));
+                Object obj = elementToObject(subE);
+                if(objectMap.containsKey(keyName)){
+                    Object oldObj = objectMap.get(keyName);
+                    if(oldObj instanceof List){
+                        ((List<Object>)oldObj).add(obj);
+                    }else{
+                        objectMap.put(keyName,
+                            CollectionsOpt.createList(oldObj, obj));
+                    }
+                }else {
+                    objectMap.put(keyName, obj);
+                }
             }
             return objectMap;
         }

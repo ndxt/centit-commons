@@ -798,7 +798,7 @@ public abstract class CollectionsOpt {
     public static <T> List<T> createList(T... objs) {
         if (objs == null)
             return null;
-        List<T> list = new ArrayList<>(objs.length+1);
+        List<T> list = new ArrayList<>(objs.length + 1);
         Collections.addAll(list, objs);
         return list;
     }

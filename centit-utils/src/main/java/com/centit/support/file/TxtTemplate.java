@@ -7,7 +7,7 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 
-/**
+/*
  * 基于模板的文本内容核对：比对两个文件，模板中用占位符标记的可变区域自动跳过
  * 占位符格式：{{字段名}} 或 ${字段名}
  */
@@ -15,7 +15,7 @@ public class TxtTemplate {
 
     private static final Pattern PLACEHOLDER = Pattern.compile("\\{\\{.+?}}|\\$\\{.+?}");
 
-    /**
+    /*
      * 核对结果
      */
     public static class CompareResult {
@@ -56,7 +56,7 @@ public class TxtTemplate {
         }
     }
 
-    /**
+    /*
      * 用模板文件核对实际文件
      * 模板中 {{xxx}} 或 ${xxx} 标记的行视为可变区域，跳过比对
      */
@@ -81,7 +81,7 @@ public class TxtTemplate {
         return compare(templateLines, actualLines, ignoreWhitespace);
     }
 
-    /**
+    /*
      * 用模板字符串核对实际文件
      */
     public static CompareResult compareWithTemplate(String templateContent, File actualFile) {
@@ -100,7 +100,7 @@ public class TxtTemplate {
         return compare(templateLines, actualLines, ignoreWhitespace);
     }
 
-    /**
+    /*
      * 用模板字符串核对字符串
      */
     public static CompareResult compareWithTemplate(String templateContent, String actualContent) {
@@ -113,7 +113,7 @@ public class TxtTemplate {
         return compare(templateLines, actualLines, ignoreWhitespace);
     }
 
-    /**
+    /*
      * 自定义占位符正则，核对文件
      */
     public static CompareResult compareWithPattern(File templateFile, File actualFile, String placeholderRegex) {
@@ -135,7 +135,7 @@ public class TxtTemplate {
         return compare(templateLines, actualLines, ignoreWhitespace, customPattern);
     }
 
-    /**
+    /*
      * 核心比较逻辑（使用默认占位符 {{}}/${}）
      */
     private static CompareResult compare(List<String> templateLines, List<String> actualLines, boolean ignoreWhitespace) {
