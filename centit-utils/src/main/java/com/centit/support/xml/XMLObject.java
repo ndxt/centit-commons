@@ -4,6 +4,7 @@ import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.common.JavaBeanMetaData;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,18 @@ public abstract class XMLObject {
         }
         element.setText(StringBaseOpt.objectToString(value));
         return element;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Pair<String, Object> extraKeyAndValue(Object obj){
+        if(obj instanceof Map){
+            Map<Object, Object> mapObj = (Map<Object, Object>)obj;
+            if(mapObj.size()==1){
+                Map.Entry<Object, Object> ent = mapObj.entrySet().iterator().next();
+                return Pair.of(StringBaseOpt.objectToString(ent.getKey()), ent.getValue());
+            }
+        }
+        return Pair.of("item",  obj);
     }
 
     @SuppressWarnings("unchecked")
@@ -83,7 +96,9 @@ public abstract class XMLObject {
             }
             for (Object obj : (Object[]) object) {
                 if (obj != null) {
-                    element.add(createXMLElementFromObject("item", obj, addTypeAttr, fieldAsKeyAttr, hasSerialized));
+                    Pair<String, Object> keyAndValue = extraKeyAndValue(obj);
+                    element.add(createXMLElementFromObject(keyAndValue.getKey(), keyAndValue.getValue(),
+                        addTypeAttr, fieldAsKeyAttr, hasSerialized));
                 }
             }
             return element;
@@ -95,7 +110,9 @@ public abstract class XMLObject {
             }
             for (Object obj : (Collection<?>) object) {
                 if (obj != null) {
-                    element.add(createXMLElementFromObject("item", obj, addTypeAttr, fieldAsKeyAttr, hasSerialized));
+                    Pair<String, Object> keyAndValue = extraKeyAndValue(obj);
+                    element.add(createXMLElementFromObject(keyAndValue.getKey(), keyAndValue.getValue(),
+                        addTypeAttr, fieldAsKeyAttr, hasSerialized));
                 }
             }
             return element;
@@ -159,25 +176,25 @@ public abstract class XMLObject {
         //Map<String, Object> objectMap = new HashMap<>();
         Attribute attr = element.attribute("type");
         String sType = attr == null ? null :attr.getValue();
-        if (StringUtils.equals("Date", sType)) {
+        if ("Date".equals(sType)) {
             return DatetimeOpt.smartPraseDate(element.getTextTrim());
-        } else if (StringUtils.equals("Long", sType)) {
+        } else if ("Long".equals(sType)) {
             return NumberBaseOpt.castObjectToLong(element.getTextTrim());
-        } else if (StringUtils.equals("Integer", sType)) {
+        } else if ("Integer".equals(sType)) {
             return NumberBaseOpt.castObjectToInteger(element.getTextTrim());
-        } else if (StringUtils.equals("Number", sType)) {
+        } else if ("Number".equals(sType)) {
             return NumberBaseOpt.castObjectToDouble(element.getTextTrim());
-        } else if (StringUtils.equals("Boolean", sType)) {
+        } else if ("Boolean".equals(sType)) {
             return StringRegularOpt.isTrue(element.getTextTrim());
-        } else if (StringUtils.equals("BigDecimal", sType)) {
+        } else if ("BigDecimal".equals(sType)) {
             return new BigDecimal(element.getTextTrim());
-        } else if (StringUtils.equals("Array", sType)) {
+        } else if ("Array".equals(sType)) {
             List<Element> subElements = element.elements();
             if (subElements == null)
                 return null;
             List<Object> objs = new ArrayList<>(subElements.size());
             for (Element subE : subElements) {
-                if (StringUtils.equals("item", subE.getName())) {
+                if ("item".equals(subE.getName())) {
                     objs.add(
                         elementToObject(subE));
                 } else {
@@ -186,7 +203,7 @@ public abstract class XMLObject {
                 }
             }
             return objs;
-        } else /*if (StringUtils.equals("Object", sType)) */{
+        } else /*if ("Object".equals(sType)) */{
             List<Element> subElements = element.elements();
             if (subElements == null || subElements.isEmpty())
                 return element.getTextTrim();
