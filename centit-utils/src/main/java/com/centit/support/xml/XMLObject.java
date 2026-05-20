@@ -4,6 +4,7 @@ import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.common.JavaBeanMetaData;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,17 @@ public abstract class XMLObject {
         }
         element.setText(StringBaseOpt.objectToString(value));
         return element;
+    }
+
+    private static Pair<String, Object> extraKeyAndValue(Object obj){
+        if(obj instanceof Map){
+            Map<Object, Object> mapObj = (Map<Object, Object>)obj;
+            if(mapObj.size()==1){
+                Map.Entry<Object, Object> ent = mapObj.entrySet().iterator().next();
+                return Pair.of(StringBaseOpt.objectToString(ent.getKey()), ent.getValue());
+            }
+        }
+        return Pair.of("item",  obj);
     }
 
     @SuppressWarnings("unchecked")
@@ -83,7 +95,9 @@ public abstract class XMLObject {
             }
             for (Object obj : (Object[]) object) {
                 if (obj != null) {
-                    element.add(createXMLElementFromObject("item", obj, addAttr, fieldAsKeyAttr, hasSerialized));
+                    Pair<String, Object> keyAndValue = extraKeyAndValue(obj);
+                    element.add(createXMLElementFromObject(keyAndValue.getKey(), keyAndValue.getValue(),
+                        addAttr, fieldAsKeyAttr, hasSerialized));
                 }
             }
             return element;
@@ -95,7 +109,9 @@ public abstract class XMLObject {
             }
             for (Object obj : (Collection<?>) object) {
                 if (obj != null) {
-                    element.add(createXMLElementFromObject("item", obj, addAttr, fieldAsKeyAttr, hasSerialized));
+                    Pair<String, Object> keyAndValue = extraKeyAndValue(obj);
+                    element.add(createXMLElementFromObject(keyAndValue.getKey(), keyAndValue.getValue(),
+                        addAttr, fieldAsKeyAttr, hasSerialized));
                 }
             }
             return element;
