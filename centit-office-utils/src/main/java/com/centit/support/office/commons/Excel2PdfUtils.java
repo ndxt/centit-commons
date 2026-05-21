@@ -277,6 +277,16 @@ public class Excel2PdfUtils {
             }
             List<PdfPCell> rowCells = new ArrayList<>();
             int columns = row.getLastCellNum();
+            // 修复：getLastCellNum() 返回的是最后一列的索引+1，需要检查实际最大列索引
+           //  如果最后一列为空（null 或空字符串），则减少列数
+            while (columns > 0) {
+                Cell lastCell = row.getCell(columns - 1);
+                if (lastCell == null || StringUtils.isBlank(getCellString(lastCell))) {
+                    columns--;
+                } else {
+                    break;
+                }
+            }
             if (columns <= 0) {
                 for (int k = 0; k < colRanges.size(); k++) {
                     PdfPCell pdfpCell = new PdfPCell();
