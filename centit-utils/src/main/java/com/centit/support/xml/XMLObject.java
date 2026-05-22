@@ -3,7 +3,6 @@ package com.centit.support.xml;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.common.JavaBeanMetaData;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.*;
 import org.slf4j.Logger;
