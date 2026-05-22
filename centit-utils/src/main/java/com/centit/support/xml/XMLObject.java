@@ -54,11 +54,8 @@ public abstract class XMLObject {
         }
         Element element = createElement(elementName, fieldAsKeyAttr);
         element.addAttribute("type", "Array");
-        if(values.isEmpty()){
-            return element;
-        }
         if(addTypeAttr) {
-            element.addAttribute("class", values.iterator().next().getClass().getName());
+            element.addAttribute("class", values.getClass().getName());
         }
         for (Object obj : values) {
             if (obj != null) {
@@ -244,8 +241,8 @@ public abstract class XMLObject {
             for (Element subE : subElements) {
                 String keyName = subE.getName();
                 Attribute keyAttr = subE.attribute("key");
-                if(attr != null) {
-                    keyName = attr.getValue();
+                if(keyAttr != null) {
+                    keyName = keyAttr.getValue();
                 }
                 Object obj = elementToObject(subE);
                 if(objectMap.containsKey(keyName)){
