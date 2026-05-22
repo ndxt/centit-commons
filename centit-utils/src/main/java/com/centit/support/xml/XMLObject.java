@@ -196,11 +196,11 @@ public abstract class XMLObject {
     }
 
     public static String objectToXMLString(String rootName, Object object) {
-        return objectToXMLString(rootName, object, true, true, false);
+        return objectToXMLString(rootName, object, true, false, true);
     }
 
     public static String objectToXMLString(Object object) {
-        return objectToXMLString("object", object,true, true, false);
+        return objectToXMLString("object", object,true, false, true);
     }
 
     @SuppressWarnings("unchecked")
