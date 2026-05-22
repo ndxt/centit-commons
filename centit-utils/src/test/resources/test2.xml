@@ -1,41 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<档案实体>
-    <数字化属性>
-        <扫描分辨率>300dpi</扫描分辨率>
-        <扫描色彩模式>彩色</扫描色彩模式>
-    </数字化属性>
-    <聚合层次>件</聚合层次>
-    <内容描述>
-        <文件类型>会议备忘</文件类型>
-        <抄送></抄送>
-        <部门负责人>程立雪</部门负责人>
-        <责任者>工程管理部</责任者>
-        <文件形成日期>2026-04-22 15:21:47</文件形成日期>
-        <题名>关于东阳重力管在线监测系统方案汇报会会议备忘</题名>
-        <主送></主送>
-    </内容描述>
-    <权限管理></权限管理>
-    <来源>
-        <立档单位名称>南京水务集团有限公司OA办公系统</立档单位名称>
-    </来源>
-    <电子签名></电子签名>
-    <档号>
-        <年度>2026</年度>
-    </档号>
-    <形式特征>
-        <文件组合类型>组合文件</文件组合类型>
-        <稿本>[正文]-7163300526919696030,[正文]7365839901825649803.pdf</稿本>
-    </形式特征>
-    <电子文件号>BW2026-0004</电子文件号>
-    <电子属性>
-        <计算机文件名>[正文]-7163300526919696030</计算机文件名>
-        <计算机文件大小>33280</计算机文件大小>
-        <hash值>949b4988d5f61b4ba16263b39081d524</hash值>
-    </电子属性>
-    <电子属性>
-        <格式信息>pdf</格式信息>
-        <计算机文件名>[正文]7365839901825649803.pdf</计算机文件名>
-        <计算机文件大小>179393</计算机文件大小>
-        <hash值>e416c74d83f1a4d7fe66665606d21553</hash值>
-    </电子属性>
-</档案实体>
+<entry key="档案实体" type="Object" class="java.util.HashMap">
+    <entry key="数字化属性" type="Object" class="java.util.HashMap">
+        <entry key="扫描分辨率" type="String">300dpi</entry>
+        <entry key="扫描色彩模式" type="String">彩色</entry>
+    </entry>
+    <entry key="聚合层次" type="String">件</entry>
+    <entry key="内容描述" type="Object" class="java.util.HashMap">
+        <entry key="文件类型" type="String">会议备忘</entry>
+        <entry key="抄送" type="String"></entry>
+        <entry key="部门负责人" type="String">程立雪</entry>
+        <entry key="责任者" type="String">工程管理部</entry>
+        <entry key="文件形成日期" type="String">2026-04-22 15:21:47</entry>
+        <entry key="题名" type="String">关于东阳重力管在线监测系统方案汇报会会议备忘</entry>
+        <entry key="主送" type="String"></entry>
+    </entry>
+    <entry key="权限管理" type="String"></entry>
+    <entry key="来源" type="Object" class="java.util.HashMap">
+        <entry key="立档单位名称" type="String">南京水务集团有限公司OA办公系统</entry>
+    </entry>
+    <entry key="电子签名" type="String"></entry>
+    <entry key="档号" type="Object" class="java.util.HashMap">
+        <entry key="年度" type="String">2026</entry>
+    </entry>
+    <entry key="形式特征" type="Object" class="java.util.HashMap">
+        <entry key="文件组合类型" type="String">组合文件</entry>
+        <entry key="稿本" type="String">[正文]-7163300526919696030,[正文]7365839901825649803.pdf</entry>
+    </entry>
+    <entry key="电子文件号" type="String">BW2026-0004</entry>
+    <entry key="电子属性" type="Array" class="java.util.ArrayList">
+        <entry key="__item" type="Object" class="java.util.HashMap">
+            <entry key="计算机文件名" type="String">[正文]-7163300526919696030</entry>
+            <entry key="计算机文件大小" type="String">33280</entry>
+            <entry key="hash值" type="String">949b4988d5f61b4ba16263b39081d524</entry>
+        </entry>
+        <entry key="__item" type="Object" class="java.util.HashMap">
+            <entry key="格式信息" type="String">pdf</entry>
+            <entry key="计算机文件名" type="String">[正文]7365839901825649803.pdf</entry>
+            <entry key="计算机文件大小" type="String">179393</entry>
+            <entry key="hash值" type="String">e416c74d83f1a4d7fe66665606d21553</entry>
+        </entry>
+    </entry>
+</entry>
