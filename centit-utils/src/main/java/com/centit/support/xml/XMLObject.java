@@ -3,6 +3,7 @@ package com.centit.support.xml;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.common.JavaBeanMetaData;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.*;
 import org.slf4j.Logger;
@@ -18,17 +19,57 @@ import java.util.*;
 public abstract class XMLObject {
 
     protected static final Logger logger = LoggerFactory.getLogger(XMLObject.class);
+    public static final String XML_ARRAY_ITEM_TAG = "__item";
 
     private XMLObject() {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static Element createXMLElement(String elementName, String valueType, Object value, boolean addTypeAttr) {
-        Element element = DocumentHelper.createElement(elementName);
+    private static Element createElement(String elementName, boolean fieldAsKeyAttr) {
+        String keyEntName = fieldAsKeyAttr? "entry" : elementName;
+        Element element = DocumentHelper.createElement(keyEntName);
+        if(fieldAsKeyAttr) {
+            element.addAttribute("key", elementName);
+        }
+        return element;
+    }
+    public static Element createXMLElement(String elementName, String valueType, Object value, boolean addTypeAttr, boolean fieldAsKeyAttr) {
+        Element element = createElement(elementName, fieldAsKeyAttr);
         if(addTypeAttr) {
             element.addAttribute("type", valueType);
         }
         element.setText(StringBaseOpt.objectToString(value));
+        return element;
+    }
+
+    public static Element createArrayXMLElement(Element paraentElement, String elementName, Collection<Object> values, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray, HashSet<Object> hasSerialized) {
+        if(flattenArray && paraentElement != null){
+            for (Object obj : values) {
+                if (obj != null) {
+                    paraentElement.add(createXMLElementFromObject(null, elementName, obj,
+                        addTypeAttr, fieldAsKeyAttr, true, hasSerialized));
+                }
+            }
+            return null;
+        }
+        Element element = createElement(elementName, fieldAsKeyAttr);
+        element.addAttribute("type", "Array");
+        if(values.isEmpty()){
+            return element;
+        }
+        if(addTypeAttr) {
+            element.addAttribute("class", values.iterator().next().getClass().getName());
+        }
+        for (Object obj : values) {
+            if (obj != null) {
+                Pair<String, Object> keyAndValue = extraKeyAndValue(obj);
+                Element entry = createXMLElementFromObject(element, keyAndValue.getKey(), keyAndValue.getValue(),
+                    addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
+                if(entry!=null) {
+                    element.add(entry);
+                }
+            }
+        }
         return element;
     }
 
@@ -41,34 +82,34 @@ public abstract class XMLObject {
                 return Pair.of(StringBaseOpt.objectToString(ent.getKey()), ent.getValue());
             }
         }
-        return Pair.of("item",  obj);
+        return Pair.of(XML_ARRAY_ITEM_TAG,  obj);
     }
 
     @SuppressWarnings("unchecked")
-    public static Element createXMLElementFromObject(String elementName, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr, HashSet<Object> hasSerialized) {
+    public static Element createXMLElementFromObject(Element paraentElement, String elementName, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray, HashSet<Object> hasSerialized) {
         if (object instanceof String) {
-            return createXMLElement(elementName, "String", object, addTypeAttr);
+            return createXMLElement(elementName, "String", object, addTypeAttr, fieldAsKeyAttr);
         }
         if (object instanceof Long) {
-            return createXMLElement(elementName, "Long", object, addTypeAttr);
+            return createXMLElement(elementName, "Long", object, addTypeAttr, fieldAsKeyAttr);
         }
         if (object instanceof BigDecimal) {
-            return createXMLElement(elementName, "BigDecimal", object, addTypeAttr);
+            return createXMLElement(elementName, "BigDecimal", object, addTypeAttr, fieldAsKeyAttr);
         }
         if (object instanceof Boolean) {
-            return createXMLElement(elementName, "Boolean", object, addTypeAttr);
+            return createXMLElement(elementName, "Boolean", object, addTypeAttr, fieldAsKeyAttr);
         }
         if (object instanceof Integer) {
-            return createXMLElement(elementName, "Integer", object, addTypeAttr);
+            return createXMLElement(elementName, "Integer", object, addTypeAttr, fieldAsKeyAttr);
         }
         if (object instanceof Number) {
-            return createXMLElement(elementName, "Number", object, addTypeAttr);
+            return createXMLElement(elementName, "Number", object, addTypeAttr, fieldAsKeyAttr);
         }
         if (object instanceof Date) {
-            return createXMLElement(elementName, "Date", object, addTypeAttr);
+            return createXMLElement(elementName, "Date", object, addTypeAttr, fieldAsKeyAttr);
         }
         if (object instanceof Map) {
-            Element element = DocumentHelper.createElement(elementName);
+            Element element = createElement(elementName, fieldAsKeyAttr);
             if(addTypeAttr) {
                 element.addAttribute("type", "Object");
                 element.addAttribute("class", object.getClass().getName());
@@ -76,60 +117,34 @@ public abstract class XMLObject {
             for (Map.Entry<Object, Object> jo : ((Map<Object, Object>) object).entrySet()) {
                 if (jo.getValue() != null) {
                     String keyName = StringBaseOpt.objectToString(jo.getKey());
-                    String keyEntName = fieldAsKeyAttr? "entry" : keyName;
-                    Element entry = createXMLElementFromObject(keyEntName, jo.getValue(), addTypeAttr, fieldAsKeyAttr, hasSerialized);
-                    if(fieldAsKeyAttr) {
-                        entry.addAttribute("key", keyName);
+                    Element entry = createXMLElementFromObject(element, keyName, jo.getValue(), addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
+                    if(entry!=null) {
+                        element.add(entry);
                     }
-                    element.add(entry);
                 }
             }
             return element;
         }
 
-        if (object instanceof Object[]) {
-            Element element = DocumentHelper.createElement(elementName);
-            element.addAttribute("type", "Array");
-            if(addTypeAttr) {
-                element.addAttribute("class", object.getClass().getName());
-            }
-            for (Object obj : (Object[]) object) {
-                if (obj != null) {
-                    Pair<String, Object> keyAndValue = extraKeyAndValue(obj);
-                    element.add(createXMLElementFromObject(keyAndValue.getKey(), keyAndValue.getValue(),
-                        addTypeAttr, fieldAsKeyAttr, hasSerialized));
-                }
-            }
-            return element;
-        } else if (object instanceof Collection) {
-            Element element = DocumentHelper.createElement(elementName);
-            element.addAttribute("type", "Array");
-            if(addTypeAttr) {
-                element.addAttribute("class", object.getClass().getName());
-            }
-            for (Object obj : (Collection<?>) object) {
-                if (obj != null) {
-                    Pair<String, Object> keyAndValue = extraKeyAndValue(obj);
-                    element.add(createXMLElementFromObject(keyAndValue.getKey(), keyAndValue.getValue(),
-                        addTypeAttr, fieldAsKeyAttr, hasSerialized));
-                }
-            }
-            return element;
+        if (object instanceof Collection) {
+            return createArrayXMLElement(paraentElement, elementName, (Collection<Object>) object, addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
+        } else if (object instanceof Object[]) {
+            return createArrayXMLElement(paraentElement, elementName, CollectionsOpt.arrayToList((Object[]) object), addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
         }
 
         if (ReflectionOpt.isScalarType(object.getClass())) {
-            return createXMLElement(elementName, "String", object, addTypeAttr);
+            return createXMLElement(elementName, "String", object, addTypeAttr, fieldAsKeyAttr);
         } else {
             if(hasSerialized.contains(object)){
-                return createXMLElement(elementName, "recursion", object.getClass().getName(), addTypeAttr);
+                return createXMLElement(elementName, "recursion", object.getClass().getName(), addTypeAttr, fieldAsKeyAttr);
             }
             hasSerialized.add(object);
             JavaBeanMetaData jbm = JavaBeanMetaData.createBeanMetaDataFromType(object.getClass());
             Map<String, JavaBeanField> fields = jbm.getFields();
             if (fields == null)
-                return createXMLElement(elementName, "String", object, addTypeAttr);
+                return createXMLElement(elementName, "String", object, addTypeAttr, fieldAsKeyAttr);
 
-            Element element = DocumentHelper.createElement(elementName);
+            Element element = createElement(elementName, fieldAsKeyAttr);
             if(addTypeAttr) {
                 element.addAttribute("type", "Object");
                 element.addAttribute("class", object.getClass().getName());
@@ -137,40 +152,59 @@ public abstract class XMLObject {
             for (Map.Entry<String, JavaBeanField> field : fields.entrySet()) {
                 Object obj = field.getValue().getObjectFieldValue(object);
                 if (obj != null) {
-                    String keyEntName = fieldAsKeyAttr? "entry" : field.getKey();
-                    Element entry = createXMLElementFromObject(keyEntName, obj, addTypeAttr, fieldAsKeyAttr, hasSerialized);
-                    if(fieldAsKeyAttr) {
-                        entry.addAttribute("key", field.getKey());
+                    Element entry = createXMLElementFromObject(element, field.getKey(), obj, addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
+                    if(entry!=null) {
+                        element.add(entry);
                     }
-                    element.add(entry);
                 }
             }
             return element;
         }
     }
 
-    public static String objectToXMLString(String rootName, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr) {
+    /**
+     *
+     * @param rootName 跟节点名称
+     * @param object 对象
+     * @param addTypeAttr 是否添加类型属性
+     * @param fieldAsKeyAttr 是否将字段名作为key属性
+     * @param flattenArray 是否扁平化数组
+     * @return xml字符串
+     */
+    public static String objectToXMLString(String rootName, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray) {
         HashSet<Object> hasSerialized = new HashSet<>();
-        Element element = createXMLElementFromObject(rootName, object, addTypeAttr, fieldAsKeyAttr, hasSerialized);
+        Element element = createXMLElementFromObject(null, rootName, object, addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
         return element.asXML();
     }
 
-    public static String objectToXMLString(String rootName, String nameSpacePrefix, String namespace, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr) {
+    /**
+     *
+     * @param rootName 跟节点名称
+     * @param nameSpacePrefix 命名空间前缀
+     * @param namespace 命名空间
+     * @param object 对象
+     * @param addTypeAttr 是否添加类型属性
+     * @param fieldAsKeyAttr 是否将字段名作为key属性
+     * @param flattenArray 是否扁平化数组
+     * @return xml字符串
+     */
+    public static String objectToXMLString(String rootName, String nameSpacePrefix, String namespace, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray) {
         HashSet<Object> hasSerialized = new HashSet<>();
-        Element element = createXMLElementFromObject(nameSpacePrefix+":"+rootName,
-            object, addTypeAttr, fieldAsKeyAttr, hasSerialized);
+        Element element = createXMLElementFromObject(null,nameSpacePrefix+":"+rootName,
+            object, addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
         element.add(new Namespace(nameSpacePrefix, namespace));
         return element.asXML();
     }
 
     public static String objectToXMLString(String rootName, Object object) {
-        return objectToXMLString(rootName, object, true, true);
+        return objectToXMLString(rootName, object, true, true, false);
     }
 
     public static String objectToXMLString(Object object) {
-        return objectToXMLString("object", object);
+        return objectToXMLString("object", object,true, true, false);
     }
 
+    @SuppressWarnings("unchecked")
     public static Object elementToObject(Element element) {
         //Map<String, Object> objectMap = new HashMap<>();
         Attribute attr = element.attribute("type");
@@ -193,7 +227,7 @@ public abstract class XMLObject {
                 return null;
             List<Object> objs = new ArrayList<>(subElements.size());
             for (Element subE : subElements) {
-                if ("item".equals(subE.getName())) {
+                if (XML_ARRAY_ITEM_TAG.equals(subE.getName())) {
                     objs.add(
                         elementToObject(subE));
                 } else {
