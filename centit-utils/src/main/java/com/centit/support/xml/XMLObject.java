@@ -224,11 +224,16 @@ public abstract class XMLObject {
                 return null;
             List<Object> objs = new ArrayList<>(subElements.size());
             for (Element subE : subElements) {
-                if (StringUtils.equals(XML_ARRAY_ITEM_TAG, subE.getName())) {
+                String keyName = subE.getName();
+                Attribute keyAttr = subE.attribute("key");
+                if(keyAttr != null) {
+                    keyName = keyAttr.getValue();
+                }
+                if (StringUtils.equals(XML_ARRAY_ITEM_TAG, keyName)) {
                     objs.add(
                         elementToObject(subE));
                 } else {
-                    objs.add(CollectionsOpt.createHashMap(subE.getName(),
+                    objs.add(CollectionsOpt.createHashMap(keyName,
                         elementToObject(subE)));
                 }
             }

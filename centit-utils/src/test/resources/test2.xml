@@ -28,12 +28,12 @@
     </entry>
     <entry key="电子文件号" type="String">BW2026-0004</entry>
     <entry key="电子属性" type="Array" class="java.util.ArrayList">
-        <entry key="entry" type="Object" class="java.util.HashMap">
+        <entry key="__item" type="Object" class="java.util.HashMap">
             <entry key="计算机文件名" type="String">[正文]-7163300526919696030</entry>
             <entry key="计算机文件大小" type="String">33280</entry>
             <entry key="hash值" type="String">949b4988d5f61b4ba16263b39081d524</entry>
         </entry>
-        <entry key="entry" type="Object" class="java.util.HashMap">
+        <entry key="__item" type="Object" class="java.util.HashMap">
             <entry key="格式信息" type="String">pdf</entry>
             <entry key="计算机文件名" type="String">[正文]7365839901825649803.pdf</entry>
             <entry key="计算机文件大小" type="String">179393</entry>

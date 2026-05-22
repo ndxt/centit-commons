@@ -12,7 +12,7 @@ public class TestXmlObject {
     public static void main(String[] args) throws IOException {
         String xmlBody = FileIOOpt.readStringFromInputStream(TestXmlObject.class.getResourceAsStream("/test2.xml"));
         Object obj = XMLObject.xmlStringToObject(xmlBody);
-        System.out.println(XMLObject.objectToXMLString("档案实体", obj, true, true, false));
+        System.out.println(XMLObject.objectToXMLString("档案实体", obj, false, false, true));
     }
     public static void main2(String[] args) {
 
