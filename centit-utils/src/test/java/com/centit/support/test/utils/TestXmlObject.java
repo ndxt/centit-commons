@@ -12,14 +12,14 @@ public class TestXmlObject {
     public static void main(String[] args) throws IOException {
         String xmlBody = FileIOOpt.readStringFromInputStream(TestXmlObject.class.getResourceAsStream("/test.xml"));
         Object obj = XMLObject.xmlStringToObject(xmlBody);
-        System.out.println(XMLObject.objectToXMLString("档案实体", obj, false, false));
+        System.out.println(XMLObject.objectToXMLString("档案实体", obj, false, false, false));
     }
     public static void main2(String[] args) {
 
        String xmlBoday = XMLObject.objectToXMLString("getData", "act", "http://tempuri.org",
            CollectionsOpt.createHashMap("funName", "string1", "userName",
                "string2", "password", "string3",
-               "paramXml", "string4"), false, false);
+               "paramXml", "string4"), false, false, true);
 
        System.out.println(xmlBoday);
 
