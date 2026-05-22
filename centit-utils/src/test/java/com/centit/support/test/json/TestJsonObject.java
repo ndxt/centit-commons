@@ -1,4 +1,4 @@
-package com.centit.support.test.utils;
+package com.centit.support.test.json;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
@@ -36,7 +36,7 @@ public class TestJsonObject {
         Object template  = JSON.parse(FileIOOpt.readStringFromInputStream(in));
         Object object1 = JSONTransformer.transformer(template, object);
         FileIOOpt.writeObjectAsJsonToFile(object1,
-            "/Users/codefan/projects/centit/centit-commons/centit-utils/src/test/resources/ouput.json");
+            "/Users/codefan/projects/centit/centit-commons/centit-utils/src/test/resources/output.json");
         System.out.println(JSON.toJSONString(object1));
     }
     public static void testObjectToJson() {

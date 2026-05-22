@@ -3,6 +3,7 @@ package com.centit.support.json;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.compiler.ObjectTranslate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -48,6 +49,7 @@ public class JSONTransformer {
      * @param dataSupport 元数据
      * @return 结果数据
      */
+    @SuppressWarnings("unchecked")
     public static Object transformer(Object templateObj,
                                      JSONTransformDataSupport dataSupport){
         if(templateObj == null){
@@ -73,7 +75,12 @@ public class JSONTransformer {
                 if(sKey.isEmpty()){
                     return null;
                 }
-                if(sKey.charAt(0) == '@'){ // 替换当前属性，这个必须返回 Map
+                if(sKey.charAt(0) == '='){ // 替换当前属性，这个必须返回 Map
+                    Object key = transformer(sKey, dataSupport);
+                    Object value = transformer(ent.getValue(), dataSupport);
+                    String keyName = key!=null? StringBaseOpt.castObjectToString(key):sKey.substring(1);
+                    putObjectToJson(jObj, keyName, value);
+                } else if(sKey.charAt(0) == '@'){ // 替换当前属性，这个必须返回 Map
                     Object value = transformer(ent.getValue(), dataSupport);
                     if(value instanceof Map){
                         jObj.putAll(CollectionsOpt.objectToMap(value));
@@ -85,16 +92,13 @@ public class JSONTransformer {
                     if(obj==null){
                         return null;
                     }
-                    if(! (obj instanceof Collection)){
-                        logger.warn(sKey.substring(1) + "对应的数据不是数组");
-                    }
                     JSONArray array = new JSONArray();
                     List<Object> loopData = CollectionsOpt.objectToList(obj);
                     int loopSize = loopData.size();
                     int index = 0;
                     for(Object ld : loopData){
                         dataSupport.pushStackValue(ld, index, loopSize);
-                        if(StringUtils.isBlank(String.valueOf(ent.getValue())) || ".".equals(String.valueOf(ent.getValue()))){
+                        if(ent.getValue() instanceof String && (StringUtils.isBlank(String.valueOf(ent.getValue())) || ".".equals(String.valueOf(ent.getValue()))) ){
                             addObjectToJson(array, ld);
                         }else {
                             addObjectToJson(array, transformer(ent.getValue(), dataSupport));
@@ -103,6 +107,28 @@ public class JSONTransformer {
                         index++;
                     }
                     return /*array.isEmpty() ? null :*/ array;
+                } else if(sKey.charAt(0) == '$') { //数组迭代； 并且只能是 单独的 一个key
+                    Object obj = dataSupport.attainExpressionValue(sKey.substring(1));
+                    if(obj==null){
+                        return null;
+                    }
+                    List<Object> loopData = CollectionsOpt.objectToList(obj);
+                    int loopSize = loopData.size();
+                    int index = 0;
+                    for(Object ld : loopData){
+                        dataSupport.pushStackValue(ld, index, loopSize);
+                        Object vObj;
+                        if(ent.getValue() instanceof String && (StringUtils.isBlank(String.valueOf(ent.getValue())) || ".".equals(String.valueOf(ent.getValue()))) ){
+                            vObj = ld;
+                        }else {
+                            vObj = transformer(ent.getValue(), dataSupport);
+                        }
+                        dataSupport.popStackValue();
+                        if(vObj instanceof Map<?,?>){
+                            jObj.putAll((Map<String, Object>)vObj);
+                        }
+                        index++;
+                    }
                 } else {
                     putObjectToJson(jObj, sKey, transformer(ent.getValue(), dataSupport));
                 }
