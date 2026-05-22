@@ -1,16 +1,29 @@
 {
-  "title": "testInfo.school+testInfo.subject+testInfo.name",
-  "title2" : "@本学期{testInfo.subject}结业测验",
-  "scores": {
-    "#students": {
-      "name": "no +':'+name",
-      "score": "round(sqrt(score)*10)",
-      "originalScore" : "score"
+  "title": "@测试动态key",
+  "dtk": {
+    "#scores": {
+      "=name": "score"
     }
   },
-  "stat" : {
-    "students" : "count(students)",
-    "avgScore" : "ave(students.score)"
+  "dtk2": {
+    "#scores": {
+      "=name": {
+        "score": "round(sqrt(score)*10)",
+        "originalScore": "score"
+      }
+    }
   },
-  "@p": "testInfo"
+  "dtk2map": {
+    "$scores": {
+      "=name": {
+        "score": "round(sqrt(score)*10)",
+        "originalScore": "score"
+      }
+    }
+  },
+  "dtk2map2": {
+    "$scores": {
+      "=name": "score"
+    }
+  }
 }

@@ -929,6 +929,7 @@ public abstract class CollectionsOpt {
         return CollectionsOpt.createHashMap("data", object);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Object> objectToList(Object object) {
         if(object == null) return null;
         if(object instanceof List){
