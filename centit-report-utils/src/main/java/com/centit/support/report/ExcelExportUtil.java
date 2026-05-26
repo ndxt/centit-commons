@@ -361,6 +361,10 @@ public abstract class ExcelExportUtil {
         for (String headStr : header) {
             Cell cell = headerRow.createCell(i);
             setCellStyle(cell, cellStyle);
+            // Excel单元格内容最大长度为32767字符
+            if (headStr != null && headStr.length() > 32767) {
+                headStr = headStr.substring(0, 32767);
+            }
             cell.setCellValue(headStr);
             i++;
         }
@@ -372,7 +376,12 @@ public abstract class ExcelExportUtil {
             for (String headStr : header) {
                 Cell cell = objRow.createCell(i++);
                 setCellStyle(cell, cellStyle);
-                cell.setCellValue(StringBaseOpt.objectToString(metaData.getFiled(headStr).getObjectFieldValue(obj)));
+                String cellValue = StringBaseOpt.objectToString(metaData.getFiled(headStr).getObjectFieldValue(obj));
+                // Excel单元格内容最大长度为32767字符
+                if (cellValue != null && cellValue.length() > 32767) {
+                    cellValue = cellValue.substring(0, 32767);
+                }
+                cell.setCellValue(cellValue);
             }
         }
     }
@@ -427,7 +436,12 @@ public abstract class ExcelExportUtil {
         for (int i = 0; i < header.length; i++) {
             Cell cell = headerRow.createCell(i);
             setCellStyle(cell, cellStyle);
-            cell.setCellValue(header[i]);
+            // Excel单元格内容最大长度为32767字符
+            String headerValue = header[i];
+            if (headerValue != null && headerValue.length() > 32767) {
+                headerValue = headerValue.substring(0, 32767);
+            }
+            cell.setCellValue(headerValue);
         }
     }
 
@@ -462,7 +476,12 @@ public abstract class ExcelExportUtil {
             for (int j = 0; j < objLists.get(i).length; j++) {
                 Cell cell = textRow.createCell(j);
                 setCellStyle(cell, cellStyle);
-                cell.setCellValue(null == objLists.get(i)[j] ? "" : StringBaseOpt.objectToString(objLists.get(i)[j]));
+                String cellValue = null == objLists.get(i)[j] ? "" : StringBaseOpt.objectToString(objLists.get(i)[j]);
+                // Excel单元格内容最大长度为32767字符
+                if (cellValue != null && cellValue.length() > 32767) {
+                    cellValue = cellValue.substring(0, 32767);
+                }
+                cell.setCellValue(cellValue);
             }
         }
     }
@@ -522,14 +541,24 @@ public abstract class ExcelExportUtil {
                 cell.setCellValue(NumberBaseOpt.castObjectToDouble(obj));
                 break;
             case "String":
-                cell.setCellValue(StringBaseOpt.objectToString(obj));
+                String strValue = StringBaseOpt.objectToString(obj);
+                // Excel单元格内容最大长度为32767字符
+                if (strValue != null && strValue.length() > 32767) {
+                    strValue = strValue.substring(0, 32767);
+                }
+                cell.setCellValue(strValue);
                 break;
             case "Date":
             case "Timestamp":
                 cell.setCellValue(DatetimeOpt.castObjectToDate(obj));
                 break;
             default:
-                cell.setCellValue(StringBaseOpt.objectToString(obj));
+                String defaultValue = StringBaseOpt.objectToString(obj);
+                // Excel单元格内容最大长度为32767字符
+                if (defaultValue != null && defaultValue.length() > 32767) {
+                    defaultValue = defaultValue.substring(0, 32767);
+                }
+                cell.setCellValue(defaultValue);
                 break;
         }
     }
@@ -627,6 +656,10 @@ public abstract class ExcelExportUtil {
                         sheet.addMergedRegion(new CellRangeAddress(preBeginRow, mergeEndRow, i, i));
                         Cell newCell = ExcelImportUtil.getCell(sheet, preBeginRow, i);
                         newCell.setCellStyle(style);
+                        // Excel单元格内容最大长度为32767字符
+                        if (preCellText != null && preCellText.length() > 32767) {
+                            preCellText = preCellText.substring(0, 32767);
+                        }
                         newCell.setCellValue(preCellText);
                     }
                     preCellText = cellText;
@@ -636,6 +669,10 @@ public abstract class ExcelExportUtil {
             if(endRow-1 >preBeginRow) {
                 sheet.addMergedRegion(new CellRangeAddress(preBeginRow, endRow-1, i, i));
                 Cell newCell = ExcelImportUtil.getCell(sheet, preBeginRow, i);
+                // Excel单元格内容最大长度为32767字符
+                if (preCellText != null && preCellText.length() > 32767) {
+                    preCellText = preCellText.substring(0, 32767);
+                }
                 newCell.setCellValue(preCellText);
             }
             //CellRangeAddress
@@ -652,7 +689,12 @@ public abstract class ExcelExportUtil {
         } else if(value instanceof Boolean){
             cell.setCellValue((Boolean) value);
         } else {
-            cell.setCellValue(StringBaseOpt.castObjectToString(value));
+            String strValue = StringBaseOpt.castObjectToString(value);
+            // Excel单元格内容最大长度为32767字符
+            if (strValue != null && strValue.length() > 32767) {
+                strValue = strValue.substring(0, 32767);
+            }
+            cell.setCellValue(strValue);
         }
     }
     public static void saveObjectsToExcelSheet(Sheet sheet, List<?> objects, Map<Integer, String> fieldDesc, int beginRow,
@@ -974,7 +1016,12 @@ public abstract class ExcelExportUtil {
                 distCell.setCellValue(srcCell.getNumericCellValue());
             }
         } else if (srcCellType == CellType.STRING) {
-            distCell.setCellValue(srcCell.getRichStringCellValue());
+            // Excel单元格内容最大长度为32767字符
+            String stringValue = srcCell.getRichStringCellValue().getString();
+            if (stringValue != null && stringValue.length() > 32767) {
+                stringValue = stringValue.substring(0, 32767);
+            }
+            distCell.setCellValue(stringValue);
         } else if (srcCellType == CellType.BOOLEAN) {
             distCell.setCellValue(srcCell.getBooleanCellValue());
         } else if (srcCellType == CellType.ERROR) {
