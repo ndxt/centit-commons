@@ -94,19 +94,12 @@ public abstract class ExcelImportUtil {
     }
 
     public static String mapIndexColumn(int ind) {
-        int index = ind + 1;
-        String column="";
-        while(index>0){
-            int i = index % 26;
-            if(i==0){
-                column = 'Z' + column;
-                index = index / 26 -1;
-            }else {
-                column = (char) (64 + i) + column;
-                index = index / 26;
-            }
+        StringBuilder sb = new StringBuilder();
+        for (int n = ind + 1; n > 0; n /= 26) {
+            n--;
+            sb.append((char) ('A' + n % 26));
         }
-        return column;
+        return sb.reverse().toString();
     }
 
     public static Map<Integer, String> mapColumnIndex(Map<String, String> fieldDesc) {
