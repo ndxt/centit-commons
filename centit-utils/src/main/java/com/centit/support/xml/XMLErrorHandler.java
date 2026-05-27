@@ -49,7 +49,7 @@ public class XMLErrorHandler implements ErrorHandler {
 
     public static JSONObject createFatalError(String fatalMessage) {
         JSONObject errorJson = new JSONObject();
-        errorJson.put("code", "0");
+        errorJson.put("code", "701");
         errorJson.put("message", "XML文件格式验证未通过，有 1 个致命错误");
         errorJson.put("data", CollectionsOpt.createHashMap("errorCount", 0,
             "warningCount", 0,"fatalErrorCount", 1,
