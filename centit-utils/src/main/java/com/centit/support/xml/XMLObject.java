@@ -272,7 +272,7 @@ public abstract class XMLObject {
         }
     }
 
-    public static Document parseXmlTextIgnoreDtd(InputStream xmlStream) throws DocumentException{
+    public static Document parseXmlStreamIgnoreDtd(InputStream xmlStream) throws DocumentException{
             SAXReader builder = new SAXReader(false);
             builder.setValidation(false);
             builder.setEntityResolver((publicId, systemId) -> new InputSource(
@@ -306,7 +306,7 @@ public abstract class XMLObject {
 
     public static Object xmlStreamToObject(InputStream xmlStream) {
         try {
-            Document doc = parseXmlTextIgnoreDtd(xmlStream);
+            Document doc = parseXmlStreamIgnoreDtd(xmlStream);
             return elementToObject(doc.getRootElement());
         } catch (DocumentException e) {
             logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
