@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,7 +30,6 @@ public class WordTableToPdfUtils {
 
     /**
      * 从HWPFDocument中提取所有内容（文本和表格），按原始顺序返回
-     *
      * 注意：此方法不负责关闭HWPFDocument，调用者需要确保在使用后关闭文档对象
      * 建议使用 try-with-resources 或 try-finally 确保资源释放
      *
@@ -55,7 +55,7 @@ public class WordTableToPdfUtils {
                 org.apache.poi.hwpf.usermodel.Paragraph wordParagraph = range.getParagraph(i);
 
                 // 检查当前段落是否属于表格
-                if (currentTable != null && isParagraphInTable(wordParagraph, currentTable)) {
+                if (isParagraphInTable(wordParagraph, currentTable)) {
                     // 如果是表格内容，处理整个表格
                     PdfPTable pdfTable = convertWordTableToPdfPTable(currentTable, baseFont);
                     if (pdfTable != null) {
@@ -74,7 +74,7 @@ public class WordTableToPdfUtils {
                     if (text != null && !text.trim().isEmpty()) {
                         // 创建段落元素，保留原始格式
                         com.itextpdf.text.Paragraph pdfParagraph = new com.itextpdf.text.Paragraph();
-                        
+
                         // 尝试获取段落的字体大小（简化处理）
                         int fontSize = 12; // 默认字号
                         try {
@@ -87,7 +87,7 @@ public class WordTableToPdfUtils {
                         } catch (Exception e) {
                             // 使用默认字号
                         }
-                        
+
                         com.itextpdf.text.Font font = new com.itextpdf.text.Font(baseFont, fontSize, com.itextpdf.text.Font.NORMAL);
                         pdfParagraph.add(new Chunk(text.trim(), font));
                         pdfParagraph.setSpacingBefore(5f); // 段前间距
@@ -172,14 +172,12 @@ public class WordTableToPdfUtils {
      */
     private static float[] calculateColumnWidths(Table wordTable, int cols) {
         float[] widths = new float[cols];
-        
         try {
             // 尝试从第一行获取列宽信息
             TableRow firstRow = wordTable.getRow(0);
             if (firstRow != null) {
                 boolean hasWidthInfo = false;
-                float totalWidth = 0;
-                
+                //float totalWidth = 0;
                 for (int i = 0; i < cols; i++) {
                     org.apache.poi.hwpf.usermodel.TableCell cell = firstRow.getCell(i);
                     if (cell != null) {
@@ -187,7 +185,7 @@ public class WordTableToPdfUtils {
                         int cellWidth = getCellWidth(cell);
                         if (cellWidth > 0) {
                             widths[i] = cellWidth;
-                            totalWidth += cellWidth;
+                            //totalWidth += cellWidth;
                             hasWidthInfo = true;
                         } else {
                             widths[i] = 1000; // 默认宽度
@@ -196,29 +194,21 @@ public class WordTableToPdfUtils {
                         widths[i] = 1000;
                     }
                 }
-                
                 // 如果没有获取到宽度信息，使用等宽
                 if (!hasWidthInfo) {
-                    for (int i = 0; i < cols; i++) {
-                        widths[i] = 1f;
-                    }
+                    Arrays.fill(widths, 1f);
                 }
             } else {
                 // 默认等宽
-                for (int i = 0; i < cols; i++) {
-                    widths[i] = 1f;
-                }
+                Arrays.fill(widths, 1f);
             }
         } catch (Exception e) {
             logger.warn("计算列宽失败，使用等宽", e);
-            for (int i = 0; i < cols; i++) {
-                widths[i] = 1f;
-            }
+            Arrays.fill(widths, 1f);
         }
-        
         return widths;
     }
-    
+
     /**
      * 获取单元格宽度（TWIPS单位）
      */
@@ -227,18 +217,16 @@ public class WordTableToPdfUtils {
             // 通过反射获取底层属性
             // HWPF的TableCell内部有TCPropertySet，包含宽度信息
             java.lang.reflect.Method getWidthMethod = cell.getClass().getMethod("getWidth");
-            if (getWidthMethod != null) {
-                Object width = getWidthMethod.invoke(cell);
-                if (width instanceof Integer) {
-                    return (Integer) width;
-                }
+            Object width = getWidthMethod.invoke(cell);
+            if (width instanceof Integer) {
+                return (Integer) width;
             }
         } catch (Exception e) {
             // 忽略异常，返回0表示无法获取
         }
         return 0;
     }
-    
+
     /**
      * 获取表头行数
      */
@@ -297,7 +285,7 @@ public class WordTableToPdfUtils {
                 } catch (Exception e) {
                     // 使用默认字号
                 }
-                
+
                 Phrase phrase = new Phrase(cellText.trim(), new com.itextpdf.text.Font(baseFont, fontSize, com.itextpdf.text.Font.NORMAL));
                 pdfCell.setPhrase(phrase);
             } else {
@@ -318,7 +306,7 @@ public class WordTableToPdfUtils {
 
             // 设置内边距 - 让单元格内容有适当的间距
             pdfCell.setPadding(5f);
-            
+
             // 设置边框样式（基于Word单元格格式）
             applyCellBorders(pdfCell, cell);
 
@@ -378,10 +366,8 @@ public class WordTableToPdfUtils {
             // 设置合理的边框宽度
             pdfCell.setBorderWidth(0.5f);
             pdfCell.setBorderColor(BaseColor.GRAY);
-            
             // 设置完整的边框（上下左右）
             pdfCell.setBorder(PdfPCell.BOX);
-
         } catch (Exception e) {
             // 使用默认边框
             pdfCell.setBorderWidth(0.5f);
@@ -412,29 +398,25 @@ public class WordTableToPdfUtils {
         try {
             // 尝试从单元格第一个段落获取对齐方式
             int horizontalAlign = Element.ALIGN_LEFT; // 默认左对齐
-            
+
             if (cell.numParagraphs() > 0) {
                 org.apache.poi.hwpf.usermodel.Paragraph para = cell.getParagraph(0);
                 if (para != null) {
                     // 获取段落的对齐方式
                     int justification = para.getJustification();
-                    switch (justification) {
-                        case 1: // 居中
-                            horizontalAlign = Element.ALIGN_CENTER;
-                            break;
-                        case 2: // 右对齐
-                            horizontalAlign = Element.ALIGN_RIGHT;
-                            break;
-                        case 3: // 两端对齐
-                            horizontalAlign = Element.ALIGN_JUSTIFIED;
-                            break;
-                        default: // 0或其他值，左对齐
-                            horizontalAlign = Element.ALIGN_LEFT;
-                            break;
-                    }
+                    horizontalAlign = switch (justification) {
+                        case 1 -> // 居中
+                            Element.ALIGN_CENTER;
+                        case 2 -> // 右对齐
+                            Element.ALIGN_RIGHT;
+                        case 3 -> // 两端对齐
+                            Element.ALIGN_JUSTIFIED;
+                        default -> // 0或其他值，左对齐
+                            Element.ALIGN_LEFT;
+                    };
                 }
             }
-            
+
             pdfCell.setHorizontalAlignment(horizontalAlign);
             pdfCell.setVerticalAlignment(Element.ALIGN_MIDDLE); // 垂直居中
 
