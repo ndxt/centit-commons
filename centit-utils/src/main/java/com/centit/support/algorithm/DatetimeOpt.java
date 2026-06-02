@@ -8,9 +8,12 @@ import org.slf4j.LoggerFactory;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -34,12 +37,10 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public abstract class DatetimeOpt {
 
-    private static Logger log = LoggerFactory.getLogger(DatetimeOpt.class);
+    private static final Logger log = LoggerFactory.getLogger(DatetimeOpt.class);
     public final static String defaultDatePattern = "yyyy-MM-dd";
     public final static String timePattern = "HH:mm";
     public final static String timeWithSecondPattern = "HH:mm:ss";
-    //private static String datetimeWithoutYearPattern = "MM-dd HH:mm";
-    //private static String datetimePattern = "yyyy-MM-dd HH:mm";
     public final static String datetimePattern = "yyyy-MM-dd HH:mm:ss";
     public final static String timestampPattern = "yyyy-MM-dd HH:mm:ss.SSS";
     public final static String gmtDatePattern = "zone:en:GMT yyyy-MM-dd HH:mm:ss";
@@ -53,18 +54,15 @@ public abstract class DatetimeOpt {
      * @return 当前时间`
      */
     public static String currentDate() { // 取系统当前日期
-        return DatetimeOpt.convertDateToString(
-            new Date(System.currentTimeMillis()), defaultDatePattern);
+        return DatetimeOpt.convertDateToString(currentUtilDate(), defaultDatePattern);
     }
 
     public static String currentTime() { // 取系统当前时间
-        return DatetimeOpt.convertDateToString(
-            new Date(System.currentTimeMillis()), timePattern);
+        return DatetimeOpt.convertDateToString(currentUtilDate(), timePattern);
     }
 
     public static String currentTimeWithSecond() { // 取系统当前时间
-        return DatetimeOpt.convertDateToString(
-            new Date(System.currentTimeMillis()), timeWithSecondPattern);
+        return DatetimeOpt.convertDateToString(currentUtilDate(), timeWithSecondPattern);
     }
 
     /**
@@ -73,17 +71,13 @@ public abstract class DatetimeOpt {
      * @return 当前时间
      */
     public static String currentDatetime() { // 取系统当前日期
-        return DatetimeOpt.convertDateToString(
-            new Date(System.currentTimeMillis()), datetimePattern);
+        return DatetimeOpt.convertDateToString(currentUtilDate(), datetimePattern);
     }
 
     public static java.util.Date createUtilDate(int year, int month, int date,
                                                 int hourOfDay, int minute, int second, int milliSecond) {
-        Calendar cal = new GregorianCalendar();
-        cal.set(year, month - 1, date,
-            hourOfDay, minute, second);
-        cal.set(Calendar.MILLISECOND, milliSecond);
-        return cal.getTime();
+        return Date.from(LocalDateTime.of(year, month, date, hourOfDay, minute, second, milliSecond * 1_000_000)
+            .atZone(ZoneId.systemDefault()).toInstant());
     }
 
     /**
@@ -151,8 +145,8 @@ public abstract class DatetimeOpt {
     public static java.sql.Date convertToSqlDate(java.util.Date date) {
         if (date == null)
             return null;
-        if (date instanceof java.sql.Date)
-            return (java.sql.Date) date;
+        if (date instanceof java.sql.Date sqlDate)
+            return sqlDate;
 
         return new java.sql.Date(date.getTime());
     }
@@ -160,10 +154,10 @@ public abstract class DatetimeOpt {
     public static java.sql.Date castObjectToSqlDate(Object date) {
         if (date == null)
             return null;
-        if (date instanceof java.sql.Date)
-            return (java.sql.Date) date;
-        if (date instanceof java.util.Date)
-            return new java.sql.Date(((java.util.Date) date).getTime());
+        if (date instanceof java.sql.Date sqlDate)
+            return sqlDate;
+        if (date instanceof java.util.Date utilDate)
+            return new java.sql.Date(utilDate.getTime());
         java.util.Date dt = DatetimeOpt.castObjectToDate(date);
         if (dt == null)
             return null;
@@ -179,18 +173,18 @@ public abstract class DatetimeOpt {
     public static java.sql.Timestamp convertToSqlTimestamp(java.util.Date date) {
         if (date == null)
             return null;
-        if (date instanceof java.sql.Timestamp)
-            return (java.sql.Timestamp) date;
+        if (date instanceof java.sql.Timestamp ts)
+            return ts;
         return new java.sql.Timestamp(date.getTime());
     }
 
     public static java.sql.Timestamp castObjectToSqlTimestamp(Object date) {
         if (date == null)
             return null;
-        if (date instanceof java.sql.Timestamp)
-            return (java.sql.Timestamp) date;
-        if (date instanceof java.util.Date)
-            return new java.sql.Timestamp(((java.util.Date) date).getTime());
+        if (date instanceof java.sql.Timestamp ts)
+            return ts;
+        if (date instanceof java.util.Date utilDate)
+            return new java.sql.Timestamp(utilDate.getTime());
         java.util.Date dt = DatetimeOpt.castObjectToDate(date);
         if (dt == null)
             return null;
@@ -201,28 +195,25 @@ public abstract class DatetimeOpt {
      * 取系统当前日期和时间 ，返回 类型 java.sql.Date
      */
     public static java.sql.Date currentSqlDate() {
-        return new java.sql.Date(System.currentTimeMillis());
+        return java.sql.Date.valueOf(LocalDate.now());
     }
 
     /*
      * 取系统当前日期和时间，返回类型 java.util.Date
      */
     public static java.util.Date currentUtilDate() {
-        return new java.util.Date(System.currentTimeMillis());
+        return Date.from(Instant.now());
     }
 
     public static Timestamp currentSqlTimeStamp() {
-        return new Timestamp(System.currentTimeMillis());
+        return Timestamp.from(Instant.now());
     }
 
     /*
      * 取系统当前日期和时间，返回类型 java.util.Calendar
      */
     public static Calendar currentCalendarDate() {
-        java.util.Date today = currentUtilDate();
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(today);
-        return cal;
+        return Calendar.getInstance();
     }
 
     /**
@@ -242,18 +233,13 @@ public abstract class DatetimeOpt {
     }
 
     public static Locale fetchLangLocal(String lang) {
-        Locale[] locales = Locale.getAvailableLocales();
-        for(Locale locale : locales) {
-            if (StringUtils.equals(locale.getCountry(), lang)) {
-                return locale;
-            }
-        }
-        for(Locale locale : locales) {
-            if (StringUtils.equals(locale.getLanguage(), lang)) {
-                return locale;
-            }
-        }
-        return Locale.SIMPLIFIED_CHINESE;
+        return Arrays.stream(Locale.getAvailableLocales())
+            .filter(l -> lang.equals(l.getCountry()))
+            .findFirst()
+            .orElseGet(() -> Arrays.stream(Locale.getAvailableLocales())
+                .filter(l -> lang.equals(l.getLanguage()))
+                .findFirst()
+                .orElse(Locale.SIMPLIFIED_CHINESE));
     }
 
     /**
@@ -371,7 +357,7 @@ public abstract class DatetimeOpt {
         if(aDate==null){
             return null;
         }
-        String sMask = (aMask == null || "".equals(aMask)) ? "yyyy-MM-dd" : aMask;
+        String sMask = (aMask == null || aMask.isEmpty()) ? "yyyy-MM-dd" : aMask;
         boolean isGmt = false;
         SimpleDateFormat df;
         if(sMask.startsWith("lang")){
@@ -527,10 +513,7 @@ public abstract class DatetimeOpt {
      * @return 星期几
      */
     public static int getDayOfWeek(int y, int m, int d) {
-        int y0 = y - (14 - m) / 12;
-        int x = y0 + y0 / 4 - y0 / 100 + y0 / 400;
-        int m0 = m + 12 * ((14 - m) / 12) - 2;
-        return (d + x + (31 * m0) / 12) % 7;
+        return LocalDate.of(y, m, d).getDayOfWeek().getValue() % 7;
     }
 
     /**
@@ -540,10 +523,7 @@ public abstract class DatetimeOpt {
      * @return 星期几
      */
     public static int getDayOfWeek(java.util.Date date) {
-
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.DAY_OF_WEEK) - 1;
+        return toLocalDateTime(date).getDayOfWeek().getValue() % 7;
     }
 
     /**
@@ -553,127 +533,77 @@ public abstract class DatetimeOpt {
      * @return 星期几
      */
     public static String getDayOfWeekCN(java.util.Date date) {
-        String[] weeklist = {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "",};
-        return weeklist[getDayOfWeek(date)];
+        String[] weekList = {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
+        return weekList[getDayOfWeek(date)];
     }
 
     public static int getSecond(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.SECOND);
+        return toLocalDateTime(date).getSecond();
     }
 
     public static int getMilliSecond(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.MILLISECOND);
+        return (int)(date.getTime() % 1000);
     }
 
     public static int getMinute(java.util.Date date) {
-
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.MINUTE);
+        return toLocalDateTime(date).getMinute();
     }
 
     public static int getHour(java.util.Date date) {
-
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.HOUR_OF_DAY);
+        return toLocalDateTime(date).getHour();
     }
 
-
     public static int getWeekOfYear(java.util.Date date) {
-
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.WEEK_OF_YEAR);
+        return toLocalDateTime(date).get(WeekFields.ISO.weekOfWeekBasedYear());
     }
 
     public static int getWeekOfMonth(java.util.Date date) {
-
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.WEEK_OF_MONTH);
+        return toLocalDateTime(date).get(WeekFields.ISO.weekOfMonth());
     }
 
     public static int getDay(Date date) {
-
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.DAY_OF_MONTH);
+        return toLocalDateTime(date).getDayOfMonth();
     }
 
-
     public static int getDayOfYear(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.DAY_OF_YEAR);
+        return toLocalDateTime(date).getDayOfYear();
     }
 
     public static int getMonth(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.MONTH) + 1;
+        return toLocalDateTime(date).getMonthValue();
     }
 
     public static int getYear(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        return cal.get(Calendar.YEAR);
+        return toLocalDateTime(date).getYear();
     }
 
-    private static void resetToZeroPoint(Calendar cal) {
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
+    private static LocalDateTime toLocalDateTime(java.util.Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
     public static java.util.Date truncateToSecond(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.set(Calendar.MILLISECOND, 0);
-        return cal.getTime();
+        return new java.util.Date((date.getTime() / 1000) * 1000);
     }
 
     public static java.util.Date truncateToDay(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        resetToZeroPoint(cal);
-        return cal.getTime();
-        //createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,cal.get(Calendar.DAY_OF_MONTH));
+        return Date.from(toLocalDateTime(date).toLocalDate()
+            .atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     public static java.util.Date truncateToMonth(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.set(Calendar.DATE, 1);
-        resetToZeroPoint(cal);
-        return cal.getTime();
-        //return createUtilDate(cal.get(Calendar.YEAR),cal.get(Calendar.MONTH)+1,1);
+        return Date.from(toLocalDateTime(date).withDayOfMonth(1).toLocalDate()
+            .atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     public static java.util.Date truncateToYear(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.set(Calendar.MONTH, 0);
-        cal.set(Calendar.DATE, 1);
-        resetToZeroPoint(cal);
-        return cal.getTime();
-        //return createUtilDate(cal.get(Calendar.YEAR),1,1);
+        return Date.from(toLocalDateTime(date).withMonth(1).withDayOfMonth(1).toLocalDate()
+            .atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     //跳转到年的最后一天
     public static java.util.Date seekEndOfYear(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.set(Calendar.MONTH, 11);
-        cal.set(Calendar.DATE, 31);
-        resetToZeroPoint(cal);
-        return cal.getTime();
-        //return createUtilDate(cal.get(Calendar.YEAR),12,31);
+        return Date.from(toLocalDateTime(date).withMonth(12).withDayOfMonth(31).toLocalDate()
+            .atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     /**
@@ -683,18 +613,9 @@ public abstract class DatetimeOpt {
      * @return 周一凌晨0点
      */
     public static java.util.Date truncateToWeek(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        resetToZeroPoint(cal);
-        int weekDay = cal.get(Calendar.DAY_OF_WEEK);
-        if (weekDay > 2) {
-            cal.setTimeInMillis(cal.getTimeInMillis() -
-                Double.valueOf((weekDay - 2) * 86400000.0).longValue());
-        } else if (weekDay == 1) {
-            cal.setTimeInMillis(cal.getTimeInMillis() -
-                Double.valueOf(6 * 86400000.0).longValue());
-        }
-        return cal.getTime();
+        LocalDateTime ldt = toLocalDateTime(date).truncatedTo(ChronoUnit.DAYS);
+        return Date.from(ldt.minusDays(ldt.getDayOfWeek().getValue() - 1)
+            .atZone(ZoneId.systemDefault()).toInstant());
     }
 
     /**
@@ -704,16 +625,9 @@ public abstract class DatetimeOpt {
      * @return 周日凌晨零点
      */
     public static java.util.Date seekEndOfWeek(java.util.Date date) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        resetToZeroPoint(cal);
-        int weekDay = cal.get(Calendar.DAY_OF_WEEK);
-        if (weekDay > 1) {
-            cal.setTimeInMillis(cal.getTimeInMillis() +
-                Double.valueOf((8 - weekDay) * 86400000.0).longValue());
-        }
-        return cal.getTime();
-        //return createUtilDate(cal.get(Calendar.YEAR),12,31);
+        LocalDateTime ldt = toLocalDateTime(date).truncatedTo(ChronoUnit.DAYS);
+        return Date.from(ldt.plusDays(7 - ldt.getDayOfWeek().getValue())
+            .atZone(ZoneId.systemDefault()).toInstant());
     }
 
     //跳转到月的最后一天
@@ -722,70 +636,49 @@ public abstract class DatetimeOpt {
     }
 
     public static java.util.Date addSeconds(java.util.Date date, int nSeconds) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.add(Calendar.SECOND, nSeconds);
-        return cal.getTime();
+        return Date.from(date.toInstant().plusSeconds(nSeconds));
     }
 
     public static java.util.Date addMinutes(java.util.Date date, int nMinutes) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.add(Calendar.MINUTE, nMinutes);
-        return cal.getTime();
+        return Date.from(date.toInstant().plusSeconds((long) nMinutes * 60));
     }
 
     public static java.util.Date addHours(java.util.Date date, int nHours) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.add(Calendar.HOUR, nHours);
-        return cal.getTime();
+        return Date.from(date.toInstant().plusSeconds((long) nHours * 3600));
     }
 
     public static java.util.Date addDays(java.util.Date date, int nDays) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.add(Calendar.DATE, nDays);
-        return cal.getTime();
+        return Date.from(date.toInstant().plusSeconds((long) nDays * 86400));
     }
 
     public static java.util.Date addDays(java.util.Date date, float nDays) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(date.getTime() +
-            Double.valueOf(nDays * 86400000.0).longValue());
-        return cal.getTime();
+        return new java.util.Date(date.getTime() + (long)(nDays * 86400000.0));
     }
 
     public static java.util.Date addTimeSpan(java.util.Date date, Object timeSpan) {
-        Calendar cal = new GregorianCalendar();
         DateTimeSpan dts = DateTimeSpan.from(timeSpan);
-        if(dts != null) {
-            cal.setTimeInMillis(date.getTime() + dts.longValue());
+        if (dts != null) {
+            return new java.util.Date(date.getTime() + dts.longValue());
         }
-        return cal.getTime();
+        return date;
     }
 
     public static java.util.Date subTimeSpan(java.util.Date date, Object timeSpan) {
-        Calendar cal = new GregorianCalendar();
         DateTimeSpan dts = DateTimeSpan.from(timeSpan);
-        if(dts != null) {
-            cal.setTimeInMillis(date.getTime() - dts.longValue());
+        if (dts != null) {
+            return new java.util.Date(date.getTime() - dts.longValue());
         }
-        return cal.getTime();
+        return date;
     }
 
     public static java.util.Date addMonths(java.util.Date date, int nMonths) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.add(Calendar.MONTH, nMonths);
-        return cal.getTime();
+        return Date.from(toLocalDateTime(date).plusMonths(nMonths)
+            .atZone(ZoneId.systemDefault()).toInstant());
     }
 
     public static java.util.Date addYears(java.util.Date date, int nYears) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTime(date);
-        cal.add(Calendar.YEAR, nYears);
-        return cal.getTime();
+        return Date.from(toLocalDateTime(date).plusYears(nYears)
+            .atZone(ZoneId.systemDefault()).toInstant());
     }
 
     /**
@@ -794,8 +687,6 @@ public abstract class DatetimeOpt {
      * @return 计算这个周期中的天数, 包括 beginTime，endTime
      */
     public static int calcSpanDays(java.util.Date beginDate, java.util.Date endDate) {
-        //System.out.println(beginDate.getTime());
-        //System.out.println(endDate.getTime());
         java.util.Date bD = (beginDate.getTime() > endDate.getTime()) ? truncateToDay(endDate) : truncateToDay(beginDate);
         java.util.Date eD = (beginDate.getTime() > endDate.getTime()) ? beginDate : endDate;
         return (int) (( eD.getTime() - bD.getTime() - 1L) / 86400000 + 1);
@@ -992,28 +883,21 @@ public abstract class DatetimeOpt {
     /*
      * 将一个Object转换为 Date
      */
-    public final static java.util.Date castObjectToDate(Object obj) {
+    public static java.util.Date castObjectToDate(Object obj) {
         if (obj == null)
             return null;
-        if (obj instanceof java.util.Date)
-            return (java.util.Date) obj;
+        if (obj instanceof java.util.Date d)
+            return d;
 
-        //if (obj instanceof Long)
-        //    return new java.util.Date((Long) obj);
+        if (obj instanceof Number n)
+            return new java.util.Date(n.longValue());
 
-        if (obj instanceof Number)
-            return new java.util.Date(((Number) obj).longValue());
-
-        if (obj instanceof LocalDateTime){
-            LocalDateTime ldt = (LocalDateTime)obj;
+        if (obj instanceof LocalDateTime ldt)
             return java.util.Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
-        }
 
-        if (obj instanceof LocalDate){
-            LocalDate ldt = (LocalDate)obj;
-            return java.util.Date.from(ldt.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-        }
+        if (obj instanceof LocalDate ld)
+            return java.util.Date.from(ld.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+
         return DatetimeOpt.smartPraseDate(StringBaseOpt.objectToString(obj));
-
     }
 }
