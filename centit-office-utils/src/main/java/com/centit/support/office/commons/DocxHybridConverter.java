@@ -86,25 +86,9 @@ public class DocxHybridConverter {
                     // 处理段落（标题、正文等）
                     XWPFParagraph paragraph = (XWPFParagraph) element;
 
-                    // 跳过真正的空段落（没有任何内容的段落）
+                    // 跳过空段落（原文中的空行不需要转换）
                     String text = paragraph.getText();
                     if (text == null || text.trim().isEmpty()) {
-                        // 检查段落是否有间距设置，如果有则添加空行
-                        double spacingBetween = paragraph.getSpacingBetween();
-                        double spacingBefore = paragraph.getSpacingBefore();
-                        double spacingAfter = paragraph.getSpacingAfter();
-                        
-                        // 只有当段落有明确的间距设置时，才添加空行
-                        if (spacingBetween > 0 || spacingBefore > 0 || spacingAfter > 0) {
-                            com.itextpdf.text.Paragraph emptyPara = new com.itextpdf.text.Paragraph(" ");
-                            if (spacingBefore > 0) {
-                                emptyPara.setSpacingBefore((float) spacingBefore);
-                            }
-                            if (spacingAfter > 0) {
-                                emptyPara.setSpacingAfter((float) spacingAfter);
-                            }
-                            pdf.add(emptyPara);
-                        }
                         continue;
                     }
 
@@ -134,16 +118,9 @@ public class DocxHybridConverter {
                     List<org.apache.poi.xwpf.usermodel.XWPFRun> runs = paragraph.getRuns();
 
                     if (runs == null || runs.isEmpty()) {
-                        // 如果没有 run，添加空行保持间距
-                        if (text == null || text.trim().isEmpty()) {
-                            // 空段落：添加一个空格作为占位符
-                            com.itextpdf.text.Font defaultFontStyle = new com.itextpdf.text.Font(defaultFont, fontSize, com.itextpdf.text.Font.NORMAL);
-                            pdfPara.add(new com.itextpdf.text.Chunk(" ", defaultFontStyle));
-                        } else {
-                            // 有文本但没有 run：使用默认字体添加文本
-                            com.itextpdf.text.Font defaultFontStyle = new com.itextpdf.text.Font(defaultFont, fontSize, com.itextpdf.text.Font.NORMAL);
-                            pdfPara.add(new com.itextpdf.text.Chunk(text.trim(), defaultFontStyle));
-                        }
+                        // 有文本但没有 run：使用默认字体添加文本
+                        com.itextpdf.text.Font defaultFontStyle = new com.itextpdf.text.Font(defaultFont, fontSize, com.itextpdf.text.Font.NORMAL);
+                        pdfPara.add(new com.itextpdf.text.Chunk(text.trim(), defaultFontStyle));
                     } else {
                         // 遍历每个 run，保留各自的样式
                         for (org.apache.poi.xwpf.usermodel.XWPFRun run : runs) {
@@ -273,12 +250,6 @@ public class DocxHybridConverter {
 
                     logger.debug("检测到表格元素");
 
-                    // 添加空行分隔
-                    com.itextpdf.text.Paragraph spacer = new com.itextpdf.text.Paragraph(" ");
-                    spacer.setSpacingBefore(10f);
-                    spacer.setSpacingAfter(10f);
-                    pdf.add(spacer);
-
                     // 使用我们的工具类转换表格
                     com.itextpdf.text.pdf.PdfPTable pdfTable =
                         DocxTableToPdfUtils.convertXWPFTableToPdf(table, defaultFont);
@@ -286,12 +257,6 @@ public class DocxHybridConverter {
                     if (pdfTable != null) {
                         logger.debug("表格转换成功，添加到PDF");
                         pdf.add(pdfTable);
-
-                        // 表格后也添加空行
-                        com.itextpdf.text.Paragraph afterSpacer = new com.itextpdf.text.Paragraph(" ");
-                        afterSpacer.setSpacingBefore(10f);
-                        afterSpacer.setSpacingAfter(10f);
-                        pdf.add(afterSpacer);
                     } else {
                         logger.warn("表格转换失败，返回null");
                     }
@@ -393,31 +358,21 @@ public class DocxHybridConverter {
             int spacingBefore = paragraph.getSpacingBefore();
             if (spacingBefore > 0) {
                 pdfPara.setSpacingBefore(spacingBefore / 20f);
-            } else {
-                pdfPara.setSpacingBefore(5f); // 默认值
             }
 
             // 获取段后间距
             int spacingAfter = paragraph.getSpacingAfter();
             if (spacingAfter > 0) {
                 pdfPara.setSpacingAfter(spacingAfter / 20f);
-            } else {
-                pdfPara.setSpacingAfter(5f); // 默认值
             }
 
             // 获取行间距（返回 double 类型）
             double lineSpacing = paragraph.getSpacingBetween();
             if (lineSpacing > 0) {
                 pdfPara.setLeading((float)(lineSpacing * 1.5)); // 1.5倍行距
-            } else {
-                pdfPara.setLeading(18f); // 默认行距
             }
         } catch (Exception e) {
             logger.debug("应用段落间距失败: {}", e.getMessage());
-            // 使用默认值
-            pdfPara.setSpacingBefore(5f);
-            pdfPara.setSpacingAfter(5f);
-            pdfPara.setLeading(18f);
         }
     }
 
