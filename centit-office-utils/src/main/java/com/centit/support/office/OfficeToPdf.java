@@ -61,52 +61,30 @@ public abstract class OfficeToPdf {
         try {
             if (DOCX.equalsIgnoreCase(suffix)) {
                 try (XWPFDocument docx = new XWPFDocument(inWordStream)) {
-                    PdfOptions options = PdfOptions.create();
-                    Map<String, BaseFont> fontMap = new HashMap<>();
-                    // 中文字体处理
-                    options.fontProvider((familyName, encoding, size, style, color) -> {
-                        try {
-                            BaseFont bfChinese = fontMap.get(familyName);
-                            if (bfChinese == null) {
-                                if (familyName.indexOf("仿") >= 0) { //仿宋
-                                    bfChinese = BaseFont.createFont("simfang.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                                } else if (familyName.indexOf("宋") >= 0) { //宋体
-                                    bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                                } else if (familyName.indexOf("楷") >= 0) { //楷体
-                                    bfChinese = BaseFont.createFont("simkai.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                                } else { // 黑体
-                                    bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                                }
-                                fontMap.put(familyName, bfChinese);
-                            }
-                            Font fontChinese = new Font(bfChinese, size, style, color);
-                            fontChinese.setFamily(familyName);
-                            return fontChinese;
-                        } catch (Exception e) {
-                            logger.error(e.getMessage(), e);
-                            return null;
-                        }
-                    });
-                    PdfConverter.getInstance().convert(docx, outPdfStram, options);
+                    // 使用混合转换器，获得更好的表格保真度
+                    return DocxHybridConverter.convert(docx, outPdfStram);
                 }
             } else if (DOC.equalsIgnoreCase(suffix)) {
                 // 读取DOC文件
                 try (HWPFDocument doc = new HWPFDocument(inWordStream)) {
-                    // 创建PDF
-                    Document pdf = new Document();
+                    // 创建PDF文档
+                    Document pdf = new Document(PageSize.A4, 36, 36, 36, 36); // 设置页边距
                     PdfWriter writer = PdfWriter.getInstance(pdf, outPdfStram);
                     writer.setPageEvent(new PDFPageEvent());
 
                     // 设置中文字体支持
-                    com.itextpdf.text.pdf.BaseFont bfChinese = com.itextpdf.text.pdf.BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+                    com.itextpdf.text.pdf.BaseFont bfChinese = com.itextpdf.text.pdf.BaseFont.createFont(
+                        "STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
 
                     pdf.open();
 
-                    // 使用新的工具类提取内容（包括文本和表格），按原始顺序合并
+                    // 使用工具类提取内容（包括文本和表格），按原始顺序合并
                     List<Element> elements = WordTableToPdfUtils.extractContentFromDoc(doc, bfChinese);
 
                     for (Element element : elements) {
-                        pdf.add(element);
+                        if (element != null) {
+                            pdf.add(element);
+                        }
                     }
 
                     pdf.close();
@@ -114,7 +92,7 @@ public abstract class OfficeToPdf {
             }
             return true;
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Word转PDF失败: {}", e.getMessage(), e);
             return false;
         }
     }

@@ -72,10 +72,26 @@ public class WordTableToPdfUtils {
                     // 普通文本段落
                     String text = wordParagraph.text();
                     if (text != null && !text.trim().isEmpty()) {
-                        // 创建段落元素
+                        // 创建段落元素，保留原始格式
                         com.itextpdf.text.Paragraph pdfParagraph = new com.itextpdf.text.Paragraph();
-                        pdfParagraph.setFont(new com.itextpdf.text.Font(baseFont, 12, com.itextpdf.text.Font.NORMAL));
-                        pdfParagraph.add(new Chunk(text.trim(), new com.itextpdf.text.Font(baseFont, 12, com.itextpdf.text.Font.NORMAL)));
+                        
+                        // 尝试获取段落的字体大小（简化处理）
+                        int fontSize = 12; // 默认字号
+                        try {
+                            // 获取段落属性
+                            org.apache.poi.hwpf.usermodel.CharacterRun charRun = wordParagraph.getCharacterRun(0);
+                            if (charRun != null) {
+                                fontSize = charRun.getFontSize() / 2; // POI返回的是半点单位
+                                if (fontSize <= 0) fontSize = 12;
+                            }
+                        } catch (Exception e) {
+                            // 使用默认字号
+                        }
+                        
+                        com.itextpdf.text.Font font = new com.itextpdf.text.Font(baseFont, fontSize, com.itextpdf.text.Font.NORMAL);
+                        pdfParagraph.add(new Chunk(text.trim(), font));
+                        pdfParagraph.setSpacingBefore(5f); // 段前间距
+                        pdfParagraph.setSpacingAfter(5f);  // 段后间距
                         elements.add(pdfParagraph);
                     }
                 }
@@ -110,14 +126,12 @@ public class WordTableToPdfUtils {
             TableRow firstRow = wordTable.getRow(0); // 修复：使用TableRow而不是Row
             int cols = firstRow.numCells();
 
-            // 创建PDF表格
-            float[] widths = new float[cols];
-            for (int i = 0; i < cols; i++) {
-                widths[i] = 1f; // 默认等宽
-            }
+            // 计算列宽 - 基于Word表格的实际宽度
+            float[] widths = calculateColumnWidths(wordTable, cols);
             PdfPTable pdfTable = new PdfPTable(widths);
             pdfTable.setWidthPercentage(100);
-            pdfTable.setKeepTogether(true); // 表格不分页
+            pdfTable.setKeepTogether(false); // 允许表格跨页，避免大表格失真
+            pdfTable.setHeaderRows(getHeaderRowCount(wordTable)); // 设置表头行数
 
             // 处理每一行
             for (int i = 0; i < rows; i++) {
@@ -154,6 +168,105 @@ public class WordTableToPdfUtils {
     }
 
     /**
+     * 计算列宽 - 尽量保持Word中的列宽比例
+     */
+    private static float[] calculateColumnWidths(Table wordTable, int cols) {
+        float[] widths = new float[cols];
+        
+        try {
+            // 尝试从第一行获取列宽信息
+            TableRow firstRow = wordTable.getRow(0);
+            if (firstRow != null) {
+                boolean hasWidthInfo = false;
+                float totalWidth = 0;
+                
+                for (int i = 0; i < cols; i++) {
+                    org.apache.poi.hwpf.usermodel.TableCell cell = firstRow.getCell(i);
+                    if (cell != null) {
+                        // 尝试获取单元格的宽度（TWIPS单位）
+                        int cellWidth = getCellWidth(cell);
+                        if (cellWidth > 0) {
+                            widths[i] = cellWidth;
+                            totalWidth += cellWidth;
+                            hasWidthInfo = true;
+                        } else {
+                            widths[i] = 1000; // 默认宽度
+                        }
+                    } else {
+                        widths[i] = 1000;
+                    }
+                }
+                
+                // 如果没有获取到宽度信息，使用等宽
+                if (!hasWidthInfo) {
+                    for (int i = 0; i < cols; i++) {
+                        widths[i] = 1f;
+                    }
+                }
+            } else {
+                // 默认等宽
+                for (int i = 0; i < cols; i++) {
+                    widths[i] = 1f;
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("计算列宽失败，使用等宽", e);
+            for (int i = 0; i < cols; i++) {
+                widths[i] = 1f;
+            }
+        }
+        
+        return widths;
+    }
+    
+    /**
+     * 获取单元格宽度（TWIPS单位）
+     */
+    private static int getCellWidth(org.apache.poi.hwpf.usermodel.TableCell cell) {
+        try {
+            // 通过反射获取底层属性
+            // HWPF的TableCell内部有TCPropertySet，包含宽度信息
+            java.lang.reflect.Method getWidthMethod = cell.getClass().getMethod("getWidth");
+            if (getWidthMethod != null) {
+                Object width = getWidthMethod.invoke(cell);
+                if (width instanceof Integer) {
+                    return (Integer) width;
+                }
+            }
+        } catch (Exception e) {
+            // 忽略异常，返回0表示无法获取
+        }
+        return 0;
+    }
+    
+    /**
+     * 获取表头行数
+     */
+    private static int getHeaderRowCount(Table wordTable) {
+        // 简化处理：如果第一行是加粗的，认为是表头
+        try {
+            if (wordTable.numRows() > 0) {
+                TableRow firstRow = wordTable.getRow(0);
+                if (firstRow != null && firstRow.numCells() > 0) {
+                    org.apache.poi.hwpf.usermodel.TableCell firstCell = firstRow.getCell(0);
+                    if (firstCell != null && firstCell.numParagraphs() > 0) {
+                        org.apache.poi.hwpf.usermodel.Paragraph para = firstCell.getParagraph(0);
+                        if (para != null && para.numCharacterRuns() > 0) {
+                            org.apache.poi.hwpf.usermodel.CharacterRun charRun = para.getCharacterRun(0);
+                            if (charRun != null && charRun.isBold()) {
+                                return 1; // 第一行是表头
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // 忽略异常
+        }
+        return 0; // 没有表头
+    }
+
+    /**
      * 转换单个Word单元格到PDF单元格
      */
     private static PdfPCell convertWordCellToPdfCell(org.apache.poi.hwpf.usermodel.TableCell cell, com.itextpdf.text.pdf.BaseFont baseFont) {
@@ -166,9 +279,26 @@ public class WordTableToPdfUtils {
                 cellText = "";
             }
 
-            // 设置内容
+            // 设置内容 - 优化字体大小和样式
             if (!cellText.trim().isEmpty()) {
-                Phrase phrase = new Phrase(cellText.trim(), new com.itextpdf.text.Font(baseFont, 10, com.itextpdf.text.Font.NORMAL));
+                // 尝试从单元格获取字体信息
+                int fontSize = 10; // 默认字号
+                try {
+                    if (cell.numParagraphs() > 0) {
+                        org.apache.poi.hwpf.usermodel.Paragraph para = cell.getParagraph(0);
+                        if (para != null && para.numCharacterRuns() > 0) {
+                            org.apache.poi.hwpf.usermodel.CharacterRun charRun = para.getCharacterRun(0);
+                            if (charRun != null) {
+                                fontSize = charRun.getFontSize() / 2;
+                                if (fontSize <= 0) fontSize = 10;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    // 使用默认字号
+                }
+                
+                Phrase phrase = new Phrase(cellText.trim(), new com.itextpdf.text.Font(baseFont, fontSize, com.itextpdf.text.Font.NORMAL));
                 pdfCell.setPhrase(phrase);
             } else {
                 pdfCell.setPhrase(new Phrase(" "));
@@ -186,13 +316,16 @@ public class WordTableToPdfUtils {
                 pdfCell.setColspan(colSpan);
             }
 
+            // 设置内边距 - 让单元格内容有适当的间距
+            pdfCell.setPadding(5f);
+            
             // 设置边框样式（基于Word单元格格式）
             applyCellBorders(pdfCell, cell);
 
             // 设置背景色
             applyCellBackground(pdfCell, cell);
 
-            // 设置对齐方式
+            // 设置对齐方式 - 根据Word原文设置
             applyCellAlignment(pdfCell, cell);
 
 
@@ -238,22 +371,22 @@ public class WordTableToPdfUtils {
 
 
     /**
-     * 应用单元格边框样式
+     * 应用单元格边框样式 - 优化边框显示
      */
-    private static void applyCellBorders(PdfPCell pdfCell, org.apache.poi.hwpf.usermodel.TableCell cell) { // 修复：参数类型使用TableCell
+    private static void applyCellBorders(PdfPCell pdfCell, org.apache.poi.hwpf.usermodel.TableCell cell) {
         try {
-            // Word中边框样式：0=无边框，1=单线等
-            // 这里简化处理，根据边框类型设置相应的边框
-
-            // 获取边框信息（需要通过cell的属性判断）
-            // 由于HWPF的API限制，我们使用默认边框样式
-            pdfCell.setBorderWidth(1f);
-            pdfCell.setBorderColor(BaseColor.BLACK);
+            // 设置合理的边框宽度
+            pdfCell.setBorderWidth(0.5f);
+            pdfCell.setBorderColor(BaseColor.GRAY);
+            
+            // 设置完整的边框（上下左右）
+            pdfCell.setBorder(PdfPCell.BOX);
 
         } catch (Exception e) {
             // 使用默认边框
-            pdfCell.setBorderWidth(1f);
-            pdfCell.setBorderColor(BaseColor.BLACK);
+            pdfCell.setBorderWidth(0.5f);
+            pdfCell.setBorderColor(BaseColor.GRAY);
+            pdfCell.setBorder(PdfPCell.BOX);
         }
     }
 
@@ -273,17 +406,41 @@ public class WordTableToPdfUtils {
     }
 
     /**
-     * 应用单元格对齐方式
+     * 应用单元格对齐方式 - 根据Word原文设置对齐
      */
-    private static void applyCellAlignment(PdfPCell pdfCell, org.apache.poi.hwpf.usermodel.TableCell cell) { // 修复：参数类型使用TableCell
+    private static void applyCellAlignment(PdfPCell pdfCell, org.apache.poi.hwpf.usermodel.TableCell cell) {
         try {
-            // 默认居中对齐
-            pdfCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            pdfCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            // 尝试从单元格第一个段落获取对齐方式
+            int horizontalAlign = Element.ALIGN_LEFT; // 默认左对齐
+            
+            if (cell.numParagraphs() > 0) {
+                org.apache.poi.hwpf.usermodel.Paragraph para = cell.getParagraph(0);
+                if (para != null) {
+                    // 获取段落的对齐方式
+                    int justification = para.getJustification();
+                    switch (justification) {
+                        case 1: // 居中
+                            horizontalAlign = Element.ALIGN_CENTER;
+                            break;
+                        case 2: // 右对齐
+                            horizontalAlign = Element.ALIGN_RIGHT;
+                            break;
+                        case 3: // 两端对齐
+                            horizontalAlign = Element.ALIGN_JUSTIFIED;
+                            break;
+                        default: // 0或其他值，左对齐
+                            horizontalAlign = Element.ALIGN_LEFT;
+                            break;
+                    }
+                }
+            }
+            
+            pdfCell.setHorizontalAlignment(horizontalAlign);
+            pdfCell.setVerticalAlignment(Element.ALIGN_MIDDLE); // 垂直居中
 
         } catch (Exception e) {
             pdfCell.setHorizontalAlignment(Element.ALIGN_LEFT);
-            pdfCell.setVerticalAlignment(Element.ALIGN_TOP);
+            pdfCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
         }
     }
 
