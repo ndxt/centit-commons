@@ -135,14 +135,14 @@ public class WordTableToPdfUtils {
 
             // 处理每一行
             for (int i = 0; i < rows; i++) {
-                TableRow row = wordTable.getRow(i); // 修复：使用TableRow而不是Row
+                TableRow row = wordTable.getRow(i);
                 if (row == null) {
                     continue;
                 }
 
                 // 处理每个单元格
                 for (int j = 0; j < cols; j++) {
-                    org.apache.poi.hwpf.usermodel.TableCell cell = row.getCell(j); // 修复：使用TableCell而不是Cell
+                    org.apache.poi.hwpf.usermodel.TableCell cell = row.getCell(j);
                     if (cell == null) {
                         // 空单元格
                         PdfPCell pdfCell = createEmptyPdfCell();
@@ -150,8 +150,19 @@ public class WordTableToPdfUtils {
                         continue;
                     }
 
-                    // 转换单元格
-                    PdfPCell pdfCell = convertWordCellToPdfCell(cell, baseFont);
+                    // 跳过被水平合并的延续单元格（非起始单元格）
+                    if (cell.isMerged() && !cell.isFirstMerged()) {
+                        continue;
+                    }
+
+                    // 跳过被垂直合并的延续单元格
+                    if (cell.isVerticallyMerged() && !cell.isFirstVerticallyMerged()) {
+                        continue;
+                    }
+
+                    // 转换单元格（传入表格上下文用于计算合并跨度）
+                    PdfPCell pdfCell = convertWordCellToPdfCell(cell, baseFont,
+                        wordTable, i, j);
                     pdfTable.addCell(pdfCell);
                 }
 
@@ -269,7 +280,9 @@ public class WordTableToPdfUtils {
     /**
      * 转换单个Word单元格到PDF单元格
      */
-    private static PdfPCell convertWordCellToPdfCell(org.apache.poi.hwpf.usermodel.TableCell cell, com.itextpdf.text.pdf.BaseFont baseFont) {
+    private static PdfPCell convertWordCellToPdfCell(org.apache.poi.hwpf.usermodel.TableCell cell,
+                                                     com.itextpdf.text.pdf.BaseFont baseFont,
+                                                     Table wordTable, int rowIndex, int colIndex) {
         PdfPCell pdfCell = new PdfPCell();
 
         try {
@@ -297,37 +310,34 @@ public class WordTableToPdfUtils {
                 } catch (Exception e) {
                     // 使用默认字号
                 }
-                
+
                 Phrase phrase = new Phrase(cellText.trim(), new com.itextpdf.text.Font(baseFont, fontSize, com.itextpdf.text.Font.NORMAL));
                 pdfCell.setPhrase(phrase);
             } else {
                 pdfCell.setPhrase(new Phrase(" "));
             }
 
-            // 处理单元格合并（行合并）- 修复：使用正确的方法获取合并信息
-            int rowSpan = getRowSpanFromCell(cell);
+            // 处理单元格合并
+            int rowSpan = calcRowSpan(wordTable, rowIndex, colIndex);
             if (rowSpan > 1) {
                 pdfCell.setRowspan(rowSpan);
             }
 
-            // 处理单元格合并（列合并）- 修复：使用正确的方法获取合并信息
-            int colSpan = getColSpanFromCell(cell);
+            int colSpan = calcColSpan(wordTable.getRow(rowIndex), colIndex);
             if (colSpan > 1) {
                 pdfCell.setColspan(colSpan);
             }
 
-            // 设置内边距 - 让单元格内容有适当的间距
+            // 设置内边距
             pdfCell.setPadding(5f);
-            
-            // 设置边框样式（基于Word单元格格式）
-            applyCellBorders(pdfCell, cell);
 
-            // 设置背景色
-            applyCellBackground(pdfCell, cell);
+            // 设置边框样式
+            pdfCell.setBorderWidth(0.5f);
+            pdfCell.setBorderColor(BaseColor.GRAY);
+            pdfCell.setBorder(PdfPCell.BOX);
 
             // 设置对齐方式 - 根据Word原文设置
             applyCellAlignment(pdfCell, cell);
-
 
         } catch (Exception e) {
             logger.warn("转换单元格时出错，使用默认样式", e);
@@ -338,70 +348,66 @@ public class WordTableToPdfUtils {
     }
 
     /**
-     * 从HWPF单元格获取行合并数
+     * 计算垂直合并的行跨度
+     * 利用 HWPF TableCell 的 isFirstVerticallyMerged() / isVerticallyMerged() 判断：
+     * 起始单元格 isFirstVerticallyMerged=true，后续被合并的单元格 isVerticallyMerged=true
+     *
+     * @param table    Word表格
+     * @param rowIndex 当前行索引
+     * @param colIndex 当前列索引
+     * @return 行跨度，默认1
      */
-    private static int getRowSpanFromCell(org.apache.poi.hwpf.usermodel.TableCell cell) {
+    private static int calcRowSpan(Table table, int rowIndex, int colIndex) {
         try {
-            // HWPF中获取行合并信息的方法
-            // 通过底层属性判断是否为合并单元格
-            // 由于HWPF API限制，这里提供一个简化实现
-            // 实际的合并信息可能需要通过底层的CellDescriptor来获取
-
-            // 检查单元格属性，如果存在合并信息则返回相应的值
-            // 这里使用反射或直接访问底层属性的方式
-            // 由于HWPF的限制，可能需要根据实际情况调整
-            return 1; // 默认返回1，表示不合并
+            org.apache.poi.hwpf.usermodel.TableCell startCell = table.getRow(rowIndex).getCell(colIndex);
+            if (startCell == null || !startCell.isFirstVerticallyMerged()) {
+                return 1;
+            }
+            int span = 1;
+            for (int r = rowIndex + 1; r < table.numRows(); r++) {
+                TableRow row = table.getRow(r);
+                if (colIndex >= row.numCells()) break;
+                org.apache.poi.hwpf.usermodel.TableCell nextCell = row.getCell(colIndex);
+                if (nextCell != null && nextCell.isVerticallyMerged()
+                    && !nextCell.isFirstVerticallyMerged()) {
+                    span++;
+                } else {
+                    break;
+                }
+            }
+            return span;
         } catch (Exception e) {
-            return 1; // 出错时返回默认值
+            return 1;
         }
     }
 
     /**
-     * 从HWPF单元格获取列合并数
+     * 计算水平合并的列跨度
+     * 利用 HWPF TableCell 的 isFirstMerged() / isMerged() 判断：
+     * 起始单元格 isFirstMerged=true，后续被合并的单元格 isMerged=true 且 isFirstMerged=false
+     *
+     * @param row      当前行
+     * @param colIndex 当前列索引
+     * @return 列跨度，默认1
      */
-    private static int getColSpanFromCell(org.apache.poi.hwpf.usermodel.TableCell cell) {
+    private static int calcColSpan(TableRow row, int colIndex) {
         try {
-            // HWPF中获取列合并信息的方法
-            // 与getRowSpanFromCell类似，需要通过底层属性获取
-            return 1; // 默认返回1，表示不合并
+            org.apache.poi.hwpf.usermodel.TableCell startCell = row.getCell(colIndex);
+            if (startCell == null || !startCell.isFirstMerged()) {
+                return 1;
+            }
+            int span = 1;
+            for (int c = colIndex + 1; c < row.numCells(); c++) {
+                org.apache.poi.hwpf.usermodel.TableCell nextCell = row.getCell(c);
+                if (nextCell != null && nextCell.isMerged() && !nextCell.isFirstMerged()) {
+                    span++;
+                } else {
+                    break;
+                }
+            }
+            return span;
         } catch (Exception e) {
-            return 1; // 出错时返回默认值
-        }
-    }
-
-
-    /**
-     * 应用单元格边框样式 - 优化边框显示
-     */
-    private static void applyCellBorders(PdfPCell pdfCell, org.apache.poi.hwpf.usermodel.TableCell cell) {
-        try {
-            // 设置合理的边框宽度
-            pdfCell.setBorderWidth(0.5f);
-            pdfCell.setBorderColor(BaseColor.GRAY);
-            
-            // 设置完整的边框（上下左右）
-            pdfCell.setBorder(PdfPCell.BOX);
-
-        } catch (Exception e) {
-            // 使用默认边框
-            pdfCell.setBorderWidth(0.5f);
-            pdfCell.setBorderColor(BaseColor.GRAY);
-            pdfCell.setBorder(PdfPCell.BOX);
-        }
-    }
-
-    /**
-     * 应用单元格背景色
-     */
-    private static void applyCellBackground(PdfPCell pdfCell, org.apache.poi.hwpf.usermodel.TableCell cell) { // 修复：参数类型使用TableCell
-        try {
-            // 尝试获取单元格背景色
-            // HWPF中背景色获取比较复杂，这里可以根据需要扩展
-            // 暂时使用白色背景
-            // pdfCell.setBackgroundColor(new BaseColor(240, 240, 240));
-
-        } catch (Exception e) {
-            // 不设置背景色
+            return 1;
         }
     }
 
@@ -428,8 +434,7 @@ public class WordTableToPdfUtils {
                         case 3: // 两端对齐
                             horizontalAlign = Element.ALIGN_JUSTIFIED;
                             break;
-                        default: // 0或其他值，左对齐
-                            horizontalAlign = Element.ALIGN_LEFT;
+                        default: // 0或其他值，左对齐（已是默认值）
                             break;
                     }
                 }
