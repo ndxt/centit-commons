@@ -82,10 +82,8 @@ public class DocxHybridConverter {
             // 按文档原始顺序遍历所有元素
             for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
 
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
+                if (element instanceof XWPFParagraph paragraph) {
                     // 处理段落（标题、正文等）
-                    XWPFParagraph paragraph = (XWPFParagraph) element;
-
                     // 跳过真正的空段落（没有任何内容的段落）
                     String text = paragraph.getText();
                     if (text == null || text.trim().isEmpty()) {
@@ -93,7 +91,7 @@ public class DocxHybridConverter {
                         double spacingBetween = paragraph.getSpacingBetween();
                         double spacingBefore = paragraph.getSpacingBefore();
                         double spacingAfter = paragraph.getSpacingAfter();
-                        
+
                         // 只有当段落有明确的间距设置时，才添加空行
                         if (spacingBetween > 0 || spacingBefore > 0 || spacingAfter > 0) {
                             com.itextpdf.text.Paragraph emptyPara = new com.itextpdf.text.Paragraph(" ");
@@ -135,15 +133,9 @@ public class DocxHybridConverter {
 
                     if (runs == null || runs.isEmpty()) {
                         // 如果没有 run，添加空行保持间距
-                        if (text == null || text.trim().isEmpty()) {
-                            // 空段落：添加一个空格作为占位符
-                            com.itextpdf.text.Font defaultFontStyle = new com.itextpdf.text.Font(defaultFont, fontSize, com.itextpdf.text.Font.NORMAL);
-                            pdfPara.add(new com.itextpdf.text.Chunk(" ", defaultFontStyle));
-                        } else {
-                            // 有文本但没有 run：使用默认字体添加文本
-                            com.itextpdf.text.Font defaultFontStyle = new com.itextpdf.text.Font(defaultFont, fontSize, com.itextpdf.text.Font.NORMAL);
-                            pdfPara.add(new com.itextpdf.text.Chunk(text.trim(), defaultFontStyle));
-                        }
+                        // 有文本但没有 run：使用默认字体添加文本
+                        com.itextpdf.text.Font defaultFontStyle = new com.itextpdf.text.Font(defaultFont, fontSize, com.itextpdf.text.Font.NORMAL);
+                        pdfPara.add(new com.itextpdf.text.Chunk(text.trim(), defaultFontStyle));
                     } else {
                         // 遍历每个 run，保留各自的样式
                         for (org.apache.poi.xwpf.usermodel.XWPFRun run : runs) {
@@ -153,9 +145,9 @@ public class DocxHybridConverter {
                             }
 
                             // 提取 run 的样式
-                            int runFontSize = fontSize; // 继承段落默认字号
-                            if (run.getFontSize() > 0) {
-                                runFontSize = run.getFontSize();
+                            double runFontSize = fontSize; // 继承段落默认字号
+                            if (run.getFontSizeAsDouble() > 0) {
+                                runFontSize = run.getFontSizeAsDouble();
                             }
 
                             // 检测字体样式
@@ -171,24 +163,27 @@ public class DocxHybridConverter {
                             String runFontFamily = run.getFontFamily();
                             com.itextpdf.text.pdf.BaseFont runBaseFont = defaultFont;
                             if (runFontFamily != null && !runFontFamily.isEmpty()) {
-                                runBaseFont = createChineseFont(fontMap, runFontFamily);
-                                if (runBaseFont == null) {
-                                    runBaseFont = defaultFont;
-                                }
+                                runBaseFont = java.util.Objects.requireNonNullElse(
+                                    createChineseFont(fontMap, runFontFamily), defaultFont);
                             }
 
                             // 创建字体
-                            com.itextpdf.text.Font runFont = new com.itextpdf.text.Font(runBaseFont, runFontSize, fontStyle);
+                            com.itextpdf.text.Font runFont = new com.itextpdf.text.Font(runBaseFont, (float) runFontSize, fontStyle);
 
                             // 设置字体颜色
                             String colorStr = run.getColor();
                             if (colorStr != null && !colorStr.isEmpty()) {
                                 try {
-                                    int rgb = Integer.parseInt(colorStr, 16);
-                                    int r = (rgb >> 16) & 0xFF;
-                                    int g = (rgb >> 8) & 0xFF;
-                                    int b = rgb & 0xFF;
-                                    runFont.setColor(r, g, b);
+                                    if (colorStr.startsWith("#")) {
+                                        colorStr = colorStr.substring(1);
+                                    }
+                                    if (!"auto".equalsIgnoreCase(colorStr)) {
+                                        int rgb = Integer.parseInt(colorStr, 16);
+                                        int r = (rgb >> 16) & 0xFF;
+                                        int g = (rgb >> 8) & 0xFF;
+                                        int b = rgb & 0xFF;
+                                        runFont.setColor(r, g, b);
+                                    }
                                 } catch (NumberFormatException e) {
                                     // 忽略颜色解析错误
                                 }
@@ -267,12 +262,9 @@ public class DocxHybridConverter {
 
                     pdf.add(pdfPara);
 
-                } else if (element instanceof XWPFTable) {
+                } else if (element instanceof XWPFTable table) {
                     // 处理表格
-                    XWPFTable table = (XWPFTable) element;
-
                     logger.debug("检测到表格元素");
-
                     // 添加空行分隔
                     com.itextpdf.text.Paragraph spacer = new com.itextpdf.text.Paragraph(" ");
                     spacer.setSpacingBefore(10f);
