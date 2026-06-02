@@ -61,11 +61,11 @@ public class DocxTableToPdfUtils {
             PdfPTable pdfTable = new PdfPTable(columnWidths);
             pdfTable.setWidthPercentage(100);
             pdfTable.setKeepTogether(false); // 允许跨页
-            
+
             // 检测表头（仅用于样式标记，不使用setHeaderRows）
             int headerRows = detectHeaderRows(rows);
             logger.debug("表格信息: 总行数={}, 检测到表头行数={}", rowCount, headerRows);
-                        
+
             // 不使用setHeaderRows()，因为它可能导致表头内容不显示
             // 改为在转换时给表头行添加背景色来区分
             if (headerRows > 0) {
@@ -78,12 +78,12 @@ public class DocxTableToPdfUtils {
             for (int i = 0; i < rowCount; i++) {
                 XWPFTableRow row = rows.get(i);
                 logger.debug("正在转换第 {} 行 / 共 {} 行", i + 1, rowCount);
-                
+
                 // 如果是表头行，添加特殊标记
                 boolean isHeaderRow = (headerRows > 0 && i < headerRows);
                 convertRowToPdf(row, pdfTable, baseFont, colCount, isHeaderRow);
             }
-            
+
             logger.debug("表格转换完成: 总共添加了 {} 行", rowCount);
 
             logger.debug("表格转换成功");
@@ -121,34 +121,138 @@ public class DocxTableToPdfUtils {
         float[] widths = new float[colCount];
 
         try {
-            // 尝试从表格属性获取宽度信息
-            Object tblWidthObj = table.getCTTbl().getTblPr().getTblW();
-
-            if (tblWidthObj != null) {
-                // 简化处理：直接使用平均列宽
-                // 如需更精确的宽度控制，需要解析底层XML
-            }
-
-            // 如果没有明确的宽度信息，根据内容估算
             List<XWPFTableRow> rows = table.getRows();
-            if (!rows.isEmpty()) {
-                XWPFTableRow firstRow = rows.get(0);
-                List<XWPFTableCell> cells = firstRow.getTableCells();
-
-                for (int i = 0; i < Math.min(cells.size(), colCount); i++) {
-                    XWPFTableCell cell = cells.get(i);
-                    String text = cell.getText();
-                    // 根据文本长度估算列宽
-                    widths[i] = Math.max(50f, text.length() * 3f);
+            if (rows.isEmpty()) {
+                // 默认等宽
+                for (int i = 0; i < colCount; i++) {
+                    widths[i] = 1f;
                 }
-
-                // 填充剩余列
-                for (int i = cells.size(); i < colCount; i++) {
-                    widths[i] = 50f;
-                }
-
                 return widths;
             }
+
+            // 获取表格总宽度（单位：twips，1 twip = 1/20 point）
+            float totalTableWidthPt = 0f;
+            try {
+                org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth tblW =
+                    table.getCTTbl().getTblPr().getTblW();
+                if (tblW != null && tblW.isSetW()) {
+                    String type = tblW.getType() != null ? tblW.getType().toString() : "dxa";
+                    int wVal = (int) tblW.getW();
+                    if ("pct".equalsIgnoreCase(type)) {
+                        // 百分比模式：wVal 的单位是 1/50%，即 5000 = 100%
+                        // A4 页面可用宽度约 525pt（842pt - 2*72pt 页边距）
+                        float pageWidthPt = 525f;
+                        totalTableWidthPt = pageWidthPt * wVal / 5000f;
+                    } else if ("dxa".equalsIgnoreCase(type)) {
+                        // twips 模式：转换为 point
+                        totalTableWidthPt = wVal / 20f;
+                    }
+                }
+            } catch (Exception e) {
+                logger.debug("获取表格宽度失败: {}", e.getMessage());
+            }
+
+            // 尝试从第一行的单元格获取各列宽度
+            XWPFTableRow firstRow = rows.get(0);
+            List<XWPFTableCell> cells = firstRow.getTableCells();
+            float[] cellWidths = new float[colCount];
+            boolean hasCellWidths = false;
+
+            for (int i = 0; i < Math.min(cells.size(), colCount); i++) {
+                try {
+                    XWPFTableCell cell = cells.get(i);
+                    org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr tcPr =
+                        cell.getCTTc().getTcPr();
+                    if (tcPr != null) {
+                        // 通过反射获取单元格宽度，避免编译时类型依赖问题
+                        Object tcW = tcPr.getTcW();
+                        if (tcW != null) {
+                            try {
+                                java.lang.reflect.Method isSetWMethod = tcW.getClass().getMethod("isSetW");
+                                Boolean isSetW = (Boolean) isSetWMethod.invoke(tcW);
+                                if (Boolean.TRUE.equals(isSetW)) {
+                                    java.lang.reflect.Method getTypeMethod = tcW.getClass().getMethod("getType");
+                                    java.lang.reflect.Method getWMethod = tcW.getClass().getMethod("getW");
+                                    Object typeObj = getTypeMethod.invoke(tcW);
+                                    Object wObj = getWMethod.invoke(tcW);
+                                    String wType = typeObj != null ? typeObj.toString() : "dxa";
+                                    int wVal = wObj != null ? ((Number) wObj).intValue() : 0;
+                                    if ("dxa".equalsIgnoreCase(wType)) {
+                                        cellWidths[i] = wVal / 20f; // twips -> pt
+                                    } else if ("pct".equalsIgnoreCase(wType)) {
+                                        cellWidths[i] = wVal / 50f; // 1/50% -> %
+                                    }
+                                    hasCellWidths = true;
+                                }
+                            } catch (Exception ex) {
+                                logger.debug("解析单元格 {} 宽度失败: {}", i, ex.getMessage());
+                            }
+                        }
+                        // 考虑列合并（gridSpan）
+                        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDecimalNumber gridSpan =
+                            tcPr.getGridSpan();
+                        if (gridSpan != null && gridSpan.getVal() != null && gridSpan.getVal().intValue() > 1) {
+                            // 如果有列合并，后续列用 0 占位
+                            int span = gridSpan.getVal().intValue();
+                            for (int j = 1; j < span && (i + j) < colCount; j++) {
+                                cellWidths[i + j] = 0f;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.debug("获取单元格 {} 宽度失败: {}", i, e.getMessage());
+                }
+            }
+
+            // 填充剩余列（没有对应单元格的列）
+            for (int i = cells.size(); i < colCount; i++) {
+                cellWidths[i] = 0f;
+            }
+
+            if (hasCellWidths && totalTableWidthPt > 0) {
+                // 情况1：有表格总宽度 + 有单元格宽度 → 按比例分配
+                float sumCellWidths = 0f;
+                int nonZeroCount = 0;
+                for (int i = 0; i < colCount; i++) {
+                    sumCellWidths += cellWidths[i];
+                    if (cellWidths[i] > 0) {
+                        nonZeroCount++;
+                    }
+                }
+
+                if (sumCellWidths > 0 && nonZeroCount > 0) {
+                    for (int i = 0; i < colCount; i++) {
+                        if (cellWidths[i] > 0) {
+                            widths[i] = totalTableWidthPt * cellWidths[i] / sumCellWidths;
+                        } else {
+                            // 没有明确宽度的列，平均分配剩余空间
+                            widths[i] = totalTableWidthPt / colCount;
+                        }
+                    }
+                    logger.debug("使用单元格宽度比例分配: 总宽度={}pt, {} 列", totalTableWidthPt, colCount);
+                    return widths;
+                }
+            }
+
+            if (totalTableWidthPt > 0) {
+                // 情况2：有表格总宽度但无单元格宽度 → 平均分配
+                for (int i = 0; i < colCount; i++) {
+                    widths[i] = totalTableWidthPt / colCount;
+                }
+                logger.debug("使用表格总宽度平均分配: {}pt / {} 列", totalTableWidthPt, colCount);
+                return widths;
+            }
+
+            // 情况3：无宽度信息 → 根据内容估算
+            for (int i = 0; i < Math.min(cells.size(), colCount); i++) {
+                String text = cells.get(i).getText();
+                widths[i] = Math.max(50f, text.length() * 3f);
+            }
+            for (int i = cells.size(); i < colCount; i++) {
+                widths[i] = 50f;
+            }
+            logger.debug("使用文本长度估算列宽");
+            return widths;
 
         } catch (Exception e) {
             logger.warn("计算列宽失败，使用默认值", e);
@@ -177,15 +281,15 @@ public class DocxTableToPdfUtils {
         if (!cells.isEmpty()) {
             int boldCellCount = 0;
             int totalCheckedCells = 0;
-            
+
             for (XWPFTableCell cell : cells) {
                 totalCheckedCells++;
                 List<XWPFParagraph> paragraphs = cell.getParagraphs();
-                
+
                 if (!paragraphs.isEmpty()) {
                     XWPFParagraph para = paragraphs.get(0);
                     List<XWPFRun> runs = para.getRuns();
-                    
+
                     // 检查该单元格是否有加粗文本
                     boolean cellIsBold = false;
                     if (runs != null && !runs.isEmpty()) {
@@ -201,7 +305,7 @@ public class DocxTableToPdfUtils {
                     } else {
                         logger.debug("单元格 {} 没有 Runs", totalCheckedCells);
                     }
-                    
+
                     if (cellIsBold) {
                         boldCellCount++;
                         logger.debug("单元格 {} 判定为加粗", totalCheckedCells);
@@ -210,15 +314,15 @@ public class DocxTableToPdfUtils {
                     logger.debug("单元格 {} 没有段落", totalCheckedCells);
                 }
             }
-            
+
             logger.debug("表头检测结果: {}/{} 单元格加粗", boldCellCount, totalCheckedCells);
-            
+
             // 改进的检测策略：
             // 1. 如果所有单元格都加粗，肯定是表头
             // 2. 如果超过一半单元格加粗，很可能是表头
             // 3. 如果只有第一个单元格加粗（常见于左侧标题列），也认为是表头
             boolean isHeader = false;
-            
+
             if (boldCellCount == totalCheckedCells) {
                 // 全部加粗 - 肯定是表头
                 isHeader = true;
@@ -243,13 +347,13 @@ public class DocxTableToPdfUtils {
                         }
                     }
                 }
-                
+
                 if (firstCellBold) {
                     isHeader = true;
                     logger.info("✓ 检测到表头（首单元格加粗）: {}/{} 单元格", boldCellCount, totalCheckedCells);
                 }
             }
-            
+
             if (isHeader) {
                 return 1;
             } else {
@@ -300,7 +404,7 @@ public class DocxTableToPdfUtils {
     private static PdfPCell convertCellToPdf(XWPFTableCell cell, com.itextpdf.text.pdf.BaseFont baseFont) {
         return convertCellToPdf(cell, baseFont, false);
     }
-    
+
     /**
      * 转换单元格到PDF
      */
@@ -343,14 +447,14 @@ public class DocxTableToPdfUtils {
      */
     private static Phrase createStyledPhrase(XWPFTableCell cell, com.itextpdf.text.pdf.BaseFont defaultBaseFont) {
         Phrase phrase = new Phrase();
-        
+
         try {
             List<XWPFParagraph> paragraphs = cell.getParagraphs();
-            
+
             for (int p = 0; p < paragraphs.size(); p++) {
                 XWPFParagraph para = paragraphs.get(p);
                 List<XWPFRun> runs = para.getRuns();
-                
+
                 if (runs != null && !runs.isEmpty()) {
                     // 遍历每个 run，保留各自的样式
                     for (XWPFRun run : runs) {
@@ -358,13 +462,13 @@ public class DocxTableToPdfUtils {
                         if (runText == null || runText.isEmpty()) {
                             continue;
                         }
-                        
+
                         // 提取字体大小
                         int fontSize = run.getFontSize();
                         if (fontSize <= 0) {
                             fontSize = 10; // 默认字号
                         }
-                        
+
                         // 检测字体样式
                         int fontStyle = Font.NORMAL;
                         if (run.isBold()) {
@@ -373,7 +477,7 @@ public class DocxTableToPdfUtils {
                         if (run.isItalic()) {
                             fontStyle |= Font.ITALIC;
                         }
-                        
+
                         // 获取字体族
                         String runFontFamily = run.getFontFamily();
                         com.itextpdf.text.pdf.BaseFont runBaseFont = defaultBaseFont;
@@ -383,10 +487,10 @@ public class DocxTableToPdfUtils {
                                 runBaseFont = defaultBaseFont;
                             }
                         }
-                        
+
                         // 创建字体
                         Font font = new Font(runBaseFont, fontSize, fontStyle);
-                        
+
                         // 设置字体颜色
                         String colorStr = run.getColor();
                         if (colorStr != null && !colorStr.isEmpty()) {
@@ -401,10 +505,10 @@ public class DocxTableToPdfUtils {
                                 logger.debug("颜色解析失败: {}", colorStr);
                             }
                         }
-                        
+
                         // 创建 Chunk 并添加到短语
                         com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, font);
-                        
+
                         // 处理下划线 - 需要更严格的检查
                         try {
                             // 通过反射获取底层XML属性来准确判断是否有下划线
@@ -429,12 +533,12 @@ public class DocxTableToPdfUtils {
                         } catch (Exception e) {
                             // 忽略下划线处理错误
                         }
-                        
+
                         // 处理删除线
                         if (run.isStrikeThrough()) {
                             chunk.setUnderline(0.5f, 3f); // 使用上划线模拟删除线
                         }
-                        
+
                         phrase.add(chunk);
                     }
                 } else if (p > 0) {
@@ -442,18 +546,18 @@ public class DocxTableToPdfUtils {
                     phrase.add("\n");
                 }
             }
-            
+
             // 如果没有任何内容，添加空格
             if (phrase.size() == 0) {
                 phrase.add(" ");
             }
-            
+
         } catch (Exception e) {
             logger.debug("创建带样式短语失败: {}", e.getMessage());
             // 回退到简单文本
             phrase.add(new com.itextpdf.text.Chunk(cell.getText(), new Font(defaultBaseFont, 10, Font.NORMAL)));
         }
-        
+
         return phrase;
     }
 
@@ -580,15 +684,15 @@ public class DocxTableToPdfUtils {
             org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc ctTc = cell.getCTTc();
             if (ctTc != null && ctTc.getTcPr() != null) {
                 org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr tcPr = ctTc.getTcPr();
-                
+
                 logger.debug("检查单元格背景色: isSetShd={}", tcPr.isSetShd());
-                
+
                 // 获取背景色 (shading)
                 if (tcPr.isSetShd()) {
                     org.openxmlformats.schemas.wordprocessingml.x2006.main.CTShd shd = tcPr.getShd();
-                    
+
                     String colorVal = null;
-                    
+
                     // CTShd 结构：val=填充模式(solid), color=背景色, fill=前景色
                     // 我们需要获取 color 属性作为单元格背景色
                     Object colorObj = shd.getColor();
@@ -608,13 +712,13 @@ public class DocxTableToPdfUtils {
                             logger.debug("从 shd.getColor() 获取: {}", colorVal);
                         }
                     }
-                    
+
                     // 如果 color 为空或 auto，尝试从 XML 直接提取
                     if (colorVal == null || colorVal.equalsIgnoreCase("auto")) {
                         try {
                             // 尝试通过反射或 XML 直接读取
                             String xmlText = shd.toString();
-                            
+
                             // 使用正则表达式提取 w:color="xxxxxx"
                             java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("w:color=\"([0-9A-Fa-f]{6})\"");
                             java.util.regex.Matcher matcher = pattern.matcher(xmlText);
@@ -626,7 +730,7 @@ public class DocxTableToPdfUtils {
                             logger.debug("从 XML 提取颜色失败: {}", ex.getMessage());
                         }
                     }
-                    
+
                     // 跳过 "auto" 等无效值，只处理十六进制颜色
                     if (colorVal != null && !colorVal.isEmpty() && !colorVal.equalsIgnoreCase("auto")) {
                         try {
@@ -635,7 +739,7 @@ public class DocxTableToPdfUtils {
                             int r = (rgb >> 16) & 0xFF;
                             int g = (rgb >> 8) & 0xFF;
                             int b = rgb & 0xFF;
-                            
+
                             pdfCell.setBackgroundColor(new com.itextpdf.text.BaseColor(r, g, b));
                             logger.debug("✓ 设置单元格背景色: {} -> RGB({},{},{})", colorVal, r, g, b);
                         } catch (NumberFormatException e) {
