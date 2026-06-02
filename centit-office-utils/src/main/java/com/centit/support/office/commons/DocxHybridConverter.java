@@ -124,11 +124,6 @@ public class DocxHybridConverter {
                     } else {
                         // 遍历每个 run，保留各自的样式
                         for (org.apache.poi.xwpf.usermodel.XWPFRun run : runs) {
-                            String runText = run.getText(0);
-                            if (runText == null || runText.isEmpty()) {
-                                continue;
-                            }
-
                             // 提取 run 的样式
                             int runFontSize = fontSize; // 继承段落默认字号
                             if (run.getFontSize() > 0) {
@@ -171,12 +166,11 @@ public class DocxHybridConverter {
                                 }
                             }
 
-                            // 创建 Chunk 并添加到段落
-                            com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
-
-                            // 处理下划线 - 需要更严格的检查
+                            // 通过反射获取下划线、删除线、上下标等属性
+                            boolean hasUnderline = false;
+                            boolean hasStrikeThrough = run.isStrikeThrough();
+                            String vertAlignStr = null;
                             try {
-                                // 通过反射获取底层XML属性来准确判断是否有下划线
                                 java.lang.reflect.Method getCTRMethod = run.getClass().getMethod("getCTR");
                                 Object ctr = getCTRMethod.invoke(run);
                                 if (ctr != null) {
@@ -185,51 +179,107 @@ public class DocxHybridConverter {
                                     if (rpr != null) {
                                         java.lang.reflect.Method getUMethod = rpr.getClass().getMethod("getU");
                                         Object u = getUMethod.invoke(rpr);
-                                        // 只有当u不为null且val不为NONE时才添加下划线
                                         if (u != null) {
                                             java.lang.reflect.Method getValMethod = u.getClass().getMethod("getVal");
                                             Object val = getValMethod.invoke(u);
                                             if (val != null && !val.toString().contains("NONE")) {
-                                                chunk.setUnderline(0.5f, -2f);
+                                                hasUnderline = true;
                                             }
                                         }
-                                    }
-                                }
-                            } catch (Exception e) {
-                                // 忽略下划线处理错误
-                            }
-
-                            // 处理删除线
-                            if (run.isStrikeThrough()) {
-                                chunk.setUnderline(0.5f, 3f); // 使用上划线模拟删除线
-                            }
-
-                            // 处理上标/下标
-                            try {
-                                // 通过反射获取垂直对齐信息
-                                java.lang.reflect.Method getCTRMethod = run.getClass().getMethod("getCTR");
-                                Object ctr = getCTRMethod.invoke(run);
-                                if (ctr != null) {
-                                    java.lang.reflect.Method getRPrMethod = ctr.getClass().getMethod("getRPr");
-                                    Object rpr = getRPrMethod.invoke(ctr);
-                                    if (rpr != null) {
                                         java.lang.reflect.Method getVertAlignMethod = rpr.getClass().getMethod("getVertAlign");
                                         Object vertAlign = getVertAlignMethod.invoke(rpr);
                                         if (vertAlign != null) {
-                                            String vertAlignStr = vertAlign.toString();
-                                            if (vertAlignStr.contains("SUPERSCRIPT")) {
-                                                chunk.setTextRise(6f); // 上标
-                                            } else if (vertAlignStr.contains("SUBSCRIPT")) {
-                                                chunk.setTextRise(-3f); // 下标
-                                            }
+                                            vertAlignStr = vertAlign.toString();
                                         }
                                     }
                                 }
                             } catch (Exception e) {
-                                // 忽略上标/下标处理错误
+                                // 忽略属性解析错误
                             }
 
-                            pdfPara.add(chunk);
+                            // 遍历 run 的 XML 子节点，按原始顺序处理文本和换行符
+                            try {
+                                org.w3c.dom.Node runNode = run.getCTR().getDomNode();
+                                org.w3c.dom.NodeList children = runNode.getChildNodes();
+                                boolean hasContent = false;
+
+                                for (int i = 0; i < children.getLength(); i++) {
+                                    org.w3c.dom.Node child = children.item(i);
+                                    if (child.getNodeType() != org.w3c.dom.Node.ELEMENT_NODE) {
+                                        continue;
+                                    }
+                                    String localName = child.getLocalName();
+                                    if ("t".equals(localName) || "delText".equals(localName)) {
+                                        // 文本节点
+                                        String runText = child.getTextContent();
+                                        if (runText == null || runText.isEmpty()) {
+                                            continue;
+                                        }
+                                        hasContent = true;
+                                        com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
+                                        if (hasUnderline) {
+                                            chunk.setUnderline(0.5f, -2f);
+                                        }
+                                        if (hasStrikeThrough) {
+                                            chunk.setUnderline(0.5f, 3f);
+                                        }
+                                        if (vertAlignStr != null) {
+                                            if (vertAlignStr.contains("SUPERSCRIPT")) {
+                                                chunk.setTextRise(6f);
+                                            } else if (vertAlignStr.contains("SUBSCRIPT")) {
+                                                chunk.setTextRise(-3f);
+                                            }
+                                        }
+                                        pdfPara.add(chunk);
+                                    } else if ("br".equals(localName)) {
+                                        // 行内换行符
+                                        hasContent = true;
+                                        pdfPara.add(new com.itextpdf.text.Chunk("\n", runFont));
+                                    }
+                                }
+
+                                if (!hasContent) {
+                                    // 回退：使用 getText(0) 获取文本
+                                    String runText = run.getText(0);
+                                    if (runText != null && !runText.isEmpty()) {
+                                        com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
+                                        if (hasUnderline) {
+                                            chunk.setUnderline(0.5f, -2f);
+                                        }
+                                        if (hasStrikeThrough) {
+                                            chunk.setUnderline(0.5f, 3f);
+                                        }
+                                        if (vertAlignStr != null) {
+                                            if (vertAlignStr.contains("SUPERSCRIPT")) {
+                                                chunk.setTextRise(6f);
+                                            } else if (vertAlignStr.contains("SUBSCRIPT")) {
+                                                chunk.setTextRise(-3f);
+                                            }
+                                        }
+                                        pdfPara.add(chunk);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                // 回退：使用 getText(0) 获取文本
+                                String runText = run.getText(0);
+                                if (runText != null && !runText.isEmpty()) {
+                                    com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
+                                    if (hasUnderline) {
+                                        chunk.setUnderline(0.5f, -2f);
+                                    }
+                                    if (hasStrikeThrough) {
+                                        chunk.setUnderline(0.5f, 3f);
+                                    }
+                                    if (vertAlignStr != null) {
+                                        if (vertAlignStr.contains("SUPERSCRIPT")) {
+                                            chunk.setTextRise(6f);
+                                        } else if (vertAlignStr.contains("SUBSCRIPT")) {
+                                            chunk.setTextRise(-3f);
+                                        }
+                                    }
+                                    pdfPara.add(chunk);
+                                }
+                            }
                         }
                     }
 
