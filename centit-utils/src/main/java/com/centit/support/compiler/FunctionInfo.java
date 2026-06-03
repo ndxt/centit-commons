@@ -13,10 +13,4 @@ public class FunctionInfo {
         nFuncID = nF;
         nRetType = nR;
     }
-    /*static public FunctionInfo newFunctionInfo(String sN,int nP,int nF,int nR)
-    {
-        return new FunctionInfo(sN, nP, nF, nR);
-
-    }
-    */
 }

@@ -1,6 +1,7 @@
 package com.centit.support.compiler;
 
 import com.centit.support.algorithm.*;
+import com.centit.support.common.DateTimeSpan;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -12,7 +13,7 @@ public class VariableFormula {
 
     private final Lexer lex;
     private VariableTranslate trans;
-    private Map<String, Function<Object[], Object>> extendFuncMap;
+    private Map<String, ExtendFunc> extendFuncMap;
 
 
     public VariableFormula() {
@@ -139,7 +140,7 @@ public class VariableFormula {
         return formula.calcFormula();
     }
 
-    public static Object calculate(String szExpress, VariableTranslate varTrans, Map<String, Function<Object[], Object>> extendFuncMap) {
+    public static Object calculate(String szExpress, VariableTranslate varTrans, Map<String, ExtendFunc> extendFuncMap) {
         VariableFormula formula = new VariableFormula();
         formula.setExtendFuncMap(extendFuncMap);
         formula.setFormula(szExpress);
@@ -165,22 +166,20 @@ public class VariableFormula {
         return formula.checkFormula();
     }
 
-    /*public static Set<String> attainFormulaVariable(String szExpress, Map<String, Function<Object[], Object>> extendFuncMap) {
-        VariableFormula formula = new VariableFormula();
-        formula.setExtendFuncMap(extendFuncMap);
-        formula.setFormula(szExpress);
-        DummyTranslate translate = new DummyTranslate();
-        formula.setTrans(translate);
-        formula.calcFormula();
-        return translate.getVariableSet();
-    }*/
-
     public static Set<String> attainFormulaVariable(String szExpress, Map<String, Function<Object[], Object>> extendFuncMap) {
         Lexer lex = new Lexer(szExpress);
         Set<String> variables = new HashSet<>();
         while(true){
             String aWord = lex.getAWord();
             if(StringUtils.isBlank(aWord)) break;
+            if (aWord.charAt(0) == '$') {
+                String str = lex.getAWord();
+                if (str.equals("{")) {
+                    str = lex.getStringUntil("}");
+                    variables.add(str);
+                }
+                continue;
+            }
             if(!Lexer.isLabel(aWord)) continue;
             if(VariableFormula.isKeyWord(aWord) || EmbedFunc.getFuncNo(aWord)>0)
                  continue;
@@ -202,11 +201,11 @@ public class VariableFormula {
         lex.setFormula(formula);
     }
 
-    public void setExtendFuncMap(Map<String, Function<Object[], Object>> extendFuncMap) {
+    public void setExtendFuncMap(Map<String, ExtendFunc> extendFuncMap) {
         this.extendFuncMap = extendFuncMap;
     }
 
-    public void addExtendFunc(String funcName, Function<Object[], Object> extendFunc) {
+    public void addExtendFunc(String funcName, ExtendFunc extendFunc) {
         if (extendFuncMap == null) {
             extendFuncMap = new HashMap<>(16);
         }
@@ -293,7 +292,7 @@ public class VariableFormula {
         }
 
         if (extendFuncMap != null) {
-            Function<Object[], Object> func = extendFuncMap.get(str);
+            ExtendFunc func = extendFuncMap.get(str);
             if (func != null) {
                 String nextWord = lex.getAWord();
                 if ("(".equals(nextWord)) {
@@ -350,6 +349,10 @@ public class VariableFormula {
             }
 
             case ConstDefine.OP_ADD: {
+                //date + timeSpan
+                if(operand instanceof Date d1){
+                    return DatetimeOpt.addTimeSpan(d1, operand2);
+                }
                 return GeneralAlgorithm.addTwoObject(operand, operand2);
             }
             case ConstDefine.OP_MUL: {
@@ -409,6 +412,14 @@ public class VariableFormula {
                 return StringRegularOpt.isMatch(StringBaseOpt.objectToString(operand2),
                     StringBaseOpt.objectToString(operand), 2);
             case ConstDefine.OP_SUB:
+                // date - date = timeSpan
+                if(operand instanceof Date d1 && operand2 instanceof Date d2){
+                    return new DateTimeSpan(d2, d1);
+                }
+                // date - timeSpan = date
+                if(operand instanceof Date d1){
+                    return DatetimeOpt.subTimeSpan(d1, operand2);
+                }
                 return GeneralAlgorithm.subtractTwoObject(operand, operand2);
             case ConstDefine.OP_DIV: {
                 return GeneralAlgorithm.divideTwoObject(operand, operand2);
@@ -681,7 +692,7 @@ public class VariableFormula {
         return EmbedFunc.runFuncWithObject(slOperand, EmbedFunc.functionsList[nFuncNo].nFuncID);
     }
 
-    private Object calcExtendFunc(Function<Object[], Object> func) {
+    private Object calcExtendFunc(ExtendFunc func) {
         List<Object> slOperand = new ArrayList<>(5);
         String str;
         while (true) {
@@ -702,7 +713,7 @@ public class VariableFormula {
         if (!")".equals(str)) {
             return null;
         }
-        return func.apply(CollectionsOpt.listToArray(slOperand, Object.class));
+        return func.execute(trans, CollectionsOpt.listToArray(slOperand, Object.class));
     }
 
     public Object calcFormula(String szExpress) {
@@ -759,7 +770,7 @@ public class VariableFormula {
 
 
     public static List<Object> calcMultiFormula(String szExpress, VariableTranslate varTrans,
-                                               Map<String, Function<Object[], Object>> extendFuncMap) {
+                                               Map<String, ExtendFunc> extendFuncMap) {
         VariableFormula formula = new VariableFormula();
         formula.setExtendFuncMap(extendFuncMap);
         formula.setFormula(szExpress);

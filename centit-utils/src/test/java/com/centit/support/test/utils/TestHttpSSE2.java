@@ -4,17 +4,17 @@ import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.network.HttpExecutor;
 import com.centit.support.security.SecurityOptUtils;
-import org.apache.http.Consts;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 public class TestHttpSSE2 {
 
@@ -46,9 +46,9 @@ public class TestHttpSSE2 {
             jsonObject.put("stream", true);
 
 
-            StringEntity entity = new StringEntity(jsonObject.toString(), Consts.UTF_8);
+            StringEntity entity = new StringEntity(jsonObject.toString(), StandardCharsets.UTF_8);
             request.setEntity(entity);
-            HttpResponse response = httpClient.execute(request);
+            ClassicHttpResponse response = httpClient.execute(request);
             InputStream inputStream = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;

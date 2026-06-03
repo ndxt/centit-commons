@@ -1,7 +1,7 @@
 package com.centit.test;
 
 import com.centit.support.algorithm.CollectionsOpt;
-import com.centit.support.office.DocOptUtil;
+import com.centit.support.office.PdfUtil;
 
 import java.awt.*;
 import java.io.IOException;
@@ -9,9 +9,9 @@ import java.io.IOException;
 public class PDFHighlighterItext {
     // /Users/codefan/Documents/temp/DeveloperWorkbook.pdf
     public static void main(String[] args) throws IOException {
-        DocOptUtil.pdfHighlightKeywords("/Users/codefan/Documents/temp/developerTest.pdf",
+        PdfUtil.pdfHighlightKeywords("/Users/codefan/Documents/temp/fileInfo.pdf",
                 "/Users/codefan/Documents/temp/HighLigher.pdf",
-                CollectionsOpt.createList("道路","管养","市长"), Color.YELLOW);
+                CollectionsOpt.createList("排水","考评"), Color.YELLOW);
         System.out.println("Done!");
     }
 }

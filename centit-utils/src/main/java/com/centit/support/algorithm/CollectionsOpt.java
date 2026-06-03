@@ -80,13 +80,13 @@ public abstract class CollectionsOpt {
         list.set(p2, tmp);    */
     }
 
-    public static <T, U> ParentChild<? super T> mapParentANdChild(
+    public static <T, U> ParentChild<? super T> mapParentAndChild(
         Function<? super T, ? extends U> pkExtractor,
         Function<? super T, ? extends U> parentPkExtractor) {
         //Objects.requireNonNull(parentExtractor);
         //Objects.requireNonNull(childExtractor);
         return (p, c) ->
-            GeneralAlgorithm.equals(pkExtractor.apply(p), parentPkExtractor.apply(c));
+            GeneralAlgorithm.equals(pkExtractor.apply(p), parentPkExtractor.apply(c), false);
     }
 
     /**
@@ -160,7 +160,7 @@ public abstract class CollectionsOpt {
     public static <T, U> void sortAsTree(List<T> list, Function<? super T, ? extends U> pkExtractor,
                                          Function<? super T, ? extends U> parentPkExtractor) {
         CollectionsOpt.sortAsTree(list,
-            CollectionsOpt.mapParentANdChild(pkExtractor, parentPkExtractor));
+            CollectionsOpt.mapParentAndChild(pkExtractor, parentPkExtractor));
     }
 
     /**

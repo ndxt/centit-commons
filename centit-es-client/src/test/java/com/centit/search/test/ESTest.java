@@ -1,42 +1,31 @@
 package com.centit.search.test;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
+import co.elastic.clients.elasticsearch.core.IndexRequest;
+import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Highlight;
+import co.elastic.clients.elasticsearch.core.search.HighlightField;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.json.JsonData;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.document.ObjectDocument;
-import com.centit.search.service.ESServerConfig;
+import com.centit.search.service.*;
 import com.centit.search.service.Impl.ESIndexer;
-import com.centit.search.service.Indexer;
-import com.centit.search.service.IndexerSearcherFactory;
-import com.centit.search.service.Searcher;
 import com.centit.search.utils.TikaTextExtractor;
 import com.centit.support.algorithm.UuidOpt;
-import org.apache.http.HttpHost;
 import org.apache.tika.exception.TikaException;
-import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.text.Text;
-import org.elasticsearch.core.TimeValue;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MultiMatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.elasticsearch.xcontent.XContentBuilder;
-import org.elasticsearch.xcontent.XContentFactory;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,169 +36,137 @@ public class ESTest {
     public static void main(String[] args) {
         try{
             testQuery();
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     public static void testQuery() throws Exception {
-        //ESServerConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/src/test/resources/system.properties");
-        ESServerConfig config = new ESServerConfig();
-        config.setServerHostIp("192.168.134.250");
-        config.setServerHostPort("32590");
-       // config.setClusterName("centit");
-        //config.setUsername("elastic");
-        //config.setPassword("*********");
+        ElasticConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/system.properties");
         /*config.setIndexName(
                 StringUtils.lowerCase(properties.getProperty("elasticsearch.index")));*/
-        config.setOsId("dde");
         config.setMinScore(0.5f);
+        ElasticsearchClient esClient = ElasticsearchClientFactory.createClient(config);
+        // 构建多字段匹配查询
+        MultiMatchQuery multiMatchQuery = MultiMatchQuery.of(m -> m
+            .query("交通")
+            .fields("xiangmmc", "guanjc", "content")
+            .minimumShouldMatch("50%"));
 
+        BoolQuery boolQuery = BoolQuery.of(b -> b
+            .must(multiMatchQuery._toQuery()));
 
-        RestHighLevelClient esClient = IndexerSearcherFactory.obtainclientPool(config).borrowObject();
-        //jsjtkj_index
-        //过滤条件 filterColumnName  filterValue
-        SearchRequest searchRequest = new SearchRequest("jsjtkj_index");
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        MultiMatchQueryBuilder multiMatchQueryBuilder =
-            QueryBuilders.multiMatchQuery("交通", "xiangmmc","guanjc","content") ;
-        multiMatchQueryBuilder.minimumShouldMatch("50%");
+        // 构建高亮配置
+        Map<String, HighlightField> highlightFields = new HashMap<>();
+        highlightFields.put("content", HighlightField.of(h -> h
+            .fragmentSize(300)
+            .numberOfFragments(6)));
+        highlightFields.put("xiangmmc", HighlightField.of(h -> h
+            .fragmentSize(300)
+            .numberOfFragments(6)));
 
-        boolQueryBuilder.must(multiMatchQueryBuilder);
+        Highlight highlight = Highlight.of(h -> h
+            .fields(highlightFields)
+            .preTags("<span style='color:red'>")
+            .postTags("</span>"));
 
+        // 构建搜索请求
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+            .index("objects")
+            .query(boolQuery._toQuery())
+            .from(0)
+            .size(10)
+            .highlight(highlight)
+            .trackTotalHits(th -> th.enabled(true)));
 
-        //封装分页  排序信息
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        SearchResponse<JsonData> searchResponse = esClient.search(searchRequest, JsonData.class);
 
-        searchSourceBuilder.from(0);
-        searchSourceBuilder.size(10);
-
-        //searchSourceBuilder.fetchSource(null, new String[]{"content"});
-
-        //设置查询超时时间 1分钟
-        //searchSourceBuilder.timeout(new TimeValue(60*1000, TimeUnit.SECONDS));
-        //查全部数据(如果不写或者写false当总记录数超过10000时会返回总数10000,配置为true就会返回真实条数)
-        searchSourceBuilder.trackTotalHits(true);
-        //explain 返回文档的评分解释
-        searchSourceBuilder.explain(false);
-        //设置高亮显示字段
-        //高亮
-        HighlightBuilder highlightBuilder = new HighlightBuilder();
-        highlightBuilder.field("content").field("xiangmmc");
-
-        String color = "red";
-        if (highlightBuilder.fields().size() > 0) {
-            highlightBuilder.preTags("<span style='color:"+color+"'>").postTags("</span>");
-            highlightBuilder.highlighterType("unified");
-            highlightBuilder.requireFieldMatch(true);
-            //下面这两项,如果你要高亮如文字内容等有很多字的字段,必须配置,不然会导致高亮不全,文章内容缺失等
-            //最大高亮分片数
-            highlightBuilder.fragmentSize(300);
-            //从第一个分片获取高亮片段
-            highlightBuilder.numOfFragments(6);
-        }
-        searchSourceBuilder.highlighter(highlightBuilder);
-        searchSourceBuilder.query(boolQueryBuilder);
-        searchRequest.source(searchSourceBuilder);
-
-
-        SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
-
-        JSONArray jsonArray =
-            returnHighlightResult(searchResponse,  true);
+        JSONArray jsonArray = returnHighlightResult(searchResponse, true);
         System.out.println(jsonArray.toJSONString());
+        ElasticsearchClientFactory.closeClient(esClient);
     }
-    private static JSONArray returnHighlightResult(SearchResponse searchResponse, Boolean explain) {
+    private static JSONArray returnHighlightResult(SearchResponse<JsonData> searchResponse, Boolean explain) {
         JSONArray jsonArray = new JSONArray();
 
-        for (SearchHit hit : searchResponse.getHits()) {
+        if (searchResponse.hits() != null) {
+            for (Hit<JsonData> hit : searchResponse.hits().hits()) {
+                JSONObject jsonObject = new JSONObject();
 
-            JSONObject jsonObject = JSON.parseObject(hit.getSourceAsString());
-
-            if (explain) jsonObject.put("explain_info", hit.getExplanation());
-            //解析高亮字段
-            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
-            for (Map.Entry<String, HighlightField> ent : highlightFields.entrySet()) {
-                HighlightField field = ent.getValue();
-                if (field != null) {
-                    Text[] fragments = field.fragments();
-                    StringBuilder sb = new StringBuilder();
-                    for (Text fragment : fragments) {
-                        sb.append(fragment.string().trim());
-                    }
-                    //高亮标题覆盖原标题
-                    jsonObject.put(ent.getKey(), sb.toString());
+                // 获取原始数据
+                if (hit.source() != null) {
+                    jsonObject = JSONObject.parseObject(hit.source().toJson().toString());
                 }
+
+                if (explain && hit.explanation() != null) {
+                    jsonObject.put("explain_info", hit.explanation());
+                }
+
+                // 解析高亮字段
+                if (hit.highlight() != null && !hit.highlight().isEmpty()) {
+                    for (Map.Entry<String, List<String>> ent : hit.highlight().entrySet()) {
+                        List<String> fragments = ent.getValue();
+                        if (fragments != null && !fragments.isEmpty()) {
+                            StringBuilder sb = new StringBuilder();
+                            for (String fragment : fragments) {
+                                sb.append(fragment.trim());
+                            }
+                            // 高亮标题覆盖原标题
+                            jsonObject.put(ent.getKey(), sb.toString());
+                        }
+                    }
+                }
+
+                jsonObject.put("_score", hit.score());
+                jsonObject.put("_id", hit.id());
+                jsonArray.add(jsonObject);
             }
-            jsonArray.add(jsonObject);
         }
         return jsonArray;
     }
 
     public static void testESIndex3(){
-        ESServerConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/src/test/resources/system.properties");
+        ElasticConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/system.properties");
         ESIndexer indexer = IndexerSearcherFactory.obtainIndexer(config, ObjectDocument.class);
         //testESIndex2();
         ObjectDocument obj= new ObjectDocument();
         obj.setOptId("ABC");
         obj.setOptTag(UuidOpt.getUuidAsString22());
-        obj.setContent("测试我的索引，使用 elasticsearch-rest-high-level-client");
+        obj.setContent("测试我的索引，使用 elasticsearch-rest-high-level-client， 包括交通信息");
         indexer.saveNewDocument(obj);
         System.out.println("Done!");
     }
 
     public static void testESIndex2(){
-        try (final RestHighLevelClient client = new RestHighLevelClient(
-            RestClient.builder(
-                new HttpHost("192.168.134.250", 32404, "http")
-            )
-        )) {
-            // Map
+        try {
+            ElasticConfig config = new ElasticConfig();
+            config.setServerHostIp("192.168.134.250");
+            config.setServerHostPort("32404");
+
+            ElasticsearchClient client = ElasticsearchClientFactory.createClient(config);
+
+            // 构建文档数据
             final Map<String, Object> map = new HashMap<>();
             map.put("user", "hainet");
-            map.put("message", "elasticsearch-rest-high-level-client-sample");
+            map.put("message", "elasticsearch-java-client-sample");
 
-            // XContentBuilder
-            final XContentBuilder builder = XContentFactory.jsonBuilder();
-            builder.startObject();
-            {
-                builder.field("user", "hainet");
-                builder.field("message", "elasticsearch-rest-high-level-client-sample");
-            }
-            builder.endObject();
-
-            final IndexRequest request = new IndexRequest()
+            final IndexRequest<JsonData> request = IndexRequest.of(i -> i
                 .index("index")
-                .type("logs")
                 .id("id")
-                .timeout(TimeValue.timeValueMinutes(2))
-                // Map
-                .source(map);
-            // XContentBUilder
-            // .source(builder);
-            // Object key-pairs
-            // .source("user", "hainet",
-            //         "message", "elasticsearch-rest-high-level-client-sample")
+                .document(JsonData.of(map)));
 
-            final IndexResponse response = client.index(request, RequestOptions.DEFAULT);
+            final IndexResponse response = client.index(request);
 
-            //assertThat(response.getIndex(), is("index"));
-            //assertThat(response.getType(), is("logs"));
-            //assertThat(response.getId(), is("id"));
+            System.out.println("Index: " + response.index());
+            System.out.println("ID: " + response.id());
+            System.out.println("Result: " + response.result());
 
-            if (response.getResult() == DocWriteResponse.Result.CREATED) {
-                //assertThat(response.getVersion(), is(1L));
-            } else if (response.getResult() == DocWriteResponse.Result.UPDATED) {
-                //assertThat(response.getVersion(), is(greaterThan(1L)));
-            }
-        } catch (final IOException e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
     //@Test
     public  void testESIndex() throws Exception {
-        ESServerConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/src/test/resources/system.properties");
+        ElasticConfig config = IndexerSearcherFactory.loadESServerConfigFormProperties("/src/test/resources/system.properties");
         Indexer indexer = IndexerSearcherFactory.obtainIndexer(config,
                 ObjectDocument.class);
        ObjectDocument indexDocument = new ObjectDocument();
@@ -232,7 +189,7 @@ public class ESTest {
     {
 //        System.out.println( DocumentUtils.obtainDocumentType(ObjectDocument.class));
 //        System.out.println( DocumentUtils.obtainDocumentMapping(ObjectDocument.class));
-        ESServerConfig config =
+        ElasticConfig config =
             IndexerSearcherFactory.loadESServerConfigFormProperties("/src/test/resources/system.properties");
         Searcher searcher = IndexerSearcherFactory.obtainSearcher(config,
                 ObjectDocument.class);

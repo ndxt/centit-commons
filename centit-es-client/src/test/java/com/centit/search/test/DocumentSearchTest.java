@@ -1,7 +1,7 @@
 package com.centit.search.test;
 
 import com.alibaba.fastjson2.JSON;
-import com.centit.search.service.ESServerConfig;
+import com.centit.search.service.ElasticConfig;
 import com.centit.search.service.Impl.ESIndexer;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
@@ -46,9 +46,9 @@ public class DocumentSearchTest {
     }
 
     public static void main(String[] args) {
-        ESServerConfig esServerConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
+        ElasticConfig elasticConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
             loadProperties() );
-        ESIndexer docIndexer = IndexerSearcherFactory.obtainIndexer(esServerConfig, HelpDoc.class);
+        ESIndexer docIndexer = IndexerSearcherFactory.obtainIndexer(elasticConfig, HelpDoc.class);
         HelpDoc doc = new HelpDoc();
         doc.setDocId("1");
         doc.setDocLevel(2);
@@ -62,10 +62,10 @@ public class DocumentSearchTest {
 
     public static void query(String[] args) throws Exception {
 
-        ESServerConfig esServerConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
+        ElasticConfig elasticConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
                 loadProperties() );
 
-        ESSearcher fetchSearcher = IndexerSearcherFactory.obtainSearcher(esServerConfig, HelpDoc.class);
+        ESSearcher fetchSearcher = IndexerSearcherFactory.obtainSearcher(elasticConfig, HelpDoc.class);
 
         Pair<Long, List<Map<String, Object>>> res = fetchSearcher.search(
             CollectionsOpt.createHashMap("osId", "zp_Qn5R5ROSo4sf-eovoWA"),

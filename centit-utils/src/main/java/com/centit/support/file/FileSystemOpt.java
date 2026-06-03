@@ -125,6 +125,16 @@ public abstract class FileSystemOpt {
     }
 
     /**
+     * 获取文件大小
+     * @param sFilePath 文件路径
+     * @return 文件大小
+     */
+    public static long fetchFileSize(String sFilePath) {
+        File f = new File(sFilePath);
+        return f.exists() && f.isFile()? f.length() : 0;
+    }
+
+    /**
      * 创建目录
      *
      * @param f 文件
@@ -305,8 +315,7 @@ public abstract class FileSystemOpt {
     /*
      * 创建文件
      */
-    public static boolean createFile(InputStream inputStream, String filePath) throws IOException {
-
+    public static Boolean createFile(InputStream inputStream, String filePath) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(filePath)) {
             int read = 0;
             byte[] bytes = new byte[1024 * 100];
@@ -315,7 +324,7 @@ public abstract class FileSystemOpt {
             }
             fos.flush();
             //fos.close();
-            return true;
+            return Boolean.TRUE;
         }
     }
 

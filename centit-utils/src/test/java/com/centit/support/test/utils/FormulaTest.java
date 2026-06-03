@@ -12,12 +12,17 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class FormulaTest {
     public static void main(String[] args)  {
 
-        System.out.println(
-            StringBaseOpt.castObjectToString(VariableFormula.attainFormulaVariable( "if(c,b+d,c, a323, aadf, \"12312\")", null)));
+        System.out.println( Pattern.compile("^1[3-9]\\d{9}$").matcher("15156334567").find() );
+
+        System.out.println(VariableFormula.calculate( "addTime(today(), timeSpan('5D3H'))"));
+        System.out.println(VariableFormula.calculate( "today() - '5D3H'"));
+        System.out.println(VariableFormula.calculate( "today() + '5D3H'"));
+        System.out.println(VariableFormula.calculate( "addTime(today(), timeSpan('5D3H')) - today()"));
 
 
         //String str = "qwefasdfas.png";
@@ -165,8 +170,8 @@ public class FormulaTest {
         System.out.println(VariableFormula.calculate("capital (123.45, true)"));
 
         VariableFormula formula = new VariableFormula();
-        formula.addExtendFunc("ex", (a) -> NumberBaseOpt.castObjectToInteger(a[0]) * NumberBaseOpt.castObjectToInteger(a[0]));
-        formula.addExtendFunc("pi", (a) -> 3.14159);
+        formula.addExtendFunc("ex", (trans,a) -> NumberBaseOpt.castObjectToInteger(a[0]) * NumberBaseOpt.castObjectToInteger(a[0]));
+        formula.addExtendFunc("pi", (trans,a) -> 3.14159);
         Object r = formula.calcFormula("ex(4) + pi()");
         System.out.println(r);
 

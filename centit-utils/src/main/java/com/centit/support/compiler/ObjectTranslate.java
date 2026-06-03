@@ -28,7 +28,7 @@ public class ObjectTranslate implements VariableTranslate {
     public Object getVarValue(String varName) {
         if (varObj == null)
             return null;
-        if(THE_DATA_SELF_LABEL.equals(varName)){
+        if(".".equals(varName)){
             return varObj;
         }
         return ReflectionOpt.attainExpressionValue

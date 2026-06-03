@@ -1,9 +1,9 @@
 package com.centit.support.test.utils;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,7 +15,7 @@ public class TestHttpSSE {
     public static void main(String[] args) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet("http://192.168.133.15:8080/apis/practice/prompt/O1JYI6OySbGWq_TX1466zQ/1");
-            HttpResponse response = httpClient.execute(request);
+            ClassicHttpResponse response = httpClient.execute(request);
             InputStream inputStream = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             int n;

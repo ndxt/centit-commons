@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class CallSystemProcess {
     private String pwd;
-    private Map<String, InputStream> extendFiles;
+    private final Map<String, InputStream> extendFiles;
     public CallSystemProcess(){
         pwd =".";
         extendFiles = new HashMap<>();
