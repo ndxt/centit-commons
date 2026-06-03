@@ -149,7 +149,7 @@ public class TestDateTimeOpt {
     public static void testUrlOpt() {
 
         String sUrl = "http://codefan:781023@dl13.yunpan.360.cn/intf.php?method=Preview.outputPic&qid=260381977&fname=%2F马甸中学20周年聚会%2FIMG_2802.JPG&fhash=342e16140c54055cf578363b27016a7b9b0afcec&dt=13.6b894db11bd878296829f48cca0f4739&v=1.0.1&rtick=13953917127584&devtype=web&sign=020a79ce62b5ad6fd644ee56b532198e&#pagemake";
-        String sParam = UrlOptUtils.getUrlParameter(sUrl);
+        String sParam = UrlOptUtils.getUrlParamter(sUrl);
         System.out.println(sParam);
         Map<String, String> params = UrlOptUtils.splitUrlParamter(sParam);
         for (Map.Entry<String, String> ent : params.entrySet()) {

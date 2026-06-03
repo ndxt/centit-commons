@@ -1,8 +1,6 @@
 package com.centit.search.service;
 
 import com.centit.search.document.ESDocument;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by codefan on 17-6-12.
@@ -15,13 +13,6 @@ public interface Indexer {
      * @return 返回文档的 文档ID
      */
     String saveNewDocument(ESDocument document);
-
-    /**
-     * 批量新建文档
-     * @param documents 文档列表
-     * @return 返回成功写入的文档数量
-     */
-    int saveNewDocuments(List<? extends ESDocument> documents);
 
     /**
      * @param  document ESDocument

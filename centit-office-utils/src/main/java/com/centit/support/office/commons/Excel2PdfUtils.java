@@ -30,14 +30,16 @@ public class Excel2PdfUtils {
         int green = 0;
         int blue = 0;
 
-        if (color instanceof HSSFColor hssfColor) {
+        if (color instanceof HSSFColor) {
+            HSSFColor hssfColor = (HSSFColor) color;
             short[] rgb = hssfColor.getTriplet();
             red = rgb[0];
             green = rgb[1];
             blue = rgb[2];
         }
 
-        if (color instanceof XSSFColor xssfColor) {
+        if (color instanceof XSSFColor) {
+            XSSFColor xssfColor = (XSSFColor) color;
             byte[] rgb = xssfColor.getRGB();
             if (rgb != null) {
                 red = (rgb[0] < 0) ? (rgb[0] + 256) : rgb[0];
@@ -63,7 +65,8 @@ public class Excel2PdfUtils {
     public static int getBorderRBG(Workbook wb, short index) {
         int result = 0;
 
-        if (wb instanceof HSSFWorkbook hwb) {
+        if (wb instanceof HSSFWorkbook) {
+            HSSFWorkbook hwb = (HSSFWorkbook) wb;
             HSSFColor color = hwb.getCustomPalette().getColor(index);
             if (color != null) {
                 result = getRGB(color);
@@ -92,7 +95,8 @@ public class Excel2PdfUtils {
     }
 
     public static int getPOIColumnWidth(Sheet sheet, Cell cell) {
-        int colWidthpoi = sheet.getColumnWidth(cell.getColumnIndex());
+        int poiCWidth = sheet.getColumnWidth(cell.getColumnIndex());
+        int colWidthpoi = poiCWidth;
         int widthPixel = 0;
         if (colWidthpoi >= 416) {
             widthPixel = (int) (((colWidthpoi - 416.0) / 256.0) * 8.0 + 13.0 + 0.5);
@@ -108,32 +112,32 @@ public class Excel2PdfUtils {
      * @param dataFormat       来自Cell.getCellStyle().getDataFormat()的值
      * @param dataFormatString 来自Cell.getCellStyle().getDataFormatString()的值
      * @param date             来自Cell.getDateCellValue()的值
-     * @return  单元格格式的值
+     * @return
      */
     private static String getFormatDateStringValue(Short dataFormat, String dataFormatString, Date date) {
         if (date == null) {
             return null;
         }
-        /*
+        /**
          * 年月日时分秒
          */
         if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_NYRSFM_STRING.contains(dataFormatString)) {
             return DatetimeOpt.convertDatetimeToString(date);
         }
-        /*
+        /**
          * 年月日
          */
         if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_NYR_STRING.contains(dataFormatString)) {
             return DatetimeOpt.convertDateToString(date);
         }
-        /*
+        /**
          * 年月
          */
         if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_NY_STRING.contains(dataFormatString)
             || CellFormatConstants.EXCEL_FORMAT_INDEX_DATA_EXACT_NY.equals(dataFormat)) {
             return DatetimeOpt.convertDateToString(date, "yyyy-MM");
         }
-        /*
+        /**
          * 月日
          */
         if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_YR_STRING.contains(dataFormatString)
@@ -141,32 +145,32 @@ public class Excel2PdfUtils {
             return DatetimeOpt.convertDateToString(date, "MM-dd");
 
         }
-        /*
+        /**
          * 月
          */
         if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_Y_STRING.contains(dataFormatString)) {
             return DatetimeOpt.convertDateToString(date, "MM");
         }
-        /*
+        /**
          * 星期X
          */
         if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_XQ_STRING.contains(dataFormatString)) {
             return CellFormatConstants.COMMON_DATE_FORMAT_XQ + CellFormatConstants.WEEK_DAYS[DatetimeOpt.getDayOfWeek(date)];
         }
-        /*
+        /**
          * 周X
          */
         if (CellFormatConstants.EXCEL_FORMAT_INDEX_DATE_Z_STRING.contains(dataFormatString)) {
             return CellFormatConstants.COMMON_DATE_FORMAT_Z + CellFormatConstants.WEEK_DAYS[DatetimeOpt.getDayOfWeek(date)];
         }
-        /*
+        /**
          * 时间格式
          */
         if (CellFormatConstants.EXCEL_FORMAT_INDEX_TIME_STRING.contains(dataFormatString)
             || CellFormatConstants.EXCEL_FORMAT_INDEX_TIME_EXACT.contains(dataFormat)) {
             return DatetimeOpt.convertTimeWithSecondToString(date);
         }
-        /*
+        /**
          * 单元格为其他未覆盖到的类型
          */
         return DatetimeOpt.convertDatetimeToString(date);
@@ -248,6 +252,7 @@ public class Excel2PdfUtils {
 
     /**
      * 解析Excel内容并转换为PDF表格
+     *
      * 注意：此方法不负责关闭Workbook，调用者需要确保在使用后关闭工作簿
      * 建议使用 try-with-resources 或 try-finally 确保资源释放
      *
@@ -346,8 +351,8 @@ public class Excel2PdfUtils {
             }
             cells.add(rowCells);
             float rw = 0;
-            for (float cw : cws) {
-                rw += cw;
+            for (int j = 0; j < cws.length; j++) {
+                rw += cws[j];
             }
             if (rw > mw || mw == 0) {
                 widths = cws;
@@ -388,18 +393,21 @@ public class Excel2PdfUtils {
     }
 
     public static float getPixelHeight(float poiHeight) {
-        return poiHeight / 28.6f * 26f;
+        float pixel = poiHeight / 28.6f * 26f;
+        return pixel;
     }
 
 
     public static void addImageByPOICell(Sheet sheet,
                                          PdfPCell pdfpCell, Cell cell) throws BadElementException, IOException {
-        if (sheet instanceof HSSFSheet hssfSheet) {
+        if (sheet instanceof HSSFSheet) {
+            HSSFSheet hssfSheet = (HSSFSheet) sheet;
             if (hssfSheet.getDrawingPatriarch() != null) {
                 List<HSSFShape> shapes = hssfSheet.getDrawingPatriarch().getChildren();
                 for (HSSFShape shape : shapes) {
                     HSSFClientAnchor anchor = (HSSFClientAnchor) shape.getAnchor();
-                    if (shape instanceof HSSFPicture pic) {
+                    if (shape instanceof HSSFPicture) {
+                        HSSFPicture pic = (HSSFPicture) shape;
                         PictureData data = pic.getPictureData();
                         //String extension = data.suggestFileExtension();
                         int row1 = anchor.getRow1();
@@ -420,12 +428,14 @@ public class Excel2PdfUtils {
                     }
                 }
             }
-        } else if (sheet instanceof XSSFSheet xssfSheet) {
+        } else if (sheet instanceof XSSFSheet) {
+            XSSFSheet xssfSheet = (XSSFSheet) sheet;
             XSSFDrawing drawing = xssfSheet.getDrawingPatriarch();
             if (drawing != null) {
                 List<XSSFShape> shapes = drawing.getShapes();
                 for (XSSFShape shape : shapes) {
-                    if (shape instanceof XSSFPicture pic) {
+                    if (shape instanceof XSSFPicture) {
+                        XSSFPicture pic = (XSSFPicture) shape;
                         XSSFClientAnchor anchor = (XSSFClientAnchor) pic.getAnchor();
                         int row1 = anchor.getRow1();
                         int col1 = anchor.getCol1();
@@ -462,13 +472,22 @@ public class Excel2PdfUtils {
     }
 
     public static int getHAlignByExcel(HorizontalAlignment align) {
-        return switch (align) {
-            case GENERAL, LEFT -> Element.ALIGN_LEFT;
-            case RIGHT -> Element.ALIGN_RIGHT;
-            case CENTER, CENTER_SELECTION -> Element.ALIGN_CENTER;
-            case FILL, JUSTIFY, DISTRIBUTED -> Element.ALIGN_JUSTIFIED;
-        };
+        int result = 0;
+        if (align == HorizontalAlignment.LEFT) {
+            result = Element.ALIGN_LEFT;
+        }
+        if (align == HorizontalAlignment.RIGHT) {
+            result = Element.ALIGN_RIGHT;
+        }
+        if (align == HorizontalAlignment.JUSTIFY) {
+            result = Element.ALIGN_JUSTIFIED;
+        }
+        if (align == HorizontalAlignment.CENTER) {
+            result = Element.ALIGN_CENTER;
+        }
+        return result;
     }
+
 
     public static Font getFontByExcel(Workbook wb, CellStyle style) {
         Font result = new Font(PDFPageEvent.BASE_FONT_CHINESE, 8, Font.NORMAL);
@@ -480,6 +499,7 @@ public class Excel2PdfUtils {
         }
 
         HSSFColor color = HSSFColor.getIndexHash().get(font.getColor());
+
         if (color != null) {
             int rbg = getRGB(color);
             result.setColor(new BaseColor(rbg));

@@ -1,6 +1,5 @@
 package com.centit.support.common;
 
-import java.io.Serial;
 import java.util.Date;
 
 /**
@@ -15,8 +14,6 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
     public static final long HOUR_MILLISECONDS = 3600000;
     public static final long MINUTE_MILLISECONDS = 60000;
     public static final long SECOND_MILLISECONDS = 1000;
-
-    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -241,7 +238,7 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
      */
     @Override
     public String toString() {
-        return toStringAsSecond();
+        return toStringAsMinute();
     }
 
     public String toStringAsMinute() {
@@ -387,18 +384,5 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
     @Override
     public int compareTo(Number o) {
         return Long.compare(this.timeSpan, o.longValue());
-    }
-
-    public static DateTimeSpan from(Object  obj){
-        if(obj == null) return null;
-        if(obj instanceof DateTimeSpan dts)
-            return dts;
-        if(obj instanceof CharSequence cs)
-            return new DateTimeSpan(cs.toString());
-        if(obj instanceof Date d)
-            return calcDateTimeSpan(d, new Date());
-        if(obj instanceof Number n)
-            return new DateTimeSpan(n.longValue());
-       return null;
     }
 }

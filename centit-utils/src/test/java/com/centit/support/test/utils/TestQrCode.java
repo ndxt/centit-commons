@@ -18,7 +18,7 @@ public class TestQrCode {
         String logImgPath = "/Users/codefan/Documents/temp/jlwaterlogo.png";
         // 简单的生成
         QrCodeConfig qrCodeConfig = new QrCodeConfig();
-        qrCodeConfig.setContent(context);
+        qrCodeConfig.setMsg(context);
         qrCodeConfig.setQrHeight(300);
         qrCodeConfig.setQrWidth(300);
         //白边预留值  取值 0-4  0最小

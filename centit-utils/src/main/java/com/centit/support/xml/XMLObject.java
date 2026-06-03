@@ -3,16 +3,12 @@ package com.centit.support.xml;
 import com.centit.support.algorithm.*;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.common.JavaBeanMetaData;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.*;
-import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -58,11 +54,8 @@ public abstract class XMLObject {
         }
         Element element = createElement(elementName, fieldAsKeyAttr);
         element.addAttribute("type", "Array");
-        if(values.isEmpty()){
-            return element;
-        }
         if(addTypeAttr) {
-            element.addAttribute("class", values.iterator().next().getClass().getName());
+            element.addAttribute("class", values.getClass().getName());
         }
         for (Object obj : values) {
             if (obj != null) {
@@ -144,7 +137,7 @@ public abstract class XMLObject {
             }
             hasSerialized.add(object);
             JavaBeanMetaData jbm = JavaBeanMetaData.createBeanMetaDataFromType(object.getClass());
-            Map<String, JavaBeanField> fields = jbm.getFields();
+            Map<String, JavaBeanField> fields = jbm.getFileds();
             if (fields == null)
                 return createXMLElement(elementName, "String", object, addTypeAttr, fieldAsKeyAttr);
 
@@ -201,11 +194,11 @@ public abstract class XMLObject {
     }
 
     public static String objectToXMLString(String rootName, Object object) {
-        return objectToXMLString(rootName, object, true, false, true);
+        return objectToXMLString(rootName, object, true, true, false);
     }
 
     public static String objectToXMLString(Object object) {
-        return objectToXMLString("object", object,true, false, true);
+        return objectToXMLString("object", object,true, true, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -213,19 +206,19 @@ public abstract class XMLObject {
         //Map<String, Object> objectMap = new HashMap<>();
         Attribute attr = element.attribute("type");
         String sType = attr == null ? null :attr.getValue();
-        if ("Date".equals(sType)) {
+        if (StringUtils.equals("Date", sType)) {
             return DatetimeOpt.smartPraseDate(element.getTextTrim());
-        } else if ("Long".equals(sType)) {
+        } else if (StringUtils.equals("Long", sType)) {
             return NumberBaseOpt.castObjectToLong(element.getTextTrim());
-        } else if ("Integer".equals(sType)) {
+        } else if (StringUtils.equals("Integer", sType)) {
             return NumberBaseOpt.castObjectToInteger(element.getTextTrim());
-        } else if ("Number".equals(sType)) {
+        } else if (StringUtils.equals("Number", sType)) {
             return NumberBaseOpt.castObjectToDouble(element.getTextTrim());
-        } else if ("Boolean".equals(sType)) {
+        } else if (StringUtils.equals("Boolean", sType)) {
             return StringRegularOpt.isTrue(element.getTextTrim());
-        } else if ("BigDecimal".equals(sType)) {
+        } else if (StringUtils.equals("BigDecimal", sType)) {
             return new BigDecimal(element.getTextTrim());
-        } else if ("Array".equals(sType)) {
+        } else if (StringUtils.equals("Array", sType)) {
             List<Element> subElements = element.elements();
             if (subElements == null)
                 return null;
@@ -236,15 +229,16 @@ public abstract class XMLObject {
                 if(keyAttr != null) {
                     keyName = keyAttr.getValue();
                 }
-                if (XML_ARRAY_ITEM_TAG.equals(keyName)) {
-                    objs.add(elementToObject(subE));
+                if (StringUtils.equals(XML_ARRAY_ITEM_TAG, keyName)) {
+                    objs.add(
+                        elementToObject(subE));
                 } else {
                     objs.add(CollectionsOpt.createHashMap(keyName,
                         elementToObject(subE)));
                 }
             }
             return objs;
-        } else /*if ("Object".equals(sType)) */{
+        } else /*if (StringUtils.equals("Object", sType)) */{
             List<Element> subElements = element.elements();
             if (subElements == null || subElements.isEmpty())
                 return element.getTextTrim();
@@ -272,41 +266,27 @@ public abstract class XMLObject {
         }
     }
 
-    public static Document parseXmlStreamIgnoreDtd(InputStream xmlStream) throws DocumentException{
-            SAXReader builder = new SAXReader(false);
-            builder.setValidation(false);
-            builder.setEntityResolver((publicId, systemId) -> new InputSource(
-                new ByteArrayInputStream(
-                    "<?xml version='1.0' encoding='UTF-8'?>".getBytes()))
-            );
-            //Attribute attr;
-            return builder.read(xmlStream);
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> elementToJSONObject(Element element) {
+        Object obj = elementToObject(element);
+        if (obj instanceof Map)
+            return (Map<String, Object>) obj;
+        return null;
     }
 
-    public static Document parseXmlTextIgnoreDtd(String xmlString) throws DocumentException{
-        SAXReader builder = new SAXReader(false);
-        builder.setValidation(false);
-        builder.setEntityResolver((publicId, systemId) -> new InputSource(
-            new ByteArrayInputStream(
-                "<?xml version='1.0' encoding='UTF-8'?>".getBytes()))
-        );
-        InputSource source = new InputSource(new StringReader(xmlString));
-        return builder.read(source);
-    }
-
-    public static Object xmlStringToObject(String xmlString) {
+    public static Map<String, Object> xmlStringToJSONObject(String xmlString) {
         try {
-            Document doc = parseXmlTextIgnoreDtd(xmlString);
-            return elementToObject(doc.getRootElement());
+            Document doc = DocumentHelper.parseText(xmlString);
+            return elementToJSONObject(doc.getRootElement());
         } catch (DocumentException e) {
             logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
             return null;
         }
     }
 
-    public static Object xmlStreamToObject(InputStream xmlStream) {
+    public static Object xmlStringToObject(String xmlString) {
         try {
-            Document doc = parseXmlStreamIgnoreDtd(xmlStream);
+            Document doc = DocumentHelper.parseText(xmlString);
             return elementToObject(doc.getRootElement());
         } catch (DocumentException e) {
             logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);

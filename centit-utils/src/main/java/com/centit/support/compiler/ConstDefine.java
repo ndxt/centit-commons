@@ -65,8 +65,8 @@ public abstract class ConstDefine {
     public static final int FUNC_TO_STRING = 153;
     public static final int FUNC_TO_NUMBER = 154;
     public static final int FUNC_STRLEN  = 156;
-    public static final int FUNC_TIME_SPAN = 157;
-    public static final int FUNC_ADD_TIME = 158;
+    public static final int FUNC_DATE_SPAN = 157;
+    public static final int FUNC_ADD_DATE = 158;
     public static final int FUNC_REG_MATCH = 159;
     public static final int FUNC_REG_MATCH_VALUES = 160;
     public static final int FUNC_WEEK = 161;
