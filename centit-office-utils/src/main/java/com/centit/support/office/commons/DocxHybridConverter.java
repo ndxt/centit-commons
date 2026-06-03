@@ -82,7 +82,14 @@ public class DocxHybridConverter {
             }
 
             // 按文档原始顺序遍历所有元素
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
+            for (int i = 0; i < bodyElements.size(); i++) {
+                org.apache.poi.xwpf.usermodel.IBodyElement element = bodyElements.get(i);
+
+                // 检查下一个元素是否是表格
+                boolean nextIsTable = false;
+                if (i + 1 < bodyElements.size()) {
+                    nextIsTable = bodyElements.get(i + 1) instanceof XWPFTable;
+                }
 
                 if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
                     // 处理段落（标题、正文等）
@@ -205,8 +212,8 @@ public class DocxHybridConverter {
                                 org.w3c.dom.NodeList children = runNode.getChildNodes();
                                 boolean hasContent = false;
 
-                                for (int i = 0; i < children.getLength(); i++) {
-                                    org.w3c.dom.Node child = children.item(i);
+                                for (int childIdx = 0; childIdx < children.getLength(); childIdx++) {
+                                    org.w3c.dom.Node child = children.item(childIdx);
                                     if (child.getNodeType() != org.w3c.dom.Node.ELEMENT_NODE) {
                                         continue;
                                     }
@@ -294,23 +301,30 @@ public class DocxHybridConverter {
                     // 设置首行缩进（如果有）
                     applyParagraphIndentation(pdfPara, paragraph);
 
+                    // 关键修复：如果段落下一个是表格，确保有足够的间距避免重叠
+                    if (nextIsTable) {
+                        float currentSpacingAfter = pdfPara.getSpacingAfter();
+                        // 确保段后间距至少为10pt，如果当前间距太小则增加
+                        if (currentSpacingAfter < 8f) {
+                            pdfPara.setSpacingAfter(10f);
+                        }
+                    }
+
                     pdf.add(pdfPara);
 
                 } else if (element instanceof XWPFTable) {
                     // 处理表格
                     XWPFTable table = (XWPFTable) element;
 
-                    logger.debug("检测到表格元素");
-
                     // 使用我们的工具类转换表格
                     com.itextpdf.text.pdf.PdfPTable pdfTable =
                         DocxTableToPdfUtils.convertXWPFTableToPdf(table, defaultFont);
 
                     if (pdfTable != null) {
-                        logger.debug("表格转换成功，添加到PDF");
+                        // 关键修复：为表格添加前导间距，避免与上面的文本重叠
+                        pdfTable.setSpacingBefore(8f);
+
                         pdf.add(pdfTable);
-                    } else {
-                        logger.warn("表格转换失败，返回null");
                     }
                 }
             }
@@ -397,7 +411,7 @@ public class DocxHybridConverter {
                 }
             }
         } catch (Exception e) {
-            logger.debug("应用段落对齐失败: {}", e.getMessage());
+            // 忽略对齐应用失败
         }
     }
 
@@ -421,10 +435,10 @@ public class DocxHybridConverter {
             // 获取行间距（返回 double 类型）
             double lineSpacing = paragraph.getSpacingBetween();
             if (lineSpacing > 0) {
-                pdfPara.setLeading((float)(lineSpacing * 1.5)); // 1.5倍行距
+                pdfPara.setLeading((float) (lineSpacing * 1.5)); // 1.5倍行距
             }
         } catch (Exception e) {
-            logger.debug("应用段落间距失败: {}", e.getMessage());
+            // 忽略间距应用失败
         }
     }
 
@@ -452,7 +466,7 @@ public class DocxHybridConverter {
                 pdfPara.setIndentationRight(rightIndent / 20f);
             }
         } catch (Exception e) {
-            logger.debug("应用段落缩进失败: {}", e.getMessage());
+            // 忽略缩进应用失败
         }
     }
 
@@ -481,12 +495,12 @@ public class DocxHybridConverter {
                         widthPt = heightPt;
                         heightPt = tmp;
                     }
-                    logger.debug("使用docx页面尺寸: {} x {} pt, landscape={}", widthPt, heightPt, isLandscape);
+                    // 使用docx页面尺寸
                     return new com.itextpdf.text.Rectangle(widthPt, heightPt);
                 }
             }
         } catch (Exception e) {
-            logger.debug("读取docx页面尺寸失败，使用默认A4: {}", e.getMessage());
+            // 使用默认A4页面
         }
         return PageSize.A4;
     }
@@ -508,7 +522,7 @@ public class DocxHybridConverter {
                 if (pgMar.getBottom() != null) bottom = ((Number) pgMar.getBottom()).floatValue() / 20f;
             }
         } catch (Exception e) {
-            logger.debug("读取docx页边距失败，使用默认值: {}", e.getMessage());
+            // 使用默认页边距
         }
         // Document 构造参数顺序：left, right, top, bottom
         return new float[]{left, right, top, bottom};
