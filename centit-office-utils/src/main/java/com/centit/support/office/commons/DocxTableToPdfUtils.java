@@ -101,12 +101,21 @@ public class DocxTableToPdfUtils {
     private static int getMaxColumnCount(List<XWPFTableRow> rows) {
         int maxCols = 0;
         for (XWPFTableRow row : rows) {
-            int cellCount = row.getTableCells().size();
+            List<XWPFTableCell> cellList = row.getTableCells();
+            int cellCount = cellList.size();
             // 考虑colSpan
-            for (XWPFTableCell cell : row.getTableCells()) {
-                CTDecimalNumber gridSpan = cell.getCTTc().getTcPr().getGridSpan();
-                if (gridSpan != null && gridSpan.getVal() != null) {
-                    cellCount += gridSpan.getVal().intValue() - 1;
+            for (XWPFTableCell cell : cellList) {
+                try {
+                    org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr tcPr =
+                        cell.getCTTc() != null ? cell.getCTTc().getTcPr() : null;
+                    if (tcPr != null) {
+                        CTDecimalNumber gridSpan = tcPr.getGridSpan();
+                        if (gridSpan != null && gridSpan.getVal() != null) {
+                            cellCount += gridSpan.getVal().intValue() - 1;
+                        }
+                    }
+                } catch (Exception e) {
+                    // 忽略，按默认 gridSpan=1 处理
                 }
             }
             maxCols = Math.max(maxCols, cellCount);
@@ -371,31 +380,37 @@ public class DocxTableToPdfUtils {
      */
     private static void convertRowToPdf(XWPFTableRow row, PdfPTable pdfTable, com.itextpdf.text.pdf.BaseFont baseFont, int expectedCols, boolean isHeaderRow) {
         List<XWPFTableCell> cells = row.getTableCells();
-        int cellIndex = 0;
+        int colIndex = 0;  // 当前列位置（按可见列计数，考虑gridSpan）
+        int cellIndex = 0; // 当前处理的docx单元格索引
 
-        for (int i = 0; i < expectedCols; i++) {
-            XWPFTableCell cell = (cellIndex < cells.size()) ? cells.get(cellIndex) : null;
+        // 添加实际单元格，按 gridSpan 推进列位置，避免溢出到下一行造成空行
+        while (colIndex < expectedCols && cellIndex < cells.size()) {
+            XWPFTableCell cell = cells.get(cellIndex);
+            int gridSpan = getGridSpan(cell);
 
-            if (cell == null) {
-                // 空单元格
-                PdfPCell pdfCell = createEmptyCell();
-                pdfTable.addCell(pdfCell);
-            } else {
-                // 转换单元格
-                PdfPCell pdfCell = convertCellToPdf(cell, baseFont, isHeaderRow);
-
-                // 处理列合并
-                int gridSpan = getGridSpan(cell);
-                if (gridSpan > 1) {
-                    pdfCell.setColspan(gridSpan);
-                }
-
-                pdfTable.addCell(pdfCell);
-                cellIndex++;
+            // 防止gridSpan超出剩余列数
+            if (gridSpan > expectedCols - colIndex) {
+                gridSpan = expectedCols - colIndex;
             }
+            if (gridSpan < 1) {
+                gridSpan = 1;
+            }
+
+            PdfPCell pdfCell = convertCellToPdf(cell, baseFont, isHeaderRow);
+            if (gridSpan > 1) {
+                pdfCell.setColspan(gridSpan);
+            }
+            pdfTable.addCell(pdfCell);
+
+            colIndex += gridSpan;
+            cellIndex++;
         }
 
-        pdfTable.completeRow();
+        // 用空单元格填充剩余列（当 cells 数量不足 expectedCols 时）
+        while (colIndex < expectedCols) {
+            pdfTable.addCell(createEmptyCell());
+            colIndex++;
+        }
     }
 
     /**
