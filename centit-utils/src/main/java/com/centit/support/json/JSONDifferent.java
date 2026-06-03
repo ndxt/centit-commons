@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import java.io.Serializable;
 import java.util.List;
 
-public class JsonDifferent implements Serializable {
+public class JSONDifferent implements Serializable {
     private static final long serialVersionUID = 20230301L;
     public static final String JSON_DIFF_TYPE_ADD = "+";
     public static final String JSON_DIFF_TYPE_DELETE = "-";
@@ -24,13 +24,13 @@ public class JsonDifferent implements Serializable {
     private Object objectId;
 
 
-    private List<JsonDifferent> diffChildren;
+    private List<JSONDifferent> diffChildren;
 
-    public JsonDifferent() {
+    public JSONDifferent() {
         this.diffChildren = null;
     }
 
-    public JsonDifferent(String jsonPath, String diffType, Object oldData, Object newData) {
+    public JSONDifferent(String jsonPath, String diffType, Object oldData, Object newData) {
         this.jsonPath = jsonPath;
         this.diffType = diffType;
         this.newData = newData;
@@ -71,11 +71,11 @@ public class JsonDifferent implements Serializable {
         this.oldData = oldData;
     }
 
-    public List<JsonDifferent> getDiffChildren() {
+    public List<JSONDifferent> getDiffChildren() {
         return diffChildren;
     }
 
-    public void setDiffChildren(List<JsonDifferent> diffChildren) {
+    public void setDiffChildren(List<JSONDifferent> diffChildren) {
         this.diffChildren = diffChildren;
     }
 
@@ -103,10 +103,10 @@ public class JsonDifferent implements Serializable {
         return jsonObj;
     }
 
-    private static JSONObject toJson(List<JsonDifferent> diffList){
+    private static JSONObject toJson(List<JSONDifferent> diffList){
         JSONObject jsonObj = new JSONObject();
         if(diffList!=null && diffList.size()>0) {
-            for (JsonDifferent childDiff : diffList) {
+            for (JSONDifferent childDiff : diffList) {
                 jsonObj.put(childDiff.getJsonPath(), childDiff.toJson());
             }
         }

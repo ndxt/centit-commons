@@ -14,13 +14,13 @@ import java.util.*;
  * 可以同时过滤多个对象的多个属性
  */
 @SuppressWarnings("unused")
-public class JsonExcludeFieldsFilters implements PropertyPreFilter {
+public class JSONExcludeFieldsFilters implements PropertyPreFilter {
 
     private final Map<Class<?>, Set<String>> excludes = new HashMap<>();
 
 
 
-    public JsonExcludeFieldsFilters() {
+    public JSONExcludeFieldsFilters() {
     }
 
     @Override
@@ -50,8 +50,8 @@ public class JsonExcludeFieldsFilters implements PropertyPreFilter {
         fields.addAll(Arrays.asList(excludeFields));
     }
 
-    public static JsonExcludeFieldsFilters create(Class<?> clazz, String ... excludeFields) {
-        JsonExcludeFieldsFilters filters = new JsonExcludeFieldsFilters();
+    public static JSONExcludeFieldsFilters create(Class<?> clazz, String ... excludeFields) {
+        JSONExcludeFieldsFilters filters = new JSONExcludeFieldsFilters();
         filters.addExclude(clazz, excludeFields);
         return filters;
     }

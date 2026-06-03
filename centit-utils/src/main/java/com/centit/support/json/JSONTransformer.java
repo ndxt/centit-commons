@@ -76,7 +76,7 @@ public class JSONTransformer {
                     return null;
                 }
                 if(sKey.charAt(0) == '='){ // 替换当前属性，这个必须返回 Map
-                    Object key = transformer(sKey, dataSupport);
+                    Object key = dataSupport.attainExpressionValue(sKey.substring(1));
                     Object value = transformer(ent.getValue(), dataSupport);
                     String keyName = key!=null? StringBaseOpt.castObjectToString(key):sKey.substring(1);
                     putObjectToJson(jObj, keyName, value);

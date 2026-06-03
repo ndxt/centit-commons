@@ -55,19 +55,19 @@ public abstract class JSONOpt {
         JSON.register(java.sql.Clob.class, JdbcSupport.createClobWriter(java.sql.Clob.class));
     }
 
-    private static JsonDifferent mapDiff(String jsonPath, Map<String, Object> mapA, Map<String, Object>  mapB, String ... arrayKeys){
-        List<JsonDifferent> differents = new ArrayList<>();
+    private static JSONDifferent mapDiff(String jsonPath, Map<String, Object> mapA, Map<String, Object>  mapB, String ... arrayKeys){
+        List<JSONDifferent> differents = new ArrayList<>();
         for(Map.Entry<String, Object> ent : mapA.entrySet()){
             Object objA = ent.getValue();
             Object objB = mapB.get(ent.getKey());
-            JsonDifferent fieldDiff = objectDiff(ent.getKey(),objA, objB, arrayKeys);
+            JSONDifferent fieldDiff = objectDiff(ent.getKey(),objA, objB, arrayKeys);
             if(fieldDiff!=null)
                 differents.add(fieldDiff);
         }
 
         for(Map.Entry<String, Object> ent : mapB.entrySet()){
             if(!mapA.containsKey(ent.getKey())){
-                differents.add(new JsonDifferent(ent.getKey(),JsonDifferent.JSON_DIFF_TYPE_ADD, null, ent.getValue()));
+                differents.add(new JSONDifferent(ent.getKey(), JSONDifferent.JSON_DIFF_TYPE_ADD, null, ent.getValue()));
             }
         }
         if(differents.isEmpty()){
@@ -76,13 +76,13 @@ public abstract class JSONOpt {
 
         Map<String, Object> objectId = fetchObjectId(mapA, arrayKeys);
         if(objectId!=null || differents.size()>1){
-            JsonDifferent updateDiff = new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_UPDATE, null, null);
+            JSONDifferent updateDiff = new JSONDifferent(jsonPath, JSONDifferent.JSON_DIFF_TYPE_UPDATE, null, null);
             updateDiff.setDiffChildren(differents);
             updateDiff.setObjectId(objectId);
             return updateDiff;
         }
 
-        JsonDifferent updateDiff = differents.get(0);
+        JSONDifferent updateDiff = differents.get(0);
         if(StringUtils.isNotBlank(jsonPath)) {
             updateDiff.setJsonPath(jsonPath+"."+updateDiff.getJsonPath());
         }
@@ -127,18 +127,18 @@ public abstract class JSONOpt {
     }
 
     @SuppressWarnings({"unchecked","rawtypes"})
-    private static JsonDifferent listDiff(String jsonPath, List<Object> listA, List<Object> listB, String ... arrayKeys){
-        List<JsonDifferent> different = new ArrayList<>();
+    private static JSONDifferent listDiff(String jsonPath, List<Object> listA, List<Object> listB, String ... arrayKeys){
+        List<JSONDifferent> different = new ArrayList<>();
         int sizeA = listA.size(), sizeB = listB.size();
         if(sizeA==0 && sizeB==0){
             return null;
         }
         if(sizeA==0){
-            return new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB);
+            return new JSONDifferent(jsonPath, JSONDifferent.JSON_DIFF_TYPE_ADD, null, listB);
         }
 
         if(sizeB==0){
-            return new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_DELETE, listA, null);
+            return new JSONDifferent(jsonPath, JSONDifferent.JSON_DIFF_TYPE_DELETE, listA, null);
         }
 
         int minSize = sizeA>sizeB? sizeB : sizeA;
@@ -150,13 +150,13 @@ public abstract class JSONOpt {
             while(i<sizeA && j<sizeB){
                 int c = compareTwoRow((Map)listA.get(i), (Map)listB.get(j), arrayKeys);
                 if(c<0){
-                    different.add(new JsonDifferent("["+i+"]", JsonDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
+                    different.add(new JSONDifferent("["+i+"]", JSONDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
                     i++;
                 } else if(c>0){
-                    different.add(new JsonDifferent("["+j+"]", JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(j)));
+                    different.add(new JSONDifferent("["+j+"]", JSONDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(j)));
                     j++;
                 } else {
-                    JsonDifferent itemDiff = objectDiff( "["+i+"]", listA.get(i), listB.get(j), arrayKeys);
+                    JSONDifferent itemDiff = objectDiff( "["+i+"]", listA.get(i), listB.get(j), arrayKeys);
                     if(itemDiff!=null)
                         different.add(itemDiff);
                     i++;
@@ -165,26 +165,26 @@ public abstract class JSONOpt {
             }
 
             while(i<sizeA){
-                different.add(new JsonDifferent("["+i+"]", JsonDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
+                different.add(new JSONDifferent("["+i+"]", JSONDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
                 i++;
             }
             while(j<sizeB){
-                different.add(new JsonDifferent("["+j+"]", JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(j)));
+                different.add(new JSONDifferent("["+j+"]", JSONDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(j)));
                 j++;
             }
 
         } //判断一下是否是多维数组，如果是多维数组只能按照序号对比
         else if(listA.get(0) instanceof List && listB.get(0) instanceof List){
             for(int i=0; i<minSize; i++){
-                JsonDifferent itemDiff = objectDiff( "["+i+"]", listA.get(i), listB.get(i), arrayKeys);
+                JSONDifferent itemDiff = objectDiff( "["+i+"]", listA.get(i), listB.get(i), arrayKeys);
                 if(itemDiff!=null)
                     different.add(itemDiff);
             }
             for(int i=minSize; i<sizeA; i++){
-                different.add(new JsonDifferent("["+i+"]", JsonDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
+                different.add(new JSONDifferent("["+i+"]", JSONDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
             }
             for(int i=minSize; i<sizeB; i++) {
-                different.add(new JsonDifferent("["+i+"]", JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(i)));
+                different.add(new JSONDifferent("["+i+"]", JSONDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(i)));
             }
         } // 作为标量处理； 全部用字符串对比的方式
         else {
@@ -199,23 +199,23 @@ public abstract class JSONOpt {
             for(int i=0; i<minSize; i++){
                 String sA = StringBaseOpt.castObjectToString(listA.get(i));
                 if(!stringsB.contains(sA)){
-                    different.add(new JsonDifferent("["+i+"]", JsonDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
+                    different.add(new JSONDifferent("["+i+"]", JSONDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
                 }
                 String sB = StringBaseOpt.castObjectToString(listB.get(i));
                 if(!stringsA.contains(sB)){
-                    different.add(new JsonDifferent("["+i+"]", JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(i)));
+                    different.add(new JSONDifferent("["+i+"]", JSONDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(i)));
                 }
             }
             for(int i=minSize; i<sizeA; i++){
                 String sA = StringBaseOpt.castObjectToString(listA.get(i));
                 if(!stringsB.contains(sA)){
-                    different.add(new JsonDifferent("["+i+"]", JsonDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
+                    different.add(new JSONDifferent("["+i+"]", JSONDifferent.JSON_DIFF_TYPE_DELETE, listA.get(i), null));
                 }
             }
             for(int i=minSize; i<sizeB; i++) {
                 String sB = StringBaseOpt.castObjectToString(listB.get(i));
                 if(!stringsA.contains(sB)){
-                    different.add(new JsonDifferent("["+i+"]", JsonDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(i)));
+                    different.add(new JSONDifferent("["+i+"]", JSONDifferent.JSON_DIFF_TYPE_ADD, null, listB.get(i)));
                 }
             }
         }
@@ -224,17 +224,17 @@ public abstract class JSONOpt {
             return null;
         }
         if(different.size()==1){
-            JsonDifferent updateDiff = different.get(0);
+            JSONDifferent updateDiff = different.get(0);
             updateDiff.setJsonPath(jsonPath+updateDiff.getJsonPath());
             return updateDiff;
         }
-        JsonDifferent updateDiff = new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_UPDATE, null, null);
+        JSONDifferent updateDiff = new JSONDifferent(jsonPath, JSONDifferent.JSON_DIFF_TYPE_UPDATE, null, null);
         updateDiff.setDiffChildren(different);
         return updateDiff;
     }
 
     @SuppressWarnings("unchecked")
-    public static JsonDifferent objectDiff(String jsonPath, Object objectA, Object objectB, String ... arrayKeys){
+    public static JSONDifferent objectDiff(String jsonPath, Object objectA, Object objectB, String ... arrayKeys){
         if(objectA instanceof Map && objectB instanceof Map){
             return mapDiff(jsonPath, (Map<String, Object>)objectA, (Map<String, Object>)objectB, arrayKeys);
         }
@@ -248,16 +248,16 @@ public abstract class JSONOpt {
         }
 
         if(objectA == null ){
-            return new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_ADD, null, objectB);
+            return new JSONDifferent(jsonPath, JSONDifferent.JSON_DIFF_TYPE_ADD, null, objectB);
         } else if(objectB == null ){
-            return new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_DELETE, objectA, null);
+            return new JSONDifferent(jsonPath, JSONDifferent.JSON_DIFF_TYPE_DELETE, objectA, null);
         } else {
             String strA = StringBaseOpt.objectToString(objectA);
             String strB = StringBaseOpt.objectToString(objectB);
             String[] stringsA = strA.split("\\n");
             String[] stringsB = strB.split("\\n");
             if(stringsA.length>1 && stringsB.length>1){
-                JsonDifferent updateDiff = listDiff(jsonPath, CollectionsOpt.arrayToList(stringsA), CollectionsOpt.arrayToList(stringsB) , arrayKeys);
+                JSONDifferent updateDiff = listDiff(jsonPath, CollectionsOpt.arrayToList(stringsA), CollectionsOpt.arrayToList(stringsB) , arrayKeys);
                 if(updateDiff==null){
                     return null;
                 }
@@ -266,11 +266,11 @@ public abstract class JSONOpt {
                 }
                 return updateDiff;
             }else
-                return new JsonDifferent(jsonPath, JsonDifferent.JSON_DIFF_TYPE_UPDATE, objectA, objectB);
+                return new JSONDifferent(jsonPath, JSONDifferent.JSON_DIFF_TYPE_UPDATE, objectA, objectB);
         }
     }
 
-    public static JsonDifferent diff(Object objectA, Object objectB, String ... arrayKeys){
+    public static JSONDifferent diff(Object objectA, Object objectB, String ... arrayKeys){
         return objectDiff("", objectA, objectB, arrayKeys);
     }
     /* 目前只支持一维数值
