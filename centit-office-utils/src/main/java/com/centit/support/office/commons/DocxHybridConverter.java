@@ -60,8 +60,10 @@ public class DocxHybridConverter {
      * 缺点：代码复杂，需要处理所有元素类型
      */
     private static boolean convertWithManualTables(XWPFDocument docx, OutputStream outputStream) throws Exception {
-        // 创建PDF文档
-        Document pdf = new Document(PageSize.A4, 36, 36, 36, 36);
+        // 从 docx 读取页面尺寸和方向（含横向 landscape 支持），并按 docx 实际页边距构造 PDF 页面
+        com.itextpdf.text.Rectangle pageSize = resolvePageSize(docx);
+        float[] margins = resolvePageMargins(docx);
+        Document pdf = new Document(pageSize, margins[0], margins[1], margins[2], margins[3]);
         PdfWriter writer = PdfWriter.getInstance(pdf, outputStream);
 
         // 设置中文字体 - 使用iText的BaseFont
@@ -452,6 +454,64 @@ public class DocxHybridConverter {
         } catch (Exception e) {
             logger.debug("应用段落缩进失败: {}", e.getMessage());
         }
+    }
+
+    /**
+     * 从 docx 读取页面尺寸（含横向 landscape 支持）。
+     * 如果 docx 未指定页面尺寸或读取失败，回退到 A4 竖向。
+     */
+    private static com.itextpdf.text.Rectangle resolvePageSize(XWPFDocument docx) {
+        try {
+            org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr sectPr =
+                docx.getDocument().getBody().getSectPr();
+            if (sectPr != null && sectPr.isSetPgSz()) {
+                org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz pgSz = sectPr.getPgSz();
+                float widthPt = pgSz.getW() != null ? ((Number) pgSz.getW()).floatValue() / 20f : 0f;
+                float heightPt = pgSz.getH() != null ? ((Number) pgSz.getH()).floatValue() / 20f : 0f;
+
+                // 显式横向：交换宽高（docx 的 w/h 在 landscape 模式下未必已交换）
+                boolean isLandscape = false;
+                if (pgSz.isSetOrient()) {
+                    isLandscape = pgSz.getOrient().toString().equalsIgnoreCase("landscape");
+                }
+
+                if (widthPt > 0 && heightPt > 0) {
+                    if (isLandscape && widthPt < heightPt) {
+                        float tmp = widthPt;
+                        widthPt = heightPt;
+                        heightPt = tmp;
+                    }
+                    logger.debug("使用docx页面尺寸: {} x {} pt, landscape={}", widthPt, heightPt, isLandscape);
+                    return new com.itextpdf.text.Rectangle(widthPt, heightPt);
+                }
+            }
+        } catch (Exception e) {
+            logger.debug("读取docx页面尺寸失败，使用默认A4: {}", e.getMessage());
+        }
+        return PageSize.A4;
+    }
+
+    /**
+     * 从 docx 读取页边距（top, bottom, left, right），单位 pt。
+     * 失败时回退到默认 36pt。
+     */
+    private static float[] resolvePageMargins(XWPFDocument docx) {
+        float left = 36f, right = 36f, top = 36f, bottom = 36f;
+        try {
+            org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr sectPr =
+                docx.getDocument().getBody().getSectPr();
+            if (sectPr != null && sectPr.isSetPgMar()) {
+                org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageMar pgMar = sectPr.getPgMar();
+                if (pgMar.getLeft() != null) left = ((Number) pgMar.getLeft()).floatValue() / 20f;
+                if (pgMar.getRight() != null) right = ((Number) pgMar.getRight()).floatValue() / 20f;
+                if (pgMar.getTop() != null) top = ((Number) pgMar.getTop()).floatValue() / 20f;
+                if (pgMar.getBottom() != null) bottom = ((Number) pgMar.getBottom()).floatValue() / 20f;
+            }
+        } catch (Exception e) {
+            logger.debug("读取docx页边距失败，使用默认值: {}", e.getMessage());
+        }
+        // Document 构造参数顺序：left, right, top, bottom
+        return new float[]{left, right, top, bottom};
     }
 
     /**
