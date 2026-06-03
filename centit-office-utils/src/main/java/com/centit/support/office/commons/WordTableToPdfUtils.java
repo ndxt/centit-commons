@@ -74,7 +74,7 @@ public class WordTableToPdfUtils {
                     if (text != null && !text.trim().isEmpty()) {
                         // 创建段落元素，保留原始格式
                         com.itextpdf.text.Paragraph pdfParagraph = new com.itextpdf.text.Paragraph();
-                        
+
                         // 尝试获取段落的字体大小（简化处理）
                         int fontSize = 12; // 默认字号
                         try {
@@ -87,7 +87,7 @@ public class WordTableToPdfUtils {
                         } catch (Exception e) {
                             // 使用默认字号
                         }
-                        
+
                         com.itextpdf.text.Font font = new com.itextpdf.text.Font(baseFont, fontSize, com.itextpdf.text.Font.NORMAL);
                         pdfParagraph.add(new Chunk(text.trim(), font));
                         pdfParagraph.setSpacingBefore(5f); // 段前间距
@@ -183,14 +183,14 @@ public class WordTableToPdfUtils {
      */
     private static float[] calculateColumnWidths(Table wordTable, int cols) {
         float[] widths = new float[cols];
-        
+
         try {
             // 尝试从第一行获取列宽信息
             TableRow firstRow = wordTable.getRow(0);
             if (firstRow != null) {
                 boolean hasWidthInfo = false;
                 float totalWidth = 0;
-                
+
                 for (int i = 0; i < cols; i++) {
                     org.apache.poi.hwpf.usermodel.TableCell cell = firstRow.getCell(i);
                     if (cell != null) {
@@ -207,7 +207,7 @@ public class WordTableToPdfUtils {
                         widths[i] = 1000;
                     }
                 }
-                
+
                 // 如果没有获取到宽度信息，使用等宽
                 if (!hasWidthInfo) {
                     for (int i = 0; i < cols; i++) {
@@ -226,10 +226,10 @@ public class WordTableToPdfUtils {
                 widths[i] = 1f;
             }
         }
-        
+
         return widths;
     }
-    
+
     /**
      * 获取单元格宽度（TWIPS单位）
      */
@@ -249,7 +249,7 @@ public class WordTableToPdfUtils {
         }
         return 0;
     }
-    
+
     /**
      * 获取表头行数
      */
@@ -418,7 +418,7 @@ public class WordTableToPdfUtils {
         try {
             // 尝试从单元格第一个段落获取对齐方式
             int horizontalAlign = Element.ALIGN_LEFT; // 默认左对齐
-            
+
             if (cell.numParagraphs() > 0) {
                 org.apache.poi.hwpf.usermodel.Paragraph para = cell.getParagraph(0);
                 if (para != null) {
@@ -439,7 +439,7 @@ public class WordTableToPdfUtils {
                     }
                 }
             }
-            
+
             pdfCell.setHorizontalAlignment(horizontalAlign);
             pdfCell.setVerticalAlignment(Element.ALIGN_MIDDLE); // 垂直居中
 
@@ -547,7 +547,7 @@ public class WordTableToPdfUtils {
     }
 
 
-    /**
+    /*
      * 获取文档中的所有表格
      */
     public static List<Table> getAllTables(HWPFDocument doc) {
@@ -565,7 +565,7 @@ public class WordTableToPdfUtils {
         return tables;
     }
 
-    /**
+    /*
      * 获取文档中的所有文本段落（不包括表格内的文本）
      */
     public static List<org.apache.poi.hwpf.usermodel.Paragraph> getTextParagraphs(HWPFDocument doc) {
@@ -587,7 +587,7 @@ public class WordTableToPdfUtils {
         return paragraphs;
     }
 
-    /**
+    /*
      * 判断段落是否在任何表格中
      */
     private static boolean isParagraphInAnyTable(org.apache.poi.hwpf.usermodel.Paragraph paragraph, List<Table> tables) {

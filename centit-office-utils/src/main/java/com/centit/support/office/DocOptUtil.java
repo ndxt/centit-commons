@@ -160,7 +160,7 @@ public class DocOptUtil {
         }
     }
 
-    /**
+    /*
      * 检测 PDF 是否为扫描件的内部实现
      * 综合判断：图片数量 + 文本质量
      */
@@ -195,7 +195,7 @@ public class DocOptUtil {
 
             int validChars = 0;
             for (char c : text.toCharArray()) {
-                if (c >= '\u4e00' && c <= '\u9fff') { // 中文
+                if (c >= '一' && c <= '鿿') { // 中文
                     validChars++;
                 } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) { // 英文
                     validChars++;
@@ -332,7 +332,7 @@ public class DocOptUtil {
             }
         }
         pdfDoc.close();
-        
+
         return hasHighlighted;
     }
 
