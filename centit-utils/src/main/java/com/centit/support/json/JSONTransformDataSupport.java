@@ -1,6 +1,8 @@
 package com.centit.support.json;
 
-public interface JSONTransformDataSupport {
+import com.centit.support.compiler.VariableTranslate;
+
+public interface JSONTransformDataSupport extends VariableTranslate {
 
     Object attainExpressionValue(String labelName);
 

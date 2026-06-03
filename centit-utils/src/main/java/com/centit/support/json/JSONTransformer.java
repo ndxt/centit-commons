@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
+import com.centit.support.compiler.ObjectTranslate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,17 +17,16 @@ import java.util.Map;
 public class JSONTransformer {
     protected static final Logger logger = LoggerFactory.getLogger(JSONTransformer.class);
 
-    public static void putObjectToJson(JSONObject jobj, String key, Object value){
+    public static void putObjectToJson(JSONObject jObj, String key, Object value){
         if(value == null){
-            jobj.remove(key);
+            jObj.remove(key);
             return;
         }
         /*if(value instanceof Map && ((Map<?,?>)value).size()==0){
-            jobj.remove(key);
+            jObj.remove(key);
             return
         }*/
-
-        jobj.put(key, value);
+        jObj.put(key, value);
     }
 
     public static void addObjectToJson(JSONArray jArray, Object value){
@@ -36,7 +36,7 @@ public class JSONTransformer {
     }
     /**
      * value | key:value
-     * value : 非字符串常量 | string 常量  "@" + 常量 | 引用 ref | # 两次计算
+     * value : 非字符串常量 | string 常量  "@" + 常量 | 引用 ref
      *        value分两种形式，默认的是表达式，
      * ref : /rootPath | .currentPath | ..ParentPath | path == currentPath
      *      ref是一个对应的表达式，用于指向原始json中的具体的属性，或者多个属性计算值
@@ -55,19 +55,18 @@ public class JSONTransformer {
         if(templateObj == null){
             return null;
         }
-        if(templateObj instanceof String){
-            String value = (String)templateObj;
+        if(templateObj instanceof String value){
             if(value.isEmpty()){
                 return null;
             }
-            if(value.charAt(0) == '@'){
-                return value.substring(1);
-            } else if(value.charAt(0) == '#'){ // 两次计算 map-> formula ； eval 函数也可以实现同样的功能
-                String formula = dataSupport.mapTemplateString(value.substring(1));
-                return dataSupport.attainExpressionValue(formula);
-            } else {
-                return dataSupport.attainExpressionValue(value);
-            }
+            return switch (value.charAt(0)) {
+                case '@' -> value.substring(1);
+                case '#' ->// 两次计算 map-> formula ； eval 函数也可以实现同样的功能
+                    dataSupport.attainExpressionValue(
+                        dataSupport.mapTemplateString(value.substring(1)));
+                case '=' -> dataSupport.attainExpressionValue(value.substring(1));
+                default -> dataSupport.mapTemplateString(value);
+            };
         } else if(templateObj instanceof Map){
             Map<String, Object> tempMap = CollectionsOpt.objectToMap(templateObj);
             JSONObject jObj = new JSONObject();
@@ -77,7 +76,7 @@ public class JSONTransformer {
                     return null;
                 }
                 if(sKey.charAt(0) == '='){ // 替换当前属性，这个必须返回 Map
-                    Object key = transformer(sKey.substring(1), dataSupport);
+                    Object key = transformer(sKey, dataSupport);
                     Object value = transformer(ent.getValue(), dataSupport);
                     String keyName = key!=null? StringBaseOpt.castObjectToString(key):sKey.substring(1);
                     putObjectToJson(jObj, keyName, value);
@@ -135,9 +134,8 @@ public class JSONTransformer {
                 }
             }
             return jObj.isEmpty() ? null : jObj;
-        } else if(templateObj instanceof Collection) {
+        } else if(templateObj instanceof Collection<?> valueList) {
             JSONArray array = new JSONArray();
-            Collection<?> valueList = (Collection<?>) templateObj;
             for (Object ov : valueList) {
                 if (ov != null) {
                     Object transValue = transformer(ov, dataSupport);
@@ -170,6 +168,7 @@ public class JSONTransformer {
 
     public static Object transformer(Object templateObj,
                                      Object dataSupport){
-        return transformer(templateObj, new DefaultJSONTransformDataSupport(dataSupport));
+        return transformer(templateObj, new DefaultJSONTransformDataSupport(
+             new ObjectTranslate(dataSupport)));
     }
 }

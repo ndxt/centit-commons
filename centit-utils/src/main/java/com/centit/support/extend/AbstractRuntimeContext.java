@@ -1,7 +1,5 @@
 package com.centit.support.extend;
 
-import com.alibaba.fastjson2.JSONArray;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,12 +10,10 @@ import javax.script.ScriptException;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public abstract class AbstractRuntimeContext {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractRuntimeContext.class);
-    private ScriptEngine scriptEngine;
+    protected ScriptEngine scriptEngine;
 
     public AbstractRuntimeContext(String engineName){
         ScriptEngineManager sem = new ScriptEngineManager();
@@ -55,43 +51,10 @@ public abstract class AbstractRuntimeContext {
         return this;
     }
 
-    /**
-     * 检查js返回的对象是否是数组
-     * @param object js对象
-     * @return js对象
-     */
-    public static Object checkArrayObject(Object object){
-        if(object instanceof Map){
-            Map<?,?> objMap = (Map<?,?>) object;
-            JSONArray objArray = new JSONArray();
-            Map<Object,  Object> despMap = new LinkedHashMap<>();
-            boolean isArray = true;
-            for(Map.Entry<?,?> ent : objMap.entrySet()){
-                Object key = ent.getKey();
-                if (key != null) {
-                    if(isArray){
-                        if(StringUtils.isNumeric(key.toString())) {
-                            objArray.add(checkArrayObject(ent.getValue()));
-                        } else {
-                            isArray = false;
-                        }
-                    }
-                    despMap.put(key, checkArrayObject(ent.getValue()));
-                }
-            }
-            if(isArray && !objArray.isEmpty()){
-                return objArray;
-            } else {
-                return despMap;
-            }
-        }
-        return object;
-    }
-
     public Object callFunc(String funcName, Object... args) throws
         ScriptException, NoSuchMethodException {
         Invocable invocable = (Invocable) scriptEngine;
-        return checkArrayObject(invocable.invokeFunction(funcName, args));
+        return invocable.invokeFunction(funcName, args);
     }
 
     public Object getObject(String objName){
@@ -100,12 +63,12 @@ public abstract class AbstractRuntimeContext {
 
     public Object getObjectProperty(String objName, String propertyName)
         throws ScriptException {
-       return checkArrayObject(scriptEngine.eval(objName+"."+propertyName));
+       return scriptEngine.eval(objName+"."+propertyName);
     }
 
     public Object callObjectMethod(Object jsObject, String methodName, Object... args)
         throws ScriptException, NoSuchMethodException {
         Invocable invocable = (Invocable) scriptEngine;
-        return checkArrayObject(invocable.invokeMethod(jsObject, methodName, args));
+        return invocable.invokeMethod(jsObject, methodName, args);
     }
 }

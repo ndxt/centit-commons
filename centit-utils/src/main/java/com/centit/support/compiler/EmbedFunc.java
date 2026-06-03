@@ -3,6 +3,7 @@ package com.centit.support.compiler;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.*;
+import com.centit.support.common.DateTimeSpan;
 import com.centit.support.common.LeftRightPair;
 import com.centit.support.image.CaptchaImageUtil;
 import com.centit.support.json.JSONOpt;
@@ -83,8 +84,8 @@ public abstract class EmbedFunc {
         new FunctionInfo("formatdate", 1, ConstDefine.FUNC_FORMAT_DATE, ConstDefine.TYPE_STR),// 格式化日期
         new FunctionInfo("dateinfo", -1, ConstDefine.FUNC_DATE_INFO, ConstDefine.TYPE_STR),// 日期信息
         new FunctionInfo("dayspan", -1, ConstDefine.FUNC_DAY_SPAN, ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
-        new FunctionInfo("datespan", -1, ConstDefine.FUNC_DATE_SPAN, ConstDefine.TYPE_NUM),//日期函数  求两日期之间的天数
-        new FunctionInfo("adddate", 2, ConstDefine.FUNC_ADD_DATE, ConstDefine.TYPE_ANY),//日期函数  加天数
+        new FunctionInfo("timespan", -1, ConstDefine.FUNC_TIME_SPAN, ConstDefine.TYPE_NUM),//日期函数 返回 DateTimeSpan
+        new FunctionInfo("addtime", 2, ConstDefine.FUNC_ADD_TIME, ConstDefine.TYPE_ANY),//日期函数  加时间，可以是浮点数 或者 DateTimeSpan
         new FunctionInfo("adddays", 2, ConstDefine.FUNC_ADD_DAYS, ConstDefine.TYPE_ANY),//日期函数  加天数
         new FunctionInfo("addmonths", 2, ConstDefine.FUNC_ADD_MONTHS, ConstDefine.TYPE_ANY),//日期函数  加月数
         new FunctionInfo("addyears", 2, ConstDefine.FUNC_ADD_YEARS, ConstDefine.TYPE_ANY),//日期函数   加年数
@@ -812,21 +813,26 @@ public abstract class EmbedFunc {
                     return null;
                 return DatetimeOpt.calcSpanDays(dt, dt2);
             }
-            case ConstDefine.FUNC_DATE_SPAN: {//
-                if (nOpSum < 2) return null;
+
+            case ConstDefine.FUNC_TIME_SPAN: {//
+                if (nOpSum == 0) return null;
+                if (nOpSum == 1) {
+                    return DateTimeSpan.from(slOperand.get(0));
+                }
                 Date dt = DatetimeOpt.castObjectToDate(slOperand.get(0));
                 Date dt2 = DatetimeOpt.castObjectToDate(slOperand.get(1));
                 if (dt == null || dt2 == null)
                     return null;
-                return DatetimeOpt.calcDateSpan(dt, dt2);
+                return new DateTimeSpan(dt, dt2);
             }
-            case ConstDefine.FUNC_ADD_DATE: {//
+
+            case ConstDefine.FUNC_ADD_TIME: {//
                 LeftRightPair<Date, Object> dateOpt = fetchDateOpt(nOpSum, slOperand);
                 if (dateOpt.getLeft() == null || dateOpt.getRight() == null)
                     return null;
-                return DatetimeOpt.addDays(dateOpt.getLeft(),
-                    NumberBaseOpt.castObjectToFloat(dateOpt.getRight()));
+                return DatetimeOpt.addTimeSpan(dateOpt.getLeft(), dateOpt.getRight());
             }
+
             case ConstDefine.FUNC_ADD_DAYS: {//
                 LeftRightPair<Date, Object> dateOpt = fetchDateOpt(nOpSum, slOperand);
                 if (dateOpt.getLeft() == null || dateOpt.getRight() == null)

@@ -1,35 +1,31 @@
 package com.centit.search.service.Impl;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOptions;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Highlight;
+import co.elastic.clients.elasticsearch.core.search.HighlightField;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.json.JsonData;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.search.annotation.ESField;
 import com.centit.search.document.DocumentUtils;
-import com.centit.search.service.ESServerConfig;
+import com.centit.search.service.ElasticsearchClientFactory;
 import com.centit.search.service.Searcher;
 import com.centit.support.algorithm.CollectionsOpt;
+import com.centit.support.algorithm.DatetimeOpt;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.ObjectException;
 import com.centit.support.compiler.Lexer;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.pool2.impl.GenericObjectPool;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.text.Text;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.elasticsearch.search.sort.SortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,73 +38,41 @@ import java.util.*;
 public class ESSearcher implements Searcher{
 
     public static final String SELF_ORDER_BY = "ORDER_BY";
-
     public static final String SELF_ORDER_BY2 = "orderBy";
-    /**
-     * 用户自定义排序字段 ， 放到 filterDesc 中
-     */
     public static final String TABLE_SORT_FIELD = "sort";
-    /**
-     * 用户自定义排序字段的排序顺序 ， 放到 filterDesc 中
-     */
     public static final String TABLE_SORT_ORDER = "order";
 
     private static final Logger logger = LoggerFactory.getLogger(ESSearcher.class);
 
-    private ESServerConfig config;
+    private ElasticsearchClient client;
 
-    private GenericObjectPool<RestHighLevelClient> clientPool;
+    @Getter
     private String indexName;
+    @Setter
     private String[] highlightPreTags;
+    @Setter
     private String[] highlightPostTags;
 
-    private List<String> allFields;
+    private final List<String> allFields;
     private Map<String, Float> queryFields;
-    private Set<String> highlightFields;
+    private final Set<String> highlightFields;
+    private final Set<String> dateFields; // 存储日期类型字段
 
-    public Map<String, Float> getQueryFields() {
-        return queryFields;
-    }
-
-    public String getIndexName() {
-        return indexName;
-    }
-
-    public ESSearcher(){
+    public ESSearcher(ElasticsearchClient client){
         this.highlightFields = new HashSet<>();
         this.highlightPreTags = new String[]{"<strong>"};
         this.highlightPostTags = new String[]{"</strong>"};
         this.allFields = new ArrayList<>();
+        this.dateFields = new HashSet<>();
+        this.client = client;
     }
 
-    public ESSearcher(ESServerConfig config, GenericObjectPool<RestHighLevelClient> clientPool){
-        this();
-        this.config = config;
-        this.clientPool = clientPool;
-    }
-
-    public RestHighLevelClient fetchClient() {
-        RestHighLevelClient client = null;
-        try {
-            client = clientPool.borrowObject();
-        } catch (Exception e) {
-            logger.error("获取ES客户端失败", e);
-        }
+    public ElasticsearchClient fetchClient() {
         return client;
     }
 
-    public void releaseClient(RestHighLevelClient client) {
-        if(client!=null) {
-            clientPool.returnObject(client);
-        }
-    }
-
-    public void setESServerConfig(ESServerConfig config){
-        this.config = config;
-    }
-
-    public void setClientPool(GenericObjectPool<RestHighLevelClient> clientPool) {
-        this.clientPool = clientPool;
+    public void releaseClient(){
+        ElasticsearchClientFactory.closeClient(client);
     }
 
     public void initTypeFields(Class<?> objType) {
@@ -117,27 +81,28 @@ public class ESSearcher implements Searcher{
             initTypeFields(indexName, objType);
         }
     }
-    // 定义索引的映射类型
+
     public void initTypeFields(String indexName ,Class<?> objType) {
         this.indexName =indexName;
-        Set<String> rf = new HashSet<>();
-        //rf.add("_type");//添加这个必须返回的保留字段
         Set<String> qf = new HashSet<>();
 
         Field[] objFields = objType.getDeclaredFields();
         for(Field field :objFields){
             if(field.isAnnotationPresent(ESField.class)){
-                ESField esType =
-                    field.getAnnotation(ESField.class);
+                ESField esType = field.getAnnotation(ESField.class);
                 if(esType.query()){
                     qf.add(field.getName());
                 }
                 if(esType.highlight()){
                     highlightFields.add(field.getName());
                 }
+                // 记录日期类型字段
+                if("date".equals(esType.type())){
+                    dateFields.add(field.getName());
+                }
                 allFields.add(field.getName());
             }
-        }//end of for
+        }
 
         queryFields = new HashMap<>();
         for(String f :qf){
@@ -145,126 +110,118 @@ public class ESSearcher implements Searcher{
         }
     }
 
-    public Pair<Long, List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
+    public Pair<Long, List<Map<String, Object>>> esSearch(Query query, List<SortOptions> sortOptions,
                                                          String[] includes, String[] excludes,
                                                          int pageNo, int pageSize){
-        RestHighLevelClient client = null;
-        long totalHits =0;
+        long totalHits = 0;
         try {
-            client = clientPool.borrowObject();
-            List<Map<String, Object>> retList = new ArrayList<>(pageSize+5);
-            /*IndicesExistsResponse indicesExistsResponse = client.admin().indices()
-                    .exists(new IndicesExistsRequest(config.getIndexName()))
-                    .actionGet();
-            if (!indicesExistsResponse.isExists()){
-                json.put("error","索引不存在");
-                retList.add(json);
-                return retList;
-            }*/
-            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(queryBuilder);
-            //添加默认根据匹配度排序 .order(SortOrder.DESC)
-            searchSourceBuilder.sort(SortBuilders.scoreSort());
-            if(sortBuilders != null && !sortBuilders.isEmpty()) {
-                searchSourceBuilder.sort(sortBuilders);
-            }
-            if(pageSize>0) {
-                searchSourceBuilder.explain(true)
-                    .from((pageNo > 1) ? (pageNo - 1) * pageSize : 0)
+            List<Map<String, Object>> retList = new ArrayList<>(pageSize + 5);
+
+            SearchRequest.Builder searchBuilder = new SearchRequest.Builder()
+                .index(indexName)
+                .query(query);
+
+            // 添加分页
+            if(pageSize > 0) {
+                searchBuilder.from((pageNo > 1) ? (pageNo - 1) * pageSize : 0)
                     .size(pageSize);
             }
 
-            if(!highlightFields.isEmpty()) {
-                HighlightBuilder highlightBuilder = new HighlightBuilder();
-                for (String hf : highlightFields) {
-                    highlightBuilder.field(hf);
-                }
-                highlightBuilder.preTags(this.highlightPreTags).postTags(this.highlightPostTags)
-                    .fragmentSize(Searcher.SEARCH_FRAGMENT_SIZE).numOfFragments(Searcher.SEARCH_FRAGMENT_NUM);
-                searchSourceBuilder.highlighter(highlightBuilder);
+            // 添加排序
+            if(sortOptions != null && !sortOptions.isEmpty()) {
+                searchBuilder.sort(sortOptions);
             }
 
-            if(includes!=null || excludes!=null)
-                searchSourceBuilder.fetchSource(includes, excludes);
+            // 添加高亮
+            if(!highlightFields.isEmpty()) {
+                Map<String, HighlightField> highlightFieldMap = new HashMap<>();
+                for (String hf : highlightFields) {
+                    highlightFieldMap.put(hf, HighlightField.of(h -> h
+                        .fragmentSize(Searcher.SEARCH_FRAGMENT_SIZE)
+                        .numberOfFragments(Searcher.SEARCH_FRAGMENT_NUM)));
+                }
 
-            SearchRequest searchRequest = new SearchRequest(indexName)
-                .source(searchSourceBuilder);
-            SearchResponse actionGet = client.search(searchRequest,RequestOptions.DEFAULT);
-            SearchHits hits = actionGet.getHits();
-            //totalHits = hits.getTotalHits();
-            if (hits != null) {
-                totalHits = hits.getTotalHits().value;
-                //System.out.println("查询到记录数=" + hits.getTotalHits());
-                /*if (StringUtils.isNotBlank(hit.getSourceAsString())) {
-                    json = JSONObject.parseObject(hit.getSourceAsString());
-                }*/
-                SearchHit[] hitsRes = hits.getHits();
-                if (hitsRes != null) {
-                    for (SearchHit hit : hitsRes) {
-                        Map<String, Object> json = hit.getSourceAsMap();
-                        if (json == null) {
-                            json = new HashMap<>(4);
-                        }
-                        /*for (Map.Entry<String, DocumentField> field : hit.getFields().entrySet()){
-                            List<Object> objValues = field.getValue().getValues();
-                            if(objValues!=null && objValues.size()>0) {
-                                if (objValues.size() == 1) {
-                                    json.put(field.getKey(), objValues.get(0));
-                                } else {
-                                    json.put(field.getKey(), objValues);
+                Highlight highlight = Highlight.of(h -> h
+                    .fields(highlightFieldMap)
+                    .preTags(Arrays.asList(this.highlightPreTags))
+                    .postTags(Arrays.asList(this.highlightPostTags)));
+
+                searchBuilder.highlight(highlight);
+            }
+
+            // 添加字段过滤
+            if(includes != null || excludes != null) {
+                searchBuilder.source(s -> s
+                    .filter(f -> f
+                        .includes(includes != null ? Arrays.asList(includes) : Collections.emptyList())
+                        .excludes(excludes != null ? Arrays.asList(excludes) : Collections.emptyList())));
+            }
+
+            SearchResponse<JsonData> response = client.search(searchBuilder.build(), JsonData.class);
+
+            if (response.hits() != null && response.hits().total() != null) {
+                totalHits = response.hits().total().value();
+
+                for (Hit<JsonData> hit : response.hits().hits()) {
+                    Map<String, Object> json;
+                    if (hit.source() != null) {
+                        // 将 JsonData 转换为 JSON 字符串，然后使用 fastjson 解析
+                        // 这样可以保持日期字段的原始格式（ISO 8601字符串），而不是转换为 long
+                        String jsonStr = hit.source().toJson().toString();
+                        json = JSONObject.parseObject(jsonStr);
+                        // 将日期类型字段从 long 转换为日期字符串
+                        if (!dateFields.isEmpty()) {
+                            for (String dateFieldName : dateFields) {
+                                Object value = json.get(dateFieldName);
+                                if (value instanceof Number) {
+                                    long timestamp = ((Number) value).longValue();
+                                    // 转换为 ISO 8601 格式的日期字符串
+                                    json.put(dateFieldName,
+                                        DatetimeOpt.convertDateToString(new Date(timestamp), "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
                                 }
                             }
-                        }*/
-                        //Highlight
-                        if (hit.getHighlightFields() != null) {
-                            StringBuilder content = new StringBuilder("");
-                            for (Map.Entry<String, HighlightField> highlight : hit.getHighlightFields().entrySet()) {
-                                HighlightField highlightField = highlight.getValue();
-//                        content.append(highlight.getKey()).append(":");
-                                if (highlightField != null) {
-                                    for (Text t : highlightField.fragments()) {
-                                        content.append(t.string()/*.replace("\n", "")*/);
-                                    }
-                                }
-                                content.append("\n");
-                            }
-                            json.put("highlight", content);
                         }
-                        json.put("_score", hit.getScore());
-                        //hit.type()
-                        String hitType = hit.getType();
-                        if (hitType != null) {//获取返回对象的类型
-                            json.put("_type", hitType);
-                        }
-                        retList.add(json);
+                    } else {
+                        json = new HashMap<>();
                     }
+                    // 添加高亮信息
+                    if (hit.highlight() != null && !hit.highlight().isEmpty()) {
+                        StringBuilder content = new StringBuilder();
+                        for (Map.Entry<String, List<String>> highlight : hit.highlight().entrySet()) {
+                            for (String fragment : highlight.getValue()) {
+                                content.append(fragment);
+                            }
+                            content.append("\n");
+                        }
+                        json.put("highlight", content.toString());
+                    }
+
+                    json.put("_score", hit.score());
+                    json.put("_id", hit.id());
+                    retList.add(json);
                 }
             }
             return new ImmutablePair<>(totalHits, retList);
         } catch (Exception e) {
             throw new ObjectException(ObjectException.UNKNOWN_EXCEPTION,
-                "查询ES失败:"+e.getMessage(), e);
-        }finally {
-            if(client!=null) {
-                clientPool.returnObject(client);
-            }
+                "查询ES失败:" + e.getMessage(), e);
         }
     }
 
-    public Pair<Long, List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, int pageNo, int pageSize) {
-        return esSearch(queryBuilder, null,  null,null,  pageNo, pageSize);
+    public Pair<Long, List<Map<String, Object>>> esSearch(Query query, int pageNo, int pageSize) {
+        return esSearch(query, null, null, null, pageNo, pageSize);
     }
 
-    public Pair<Long, List<Map<String, Object>>> esSearch(QueryBuilder queryBuilder, List<SortBuilder<?>> sortBuilders,
+    public Pair<Long, List<Map<String, Object>>> esSearch(Query query, List<SortOptions> sortOptions,
                                                          int pageNo, int pageSize) {
-        return esSearch(queryBuilder, sortBuilders,  null,null,  pageNo, pageSize);
+        return esSearch(query, sortOptions, null, null, pageNo, pageSize);
     }
 
-    public static List<SortBuilder<?>> mapSortBuilder(Map<String, Object> filterMap) {
-        if(filterMap==null || filterMap.isEmpty()){
+    public static List<SortOptions> mapSortBuilder(Map<String, Object> filterMap) {
+        if(filterMap == null || filterMap.isEmpty()){
             return null;
         }
-        List<SortBuilder<?>> sortBuilders = new ArrayList<>();
+        List<SortOptions> sortOptions = new ArrayList<>();
         String selfOrderBy = StringBaseOpt.objectToString(filterMap.get(SELF_ORDER_BY));
         if(StringUtils.isBlank(selfOrderBy)){
             selfOrderBy = StringBaseOpt.objectToString(filterMap.get(SELF_ORDER_BY2));
@@ -274,12 +231,9 @@ public class ESSearcher implements Searcher{
             String aWord = lexer.getAWord();
             while (StringUtils.isNotBlank(aWord)) {
                 String field = aWord;
-                SortOrder sortOrder = SortOrder.ASC;
                 aWord = lexer.getAWord();
-                if("desc".equalsIgnoreCase(aWord)){
-                    sortOrder = SortOrder.DESC;
-                }
-                sortBuilders.add(SortBuilders.fieldSort(field).order(sortOrder));
+                final SortOrder sortOrder = "desc".equalsIgnoreCase(aWord)?  SortOrder.Desc : SortOrder.Asc;
+                sortOptions.add(SortOptions.of(s -> s.field(f -> f.field(field).order(sortOrder))));
                 while(StringUtils.equalsAnyIgnoreCase(aWord, "desc", "asc", ",")){
                     aWord = lexer.getAWord();
                 }
@@ -288,16 +242,11 @@ public class ESSearcher implements Searcher{
 
         String sortField = StringBaseOpt.objectToString(filterMap.get(TABLE_SORT_FIELD));
         if (StringUtils.isNotBlank(sortField)) {
-            SortBuilder sortBuilder;
             String sOrder = StringBaseOpt.objectToString(filterMap.get(TABLE_SORT_ORDER));
-            if ("desc".equalsIgnoreCase(sOrder)) {
-                sortBuilder = SortBuilders.fieldSort(sortField).order(SortOrder.DESC);
-            } else {
-                sortBuilder = SortBuilders.fieldSort(sortField).order(SortOrder.ASC);
-            }
-            sortBuilders.add(sortBuilder);
+            SortOrder sortOrder = "desc".equalsIgnoreCase(sOrder) ? SortOrder.Desc : SortOrder.Asc;
+            sortOptions.add(SortOptions.of(s -> s.field(f -> f.field(sortField).order(sortOrder))));
         }
-        return sortBuilders;
+        return sortOptions;
     }
 
     public static String buildWildcardQuery(String sMatch) {
@@ -324,19 +273,77 @@ public class ESSearcher implements Searcher{
         return sRes.toString();
     }
 
-    /**
-     * 检索所有文档
-     * @param fieldFilter 过滤的文件
-     * @param queryWord 检索的关键字
-     * @param pageNo 当前页
-     * @param pageSize 每页多少条
-     * @return 返回的list结果集
-     */
+    public static void makeFilterCondition(String field, Object filterValue, BoolQuery.Builder boolQueryBuilder){
+        String fieldSuffix = "_UN";
+        if(StringUtils.endsWithAny(field, "_gt", "_ge", "_lt", "_le", "_in", "_ni", "_eq", "_ne", "_lk")) {
+            fieldSuffix = field.substring(field.length() - 3).toLowerCase();
+            field = field.substring(0,field.length() - 3);
+        }
+
+        final String finalField = field;
+        switch (fieldSuffix) {
+            case "_gt":
+                boolQueryBuilder.must(q -> q.range(r -> r.field(finalField).gt(JsonData.of(filterValue))));
+                break;
+            case "_ge":
+                boolQueryBuilder.must(q -> q.range(r -> r.field(finalField).gte(JsonData.of(filterValue))));
+                break;
+            case "_lt":
+                boolQueryBuilder.must(q -> q.range(r -> r.field(finalField).lt(JsonData.of(filterValue))));
+                break;
+            case "_le":
+                boolQueryBuilder.must(q -> q.range(r -> r.field(finalField).lte(JsonData.of(filterValue))));
+                break;
+            case "_ne":
+                if (filterValue == null || "null".equals(String.valueOf(filterValue)) || StringUtils.isBlank(String.valueOf(filterValue))) {
+                    boolQueryBuilder.must(q -> q.exists(e -> e.field(finalField)));
+                } else {
+                    boolQueryBuilder.mustNot(q -> q.term(t -> t.field(finalField).value(String.valueOf(filterValue))));
+                }
+                break;
+            case "_ni":
+                if (filterValue == null || "null".equals(String.valueOf(filterValue)) || StringUtils.isBlank(String.valueOf(filterValue))) {
+                    boolQueryBuilder.must(q -> q.exists(e -> e.field(finalField)));
+                } else {
+                    String[] values = StringBaseOpt.objectToStringArray(filterValue);
+                    List<FieldValue> valueList = new ArrayList<>();
+                    for (String value : values) {
+                        valueList.add(FieldValue.of(value));
+                    }
+                    boolQueryBuilder.mustNot(q -> q.terms(t -> t.field(finalField).terms(f -> f.value(valueList))));
+                }
+                break;
+            case "_lk":{ // like 模糊查询
+                String value = StringBaseOpt.objectToString(filterValue);
+                // 使用通配符查询，支持 * 和 ? 通配符
+                boolQueryBuilder.must(q -> q.wildcard(w -> w.field(finalField).value(value)));
+                break;
+            }
+            case "_in":
+            default: // _eq
+                if (filterValue == null || "null".equals(String.valueOf(filterValue)) || StringUtils.isBlank(String.valueOf(filterValue))) {
+                    boolQueryBuilder.mustNot(q -> q.exists(e -> e.field(finalField)));
+                } else {
+                    String[] values = StringBaseOpt.objectToStringArray(filterValue);
+                    if (values.length > 1) {
+                        List<FieldValue> valueList = new ArrayList<>();
+                        for (String value : values) {
+                            valueList.add(FieldValue.of(value));
+                        }
+                        boolQueryBuilder.must(q -> q.terms(t -> t.field(finalField).terms(f -> f.value(valueList))));
+                    } else if (values.length == 1) {
+                        boolQueryBuilder.must(q -> q.term(t -> t.field(finalField).value(values[0])));
+                    }
+                }
+        }
+    }
+
     @Override
     public Pair<Long, List<Map<String, Object>>> search(Map<String, Object> fieldFilter,
                                                        String queryWord, int pageNo, int pageSize){
-        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
-        if(fieldFilter!=null) {
+        BoolQuery.Builder boolBuilder = new BoolQuery.Builder();
+
+        if(fieldFilter != null) {
             for (Map.Entry<String, Object> ent : fieldFilter.entrySet()) {
                 boolean isField = false;
                 for(String fieldName : allFields) {
@@ -346,69 +353,28 @@ public class ESSearcher implements Searcher{
                     }
                 }
                 if(!isField) continue;
-                if (ent.getValue().getClass().isArray()) {
-                    queryBuilder.must(QueryBuilders.termsQuery(ent.getKey(), (String[]) ent.getValue()));
-                } else if (ent.getValue() instanceof Collection) {
-                    queryBuilder.must(QueryBuilders.termsQuery(
-                        ent.getKey(), CollectionsOpt.listToArray((Collection)ent.getValue())));
-                } else {
-                    String key = ent.getKey();
-                    int keyLen = key.length();
-                    String optSuffix = keyLen>3 ? key.substring(keyLen - 3).toLowerCase() : "_eq";
-                    switch (optSuffix) {
-                        case "_gt":
-                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).gt(ent.getValue()));
-                            break;
-                        case "_ge":
-                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).gte(ent.getValue()));
-                            break;
-                        case "_lt":
-                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).lt(ent.getValue()));
-                            break;
-                        case "_le":
-                            queryBuilder.must(QueryBuilders.rangeQuery(key.substring(0,keyLen-3)).lte(ent.getValue()));
-                            break;
-                        case "_lk":
-                            queryBuilder.must(QueryBuilders.wildcardQuery(key.substring(0,keyLen-3),
-                                buildWildcardQuery(StringBaseOpt.castObjectToString(ent.getValue()))));
-                            break;
-                        default:
-                            queryBuilder.must(QueryBuilders.termQuery(ent.getKey(), ent.getValue()));
-                            break;
-                    }
-                }
+                ESSearcher.makeFilterCondition(ent.getKey(), ent.getValue(), boolBuilder);
             }
         }
+
         if (StringUtils.isNotBlank(queryWord)) {
-            //queryBuilder.filter(QueryBuilders.multiMatchQuery(
-            //               queryWord, queryFields));
-            queryBuilder.filter(QueryBuilders.queryStringQuery(
-                queryWord).fields(queryFields));
+            QueryStringQuery.Builder queryStringBuilder = new QueryStringQuery.Builder()
+                .query(queryWord);
+            for (Map.Entry<String, Float> entry : queryFields.entrySet()) {
+                queryStringBuilder.fields(entry.getKey());//, entry.getValue()
+            }
+            boolBuilder.filter(queryStringBuilder.build()._toQuery());
         }
 
-        return esSearch(queryBuilder, mapSortBuilder(fieldFilter), pageNo, pageSize);
+        Query query = boolBuilder.build()._toQuery();
+        return esSearch(query, mapSortBuilder(fieldFilter), pageNo, pageSize);
     }
 
-    /**
-     * 检索所有文档
-     * @param queryWord 检索的关键字
-     * @param pageNo 当前页
-     * @param pageSize 每页多少条
-     * @return 返回的list结果集
-     */
     @Override
     public Pair<Long, List<Map<String, Object>>> search(String queryWord, int pageNo, int pageSize) {
         return search(null, queryWord, pageNo, pageSize);
     }
 
-    /**
-     * 检索某一个系统
-     * @param optId 所属业务id
-     * @param queryWord 检索的关键字
-     * @param pageNo 当前页
-     * @param pageSize 每页多少条
-     * @return 返回的list结果集
-     */
     @Override
     public Pair<Long, List<Map<String, Object>>> searchOpt(String optId,
                                                           String queryWord, int pageNo, int pageSize) {
@@ -416,14 +382,6 @@ public class ESSearcher implements Searcher{
             queryWord, pageNo, pageSize);
     }
 
-    /**
-     * 根据文档所属 人员来检索
-     * @param owner 所属人员
-     * @param queryWord 检索的关键字
-     * @param pageNo 当前页
-     * @param pageSize 每页多少条
-     * @return 返回list结果集
-     */
     @Override
     public Pair<Long, List<Map<String, Object>>> searchOwner(String owner,
                                                             String queryWord, int pageNo, int pageSize) {
@@ -431,15 +389,6 @@ public class ESSearcher implements Searcher{
             queryWord, pageNo, pageSize);
     }
 
-    /**
-     * 根据文档所属 人员 业务来检索
-     * @param owner 所属人员
-     * @param optId 所属业务id
-     * @param queryWord 检索的关键字
-     * @param pageNo 当前页
-     * @param pageSize 每页多少条
-     * @return 返回list结果集
-     */
     @Override
     public Pair<Long, List<Map<String, Object>>> searchOwner(String owner, String optId,
                                                             String queryWord, int pageNo, int pageSize){
@@ -447,14 +396,6 @@ public class ESSearcher implements Searcher{
             queryWord, pageNo, pageSize);
     }
 
-    /**
-     * 根据文档所属机构来检索
-     * @param units 文档所属机构
-     * @param queryWord 检索的关键字
-     * @param pageNo 当前页
-     * @param pageSize 每页多少条
-     * @return 返回list结果集
-     */
     @Override
     public Pair<Long, List<Map<String, Object>>> searchUnits(String[] units,
                                                             String queryWord, int pageNo, int pageSize) {
@@ -462,15 +403,6 @@ public class ESSearcher implements Searcher{
             queryWord, pageNo, pageSize);
     }
 
-    /**
-     * 根据文档所属机构 业务 关键字 来检索
-     * @param units 文档所属机构
-     * @param optId 所属业务id
-     * @param queryWord 检索的关键字
-     * @param pageNo 当前页
-     * @param pageSize 每页多少条
-     * @return 返回list结果集
-     */
     @Override
     public Pair<Long, List<Map<String, Object>>> searchUnits(String[] units,
                                                             String optId, String queryWord, int pageNo, int pageSize) {
@@ -478,42 +410,26 @@ public class ESSearcher implements Searcher{
             queryWord, pageNo, pageSize);
     }
 
-    public ESSearcher setHighlightPreTags(String[] highlightPreTags) {
-        this.highlightPreTags = highlightPreTags;
-        return this;
-    }
-
-    public ESSearcher setHighlightPostTags(String[] highlightPostTags) {
-        this.highlightPostTags = highlightPostTags;
-        return this;
-    }
-
     @Override
     public JSONObject getDocumentById(String idFieldName, String docId) {
-        RestHighLevelClient restHighLevelClient = null;
         try {
-            SearchRequest searchRequest = new SearchRequest(indexName);
-            SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-            TermQueryBuilder termQuery = QueryBuilders.termQuery(idFieldName, docId);
-            searchSourceBuilder.query(termQuery);
-            searchRequest.source(searchSourceBuilder);
-            restHighLevelClient = clientPool.borrowObject();
-            SearchResponse searchResponse = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHit[] hits = searchResponse.getHits().getHits();
-            if(hits.length > 0) {
-                String sourceAsString = hits[0].getSourceAsString();
-                return JSONObject.parseObject(sourceAsString);
-            } else {
-                return null;
+            TermQuery termQuery = TermQuery.of(t -> t.field(idFieldName).value(docId));
+            SearchRequest searchRequest = SearchRequest.of(s -> s
+                .index(indexName)
+                .query(termQuery._toQuery()));
+
+            SearchResponse<JsonData> response = client.search(searchRequest, JsonData.class);
+
+            if(!response.hits().hits().isEmpty()) {
+                Hit<JsonData> hit = response.hits().hits().get(0);
+                if (hit.source() != null) {
+                    return JSONObject.parseObject(hit.source().toJson().toString());
+                }
             }
+            return null;
         } catch (Exception e) {
             logger.error("查询异常,异常信息：" + e.getMessage());
             return null;
-        } finally {
-            if (restHighLevelClient != null) {
-                clientPool.returnObject(restHighLevelClient);
-            }
         }
     }
-
 }

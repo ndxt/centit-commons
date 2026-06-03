@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-commons</artifactId>
         <groupId>com.centit.support</groupId>
-       <version>5.5-SNAPSHOT</version>
+        <version>JDK21-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>centit-report-utils</artifactId>
@@ -19,18 +19,11 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.jxls</groupId>
-            <artifactId>jxls-poi</artifactId>
-            <version>2.12.1</version>
-        </dependency>
-
         <!-- word(docx)的格式报表 同时可以转换pdf -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
@@ -52,6 +45,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jxls</groupId>
+            <artifactId>jxls-poi</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.xdocreport.document.docx</artifactId>
         </dependency>
@@ -59,7 +57,6 @@
         <dependency>
             <groupId>org.knowm.xchart</groupId>
             <artifactId>xchart</artifactId>
-            <version>3.8.8</version>
         </dependency>
 
     </dependencies>

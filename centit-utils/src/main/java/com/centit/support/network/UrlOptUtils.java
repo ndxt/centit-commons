@@ -13,12 +13,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +33,7 @@ public abstract class UrlOptUtils {
     /*private static final String ALLOWED_CHARS =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.!~*'()";*/
 
-    public static final String getUrlParamter(String szUrl) {
+    public static String getUrlParameter(String szUrl) {
         String sQuery;
         try {
             java.net.URL url = new java.net.URL(szUrl);
@@ -54,7 +54,7 @@ public abstract class UrlOptUtils {
         return sQuery;
     }
 
-    public static final Map<String, String> splitUrlParamter(
+    public static Map<String, String> splitUrlParamter(
         String szUrlParameter) {
         Map<String, String> params = new HashMap<>();
         int bpos = 0;
@@ -66,21 +66,11 @@ public abstract class UrlOptUtils {
             int n2 = szUrlParameter.indexOf('&', n + 1);
             if (n2 < 0) {
                 String value = szUrlParameter.substring(n + 1);
-                try {
-                    value = URLDecoder.decode(value, "utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
-                }
-                params.put(name, value);
+                params.put(name, URLDecoder.decode(value, StandardCharsets.UTF_8));
                 break;
             } else {
                 String value = szUrlParameter.substring(n + 1, n2);
-                try {
-                    value = URLDecoder.decode(value, "utf-8");
-                } catch (UnsupportedEncodingException e) {
-                    logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
-                }
-                params.put(name, value);
+                params.put(name, URLDecoder.decode(value, StandardCharsets.UTF_8));
                 bpos = n2 + 1;
             }
         }
@@ -142,21 +132,13 @@ public abstract class UrlOptUtils {
     public static String urlDecode(String urlParam){
         if(StringUtils.isBlank(urlParam))
             return urlParam;
-        try {
-            return URLDecoder.decode(urlParam, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return urlParam;
-        }
+        return URLDecoder.decode(urlParam, StandardCharsets.UTF_8);
     }
 
     public static String urlEncode(String urlParam){
         if(StringUtils.isBlank(urlParam))
             return urlParam;
-        try {
-            return URLEncoder.encode(urlParam,"UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return urlParam;
-        }
+        return URLEncoder.encode(urlParam, StandardCharsets.UTF_8);
     }
 
     public static String appendParamToUrl(String uri, String paramName, Object paramValue) {
@@ -190,10 +172,10 @@ public abstract class UrlOptUtils {
         int nLen = 0;
         while (nLen < urlLength) {
             md5Hex = Md5Encoder.encodeBase64(md5Hex + longUrl, true);
-            int md5Len = md5Hex.length();
-            int copylen = md5Len < urlLength - nLen ? md5Len : urlLength - nLen;
-            sbBuilder.append(md5Hex, 0, copylen);
-            nLen += copylen;
+            int md5Len = md5Hex == null ? 0 : md5Hex.length();
+            int copyLen = md5Len < urlLength - nLen ? md5Len : urlLength - nLen;
+            sbBuilder.append(md5Hex, 0, copyLen);
+            nLen += copyLen;
             if (nLen == urlLength) {
                 break;
             }
@@ -248,10 +230,9 @@ public abstract class UrlOptUtils {
             } else {
                 return null;
             }
-        } else if (objValue instanceof Collection) {
+        } else if (objValue instanceof Collection<?> valueList ) {
             StringBuilder sb = new StringBuilder();
             int vc = 0;
-            Collection<?> valueList = (Collection<?>) objValue;
             for (Object ov : valueList) {
                 if (ov != null) {
                     String objStr = objectToUrlString(ov);

@@ -3,7 +3,9 @@ package com.centit.support.common;
 import com.centit.support.algorithm.ReflectionOpt;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serial;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -17,8 +19,8 @@ import java.util.Map;
  * @see java.beans.Introspector
  */
 public class JavaBeanMetaData {
-    private Class<?> javaType;
-    private Map<String, JavaBeanField> fileds;
+    private final Class<?> javaType;
+    private final Map<String, JavaBeanField> fileds;
 
     private JavaBeanMetaData(Class<?> javaType) {
         this.javaType = javaType;
@@ -34,7 +36,8 @@ public class JavaBeanMetaData {
         JavaBeanMetaData metaData = new JavaBeanMetaData(javaType);
         Field[] objFields = javaType.getDeclaredFields();
         for (Field field : objFields) {
-            metaData.getFileds().put(field.getName(), new JavaBeanField(field));
+            if(field.isAnnotationPresent(Serial.class)) continue;
+            metaData.getFields().put(field.getName(), new JavaBeanField(field));
         }
 
         if (getType == 1 || getType == 3) {
@@ -49,7 +52,7 @@ public class JavaBeanMetaData {
                         javaField.setGetFieldValueFunc(md);
                         javaField.setFieldType(md.getReturnType());
 
-                        metaData.getFileds().put(fieldName, javaField);
+                        metaData.getFields().put(fieldName, javaField);
                     } else {
                         if (javaField.isAssignableFrom(md.getReturnType())) {
                             javaField.setGetFieldValueFunc(md);
@@ -72,7 +75,7 @@ public class JavaBeanMetaData {
                         javaField.setSetFieldValueFunc(md);
                         javaField.setFieldType(md.getParameterTypes()[0]);
 
-                        metaData.getFileds().put(fieldName, javaField);
+                        metaData.getFields().put(fieldName, javaField);
                     } else {
                         if (javaField.isAssignableFrom(md.getParameterTypes()[0])) {
                             javaField.setSetFieldValueFunc(md);
@@ -88,12 +91,14 @@ public class JavaBeanMetaData {
         return createBeanMetaDataFromType(javaType, 3);
     }
 
-    public Object createBeanObject() throws IllegalAccessException, InstantiationException {
-        return javaType.newInstance();
+    public Object createBeanObject() throws
+        NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return javaType.getDeclaredConstructor().newInstance();
     }
 
-    public Object createBeanObjectFromMap(Map<String, Object> properties) throws IllegalAccessException, InstantiationException {
-        Object object = javaType.newInstance();
+    public Object createBeanObjectFromMap(Map<String, Object> properties) throws
+        NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Object object = createBeanObject() ;
         for (Map.Entry<String, Object> pro : properties.entrySet()) {
             setObjectFieldValue(object, pro.getKey(), pro.getValue());
         }
@@ -118,7 +123,7 @@ public class JavaBeanMetaData {
         return javaType;
     }
 
-    public Map<String, JavaBeanField> getFileds() {
+    public Map<String, JavaBeanField> getFields() {
         return fileds;
     }
 

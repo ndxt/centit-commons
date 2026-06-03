@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * DOCX混合转换器
@@ -84,13 +85,27 @@ public class DocxHybridConverter {
             // 按文档原始顺序遍历所有元素
             for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
 
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
+                if (element instanceof XWPFParagraph paragraph) {
                     // 处理段落（标题、正文等）
-                    XWPFParagraph paragraph = (XWPFParagraph) element;
-
-                    // 跳过空段落（原文中的空行不需要转换）
+                    // 跳过真正的空段落（没有任何内容的段落）
                     String text = paragraph.getText();
                     if (text == null || text.trim().isEmpty()) {
+                        // 检查段落是否有间距设置，如果有则添加空行
+                        double spacingBetween = paragraph.getSpacingBetween();
+                        double spacingBefore = paragraph.getSpacingBefore();
+                        double spacingAfter = paragraph.getSpacingAfter();
+
+                        // 只有当段落有明确的间距设置时，才添加空行
+                        if (spacingBetween > 0 || spacingBefore > 0 || spacingAfter > 0) {
+                            com.itextpdf.text.Paragraph emptyPara = new com.itextpdf.text.Paragraph(" ");
+                            if (spacingBefore > 0) {
+                                emptyPara.setSpacingBefore((float) spacingBefore);
+                            }
+                            if (spacingAfter > 0) {
+                                emptyPara.setSpacingAfter((float) spacingAfter);
+                            }
+                            pdf.add(emptyPara);
+                        }
                         continue;
                     }
 
@@ -120,16 +135,22 @@ public class DocxHybridConverter {
                     List<org.apache.poi.xwpf.usermodel.XWPFRun> runs = paragraph.getRuns();
 
                     if (runs == null || runs.isEmpty()) {
+                        // 如果没有 run，添加空行保持间距
                         // 有文本但没有 run：使用默认字体添加文本
                         com.itextpdf.text.Font defaultFontStyle = new com.itextpdf.text.Font(defaultFont, fontSize, com.itextpdf.text.Font.NORMAL);
                         pdfPara.add(new com.itextpdf.text.Chunk(text.trim(), defaultFontStyle));
                     } else {
                         // 遍历每个 run，保留各自的样式
                         for (org.apache.poi.xwpf.usermodel.XWPFRun run : runs) {
+                            String runText = run.getText(0);
+                            if (runText == null || runText.isEmpty()) {
+                                continue;
+                            }
+
                             // 提取 run 的样式
-                            int runFontSize = fontSize; // 继承段落默认字号
-                            if (run.getFontSize() > 0) {
-                                runFontSize = run.getFontSize();
+                            double runFontSize = fontSize; // 继承段落默认字号
+                            if (run.getFontSizeAsDouble() > 0) {
+                                runFontSize = run.getFontSizeAsDouble();
                             }
 
                             // 检测字体样式
@@ -145,34 +166,38 @@ public class DocxHybridConverter {
                             String runFontFamily = run.getFontFamily();
                             com.itextpdf.text.pdf.BaseFont runBaseFont = defaultFont;
                             if (runFontFamily != null && !runFontFamily.isEmpty()) {
-                                runBaseFont = createChineseFont(fontMap, runFontFamily);
-                                if (runBaseFont == null) {
-                                    runBaseFont = defaultFont;
-                                }
+                                runBaseFont = Objects.requireNonNullElse(
+                                    createChineseFont(fontMap, runFontFamily), defaultFont);
                             }
 
                             // 创建字体
-                            com.itextpdf.text.Font runFont = new com.itextpdf.text.Font(runBaseFont, runFontSize, fontStyle);
+                            com.itextpdf.text.Font runFont = new com.itextpdf.text.Font(runBaseFont, (float) runFontSize, fontStyle);
 
                             // 设置字体颜色
                             String colorStr = run.getColor();
                             if (colorStr != null && !colorStr.isEmpty()) {
                                 try {
-                                    int rgb = Integer.parseInt(colorStr, 16);
-                                    int r = (rgb >> 16) & 0xFF;
-                                    int g = (rgb >> 8) & 0xFF;
-                                    int b = rgb & 0xFF;
-                                    runFont.setColor(r, g, b);
+                                    if (colorStr.startsWith("#")) {
+                                        colorStr = colorStr.substring(1);
+                                    }
+                                    if (!"auto".equalsIgnoreCase(colorStr)) {
+                                        int rgb = Integer.parseInt(colorStr, 16);
+                                        int r = (rgb >> 16) & 0xFF;
+                                        int g = (rgb >> 8) & 0xFF;
+                                        int b = rgb & 0xFF;
+                                        runFont.setColor(r, g, b);
+                                    }
                                 } catch (NumberFormatException e) {
                                     // 忽略颜色解析错误
                                 }
                             }
 
-                            // 通过反射获取下划线、删除线、上下标等属性
-                            boolean hasUnderline = false;
-                            boolean hasStrikeThrough = run.isStrikeThrough();
-                            String vertAlignStr = null;
+                            // 创建 Chunk 并添加到段落
+                            com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
+
+                            // 处理下划线 - 需要更严格的检查
                             try {
+                                // 通过反射获取底层XML属性来准确判断是否有下划线
                                 java.lang.reflect.Method getCTRMethod = run.getClass().getMethod("getCTR");
                                 Object ctr = getCTRMethod.invoke(run);
                                 if (ctr != null) {
@@ -181,107 +206,51 @@ public class DocxHybridConverter {
                                     if (rpr != null) {
                                         java.lang.reflect.Method getUMethod = rpr.getClass().getMethod("getU");
                                         Object u = getUMethod.invoke(rpr);
+                                        // 只有当u不为null且val不为NONE时才添加下划线
                                         if (u != null) {
                                             java.lang.reflect.Method getValMethod = u.getClass().getMethod("getVal");
                                             Object val = getValMethod.invoke(u);
                                             if (val != null && !val.toString().contains("NONE")) {
-                                                hasUnderline = true;
+                                                chunk.setUnderline(0.5f, -2f);
                                             }
                                         }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                // 忽略下划线处理错误
+                            }
+
+                            // 处理删除线
+                            if (run.isStrikeThrough()) {
+                                chunk.setUnderline(0.5f, 3f); // 使用上划线模拟删除线
+                            }
+
+                            // 处理上标/下标
+                            try {
+                                // 通过反射获取垂直对齐信息
+                                java.lang.reflect.Method getCTRMethod = run.getClass().getMethod("getCTR");
+                                Object ctr = getCTRMethod.invoke(run);
+                                if (ctr != null) {
+                                    java.lang.reflect.Method getRPrMethod = ctr.getClass().getMethod("getRPr");
+                                    Object rpr = getRPrMethod.invoke(ctr);
+                                    if (rpr != null) {
                                         java.lang.reflect.Method getVertAlignMethod = rpr.getClass().getMethod("getVertAlign");
                                         Object vertAlign = getVertAlignMethod.invoke(rpr);
                                         if (vertAlign != null) {
-                                            vertAlignStr = vertAlign.toString();
+                                            String vertAlignStr = vertAlign.toString();
+                                            if (vertAlignStr.contains("SUPERSCRIPT")) {
+                                                chunk.setTextRise(6f); // 上标
+                                            } else if (vertAlignStr.contains("SUBSCRIPT")) {
+                                                chunk.setTextRise(-3f); // 下标
+                                            }
                                         }
                                     }
                                 }
                             } catch (Exception e) {
-                                // 忽略属性解析错误
+                                // 忽略上标/下标处理错误
                             }
 
-                            // 遍历 run 的 XML 子节点，按原始顺序处理文本和换行符
-                            try {
-                                org.w3c.dom.Node runNode = run.getCTR().getDomNode();
-                                org.w3c.dom.NodeList children = runNode.getChildNodes();
-                                boolean hasContent = false;
-
-                                for (int i = 0; i < children.getLength(); i++) {
-                                    org.w3c.dom.Node child = children.item(i);
-                                    if (child.getNodeType() != org.w3c.dom.Node.ELEMENT_NODE) {
-                                        continue;
-                                    }
-                                    String localName = child.getLocalName();
-                                    if ("t".equals(localName) || "delText".equals(localName)) {
-                                        // 文本节点
-                                        String runText = child.getTextContent();
-                                        if (runText == null || runText.isEmpty()) {
-                                            continue;
-                                        }
-                                        hasContent = true;
-                                        com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
-                                        if (hasUnderline) {
-                                            chunk.setUnderline(0.5f, -2f);
-                                        }
-                                        if (hasStrikeThrough) {
-                                            chunk.setUnderline(0.5f, 3f);
-                                        }
-                                        if (vertAlignStr != null) {
-                                            if (vertAlignStr.contains("SUPERSCRIPT")) {
-                                                chunk.setTextRise(6f);
-                                            } else if (vertAlignStr.contains("SUBSCRIPT")) {
-                                                chunk.setTextRise(-3f);
-                                            }
-                                        }
-                                        pdfPara.add(chunk);
-                                    } else if ("br".equals(localName)) {
-                                        // 行内换行符
-                                        hasContent = true;
-                                        pdfPara.add(new com.itextpdf.text.Chunk("\n", runFont));
-                                    }
-                                }
-
-                                if (!hasContent) {
-                                    // 回退：使用 getText(0) 获取文本
-                                    String runText = run.getText(0);
-                                    if (runText != null && !runText.isEmpty()) {
-                                        com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
-                                        if (hasUnderline) {
-                                            chunk.setUnderline(0.5f, -2f);
-                                        }
-                                        if (hasStrikeThrough) {
-                                            chunk.setUnderline(0.5f, 3f);
-                                        }
-                                        if (vertAlignStr != null) {
-                                            if (vertAlignStr.contains("SUPERSCRIPT")) {
-                                                chunk.setTextRise(6f);
-                                            } else if (vertAlignStr.contains("SUBSCRIPT")) {
-                                                chunk.setTextRise(-3f);
-                                            }
-                                        }
-                                        pdfPara.add(chunk);
-                                    }
-                                }
-                            } catch (Exception e) {
-                                // 回退：使用 getText(0) 获取文本
-                                String runText = run.getText(0);
-                                if (runText != null && !runText.isEmpty()) {
-                                    com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
-                                    if (hasUnderline) {
-                                        chunk.setUnderline(0.5f, -2f);
-                                    }
-                                    if (hasStrikeThrough) {
-                                        chunk.setUnderline(0.5f, 3f);
-                                    }
-                                    if (vertAlignStr != null) {
-                                        if (vertAlignStr.contains("SUPERSCRIPT")) {
-                                            chunk.setTextRise(6f);
-                                        } else if (vertAlignStr.contains("SUBSCRIPT")) {
-                                            chunk.setTextRise(-3f);
-                                        }
-                                    }
-                                    pdfPara.add(chunk);
-                                }
-                            }
+                            pdfPara.add(chunk);
                         }
                     }
 
@@ -296,11 +265,14 @@ public class DocxHybridConverter {
 
                     pdf.add(pdfPara);
 
-                } else if (element instanceof XWPFTable) {
+                } else if (element instanceof XWPFTable table) {
                     // 处理表格
-                    XWPFTable table = (XWPFTable) element;
-
                     logger.debug("检测到表格元素");
+                    // 添加空行分隔
+                    com.itextpdf.text.Paragraph spacer = new com.itextpdf.text.Paragraph(" ");
+                    spacer.setSpacingBefore(10f);
+                    spacer.setSpacingAfter(10f);
+                    pdf.add(spacer);
 
                     // 使用我们的工具类转换表格
                     com.itextpdf.text.pdf.PdfPTable pdfTable =
@@ -309,6 +281,12 @@ public class DocxHybridConverter {
                     if (pdfTable != null) {
                         logger.debug("表格转换成功，添加到PDF");
                         pdf.add(pdfTable);
+
+                        // 表格后也添加空行
+                        com.itextpdf.text.Paragraph afterSpacer = new com.itextpdf.text.Paragraph(" ");
+                        afterSpacer.setSpacingBefore(10f);
+                        afterSpacer.setSpacingAfter(10f);
+                        pdf.add(afterSpacer);
                     } else {
                         logger.warn("表格转换失败，返回null");
                     }
@@ -410,21 +388,31 @@ public class DocxHybridConverter {
             int spacingBefore = paragraph.getSpacingBefore();
             if (spacingBefore > 0) {
                 pdfPara.setSpacingBefore(spacingBefore / 20f);
+            } else {
+                pdfPara.setSpacingBefore(5f); // 默认值
             }
 
             // 获取段后间距
             int spacingAfter = paragraph.getSpacingAfter();
             if (spacingAfter > 0) {
                 pdfPara.setSpacingAfter(spacingAfter / 20f);
+            } else {
+                pdfPara.setSpacingAfter(5f); // 默认值
             }
 
             // 获取行间距（返回 double 类型）
             double lineSpacing = paragraph.getSpacingBetween();
             if (lineSpacing > 0) {
                 pdfPara.setLeading((float)(lineSpacing * 1.5)); // 1.5倍行距
+            } else {
+                pdfPara.setLeading(18f); // 默认行距
             }
         } catch (Exception e) {
             logger.debug("应用段落间距失败: {}", e.getMessage());
+            // 使用默认值
+            pdfPara.setSpacingBefore(5f);
+            pdfPara.setSpacingAfter(5f);
+            pdfPara.setLeading(18f);
         }
     }
 

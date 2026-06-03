@@ -17,14 +17,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 
-public abstract class PdfSignatureUtil {
-    private static final Logger logger = LogManager.getLogger(PdfSignatureUtil.class);
+public abstract class SignatureUtil {
+    private static final Logger logger = LogManager.getLogger(SignatureUtil.class);
 
     public static SignatureInfo createSingInfo(){
         return new SignatureInfo();
     }
 
-    public static boolean sign(InputStream srcStream, OutputStream targetStream, SignatureInfo signatureInfo) {
+    public static boolean signPdf(InputStream srcStream, OutputStream targetStream, SignatureInfo signatureInfo) {
         try{
             ByteArrayOutputStream tempArrayOutputStream = new ByteArrayOutputStream();
             PdfReader reader = new PdfReader(srcStream);
@@ -68,10 +68,10 @@ public abstract class PdfSignatureUtil {
         }
     }
 
-    public static boolean sign(String src, String target, SignatureInfo signatureInfo) {
+    public static boolean signPdf(String src, String target, SignatureInfo signatureInfo) {
         try(InputStream srcStream = Files.newInputStream(Paths.get(src));
             OutputStream targetStream = Files.newOutputStream(Paths.get(target))) {
-            return sign(srcStream, targetStream, signatureInfo);
+            return signPdf(srcStream, targetStream, signatureInfo);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             return false;
