@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * DOCX混合转换器
@@ -163,7 +164,7 @@ public class DocxHybridConverter {
                             String runFontFamily = run.getFontFamily();
                             com.itextpdf.text.pdf.BaseFont runBaseFont = defaultFont;
                             if (runFontFamily != null && !runFontFamily.isEmpty()) {
-                                runBaseFont = java.util.Objects.requireNonNullElse(
+                                runBaseFont = Objects.requireNonNullElse(
                                     createChineseFont(fontMap, runFontFamily), defaultFont);
                             }
 

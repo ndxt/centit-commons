@@ -528,7 +528,7 @@ public class WordTableToPdfUtils {
     }
 
 
-    /**
+    /*
      * 获取文档中的所有表格
      */
     public static List<Table> getAllTables(HWPFDocument doc) {
@@ -546,7 +546,7 @@ public class WordTableToPdfUtils {
         return tables;
     }
 
-    /**
+    /*
      * 获取文档中的所有文本段落（不包括表格内的文本）
      */
     public static List<org.apache.poi.hwpf.usermodel.Paragraph> getTextParagraphs(HWPFDocument doc) {
@@ -568,7 +568,7 @@ public class WordTableToPdfUtils {
         return paragraphs;
     }
 
-    /**
+    /*
      * 判断段落是否在任何表格中
      */
     private static boolean isParagraphInAnyTable(org.apache.poi.hwpf.usermodel.Paragraph paragraph, List<Table> tables) {
