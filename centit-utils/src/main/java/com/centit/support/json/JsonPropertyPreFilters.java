@@ -14,13 +14,19 @@ import java.util.*;
  * 可以同时过滤多个对象的多个属性
  */
 @SuppressWarnings("unused")
-public class JsonExcludeFieldsFilters implements PropertyPreFilter {
+public class JsonPropertyPreFilters implements PropertyPreFilter {
 
-    private final Map<Class<?>, Set<String>> excludes = new HashMap<>();
+    private Set<Class<?>> clazzs;
+    private Map<Class<?>, Set<String>> excludes = new HashMap<Class<?>, Set<String>>();
 
 
+    public JsonPropertyPreFilters(Class<?>[] clazzs) {
+        super();
+        this.clazzs = new HashSet<>();
+        this.clazzs.addAll(Arrays.asList(clazzs));
+    }
 
-    public JsonExcludeFieldsFilters() {
+    public JsonPropertyPreFilters() {
     }
 
     @Override
@@ -29,7 +35,7 @@ public class JsonExcludeFieldsFilters implements PropertyPreFilter {
             return true;
         }
 
-        for (Class<?> clazz : excludes.keySet()) {
+        for (Class<?> clazz : clazzs) {
             if (clazz.isInstance(object)) {
                 if (this.excludes.get(clazz).contains(name)) {
                     return false;
@@ -40,19 +46,13 @@ public class JsonExcludeFieldsFilters implements PropertyPreFilter {
         return true;
     }
 
-    public void addExclude(Class<?> clazz, String ... excludeFields) {
+    public void addExclude(Class<?> clazz, String exclude) {
         if (this.excludes.get(clazz) == null) {
             Set<String> fields = new HashSet<>();
             this.excludes.put(clazz, fields);
         }
 
         Set<String> fields = this.excludes.get(clazz);
-        fields.addAll(Arrays.asList(excludeFields));
-    }
-
-    public static JsonExcludeFieldsFilters create(Class<?> clazz, String ... excludeFields) {
-        JsonExcludeFieldsFilters filters = new JsonExcludeFieldsFilters();
-        filters.addExclude(clazz, excludeFields);
-        return filters;
+        fields.add(exclude);
     }
 }

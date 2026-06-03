@@ -187,7 +187,7 @@ public abstract class ObjectTextExtractor {
         }
 
         JavaBeanMetaData metadata = JavaBeanMetaData.createBeanMetaDataFromType(objClazz, 1);
-        Map<String, JavaBeanField> fileds = metadata.getFields();
+        Map<String, JavaBeanField> fileds = metadata.getFileds();
         String[] excludeFields = content.getExcludeFields(objClazz);
         if(excludeFields!=null){
             for(String skey : excludeFields){

@@ -1,8 +1,8 @@
 package com.centit.search.test;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONWriter;
-import com.centit.search.service.ElasticConfig;
+import com.centit.search.document.FileDocument;
+import com.centit.search.service.ESServerConfig;
 import com.centit.search.service.Impl.ESSearcher;
 import com.centit.search.service.IndexerSearcherFactory;
 import org.apache.commons.lang3.tuple.Pair;
@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-public class TestOperationLog {
+public class TestSearchFiles {
 
-    private static final Logger logger = LogManager.getLogger(TestOperationLog.class);
+    private static final Logger logger = LogManager.getLogger(TestSearchFiles.class);
     public static Properties loadProperties() {
         Properties prop = new Properties();
         try(InputStream resource = DocumentSearchTest
@@ -38,14 +38,14 @@ public class TestOperationLog {
         return prop;
     }
     public static ESSearcher createSearch(){
-        ElasticConfig elasticConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
+        ESServerConfig esServerConfig = IndexerSearcherFactory.loadESServerConfigFormProperties(
             loadProperties() );
-        return IndexerSearcherFactory.obtainSearcher(elasticConfig, OperationLog.class);
+        return IndexerSearcherFactory.obtainSearcher(esServerConfig, FileDocument.class);
     }
 
     public static void main(String[] args)  throws IOException {
         ESSearcher searcher = createSearch();
-        Pair<Long, List<Map<String, Object>>>  p = searcher.searchOwner("U0000000","地图", 1, 10);
-        System.out.println(JSON.toJSONString(p.getRight(), JSONWriter.Feature.PrettyFormat));
+        Pair<Long, List<Map<String, Object>>>  p = searcher.search("\"数字化平台\"", 1, 10);
+        System.out.println(JSON.toJSONString(p.getLeft()));
     }
 }

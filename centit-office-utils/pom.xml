@@ -5,7 +5,7 @@
     <parent>
         <artifactId>centit-commons</artifactId>
         <groupId>com.centit.support</groupId>
-        <version>JDK21-SNAPSHOT</version>
+       <version>5.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>centit-office-utils</artifactId>
@@ -19,8 +19,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-scratchpad</artifactId>
+            <groupId>com.centit.support</groupId>
+            <artifactId>centit-utils</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -29,27 +30,16 @@
         </dependency>
 
         <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.converter.docx.xwpf</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.centit.support</groupId>
-            <artifactId>centit-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
         </dependency>
 
-         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
         </dependency>
 
-        <!--com.lowagie itext 4.2.1 相当有 itextpdf的5.5.6，同时
+        <!--com.lowagie itext 4.2.1 相当于 itextpdf的5.5.6，同时
          它将覆盖 com.lowagie 2.1.7 -->
         <dependency>
             <groupId>com.itextpdf</groupId>
@@ -59,12 +49,13 @@
         <dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>itext-asian</artifactId>
+            <version>5.2.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.ofdrw</groupId>
             <artifactId>ofdrw-converter</artifactId>
-            <version>2.3.9</version>
+            <version>2.3.6</version>
             <exclusions>
                 <exclusion>
                     <artifactId>bcpkix-jdk15on</artifactId>
@@ -77,21 +68,43 @@
             </exclusions>
         </dependency>
 
-        <!-- 显式声明 fontbox 版本，确保与 pdfbox 3.0.6 兼容 -->
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j-JAXB-Internal</artifactId>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j-export-fo</artifactId>
+            <version>8.2.3</version>
+        </dependency>-->
+
+        <!--<dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j</artifactId>
+            <version>6.1.2</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>fr.opensagres.xdocreport.converter.docx.xwpf</artifactId>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>fr.opensagres.xdocreport</groupId>
+            <artifactId>org.apache.poi.xwpf.converter.xhtml</artifactId>
+            <version>1.0.6</version>
+        </dependency>-->
+
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>fontbox</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.docx4j</groupId>
-            <artifactId>docx4j-JAXB-Internal</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.pdfbox</groupId>-->
+<!--            <artifactId>fontbox</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>junit</groupId>

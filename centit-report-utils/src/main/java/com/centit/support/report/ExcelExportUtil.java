@@ -356,7 +356,7 @@ public abstract class ExcelExportUtil {
 
         Row headerRow = sheet.createRow(0);
         CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
-        List<String> header = new ArrayList<>(metaData.getFields().keySet());
+        List<String> header = new ArrayList<>(metaData.getFileds().keySet());
         int i = 0;
         for (String headStr : header) {
             Cell cell = headerRow.createCell(i);
@@ -583,7 +583,7 @@ public abstract class ExcelExportUtil {
 
         return cellStyle;
     }
-    private static void createNewRowsForSaveData(Sheet sheet, int beginRow, int nRowCount){
+    public static void createNewRowsForSaveData(Sheet sheet, int beginRow, int nRowCount){
         Row excelRow = sheet.getRow(beginRow);
         if(excelRow==null){
             for(int i=0; i<nRowCount; i++ ){
@@ -636,8 +636,8 @@ public abstract class ExcelExportUtil {
 
         return mergeCols;
     }
-    private static void mergeColCell(Sheet sheet, String mergeColCellDesc, int beginRow, int endRow){
-        Set<Integer> mergeCols  = praiseColsRangeDesc(mergeColCellDesc);
+    private static void mergeColCell(Sheet sheet, String mergeColCell, int beginRow, int endRow){
+        Set<Integer> mergeCols  = praiseColsRangeDesc(mergeColCell);
         if(mergeCols==null || mergeCols.isEmpty()) return;
         for(int i : mergeCols){
             String preCellText = "";// ExcelImportUtil.getCellString( )
@@ -666,7 +666,7 @@ public abstract class ExcelExportUtil {
                     preBeginRow = j;
                 }
             }
-            if(endRow-1 > preBeginRow) {
+            if(endRow-1 >preBeginRow) {
                 sheet.addMergedRegion(new CellRangeAddress(preBeginRow, endRow-1, i, i));
                 Cell newCell = ExcelImportUtil.getCell(sheet, preBeginRow, i);
                 // Excel单元格内容最大长度为32767字符
@@ -698,7 +698,7 @@ public abstract class ExcelExportUtil {
         }
     }
     public static void saveObjectsToExcelSheet(Sheet sheet, List<?> objects, Map<Integer, String> fieldDesc, int beginRow,
-                                               boolean createRow, String mergeColCellDesc) {
+                                               boolean createRow, String mergeColCell) {
         int nRowCount = objects.size();
         //CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
         if(createRow)
@@ -719,10 +719,10 @@ public abstract class ExcelExportUtil {
             }
         }
         //mergeColCell;
-        mergeColCell(sheet, mergeColCellDesc, beginRow, beginRow+nRowCount);
+        mergeColCell(sheet, mergeColCell, beginRow, beginRow+nRowCount);
     }
 
-    public static void saveObjectsToExcelSheet(Sheet sheet, List<Object[]> objects, int beginCol, int beginRow, boolean createRow, String mergeColCellDesc) {
+    public static void saveObjectsToExcelSheet(Sheet sheet, List<Object[]> objects, int beginCol, int beginRow, boolean createRow, String mergeColCell) {
         int nRowCount = objects.size();
         //CellStyle cellStyle = getDefaultCellStyle(sheet.getWorkbook());
         if(createRow)
@@ -747,7 +747,7 @@ public abstract class ExcelExportUtil {
                 }
             }
         }
-        mergeColCell(sheet, mergeColCellDesc, beginRow, beginRow + nRowCount);
+        mergeColCell(sheet, mergeColCell, beginRow, beginRow + nRowCount);
     }
 
     /**
@@ -982,6 +982,7 @@ public abstract class ExcelExportUtil {
             if(toRow==null){
                 toRow = sheet.createRow(toRowIndex + i);
             }
+            toRow.setHeight(fromRow.getHeight());
             for (int colIndex = 0; colIndex < (colNum != null ? colNum : fromRow.getLastCellNum()+1); colIndex++) {
                 Cell tmpCell = fromRow.getCell(colIndex);
                 if (tmpCell == null) {

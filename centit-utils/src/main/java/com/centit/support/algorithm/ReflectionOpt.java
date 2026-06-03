@@ -386,7 +386,7 @@ public abstract class ReflectionOpt {
         }
     }
 
-    public static LeftRightPair<String, String> splitLabel(String labelStr){
+    private static LeftRightPair<String, String> splitLabel(String labelStr){
         int bPos = 0;
         int len = labelStr.length();
         while(bPos < len && (labelStr.charAt(bPos) == ' ' || labelStr.charAt(bPos) == '.')){

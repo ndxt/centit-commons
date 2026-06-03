@@ -1,21 +1,19 @@
 package com.centit.support.network;
 
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
-import org.apache.hc.core5.http.HttpHost;
+import org.apache.http.HttpHost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.protocol.HttpContext;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpExecutorContext {
     private CloseableHttpClient httpclient;
-    private HttpClientContext httpContext;
+    private HttpContext httpContext;
     private Map<String, String> httpHeaders;
     private Map<String, String> httpCookies;
     private HttpHost httpProxy;
     private int timeout;
-    private boolean storeCookie;
-    private boolean useSSL;
 
     public HttpExecutorContext() {
         httpHeaders = null;
@@ -23,8 +21,6 @@ public class HttpExecutorContext {
         httpContext = null;
         httpclient = null;
         httpProxy = null;
-        useSSL = false;
-        storeCookie = false;
         timeout=-1;
     }
 
@@ -47,7 +43,7 @@ public class HttpExecutorContext {
         return this;
     }
 
-    public HttpExecutorContext context(HttpClientContext httpContext) {
+    public HttpExecutorContext context(HttpContext httpContext) {
         this.httpContext = httpContext;
         return this;
     }
@@ -82,38 +78,19 @@ public class HttpExecutorContext {
         httpCookies.put(name, value);
         return this;
     }
-    public HttpExecutorContext enableSSL(boolean useSSL){
-        this.useSSL=useSSL;
-        return  this;
-    }
-
-    public HttpExecutorContext enableCookie(boolean storeCookie){
-        this.storeCookie = storeCookie;
-        return  this;
-    }
-
-    public HttpExecutorContext timeout(int timeout){
+    public HttpExecutorContext timout(int timeout){
         this.timeout=timeout;
         return  this;
     }
-
     public int getTimeout(){
         return this.timeout;
-    }
-
-    public boolean isUseSSL(){
-        return this.useSSL;
-    }
-
-    public boolean isStoreCookie(){
-        return this.storeCookie;
     }
 
     public CloseableHttpClient getHttpclient() {
         return httpclient;
     }
 
-    public HttpClientContext getHttpContext() {
+    public HttpContext getHttpContext() {
         return httpContext;
     }
 

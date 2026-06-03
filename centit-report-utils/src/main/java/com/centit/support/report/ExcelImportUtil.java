@@ -94,12 +94,19 @@ public abstract class ExcelImportUtil {
     }
 
     public static String mapIndexColumn(int ind) {
-        StringBuilder sb = new StringBuilder();
-        for (int n = ind + 1; n > 0; n /= 26) {
-            n--;
-            sb.append((char) ('A' + n % 26));
+        int index = ind + 1;
+        String column="";
+        while(index>0){
+            int i = index % 26;
+            if(i==0){
+                column = 'Z' + column;
+                index = index / 26 -1;
+            }else {
+                column = (char) (64 + i) + column;
+                index = index / 26;
+            }
         }
-        return sb.reverse().toString();
+        return column;
     }
 
     public static Map<Integer, String> mapColumnIndex(Map<String, String> fieldDesc) {
@@ -904,7 +911,7 @@ public abstract class ExcelImportUtil {
      */
 
     private static List<Map<String, Object>> loadMapFromExcelSheet(Sheet sheet, int headerRow, int beginRow, int endRow,
-                                                                   int beginColumn, int endColumn, boolean useUpMergeCell) {
+                                                                   int beginColumn, int endColumn, boolean userUpMergeCell) {
         if (beginColumn < 0) {
             beginColumn = 0;
         }
@@ -926,9 +933,9 @@ public abstract class ExcelImportUtil {
             }
         }
 
-        List<CellRangeAddress> cellRanges = useUpMergeCell? sheet.getMergedRegions():null;
+        List<CellRangeAddress> cellRanges = userUpMergeCell? sheet.getMergedRegions():null;
 
-        if(useUpMergeCell && existNoHeader){
+        if(userUpMergeCell && existNoHeader){
             for(int i=headerRow-1; i>=0;  i--) {
                 headRow = sheet.getRow(i);
                 existNoHeader = false;
@@ -973,7 +980,7 @@ public abstract class ExcelImportUtil {
                     String key = column <= endColumn ? header.get(column-beginColumn) : "column" + column;
                     hasValue = true;
                     rowData.put(key, cellValue);
-                } else if(useUpMergeCell && preRowData!=null && isMergedRegion(cellRanges, row,  column )) {
+                } else if(userUpMergeCell && preRowData!=null && isMergedRegion(cellRanges, row,  column )) {
                     String key = column <= endColumn ? header.get(column - beginColumn) : "column" + column;
                     rowData.put(key, preRowData.get(key));
                 }
@@ -1242,23 +1249,23 @@ public abstract class ExcelImportUtil {
         Sheet sheet = loadExcelFileSheet(excelFile, sheetName);
         return loadMapFromExcelSheet(sheet, headerRow, beginRow, endRow, beginColumn, endColumn, true);
     }
-    public static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(InputStream excelFile, String sheetName, int beginRow, int endRow, boolean useUpMergeCell)
+    public static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(InputStream excelFile, String sheetName, int beginRow, int endRow, boolean userUpMergeCell)
         throws IOException{
         Sheet sheet = loadExcelFileSheet(excelFile, sheetName);
-        return loadMapFromExcelSheetUseIndexAsKey(sheet, beginRow, endRow, useUpMergeCell);
+        return loadMapFromExcelSheetUseIndexAsKey(sheet, beginRow, endRow, userUpMergeCell);
     }
 
-    public static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(InputStream excelFile, int sheetIndex, int beginRow, int endRow, boolean useUpMergeCell) throws IOException{
+    public static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(InputStream excelFile, int sheetIndex, int beginRow, int endRow, boolean userUpMergeCell) throws IOException{
         Sheet sheet = loadExcelFileSheet(excelFile, sheetIndex);
-        return loadMapFromExcelSheetUseIndexAsKey(sheet, beginRow, endRow, useUpMergeCell);
+        return loadMapFromExcelSheetUseIndexAsKey(sheet, beginRow, endRow, userUpMergeCell);
     }
 
-    private static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(Sheet sheet, int beginRow, int endRow, boolean useUpMergeCell) {
+    private static List<Map<String, Object>> loadMapFromExcelSheetUseIndexAsKey(Sheet sheet, int beginRow, int endRow, boolean userUpMergeCell) {
         if (sheet == null)
             return null;
 
         List<Map<String, Object>> datas = new ArrayList<>(endRow - beginRow + 1);
-        List<CellRangeAddress> cellRanges = useUpMergeCell? sheet.getMergedRegions():null;
+        List<CellRangeAddress> cellRanges = userUpMergeCell? sheet.getMergedRegions():null;
         Map<String, Object> preRowObj = null;
         for (int row = beginRow; row < endRow; row++) {
             Row excelRow = sheet.getRow(row);
@@ -1274,7 +1281,7 @@ public abstract class ExcelImportUtil {
                 if (cellValue != null) {
                     hasValue = true;
                     rowObj.put(columnIndex, cellValue);
-                } else if(useUpMergeCell && preRowObj!=null && isMergedRegion(cellRanges, row, i)) {
+                } else if(userUpMergeCell && preRowObj!=null && isMergedRegion(cellRanges, row, i)) {
                     // 判断是否在合并单元格中
                     rowObj.put(columnIndex, preRowObj.get(columnIndex));
                 }
@@ -1289,7 +1296,7 @@ public abstract class ExcelImportUtil {
     }
 
     private static List<Map<String, Object>> loadMapFromExcelSheet(Sheet sheet,
-                                      Map<Integer, String> fieldDesc, int beginRow, int endRow, boolean useUpMergeCell) {
+                                      Map<Integer, String> fieldDesc, int beginRow, int endRow, boolean userUpMergeCell) {
         if (sheet == null)
             return null;
         int columns = fieldDesc.size();
@@ -1297,7 +1304,7 @@ public abstract class ExcelImportUtil {
             endRow = sheet.getLastRowNum() + 1;
         }
         List<Map<String, Object>> datas = new ArrayList<>(endRow - beginRow + 1);
-        List<CellRangeAddress> cellRanges = useUpMergeCell? sheet.getMergedRegions():null;
+        List<CellRangeAddress> cellRanges = userUpMergeCell? sheet.getMergedRegions():null;
         Map<String, Object> preRowObj = null;
         for (int row = beginRow; row < endRow; row++) {
             Row excelRow = sheet.getRow(row);
@@ -1313,7 +1320,7 @@ public abstract class ExcelImportUtil {
                 if (cellValue != null) {
                     hasValue = true;
                     rowObj.put(ent.getValue(), cellValue);
-                } else if(useUpMergeCell && preRowObj!=null && isMergedRegion(cellRanges, row, ent.getKey() )) {
+                } else if(userUpMergeCell && preRowObj!=null && isMergedRegion(cellRanges, row, ent.getKey() )) {
                     // 判断是否在合并单元格中
                     rowObj.put(ent.getValue(), preRowObj.get(ent.getValue()));
                 }

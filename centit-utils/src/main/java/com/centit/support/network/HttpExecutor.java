@@ -6,40 +6,47 @@ import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.file.FileSystemOpt;
 import com.centit.support.json.JSONOpt;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.classic.methods.*;
-import org.apache.hc.client5.http.config.ConnectionConfig;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.cookie.BasicCookieStore;
-import org.apache.hc.client5.http.entity.EntityBuilder;
-import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
-import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
-import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
-import org.apache.hc.core5.http.*;
-import org.apache.hc.core5.http.io.HttpClientResponseHandler;
-import org.apache.hc.core5.http.io.SocketConfig;
-import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.apache.hc.core5.http.io.entity.InputStreamEntity;
-import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.hc.core5.http.message.BasicNameValuePair;
-import org.apache.hc.core5.ssl.SSLContexts;
-import org.apache.hc.core5.ssl.TrustStrategy;
-import org.apache.hc.core5.util.Timeout;
+import org.apache.http.*;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.*;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -51,7 +58,7 @@ import java.util.regex.Pattern;
 public abstract class HttpExecutor {
 
     public static final ContentType APPLICATION_FORM_URLENCODED = ContentType.create(
-        "application/x-www-form-urlencoded", StandardCharsets.UTF_8);
+        "application/x-www-form-urlencoded", Consts.UTF_8);
     public static final String BOUNDARY = "------1cC9oE7dN8eT1fI0aT2n4------";
     public static final String multiPartTypeHead =
         "multipart/form-data; charset=UTF-8; boundary=" + BOUNDARY;
@@ -70,58 +77,55 @@ public abstract class HttpExecutor {
             new BasicNameValuePair("boundary",BOUNDARY)
     })).toString();    */
     public static final String applicationJSONHead = ContentType.create(
-        "application/json", StandardCharsets.UTF_8).toString();
+        "application/json", Consts.UTF_8).toString();
     public static final String plainTextHead = ContentType.create(
-        "text/plain", StandardCharsets.UTF_8).toString();
+        "text/plain", Consts.UTF_8).toString();
     public static final String xmlTextHead = ContentType.create(
-        "text/xml", StandardCharsets.UTF_8).toString();
+        "text/xml", Consts.UTF_8).toString();
     public static final String applicationOctetStream = ContentType.create(
         "application/octet-stream", (Charset) null).toString();
     protected static final Logger logger = LoggerFactory.getLogger(HttpExecutor.class);
+    private static TrustManager manager = new X509TrustManager() {
+        @Override
+        public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+    };
 
     private HttpExecutor() {
         throw new IllegalAccessError("Utility class");
     }
 
-    public static CloseableHttpClient createHttpClient(HttpExecutorContext executorContext) {
+    public static CloseableHttpClient createHttpClient(HttpHost httpProxy, boolean keepSession, boolean useSSL)
+        throws NoSuchAlgorithmException, KeyManagementException {
         HttpClientBuilder clientBuilder = HttpClients.custom();
-        // 配置连接管理器和连接超时
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setDefaultSocketConfig(SocketConfig.custom()
-            .setSoTimeout(Timeout.ofMinutes(1))
-            .build());
-        // 设置连接超时时间
-        if(executorContext.getTimeout() > 0) {
-            connectionManager.setConnectionConfigResolver(route -> ConnectionConfig.custom()
-                .setConnectTimeout(Timeout.ofSeconds(executorContext.getTimeout()))
-                .build());
-        }
-        clientBuilder.setConnectionManager(connectionManager);
-        if (executorContext.isUseSSL()) {
-            // HttpClient5中为了兼容老版本的SSL信任所有证书功能
-            // 在生产环境中应该使用正确的SSL证书验证
-            try {
-                TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-                javax.net.ssl.SSLContext sslContext = SSLContexts.custom()
-                    .loadTrustMaterial(null, acceptingTrustStrategy)
+        if (useSSL) {
+            SSLContext context = SSLContext.getInstance("TLS");
+            context.init(null, new TrustManager[]{manager}, null);
+            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(context, NoopHostnameVerifier.INSTANCE);
+            //RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).build();
+            Registry<ConnectionSocketFactory> socketFactoryRegistry =
+                RegistryBuilder.<ConnectionSocketFactory>create()
+                    .register("http", PlainConnectionSocketFactory.INSTANCE)
+                    .register("https", socketFactory)
                     .build();
-                // 注意：HttpClient5推荐使用默认的SSL配置，如需自定义SSL请参考官方文档
-                logger.warn("使用宽松的SSL配置，不建议在生产环境使用");
-            } catch (Exception e) {
-                logger.error("SSL配置失败，使用默认配置", e);
-            }
+            PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+            clientBuilder.setConnectionManager(connectionManager);
         }
-        if (executorContext.isStoreCookie()){
-            BasicCookieStore cookieStore = new BasicCookieStore();
-            clientBuilder.setDefaultCookieStore(cookieStore);
-            if(executorContext.getHttpContext() == null) {
-                executorContext.context(HttpClientContext.create());
-            }
-            executorContext.getHttpContext().setCookieStore(cookieStore);
+        if (keepSession) {
+            RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).build();
+            clientBuilder.setDefaultRequestConfig(config);
         }
-        if (executorContext.getHttpProxy() != null)
-            clientBuilder.setProxy(executorContext.getHttpProxy());
-
+        if (httpProxy != null)
+            clientBuilder.setProxy(httpProxy);
         return clientBuilder.build();
     }
 
@@ -129,21 +133,41 @@ public abstract class HttpExecutor {
         return HttpClients.createDefault();
     }
 
-    public static void prepareHttpRequest(HttpExecutorContext executorContext,
-                                          HttpUriRequestBase httpRequest){
-        if(executorContext.getTimeout()>0) {
-            httpRequest.setConfig(RequestConfig.custom()
-                //.setConnectTimeout(Timeout.ofSeconds(60))
-                .setResponseTimeout(Timeout.ofSeconds(executorContext.getTimeout()))
-                .build());
-        }
+    public static CloseableHttpClient createHttpClient(HttpHost httpProxy) {
+        return HttpClients.custom().setProxy(httpProxy).build();
+    }
 
+    /*
+     * 设置cookie的保存策略为CookieSpecs.NETSCAPE，这样可以保持session
+     */
+    public static CloseableHttpClient createKeepSessionHttpClient() {
+        RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).build();
+        return HttpClients.custom().setDefaultRequestConfig(config).build();
+    }
+
+    public static CloseableHttpClient createKeepSessionHttpClient(HttpHost httpProxy) {
+        RequestConfig config = RequestConfig.custom().setCookieSpec(CookieSpecs.NETSCAPE).build();
+        return HttpClients.custom().setDefaultRequestConfig(config).setProxy(httpProxy).build();
+    }
+
+    public static CloseableHttpClient createHttpsClient()
+        throws NoSuchAlgorithmException, KeyManagementException {
+        return createHttpClient(null, false, true);
+    }
+
+    public static CloseableHttpClient createKeepSessionHttpsClient()
+        throws NoSuchAlgorithmException, KeyManagementException {
+        return createHttpClient(null, true, true);
+    }
+
+    public static void prepareHttpRequest(HttpExecutorContext executorContext,
+                                   HttpRequestBase httpRequest){
         if (executorContext.getHttpHeaders() != null) {
             for (Map.Entry<String, String> entHeader : executorContext.getHttpHeaders().entrySet())
                 httpRequest.setHeader(entHeader.getKey(), entHeader.getValue());
         }
 
-        if (executorContext.getHttpCookies() != null && !executorContext.getHttpCookies().isEmpty()) {
+        if (executorContext.getHttpCookies() != null && executorContext.getHttpCookies().size()>0) {
             StringBuilder cookieString = new StringBuilder();
             int i = 0;
             for (Map.Entry<String, String> entCookie : executorContext.getHttpCookies().entrySet()) {
@@ -155,24 +179,56 @@ public abstract class HttpExecutor {
             }
             httpRequest.setHeader("Cookie", cookieString.toString());
         }
-        // HttpClient5中超时和代理配置应该在HttpClientBuilder级别设置，
-        // 而不是在每个request上设置，因此移除了无效的per-request配置代码
+
+        /**
+         * 1.connectionRequestTimout(单位是ms)：指从连接池获取连接的timeout超出预设时间(
+         *
+         * 从连接池获取连接的超时时间，如果连接池里连接都被用了，且超过设定时间,就会报错connectionrequesttimeout，会抛出超时异常.
+         *
+         * 2.connetionTimeout(单位是ms)：指客户端和服务器建立连接的timeout.
+         *
+         * 就是http请求的三个阶段，一：建立连接；二：数据传送；三，断开连接。如果与服务器(这里指数据库)请求建立连接的时间超过ConnectionTimeOut，就会抛 ConnectionTimeOutException，即服务器连接超时，没有在规定的时间内建立连接。
+         *
+         * 3.socketTimeout(单位是ms)：指客户端从服务器读取数据的timeout超出预期设定时间，超出后会抛出SocketTimeOutException.
+         */
+        RequestConfig.Builder builder = RequestConfig.custom().setMaxRedirects(3);
+        if(executorContext.getHttpProxy() != null || executorContext.getTimeout() != -1) {
+            if (executorContext.getHttpProxy() != null) {
+                builder.setProxy(executorContext.getHttpProxy());
+            }
+            //设置超时时间
+            if(executorContext.getTimeout()>1000){
+                builder.setConnectionRequestTimeout(executorContext.getTimeout())
+                    .setConnectTimeout(executorContext.getTimeout())
+                    .setSocketTimeout(executorContext.getTimeout());
+            } else {
+                builder.setConnectionRequestTimeout(10000)
+                    .setConnectTimeout(10000)
+                    .setSocketTimeout(20000);
+            }
+            httpRequest.setConfig(builder.build());
+        }else {
+            httpRequest.setConfig(builder.build());
+        }
     }
     public static <T> T httpExecute(HttpExecutorContext executorContext,
-                                    HttpUriRequestBase httpRequest,
-                                    HttpClientResponseHandler<T> responseHandler)
+                                    HttpRequestBase httpRequest, ResponseHandler<T> responseHandler)
         throws IOException {
+
         prepareHttpRequest(executorContext, httpRequest);
-        CloseableHttpClient httpClient;
+
+        CloseableHttpClient httpClient = null;
         boolean createSelfClient = executorContext.getHttpclient() == null;
         if (createSelfClient) {
-            httpClient = HttpExecutor.createHttpClient(executorContext);
+            httpClient = executorContext.getHttpProxy() == null ?
+                HttpExecutor.createHttpClient() :
+                HttpExecutor.createHttpClient(executorContext.getHttpProxy());
         } else {
             httpClient = executorContext.getHttpclient();
         }
 
-        try {
-            return httpClient.execute(httpRequest, executorContext.getHttpContext(), responseHandler);
+        try (CloseableHttpResponse response = httpClient.execute(httpRequest, executorContext.getHttpContext())) {
+            return responseHandler.handleResponse(response);
         } finally {
             if (createSelfClient) {
                 httpClient.close();
@@ -181,9 +237,9 @@ public abstract class HttpExecutor {
     }
 
     public static String httpExecute(HttpExecutorContext executorContext,
-                                     HttpUriRequestBase httpRequest)
+                                     HttpRequestBase httpRequest)
         throws IOException {
-        return httpExecute(executorContext, httpRequest, StringResponseHandler.UTF8StringHandler);
+        return httpExecute(executorContext, httpRequest, Utf8ResponseHandler.INSTANCE);
     }
 
     public static String simpleGet(HttpExecutorContext executorContext, String uri, String queryParam)
@@ -232,7 +288,7 @@ public abstract class HttpExecutor {
 
         httpPut.setHeader("Content-Type", plainTextHead);
         if (putEntity != null) {
-            StringEntity entity = new StringEntity(putEntity, StandardCharsets.UTF_8);
+            StringEntity entity = new StringEntity(putEntity, Consts.UTF_8);
             httpPut.setEntity(entity);
         }
         return httpExecute(executorContext, httpPut);
@@ -248,7 +304,7 @@ public abstract class HttpExecutor {
 
 
         if (bytes != null) {
-            ByteArrayEntity entity = new ByteArrayEntity(bytes, ContentType.APPLICATION_OCTET_STREAM);
+            ByteArrayEntity entity = new ByteArrayEntity(bytes);
             httpPut.setEntity(entity);
         }
 
@@ -268,14 +324,14 @@ public abstract class HttpExecutor {
         httpPut.setHeader("Content-Type", applicationFormHead);
 
         if (putIS != null) {
-            InputStreamEntity entity = new InputStreamEntity(putIS, ContentType.APPLICATION_OCTET_STREAM);
+            InputStreamEntity entity = new InputStreamEntity(putIS);
             httpPut.setEntity(entity);
         }
 
         return httpExecute(executorContext, httpPut);
     }
 
-    public static List<NameValuePair> makeRequestParams(Object obj, String prefixName) {
+    public static List<NameValuePair> makeRequectParams(Object obj, String prefixName) {
         List<NameValuePair> params = new ArrayList<>();
         if (obj == null)
             return params;
@@ -288,7 +344,7 @@ public abstract class HttpExecutor {
             params.add((NameValuePair) obj);
             return params;
         } else if (obj instanceof Map) {
-            String sFN = StringUtils.isBlank(prefixName) ? "" : prefixName + ".";
+            String sFN = (prefixName == null || "".equals(prefixName)) ? "" : prefixName + ".";
             @SuppressWarnings("unchecked")
             Map<String, Object> objMap = (Map<String, Object>) obj;
             /*objMap.entrySet().forEach( f -> {if(f.getRight()!=null){
@@ -297,12 +353,13 @@ public abstract class HttpExecutor {
             }} );*/
             for (Map.Entry<String, Object> f : objMap.entrySet()) {
                 if (f.getValue() != null) {
-                    List<NameValuePair> subNP = makeRequestParams(f.getValue(), sFN + f.getKey());
+                    List<NameValuePair> subNP = makeRequectParams(f.getValue(), sFN + f.getKey());
                     params.addAll(subNP);
                 }
             }//end of for
             return params;
-        } else if (obj instanceof Collection<?> objList) {//end of map
+        } else if (obj instanceof Collection) {//end of map
+            Collection<?> objList = (Collection<?>) obj;
             if (objList.size() == 1) {
                 Object subObj = objList.iterator().next();
                 if (subObj != null) {
@@ -313,7 +370,7 @@ public abstract class HttpExecutor {
                         if (subObj instanceof NameValuePair) {
                             params.add((NameValuePair) subObj);
                         } else {
-                            List<NameValuePair> subNP = makeRequestParams(subObj, prefixName);
+                            List<NameValuePair> subNP = makeRequectParams(subObj, prefixName);
                             params.addAll(subNP);
                         }
                     }
@@ -335,7 +392,7 @@ public abstract class HttpExecutor {
                             params.add((NameValuePair) subObj);
                             //complexObject ++;
                         } else {
-                            List<NameValuePair> subNP = makeRequestParams(subObj, prefixName + "[" + n + "]");
+                            List<NameValuePair> subNP = makeRequectParams(subObj, prefixName + "[" + n + "]");
                             params.addAll(subNP);
                             //complexObject ++;
                         }
@@ -348,7 +405,8 @@ public abstract class HttpExecutor {
                             StringBaseOpt.objectToString(arrayStr)));*/
             }
             return params; //返回一个空的
-        } else if (obj instanceof Object[] objs) {
+        } else if (obj instanceof Object[]) {
+            Object[] objs = (Object[]) obj;
             if (objs.length == 1) {
                 Object subobj = objs[0];
                 if (subobj != null) {
@@ -358,7 +416,7 @@ public abstract class HttpExecutor {
                     } else if (subobj instanceof NameValuePair) {
                         params.add((NameValuePair) subobj);
                     } else {
-                        List<NameValuePair> subNP = makeRequestParams(subobj, prefixName);
+                        List<NameValuePair> subNP = makeRequectParams(subobj, prefixName);
                         params.addAll(subNP);
                     }
                 }
@@ -378,7 +436,7 @@ public abstract class HttpExecutor {
                             params.add((NameValuePair) objs[i]);
                             //complexObject ++;
                         } else {
-                            List<NameValuePair> subNP = makeRequestParams(objs[i], prefixName + "[" + i + "]");
+                            List<NameValuePair> subNP = makeRequectParams(objs[i], prefixName + "[" + i + "]");
                             params.addAll(subNP);
                             //complexObject ++;
                         }
@@ -392,19 +450,19 @@ public abstract class HttpExecutor {
             return params; //返回一个空的
         } else {
             List<Method> methods = ReflectionOpt.getAllGetterMethod(obj.getClass());
-            if(methods!=null) {
-                String sFN = StringUtils.isBlank(prefixName) ? "" : prefixName + ".";
-                for (Method md : methods) {
-                    try {
-                        Object v = md.invoke(obj);
-                        if (v != null) {
-                            String sKey = ReflectionOpt.methodNameToField(md.getName());
-                            List<NameValuePair> subNP = makeRequestParams(v, sFN + sKey);
-                            params.addAll(subNP);
-                        }
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
+            String sFN = (prefixName == null || "".equals(prefixName)) ? "" : prefixName + ".";
+            for (Method md : methods) {
+                try {
+                    Object v = md.invoke(obj);
+                    if (v != null) {
+                        String skey = ReflectionOpt.methodNameToField(md.getName());
+
+                        List<NameValuePair> subNP = makeRequectParams(v, sFN + skey);
+                        params.addAll(subNP);
+
                     }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
                 }
             }
             return params;
@@ -417,7 +475,7 @@ public abstract class HttpExecutor {
         eb.setContentType(APPLICATION_FORM_URLENCODED);
         eb.setContentEncoding("utf-8");
         //FormBodyPartBuilder formBuilder = FormBodyPartBuilder.create(formName,null);
-        List<NameValuePair> params = makeRequestParams(formData, "");
+        List<NameValuePair> params = makeRequectParams(formData, "");
         eb.setParameters(params);
         return eb.build();
     }
@@ -425,15 +483,15 @@ public abstract class HttpExecutor {
     private static HttpEntity buildEntity(Object[] formObjects, Map<String, Object> extFormObjects){
         List<NameValuePair> params = new ArrayList<>();
         if (formObjects != null) {
-            for (Object formObject : formObjects) {
-                if (formObject != null) {
-                    List<NameValuePair> subNP = makeRequestParams(formObject, "");
+            for (int i = 0; i < formObjects.length; i++) {
+                if (formObjects[i] != null) {
+                    List<NameValuePair> subNP = makeRequectParams(formObjects[i], "");
                     params.addAll(subNP);
                 }
             }//end of for
         }
         if (extFormObjects != null) {
-            List<NameValuePair> subNP = makeRequestParams(extFormObjects, "");
+            List<NameValuePair> subNP = makeRequectParams(extFormObjects, "");
             params.addAll(subNP);
         }
         EntityBuilder eb = EntityBuilder.create();
@@ -446,8 +504,8 @@ public abstract class HttpExecutor {
 
     }
 
-    public static List<NameValuePair> makeRequestParams(Object obj) {
-        return makeRequestParams(obj, "");
+    public static List<NameValuePair> makeRequectParams(Object obj) {
+        return makeRequectParams(obj, "");
     }
 
     public static String formPut(HttpExecutorContext executorContext,
@@ -490,7 +548,7 @@ public abstract class HttpExecutor {
         if(!executorContext.hasHeader("Content-Type"))
             httpPost.setHeader("Content-Type", plainTextHead);
         if (postEntity != null) {
-            StringEntity entity = new StringEntity(postEntity, StandardCharsets.UTF_8);
+            StringEntity entity = new StringEntity(postEntity, Consts.UTF_8);
             httpPost.setEntity(entity);
         }
         return httpExecute(executorContext, httpPost);
@@ -515,7 +573,7 @@ public abstract class HttpExecutor {
             httpPost.setHeader("Content-Type", applicationFormHead);
 
         if (postIS != null) {
-            InputStreamEntity entity = new InputStreamEntity(postIS, ContentType.APPLICATION_OCTET_STREAM);
+            InputStreamEntity entity = new InputStreamEntity(postIS);
             httpPost.setEntity(entity);
         }
 
@@ -531,7 +589,7 @@ public abstract class HttpExecutor {
             httpPost.setHeader("Content-Type", applicationFormHead);
 
         if (bytes != null) {
-            ByteArrayEntity entity = new ByteArrayEntity(bytes, ContentType.APPLICATION_OCTET_STREAM);
+            ByteArrayEntity entity = new ByteArrayEntity(bytes);
             httpPost.setEntity(entity);
         }
 
@@ -559,8 +617,8 @@ public abstract class HttpExecutor {
         HttpPost httpPost = new HttpPost(asPutMethod ? urlAddMethodParameter(uri, "PUT") : uri);
         if(!executorContext.hasHeader("Content-Type"))
             httpPost.setHeader("Content-Type", applicationJSONHead);
-        if (StringUtils.isNotBlank(jsonString)) {
-            StringEntity entity = new StringEntity(jsonString, StandardCharsets.UTF_8);
+        if (jsonString != null && ! "".equals(jsonString)) {
+            StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
             httpPost.setEntity(entity);
         }
 
@@ -587,8 +645,8 @@ public abstract class HttpExecutor {
         HttpPut httpPut = new HttpPut(uri);
         if(!executorContext.hasHeader("Content-Type"))
             httpPut.setHeader("Content-Type", applicationJSONHead);
-        if (StringUtils.isNotBlank(jsonString)) {
-            StringEntity entity = new StringEntity(jsonString, StandardCharsets.UTF_8);
+        if (jsonString != null && !"".equals(jsonString)) {
+            StringEntity entity = new StringEntity(jsonString, Consts.UTF_8);
             httpPut.setEntity(entity);
         }
         return httpExecute(executorContext, httpPut);
@@ -603,7 +661,7 @@ public abstract class HttpExecutor {
             httpPost.setHeader("Content-Type", xmlTextHead);
 
         if (xmlEntity != null) {
-            StringEntity entity = new StringEntity(xmlEntity, StandardCharsets.UTF_8);
+            StringEntity entity = new StringEntity(xmlEntity, Consts.UTF_8);
             httpPost.setEntity(entity);
         }
 
@@ -622,8 +680,8 @@ public abstract class HttpExecutor {
         HttpPut httpPut = new HttpPut(uri);
         if(!executorContext.hasHeader("Content-Type"))
             httpPut.setHeader("Content-Type", xmlTextHead);
-        if (StringUtils.isNotBlank(xmlEntity)) {
-            StringEntity entity = new StringEntity(xmlEntity, StandardCharsets.UTF_8);
+        if (xmlEntity != null && !"".equals(xmlEntity)) {
+            StringEntity entity = new StringEntity(xmlEntity, Consts.UTF_8);
             httpPut.setEntity(entity);
         }
         return httpExecute(executorContext, httpPut);
@@ -734,12 +792,9 @@ public abstract class HttpExecutor {
 
         String paramsUrl = null;
         if (formObjects != null) {
-            List<NameValuePair> params = makeRequestParams(formObjects, "");
-            try {
-                paramsUrl = EntityUtils.toString(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
-            } catch (org.apache.hc.core5.http.ParseException e) {
-                throw new RuntimeException(e);
-            }
+            List<NameValuePair> params = makeRequectParams(formObjects, "");
+            paramsUrl =
+                EntityUtils.toString(new UrlEncodedFormEntity(params, Consts.UTF_8));
         }
         return inputStreamUpload(executorContext,
             UrlOptUtils.appendParamToUrl(uri, paramsUrl), inputStream, filedName, contentType, filename);
@@ -748,10 +803,10 @@ public abstract class HttpExecutor {
     private static MultipartEntityBuilder createMultipartEntityFromFormAndFiles(Map<String, Object> formObjects, Map<String, File> files) {
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.setBoundary(BOUNDARY);
-        builder.setMode(HttpMultipartMode.LEGACY);
+        builder.setMode(HttpMultipartMode.RFC6532);
 
         if (formObjects != null) {
-            ContentType contentType = ContentType.create("text/plain",StandardCharsets.UTF_8);
+            ContentType contentType = ContentType.create("text/plain",Consts.UTF_8);
             for (Map.Entry<String, Object> param : formObjects.entrySet()) {
                 builder.addTextBody(param.getKey(),
                     JSONOpt.objectToJSONString(param.getValue()),contentType);
@@ -793,7 +848,7 @@ public abstract class HttpExecutor {
         HttpPost httpPost = new HttpPost(uri);
         if(!executorContext.hasHeader("Content-Type"))
             httpPost.setHeader("Content-Type", multiPartTypeHead);
-        InputStreamEntity entity = new InputStreamEntity(new FileInputStream(file), ContentType.APPLICATION_OCTET_STREAM);
+        InputStreamEntity entity = new InputStreamEntity(new FileInputStream(file));
         httpPost.setEntity(entity);
         return httpExecute(executorContext, httpPost);
     }
@@ -803,18 +858,15 @@ public abstract class HttpExecutor {
         throws IOException {
         String paramsUrl = null;
         if (formObjects != null) {
-            List<NameValuePair> params = makeRequestParams(formObjects, "");
-            try {
-                paramsUrl = EntityUtils.toString(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
-            } catch (org.apache.hc.core5.http.ParseException e) {
-                throw new RuntimeException(e);
-            }
+            List<NameValuePair> params = makeRequectParams(formObjects, "");
+            paramsUrl =
+                EntityUtils.toString(new UrlEncodedFormEntity(params, Consts.UTF_8));
         }
         return fileUpload(executorContext,
             UrlOptUtils.appendParamToUrl(uri, paramsUrl), file);
     }
 
-    public static String extraFileName(ClassicHttpResponse response) {
+    public static String extraFileName(CloseableHttpResponse response) {
         Header[] contentDispositionHeader = response
             .getHeaders("Content-Disposition");
         if(contentDispositionHeader == null || contentDispositionHeader.length == 0){
@@ -832,34 +884,36 @@ public abstract class HttpExecutor {
 
         HttpGet httpGet = new HttpGet(UrlOptUtils.appendParamToUrl(uri, queryParam));
         CloseableHttpClient httpClient = null;
-        final boolean createSelfClient = executorContext.getHttpclient() == null;
+        boolean createSelfClient = executorContext.getHttpclient() == null;
         if (createSelfClient) {
-            httpClient = HttpExecutor.createHttpClient(executorContext);
+            httpClient = executorContext.getHttpProxy() == null ?
+                HttpExecutor.createHttpClient() :
+                HttpExecutor.createHttpClient(executorContext.getHttpProxy());
         } else {
             httpClient = executorContext.getHttpclient();
         }
         prepareHttpRequest(executorContext, httpGet);
 
-        final CloseableHttpClient finalHttpClient = httpClient;
-        try {
-            return httpClient.execute(httpGet, executorContext.getHttpContext(), response -> {
-                Header[] contentTypeHeader = response.getHeaders("Content-Type");
-                if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
-                    contentTypeHeader[0].getValue().contains("text/") ) {
-                    String responseContent = StringResponseHandler.UTF8StringHandler
-                        .handleResponse(response);
-                    throw new RuntimeException(responseContent);
-                }
-                try (InputStream inputStream = InputStreamResponseHandler.INSTANCE
-                    .handleResponse(response)) {
-                    // 视频文件不支持下载
-                    //fileName = extraFileName(response);
-                    return operate.doOperate(inputStream);
-                }
-            });
+        try (CloseableHttpResponse response = httpClient.execute(httpGet, executorContext.getHttpContext())) {
+
+            Header[] contentTypeHeader = response.getHeaders("Content-Type");
+            if (contentTypeHeader == null || contentTypeHeader.length < 1 ||
+                StringUtils.indexOf(
+                    contentTypeHeader[0].getValue(), "text/") >= 0
+            ) {
+                String responseContent = Utf8ResponseHandler.INSTANCE
+                    .handleResponse(response);
+                throw new RuntimeException(responseContent);
+            }
+            try (InputStream inputStream = InputStreamResponseHandler.INSTANCE
+                .handleResponse(response)) {
+                // 视频文件不支持下载
+                //fileName = extraFileName(response);
+                return operate.doOperate(inputStream);
+            }
         } finally {
-            if (createSelfClient && finalHttpClient != null) {
-                finalHttpClient.close();
+            if (createSelfClient) {
+                httpClient.close();
             }
         }
     }
@@ -874,6 +928,7 @@ public abstract class HttpExecutor {
     public static <T> T fetchInputStreamByUrl(String uri,
                                               DoOperateInputStream<T> operate) throws IOException {
         try (CloseableHttpClient httpClient = HttpExecutor.createHttpClient()) {
+
             return fetchInputStreamByUrl(HttpExecutorContext.create(httpClient),
                 uri, null, operate);
         }
@@ -886,6 +941,7 @@ public abstract class HttpExecutor {
         return fetchInputStreamByUrl(executorContext,
             uri, queryParam,
             (inputStream) -> FileSystemOpt.createFile(inputStream, filePath));
+
     }
 
     public static boolean fileDownload(HttpExecutorContext executorContext,

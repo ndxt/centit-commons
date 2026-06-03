@@ -28,10 +28,10 @@ public class PowerPointUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(OfficeToPdf.class);
 
-    private static final PDRectangle mediaBox = PDRectangle.LETTER;
-    private static final boolean landscape = false;
-    private static final boolean autoOrientation = true;
-    private static final boolean resize = true;
+    private static PDRectangle mediaBox = PDRectangle.LETTER;
+    private static boolean landscape = false;
+    private static boolean autoOrientation = true;
+    private static boolean resize = true;
 
     private static void createPDFFromImages(List<ByteArrayOutputStream> imageFilenames, String targetFilePath) throws IOException {
         try (PDDocument doc = new PDDocument()) {
@@ -58,7 +58,7 @@ public class PowerPointUtils {
     }
 
     private static void createHTMLFromImages(List<ByteArrayOutputStream> imageFilenames, String targetFilePath) throws IOException {
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         for (ByteArrayOutputStream imageFileName : imageFilenames) {
             String base64 = Base64.getEncoder().encodeToString(imageFileName.toByteArray());
             sb.append("<br><img src=\"data:image/png;base64,").append(base64).append("\">");
@@ -72,15 +72,11 @@ public class PowerPointUtils {
             try {
                 if ("ppt".equalsIgnoreCase(suffix)) {
                     List<ByteArrayOutputStream> htmlStr = toImage2003(sourceFilePath);
-                    if(htmlStr!=null) {
-                        createPDFFromImages(htmlStr, targetFileName);
-                    }
+                    createPDFFromImages(htmlStr, targetFileName);
                     return "ok";
                 } else if ("pptx".equalsIgnoreCase(suffix)) {
                     List<ByteArrayOutputStream> htmlStr = toImage2007(sourceFilePath);
-                    if(htmlStr!=null) {
-                        createPDFFromImages(htmlStr, targetFileName);
-                    }
+                    createPDFFromImages(htmlStr, targetFileName);
                     return "ok";
                 } else {
                     logger.error("ppt转换为pdf,源文件={}不是ppt文件", sourceFilePath);
@@ -103,15 +99,11 @@ public class PowerPointUtils {
             try {
                 if ("ppt".equalsIgnoreCase(suffix)) {
                     List<ByteArrayOutputStream> htmlStr = toImage2003(sourceFilePath);
-                    if(htmlStr!=null) {
-                        createHTMLFromImages(htmlStr, targetFileName);
-                    }
+                    createHTMLFromImages(htmlStr, targetFileName);
                     return "ok";
                 } else if ("pptx".equalsIgnoreCase(suffix)) {
                     List<ByteArrayOutputStream> htmlStr = toImage2007(sourceFilePath);
-                    if(htmlStr!=null) {
-                        createHTMLFromImages(htmlStr, targetFileName);
-                    }
+                    createHTMLFromImages(htmlStr, targetFileName);
                     return "ok";
                 } else {
                     logger.error("ppt转换为html,源文件={}不是ppt文件", sourceFilePath);
@@ -136,7 +128,8 @@ public class PowerPointUtils {
             for (int i = 0; i < ppt.getSlides().size(); i++) {
                 try {
                     for (XSLFShape shape : ppt.getSlides().get(i).getShapes()) {
-                        if (shape instanceof XSLFTextShape tsh) {
+                        if (shape instanceof XSLFTextShape) {
+                            XSLFTextShape tsh = (XSLFTextShape) shape;
                             for (XSLFTextParagraph p : tsh) {
                                 for (XSLFTextRun r : p) {
                                     r.setFontFamily("宋体");
@@ -172,7 +165,8 @@ public class PowerPointUtils {
             Dimension pgsize = ppt.getPageSize();
             for (int i = 0; i < ppt.getSlides().size(); i++) {
                 for (HSLFShape shape : ppt.getSlides().get(i).getShapes()) {
-                    if (shape instanceof HSLFTextShape tsh) {
+                    if (shape instanceof HSLFTextShape) {
+                        HSLFTextShape tsh = (HSLFTextShape) shape;
                         for (HSLFTextParagraph p : tsh) {
                             for (HSLFTextRun r : p) {
                                 r.setFontFamily("宋体");

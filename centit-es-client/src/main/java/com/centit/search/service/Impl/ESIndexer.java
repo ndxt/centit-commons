@@ -1,23 +1,25 @@
 package com.centit.search.service.Impl;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.mapping.TypeMapping;
-import co.elastic.clients.elasticsearch.core.*;
-import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
-import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
-import co.elastic.clients.elasticsearch.indices.ExistsRequest;
-import co.elastic.clients.elasticsearch.indices.IndexSettings;
-import co.elastic.clients.json.JsonData;
 import com.centit.search.annotation.ESType;
 import com.centit.search.document.DocumentUtils;
 import com.centit.search.document.ESDocument;
-import com.centit.search.service.ElasticsearchClientFactory;
 import com.centit.search.service.Indexer;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.StringReader;
-import java.util.List;
 
 /**
  * Created by codefan on 17-6-12.
@@ -26,63 +28,70 @@ public class ESIndexer implements Indexer{
 
     private static final Logger logger = LoggerFactory.getLogger(ESIndexer.class);
 
-    private final ElasticsearchClient client;
+    private GenericObjectPool<RestHighLevelClient> clientPool;
     private String indexName;
     private boolean sureIndexExist;
-    private final Class<?> objType ;
+    private Class<?> objType ;
 
-    public ESIndexer(ElasticsearchClient client, String indexName, Class<?> objType){
-        this.client = client;
-        this.indexName = indexName;
+    public ESIndexer(GenericObjectPool<RestHighLevelClient> clientPool,
+                     String indexName, Class<?> objType){
+        this.clientPool = clientPool;
+        this.indexName=indexName;
         this.objType = objType;
         this.sureIndexExist = false;
     }
 
-    public ElasticsearchClient fetchClient() {
-        return client;
-    }
-
-    public void releaseClient(){
-        ElasticsearchClientFactory.closeClient(client);
+    public void setClientPool(GenericObjectPool<RestHighLevelClient> clientPool) {
+        this.clientPool = clientPool;
     }
 
     private void makeSureIndexIsExist() {
         if(sureIndexExist){
             return;
         }
+        RestHighLevelClient client = null;
         try {
-            ExistsRequest request = ExistsRequest.of(e -> e.index(indexName));
-            if (!client.indices().exists(request).value()) {
+            client = clientPool.borrowObject();
+            GetIndexRequest request = new GetIndexRequest(indexName);
+            if (!client.indices().exists(request, RequestOptions.DEFAULT)) {
                 createEsIndex(indexName, objType);
             }
             sureIndexExist = true;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
+        }finally {
+            if(client!=null) {
+                clientPool.returnObject(client);
+            }
         }
     }
 
     // 定义索引的映射类型
     private void createEsIndex(String indexName, Class<?> objType) {
         this.indexName = indexName;
+        //判断索引是否存在，不存在则新建
+        RestHighLevelClient client = null;
         try {
+            client = clientPool.borrowObject();
+
+            CreateIndexRequest request = new CreateIndexRequest(indexName);
             ESType esType = objType.getAnnotation(ESType.class);
-            // 构建索引设置
-            IndexSettings settings = IndexSettings.of(s -> s
-                .numberOfShards(String.valueOf(esType.shards()))
-                .numberOfReplicas(String.valueOf(esType.replicas())));
+            request.settings(Settings.builder()
+                .put("index.number_of_shards", esType.shards())
+                .put("index.number_of_replicas", esType.replicas()));
 
-            // 构建映射
-            String mappingJson = DocumentUtils.obtainDocumentMapping(objType).toJSONString();
-            TypeMapping mapping = TypeMapping.of(m -> m.withJson(new StringReader(mappingJson)));
-
-            CreateIndexRequest request = CreateIndexRequest.of(c -> c
-                .index(indexName)
-                .settings(settings)
-                .mappings(mapping));
-
-            client.indices().create(request);
+            request.mapping(
+                DocumentUtils.obtainDocumentMapping(objType).toJSONString(),
+                XContentType.JSON);
+            //client.admin().indices().putMapping(putMappingRequest).actionGet();
+            client.indices().create(request, RequestOptions.DEFAULT);
+        //return client;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
+        }finally {
+            if(client!=null) {
+                clientPool.returnObject(client);
+            }
         }
     }
 
@@ -94,78 +103,25 @@ public class ESIndexer implements Indexer{
     @Override
     public String saveNewDocument(ESDocument document) {
         makeSureIndexIsExist();
+        RestHighLevelClient client = null;
         try {
-            IndexRequest<JsonData> request = IndexRequest.of(i -> i
-                .index(indexName)
-                .id(document.obtainDocumentId())
-                .document(JsonData.fromJson(document.toJSONObject().toJSONString())));
+            client = clientPool.borrowObject();
+            /*String type = document.obtainDocumentType();
+            String docId = document.obtainDocumentId();*/
+            IndexRequest request = new IndexRequest(indexName)
+                            .id(document.obtainDocumentId())
+                            .source(document.toJSONObject());
 
-            IndexResponse indexResponse = client.index(request);
-            return indexResponse.id();
+            IndexResponse indexResponse = client.index(request, RequestOptions.DEFAULT);
+            return indexResponse.getId();
         }
         catch (Exception e) {
             logger.error(e.getMessage(), e);
             return null;
-        }
-    }
-
-    /**
-     * 批量新建文档 - 使用 ES Bulk API 提高性能
-     * @param documents 文档列表
-     * @return 返回成功写入的文档数量
-     */
-    @Override
-    public int saveNewDocuments(List<? extends ESDocument> documents) {
-        if (documents == null || documents.isEmpty()) {
-            return 0;
-        }
-        makeSureIndexIsExist();
-        int successCount = 0;
-        try {
-            BulkRequest.Builder bulkBuilder = new BulkRequest.Builder();
-            for (ESDocument document : documents) {
-                try {
-                    bulkBuilder.operations(op -> op
-                        .index(idx -> idx
-                            .index(indexName)
-                            .id(document.obtainDocumentId())
-                            .document(JsonData.fromJson(document.toJSONObject().toJSONString()))
-                        )
-                    );
-                } catch (Exception e) {
-                    logger.error("构建批量请求失败，文档ID: {}", document.obtainDocumentId(), e);
-                }
+        }finally {
+            if(client!=null) {
+                clientPool.returnObject(client);
             }
-            BulkResponse response = client.bulk(bulkBuilder.build());
-            if (response.errors()) {
-                logger.warn("批量写入存在错误，详情如下：");
-                for (BulkResponseItem item : response.items()) {
-                    if (item.error() != null) {
-                        logger.warn("文档ID: {}, 错误: {}", item.id(), item.error().reason());
-                    } else {
-                        successCount++;
-                    }
-                }
-            } else {
-                successCount = documents.size();
-                logger.info("成功批量写入 {} 条文档到索引 {}", successCount, indexName);
-            }
-            return successCount;
-        } catch (Exception e) {
-            logger.error("批量写入文档失败", e);
-            // 降级：逐条写入
-            logger.info("尝试逐条写入 {} 条文档", documents.size());
-            for (ESDocument document : documents) {
-                try {
-                    String result = saveNewDocument(document);
-                    if (result != null) {
-                        successCount++;
-                    }
-                } catch (Exception ex) {
-                    logger.error("逐条写入文档失败，文档ID: {}", document.obtainDocumentId(), ex);
-                }
-            }
-            return successCount;
         }
     }
 
@@ -187,19 +143,22 @@ public class ESIndexer implements Indexer{
      */
     @Override
     public boolean deleteDocument(String docId) {
-
+        RestHighLevelClient client = null;
         try {
-
-            DeleteRequest request = DeleteRequest.of(d -> d
-                .index(indexName)
-                .id(docId));
-
-            DeleteResponse response = client.delete(request);
-            return response.result().jsonValue().equals("deleted");
+            client = clientPool.borrowObject();
+            /*DeleteResponse response = client.prepareDelete(
+                indexName, docType, docId).execute().actionGet();*/
+            DeleteRequest request = new DeleteRequest(indexName, docId);
+            DeleteResponse response = client.delete(request, RequestOptions.DEFAULT);
+            return response.status().getStatus() == 200;
         }
         catch (Exception e) {
             logger.error(e.getMessage(), e);
             return false;
+        }finally {
+            if(client!=null) {
+                clientPool.returnObject(client);
+            }
         }
     }
 
@@ -224,20 +183,25 @@ public class ESIndexer implements Indexer{
      */
     @Override
     public int updateDocument(String docId, ESDocument document) {
-
+        RestHighLevelClient client = null;
         try {
-
-            UpdateRequest<JsonData, JsonData> request = UpdateRequest.of(u -> u
-                .index(indexName)
-                .id(docId)
-                .doc(JsonData.fromJson(document.toJSONObject().toJSONString())));
-
-            UpdateResponse<JsonData> response = client.update(request, JsonData.class);
-            return response.result().jsonValue().equals("updated") ? 1 : 0;
+            client = clientPool.borrowObject();
+            UpdateRequest request = new UpdateRequest()
+                        .index(indexName)
+                        //.type(type)
+                        .id(docId)
+                        .doc(document.toJSONObject());
+            UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
+            int ret = response.status().getStatus();
+            return (ret == 200)?1:0;
         }
         catch (Exception e) {
             logger.error(e.getMessage(), e);
             return 0;
+        }finally {
+            if(client!=null) {
+                clientPool.returnObject(client);
+            }
         }
     }
 
@@ -250,45 +214,36 @@ public class ESIndexer implements Indexer{
     @Override
     public String mergeDocument(ESDocument document) {
         makeSureIndexIsExist();
-
+        RestHighLevelClient client = null;
         try {
+            client = clientPool.borrowObject();
             String docId = document.obtainDocumentId();
-
-            // 判断文档是否存在
-            GetRequest getRequest = GetRequest.of(g -> g
-                .index(indexName)
-                .id(docId));
-
-            boolean exists;
-            try {
-                GetResponse<JsonData> getResponse = client.get(getRequest, JsonData.class);
-                exists = getResponse.found();
-            } catch (Exception e) {
-                // 文档不存在时会抛出异常，设置exists为false
-                exists = false;
-            }
-
-            if(exists) {
-                UpdateRequest<JsonData, JsonData> updateReq = UpdateRequest.of(u -> u
+            GetRequest request = new GetRequest(indexName)
+                        .id(docId);
+            if(client.exists(request, RequestOptions.DEFAULT)) {
+                UpdateRequest req = new UpdateRequest()
                     .index(indexName)
+                    //.type(type)
                     .id(docId)
-                    .doc(JsonData.fromJson(document.toJSONObject().toJSONString())));
-
-                UpdateResponse<JsonData> response = client.update(updateReq, JsonData.class);
-                return response.result().jsonValue().equals("updated") ? response.id() : null;
-            } else {
-                IndexRequest<JsonData> indexReq = IndexRequest.of(i -> i
-                    .index(indexName)
-                    .id(docId)
-                    .document(JsonData.fromJson(document.toJSONObject().toJSONString())));
-
-                IndexResponse indexResponse = client.index(indexReq);
-                return indexResponse.id();
+                    .doc(document.toJSONObject());
+                UpdateResponse response = client.update(req, RequestOptions.DEFAULT);
+                int ret = response.status().getStatus();
+                return (ret == 200)? response.getId() : null;
+            }else {
+                IndexRequest req = new IndexRequest(indexName)
+                        .id(docId)
+                        .source(document.toJSONObject());
+                IndexResponse indexResponse = client.index(req, RequestOptions.DEFAULT);
+                return indexResponse.getId();
             }
         }
         catch (Exception e) {
             logger.error(e.getMessage(), e);
             return null;
+        }finally {
+            if(client!=null) {
+                clientPool.returnObject(client);
+            }
         }
     }
 }
