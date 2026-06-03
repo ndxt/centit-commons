@@ -591,18 +591,18 @@ public class DocxTableToPdfUtils {
 
                 // 使用估算的最大高度，加上一些内边距
                 if (maxRequiredHeight > 0) {
-                    rowHeightPt = maxRequiredHeight + 5f; // 减小额外间距为5pt
+                    rowHeightPt = maxRequiredHeight + 2f; // 减小额外间距为2pt
                 }
             }
 
             // 3. 设置最小行高，确保不会太小
-            if (rowHeightPt < 12f) {
-                rowHeightPt = 12f; // 减小默认最小行高为12pt
+            if (rowHeightPt < 10f) {
+                rowHeightPt = 10f; // 进一步减小默认最小行高为10pt
             }
 
         } catch (Exception e) {
             // 出错时使用默认行高
-            rowHeightPt = 20f;
+            rowHeightPt = 15f;
         }
 
         return rowHeightPt;
@@ -643,11 +643,11 @@ public class DocxTableToPdfUtils {
                 }
             }
 
-            // 计算所需高度：字体大小 * 段落数量 * 行间距系数(1.2) + 内边距(5pt)
-            return maxFontSize * paragraphCount * 1.2f + 5f;
+            // 计算所需高度：字体大小 * 段落数量 * 行间距系数(1.15) + 内边距(2pt)
+            return maxFontSize * paragraphCount * 1.15f + 2f;
 
         } catch (Exception e) {
-            return 18f; // 减小默认高度为18f
+            return 15f; // 进一步减小默认高度为15f
         }
     }
 
@@ -689,7 +689,7 @@ public class DocxTableToPdfUtils {
             }
 
             // 设置内边距
-            pdfCell.setPadding(5f);
+            pdfCell.setPadding(3f);
 
             // 设置边框
             applyBorders(pdfCell, cell, isHeaderRow);
