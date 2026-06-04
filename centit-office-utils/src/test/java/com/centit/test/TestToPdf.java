@@ -34,11 +34,11 @@ public class TestToPdf {
                     try {
                         BaseFont bfChinese = fontMap.get(familyName);
                         if(bfChinese==null) {
-                            if (familyName.indexOf("仿") >= 0) { //仿宋
+                            if (familyName.contains("仿")) { //仿宋
                                 bfChinese = BaseFont.createFont("simfang.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                            } else if (familyName.indexOf("宋") >= 0) { //宋体
+                            } else if (familyName.contains("宋")) { //宋体
                                 bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                            } else if (familyName.indexOf("楷") >= 0) { //楷体
+                            } else if (familyName.contains("楷")) { //楷体
                                 bfChinese = BaseFont.createFont("simkai.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
                             } else { // 黑体
                                 bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
