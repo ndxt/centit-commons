@@ -157,7 +157,7 @@ public class DocxHybridConverter {
                             }
 
                             // 创建字体
-                            com.itextpdf.text.Font runFont = new com.itextpdf.text.Font(runBaseFont, (float)runFontSize, fontStyle);
+                            com.itextpdf.text.Font runFont = new com.itextpdf.text.Font(runBaseFont, (float) runFontSize, fontStyle);
 
                             // 设置字体颜色
                             String colorStr = run.getColor();
@@ -318,8 +318,6 @@ public class DocxHybridConverter {
                         pdfTable.setSpacingBefore(8f);
 
                         pdf.add(pdfTable);
-                    } else {
-                        logger.warn("表格转换失败，返回null");
                     }
                 }
             }
@@ -342,7 +340,6 @@ public class DocxHybridConverter {
      */
     private static boolean convertWithAutoMode(XWPFDocument docx, OutputStream outputStream) throws Exception {
         PdfOptions options = PdfOptions.create();
-
         Map<String, BaseFont> fontMap = new HashMap<>();
 
         // 配置中文字体
@@ -490,7 +487,7 @@ public class DocxHybridConverter {
                         widthPt = heightPt;
                         heightPt = tmp;
                     }
-                    logger.debug("使用docx页面尺寸: {} x {} pt, landscape={}", widthPt, heightPt, isLandscape);
+                    // 使用docx页面尺寸
                     return new com.itextpdf.text.Rectangle(widthPt, heightPt);
                 }
             }

@@ -48,8 +48,6 @@ public class DocxTableToPdfUtils {
             int rowCount = rows.size();
             int colCount = getMaxColumnCount(rows);
 
-            logger.debug("转换表格: {} 行, {} 列", rowCount, colCount);
-
             if (colCount == 0) {
                 logger.warn("表格列数为0");
                 return null;
@@ -204,7 +202,6 @@ public class DocxTableToPdfUtils {
                             widths[i] = totalTableWidthPt / colCount;
                         }
                     }
-                    logger.debug("使用单元格宽度比例分配: 总宽度={}pt, {} 列", totalTableWidthPt, colCount);
                     return widths;
                 }
             }
@@ -226,9 +223,7 @@ public class DocxTableToPdfUtils {
             for (int i = cells.size(); i < colCount; i++) {
                 widths[i] = 50f;
             }
-            logger.debug("使用文本长度估算列宽");
             return widths;
-
         } catch (Exception e) {
             logger.warn("计算列宽失败，使用默认值", e);
         }
@@ -243,30 +238,24 @@ public class DocxTableToPdfUtils {
     private static float[] calculateColumnWidthsFromRows(List<XWPFTableRow> rows, int colCount) {
         float[] maxWidths = new float[colCount];
         boolean hasAnyWidth = false;
-
         // 遍历所有行，找出每列的最大宽度
-        for (int rowIdx = 0; rowIdx < rows.size(); rowIdx++) {
-            XWPFTableRow row = rows.get(rowIdx);
+        for (XWPFTableRow row : rows) {
             List<XWPFTableCell> cells = row.getTableCells();
             int colPos = 0;
-
             for (int i = 0; i < cells.size() && colPos < colCount; i++) {
                 XWPFTableCell cell = cells.get(i);
-
                 try {
                     org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr tcPr =
-                        cell.getCTTc() != null ? cell.getCTTc().getTcPr() : null;
-
+                            cell.getCTTc() != null ? cell.getCTTc().getTcPr() : null;
                     // 获取gridSpan
                     int gridSpan = 1;
                     if (tcPr != null) {
-                        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDecimalNumber gridSpanObj =
-                            tcPr.getGridSpan();
+                        CTDecimalNumber gridSpanObj =
+                                tcPr.getGridSpan();
                         if (gridSpanObj != null && gridSpanObj.getVal() != null) {
                             gridSpan = gridSpanObj.getVal().intValue();
                         }
                     }
-
                     // 获取单元格宽度
                     if (tcPr != null) {
                         Object tcW = tcPr.getTcW();
@@ -317,7 +306,6 @@ public class DocxTableToPdfUtils {
                     }
 
                     colPos += gridSpan;
-
                 } catch (Exception e) {
                     colPos++;
                 }
@@ -380,7 +368,6 @@ public class DocxTableToPdfUtils {
                     if (hasVerySmallColumn) {
                         return null;
                     }
-
                     // 第二步：根据表格实际宽度按比例调整列宽
                     // 如果原始网格总宽度与实际表格宽度差异较大，需要按比例缩放
                     if (totalGridWidth > 0 && Math.abs(totalGridWidth - totalTableWidthPt) > 10) {
@@ -493,35 +480,27 @@ public class DocxTableToPdfUtils {
      */
     private static void convertRowToPdf(XWPFTableRow row, PdfPTable pdfTable, com.itextpdf.text.pdf.BaseFont baseFont, int expectedCols, boolean isHeaderRow, int rowIndex, XWPFTable table) {
         List<XWPFTableCell> cells = row.getTableCells();
-
         // 获取行高
         float rowHeightPt = getRowHeight(row);
-
         // 按单元格在DOCX中的顺序处理
         for (int cellIndex = 0; cellIndex < cells.size(); cellIndex++) {
             XWPFTableCell cell = cells.get(cellIndex);
             int gridSpan = getGridSpan(cell);
-
             // 计算当前单元格的逻辑列位置
             int docxColPos = getCellColPosition(row, cellIndex);
-
             // 计算rowSpan
             int rowSpan = getRowSpan(cell, table, rowIndex, docxColPos);
-
             // 被垂直合并的单元格（rowSpan=0），完全跳过
             // iText会自动处理rowspan，不需要添加占位单元格
             if (rowSpan == 0) {
                 continue;
             }
-
             // 添加正常单元格到PDF
             PdfPCell pdfCell = convertCellToPdf(cell, baseFont, isHeaderRow);
-
             // 设置行高
             if (rowHeightPt > 0) {
                 pdfCell.setMinimumHeight(rowHeightPt);
             }
-
             if (gridSpan > 1) {
                 pdfCell.setColspan(gridSpan);
             }
@@ -530,7 +509,6 @@ public class DocxTableToPdfUtils {
             }
             pdfTable.addCell(pdfCell);
         }
-
         // 完成当前行
         pdfTable.completeRow();
     }
@@ -541,7 +519,6 @@ public class DocxTableToPdfUtils {
      */
     private static float getRowHeight(XWPFTableRow row) {
         float rowHeightPt = 0f;
-
         try {
             // 1. 尝试从DOCX行属性中获取行高
             Object ctRow = row.getCtRow();
@@ -577,30 +554,25 @@ public class DocxTableToPdfUtils {
             if (rowHeightPt <= 0) {
                 float maxRequiredHeight = 0f;
                 List<XWPFTableCell> cells = row.getTableCells();
-
                 for (XWPFTableCell cell : cells) {
                     float cellRequiredHeight = calculateCellRequiredHeight(cell);
                     if (cellRequiredHeight > maxRequiredHeight) {
                         maxRequiredHeight = cellRequiredHeight;
                     }
                 }
-
                 // 使用估算的最大高度，加上一些内边距
                 if (maxRequiredHeight > 0) {
                     rowHeightPt = maxRequiredHeight + 2f; // 减小额外间距为2pt
                 }
             }
-
             // 3. 设置最小行高，确保不会太小
             if (rowHeightPt < 10f) {
                 rowHeightPt = 10f; // 进一步减小默认最小行高为10pt
             }
-
         } catch (Exception e) {
             // 出错时使用默认行高
             rowHeightPt = 15f;
         }
-
         return rowHeightPt;
     }
 
@@ -611,7 +583,6 @@ public class DocxTableToPdfUtils {
         try {
             float maxFontSize = 12f; // 默认字体大小
             int paragraphCount = 0;
-
             List<XWPFParagraph> paragraphs = cell.getParagraphs();
             for (XWPFParagraph para : paragraphs) {
                 List<XWPFRun> runs = para.getRuns();
@@ -650,7 +621,6 @@ public class DocxTableToPdfUtils {
      */
     private static PdfPCell convertCellToPdf(XWPFTableCell cell, com.itextpdf.text.pdf.BaseFont baseFont, boolean isHeaderRow) {
         PdfPCell pdfCell = new PdfPCell();
-
         try {
             // 获取单元格文本
             String text = cell.getText();
@@ -681,23 +651,18 @@ public class DocxTableToPdfUtils {
                     }
                 }
             }
-
             // 设置内边距
             pdfCell.setPadding(3f);
-
             // 设置边框
             applyBorders(pdfCell, cell, isHeaderRow);
-
             // 设置对齐方式
             applyAlignment(pdfCell, cell);
-
             // 设置背景色
             applyBackgroundColor(pdfCell, cell);
 
         } catch (Exception e) {
             pdfCell.setPhrase(new Phrase(" "));
         }
-
         return pdfCell;
     }
 
@@ -707,23 +672,8 @@ public class DocxTableToPdfUtils {
      */
     private static Phrase createStyledPhrase(XWPFTableCell cell, com.itextpdf.text.pdf.BaseFont defaultBaseFont) {
         Phrase phrase = new Phrase();
-
         try {
             List<XWPFParagraph> paragraphs = cell.getParagraphs();
-
-            // 首先检查第一个段落的内容，用于后续过滤
-            String firstParaText = "";
-            if (!paragraphs.isEmpty()) {
-                List<XWPFRun> firstRuns = paragraphs.get(0).getRuns();
-                if (firstRuns != null) {
-                    for (XWPFRun run : firstRuns) {
-                        String text = run.getText(0);
-                        if (text != null) {
-                            firstParaText += text;
-                        }
-                    }
-                }
-            }
             boolean hasAnyContent = false;
             // 处理所有段落，段落之间添加换行符
             for (XWPFParagraph para : paragraphs) {
@@ -739,7 +689,6 @@ public class DocxTableToPdfUtils {
                             break;
                         }
                     }
-
                     // 如果段落有内容，处理它
                     if (paraHasContent) {
                         // 如果不是第一个段落，先添加换行符
@@ -835,12 +784,10 @@ public class DocxTableToPdfUtils {
                     }
                 }
             } // 结束段落循环
-
             // 如果没有任何内容，添加空格
             if (phrase.isEmpty()) {
                 phrase.add(" ");
             }
-
         } catch (Exception e) {
             // 回退到简单文本
             phrase.add(new com.itextpdf.text.Chunk(cell.getText(), new Font(defaultBaseFont, 10, Font.NORMAL)));
@@ -891,7 +838,6 @@ public class DocxTableToPdfUtils {
             if (!paragraphs.isEmpty()) {
                 XWPFParagraph para = paragraphs.get(0);
                 List<XWPFRun> runs = para.getRuns();
-
                 if (!runs.isEmpty()) {
                     XWPFRun run = runs.get(0);
                     int fontSize = run.getFontSize();
@@ -928,7 +874,6 @@ public class DocxTableToPdfUtils {
                     // 忽略设置失败
                 }
             }
-
         } catch (Exception e) {
             pdfCell.setBorderWidth(0.5f);
             pdfCell.setBorderColor(BaseColor.GRAY);
@@ -965,7 +910,6 @@ public class DocxTableToPdfUtils {
                 pdfCell.setHorizontalAlignment(Element.ALIGN_LEFT);
             }
             pdfCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-
         } catch (Exception e) {
             pdfCell.setHorizontalAlignment(Element.ALIGN_LEFT);
             pdfCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -1032,8 +976,6 @@ public class DocxTableToPdfUtils {
                         } catch (NumberFormatException e) {
                             logger.debug("背景色格式不支持: {} (可能是图案模式而非颜色)", colorVal);
                         }
-                    } else {
-                        logger.debug("跳过无效颜色值: {}", colorVal != null ? colorVal : "null");
                     }
                 }
             }
@@ -1119,7 +1061,6 @@ public class DocxTableToPdfUtils {
             }
             colPos += getGridSpan(cells.get(i));
         }
-
         return -1;
     }
 
