@@ -241,12 +241,12 @@ public class DocxTableToPdfUtils {
                 XWPFTableCell cell = cells.get(i);
                 try {
                     org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr tcPr =
-                            cell.getCTTc() != null ? cell.getCTTc().getTcPr() : null;
+                        cell.getCTTc() != null ? cell.getCTTc().getTcPr() : null;
                     // 获取gridSpan
                     int gridSpan = 1;
                     if (tcPr != null) {
                         CTDecimalNumber gridSpanObj =
-                                tcPr.getGridSpan();
+                            tcPr.getGridSpan();
                         if (gridSpanObj != null && gridSpanObj.getVal() != null) {
                             gridSpan = gridSpanObj.getVal().intValue();
                         }
@@ -513,63 +513,168 @@ public class DocxTableToPdfUtils {
     /**
      * 获取行高度（单位：points）
      * 综合考虑DOCX行高设置、字体大小、段落间距等因素
+     * <p>
+     * DOCX行高说明：
+     * - 单位：twips (1/20 point)，例如 850 twips = 42.5 points
+     * - hRule属性：
+     * - auto: 自动计算行高（默认）
+     * - atLeast: 最小行高，内容多时会自动扩展
+     * - exact: 精确行高，内容超出时可能被截断
      */
     private static float getRowHeight(XWPFTableRow row) {
         float rowHeightPt = 0f;
+        boolean isExactHeight = false;
+        boolean isAtLeastHeight = false;
+
         try {
-            // 1. 尝试从DOCX行属性中获取行高
             Object ctRow = row.getCtRow();
             if (ctRow != null) {
-                java.lang.reflect.Method getTrPrMethod = ctRow.getClass().getMethod("getTrPr");
-                Object trPr = getTrPrMethod.invoke(ctRow);
-                if (trPr != null) {
-                    // 尝试获取高度属性
-                    try {
-                        java.lang.reflect.Method getHMethod = trPr.getClass().getMethod("getH");
-                        Object hObj = getHMethod.invoke(trPr);
-                        if (hObj != null) {
-                            int hVal;
-                            if (hObj instanceof java.math.BigInteger) {
-                                hVal = ((java.math.BigInteger) hObj).intValue();
-                            } else if (hObj instanceof Integer) {
-                                hVal = (Integer) hObj;
-                            } else {
-                                hVal = Integer.parseInt(hObj.toString());
+                // 方法1：优先通过API获取行高（更可靠）
+                try {
+                    // 获取行属性 CTTblPrBase
+                    java.lang.reflect.Method getTrPrMethod = ctRow.getClass().getMethod("getTrPr");
+                    Object trPr = getTrPrMethod.invoke(ctRow);
+
+                    if (trPr != null) {
+                        // 获取行高对象 CTHeight
+                        java.lang.reflect.Method getTrHeightMethod = trPr.getClass().getMethod("getTrHeight");
+                        Object trHeight = getTrHeightMethod.invoke(trPr);
+
+                        if (trHeight != null) {
+                            // 获取行高值 (BigInteger)
+                            java.lang.reflect.Method getValMethod = trHeight.getClass().getMethod("getVal");
+                            Object valObj = getValMethod.invoke(trHeight);
+
+                            // 获取行高规则 (STHeightRule)
+                            java.lang.reflect.Method getHRuleMethod = trHeight.getClass().getMethod("getHRule");
+                            Object hRuleObj = getHRuleMethod.invoke(trHeight);
+
+                            // 解析行高值
+                            int hVal = 0;
+                            if (valObj instanceof java.math.BigInteger) {
+                                hVal = ((java.math.BigInteger) valObj).intValue();
+                            } else if (valObj instanceof Integer) {
+                                hVal = (Integer) valObj;
+                            } else if (valObj != null) {
+                                hVal = Integer.parseInt(valObj.toString());
                             }
-                            // DOCX中行高单位是twips (1/20 point)，需要转换为points
-                            if (hVal > 0) {
+
+                            // 解析行高规则
+                            String hRule = "auto";
+                            if (hRuleObj != null) {
+                                hRule = hRuleObj.toString();
+                            }
+
+                            // 处理不同的hRule值
+                            if (hVal > 0 && !"auto".equalsIgnoreCase(hRule)) {
+                                // 转换单位：twips -> points
                                 rowHeightPt = hVal / 20.0f;
+
+                                if ("exact".equalsIgnoreCase(hRule)) {
+                                    isExactHeight = true;
+                                } else if ("atLeast".equalsIgnoreCase(hRule)) {
+                                    isAtLeastHeight = true;
+                                }
                             }
                         }
-                    } catch (Exception e) {
-                        // 没有设置行高，继续尝试其他方法
+                    }
+                } catch (Exception ex) {
+                    // API方法失败，回退到XML解析
+                }
+
+                // 方法2：如果API方法失败，使用XML正则解析（兼容性方案）
+                if (rowHeightPt <= 0) {
+                    try {
+                        String xmlText = ctRow.toString();
+
+                        // 查找 w:trHeight 元素
+                        // 格式: <w:trHeight w:val="850" w:hRule="exact"/>
+                        java.util.regex.Pattern trHeightPattern =
+                            java.util.regex.Pattern.compile("<w:trHeight\\s[^>]*/>");
+                        java.util.regex.Matcher trHeightMatcher = trHeightPattern.matcher(xmlText);
+
+                        if (trHeightMatcher.find()) {
+                            String trHeightTag = trHeightMatcher.group();
+
+                            // 获取行高值 w:val
+                            java.util.regex.Pattern valPattern =
+                                java.util.regex.Pattern.compile("w:val=\"([0-9]+)\"");
+                            java.util.regex.Matcher valMatcher = valPattern.matcher(trHeightTag);
+                            int hVal = 0;
+                            if (valMatcher.find()) {
+                                hVal = Integer.parseInt(valMatcher.group(1));
+                            }
+
+                            // 获取行高规则 w:hRule
+                            String hRule = "auto";
+                            java.util.regex.Pattern hRulePattern =
+                                java.util.regex.Pattern.compile("w:hRule=\"([^\"]+)\"");
+                            java.util.regex.Matcher hRuleMatcher = hRulePattern.matcher(trHeightTag);
+                            if (hRuleMatcher.find()) {
+                                hRule = hRuleMatcher.group(1);
+                            }
+
+                            // 根据hRule判断如何处理行高
+                            if (hVal > 0 && !"auto".equalsIgnoreCase(hRule)) {
+                                // 转换单位：twips -> points
+                                rowHeightPt = hVal / 20.0f;
+
+                                if ("exact".equalsIgnoreCase(hRule)) {
+                                    isExactHeight = true;
+                                } else if ("atLeast".equalsIgnoreCase(hRule)) {
+                                    isAtLeastHeight = true;
+                                }
+                            }
+                        }
+                    } catch (Exception ex) {
+                        // XML解析也失败，使用内容估算
                     }
                 }
             }
 
-            // 2. 如果没有明确的行高设置，根据单元格内容估算
-            if (rowHeightPt <= 0) {
+            // 如果是精确高度，直接返回
+            if (isExactHeight && rowHeightPt > 0) {
+                return rowHeightPt;
+            }
+
+            // 如果没有明确行高或是最小高度，根据单元格内容估算
+            if (rowHeightPt <= 0 || isAtLeastHeight) {
                 float maxRequiredHeight = 0f;
                 List<XWPFTableCell> cells = row.getTableCells();
+
                 for (XWPFTableCell cell : cells) {
                     float cellRequiredHeight = calculateCellRequiredHeight(cell);
                     if (cellRequiredHeight > maxRequiredHeight) {
                         maxRequiredHeight = cellRequiredHeight;
                     }
                 }
-                // 使用估算的最大高度，加上一些内边距
-                if (maxRequiredHeight > 0) {
-                    rowHeightPt = maxRequiredHeight + 2f; // 减小额外间距为2pt
+
+                // 使用估算的最大高度，加上内边距
+                float calculatedHeight = maxRequiredHeight + 4f; // 内边距2pt*2
+
+                // 对于atLeast，取设置值和计算值的较大者
+                if (isAtLeastHeight && rowHeightPt > 0) {
+                    rowHeightPt = Math.max(rowHeightPt, calculatedHeight);
+                } else if (calculatedHeight > 0) {
+                    rowHeightPt = calculatedHeight;
                 }
             }
-            // 3. 设置最小行高，确保不会太小
-            if (rowHeightPt < 10f) {
-                rowHeightPt = 10f; // 进一步减小默认最小行高为10pt
+
+            // 设置合理的最小行高（避免行高过小）
+            if (rowHeightPt < 12f) {
+                rowHeightPt = 12f;
             }
+
+            // 设置合理的最大行高（避免异常大的行高）
+            if (rowHeightPt > 200f) {
+                rowHeightPt = 200f;
+            }
+
         } catch (Exception e) {
             // 出错时使用默认行高
             rowHeightPt = 15f;
         }
+
         return rowHeightPt;
     }
 
@@ -585,9 +690,9 @@ public class DocxTableToPdfUtils {
                 List<XWPFRun> runs = para.getRuns();
                 for (XWPFRun run : runs) {
                     Double fontSize = run.getFontSizeAsDouble();
-                    if (fontSize !=null) {
+                    if (fontSize != null) {
                         if (fontSize.floatValue() > maxFontSize) {
-                            maxFontSize = fontSize.floatValue() ;
+                            maxFontSize = fontSize.floatValue();
                         }
                     }
                 }
@@ -651,7 +756,7 @@ public class DocxTableToPdfUtils {
             // 设置内边距
             pdfCell.setPadding(3f);
             // 设置边框
-            applyBorders(pdfCell, cell, isHeaderRow);
+            applyBorders(pdfCell, isHeaderRow);
             // 设置对齐方式
             applyAlignment(pdfCell, cell);
             // 设置背景色
@@ -828,34 +933,9 @@ public class DocxTableToPdfUtils {
     }
 
     /**
-     * 提取字体大小（已废弃，使用 createStyledPhrase 替代）
-     */
-    @Deprecated
-    private static int extractFontSize(XWPFTableCell cell) {
-        try {
-            List<XWPFParagraph> paragraphs = cell.getParagraphs();
-            if (!paragraphs.isEmpty()) {
-                XWPFParagraph para = paragraphs.get(0);
-                List<XWPFRun> runs = para.getRuns();
-                if (!runs.isEmpty()) {
-                    XWPFRun run = runs.get(0);
-                    int fontSize = run.getFontSize();
-                    if (fontSize > 0) {
-                        return fontSize;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // 忽略
-        }
-
-        return 10; // 默认字号
-    }
-
-    /**
      * 应用边框
      */
-    private static void applyBorders(PdfPCell pdfCell, XWPFTableCell cell, boolean isHeaderRow) {
+    private static void applyBorders(PdfPCell pdfCell, boolean isHeaderRow) {
         try {
             // 设置统一的细边框
             pdfCell.setBorderWidth(0.5f);
