@@ -1,6 +1,7 @@
 package com.centit.test;
 
 import com.centit.support.office.OfdUtils;
+import com.centit.support.office.OfficeToPdf;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -75,7 +76,7 @@ public class TestToPdf {
 
         /*String waterMark = "杨淮生 codefan 2024-9-12";
         System.out.println(waterMark.length());*/
-        word2Pdf(new FileInputStream("/Users/codefan/Documents/temp/four-test.docx"),
+        OfficeToPdf.word2Pdf(new FileInputStream("/Users/codefan/Documents/temp/four-test.docx"),
            new FileOutputStream("/Users/codefan/Documents/temp/four-test.pdf"), "docx");
 
         System.out.println("Done!");
