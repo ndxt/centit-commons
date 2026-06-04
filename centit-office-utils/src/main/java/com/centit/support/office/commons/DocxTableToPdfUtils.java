@@ -587,10 +587,10 @@ public class DocxTableToPdfUtils {
             for (XWPFParagraph para : paragraphs) {
                 List<XWPFRun> runs = para.getRuns();
                 for (XWPFRun run : runs) {
-                    double fontSize = run.getFontSizeAsDouble();
-                    if (fontSize > 0) {
-                        if ((float) fontSize > maxFontSize) {
-                            maxFontSize = (float) fontSize;
+                    Double fontSize = run.getFontSizeAsDouble();
+                    if (fontSize !=null) {
+                        if (fontSize.floatValue() > maxFontSize) {
+                            maxFontSize = fontSize.floatValue() ;
                         }
                     }
                 }
@@ -707,9 +707,9 @@ public class DocxTableToPdfUtils {
                                 continue;
                             }
                             // 提取字体大小
-                            double fontSize = run.getFontSizeAsDouble();
-                            if (fontSize <= 0) {
-                                fontSize = 10; // 默认字号
+                            Double fontSize = run.getFontSizeAsDouble();
+                            if (fontSize == null) {
+                                fontSize = 10.0; // 默认字号
                             }
                             // 检测字体样式
                             int fontStyle = Font.NORMAL;
@@ -730,7 +730,7 @@ public class DocxTableToPdfUtils {
                             }
 
                             // 创建字体
-                            Font font = new Font(runBaseFont, (float) fontSize, fontStyle);
+                            Font font = new Font(runBaseFont, fontSize.floatValue(), fontStyle);
 
                             // 设置字体颜色
                             String colorStr = run.getColor();

@@ -132,9 +132,9 @@ public class DocxHybridConverter {
                         // 遍历每个 run，保留各自的样式
                         for (org.apache.poi.xwpf.usermodel.XWPFRun run : runs) {
                             // 提取 run 的样式
-                            double runFontSize = fontSize; // 继承段落默认字号
-                            if (run.getFontSizeAsDouble() > 0) {
-                                runFontSize = run.getFontSizeAsDouble();
+                            float runFontSize = fontSize; // 继承段落默认字号
+                            if (run.getFontSizeAsDouble() != null) {
+                                runFontSize = run.getFontSizeAsDouble().floatValue();
                             }
 
                             // 检测字体样式
@@ -157,7 +157,7 @@ public class DocxHybridConverter {
                             }
 
                             // 创建字体
-                            com.itextpdf.text.Font runFont = new com.itextpdf.text.Font(runBaseFont, (float) runFontSize, fontStyle);
+                            com.itextpdf.text.Font runFont = new com.itextpdf.text.Font(runBaseFont, runFontSize, fontStyle);
 
                             // 设置字体颜色
                             String colorStr = run.getColor();
