@@ -3,6 +3,8 @@ package com.centit.support.report;
 import com.centit.support.algorithm.StringBaseOpt;
 import com.centit.support.common.JavaBeanField;
 import com.centit.support.common.JavaBeanMetaData;
+
+import java.lang.reflect.InvocationTargetException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ooxml.util.SAXHelper;
 import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
@@ -53,7 +55,7 @@ public abstract class LargeExcelImportUtil {
         JavaBeanMetaData metaData = JavaBeanMetaData.createBeanMetaDataFromType(beanType);
         parserXSSFSheet(xlsxFile, sheetName, beginRow, endRow, (rowMap) -> {
             try {
-                T rowObj = beanType.newInstance();
+                T rowObj = beanType.getDeclaredConstructor().newInstance();
                 for(Map.Entry<Integer,String> ent : fieldDesc.entrySet() ){
                     Object value = rowMap.get(ent.getKey());
                     if(value != null){
@@ -64,7 +66,7 @@ public abstract class LargeExcelImportUtil {
                     }
                 }
                 consumer.accept(rowObj);
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 logger.error(e.getMessage(), e);
             }
         });

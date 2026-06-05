@@ -855,8 +855,8 @@ public abstract class ReflectionOpt {
      */
     public <T> T createObjectFromMap(Class<T> clazz, Map<String, Object> properties)
         throws InstantiationException, IllegalAccessException,
-        IllegalArgumentException, InvocationTargetException {
-        T obj = (T) clazz.newInstance();
+        IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
+        T obj = clazz.getDeclaredConstructor().newInstance();
         try {
             Method[] mths = clazz.getMethods();
             for (Method mth : mths) {

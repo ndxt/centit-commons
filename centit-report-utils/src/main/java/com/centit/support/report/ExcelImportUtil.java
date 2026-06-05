@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 
@@ -206,7 +207,7 @@ public abstract class ExcelImportUtil {
 
     private static <T> List<T> loadObjectFromExcelSheet(Sheet sheet, Class<T> beanType,
                                                         Map<Integer, String> fieldDesc, int beginRow, int endRow)
-        throws IllegalAccessException, InstantiationException {
+        throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
 
         if (sheet == null)
             return null;
@@ -221,7 +222,7 @@ public abstract class ExcelImportUtil {
             if (excelRow == null)
                 continue;
             int i = 0;
-            T rowObj = beanType.newInstance();
+            T rowObj = beanType.getDeclaredConstructor().newInstance();
             boolean hasValue = false;
             //excelRow.getFirstCellNum()
             for (Map.Entry<Integer, String> ent : fieldDesc.entrySet()) {
@@ -256,7 +257,7 @@ public abstract class ExcelImportUtil {
      */
     public static <T> List<T> loadObjectFromExcel(InputStream excelFile, ExcelTypeEnum excelType, String sheetName,
                                                   Class<T> beanType, Map<Integer, String> fieldDesc, int beginRow, int endRow)
-        throws IllegalAccessException, InstantiationException, IOException {
+        throws IllegalAccessException, InstantiationException, IOException, NoSuchMethodException, InvocationTargetException {
         Sheet sheet = loadExcelFileSheet(excelFile, excelType, sheetName);
         return loadObjectFromExcelSheet(sheet, beanType, fieldDesc, beginRow, endRow);
     }
@@ -276,7 +277,7 @@ public abstract class ExcelImportUtil {
      */
     public static <T> List<T> loadObjectFromExcel(String filePath, String sheetName,
                                                   Class<T> beanType, Map<Integer, String> fieldDesc, int beginRow, int endRow)
-        throws IllegalAccessException, InstantiationException, IOException {
+        throws IllegalAccessException, InstantiationException, IOException, NoSuchMethodException, InvocationTargetException {
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(filePath);
         try (InputStream excelFile = new FileInputStream(new File(filePath))) {
             return loadObjectFromExcel(excelFile, excelType, sheetName,
@@ -299,7 +300,7 @@ public abstract class ExcelImportUtil {
      */
     public static <T> List<T> loadObjectFromExcel(InputStream excelFile, ExcelTypeEnum excelType, String sheetName,
                                                   Class<T> beanType, Map<Integer, String> fieldDesc, int beginRow)
-        throws IllegalAccessException, InstantiationException, IOException {
+        throws IllegalAccessException, InstantiationException, IOException, NoSuchMethodException, InvocationTargetException {
 
         Sheet sheet = loadExcelFileSheet(excelFile, excelType, sheetName);
         return loadObjectFromExcelSheet(sheet, beanType, fieldDesc, beginRow, sheet.getLastRowNum() + 1);
@@ -319,7 +320,7 @@ public abstract class ExcelImportUtil {
      */
     public static <T> List<T> loadObjectFromExcel(String filePath, String sheetName,
                                                   Class<T> beanType, Map<Integer, String> fieldDesc, int beginRow)
-        throws IllegalAccessException, InstantiationException, IOException {
+        throws IllegalAccessException, InstantiationException, IOException, NoSuchMethodException, InvocationTargetException {
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(filePath);
         try (InputStream excelFile = new FileInputStream(new File(filePath))) {
             return loadObjectFromExcel(excelFile, excelType, sheetName,
@@ -343,7 +344,7 @@ public abstract class ExcelImportUtil {
      */
     public static <T> List<T> loadObjectFromExcel(InputStream excelFile, ExcelTypeEnum excelType, int sheetIndex,
                                                   Class<T> beanType, Map<Integer, String> fieldDesc, int beginRow, int endRow)
-        throws IllegalAccessException, InstantiationException, IOException {
+        throws IllegalAccessException, InstantiationException, IOException, NoSuchMethodException, InvocationTargetException {
         Sheet sheet = loadExcelFileSheet(excelFile, excelType, sheetIndex);
         return loadObjectFromExcelSheet(sheet, beanType, fieldDesc, beginRow, endRow);
     }
@@ -363,7 +364,7 @@ public abstract class ExcelImportUtil {
      */
     public static <T> List<T> loadObjectFromExcel(String filePath, int sheetIndex,
                                                   Class<T> beanType, Map<Integer, String> fieldDesc, int beginRow, int endRow)
-        throws IllegalAccessException, InstantiationException, IOException {
+        throws IllegalAccessException, InstantiationException, IOException, NoSuchMethodException, InvocationTargetException {
 
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(filePath);
 
@@ -388,7 +389,7 @@ public abstract class ExcelImportUtil {
      */
     public static <T> List<T> loadObjectFromExcel(InputStream excelFile, ExcelTypeEnum excelType, int sheetIndex,
                                                   Class<T> beanType, Map<Integer, String> fieldDesc, int beginRow)
-        throws IllegalAccessException, InstantiationException, IOException {
+        throws IllegalAccessException, InstantiationException, IOException, NoSuchMethodException, InvocationTargetException {
 
         Workbook wb = excelType == ExcelTypeEnum.HSSF ?
             new HSSFWorkbook(excelFile) : /*new SXSSFWorkbook(*/new XSSFWorkbook(excelFile);
@@ -411,7 +412,7 @@ public abstract class ExcelImportUtil {
      */
     public static <T> List<T> loadObjectFromExcel(String filePath, int sheetIndex,
                                                   Class<T> beanType, Map<Integer, String> fieldDesc, int beginRow)
-        throws IllegalAccessException, InstantiationException, IOException {
+        throws IllegalAccessException, InstantiationException, IOException, NoSuchMethodException, InvocationTargetException {
 
         ExcelTypeEnum excelType = ExcelTypeEnum.checkFileExcelType(filePath);
         try (InputStream excelFile = new FileInputStream(new File(filePath))) {
@@ -882,7 +883,7 @@ public abstract class ExcelImportUtil {
     }
 
     private static boolean isMergedRegion(List<CellRangeAddress> cellRanges, int row , int column) {
-        if(cellRanges==null || cellRanges.size()==0){
+        if(cellRanges==null || cellRanges.isEmpty()){
             return false;
         }
         for(CellRangeAddress range : cellRanges){
