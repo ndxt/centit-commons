@@ -13,7 +13,7 @@ public class ElasticConfig {
     private String clusterName ;
     private String username ;
     private String password ;
-    private String usingSSL ;
+    private boolean usingSSL ;
     private float minScore;
 
     public void setUsername(String username) {

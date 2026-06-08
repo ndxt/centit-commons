@@ -30,7 +30,7 @@ public abstract class ElasticsearchClientFactory {
             HttpHost[] httpHosts = new HttpHost[1];
             httpHosts[0] = new HttpHost(config.getServerHostIp(),
                 NumberBaseOpt.castObjectToInteger(config.getServerHostPort(), 9200),
-                BooleanBaseOpt.castObjectToBoolean(config.getUsingSSL(), false)?"https":"http");
+                config.isUsingSSL() ? "https" : "http");
 
             RestClientBuilder clientBuilder = RestClient.builder(httpHosts);
             // 添加用户认证
