@@ -61,10 +61,11 @@ public class JSONTransformer {
             }
             return switch (value.charAt(0)) {
                 case '@' -> value.substring(1);
-                case '#' ->// 两次计算 map-> formula ； eval 函数也可以实现同样的功能
-                    dataSupport.attainExpressionValue(
-                        dataSupport.mapTemplateString(value.substring(1)));
                 case '=' -> dataSupport.attainExpressionValue(value.substring(1));
+                case '$' -> dataSupport.extractJSONPathValue(value.substring(1)); // JSONPath $$ 表示跟节点对象 $@ 表示当前对象
+                case '#' ->// 两次计算 map-> formula ； eval 函数也可以实现同样的功能
+                    transformer(
+                        dataSupport.mapTemplateString(value.substring(1)), dataSupport);
                 default -> dataSupport.mapTemplateString(value);
             };
         } else if(templateObj instanceof Map){
@@ -87,7 +88,7 @@ public class JSONTransformer {
                     } else {
                         putObjectToJson(jObj, sKey.substring(1), value);
                     }
-                } else if(sKey.charAt(0) == '#') { //数组迭代； 并且只能是 单独的 一个key
+                } else if(sKey.charAt(0) == '#') { //数组迭代； 并且只能是 单独的 一个key; 返回数组
                     Object obj = dataSupport.attainExpressionValue(sKey.substring(1));
                     if(obj==null){
                         return null;
@@ -106,11 +107,11 @@ public class JSONTransformer {
                         dataSupport.popStackValue();
                         index++;
                     }
-                    return /*array.isEmpty() ? null :*/ array;
-                } else if(sKey.charAt(0) == '$') { //数组迭代； 并且只能是 单独的 一个key
+                    return /*array.isEmpty() ? null :*/ array; //只能是 单独的 一个key，直接返回
+                } else if(sKey.charAt(0) == '$') { //数组迭代； 将内容合并到上级map中； 和 =开头的key联合使用可以将数据转换为map
                     Object obj = dataSupport.attainExpressionValue(sKey.substring(1));
                     if(obj==null){
-                        return null;
+                        continue;
                     }
                     List<Object> loopData = CollectionsOpt.objectToList(obj);
                     int loopSize = loopData.size();

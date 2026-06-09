@@ -1,5 +1,7 @@
 package com.centit.support.json;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONPath;
 import com.centit.support.algorithm.ReflectionOpt;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
@@ -50,6 +52,12 @@ public class DefaultJSONTransformDataSupport implements JSONTransformDataSupport
         variableFormula.setTrans(this);
         variableFormula.setFormula(expression);
         return variableFormula.calcFormula();
+    }
+
+    @Override
+    public Object extractJSONPathValue(String jsonPath) {
+        // JSONPath
+        return JSONPath.extract(JSON.toJSONString(getTopStackData()), jsonPath);
     }
 
     @Override
