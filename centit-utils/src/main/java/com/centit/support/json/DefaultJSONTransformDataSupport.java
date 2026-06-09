@@ -1,8 +1,7 @@
 package com.centit.support.json;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONPath;
 import com.centit.support.algorithm.ReflectionOpt;
+import com.centit.support.compiler.ObjectTranslate;
 import com.centit.support.compiler.Pretreatment;
 import com.centit.support.compiler.VariableFormula;
 import com.centit.support.compiler.VariableTranslate;
@@ -21,17 +20,22 @@ public class DefaultJSONTransformDataSupport implements JSONTransformDataSupport
             this.count = count;
         }
     }
+    private final Object paramData;
     private final VariableTranslate varTrans;
     private int stackLength;
     private final List<StackData> stack;
 
-    public DefaultJSONTransformDataSupport(VariableTranslate varTrans){
-        this.varTrans = varTrans;
+    public DefaultJSONTransformDataSupport(Object paramData){
+        this.paramData = paramData;
+        this.varTrans = new ObjectTranslate(paramData);
         this.stackLength = 0;
         this.stack = new ArrayList<>(10);
     }
 
     private Object getTopStackData() {
+        if(stackLength<=0){
+            return paramData;
+        }
         return stack.get(stackLength-1).data;
     }
     // n>0
@@ -57,7 +61,7 @@ public class DefaultJSONTransformDataSupport implements JSONTransformDataSupport
     @Override
     public Object extractJSONPathValue(String jsonPath) {
         // JSONPath
-        return JSONPath.extract(JSON.toJSONString(getTopStackData()), jsonPath);
+        return JSONOpt.extractValueByPath(getTopStackData(), jsonPath);
     }
 
     @Override

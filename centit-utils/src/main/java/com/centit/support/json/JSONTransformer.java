@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.centit.support.algorithm.CollectionsOpt;
 import com.centit.support.algorithm.StringBaseOpt;
-import com.centit.support.compiler.ObjectTranslate;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class JSONTransformer {
+public abstract class JSONTransformer {
     protected static final Logger logger = LoggerFactory.getLogger(JSONTransformer.class);
 
     public static void putObjectToJson(JSONObject jObj, String key, Object value){
@@ -169,7 +168,6 @@ public class JSONTransformer {
 
     public static Object transformer(Object templateObj,
                                      Object dataSupport){
-        return transformer(templateObj, new DefaultJSONTransformDataSupport(
-             new ObjectTranslate(dataSupport)));
+        return transformer(templateObj, new DefaultJSONTransformDataSupport(dataSupport));
     }
 }

@@ -1,9 +1,6 @@
 package com.centit.support.json;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.JSONReader;
+import com.alibaba.fastjson2.*;
 import com.alibaba.fastjson2.util.JdbcSupport;
 import com.centit.support.algorithm.*;
 import com.centit.support.json.config.LobSerializer;
@@ -292,8 +289,8 @@ public abstract class JSONOpt {
         return key;
     }
 
-    private static JSONPath findJsonObject(JSONObject objJson, int depth, String[] skeys) {
-        JSONPath p = new JSONPath();
+    private static JSONDataWithPath findJsonObject(JSONObject objJson, int depth, String[] skeys) {
+        JSONDataWithPath p = new JSONDataWithPath();
         //p.found = false;
         //p.pathPos = 0;
         int nLast = 0;
@@ -380,7 +377,7 @@ public abstract class JSONOpt {
         int depth = skeys.length;
         if (depth == 0)
             return;
-        JSONPath jpath = findJsonObject(objJson, depth - 1, skeys);
+        JSONDataWithPath jpath = findJsonObject(objJson, depth - 1, skeys);
         Object jsonValue = value;
         if (jpath.pathPos < depth - 1)
             jsonValue = innerCreateJsonObject(skeys, jpath.pathPos + 1, value);
@@ -449,7 +446,7 @@ public abstract class JSONOpt {
         int depth = skeys.length;
         if (depth == 0)
             return;
-        JSONPath jpath = findJsonObject(objJson, depth - 1, skeys);
+        JSONDataWithPath jpath = findJsonObject(objJson, depth - 1, skeys);
         Object jsonValue = value;
         if (jpath.pathPos < depth - 1) {
             jsonValue = innerCreateJsonObject(skeys, jpath.pathPos + 1, value);
@@ -755,7 +752,7 @@ public abstract class JSONOpt {
         return arrayToJSONArray(objArray, methodOnly, fieldOnly, false);
     }
 
-    static class JSONPath {
+    static class JSONDataWithPath {
         JSONObject objJson;
         String path;
         boolean found;
@@ -771,6 +768,14 @@ public abstract class JSONOpt {
         if(StringUtils.isNotBlank(jsonStr) && ( jsonStr.startsWith("{") || jsonStr.startsWith("[")))
             return JSON.parse(jsonStr);
         return jsonStr;
+    }
+
+    public static Object extractValueByPath(Object obj, String jsonPath) {
+        if(obj instanceof JSONObject jsonObject){
+            return jsonObject.getByPath(jsonPath);
+        }
+        JSONPath path = JSONPath.of(jsonPath);
+        return path.eval(obj);
     }
 
 }
