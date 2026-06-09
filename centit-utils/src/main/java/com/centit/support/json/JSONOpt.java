@@ -11,9 +11,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -138,7 +140,7 @@ public abstract class JSONOpt {
             return new JSONDifferent(jsonPath, JSONDifferent.JSON_DIFF_TYPE_DELETE, listA, null);
         }
 
-        int minSize = sizeA>sizeB? sizeB : sizeA;
+        int minSize = sizeA > sizeB ? sizeB : sizeA;
         //通过ID排序; 对于数组中的Map来说 必须有id， id可以是多个字段， 如果不同的map id不一样，也可以同时提供
         if(listA.get(0) instanceof Map && listB.get(0) instanceof Map && arrayKeys !=null && arrayKeys.length>0){
             listA.sort( (o1, o2) -> compareTwoRow((Map)o1, (Map)o2, arrayKeys));
@@ -306,10 +308,9 @@ public abstract class JSONOpt {
                     break;
                 lastKeyJson = (JSONObject) obj;
                 nLast++;
-            } else if (obj instanceof JSONArray) {
+            } else if (obj instanceof JSONArray jarray) {
                 if (key.ind < 0)
                     break;
-                JSONArray jarray = (JSONArray) obj;
                 if (key.ind >= jarray.size())
                     break;
                 Object obj2 = jarray.get(key.ind);
@@ -331,7 +332,6 @@ public abstract class JSONOpt {
         int depth = skeys.length;
         if (depth == 0)
             return null;
-        int nLast = beginPos;
 
         JSONKey key = praseJosnKey(skeys[depth - 1]);
         JSONObject leafKey = new JSONObject();
@@ -345,7 +345,7 @@ public abstract class JSONOpt {
             leafKey.put(key.skey, jarray);
         }
         depth = depth - 2;
-        while (depth >= nLast) {
+        while (depth >= beginPos) {
             key = praseJosnKey(skeys[depth]);
             JSONObject tempKey = new JSONObject();
             if (key.ind < 0)
@@ -396,8 +396,7 @@ public abstract class JSONOpt {
             if (jpath.objJson.containsKey(key.skey)) {
                 Object leafJson = jpath.objJson.get(key.skey);
                 //如果变量已经是数组，设置对应的值
-                if (leafJson instanceof JSONArray) {
-                    JSONArray jarray = ((JSONArray) leafJson);
+                if (leafJson instanceof JSONArray jarray) {
                     //对应位置的数值不存在
                     if (jarray.size() < key.ind + 1) {
                         for (int i = jarray.size(); i < key.ind; i++)
@@ -654,7 +653,7 @@ public abstract class JSONOpt {
         }
         //obj.getClass().getDeclaredFields();
         Field[] fls = ReflectionOpt.getFields(obj);
-        if (!methodOnly && fls != null) {
+        if (!methodOnly) {
             for (Field fl : fls) {
                 if (methodNames.contains(fl.getName()))
                     continue;
@@ -668,7 +667,7 @@ public abstract class JSONOpt {
             }
         }
 
-        if ((fls == null || fls.length < 1) && (getMethods == null || getMethods.isEmpty())) {
+        if (fls.length < 1 && (getMethods == null || getMethods.isEmpty())) {
             jObj.put("value", obj.toString());
         }
         return jObj;
@@ -704,8 +703,7 @@ public abstract class JSONOpt {
             return (JSONArray) objArray;
 
         JSONArray jArray = new JSONArray();
-        if (objArray instanceof Object[]) {
-            Object[] objList = (Object[]) objArray;
+        if (objArray instanceof Object[] objList) {
             for (Object obj : objList) {
                 jArray.add(makeJSONValue(obj, methodOnly, fieldOnly));
             }
@@ -773,6 +771,14 @@ public abstract class JSONOpt {
     public static Object extractValueByPath(Object obj, String jsonPath) {
         if(obj instanceof JSONObject jsonObject){
             return jsonObject.getByPath(jsonPath);
+        }
+        if(obj instanceof InputStream is){
+            JSONPath path = JSONPath.of(jsonPath);
+            return path.extract(JSONReader.of(is, StandardCharsets.UTF_8));
+        }
+        if(obj instanceof String str){
+            JSONPath path = JSONPath.of(jsonPath);
+            return path.extract(str);
         }
         JSONPath path = JSONPath.of(jsonPath);
         return path.eval(obj);
