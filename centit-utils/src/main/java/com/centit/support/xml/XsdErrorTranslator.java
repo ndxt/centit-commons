@@ -74,7 +74,167 @@ public class XsdErrorTranslator {
         "cvc-length-valid:\\s*Value\\s+'([^']*)'\\s+with\\s+length\\s*=\\s*'?(\\d+)'?\\s+is\\s+not\\s+facet-valid\\s+with\\s+respect\\s+to\\s+length\\s+'?(\\d+)'?\\s+for\\s+type\\s+'([^']+)'",
         Pattern.CASE_INSENSITIVE
     );
-    
+
+    // XML 特殊字符相关错误模式
+    private static final Pattern INVALID_CHARACTER_ENTITY = Pattern.compile(
+        "(?:The entity|Entity) \".*?\" was referenced, but not declared",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    private static final Pattern INVALID_XML_CHARACTER = Pattern.compile(
+        "An invalid XML character \\(Unicode: (0x[0-9a-f]+)\\) (?:was found|in element)",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    private static final Pattern INVALID_CHARACTER_IN_ELEMENT = Pattern.compile(
+        "Invalid character (?:\\(Unicode: 0x([0-9a-f]+)\\))? (?:was found|in) the element content",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    private static final Pattern ILLEGAL_CHARACTER = Pattern.compile(
+        "(?:Character|char) (?:0x([0-9a-f]+)|\"([^\"]+)\") is (?:an invalid|not a valid) XML character",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    /**
+     * 允许的字符正则表达式
+     * 包含：中文、英文字母、数字、CJK标点符号、空白字符
+     */
+    private static final Pattern ALLOWED_CHARS_PATTERN = Pattern.compile(
+        "^[\\p{IsHan}a-zA-Z0-9\\u3000-\\u303F\\s]+$"
+    );
+
+    /**
+     * 检测内容中是否包含特殊字符
+     * @param content 要检测的内容
+     * @return 如果存在特殊字符，返回特殊字符的描述；否则返回 null
+     */
+    public static String detectInvalidCharacters(String content) {
+        if (content == null || content.isEmpty()) {
+            return null;
+        }
+
+        // 使用正则表达式检查是否只包含允许的字符
+        if (ALLOWED_CHARS_PATTERN.matcher(content).matches()) {
+            return null;
+        }
+
+        // 如果包含不允许的字符，找出所有特殊字符
+        StringBuilder specialChars = new StringBuilder();
+        StringBuilder positions = new StringBuilder();
+
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            String charStr = String.valueOf(c);
+
+            // 检查字符是否匹配允许的模式
+            if (!ALLOWED_CHARS_PATTERN.matcher(charStr).matches()) {
+                if (specialChars.length() > 0) {
+                    specialChars.append(", ");
+                    positions.append(", ");
+                }
+                specialChars.append(String.format("'%c' (Unicode: 0x%04X)", c, (int) c));
+                positions.append(i);
+            }
+        }
+
+        if (specialChars.length() > 0) {
+            return "检测到特殊字符: " + specialChars + "，位置: " + positions;
+        }
+        return null;
+    }
+
+    /**
+     * 检查字符是否是 XML 1.0 中的非法字符
+     * XML 1.0 规范允许：#x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
+     * 注意：char 类型是 16 位，最大值为 0xFFFF，所以不需要检查 0x10000-0x10FFFF 范围
+     */
+    @SuppressWarnings("unused")
+    private static boolean isInvalidXmlChar(char c) {
+        return !(
+            c == 0x9 || c == 0xA || c == 0xD ||  // Tab, LF, CR
+            (c >= 0x20 && c <= 0xD7FF) ||
+            (c >= 0xE000 && c <= 0xFFFD)
+        );
+    }
+
+    /**
+     * 检测需要转义的 XML 特殊字符
+     * @param content 要检测的内容
+     * @return 如果存在未转义的特殊字符，返回描述；否则返回 null
+     */
+    public static String detectUnescapedSpecialChars(String content) {
+        if (content == null || content.isEmpty()) {
+            return null;
+        }
+
+        StringBuilder warnings = new StringBuilder();
+
+        // 检查未转义的 & 符号（但排除合法的实体引用）
+        int ampIndex = 0;
+        while ((ampIndex = content.indexOf('&', ampIndex)) != -1) {
+            // 检查是否是合法的实体引用
+            if (!isValidEntityReference(content, ampIndex)) {
+                if (warnings.length() > 0) {
+                    warnings.append(", ");
+                }
+                warnings.append("发现未转义的 '&' 符号在位置 ").append(ampIndex);
+            }
+            ampIndex++;
+        }
+
+        // 检查未转义的 < 符号
+        int ltIndex = 0;
+        while ((ltIndex = content.indexOf('<', ltIndex)) != -1) {
+            if (!isValidTagStart(content, ltIndex)) {
+                if (warnings.length() > 0) {
+                    warnings.append(", ");
+                }
+                warnings.append("发现未转义的 '<' 符号在位置 ").append(ltIndex);
+            }
+            ltIndex++;
+        }
+
+        // 检查未转义的 ]]> 序列（在 CDATA 中会导致问题）
+        int cdataEndIndex = content.indexOf("]]>");
+        if (cdataEndIndex != -1 && !content.contains("<![CDATA[")) {
+            if (warnings.length() > 0) {
+                warnings.append(", ");
+            }
+            warnings.append("发现未转义的 ']]>' 序列在位置 ").append(cdataEndIndex);
+        }
+
+        return warnings.length() > 0 ? warnings.toString() : null;
+    }
+
+    /**
+     * 检查 & 符号是否是合法的实体引用
+     */
+    private static boolean isValidEntityReference(String content, int ampIndex) {
+        int endIndex = content.indexOf(';', ampIndex);
+        if (endIndex == -1 || endIndex - ampIndex > 10) {
+            return false;
+        }
+
+        String entity = content.substring(ampIndex + 1, endIndex);
+        // 检查是否是预定义实体或数字字符引用
+        return entity.matches("amp|lt|gt|quot|apos|#\\d+|#x[0-9a-fA-F]+");
+    }
+
+    /**
+     * 检查 < 符号是否是合法的标签开始
+     */
+    private static boolean isValidTagStart(String content, int ltIndex) {
+        if (ltIndex + 1 >= content.length()) {
+            return false;
+        }
+
+        char nextChar = content.charAt(ltIndex + 1);
+        // 允许的标签开始字符：字母、下划线、问号（XML声明）、感叹号（注释/CDATA）
+        return Character.isLetter(nextChar) || nextChar == '_' || nextChar == '?' ||
+               nextChar == '!' || nextChar == '/';
+    }
+
     /**
      * 翻译XSD验证错误消息
      * @param originalMessage 原始错误消息
@@ -256,7 +416,59 @@ public class XsdErrorTranslator {
                 return "值 '" + value + "' 的长度(" + actualLength + ")不符合要求的长度(" + requiredLength + ")";
             }
         }
-        
+
+        // 特殊字符相关错误翻译
+
+        // 无效的 XML 字符
+        matcher = INVALID_XML_CHARACTER.matcher(message);
+        if (matcher.find()) {
+            String charCode = matcher.group(1);
+            return "XML 中包含非法字符 (Unicode: " + charCode + ")，该字符不符合 XML 1.0 规范";
+        }
+
+        // 元素内容中的无效字符
+        matcher = INVALID_CHARACTER_IN_ELEMENT.matcher(message);
+        if (matcher.find()) {
+            String charCode = matcher.group(1);
+            if (charCode != null) {
+                return "元素内容中包含非法字符 (Unicode: 0x" + charCode + ")";
+            }
+            return "元素内容中包含非法字符，请检查是否包含控制字符或其他无效字符";
+        }
+
+        // 非法 XML 字符
+        matcher = ILLEGAL_CHARACTER.matcher(message);
+        if (matcher.find()) {
+            String charCode = matcher.group(1);
+            String charLiteral = matcher.group(2);
+            if (charCode != null) {
+                return "字符 0x" + charCode + " 不是合法的 XML 字符";
+            }
+            if (charLiteral != null) {
+                return "字符 '" + charLiteral + "' 不是合法的 XML 字符";
+            }
+            return "包含非法的 XML 字符";
+        }
+
+        // 实体引用错误
+        matcher = INVALID_CHARACTER_ENTITY.matcher(message);
+        if (matcher.find()) {
+            return "XML 中引用了未声明的实体，请检查实体引用是否正确或需要在 DTD 中声明";
+        }
+
+        // 通用特殊字符错误检测
+        String lowerMessage = message.toLowerCase();
+        if (lowerMessage.contains("invalid character") || lowerMessage.contains("illegal character")) {
+            if (lowerMessage.contains("unicode")) {
+                return "XML 中包含非法字符，该字符不符合 XML 规范要求";
+            }
+            return "XML 中包含无效字符，请检查内容";
+        }
+
+        if (lowerMessage.contains("entity") && lowerMessage.contains("not declared")) {
+            return "XML 中引用了未声明的实体，请检查实体引用";
+        }
+
         return null;
     }
     
@@ -265,41 +477,55 @@ public class XsdErrorTranslator {
      */
     private static String translateGeneral(String message) {
         String lowerMessage = message.toLowerCase();
-        
+
+        // 特殊字符相关错误优先处理
+        if (lowerMessage.contains("invalid character") || lowerMessage.contains("illegal character")) {
+            return message.replaceAll("(?i)invalid character", "非法字符")
+                         .replaceAll("(?i)illegal character", "非法字符")
+                         .replaceAll("(?i)was found", "被发现")
+                         .replaceAll("(?i)in the element", "在元素中");
+        }
+
+        if (lowerMessage.contains("entity") && lowerMessage.contains("not declared")) {
+            return message.replaceAll("(?i)entity", "实体")
+                         .replaceAll("(?i)not declared", "未声明")
+                         .replaceAll("(?i)was referenced", "被引用");
+        }
+
         // 常见关键字翻译
         if (lowerMessage.contains("not a valid")) {
             return message.replaceAll("(?i)not a valid", "不是一个有效的")
                          .replaceAll("(?i)value", "值");
         }
-        
+
         if (lowerMessage.contains("is not complete")) {
             return message.replaceAll("(?i)is not complete", "不完整")
                          .replaceAll("(?i)one of", "其中之一");
         }
-        
+
         if (lowerMessage.contains("missing child element")) {
             return message.replaceAll("(?i)missing child element", "缺少子元素");
         }
-        
+
         if (lowerMessage.contains("required attribute")) {
             return message.replaceAll("(?i)required attribute", "必需的属性");
         }
-        
+
         if (lowerMessage.contains("unexpected element")) {
             return message.replaceAll("(?i)unexpected element", "意外的元素");
         }
-        
+
         if (lowerMessage.contains("invalid content")) {
             return message.replaceAll("(?i)invalid content", "无效的内容");
         }
-        
+
         // 如果无法识别，返回原消息
         return message;
     }
     
     /**
      * 从带命名空间的名称中提取本地名称
-     * 例如: {http://example.com}localName -> localName
+     * 例如: {@code {http://example.com}localName} -> localName
      */
     private static String extractLocalName(String qualifiedName) {
         if (qualifiedName == null) {
