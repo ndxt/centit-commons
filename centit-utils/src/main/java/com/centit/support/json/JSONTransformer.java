@@ -62,7 +62,7 @@ public class JSONTransformer {
             return switch (value.charAt(0)) {
                 case '@' -> value.substring(1);
                 case '=' -> dataSupport.attainExpressionValue(value.substring(1));
-                case '$' -> dataSupport.extractJSONPathValue(value.substring(1)); // JSONPath $$ 表示跟节点对象 $@ 表示当前对象
+                case '$' -> dataSupport.extractJSONPathValue(value); // JSONPath
                 case '#' ->// 两次计算 map-> formula ； eval 函数也可以实现同样的功能
                     transformer(
                         dataSupport.mapTemplateString(value.substring(1)), dataSupport);
