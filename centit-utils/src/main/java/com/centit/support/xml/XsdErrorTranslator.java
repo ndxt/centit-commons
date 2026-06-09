@@ -98,10 +98,10 @@ public class XsdErrorTranslator {
 
     /**
      * 允许的字符正则表达式
-     * 包含：中文、英文字母、数字、CJK标点符号、空白字符
+     * 包含：中文、英文字母、数字、CJK标点符号、空白字符、常用标点符号(-/,\.)
      */
     private static final Pattern ALLOWED_CHARS_PATTERN = Pattern.compile(
-        "^[\\p{IsHan}a-zA-Z0-9\\u3000-\\u303F\\s]+$"
+        "^[\\p{IsHan}a-zA-Z0-9\\u3000-\\u303F\\s\\-/,.\\\\]+$"
     );
 
     /**

@@ -73,4 +73,12 @@ public class XMLErrorHandler implements ErrorHandler {
         String translatedMessage = XsdErrorTranslator.translate(exception.getMessage());
         fatalErrorMessage.add(translatedMessage + " 位置在" + exception.getLineNumber() + "行" + exception.getColumnNumber()+"列");
     }
+
+    /**
+     * 直接添加错误消息（用于特殊字符检测等）
+     * @param errorMsg 错误消息
+     */
+    public void addError(String errorMsg) {
+        errorMessage.add(errorMsg);
+    }
 }
