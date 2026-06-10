@@ -11,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -776,9 +778,19 @@ public abstract class JSONOpt {
             JSONPath path = JSONPath.of(jsonPath);
             return path.extract(JSONReader.of(is, StandardCharsets.UTF_8));
         }
-        if(obj instanceof String str){
+        if(obj instanceof CharSequence str){
             JSONPath path = JSONPath.of(jsonPath);
-            return path.extract(str);
+            return path.extract(str.toString());
+        }
+        if (obj instanceof ByteArrayOutputStream byteOutput) {
+            JSONPath path = JSONPath.of(jsonPath);
+            return path.extract(JSONReader.of(
+               new ByteArrayInputStream(byteOutput.toByteArray()), StandardCharsets.UTF_8));
+        }
+        if(obj instanceof byte[] bytes){
+            JSONPath path = JSONPath.of(jsonPath);
+            return path.extract(JSONReader.of(
+                new ByteArrayInputStream(bytes), StandardCharsets.UTF_8));
         }
         JSONPath path = JSONPath.of(jsonPath);
         return path.eval(obj);

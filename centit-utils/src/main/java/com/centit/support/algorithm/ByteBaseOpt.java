@@ -52,26 +52,23 @@ public abstract class ByteBaseOpt {
             return JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8);
         }
 
-        if (obj instanceof ByteArrayInputStream) {
-            ByteArrayInputStream byteInput = (ByteArrayInputStream) obj;
+        if (obj instanceof ByteArrayInputStream byteInput) {
             byteInput.reset();
         }
 
-        if (obj instanceof InputStream) {
+        if (obj instanceof InputStream inputStream) {
             try {
-                return FileIOOpt.readBytesFromInputStream((InputStream) obj);
+                return FileIOOpt.readBytesFromInputStream(inputStream);
             } catch (IOException e) {
                 return null;
             }
         }
 
-        if (obj instanceof ByteArrayOutputStream) {
-            ByteArrayOutputStream byteOutput = (ByteArrayOutputStream) obj;
+        if (obj instanceof ByteArrayOutputStream byteOutput) {
             return byteOutput.toByteArray();
         }
 
-        if (obj instanceof BufferedImage) {
-            BufferedImage image = (BufferedImage) obj;
+        if (obj instanceof BufferedImage image) {
             try {
                 return ImageOpt.imageToByteArray(image);
             } catch (IOException e) {
@@ -80,37 +77,37 @@ public abstract class ByteBaseOpt {
             }
         }
 
-        if (obj instanceof Long) {
+        if (obj instanceof Long l) {
             byte[] buf = new byte[8];
-            writeInt64(buf, (Long) obj, 0);
+            writeInt64(buf, l, 0);
             return buf;
         }
 
-        if (obj instanceof Integer) {
+        if (obj instanceof Integer i) {
             byte[] buf = new byte[4];
-            writeInt32(buf, (Integer) obj, 0);
+            writeInt32(buf, i, 0);
             return buf;
         }
 
-        if (obj instanceof Date) {
+        if (obj instanceof Date date) {
             byte[] buf = new byte[8];
-            writeInt64(buf, ((Date) obj).getTime(), 0);
+            writeInt64(buf, date.getTime(), 0);
             return buf;
         }
 
-        if (obj instanceof Float) {
+        if (obj instanceof Float f) {
             byte[] buf = new byte[4];
-            writeFloat(buf, (Float) obj, 0);
+            writeFloat(buf, f, 0);
             return buf;
         }
 
-        if (obj instanceof Double) {
+        if (obj instanceof Double d) {
             byte[] buf = new byte[8];
-            writeDouble(buf, (Double) obj, 0);
+            writeDouble(buf, d, 0);
             return buf;
         }
-        if (obj instanceof String) {
-            return ((String) obj).getBytes();
+        if (obj instanceof String str) {
+            return str.getBytes();
         }
         return JSON.toJSONString(obj).getBytes(StandardCharsets.UTF_8);
     }
