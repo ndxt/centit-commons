@@ -42,12 +42,19 @@ public class DocxHybridConverter {
             // 检测文档是否包含图片
             boolean hasImages = checkDocumentHasImages(docx);
 
+            // 检测文档是否包含嵌套表格
+            boolean hasNestedTables = checkDocumentHasNestedTables(docx);
+
             if (hasImages) {
                 // 如果包含图片，使用自动模式（支持图片转换）
                 logger.info("文档包含图片，使用自动模式以支持图片转换");
                 return convertWithAutoMode(docx, outputStream);
+            } else if (hasNestedTables) {
+                // 如果包含嵌套表格，使用自动模式（手动模式不支持嵌套表格）
+                logger.info("文档包含嵌套表格，使用自动模式以支持嵌套表格转换");
+                return convertWithAutoMode(docx, outputStream);
             } else {
-                // 方案A：不包含图片，使用手动控制（表格质量最高）
+                // 方案A：不包含图片和嵌套表格，使用手动控制（表格质量最高）
                 return convertWithManualTables(docx, outputStream);
             }
 
@@ -610,6 +617,78 @@ public class DocxHybridConverter {
             }
         } catch (Exception e) {
             // 忽略缩进应用失败
+        }
+    }
+
+    /**
+     * 检测文档是否包含嵌套表格
+     * 遍历文档中所有表格，检查其单元格中是否包含其他表格
+     */
+    private static boolean checkDocumentHasNestedTables(XWPFDocument docx) {
+        try {
+            List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
+
+            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
+                if (element instanceof XWPFTable) {
+                    XWPFTable table = (XWPFTable) element;
+                    // 递归检查表格中是否包含嵌套表格
+                    if (hasNestedTableRecursive(table, 0)) {
+                        logger.info("检测到嵌套表格");
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            logger.error("检测嵌套表格失败: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * 递归检查表格是否有嵌套表格
+     * @param table 要检查的表格
+     * @param depth 当前递归深度，防止无限递归
+     * @return 是否包含嵌套表格
+     */
+    private static boolean hasNestedTableRecursive(XWPFTable table, int depth) {
+        // 防止无限递归，限制最大深度为5
+        if (depth > 5) {
+            return false;
+        }
+
+        try {
+            List<org.apache.poi.xwpf.usermodel.XWPFTableRow> rows = table.getRows();
+            if (rows == null || rows.isEmpty()) {
+                return false;
+            }
+
+            for (org.apache.poi.xwpf.usermodel.XWPFTableRow row : rows) {
+                List<org.apache.poi.xwpf.usermodel.XWPFTableCell> cells = row.getTableCells();
+                if (cells == null || cells.isEmpty()) {
+                    continue;
+                }
+
+                for (org.apache.poi.xwpf.usermodel.XWPFTableCell cell : cells) {
+                    List<org.apache.poi.xwpf.usermodel.IBodyElement> cellElements = cell.getBodyElements();
+                    if (cellElements == null || cellElements.isEmpty()) {
+                        continue;
+                    }
+
+                    for (org.apache.poi.xwpf.usermodel.IBodyElement cellElement : cellElements) {
+                        if (cellElement instanceof XWPFTable) {
+                            // 发现嵌套表格
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            logger.error("递归检查嵌套表格失败: {}", e.getMessage(), e);
+            return false;
         }
     }
 
