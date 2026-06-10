@@ -10,7 +10,6 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDecimalNumber;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -1365,20 +1364,6 @@ public class DocxTableToPdfUtils {
             // 有边框，应用设置
             pdfCell.enableBorderSide(side);
 
-            // 获取边框宽度
-            float borderWidth = 0.5f;
-            try {
-                java.lang.reflect.Method getSzMethod = border.getClass().getMethod("getSz");
-                Object szObj = getSzMethod.invoke(border);
-                if (szObj != null) {
-                    int borderSize = Integer.parseInt(szObj.toString());
-                    // Word中边框单位是八分之一磅，需要转换
-                    borderWidth = borderSize / 8.0f;
-                }
-            } catch (Exception e) {
-                // 使用默认宽度
-            }
-
         } catch (Exception e) {
             // 出错时使用默认边框
             pdfCell.enableBorderSide(side);
@@ -1658,7 +1643,7 @@ public class DocxTableToPdfUtils {
      * 支持完整的段落间距设置
      */
     private static com.itextpdf.text.Paragraph convertWordParagraphToPdfParagraph(
-            XWPFParagraph wordPara, com.itextpdf.text.pdf.BaseFont baseFont) {
+        XWPFParagraph wordPara, com.itextpdf.text.pdf.BaseFont baseFont) {
 
         com.itextpdf.text.Paragraph pdfPara = new com.itextpdf.text.Paragraph();
         float fontSize = 12f; // 在try块外定义，确保后面可以访问

@@ -119,26 +119,19 @@ public class DocxHybridConverter {
                         String style = paragraph.getStyle();
                         int fontSize = 12; // 默认字号
                         boolean isBold = false;
-                        boolean isHeading = false; // 标记是否是标题
 
                         if (style != null) {
                             if (style.contains("Heading1") || style.contains("标题1")) {
                                 fontSize = 18;
                                 isBold = true;
-                                isHeading = true;
                             } else if (style.contains("Heading2") || style.contains("标题2")) {
                                 fontSize = 16;
                                 isBold = true;
-                                isHeading = true;
                             } else if (style.contains("Heading3") || style.contains("标题3")) {
                                 fontSize = 14;
                                 isBold = true;
-                                isHeading = true;
                             }
                         }
-
-                        // 将isHeading传递到后续处理中
-                        final boolean finalIsHeading = isHeading;
 
                         // 关键改进：逐个处理 Run，保留完整样式
                         List<org.apache.poi.xwpf.usermodel.XWPFRun> runs = paragraph.getRuns();
