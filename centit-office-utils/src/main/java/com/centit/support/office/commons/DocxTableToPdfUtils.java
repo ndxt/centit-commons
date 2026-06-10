@@ -1829,6 +1829,24 @@ public class DocxTableToPdfUtils {
                 float leading = calculateParagraphLeading(wordPara, fontSize);
                 pdfPara.setLeading(leading);
 
+                // 重新设置对齐方式（重要！）
+                ParagraphAlignment alignment = wordPara.getAlignment();
+                switch (alignment) {
+                    case CENTER:
+                        pdfPara.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
+                        break;
+                    case RIGHT:
+                        pdfPara.setAlignment(com.itextpdf.text.Element.ALIGN_RIGHT);
+                        break;
+                    case BOTH:
+                        pdfPara.setAlignment(com.itextpdf.text.Element.ALIGN_JUSTIFIED);
+                        break;
+                    case LEFT:
+                    default:
+                        pdfPara.setAlignment(com.itextpdf.text.Element.ALIGN_LEFT);
+                        break;
+                }
+
                 // 添加完整文本
                 com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(
                     fullParaText, new com.itextpdf.text.Font(baseFont, fontSize, com.itextpdf.text.Font.NORMAL));
