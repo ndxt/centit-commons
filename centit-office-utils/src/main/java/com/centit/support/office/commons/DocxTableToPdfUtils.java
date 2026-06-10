@@ -10,7 +10,9 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTDecimalNumber;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DOCX表格转PDF高级工具类
@@ -30,6 +32,18 @@ public class DocxTableToPdfUtils {
     public static PdfPTable convertXWPFTableToPdf(XWPFTable table, com.itextpdf.text.pdf.BaseFont baseFont) {
         if (table == null) {
             return null;
+        }
+
+        // 确保字体不为null，如果为null则创建紧急回退字体
+        if (baseFont == null) {
+            try {
+                baseFont = com.itextpdf.text.pdf.BaseFont.createFont(
+                    com.itextpdf.text.pdf.BaseFont.HELVETICA,
+                    com.itextpdf.text.pdf.BaseFont.WINANSI,
+                    com.itextpdf.text.pdf.BaseFont.EMBEDDED);
+            } catch (Exception e) {
+                return null;
+            }
         }
 
         try {
@@ -493,7 +507,7 @@ public class DocxTableToPdfUtils {
                 continue;
             }
             // 添加正常单元格到PDF
-            PdfPCell pdfCell = convertCellToPdf(cell, baseFont, isHeaderRow);
+            PdfPCell pdfCell = convertCellToPdf(cell, baseFont, isHeaderRow, table);
             // 设置行高
             if (rowHeightPt > 0) {
                 pdfCell.setMinimumHeight(rowHeightPt);
@@ -632,8 +646,22 @@ public class DocxTableToPdfUtils {
                 }
             }
 
-            // 如果是精确高度，直接返回
+            // 如果是精确高度，需要确保至少能容纳内容
             if (isExactHeight && rowHeightPt > 0) {
+                // 计算内容所需的最小高度
+                float contentMinHeight = 0f;
+                List<XWPFTableCell> cells = row.getTableCells();
+                for (XWPFTableCell cell : cells) {
+                    float cellRequiredHeight = calculateCellRequiredHeight(cell);
+                    if (cellRequiredHeight > contentMinHeight) {
+                        contentMinHeight = cellRequiredHeight;
+                    }
+                }
+                // 如果精确高度小于内容所需高度，使用内容高度
+                // 这样可以避免文字被裁剪
+                if (contentMinHeight > rowHeightPt) {
+                    return contentMinHeight;
+                }
                 return rowHeightPt;
             }
 
@@ -721,7 +749,7 @@ public class DocxTableToPdfUtils {
     /**
      * 转换单元格到PDF
      */
-    private static PdfPCell convertCellToPdf(XWPFTableCell cell, com.itextpdf.text.pdf.BaseFont baseFont, boolean isHeaderRow) {
+    private static PdfPCell convertCellToPdf(XWPFTableCell cell, com.itextpdf.text.pdf.BaseFont baseFont, boolean isHeaderRow, XWPFTable table) {
         PdfPCell pdfCell = new PdfPCell();
         try {
             // 获取单元格文本
@@ -729,9 +757,25 @@ public class DocxTableToPdfUtils {
             if (text == null || text.trim().isEmpty()) {
                 pdfCell.setPhrase(new Phrase(" "));
             } else {
-                // 创建包含样式的短语
-                Phrase phrase = createStyledPhrase(cell, baseFont);
-                pdfCell.setPhrase(phrase);
+                // 检查单元格是否需要段落间距支持
+                boolean needsParagraphSpacing = cellNeedsParagraphSpacing(cell);
+
+                if (needsParagraphSpacing) {
+                    // 使用Paragraph来支持完整的间距设置
+                    // 清空单元格，使用addElement添加Paragraph
+                    pdfCell.setPhrase(new Phrase("")); // 设置空phrase避免null
+
+                    List<XWPFParagraph> paragraphs = cell.getParagraphs();
+                    for (int i = 0; i < paragraphs.size(); i++) {
+                        XWPFParagraph wordPara = paragraphs.get(i);
+                        com.itextpdf.text.Paragraph pdfPara = convertWordParagraphToPdfParagraph(wordPara, baseFont);
+                        pdfCell.addElement(pdfPara);
+                    }
+                } else {
+                    // 使用Phrase（原有逻辑）
+                    Phrase phrase = createStyledPhrase(cell, baseFont);
+                    pdfCell.setPhrase(phrase);
+                }
 
                 // 修复换行问题：默认允许自动换行，保持原文档的换行行为
                 // 只有在单元格内容非常短且确实是单个单词/数字时，才考虑禁用换行
@@ -756,7 +800,7 @@ public class DocxTableToPdfUtils {
             // 设置内边距
             pdfCell.setPadding(3f);
             // 设置边框
-            applyBorders(pdfCell, isHeaderRow);
+            applyBorders(pdfCell, cell, isHeaderRow, table);
             // 设置对齐方式
             applyAlignment(pdfCell, cell);
             // 设置背景色
@@ -773,12 +817,24 @@ public class DocxTableToPdfUtils {
      * 对于表格单元格，处理所有段落，段落之间用换行符分隔
      */
     private static Phrase createStyledPhrase(XWPFTableCell cell, com.itextpdf.text.pdf.BaseFont defaultBaseFont) {
+        // 获取单元格内段落的行间距设置
+        float cellLeading = calculateCellLeading(cell, defaultBaseFont);
+
         Phrase phrase = new Phrase();
+        // 设置单元格的行间距（使用直接值）
+        // iText中setLeading(fixedLeading, multipliedLeading)的公式是：
+        // actualLeading = fixedLeading + multipliedLeading * maxFontSize
+        // 如果要设置固定的leading值，可以使用setLeading(fixedLeading, 0)
+        phrase.setLeading(cellLeading, 0f);
         try {
             List<XWPFParagraph> paragraphs = cell.getParagraphs();
             boolean hasAnyContent = false;
+            boolean isFirstParagraph = true; // 标记是否是第一个段落
             // 处理所有段落，段落之间添加换行符
             for (XWPFParagraph para : paragraphs) {
+                // 获取段落的首行缩进（用于模拟缩进）
+                int firstLineIndent = para.getIndentationFirstLine();
+
                 List<XWPFRun> runs = para.getRuns();
 
                 if (runs != null && !runs.isEmpty()) {
@@ -793,14 +849,75 @@ public class DocxTableToPdfUtils {
                     }
                     // 如果段落有内容，处理它
                     if (paraHasContent) {
+                        // 获取段落的段前间距（单位：twips，转换为point）
+                        int spacingBefore = para.getSpacingBefore();
+                        float spacingBeforePt = spacingBefore / 20.0f;
+
+                        // 获取段落的字体大小
+                        float paraFontSize = 12f; // 默认字号
+                        try {
+                            List<XWPFRun> paraRuns = para.getRuns();
+                            if (paraRuns != null && !paraRuns.isEmpty()) {
+                                XWPFRun firstRun = paraRuns.get(0);
+                                Double runFontSize = firstRun.getFontSizeAsDouble();
+                                if (runFontSize != null && runFontSize > 0) {
+                                    paraFontSize = runFontSize.floatValue();
+                                }
+                            }
+                        } catch (Exception e) {
+                            // 使用默认值
+                        }
+
+                        // 使用正确的行间距计算方法（支持lineRule类型）
+                        float leading = calculateParagraphLeading(para, paraFontSize);
+                        // 需要额外增加的间距（行间距超出单倍的部分）
+                        float extraLineSpacing = leading - paraFontSize;
+
+                        // 段前间距 + 行间距额外部分
+                        float totalSpacing = spacingBeforePt + extraLineSpacing;
+
                         // 如果不是第一个段落，先添加换行符
                         if (hasAnyContent) {
-                            // 使用 Chunk 创建换行符
-                            com.itextpdf.text.Chunk newline = new com.itextpdf.text.Chunk("\n", new Font(defaultBaseFont, 10));
+                            // 创建换行符
+                            com.itextpdf.text.Chunk newline = new com.itextpdf.text.Chunk("\n", new Font(defaultBaseFont, paraFontSize));
                             phrase.add(newline);
+
+                            // 使用不可见Chunk来模拟段前间距和行间距
+                            if (totalSpacing > 2f) {
+                                Font spacingFont = new Font(defaultBaseFont, totalSpacing, Font.NORMAL);
+                                spacingFont.setColor(new BaseColor(255, 255, 255)); // 白色（不可见）
+                                com.itextpdf.text.Chunk spacingChunk = new com.itextpdf.text.Chunk(" ", spacingFont);
+                                phrase.add(spacingChunk);
+                            }
+                        } else if (isFirstParagraph && spacingBeforePt > 0) {
+                            // 第一个段落也有段前间距，使用不可见Chunk来模拟
+                            if (spacingBeforePt > 1f) {
+                                Font spacingFont = new Font(defaultBaseFont, spacingBeforePt, Font.NORMAL);
+                                spacingFont.setColor(new BaseColor(255, 255, 255)); // 白色（不可见）
+                                com.itextpdf.text.Chunk spacingChunk = new com.itextpdf.text.Chunk(" ", spacingFont);
+                                phrase.add(spacingChunk);
+                            }
                         }
 
                         hasAnyContent = true;
+                        isFirstParagraph = false;
+
+                        // 处理首行缩进：添加空格来模拟缩进
+                        // Word中首行缩进单位是twips（1/20 point），需要转换为字符数
+                        // 假设1个中文字符宽度约为12-14pt，空格约为6pt
+                        if (firstLineIndent > 0) {
+                            float indentPt = firstLineIndent / 20.0f; // 转换为point
+                            // paraFontSize已经在上面定义并获取了，直接使用
+                            // 计算需要添加的空格数
+                            // 中文字符宽度约为字体大小，空格约为字体大小的0.5倍
+                            float charWidth = paraFontSize * 0.5f; // 空格宽度
+                            int spaceCount = Math.round(indentPt / charWidth);
+                            if (spaceCount > 0) {
+                                String indentSpaces = String.format("%" + spaceCount + "s", "");
+                                com.itextpdf.text.Chunk indentChunk = new com.itextpdf.text.Chunk(indentSpaces, new Font(defaultBaseFont, paraFontSize, Font.NORMAL));
+                                phrase.add(indentChunk);
+                            }
+                        }
 
                         // 处理当前段落的每个 run
                         for (XWPFRun run : runs) {
@@ -832,6 +949,10 @@ public class DocxTableToPdfUtils {
                                 if (runBaseFont == null) {
                                     runBaseFont = defaultBaseFont;
                                 }
+                            }
+                            // 双重保护：确保基础字体不为null
+                            if (runBaseFont == null) {
+                                runBaseFont = defaultBaseFont;
                             }
 
                             // 创建字体
@@ -886,77 +1007,381 @@ public class DocxTableToPdfUtils {
 
                             phrase.add(chunk);
                         }
+                    } else {
+                        // 段落有run但没有内容（空段落）
+                        // 仍然需要添加换行符以保持段落间距
+                        if (hasAnyContent) {
+                            com.itextpdf.text.Chunk newline = new com.itextpdf.text.Chunk("\n", new Font(defaultBaseFont, 10));
+                            phrase.add(newline);
+                        }
+                        hasAnyContent = true;
+                    }
+                } else {
+                    // 重要修复：处理段落有 0 个 run 的情况
+                    // 这种情况下，cell.getText() 能获取到文本，但没有 run 对象
+                    // 文本可能直接存储在段落的底层 XML 中
+                    String paraText = para.getText();
+                    if (paraText != null && !paraText.trim().isEmpty()) {
+                        // 如果不是第一个段落，先添加换行符
+                        if (hasAnyContent) {
+                            com.itextpdf.text.Chunk newline = new com.itextpdf.text.Chunk("\n", new Font(defaultBaseFont, 10.0f, Font.NORMAL));
+                            phrase.add(newline);
+                        }
+                        hasAnyContent = true;
+                        // 使用默认字体添加文本
+                        com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(paraText, new Font(defaultBaseFont, 10.5f, Font.NORMAL));
+                        phrase.add(chunk);
+                    } else {
+                        // 完全空段落（没有run且没有文本）
+                        // 仍然需要添加换行符以保持段落间距
+                        if (hasAnyContent) {
+                            com.itextpdf.text.Chunk newline = new com.itextpdf.text.Chunk("\n", new Font(defaultBaseFont, 10));
+                            phrase.add(newline);
+                        }
+                        hasAnyContent = true;
                     }
                 }
             } // 结束段落循环
+
+            // 重要修复：检查phrase是否为空或内容很少
+            // 有时候cell.getText()有文本，但所有段落都没有run或run为空
+            // 这种情况下，使用cell.getText()作为回退
+            String fullCellText = cell.getText();
+            if (fullCellText != null && !fullCellText.trim().isEmpty()) {
+                // 检查phrase的内容长度
+                String phraseContent = phrase.getContent();
+                int phraseLength = (phraseContent != null) ? phraseContent.length() : 0;
+                int fullTextLength = fullCellText.trim().length();
+
+                // 如果phrase内容明显少于完整文本（少于80%），说明有文本丢失
+                // 使用完整文本替换
+                if (phraseLength < fullTextLength * 0.8) {
+                    // 清空phrase并使用完整文本
+                    phrase = new Phrase();
+                    com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(fullCellText, new Font(defaultBaseFont, 10.5f, Font.NORMAL));
+                    phrase.add(chunk);
+                }
+            }
+
             // 如果没有任何内容，添加空格
             if (phrase.isEmpty()) {
                 phrase.add(" ");
             }
         } catch (Exception e) {
             // 回退到简单文本
-            phrase.add(new com.itextpdf.text.Chunk(cell.getText(), new Font(defaultBaseFont, 10, Font.NORMAL)));
+            try {
+                String cellText = cell.getText();
+                phrase = new Phrase();
+                phrase.add(new com.itextpdf.text.Chunk(cellText, new Font(defaultBaseFont, 10, Font.NORMAL)));
+            } catch (Exception e2) {
+                phrase = new Phrase();
+                phrase.add(" ");
+            }
         }
 
         return phrase;
     }
 
     /**
+     * 计算单元格的行间距
+     * 基于单元格内段落的行间距设置，支持auto/atLeast/exact三种类型
+     */
+    private static float calculateCellLeading(XWPFTableCell cell, com.itextpdf.text.pdf.BaseFont defaultBaseFont) {
+        try {
+            List<XWPFParagraph> paragraphs = cell.getParagraphs();
+            float defaultLeading = 18f; // 默认行间距
+
+            // 统计不同行间距出现的次数
+            Map<Float, Integer> leadingCount = new java.util.HashMap<>();
+
+            for (XWPFParagraph para : paragraphs) {
+                // 使用正确的方法计算行间距，支持不同lineRule类型
+                float fontSize = 12f; // 默认字号
+                try {
+                    List<XWPFRun> runs = para.getRuns();
+                    if (runs != null && !runs.isEmpty()) {
+                        for (XWPFRun run : runs) {
+                            Double runFontSize = run.getFontSizeAsDouble();
+                            if (runFontSize != null && runFontSize > 0) {
+                                fontSize = runFontSize.floatValue();
+                                break;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    // 使用默认值
+                }
+
+                // 计算段落行间距（支持lineRule类型）
+                float leading = calculateParagraphLeading(para, fontSize);
+
+                // 统计出现次数（四舍五入到最近的整数）
+                float roundedLeading = Math.round(leading);
+                leadingCount.put(roundedLeading, leadingCount.getOrDefault(roundedLeading, 0) + 1);
+            }
+
+            // 取出现次数最多的行间距
+            float mostCommonLeading = defaultLeading;
+            int maxCount = 0;
+            for (java.util.Map.Entry<Float, Integer> entry : leadingCount.entrySet()) {
+                if (entry.getValue() > maxCount) {
+                    maxCount = entry.getValue();
+                    mostCommonLeading = entry.getKey();
+                }
+            }
+
+            return mostCommonLeading;
+        } catch (Exception e) {
+            return 18f; // 出错时返回默认值
+        }
+    }
+
+    /**
+     * 计算段落的行间距
+     * 支持auto/atLeast/exact三种lineRule类型
+     * 与DocxHybridConverter.calculateLeading逻辑保持一致
+     */
+    private static float calculateParagraphLeading(XWPFParagraph paragraph, float fontSize) {
+        try {
+            // 通过底层XML获取行间距设置
+            String xmlText = paragraph.getCTP().toString();
+
+            // 查找 w:spacing 元素
+            java.util.regex.Pattern spacingPattern = java.util.regex.Pattern.compile("<w:spacing[^>]*/>");
+            java.util.regex.Matcher spacingMatcher = spacingPattern.matcher(xmlText);
+
+            if (spacingMatcher.find()) {
+                String spacingTag = spacingMatcher.group();
+
+                // 获取行间距类型 w:lineRule
+                String lineRule = "auto"; // 默认自动
+                java.util.regex.Pattern lineRulePattern = java.util.regex.Pattern.compile("w:lineRule=\"([^\"]+)\"");
+                java.util.regex.Matcher lineRuleMatcher = lineRulePattern.matcher(spacingTag);
+                if (lineRuleMatcher.find()) {
+                    lineRule = lineRuleMatcher.group(1);
+                }
+
+                // 获取行间距值 w:line
+                int lineValue = 240; // 默认单倍行距（240 twips）
+                java.util.regex.Pattern linePattern = java.util.regex.Pattern.compile("w:line=\"([0-9]+)\"");
+                java.util.regex.Matcher lineMatcher = linePattern.matcher(spacingTag);
+                if (lineMatcher.find()) {
+                    lineValue = Integer.parseInt(lineMatcher.group(1));
+                }
+
+                // 根据不同的lineRule计算leading
+                if ("auto".equalsIgnoreCase(lineRule) || lineRule.isEmpty()) {
+                    // 自动行距：lineValue单位是1/240行，240表示单倍行距
+                    // 转换为point：lineValue / 240 * fontSize
+                    return (lineValue / 240.0f) * fontSize;
+                } else if ("atLeast".equalsIgnoreCase(lineRule)) {
+                    // 最小值：lineValue单位是twips（1/20 point）
+                    // 取lineValue/20和fontSize的较大值
+                    float minLeading = lineValue / 20.0f;
+                    return Math.max(fontSize, minLeading);
+                } else if ("exact".equalsIgnoreCase(lineRule)) {
+                    // 固定值：lineValue单位是twips（1/20 point）
+                    // 这就是"间距2.0磅"对应的设置！
+                    return lineValue / 20.0f;
+                }
+            }
+
+            // 如果没有找到spacing设置，使用默认值
+            return fontSize;
+        } catch (Exception e) {
+            // 出错时使用默认值
+            return fontSize;
+        }
+    }
+
+    /**
      * 为表格创建中文字体
+     * 永不返回null，如果创建失败会尝试使用系统字体
      */
     private static com.itextpdf.text.pdf.BaseFont createChineseFontForTable(String fontFamily) {
         try {
-            if (fontFamily.contains("宋体") || fontFamily.contains("SimSun")) {
-                return com.itextpdf.text.pdf.BaseFont.createFont("simsun.ttf",
-                    com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
-                    com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
-            } else if (fontFamily.contains("黑体") || fontFamily.contains("SimHei")) {
-                return com.itextpdf.text.pdf.BaseFont.createFont("simhei.ttf",
-                    com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
-                    com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
-            } else if (fontFamily.contains("楷体") || fontFamily.contains("KaiTi")) {
-                return com.itextpdf.text.pdf.BaseFont.createFont("simkai.ttf",
-                    com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
-                    com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
-            } else if (fontFamily.contains("仿宋") || fontFamily.contains("FangSong")) {
-                return com.itextpdf.text.pdf.BaseFont.createFont("simfang.ttf",
-                    com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
-                    com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
-            } else {
-                return com.itextpdf.text.pdf.BaseFont.createFont("simsun.ttf",
-                    com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
-                    com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+            try {
+                if (fontFamily.contains("宋体") || fontFamily.contains("SimSun")) {
+                    return com.itextpdf.text.pdf.BaseFont.createFont("simsun.ttf",
+                        com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
+                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                } else if (fontFamily.contains("黑体") || fontFamily.contains("SimHei")) {
+                    return com.itextpdf.text.pdf.BaseFont.createFont("simhei.ttf",
+                        com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
+                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                } else if (fontFamily.contains("楷体") || fontFamily.contains("KaiTi")) {
+                    return com.itextpdf.text.pdf.BaseFont.createFont("simkai.ttf",
+                        com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
+                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                } else if (fontFamily.contains("仿宋") || fontFamily.contains("FangSong")) {
+                    return com.itextpdf.text.pdf.BaseFont.createFont("simfang.ttf",
+                        com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
+                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                } else {
+                    return com.itextpdf.text.pdf.BaseFont.createFont("simsun.ttf",
+                        com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
+                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                }
+            } catch (Exception e) {
+                // 字体文件找不到，尝试内置字体
+                try {
+                    return com.itextpdf.text.pdf.BaseFont.createFont("STSong-Light",
+                        "UniGB-UCS2-H",
+                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                } catch (Exception e2) {
+                    // 最后回退到Helvetica（不支持中文但不会崩溃）
+                    return com.itextpdf.text.pdf.BaseFont.createFont(
+                        com.itextpdf.text.pdf.BaseFont.HELVETICA,
+                        com.itextpdf.text.pdf.BaseFont.WINANSI,
+                        com.itextpdf.text.pdf.BaseFont.EMBEDDED);
+                }
             }
+        } catch (Exception e) {
+            // 紧急回退
+            try {
+                return com.itextpdf.text.pdf.BaseFont.createFont(
+                    com.itextpdf.text.pdf.BaseFont.HELVETICA,
+                    com.itextpdf.text.pdf.BaseFont.WINANSI,
+                    com.itextpdf.text.pdf.BaseFont.EMBEDDED);
+            } catch (Exception e2) {
+                return null; // 只有在极端情况下才会返回null
+            }
+        }
+    }
+
+    /**
+     * 应用边框
+     * 检查Word文档中的边框设置，正确处理隐藏边框
+     */
+    private static void applyBorders(PdfPCell pdfCell, XWPFTableCell cell, boolean isHeaderRow, XWPFTable table) {
+        try {
+            boolean hasCellBorderSettings = false;
+
+            // 获取单元格的边框设置
+            Object tcPr = cell.getCTTc() != null ? cell.getCTTc().getTcPr() : null;
+
+            if (tcPr != null) {
+                // 使用反射获取边框信息，避免类名问题
+                try {
+                    java.lang.reflect.Method getBordersMethod = tcPr.getClass().getMethod("getTcBorders");
+                    Object borders = getBordersMethod.invoke(tcPr);
+                    if (borders != null) {
+                        hasCellBorderSettings = true;
+                        // 检查每个边框的设置
+                        Object topBorder = getBorderFromBorders(borders, "getTop");
+                        Object bottomBorder = getBorderFromBorders(borders, "getBottom");
+                        Object leftBorder = getBorderFromBorders(borders, "getLeft");
+                        Object rightBorder = getBorderFromBorders(borders, "getRight");
+
+                        applyBorderSide(pdfCell, topBorder, PdfPCell.TOP, isHeaderRow);
+                        applyBorderSide(pdfCell, bottomBorder, PdfPCell.BOTTOM, isHeaderRow);
+                        applyBorderSide(pdfCell, leftBorder, PdfPCell.LEFT, isHeaderRow);
+                        applyBorderSide(pdfCell, rightBorder, PdfPCell.RIGHT, isHeaderRow);
+                    }
+                } catch (Exception e) {
+                    // 反射失败，继续检查表格级别边框
+                }
+            }
+
+            // 如果单元格没有明确的边框设置，检查表格级别的边框设置
+            if (!hasCellBorderSettings && table != null) {
+                try {
+                    org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblPr tblPr = table.getCTTbl().getTblPr();
+                    if (tblPr != null) {
+                        Object tblBorders = tblPr.getTblBorders();
+                        if (tblBorders != null) {
+                            // 使用表格级别的边框设置
+                            Object topBorder = getBorderFromBorders(tblBorders, "getTop");
+                            Object bottomBorder = getBorderFromBorders(tblBorders, "getBottom");
+                            Object leftBorder = getBorderFromBorders(tblBorders, "getLeft");
+                            Object rightBorder = getBorderFromBorders(tblBorders, "getRight");
+
+                            applyBorderSide(pdfCell, topBorder, PdfPCell.TOP, isHeaderRow);
+                            applyBorderSide(pdfCell, bottomBorder, PdfPCell.BOTTOM, isHeaderRow);
+                            applyBorderSide(pdfCell, leftBorder, PdfPCell.LEFT, isHeaderRow);
+                            applyBorderSide(pdfCell, rightBorder, PdfPCell.RIGHT, isHeaderRow);
+                            return;
+                        }
+                    }
+                } catch (Exception e) {
+                    // 获取表格边框失败
+                }
+            }
+
+            // 如果单元格和表格都没有明确的边框设置，默认不显示边框
+            // 只有在明确设置了边框时才显示
+            if (!hasCellBorderSettings) {
+                pdfCell.setBorder(PdfPCell.NO_BORDER);
+            }
+
+        } catch (Exception e) {
+            // 出错时默认不显示边框
+            pdfCell.setBorder(PdfPCell.NO_BORDER);
+        }
+    }
+
+    /**
+     * 从边框对象中获取单个边框
+     */
+    private static Object getBorderFromBorders(Object borders, String methodName) {
+        try {
+            java.lang.reflect.Method method = borders.getClass().getMethod(methodName);
+            return method.invoke(borders);
         } catch (Exception e) {
             return null;
         }
     }
 
     /**
-     * 应用边框
+     * 应用单个边框的设置
      */
-    private static void applyBorders(PdfPCell pdfCell, boolean isHeaderRow) {
+    private static void applyBorderSide(PdfPCell pdfCell, Object border, int side, boolean isHeaderRow) {
         try {
-            // 设置统一的细边框
-            pdfCell.setBorderWidth(0.5f);
-            pdfCell.setBorderColor(BaseColor.GRAY);
-            pdfCell.setBorder(PdfPCell.BOX);
-
-            // 如果是表头行，增强底部边框以更好地区分标题行
-            if (isHeaderRow) {
-                // 为表头行设置更明显的底部边框
-                try {
-                    pdfCell.setBorderWidthBottom(1.5f);
-                    // 增加表头行的底部间距，避免与表格线重合
-                    pdfCell.setPaddingBottom(8f);
-                } catch (Exception e) {
-                    // 忽略设置失败
-                }
+            if (border == null) {
+                // 没有设置该边框，使用默认边框
+                pdfCell.enableBorderSide(side);
+                return;
             }
+
+            // 使用反射获取边框的val属性
+            String val = "single";
+            try {
+                java.lang.reflect.Method getValMethod = border.getClass().getMethod("getVal");
+                Object valObj = getValMethod.invoke(border);
+                if (valObj != null) {
+                    val = valObj.toString();
+                }
+            } catch (Exception e) {
+                // 使用默认值
+            }
+
+            // 检查是否是nil或none（无边框/隐藏）
+            if ("nil".equalsIgnoreCase(val) || "none".equalsIgnoreCase(val)) {
+                // 隐藏该边框
+                pdfCell.disableBorderSide(side);
+                return;
+            }
+
+            // 有边框，应用设置
+            pdfCell.enableBorderSide(side);
+
+            // 获取边框宽度
+            float borderWidth = 0.5f;
+            try {
+                java.lang.reflect.Method getSzMethod = border.getClass().getMethod("getSz");
+                Object szObj = getSzMethod.invoke(border);
+                if (szObj != null) {
+                    int borderSize = Integer.parseInt(szObj.toString());
+                    // Word中边框单位是八分之一磅，需要转换
+                    borderWidth = borderSize / 8.0f;
+                }
+            } catch (Exception e) {
+                // 使用默认宽度
+            }
+
         } catch (Exception e) {
-            pdfCell.setBorderWidth(0.5f);
-            pdfCell.setBorderColor(BaseColor.GRAY);
-            pdfCell.setBorder(PdfPCell.BOX);
+            // 出错时使用默认边框
+            pdfCell.enableBorderSide(side);
         }
     }
 
@@ -1192,5 +1617,231 @@ public class DocxTableToPdfUtils {
         }
 
         return span;
+    }
+
+    /**
+     * 检查单元格是否需要段落间距支持
+     * 放宽检测条件，只要有间距设置就返回true
+     */
+    private static boolean cellNeedsParagraphSpacing(XWPFTableCell cell) {
+        try {
+            List<XWPFParagraph> paragraphs = cell.getParagraphs();
+            for (XWPFParagraph para : paragraphs) {
+                // 检查段前间距
+                if (para.getSpacingBefore() != 0) {
+                    return true;
+                }
+                // 检查段后间距
+                if (para.getSpacingAfter() != 0) {
+                    return true;
+                }
+                // 检查是否有任何间距相关的XML设置
+                try {
+                    String xml = para.getCTP().toString();
+                    // 只要包含w:spacing元素，就认为需要段落间距支持
+                    // 这样可以捕获所有行距设置，包括倍数行距
+                    if (xml.contains("w:spacing")) {
+                        return true;
+                    }
+                } catch (Exception e) {
+                    // 忽略
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 将Word段落转换为PDF段落
+     * 支持完整的段落间距设置
+     */
+    private static com.itextpdf.text.Paragraph convertWordParagraphToPdfParagraph(
+            XWPFParagraph wordPara, com.itextpdf.text.pdf.BaseFont baseFont) {
+
+        com.itextpdf.text.Paragraph pdfPara = new com.itextpdf.text.Paragraph();
+        float fontSize = 12f; // 在try块外定义，确保后面可以访问
+
+        try {
+            // 1. 设置段前间距
+            int spacingBefore = wordPara.getSpacingBefore();
+            if (spacingBefore > 0) {
+                pdfPara.setSpacingBefore(spacingBefore / 20.0f);
+            }
+
+            // 2. 设置段后间距
+            int spacingAfter = wordPara.getSpacingAfter();
+            if (spacingAfter > 0) {
+                pdfPara.setSpacingAfter(spacingAfter / 20.0f);
+            }
+
+            // 3. 设置行距（支持lineRule类型）
+            List<XWPFRun> runs = wordPara.getRuns();
+            if (runs != null && !runs.isEmpty()) {
+                for (XWPFRun run : runs) {
+                    Double runFontSize = run.getFontSizeAsDouble();
+                    if (runFontSize != null && runFontSize > 0) {
+                        fontSize = runFontSize.floatValue();
+                        break;
+                    }
+                }
+            }
+            float leading = calculateParagraphLeading(wordPara, fontSize);
+            pdfPara.setLeading(leading);
+
+            // 4. 添加文本内容
+            for (XWPFRun run : runs) {
+                if (run == null) continue;
+
+                String runText = run.getText(0);
+                if (runText == null || runText.isEmpty()) {
+                    continue;
+                }
+
+                Double runFontSize = run.getFontSizeAsDouble();
+                if (runFontSize == null) {
+                    runFontSize = 10.0;
+                }
+
+                int fontStyle = com.itextpdf.text.Font.NORMAL;
+                if (run.isBold()) {
+                    fontStyle |= com.itextpdf.text.Font.BOLD;
+                }
+                if (run.isItalic()) {
+                    fontStyle |= com.itextpdf.text.Font.ITALIC;
+                }
+
+                com.itextpdf.text.pdf.BaseFont runBaseFont = baseFont;
+                String runFontFamily = run.getFontFamily();
+                if (runFontFamily != null && !runFontFamily.isEmpty()) {
+                    runBaseFont = createChineseFontForTable(runFontFamily);
+                    if (runBaseFont == null) {
+                        runBaseFont = baseFont;
+                    }
+                }
+
+                com.itextpdf.text.Font font = new com.itextpdf.text.Font(
+                    runBaseFont != null ? runBaseFont : baseFont,
+                    runFontSize.floatValue(), fontStyle);
+
+                // 设置颜色
+                String colorStr = run.getColor();
+                if (colorStr != null && !colorStr.isEmpty()) {
+                    try {
+                        int rgb = Integer.parseInt(colorStr, 16);
+                        int r = (rgb >> 16) & 0xFF;
+                        int g = (rgb >> 8) & 0xFF;
+                        int b = rgb & 0xFF;
+                        font.setColor(new com.itextpdf.text.BaseColor(r, g, b));
+                    } catch (NumberFormatException e) {
+                        // 忽略
+                    }
+                }
+
+                com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, font);
+
+                // 处理下划线 - 通过反射获取底层XML
+                try {
+                    java.lang.reflect.Method getCTRMethod = run.getClass().getMethod("getCTR");
+                    Object ctr = getCTRMethod.invoke(run);
+                    if (ctr != null) {
+                        java.lang.reflect.Method getRPrMethod = ctr.getClass().getMethod("getRPr");
+                        Object rpr = getRPrMethod.invoke(ctr);
+                        if (rpr != null) {
+                            java.lang.reflect.Method getUMethod = rpr.getClass().getMethod("getU");
+                            Object u = getUMethod.invoke(rpr);
+                            if (u != null) {
+                                java.lang.reflect.Method getValMethod = u.getClass().getMethod("getVal");
+                                Object val = getValMethod.invoke(u);
+                                if (val != null && !val.toString().contains("NONE")) {
+                                    chunk.setUnderline(0.5f, -2f);
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    // 忽略下划线处理错误
+                }
+
+                // 处理删除线
+                if (run.isStrikeThrough()) {
+                    chunk.setUnderline(0.5f, 3f);
+                }
+
+                pdfPara.add(chunk);
+            }
+
+            // 5. 设置对齐方式
+            ParagraphAlignment alignment = wordPara.getAlignment();
+            switch (alignment) {
+                case CENTER:
+                    pdfPara.setAlignment(com.itextpdf.text.Element.ALIGN_CENTER);
+                    break;
+                case RIGHT:
+                    pdfPara.setAlignment(com.itextpdf.text.Element.ALIGN_RIGHT);
+                    break;
+                case BOTH:
+                    pdfPara.setAlignment(com.itextpdf.text.Element.ALIGN_JUSTIFIED);
+                    break;
+                case LEFT:
+                default:
+                    pdfPara.setAlignment(com.itextpdf.text.Element.ALIGN_LEFT);
+                    break;
+            }
+
+            // 6. 设置首行缩进
+            int firstLineIndent = wordPara.getIndentationFirstLine();
+            if (firstLineIndent != 0) {
+                pdfPara.setFirstLineIndent(firstLineIndent / 20.0f);
+            }
+
+        } catch (Exception e) {
+            // 出错时添加空段落
+            pdfPara.add(new com.itextpdf.text.Chunk(" ", new com.itextpdf.text.Font(baseFont, 10)));
+        }
+
+        // 重要：检查段落是否为空或内容丢失
+        // 有时候para.getText()有文本，但所有runs都没有或为空
+        // 这种情况下，使用para.getText()作为回退
+        String fullParaText = wordPara.getText();
+        if (fullParaText != null && !fullParaText.trim().isEmpty()) {
+            // 检查pdfPara的内容长度
+            String pdfContent = pdfPara.getContent();
+            int pdfLength = (pdfContent != null) ? pdfContent.length() : 0;
+            int fullTextLength = fullParaText.trim().length();
+
+            // 如果pdf内容明显少于完整文本（少于80%），说明有文本丢失
+            // 使用完整文本替换
+            if (pdfLength < fullTextLength * 0.8) {
+                // 清空pdfPara并使用完整文本
+                pdfPara = new com.itextpdf.text.Paragraph();
+
+                // 重新设置间距
+                int spacingBefore = wordPara.getSpacingBefore();
+                if (spacingBefore > 0) {
+                    pdfPara.setSpacingBefore(spacingBefore / 20.0f);
+                }
+                int spacingAfter = wordPara.getSpacingAfter();
+                if (spacingAfter > 0) {
+                    pdfPara.setSpacingAfter(spacingAfter / 20.0f);
+                }
+                float leading = calculateParagraphLeading(wordPara, fontSize);
+                pdfPara.setLeading(leading);
+
+                // 添加完整文本
+                com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(
+                    fullParaText, new com.itextpdf.text.Font(baseFont, fontSize, com.itextpdf.text.Font.NORMAL));
+                pdfPara.add(chunk);
+            }
+        }
+
+        // 最后检查：如果段落还是完全空的，添加空格
+        if (pdfPara.getChunks().isEmpty()) {
+            com.itextpdf.text.Chunk emptyChunk = new com.itextpdf.text.Chunk(" ", new com.itextpdf.text.Font(baseFont, fontSize));
+            pdfPara.add(emptyChunk);
+        }
+
+        return pdfPara;
     }
 }

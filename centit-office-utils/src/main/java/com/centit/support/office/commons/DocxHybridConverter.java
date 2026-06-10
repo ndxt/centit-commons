@@ -39,8 +39,17 @@ public class DocxHybridConverter {
      */
     public static boolean convert(XWPFDocument docx, OutputStream outputStream) {
         try {
-            // 方案A：先尝试完全手动控制（推荐，表格质量最高）
-            return convertWithManualTables(docx, outputStream);
+            // 检测文档是否包含图片
+            boolean hasImages = checkDocumentHasImages(docx);
+
+            if (hasImages) {
+                // 如果包含图片，使用自动模式（支持图片转换）
+                logger.info("文档包含图片，使用自动模式以支持图片转换");
+                return convertWithAutoMode(docx, outputStream);
+            } else {
+                // 方案A：不包含图片，使用手动控制（表格质量最高）
+                return convertWithManualTables(docx, outputStream);
+            }
 
         } catch (Exception e) {
             logger.error("混合转换失败，回退到自动转换: {}", e.getMessage(), e);
@@ -95,159 +104,188 @@ public class DocxHybridConverter {
                     // 处理段落（标题、正文等）
                     XWPFParagraph paragraph = (XWPFParagraph) element;
 
-                    // 跳过空段落（原文中的空行不需要转换）
-                    String text = paragraph.getText();
-                    if (text == null || text.trim().isEmpty()) {
-                        continue;
-                    }
-
                     // 创建PDF段落
                     com.itextpdf.text.Paragraph pdfPara = new com.itextpdf.text.Paragraph();
 
-                    // 检测标题级别和样式
-                    String style = paragraph.getStyle();
-                    int fontSize = 12; // 默认字号
-                    boolean isBold = false;
-                    String fontFamily = null; // 字体族
+                    // 获取段落文本
+                    String text = paragraph.getText();
 
-                    if (style != null) {
-                        if (style.contains("Heading1") || style.contains("标题1")) {
-                            fontSize = 18;
-                            isBold = true;
-                        } else if (style.contains("Heading2") || style.contains("标题2")) {
-                            fontSize = 16;
-                            isBold = true;
-                        } else if (style.contains("Heading3") || style.contains("标题3")) {
-                            fontSize = 14;
-                            isBold = true;
+                    // 修复空行转换问题：不跳过空段落，而是保留空行以保持文档布局
+                    // 空段落在Word中用于控制间距和布局，应该被保留
+                    if (text != null && !text.trim().isEmpty()) {
+                        // 有文本的段落，按原逻辑处理
+
+                        // 检测标题级别和样式
+                        String style = paragraph.getStyle();
+                        int fontSize = 12; // 默认字号
+                        boolean isBold = false;
+                        boolean isHeading = false; // 标记是否是标题
+
+                        if (style != null) {
+                            if (style.contains("Heading1") || style.contains("标题1")) {
+                                fontSize = 18;
+                                isBold = true;
+                                isHeading = true;
+                            } else if (style.contains("Heading2") || style.contains("标题2")) {
+                                fontSize = 16;
+                                isBold = true;
+                                isHeading = true;
+                            } else if (style.contains("Heading3") || style.contains("标题3")) {
+                                fontSize = 14;
+                                isBold = true;
+                                isHeading = true;
+                            }
                         }
-                    }
 
-                    // 关键改进：逐个处理 Run，保留完整样式
-                    List<org.apache.poi.xwpf.usermodel.XWPFRun> runs = paragraph.getRuns();
+                        // 将isHeading传递到后续处理中
+                        final boolean finalIsHeading = isHeading;
 
-                    if (runs == null || runs.isEmpty()) {
-                        // 有文本但没有 run：使用默认字体添加文本
-                        com.itextpdf.text.Font defaultFontStyle = new com.itextpdf.text.Font(defaultFont, fontSize, com.itextpdf.text.Font.NORMAL);
-                        pdfPara.add(new com.itextpdf.text.Chunk(text.trim(), defaultFontStyle));
-                    } else {
-                        // 遍历每个 run，保留各自的样式
-                        for (org.apache.poi.xwpf.usermodel.XWPFRun run : runs) {
-                            // 提取 run 的样式
-                            float runFontSize = fontSize; // 继承段落默认字号
-                            if (run.getFontSizeAsDouble() != null) {
-                                runFontSize = run.getFontSizeAsDouble().floatValue();
-                            }
+                        // 关键改进：逐个处理 Run，保留完整样式
+                        List<org.apache.poi.xwpf.usermodel.XWPFRun> runs = paragraph.getRuns();
 
-                            // 检测字体样式
-                            int fontStyle = com.itextpdf.text.Font.NORMAL;
-                            if (run.isBold() || isBold) {
-                                fontStyle |= com.itextpdf.text.Font.BOLD;
-                            }
-                            if (run.isItalic()) {
-                                fontStyle |= com.itextpdf.text.Font.ITALIC;
-                            }
-
-                            // 获取字体族
-                            String runFontFamily = run.getFontFamily();
-                            com.itextpdf.text.pdf.BaseFont runBaseFont = defaultFont;
-                            if (runFontFamily != null && !runFontFamily.isEmpty()) {
-                                runBaseFont = createChineseFont(fontMap, runFontFamily);
-                                if (runBaseFont == null) {
-                                    runBaseFont = defaultFont;
+                        if (runs == null || runs.isEmpty()) {
+                            // 有文本但没有 run：使用默认字体添加文本
+                            com.itextpdf.text.Font defaultFontStyle = new com.itextpdf.text.Font(defaultFont, fontSize, com.itextpdf.text.Font.NORMAL);
+                            pdfPara.add(new com.itextpdf.text.Chunk(text.trim(), defaultFontStyle));
+                        } else {
+                            // 遍历每个 run，保留各自的样式
+                            for (org.apache.poi.xwpf.usermodel.XWPFRun run : runs) {
+                                // 提取 run 的样式
+                                float runFontSize = fontSize; // 继承段落默认字号
+                                if (run.getFontSizeAsDouble() != null) {
+                                    runFontSize = run.getFontSizeAsDouble().floatValue();
                                 }
-                            }
 
-                            // 创建字体
-                            com.itextpdf.text.Font runFont = new com.itextpdf.text.Font(runBaseFont, runFontSize, fontStyle);
+                                // 检测字体样式
+                                int fontStyle = com.itextpdf.text.Font.NORMAL;
+                                if (run.isBold() || isBold) {
+                                    fontStyle |= com.itextpdf.text.Font.BOLD;
+                                }
+                                if (run.isItalic()) {
+                                    fontStyle |= com.itextpdf.text.Font.ITALIC;
+                                }
 
-                            // 设置字体颜色
-                            String colorStr = run.getColor();
-                            if (colorStr != null && !colorStr.isEmpty()) {
+                                // 获取字体族
+                                String runFontFamily = run.getFontFamily();
+                                com.itextpdf.text.pdf.BaseFont runBaseFont = defaultFont;
+                                if (runFontFamily != null && !runFontFamily.isEmpty()) {
+                                    runBaseFont = createChineseFont(fontMap, runFontFamily);
+                                    if (runBaseFont == null) {
+                                        runBaseFont = defaultFont;
+                                    }
+                                }
+
+                                // 创建字体
+                                com.itextpdf.text.Font runFont = new com.itextpdf.text.Font(runBaseFont, runFontSize, fontStyle);
+
+                                // 设置字体颜色
+                                String colorStr = run.getColor();
+                                if (colorStr != null && !colorStr.isEmpty()) {
+                                    try {
+                                        int rgb = Integer.parseInt(colorStr, 16);
+                                        int r = (rgb >> 16) & 0xFF;
+                                        int g = (rgb >> 8) & 0xFF;
+                                        int b = rgb & 0xFF;
+                                        runFont.setColor(r, g, b);
+                                    } catch (NumberFormatException e) {
+                                        // 忽略颜色解析错误
+                                    }
+                                }
+
+                                // 通过反射获取下划线、删除线、上下标等属性
+                                boolean hasUnderline = false;
+                                boolean hasStrikeThrough = run.isStrikeThrough();
+                                String vertAlignStr = null;
                                 try {
-                                    int rgb = Integer.parseInt(colorStr, 16);
-                                    int r = (rgb >> 16) & 0xFF;
-                                    int g = (rgb >> 8) & 0xFF;
-                                    int b = rgb & 0xFF;
-                                    runFont.setColor(r, g, b);
-                                } catch (NumberFormatException e) {
-                                    // 忽略颜色解析错误
-                                }
-                            }
-
-                            // 通过反射获取下划线、删除线、上下标等属性
-                            boolean hasUnderline = false;
-                            boolean hasStrikeThrough = run.isStrikeThrough();
-                            String vertAlignStr = null;
-                            try {
-                                java.lang.reflect.Method getCTRMethod = run.getClass().getMethod("getCTR");
-                                Object ctr = getCTRMethod.invoke(run);
-                                if (ctr != null) {
-                                    java.lang.reflect.Method getRPrMethod = ctr.getClass().getMethod("getRPr");
-                                    Object rpr = getRPrMethod.invoke(ctr);
-                                    if (rpr != null) {
-                                        java.lang.reflect.Method getUMethod = rpr.getClass().getMethod("getU");
-                                        Object u = getUMethod.invoke(rpr);
-                                        if (u != null) {
-                                            java.lang.reflect.Method getValMethod = u.getClass().getMethod("getVal");
-                                            Object val = getValMethod.invoke(u);
-                                            if (val != null && !val.toString().contains("NONE")) {
-                                                hasUnderline = true;
+                                    java.lang.reflect.Method getCTRMethod = run.getClass().getMethod("getCTR");
+                                    Object ctr = getCTRMethod.invoke(run);
+                                    if (ctr != null) {
+                                        java.lang.reflect.Method getRPrMethod = ctr.getClass().getMethod("getRPr");
+                                        Object rpr = getRPrMethod.invoke(ctr);
+                                        if (rpr != null) {
+                                            java.lang.reflect.Method getUMethod = rpr.getClass().getMethod("getU");
+                                            Object u = getUMethod.invoke(rpr);
+                                            if (u != null) {
+                                                java.lang.reflect.Method getValMethod = u.getClass().getMethod("getVal");
+                                                Object val = getValMethod.invoke(u);
+                                                if (val != null && !val.toString().contains("NONE")) {
+                                                    hasUnderline = true;
+                                                }
+                                            }
+                                            java.lang.reflect.Method getVertAlignMethod = rpr.getClass().getMethod("getVertAlign");
+                                            Object vertAlign = getVertAlignMethod.invoke(rpr);
+                                            if (vertAlign != null) {
+                                                vertAlignStr = vertAlign.toString();
                                             }
                                         }
-                                        java.lang.reflect.Method getVertAlignMethod = rpr.getClass().getMethod("getVertAlign");
-                                        Object vertAlign = getVertAlignMethod.invoke(rpr);
-                                        if (vertAlign != null) {
-                                            vertAlignStr = vertAlign.toString();
-                                        }
                                     }
+                                } catch (Exception e) {
+                                    // 忽略属性解析错误
                                 }
-                            } catch (Exception e) {
-                                // 忽略属性解析错误
-                            }
 
-                            // 遍历 run 的 XML 子节点，按原始顺序处理文本和换行符
-                            try {
-                                org.w3c.dom.Node runNode = run.getCTR().getDomNode();
-                                org.w3c.dom.NodeList children = runNode.getChildNodes();
-                                boolean hasContent = false;
+                                // 遍历 run 的 XML 子节点，按原始顺序处理文本和换行符
+                                try {
+                                    org.w3c.dom.Node runNode = run.getCTR().getDomNode();
+                                    org.w3c.dom.NodeList children = runNode.getChildNodes();
+                                    boolean hasContent = false;
 
-                                for (int childIdx = 0; childIdx < children.getLength(); childIdx++) {
-                                    org.w3c.dom.Node child = children.item(childIdx);
-                                    if (child.getNodeType() != org.w3c.dom.Node.ELEMENT_NODE) {
-                                        continue;
-                                    }
-                                    String localName = child.getLocalName();
-                                    if ("t".equals(localName) || "delText".equals(localName)) {
-                                        // 文本节点
-                                        String runText = child.getTextContent();
-                                        if (runText == null || runText.isEmpty()) {
+                                    for (int childIdx = 0; childIdx < children.getLength(); childIdx++) {
+                                        org.w3c.dom.Node child = children.item(childIdx);
+                                        if (child.getNodeType() != org.w3c.dom.Node.ELEMENT_NODE) {
                                             continue;
                                         }
-                                        hasContent = true;
-                                        com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
-                                        if (hasUnderline) {
-                                            chunk.setUnderline(0.5f, -2f);
-                                        }
-                                        if (hasStrikeThrough) {
-                                            chunk.setUnderline(0.5f, 3f);
-                                        }
-                                        if (vertAlignStr != null) {
-                                            if (vertAlignStr.contains("SUPERSCRIPT")) {
-                                                chunk.setTextRise(6f);
-                                            } else if (vertAlignStr.contains("SUBSCRIPT")) {
-                                                chunk.setTextRise(-3f);
+                                        String localName = child.getLocalName();
+                                        if ("t".equals(localName) || "delText".equals(localName)) {
+                                            // 文本节点
+                                            String runText = child.getTextContent();
+                                            if (runText == null || runText.isEmpty()) {
+                                                continue;
                                             }
+                                            hasContent = true;
+                                            com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
+                                            if (hasUnderline) {
+                                                chunk.setUnderline(0.5f, -2f);
+                                            }
+                                            if (hasStrikeThrough) {
+                                                chunk.setUnderline(0.5f, 3f);
+                                            }
+                                            if (vertAlignStr != null) {
+                                                if (vertAlignStr.contains("SUPERSCRIPT")) {
+                                                    chunk.setTextRise(6f);
+                                                } else if (vertAlignStr.contains("SUBSCRIPT")) {
+                                                    chunk.setTextRise(-3f);
+                                                }
+                                            }
+                                            pdfPara.add(chunk);
+                                        } else if ("br".equals(localName)) {
+                                            // 行内换行符
+                                            hasContent = true;
+                                            pdfPara.add(new com.itextpdf.text.Chunk("\n", runFont));
                                         }
-                                        pdfPara.add(chunk);
-                                    } else if ("br".equals(localName)) {
-                                        // 行内换行符
-                                        hasContent = true;
-                                        pdfPara.add(new com.itextpdf.text.Chunk("\n", runFont));
                                     }
-                                }
 
-                                if (!hasContent) {
+                                    if (!hasContent) {
+                                        // 回退：使用 getText(0) 获取文本
+                                        String runText = run.getText(0);
+                                        if (runText != null && !runText.isEmpty()) {
+                                            com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
+                                            if (hasUnderline) {
+                                                chunk.setUnderline(0.5f, -2f);
+                                            }
+                                            if (hasStrikeThrough) {
+                                                chunk.setUnderline(0.5f, 3f);
+                                            }
+                                            if (vertAlignStr != null) {
+                                                if (vertAlignStr.contains("SUPERSCRIPT")) {
+                                                    chunk.setTextRise(6f);
+                                                } else if (vertAlignStr.contains("SUBSCRIPT")) {
+                                                    chunk.setTextRise(-3f);
+                                                }
+                                            }
+                                            pdfPara.add(chunk);
+                                        }
+                                    }
+                                } catch (Exception e) {
                                     // 回退：使用 getText(0) 获取文本
                                     String runText = run.getText(0);
                                     if (runText != null && !runText.isEmpty()) {
@@ -268,35 +306,25 @@ public class DocxHybridConverter {
                                         pdfPara.add(chunk);
                                     }
                                 }
-                            } catch (Exception e) {
-                                // 回退：使用 getText(0) 获取文本
-                                String runText = run.getText(0);
-                                if (runText != null && !runText.isEmpty()) {
-                                    com.itextpdf.text.Chunk chunk = new com.itextpdf.text.Chunk(runText, runFont);
-                                    if (hasUnderline) {
-                                        chunk.setUnderline(0.5f, -2f);
-                                    }
-                                    if (hasStrikeThrough) {
-                                        chunk.setUnderline(0.5f, 3f);
-                                    }
-                                    if (vertAlignStr != null) {
-                                        if (vertAlignStr.contains("SUPERSCRIPT")) {
-                                            chunk.setTextRise(6f);
-                                        } else if (vertAlignStr.contains("SUBSCRIPT")) {
-                                            chunk.setTextRise(-3f);
-                                        }
-                                    }
-                                    pdfPara.add(chunk);
-                                }
                             }
                         }
+                    } // end of if (text != null && !text.trim().isEmpty())
+
+                    // 修复空段落转换问题：为空段落添加不可见内容以确保有高度
+                    boolean isEmptyParagraph = (text == null || text.trim().isEmpty());
+                    if (isEmptyParagraph) {
+                        // 添加一个不可见的零宽度空格，确保段落有内容
+                        com.itextpdf.text.Font invisibleFont = new com.itextpdf.text.Font(defaultFont, 1, com.itextpdf.text.Font.NORMAL);
+                        invisibleFont.setColor(new com.itextpdf.text.BaseColor(255, 255, 255));
+                        com.itextpdf.text.Chunk invisibleChunk = new com.itextpdf.text.Chunk(" ", invisibleFont);
+                        pdfPara.add(invisibleChunk);
                     }
 
                     // 设置段落对齐方式
                     applyParagraphAlignment(pdfPara, paragraph);
 
                     // 设置段落间距（从样式中读取）
-                    applyParagraphSpacing(pdfPara, paragraph);
+                    applyParagraphSpacing(pdfPara, paragraph, isEmptyParagraph);
 
                     // 设置首行缩进（如果有）
                     applyParagraphIndentation(pdfPara, paragraph);
@@ -417,7 +445,7 @@ public class DocxHybridConverter {
     /**
      * 应用段落间距
      */
-    private static void applyParagraphSpacing(com.itextpdf.text.Paragraph pdfPara, XWPFParagraph paragraph) {
+    private static void applyParagraphSpacing(com.itextpdf.text.Paragraph pdfPara, XWPFParagraph paragraph, boolean isEmptyParagraph) {
         try {
             // 获取段前间距（单位：twips，1 twip = 1/20 point）
             int spacingBefore = paragraph.getSpacingBefore();
@@ -427,17 +455,140 @@ public class DocxHybridConverter {
 
             // 获取段后间距
             int spacingAfter = paragraph.getSpacingAfter();
-            if (spacingAfter > 0) {
-                pdfPara.setSpacingAfter(spacingAfter / 20f);
+
+            // 获取段落的实际字体大小（用于计算行间距）
+            float actualFontSize = getParagraphFontSize(paragraph);
+
+            // 检查是否是标题
+            String style = paragraph.getStyle();
+            boolean isHeading = false;
+            if (style != null) {
+                isHeading = style.contains("Heading") || style.contains("标题");
             }
 
-            // 获取行间距（返回 double 类型）
-            double lineSpacing = paragraph.getSpacingBetween();
-            if (lineSpacing > 0) {
-                pdfPara.setLeading((float) (lineSpacing * 1.5)); // 1.5倍行距
+            // 对于标题，确保有足够的段后间距避免重叠
+            if (isHeading) {
+                // 标题默认需要更大的段后间距
+                float headingSpacingAfter = spacingAfter > 0 ? spacingAfter / 20f : 0f;
+                if (headingSpacingAfter < 12f) {
+                    // 如果段后间距太小，设置最小值为12pt
+                    headingSpacingAfter = 12f;
+                }
+                pdfPara.setSpacingAfter(headingSpacingAfter);
+            } else {
+                // 非标题段落的段后间距
+                if (spacingAfter > 0) {
+                    pdfPara.setSpacingAfter(spacingAfter / 20f);
+                }
             }
+
+            // 获取行间距
+            // Word中的行间距有多种类型：单倍、1.5倍、双倍、最小值、固定值等
+            // 需要通过底层XML来准确读取
+            float leading;
+            if (isEmptyParagraph) {
+                // 空段落使用固定的行间距，确保有可见高度
+                leading = 12f; // 12pt的行间距
+            } else {
+                leading = calculateLeading(paragraph, actualFontSize, isHeading);
+            }
+            pdfPara.setLeading(leading);
         } catch (Exception e) {
             // 忽略间距应用失败
+        }
+    }
+
+    /**
+     * 计算段落行间距
+     * 读取Word文档的行间距设置并转换为PDF的leading值
+     */
+    private static float calculateLeading(XWPFParagraph paragraph, float fontSize, boolean isHeading) {
+        try {
+            // 通过底层XML获取行间距设置
+            String xmlText = paragraph.getCTP().toString();
+
+            // 查找 w:spacing 元素
+            java.util.regex.Pattern spacingPattern = java.util.regex.Pattern.compile("<w:spacing[^>]*/>");
+            java.util.regex.Matcher spacingMatcher = spacingPattern.matcher(xmlText);
+
+            if (spacingMatcher.find()) {
+                String spacingTag = spacingMatcher.group();
+
+                // 获取行间距类型 w:lineRule
+                String lineRule = "auto"; // 默认自动
+                java.util.regex.Pattern lineRulePattern = java.util.regex.Pattern.compile("w:lineRule=\"([^\"]+)\"");
+                java.util.regex.Matcher lineRuleMatcher = lineRulePattern.matcher(spacingTag);
+                if (lineRuleMatcher.find()) {
+                    lineRule = lineRuleMatcher.group(1);
+                }
+
+                // 获取行间距值 w:line
+                int lineValue = 240; // 默认单倍行距（240 twips）
+                java.util.regex.Pattern linePattern = java.util.regex.Pattern.compile("w:line=\"([0-9]+)\"");
+                java.util.regex.Matcher lineMatcher = linePattern.matcher(spacingTag);
+                if (lineMatcher.find()) {
+                    lineValue = Integer.parseInt(lineMatcher.group(1));
+                }
+
+                // 根据不同的lineRule计算leading
+                if ("auto".equalsIgnoreCase(lineRule) || lineRule.isEmpty()) {
+                    // 自动行距：lineValue单位是1/240行，240表示单倍行距
+                    // 转换为point：lineValue / 240 * fontSize
+                    return (lineValue / 240.0f) * fontSize;
+                } else if ("atLeast".equalsIgnoreCase(lineRule)) {
+                    // 最小值：lineValue单位是twips（1/20 point）
+                    // 取lineValue/20和fontSize的较大值
+                    float minLeading = lineValue / 20.0f;
+                    return Math.max(fontSize, minLeading);
+                } else if ("exact".equalsIgnoreCase(lineRule)) {
+                    // 固定值：lineValue单位是twips（1/20 point）
+                    return lineValue / 20.0f;
+                }
+            }
+
+            // 如果没有找到spacing设置，使用默认值
+            // Word的默认行间距通常是单倍（1.0）
+            return fontSize;
+        } catch (Exception e) {
+            // 出错时使用默认值
+            return fontSize;
+        }
+    }
+
+    /**
+     * 获取段落的实际字体大小
+     */
+    private static float getParagraphFontSize(XWPFParagraph paragraph) {
+        try {
+            // 首先检查段落样式
+            String style = paragraph.getStyle();
+            int styleFontSize = 12; // 默认字号
+
+            if (style != null) {
+                if (style.contains("Heading1") || style.contains("标题1")) {
+                    styleFontSize = 18;
+                } else if (style.contains("Heading2") || style.contains("标题2")) {
+                    styleFontSize = 16;
+                } else if (style.contains("Heading3") || style.contains("标题3")) {
+                    styleFontSize = 14;
+                }
+            }
+
+            // 然后检查run中的字体大小（优先使用run的设置）
+            List<org.apache.poi.xwpf.usermodel.XWPFRun> runs = paragraph.getRuns();
+            if (runs != null && !runs.isEmpty()) {
+                for (org.apache.poi.xwpf.usermodel.XWPFRun run : runs) {
+                    Double runFontSize = run.getFontSizeAsDouble();
+                    if (runFontSize != null && runFontSize > 0) {
+                        return runFontSize.floatValue();
+                    }
+                }
+            }
+
+            // 使用样式中的字体大小
+            return styleFontSize;
+        } catch (Exception e) {
+            return 12f; // 出错时返回默认值
         }
     }
 
@@ -446,10 +597,10 @@ public class DocxHybridConverter {
      */
     private static void applyParagraphIndentation(com.itextpdf.text.Paragraph pdfPara, XWPFParagraph paragraph) {
         try {
-            // 获取首行缩进
+            // 获取首行缩进（twips to points）
+            // 需要处理负值（悬挂缩进）和正值（首行缩进）
             int firstLineIndent = paragraph.getIndentationFirstLine();
-            if (firstLineIndent > 0) {
-                // 转换为点（twips to points）
+            if (firstLineIndent != 0) {
                 pdfPara.setFirstLineIndent(firstLineIndent / 20f);
             }
 
@@ -466,6 +617,41 @@ public class DocxHybridConverter {
             }
         } catch (Exception e) {
             // 忽略缩进应用失败
+        }
+    }
+
+    /**
+     * 检测文档是否包含图片
+     */
+    private static boolean checkDocumentHasImages(XWPFDocument docx) {
+        try {
+            List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
+
+            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
+                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
+                    XWPFParagraph paragraph = (XWPFParagraph) element;
+                    List<org.apache.poi.xwpf.usermodel.XWPFRun> runs = paragraph.getRuns();
+
+                    if (runs != null) {
+                        for (org.apache.poi.xwpf.usermodel.XWPFRun run : runs) {
+                            try {
+                                // 检查run中是否包含图片
+                                List<org.apache.poi.xwpf.usermodel.XWPFPicture> pictures = run.getEmbeddedPictures();
+                                if (pictures != null && !pictures.isEmpty()) {
+                                    return true;
+                                }
+                            } catch (Exception e) {
+                                // 忽略单个run的检测失败
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        } catch (Exception e) {
+            // 检测失败，保守返回false
+            return false;
         }
     }
 
@@ -529,39 +715,75 @@ public class DocxHybridConverter {
 
     /**
      * 创建中文字体 - 返回iText的BaseFont
+     * 永不返回null，如果创建失败会尝试使用系统字体
      */
     private static com.itextpdf.text.pdf.BaseFont createChineseFont(
         Map<String, com.itextpdf.text.pdf.BaseFont> fontMap, String fontFamily) {
         try {
             com.itextpdf.text.pdf.BaseFont bf = fontMap.get(fontFamily);
             if (bf == null) {
-                if ("宋体".equals(fontFamily)) {
-                    bf = com.itextpdf.text.pdf.BaseFont.createFont("simsun.ttf",
-                        com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
-                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
-                } else if ("黑体".equals(fontFamily)) {
-                    bf = com.itextpdf.text.pdf.BaseFont.createFont("simhei.ttf",
-                        com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
-                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
-                } else if ("楷体".equals(fontFamily)) {
-                    bf = com.itextpdf.text.pdf.BaseFont.createFont("simkai.ttf",
-                        com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
-                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
-                } else if ("仿宋".equals(fontFamily)) {
-                    bf = com.itextpdf.text.pdf.BaseFont.createFont("simfang.ttf",
-                        com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
-                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
-                } else {
-                    bf = com.itextpdf.text.pdf.BaseFont.createFont("simsun.ttf",
-                        com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
-                        com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                // 尝试创建字体
+                try {
+                    if ("宋体".equals(fontFamily)) {
+                        bf = com.itextpdf.text.pdf.BaseFont.createFont("simsun.ttf",
+                            com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
+                            com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                    } else if ("黑体".equals(fontFamily)) {
+                        bf = com.itextpdf.text.pdf.BaseFont.createFont("simhei.ttf",
+                            com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
+                            com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                    } else if ("楷体".equals(fontFamily)) {
+                        bf = com.itextpdf.text.pdf.BaseFont.createFont("simkai.ttf",
+                            com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
+                            com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                    } else if ("仿宋".equals(fontFamily)) {
+                        bf = com.itextpdf.text.pdf.BaseFont.createFont("simfang.ttf",
+                            com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
+                            com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                    } else {
+                        bf = com.itextpdf.text.pdf.BaseFont.createFont("simsun.ttf",
+                            com.itextpdf.text.pdf.BaseFont.IDENTITY_H,
+                            com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                    }
+                } catch (Exception e) {
+                    // 如果字体文件找不到，尝试使用内置字体
+                    logger.warn("字体文件 '" + fontFamily + "' 未找到，尝试使用STSong-Light");
+                    try {
+                        bf = com.itextpdf.text.pdf.BaseFont.createFont("STSong-Light",
+                            "UniGB-UCS2-H",
+                            com.itextpdf.text.pdf.BaseFont.NOT_EMBEDDED);
+                    } catch (Exception e2) {
+                        // 最后回退到Helvetica（不支持中文但不会崩溃）
+                        logger.error("无法加载中文字体，使用Helvetica代替，中文可能显示为方框");
+                        bf = com.itextpdf.text.pdf.BaseFont.createFont(
+                            com.itextpdf.text.pdf.BaseFont.HELVETICA,
+                            com.itextpdf.text.pdf.BaseFont.WINANSI,
+                            com.itextpdf.text.pdf.BaseFont.EMBEDDED);
+                    }
                 }
                 fontMap.put(fontFamily, bf);
+            }
+            // 确保永不返回null
+            if (bf == null) {
+                logger.error("字体创建返回null，使用Helvetica作为紧急回退");
+                bf = com.itextpdf.text.pdf.BaseFont.createFont(
+                    com.itextpdf.text.pdf.BaseFont.HELVETICA,
+                    com.itextpdf.text.pdf.BaseFont.WINANSI,
+                    com.itextpdf.text.pdf.BaseFont.EMBEDDED);
             }
             return bf;
         } catch (Exception e) {
             logger.error("创建字体失败: {}", e.getMessage(), e);
-            return null;
+            // 紧急回退：使用系统默认字体
+            try {
+                return com.itextpdf.text.pdf.BaseFont.createFont(
+                    com.itextpdf.text.pdf.BaseFont.HELVETICA,
+                    com.itextpdf.text.pdf.BaseFont.WINANSI,
+                    com.itextpdf.text.pdf.BaseFont.EMBEDDED);
+            } catch (Exception e2) {
+                logger.error("紧急回退也失败，这不应该发生");
+                return null; // 只有在极端情况下才会返回null
+            }
         }
     }
 }
