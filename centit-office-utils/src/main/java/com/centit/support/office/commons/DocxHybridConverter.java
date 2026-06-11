@@ -20,7 +20,17 @@ import java.util.Map;
 
 /**
  * DOCX混合转换器
- * 结合fr.opensagres自动转换和手动表格转换，获得最佳的表格保真度
+ * 提供多种DOCX到PDF转换模式，满足不同场景需求
+ *
+ * 支持的转换模式：
+ * 1. 自动模式（convert）：使用fr.opensagres转换器，支持所有复杂特性，推荐默认使用
+ * 2. 手动模式（convertWithManualMode）：自定义表格转换，表格保真度最高，但不支持复杂特性
+ * 3. 智能模式（convertWithSmartMode）：自动检测文档特性并选择最佳转换模式
+ *
+ * 使用建议：
+ * - 一般情况：使用convert()（自动模式）
+ * - 纯表格文档：使用convertWithManualMode()（手动模式）
+ * - 不确定文档类型：使用convertWithSmartMode()（智能模式）
  *
  * @author zhf
  */
@@ -29,9 +39,8 @@ public class DocxHybridConverter {
     private static final Logger logger = LoggerFactory.getLogger(DocxHybridConverter.class);
 
     /**
-     * 混合转换DOCX到PDF
-     * - 文本、图片等：使用fr.opensagres自动转换
-     * - 表格：使用DocxTableToPdfUtils手动转换
+     * 转换DOCX到PDF（使用自动模式）
+     * 自动模式使用fr.opensagres转换器，支持所有复杂特性（图片、嵌套表格、页眉页脚等）
      *
      * @param docx         DOCX文档
      * @param outputStream PDF输出流
@@ -39,82 +48,46 @@ public class DocxHybridConverter {
      */
     public static boolean convert(XWPFDocument docx, OutputStream outputStream) {
         try {
-            // 检测文档复杂特性 - 如果包含任何手动模式不支持的特性，使用自动模式
-
-            // 1. 检测图片
-            boolean hasImages = checkDocumentHasImages(docx);
-            if (hasImages) {
-                logger.info("文档包含图片，使用自动模式以支持图片转换");
-                return convertWithAutoMode(docx, outputStream);
-            }
-
-            // 2. 检测嵌套表格
-            boolean hasNestedTables = checkDocumentHasNestedTables(docx);
-            if (hasNestedTables) {
-                logger.info("文档包含嵌套表格，使用自动模式以支持嵌套表格转换");
-                return convertWithAutoMode(docx, outputStream);
-            }
-
-            // 3. 检测页眉页脚
-            boolean hasHeadersFooters = checkDocumentHasHeadersFooters(docx);
-            if (hasHeadersFooters) {
-                logger.info("文档包含页眉页脚，使用自动模式以支持页眉页脚转换");
-                return convertWithAutoMode(docx, outputStream);
-            }
-
-            // 4. 检测分节
-            boolean hasSections = checkDocumentHasSections(docx);
-            if (hasSections) {
-                logger.info("文档包含多个分节，使用自动模式以支持分节转换");
-                return convertWithAutoMode(docx, outputStream);
-            }
-
-            // 5. 检测文本框
-            boolean hasTextBoxes = checkDocumentHasTextBoxes(docx);
-            if (hasTextBoxes) {
-                logger.info("文档包含文本框，使用自动模式以支持文本框转换");
-                return convertWithAutoMode(docx, outputStream);
-            }
-
-            // 6. 检测形状/SmartArt
-            boolean hasShapes = checkDocumentHasShapes(docx);
-            if (hasShapes) {
-                logger.info("文档包含形状或SmartArt，使用自动模式以支持形状转换");
-                return convertWithAutoMode(docx, outputStream);
-            }
-
-            // 7. 检测水印
-            boolean hasWatermarks = checkDocumentHasWatermarks(docx);
-            if (hasWatermarks) {
-                logger.info("文档包含水印，使用自动模式以支持水印转换");
-                return convertWithAutoMode(docx, outputStream);
-            }
-
-            // 8. 检测脚注/尾注
-            boolean hasFootnotes = checkDocumentHasFootnotes(docx);
-            if (hasFootnotes) {
-                logger.info("文档包含脚注或尾注，使用自动模式以支持脚注尾注转换");
-                return convertWithAutoMode(docx, outputStream);
-            }
-
-            // 9. 检测目录
-            boolean hasTOC = checkDocumentHasTOC(docx);
-            if (hasTOC) {
-                logger.info("文档包含目录，使用自动模式以支持目录转换");
-                return convertWithAutoMode(docx, outputStream);
-            }
-
-            // 10. 不包含任何复杂特性，使用手动控制（表格质量最高）
-            logger.info("文档不包含复杂特性，使用手动模式以获得最高表格质量");
-            return convertWithManualTables(docx, outputStream);
-
+            logger.info("使用自动模式转换DOCX到PDF");
+            return convertWithAutoMode(docx, outputStream);
         } catch (Exception e) {
-            logger.error("混合转换失败，回退到自动转换: {}", e.getMessage(), e);
+            logger.error("自动模式转换失败: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * 转换DOCX到PDF（使用手动模式）
+     * 手动模式使用自定义表格转换，表格保真度最高，但不支持复杂特性
+     * 适用于：简单文档、主要包含表格的文档、对表格质量要求高的场景
+     *
+     * 注意：手动模式不支持以下特性：
+     * - 图片
+     * - 嵌套表格
+     * - 页眉页脚
+     * - 多分节
+     * - 文本框
+     * - 形状/SmartArt
+     * - 水印
+     * - 脚注/尾注
+     * - 目录
+     *
+     * 如果文档包含以上特性，建议使用convert()（自动模式）
+     *
+     * @param docx         DOCX文档
+     * @param outputStream PDF输出流
+     * @return 是否成功
+     */
+    public static boolean convertWithManualMode(XWPFDocument docx, OutputStream outputStream) {
+        try {
+            logger.info("使用手动模式转换DOCX到PDF");
+            return convertWithManualTables(docx, outputStream);
+        } catch (Exception e) {
+            logger.error("手动模式转换失败，回退到自动模式: {}", e.getMessage(), e);
             try {
-                // 方案B：回退到完全自动转换
                 return convertWithAutoMode(docx, outputStream);
             } catch (Exception ex) {
-                logger.error("自动转换也失败: {}", ex.getMessage(), ex);
+                logger.error("自动模式转换也失败: {}", ex.getMessage(), ex);
                 return false;
             }
         }
@@ -667,555 +640,6 @@ public class DocxHybridConverter {
             }
         } catch (Exception e) {
             // 忽略缩进应用失败
-        }
-    }
-
-    /**
-     * 检测文档是否包含嵌套表格
-     * 遍历文档中所有表格，检查其单元格中是否包含其他表格
-     */
-    private static boolean checkDocumentHasNestedTables(XWPFDocument docx) {
-        try {
-            List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
-
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                if (element instanceof XWPFTable) {
-                    XWPFTable table = (XWPFTable) element;
-                    // 递归检查表格中是否包含嵌套表格
-                    if (hasNestedTableRecursive(table, 0)) {
-                        logger.info("检测到嵌套表格");
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        } catch (Exception e) {
-            logger.error("检测嵌套表格失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * 递归检查表格是否有嵌套表格
-     * @param table 要检查的表格
-     * @param depth 当前递归深度，防止无限递归
-     * @return 是否包含嵌套表格
-     */
-    private static boolean hasNestedTableRecursive(XWPFTable table, int depth) {
-        // 防止无限递归，限制最大深度为5
-        if (depth > 5) {
-            return false;
-        }
-
-        try {
-            List<org.apache.poi.xwpf.usermodel.XWPFTableRow> rows = table.getRows();
-            if (rows == null || rows.isEmpty()) {
-                return false;
-            }
-
-            for (org.apache.poi.xwpf.usermodel.XWPFTableRow row : rows) {
-                List<org.apache.poi.xwpf.usermodel.XWPFTableCell> cells = row.getTableCells();
-                if (cells == null || cells.isEmpty()) {
-                    continue;
-                }
-
-                for (org.apache.poi.xwpf.usermodel.XWPFTableCell cell : cells) {
-                    List<org.apache.poi.xwpf.usermodel.IBodyElement> cellElements = cell.getBodyElements();
-                    if (cellElements == null || cellElements.isEmpty()) {
-                        continue;
-                    }
-
-                    for (org.apache.poi.xwpf.usermodel.IBodyElement cellElement : cellElements) {
-                        if (cellElement instanceof XWPFTable) {
-                            // 发现嵌套表格
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
-        } catch (Exception e) {
-            logger.error("递归检查嵌套表格失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * 检测文档是否包含页眉页脚
-     * 检查文档的每个分节是否有页眉或页脚
-     */
-    private static boolean checkDocumentHasHeadersFooters(XWPFDocument docx) {
-        try {
-            // 方法1：通过文档对象获取页眉页脚
-            try {
-                // 尝试获取页眉
-                if (docx.getHeaderList() != null && !docx.getHeaderList().isEmpty()) {
-                    logger.debug("检测到页眉");
-                    return true;
-                }
-                // 尝试获取页脚
-                if (docx.getFooterList() != null && !docx.getFooterList().isEmpty()) {
-                    logger.debug("检测到页脚");
-                    return true;
-                }
-            } catch (Exception e) {
-                // 某些POI版本可能不支持这些方法，继续尝试其他方法
-            }
-
-            // 方法2：通过底层XML检测页眉页脚
-            try {
-                String documentXml = docx.getDocument().toString();
-                // 检查是否包含页眉相关标签
-                if (documentXml.contains("<w:header") || documentXml.contains("w:hdr")) {
-                    logger.debug("通过XML检测到页眉");
-                    return true;
-                }
-                // 检查是否包含页脚相关标签
-                if (documentXml.contains("<w:footer") || documentXml.contains("w:ftr")) {
-                    logger.debug("通过XML检测到页脚");
-                    return true;
-                }
-            } catch (Exception e) {
-                // XML检测失败
-            }
-
-            // 方法3：检查分节属性中的页眉页脚引用
-            try {
-                List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
-                for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                    if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
-                        org.apache.poi.xwpf.usermodel.XWPFParagraph para = (org.apache.poi.xwpf.usermodel.XWPFParagraph) element;
-                        String paraXml = para.getCTP().toString();
-                        // 检查段落是否包含分节引用
-                        if (paraXml.contains("w:sectPr")) {
-                            // 进一步检查分节属性中的页眉页脚引用
-                            if (paraXml.contains("w:headerReference") || paraXml.contains("w:footerReference")) {
-                                logger.debug("检测到分节中的页眉页脚引用");
-                                return true;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                // 分节检测失败
-            }
-
-            return false;
-        } catch (Exception e) {
-            logger.error("检测页眉页脚失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * 检测文档是否包含多个分节
-     * 多个分节意味着不同的页面设置、页眉页脚等
-     */
-    private static boolean checkDocumentHasSections(XWPFDocument docx) {
-        try {
-            int sectionCount = 0;
-
-            // 遍历文档元素，统计分节符数量
-            List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
-                    org.apache.poi.xwpf.usermodel.XWPFParagraph para = (org.apache.poi.xwpf.usermodel.XWPFParagraph) element;
-                    String paraXml = para.getCTP().toString();
-                    // 检查段落是否包含分节属性
-                    if (paraXml.contains("w:sectPr")) {
-                        sectionCount++;
-                        // 如果有多个分节，立即返回
-                        if (sectionCount > 1) {
-                            logger.debug("检测到多个分节（计数: {}）", sectionCount);
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            // 检查文档级别的分节属性
-            try {
-                org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr sectPr =
-                    docx.getDocument().getBody().getSectPr();
-                if (sectPr != null && sectionCount > 0) {
-                    // 有段落级别的分节 + 文档级别的分节 = 多个分节
-                    logger.debug("检测到文档级分节属性与段落级分节属性");
-                    return true;
-                }
-            } catch (Exception e) {
-                // 忽略
-            }
-
-            return false;
-        } catch (Exception e) {
-            logger.error("检测分节失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * 检测文档是否包含文本框
-     * 文本框在DOCX中以textbox或wtxbox存储
-     */
-    private static boolean checkDocumentHasTextBoxes(XWPFDocument docx) {
-        try {
-            // 方法1：通过段落底层XML检测文本框
-            List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
-
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
-                    org.apache.poi.xwpf.usermodel.XWPFParagraph para = (org.apache.poi.xwpf.usermodel.XWPFParagraph) element;
-                    String paraXml = para.getCTP().toString();
-
-                    // 检查文本框相关标签
-                    if (paraXml.contains("w: textbox") || paraXml.contains("v: textbox") ||
-                        paraXml.contains("w:txbxContent") || paraXml.contains("wtxbox")) {
-                        logger.debug("检测到文本框");
-                        return true;
-                    }
-                }
-            }
-
-            // 方法2：检查表格单元格中的文本框
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFTable) {
-                    org.apache.poi.xwpf.usermodel.XWPFTable table = (org.apache.poi.xwpf.usermodel.XWPFTable) element;
-                    List<org.apache.poi.xwpf.usermodel.XWPFTableRow> rows = table.getRows();
-
-                    for (org.apache.poi.xwpf.usermodel.XWPFTableRow row : rows) {
-                        List<org.apache.poi.xwpf.usermodel.XWPFTableCell> cells = row.getTableCells();
-                        for (org.apache.poi.xwpf.usermodel.XWPFTableCell cell : cells) {
-                            List<org.apache.poi.xwpf.usermodel.XWPFParagraph> paragraphs = cell.getParagraphs();
-                            for (org.apache.poi.xwpf.usermodel.XWPFParagraph para : paragraphs) {
-                                String paraXml = para.getCTP().toString();
-                                if (paraXml.contains("w: textbox") || paraXml.contains("v: textbox") ||
-                                    paraXml.contains("w:txbxContent") || paraXml.contains("wtxbox")) {
-                                    logger.debug("检测到表格单元格中的文本框");
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
-        } catch (Exception e) {
-            logger.error("检测文本框失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * 检测文档是否包含形状或SmartArt
-     * 形状包括：基本形状、连接符、SmartArt图形等
-     */
-    private static boolean checkDocumentHasShapes(XWPFDocument docx) {
-        try {
-            // 方法1：通过底层XML检测形状
-            List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
-
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
-                    org.apache.poi.xwpf.usermodel.XWPFParagraph para = (org.apache.poi.xwpf.usermodel.XWPFParagraph) element;
-                    String paraXml = para.getCTP().toString();
-
-                    // 检查形状相关标签
-                    // Office 2007+ 格式
-                    if (paraXml.contains("w:drawing") && (
-                        paraXml.contains("wp:shape") || paraXml.contains("wsp:") ||
-                        paraXml.contains("pic:pic") || paraXml.contains("a:graphic"))) {
-                        logger.debug("检测到形状或SmartArt");
-                        return true;
-                    }
-
-                    // 旧格式 (VML)
-                    if (paraXml.contains("v:shape") || paraXml.contains("v:group") ||
-                        paraXml.contains("v:rect") || paraXml.contains("v:oval")) {
-                        logger.debug("检测到VML形状");
-                        return true;
-                    }
-
-                    // SmartArt 特征
-                    if (paraXml.contains("dgm:") || paraXml.contains("smartArt") ||
-                        paraXml.contains("w:smartTag")) {
-                        logger.debug("检测到SmartArt");
-                        return true;
-                    }
-                }
-            }
-
-            // 方法2：检查表格中的形状
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFTable) {
-                    org.apache.poi.xwpf.usermodel.XWPFTable table = (org.apache.poi.xwpf.usermodel.XWPFTable) element;
-                    List<org.apache.poi.xwpf.usermodel.XWPFTableRow> rows = table.getRows();
-
-                    for (org.apache.poi.xwpf.usermodel.XWPFTableRow row : rows) {
-                        List<org.apache.poi.xwpf.usermodel.XWPFTableCell> cells = row.getTableCells();
-                        for (org.apache.poi.xwpf.usermodel.XWPFTableCell cell : cells) {
-                            List<org.apache.poi.xwpf.usermodel.XWPFParagraph> paragraphs = cell.getParagraphs();
-                            for (org.apache.poi.xwpf.usermodel.XWPFParagraph para : paragraphs) {
-                                String paraXml = para.getCTP().toString();
-
-                                if ((paraXml.contains("w:drawing") && paraXml.contains("wp:shape")) ||
-                                    paraXml.contains("v:shape") || paraXml.contains("dgm:")) {
-                                    logger.debug("检测到表格中的形状或SmartArt");
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
-        } catch (Exception e) {
-            logger.error("检测形状失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * 检测文档是否包含水印
-     * 水印通常在页眉中，或者是文档级别的对象
-     */
-    private static boolean checkDocumentHasWatermarks(XWPFDocument docx) {
-        try {
-            // 方法1：检查页眉中的水印
-            try {
-                List<org.apache.poi.xwpf.usermodel.XWPFHeader> headers = docx.getHeaderList();
-                if (headers != null && !headers.isEmpty()) {
-                    for (org.apache.poi.xwpf.usermodel.XWPFHeader header : headers) {
-                        // 通过反射获取底层CTHdr对象
-                        try {
-                            java.lang.reflect.Method getHdrMethod = header.getClass().getDeclaredMethod("_getHdr");
-                            Object hdr = getHdrMethod.invoke(header);
-                            if (hdr != null) {
-                                String headerXml = hdr.toString();
-                                // 检查水印相关标签
-                                if (headerXml.contains("watermark") || headerXml.contains("v:background") ||
-                                    headerXml.contains("wordObject") || (headerXml.contains("w:drawing") && headerXml.contains("opacity"))) {
-                                    logger.debug("检测到水印");
-                                    return true;
-                                }
-                            }
-                        } catch (Exception ex) {
-                            // 反射失败，尝试通过段落检测
-                        }
-
-                        // 备用方法：检查页眉中的段落
-                        List<org.apache.poi.xwpf.usermodel.XWPFParagraph> paragraphs = header.getParagraphs();
-                        for (org.apache.poi.xwpf.usermodel.XWPFParagraph para : paragraphs) {
-                            String paraXml = para.getCTP().toString();
-                            if ((paraXml.contains("w:drawing") || paraXml.contains("v:shape")) &&
-                                (paraXml.contains("opacity") || paraXml.contains("semitransparent"))) {
-                                logger.debug("检测到页眉中的水印");
-                                return true;
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                // 页眉检测失败，继续其他方法
-            }
-
-            // 方法2：检查文档底层XML中的水印
-            try {
-                String documentXml = docx.getDocument().toString();
-                if (documentXml.contains("watermark") || documentXml.contains("v:background")) {
-                    logger.debug("通过文档XML检测到水印");
-                    return true;
-                }
-            } catch (Exception e) {
-                // XML检测失败
-            }
-
-            // 方法3：检查主体中的水印对象
-            List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
-                    org.apache.poi.xwpf.usermodel.XWPFParagraph para = (org.apache.poi.xwpf.usermodel.XWPFParagraph) element;
-                    String paraXml = para.getCTP().toString();
-
-                    // 水印通常包含的特征
-                    if ((paraXml.contains("w:drawing") || paraXml.contains("v:shape")) &&
-                        (paraXml.contains("opacity") || paraXml.contains("semitransparent"))) {
-                        logger.debug("检测到水印对象");
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        } catch (Exception e) {
-            logger.error("检测水印失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * 检测文档是否包含脚注或尾注
-     */
-    private static boolean checkDocumentHasFootnotes(XWPFDocument docx) {
-        try {
-            // 方法1：检查脚注列表
-            try {
-                List<org.apache.poi.xwpf.usermodel.XWPFFootnote> footnotes = docx.getFootnotes();
-                if (footnotes != null && !footnotes.isEmpty()) {
-                    logger.debug("检测到脚注");
-                    return true;
-                }
-            } catch (Exception e) {
-                // 脚注检测失败，继续检查尾注
-            }
-
-            // 方法2：检查尾注列表（使用反射，因为getEndnotes()可能返回不同类型）
-            try {
-                java.lang.reflect.Method getEndnotesMethod = docx.getClass().getMethod("getEndnotes");
-                Object endnotesObj = getEndnotesMethod.invoke(docx);
-                if (endnotesObj instanceof java.util.List) {
-                    java.util.List<?> endnotes = (java.util.List<?>) endnotesObj;
-                    if (!endnotes.isEmpty()) {
-                        logger.debug("检测到尾注");
-                        return true;
-                    }
-                }
-            } catch (Exception e) {
-                // 尾注检测失败，继续其他方法
-            }
-
-            // 方法3：通过段落XML检测脚注/尾注引用
-            List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
-                    org.apache.poi.xwpf.usermodel.XWPFParagraph para = (org.apache.poi.xwpf.usermodel.XWPFParagraph) element;
-                    String paraXml = para.getCTP().toString();
-
-                    // 检查脚注引用
-                    if (paraXml.contains("w:footnoteReference") || paraXml.contains("w:footnoteRef")) {
-                        logger.debug("检测到脚注引用");
-                        return true;
-                    }
-
-                    // 检查尾注引用
-                    if (paraXml.contains("w:endnoteReference") || paraXml.contains("w:endnoteRef")) {
-                        logger.debug("检测到尾注引用");
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        } catch (Exception e) {
-            logger.error("检测脚注尾注失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * 检测文档是否包含目录
-     * 目录通常由TOC域代码生成
-     */
-    private static boolean checkDocumentHasTOC(XWPFDocument docx) {
-        try {
-            // 方法1：通过段落XML检测目录域代码
-            List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
-
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
-                    org.apache.poi.xwpf.usermodel.XWPFParagraph para = (org.apache.poi.xwpf.usermodel.XWPFParagraph) element;
-                    String paraXml = para.getCTP().toString();
-
-                    // 检查TOC域代码
-                    if (paraXml.contains("TOC") || paraXml.contains("w:instrText") && paraXml.contains("TABLE OF CONTENTS")) {
-                        logger.debug("检测到目录域代码");
-                        return true;
-                    }
-
-                    // 检查目录样式 (TOC1, TOC2, etc.)
-                    try {
-                        String style = para.getStyle();
-                        if (style != null && (style.contains("TOC") || style.contains("toc"))) {
-                            logger.debug("检测到目录样式");
-                            return true;
-                        }
-                    } catch (Exception e) {
-                        // 样式检测失败
-                    }
-                }
-            }
-
-            // 方法2：检查文档级别的目录设置
-            try {
-                String documentXml = docx.getDocument().toString();
-                if (documentXml.contains("w:instrText") && documentXml.contains("TOC")) {
-                    logger.debug("通过文档XML检测到目录");
-                    return true;
-                }
-            } catch (Exception e) {
-                // XML检测失败
-            }
-
-            // 方法3：检查是否有复杂的fldSimple域（目录通常用这种方式）
-            try {
-                for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                    if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
-                        org.apache.poi.xwpf.usermodel.XWPFParagraph para = (org.apache.poi.xwpf.usermodel.XWPFParagraph) element;
-                        String paraXml = para.getCTP().toString();
-
-                        // 检查fldSimple域
-                        if (paraXml.contains("w:fldSimple") && paraXml.contains("TOC")) {
-                            logger.debug("检测到fldSimple目录域");
-                            return true;
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                // 域检测失败
-            }
-
-            return false;
-        } catch (Exception e) {
-            logger.error("检测目录失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * 检测文档是否包含图片
-     */
-    private static boolean checkDocumentHasImages(XWPFDocument docx) {
-        try {
-            List<org.apache.poi.xwpf.usermodel.IBodyElement> bodyElements = docx.getBodyElements();
-
-            for (org.apache.poi.xwpf.usermodel.IBodyElement element : bodyElements) {
-                if (element instanceof org.apache.poi.xwpf.usermodel.XWPFParagraph) {
-                    XWPFParagraph paragraph = (XWPFParagraph) element;
-                    List<org.apache.poi.xwpf.usermodel.XWPFRun> runs = paragraph.getRuns();
-
-                    if (runs != null) {
-                        for (org.apache.poi.xwpf.usermodel.XWPFRun run : runs) {
-                            try {
-                                // 检查run中是否包含图片
-                                List<org.apache.poi.xwpf.usermodel.XWPFPicture> pictures = run.getEmbeddedPictures();
-                                if (pictures != null && !pictures.isEmpty()) {
-                                    return true;
-                                }
-                            } catch (Exception e) {
-                                // 忽略单个run的检测失败
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
-        } catch (Exception e) {
-            // 检测失败，保守返回false
-            return false;
         }
     }
 

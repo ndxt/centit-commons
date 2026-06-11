@@ -109,6 +109,64 @@ public abstract class OfficeToPdf {
         return word2Pdf(inWordFile, outPdfFile, FileType.getFileExtName(inWordFile));
     }
 
+    /**
+     * Word转PDF（使用手动模式）
+     * 手动模式使用自定义表格转换，表格保真度最高
+     * 适用于：纯表格文档、主要包含表格的文档、对表格质量要求高的场景
+     *
+     * 注意：此函数仅支持DOCX格式，不支持DOC格式
+     * 手动模式不支持图片、嵌套表格、页眉页脚等复杂特性
+     * 如果文档包含这些特性，建议使用word2Pdf()
+     *
+     * @param inWordStream  Word文档输入流（仅支持DOCX）
+     * @param outPdfStream  PDF文档输出流
+     * @return 是否成功
+     */
+    public static boolean word2PdfManualMode(InputStream inWordStream, OutputStream outPdfStream) {
+        try {
+            try (XWPFDocument docx = new XWPFDocument(inWordStream)) {
+                // 使用手动模式转换，获得最高的表格保真度
+                return DocxHybridConverter.convertWithManualMode(docx, outPdfStream);
+            }
+        } catch (Exception e) {
+            logger.error("Word转PDF（手动模式）失败: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    /**
+     * Word转PDF（使用手动模式）
+     * 手动模式使用自定义表格转换，表格保真度最高
+     * 适用于：纯表格文档、主要包含表格的文档、对表格质量要求高的场景
+     *
+     * 注意：此函数仅支持DOCX格式，不支持DOC格式
+     * 手动模式不支持图片、嵌套表格、页眉页脚等复杂特性
+     * 如果文档包含这些特性，建议使用word2Pdf()
+     *
+     * @param inWordFile  Word文档路径（仅支持DOCX）
+     * @param outPdfFile  PDF文档路径
+     * @return 是否成功
+     */
+    public static boolean word2PdfManualMode(String inWordFile, String outPdfFile) {
+        String inputFile = CommonUtils.mapWidowsPathIfNecessary(inWordFile);
+        String pdfFile = CommonUtils.mapWidowsPathIfNecessary(outPdfFile);
+
+        // 检查文件格式
+        String suffix = FileType.getFileExtName(inWordFile);
+        if (!DOCX.equalsIgnoreCase(suffix)) {
+            logger.error("word2PdfManualMode仅支持DOCX格式，不支持{}格式", suffix);
+            return false;
+        }
+
+        try (InputStream inWordStream = Files.newInputStream(new File(inputFile).toPath());
+             OutputStream outPdfStream = Files.newOutputStream(new File(pdfFile).toPath())) {
+            return word2PdfManualMode(inWordStream, outPdfStream);
+        } catch (Exception e) {
+            logger.error("Word转PDF（手动模式）失败: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
     public static boolean excel2Pdf(InputStream inWExcelStream, OutputStream outPdfStram) {
         try {
             com.itextpdf.text.Document document = new com.itextpdf.text.Document();
