@@ -405,20 +405,16 @@ public class DocxHybridConverter {
             try {
                 BaseFont bfChinese = fontMap.get(familyName);
                 if (bfChinese == null) {
-                    String lowerFamily = familyName != null ? familyName.toLowerCase() : "";
-
-                    if (lowerFamily.contains("fangsong") || lowerFamily.contains("仿宋")) {
+                    if (familyName.contains("仿")) { //仿宋
                         bfChinese = BaseFont.createFont("simfang.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                    } else if (lowerFamily.contains("simsun") || lowerFamily.contains("宋体") || lowerFamily.contains("serif")) {
+                    } else if (familyName.contains("宋")) { //宋体
                         bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                    } else if (lowerFamily.contains("kaiti") || lowerFamily.contains("楷体")) {
+                    } else if (familyName.contains("楷")) { //楷体
                         bfChinese = BaseFont.createFont("simkai.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                    } else if (lowerFamily.contains("hei") || lowerFamily.contains("黑体") || lowerFamily.contains("sans")) {
+                    } else { // 黑体
                         bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                    } else {
-                        bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
                     }
-                    fontMap.put(familyName != null ? familyName : "default", bfChinese);
+                    fontMap.put(familyName, bfChinese);
                 }
 
                 Font fontChinese = new Font(bfChinese, size, style, color);
