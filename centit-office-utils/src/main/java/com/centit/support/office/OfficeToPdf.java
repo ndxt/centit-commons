@@ -9,7 +9,10 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.lowagie.text.Font;
 import com.lowagie.text.pdf.BaseFont;
+import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
+import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -23,7 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhf
@@ -55,10 +60,34 @@ public abstract class OfficeToPdf {
     public static boolean word2Pdf(InputStream inWordStream, OutputStream outPdfStram, String suffix) {
         try {
             if (DOCX.equalsIgnoreCase(suffix)) {
-                try (XWPFDocument docx = new XWPFDocument(inWordStream)) {
-                    // 使用混合转换器，获得更好的表格保真度
-                    return DocxHybridConverter.convert(docx, outPdfStram);
-                }
+                XWPFDocument docx = new XWPFDocument(inWordStream);
+                PdfOptions options = PdfOptions.create();
+                Map<String, BaseFont> fontMap = new HashMap<>();
+                // 中文字体处理
+                options.fontProvider((familyName, encoding, size, style, color) -> {
+                    try {
+                        BaseFont bfChinese = fontMap.get(familyName);
+                        if(bfChinese==null) {
+                            if (familyName.contains("仿")) { //仿宋
+                                bfChinese = BaseFont.createFont("simfang.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                            } else if (familyName.contains("宋")) { //宋体
+                                bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                            } else if (familyName.contains("楷")) { //楷体
+                                bfChinese = BaseFont.createFont("simkai.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                            } else { // 黑体
+                                bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                            }
+                            fontMap.put(familyName, bfChinese);
+                        }
+                        Font fontChinese = new Font(bfChinese, size, style, color);
+                        fontChinese.setFamily(familyName);
+                        return fontChinese;
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
+                        return null;
+                    }
+                });
+                PdfConverter.getInstance().convert(docx, outPdfStram, options);
             } else if (DOC.equalsIgnoreCase(suffix)) {
                 // 读取DOC文件
                 try (HWPFDocument doc = new HWPFDocument(inWordStream)) {
@@ -66,22 +95,17 @@ public abstract class OfficeToPdf {
                     Document pdf = new Document(PageSize.A4, 36, 36, 36, 36); // 设置页边距
                     PdfWriter writer = PdfWriter.getInstance(pdf, outPdfStram);
                     writer.setPageEvent(new PDFPageEvent());
-
                     // 设置中文字体支持
                     com.itextpdf.text.pdf.BaseFont bfChinese = com.itextpdf.text.pdf.BaseFont.createFont(
                         "STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
-
                     pdf.open();
-
                     // 使用工具类提取内容（包括文本和表格），按原始顺序合并
                     List<Element> elements = WordTableToPdfUtils.extractContentFromDoc(doc, bfChinese);
-
                     for (Element element : elements) {
                         if (element != null) {
                             pdf.add(element);
                         }
                     }
-
                     pdf.close();
                 }
             }
