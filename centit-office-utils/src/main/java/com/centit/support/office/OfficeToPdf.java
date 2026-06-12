@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,66 @@ public abstract class OfficeToPdf {
 
     final static String DOC = "doc";
     final static String DOCX = "docx";
+
+    /**
+     * 当前系统的字体目录
+     */
+    private static final String[] SYSTEM_FONT_DIRS;
+    static {
+        List<String> dirs = new ArrayList<>();
+        String os = System.getProperty("os.name", "").toLowerCase();
+        if (os.contains("win")) {
+            String windir = System.getenv("WINDIR");
+            dirs.add(windir != null ? windir + "\\Fonts" : "C:\\Windows\\Fonts");
+        } else if (os.contains("mac")) {
+            dirs.add("/Library/Fonts");
+            dirs.add("/System/Library/Fonts");
+            dirs.add(System.getProperty("user.home") + "/Library/Fonts");
+        } else {
+            dirs.add("/usr/share/fonts");
+            dirs.add("/usr/local/share/fonts");
+            dirs.add(System.getProperty("user.home") + "/.fonts");
+            dirs.add(System.getProperty("user.home") + "/.local/share/fonts");
+        }
+        SYSTEM_FONT_DIRS = dirs.toArray(new String[0]);
+    }
+
+    /**
+     * 根据字体名称在系统字体目录中查找字库文件，找不到返回 null。
+     * 直接用 familyName 匹配文件名（含扩展名 .ttf/.ttc/.otf）。
+     */
+    private static String findSystemFont(String familyName) {
+        String lower = familyName.toLowerCase().replace(" ", "");
+        String[] nameCandidates = {
+            lower + ".ttf", lower + ".ttc", lower + ".otf",
+            familyName + ".ttf", familyName + ".ttc", familyName + ".otf"
+        };
+        for (String dir : SYSTEM_FONT_DIRS) {
+            File found = findFontFile(new File(dir), nameCandidates);
+            if (found != null) return found.getAbsolutePath();
+        }
+        return null;
+    }
+
+    /**
+     * 在目录中递归查找匹配的字体文件（不区分大小写）
+     */
+    private static File findFontFile(File dir, String[] candidates) {
+        File[] files = dir.listFiles();
+        if (files == null) return null;
+        for (File f : files) {
+            if (f.isDirectory()) {
+                File found = findFontFile(f, candidates);
+                if (found != null) return found;
+            } else {
+                String lower = f.getName().toLowerCase();
+                for (String c : candidates) {
+                    if (lower.equals(c.toLowerCase())) return f;
+                }
+            }
+        }
+        return null;
+    }
 
     public static boolean ppt2Pdf(String inPptFile, String outPdfFile, String suffix) {
         String inputFile = CommonUtils.mapWidowsPathIfNecessary(inPptFile);
@@ -68,15 +129,20 @@ public abstract class OfficeToPdf {
                     try {
                         BaseFont bfChinese = fontMap.get(familyName);
                         if(bfChinese==null) {
-                            if (familyName.contains("仿")) { //仿宋
-                                bfChinese = BaseFont.createFont("simfang.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                            } else if (familyName.contains("宋")) { //宋体
-                                bfChinese = BaseFont.createFont("simsun.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                            } else if (familyName.contains("楷")) { //楷体
-                                bfChinese = BaseFont.createFont("simkai.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-                            } else { // 黑体
-                                bfChinese = BaseFont.createFont("simhei.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+                            String fontPath = findSystemFont(familyName);
+                            if (fontPath == null) {
+                                // 回退到内置字体（classpath）
+                                String fontKey = familyName.contains("仿") ? "仿" :
+                                                 familyName.contains("宋") ? "宋" :
+                                                 familyName.contains("楷") ? "楷" : "黑";
+                                fontPath = switch (fontKey) {
+                                    case "仿" -> "fonts/simfang.ttf";
+                                    case "宋" -> "fonts/simsun.ttf";
+                                    case "楷" -> "fonts/simkai.ttf";
+                                    default  -> "fonts/simhei.ttf";
+                                };
                             }
+                            bfChinese = BaseFont.createFont(fontPath, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
                             fontMap.put(familyName, bfChinese);
                         }
                         Font fontChinese = new Font(bfChinese, size, style, color);
