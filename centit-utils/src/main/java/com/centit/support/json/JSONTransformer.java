@@ -33,16 +33,30 @@ public abstract class JSONTransformer {
             jArray.add(value);
         }
     }
+
     /**
-     * value | key:value
-     * value : 非字符串常量 | string 常量  "@" + 常量 | 引用 ref
-     *        value分两种形式，默认的是表达式，
-     * ref : /rootPath | .currentPath | ..ParentPath | path == currentPath
-     *      ref是一个对应的表达式，用于指向原始json中的具体的属性，或者多个属性计算值
-     * key : @ noKey | # loop | key 常量
-     *      '@' 开头的key表示要用value中的值替换当前的 key内容，不保留key，所以后面的名称没有实际意义
-     *      '#' 开头表示根据引用的数据进行循环，重复生成数组
-     *      普通的key就是在目标json中保留对应的key
+     * JSON 转换模板引擎，根据模板和元数据生成目标 JSON 结构。
+     * 一、value（模板值为字符串时）的前缀约定：
+     *   '@' + 常量      → 字符串常量，直接返回 '@' 之后的内容，不做任何计算
+     *   '=' + 表达式    → 调用 attainExpressionValue 计算表达式并返回结果
+     *   '$' + JSONPath  → 调用 extractJSONPathValue 按 JSONPath 提取数据
+     *   '#' + 模板      → 先对模板字符串做 mapTemplateString 变量替换，再递归调用 transformer
+     *   其他            → 调用 mapTemplateString 做变量替换后返回
+     * 二、key（模板为 Map 时，每个 entry 的 key）的前缀约定：
+     *   '=' + 表达式    → 动态 key：用表达式的计算结果作为实际的 key 名，
+     *                      value 正常递归转换。常与 '$' 循环合并配合将列表转为 Map
+     *   '@' + 名称      → 展开/合并：若 value 递归转换后为 Map，则将其所有属性
+     *                      合并到当前对象中（类似展开运算符）；否则以 '@' 后的名称为 key 正常放入
+     *   '#' + 表达式    → 循环迭代：计算表达式得到集合，遍历每个元素（压入上下文栈），
+     *                      对 value 递归转换，将所有结果收集为数组直接返回（替换当前 entry）。
+     *                      特殊地，若 value 为空白字符串或 "."，则直接使用迭代元素本身
+     *   '$' + 表达式    → 循环合并：类似 '#'，但将每次迭代的转换结果（若为 Map）
+     *                      合并到当前对象中，适用于将列表数据展开为 Map 属性
+     *   普通字符串      → 直接作为目标 JSON 中的 key，value 递归转换
+     * 三、其他模板类型：
+     *   Collection / 数组 → 逐元素递归转换，收集为 JSONArray；
+     *                        若非集合元素转换后变成集合，则自动展开（扁平化）
+     *   其他类型（数字、布尔等）→ 直接返回原值
      *
      * @param templateObj 模板
      * @param dataSupport 元数据
@@ -70,11 +84,11 @@ public abstract class JSONTransformer {
         } else if(templateObj instanceof Map){
             Map<String, Object> tempMap = CollectionsOpt.objectToMap(templateObj);
             JSONObject jObj = new JSONObject();
+            boolean isMap = true;
+            JSONArray array = new JSONArray();
             for(Map.Entry<String, Object> ent : tempMap.entrySet()){
                 String sKey = ent.getKey();
-                if(sKey.isEmpty()){
-                    return null;
-                }
+                if(sKey.isEmpty()){ continue; }
                 if(sKey.charAt(0) == '='){ // 替换当前属性，这个必须返回 Map
                     Object key = dataSupport.attainExpressionValue(sKey.substring(1));
                     Object value = transformer(ent.getValue(), dataSupport);
@@ -87,12 +101,9 @@ public abstract class JSONTransformer {
                     } else {
                         putObjectToJson(jObj, sKey.substring(1), value);
                     }
-                } else if(sKey.charAt(0) == '#') { //数组迭代； 并且只能是 单独的 一个key; 返回数组
+                } else if(sKey.charAt(0) == '#') { //数组迭代； 如何出现# 则忽略其他的key; 返回数组 ，可以有多个#开头的key，会自动合并到一个数组中
                     Object obj = dataSupport.attainExpressionValue(sKey.substring(1));
-                    if(obj==null){
-                        return null;
-                    }
-                    JSONArray array = new JSONArray();
+                    if(obj==null){continue; }
                     List<Object> loopData = CollectionsOpt.objectToList(obj);
                     int loopSize = loopData.size();
                     int index = 0;
@@ -106,12 +117,10 @@ public abstract class JSONTransformer {
                         dataSupport.popStackValue();
                         index++;
                     }
-                    return /*array.isEmpty() ? null :*/ array; //只能是 单独的 一个key，直接返回
+                    isMap = false;
                 } else if(sKey.charAt(0) == '$') { //数组迭代； 将内容合并到上级map中； 和 =开头的key联合使用可以将数据转换为map
                     Object obj = dataSupport.attainExpressionValue(sKey.substring(1));
-                    if(obj==null){
-                        continue;
-                    }
+                    if(obj==null){ continue; }
                     List<Object> loopData = CollectionsOpt.objectToList(obj);
                     int loopSize = loopData.size();
                     int index = 0;
@@ -133,7 +142,7 @@ public abstract class JSONTransformer {
                     putObjectToJson(jObj, sKey, transformer(ent.getValue(), dataSupport));
                 }
             }
-            return jObj.isEmpty() ? null : jObj;
+            return isMap ? jObj : array;
         } else if(templateObj instanceof Collection<?> valueList) {
             JSONArray array = new JSONArray();
             for (Object ov : valueList) {
