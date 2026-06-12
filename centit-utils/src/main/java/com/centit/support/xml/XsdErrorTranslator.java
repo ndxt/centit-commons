@@ -25,22 +25,22 @@ public class XsdErrorTranslator {
         Pattern.CASE_INSENSITIVE
     );
 
-    private static final Pattern CVc_ELEMENT_MINIMAX_OCCURS = Pattern.compile(
+    private static final Pattern CVC_ELEMENT_MINIMAX_OCCURS = Pattern.compile(
         "cvc-complex-type\\.2\\.3:.*element '([^']+)'.*",
         Pattern.CASE_INSENSITIVE
     );
 
-    private static final Pattern CVc_DATATYPE_VALID_1_2_3 = Pattern.compile(
+    private static final Pattern CVC_DATATYPE_VALID_1_2_3 = Pattern.compile(
         "cvc-datatype-valid\\.1\\.2\\.3:.*'([^']+)'.*'([^']+)'.*",
         Pattern.CASE_INSENSITIVE
     );
 
-    private static final Pattern CVc_TYPE_3_1_3 = Pattern.compile(
+    private static final Pattern CVC_TYPE_3_1_3 = Pattern.compile(
         "cvc-type\\.3\\.1\\.3:.*element '([^']+)'.*",
         Pattern.CASE_INSENSITIVE
     );
 
-    private static final Pattern CVc_ELT_CONTENT_VALID = Pattern.compile(
+    private static final Pattern CVC_ELT_CONTENT_VALID = Pattern.compile(
         "cvc-elt\\.3\\.2\\.2:.*element '([^']+)'.*",
         Pattern.CASE_INSENSITIVE
     );
@@ -50,30 +50,191 @@ public class XsdErrorTranslator {
         Pattern.CASE_INSENSITIVE
     );
 
-    private static final Pattern CVc_DATATYPE_VALID_1_2_1 = Pattern.compile(
+    private static final Pattern CVC_DATATYPE_VALID_1_2_1 = Pattern.compile(
         "cvc-datatype-valid\\.1\\.2\\.1:\\s*'([^']*)'\\s+is\\s+.+?\\s+for\\s+'([^']+)'",
         Pattern.CASE_INSENSITIVE
     );
 
-    private static final Pattern CVc_ENUMERATION_VALID = Pattern.compile(
+    private static final Pattern CVC_ENUMERATION_VALID = Pattern.compile(
         "cvc-enumeration-valid:\\s*Value\\s+'([^']+)'\\s+is\\s+not\\s+facet-valid\\s+with\\s+respect\\s+to\\s+enumeration\\s+'\\[([^\\]]+)\\]'",
         Pattern.CASE_INSENSITIVE
     );
 
-    private static final Pattern CVc_IDENTITY_CONSTRAINT_4_1 = Pattern.compile(
+    private static final Pattern CVC_IDENTITY_CONSTRAINT_4_1 = Pattern.compile(
         "cvc-identity-constraint\\.4\\.1:\\s*Duplicate\\s+unique\\s+value\\s+\\[([^\\]]+)\\]\\s+found\\s+for\\s+identity\\s+constraint\\s+\"([^\"]+)\"\\s+of\\s+element\\s+\"([^\"]+)\"",
         Pattern.CASE_INSENSITIVE
     );
 
-    private static final Pattern CVc_MIN_LENGTH_VALID = Pattern.compile(
+    private static final Pattern CVC_MIN_LENGTH_VALID = Pattern.compile(
         "cvc-minLength-valid:\\s*Value\\s+'([^']*)'\\s+with\\s+length\\s*=\\s*'?(\\d+)'?\\s+is\\s+not\\s+facet-valid\\s+with\\s+respect\\s+to\\s+minLength\\s+'?(\\d+)'?\\s+for\\s+type\\s+'([^']+)'",
         Pattern.CASE_INSENSITIVE
     );
 
-    private static final Pattern CVc_LENGTH_VALID = Pattern.compile(
+    private static final Pattern CVC_LENGTH_VALID = Pattern.compile(
         "cvc-length-valid:\\s*Value\\s+'([^']*)'\\s+with\\s+length\\s*=\\s*'?(\\d+)'?\\s+is\\s+not\\s+facet-valid\\s+with\\s+respect\\s+to\\s+length\\s+'?(\\d+)'?\\s+for\\s+type\\s+'([^']+)'",
         Pattern.CASE_INSENSITIVE
     );
+
+    // XML 特殊字符相关错误模式
+    private static final Pattern INVALID_CHARACTER_ENTITY = Pattern.compile(
+        "(?:The entity|Entity) \".*?\" was referenced, but not declared",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    private static final Pattern INVALID_XML_CHARACTER = Pattern.compile(
+        "An invalid XML character \\(Unicode: (0x[0-9a-f]+)\\) (?:was found|in element)",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    private static final Pattern INVALID_CHARACTER_IN_ELEMENT = Pattern.compile(
+        "Invalid character (?:\\(Unicode: 0x([0-9a-f]+)\\))? (?:was found|in) the element content",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    private static final Pattern ILLEGAL_CHARACTER = Pattern.compile(
+        "(?:Character|char) (?:0x([0-9a-f]+)|\"([^\"]+)\") is (?:an invalid|not a valid) XML character",
+        Pattern.CASE_INSENSITIVE
+    );
+
+    /**
+     * 允许的字符正则表达式
+     * 包含：中文、英文字母、数字、CJK标点符号、空白字符、常用键盘标点符号
+     * 键盘标点：;:"'()[]{}?!@#$%^&*~`|<>=+_-
+     */
+    private static final Pattern ALLOWED_CHARS_PATTERN = Pattern.compile(
+        "^[\\p{IsHan}a-zA-Z0-9\\u3000-\\u303F\\s;:'\"()\\[\\]{}!@#$%^&*~`|<>=+_,./\\\\-]+$"
+    );
+
+    /**
+     * 检测内容中是否包含特殊字符
+     * @param content 要检测的内容
+     * @return 如果存在特殊字符，返回特殊字符的描述；否则返回 null
+     */
+    public static String detectInvalidCharacters(String content) {
+        if (content == null || content.isEmpty()) {
+            return null;
+        }
+
+        // 使用正则表达式检查是否只包含允许的字符
+        if (ALLOWED_CHARS_PATTERN.matcher(content).matches()) {
+            return null;
+        }
+
+        // 如果包含不允许的字符，找出所有特殊字符
+        StringBuilder specialChars = new StringBuilder();
+        StringBuilder positions = new StringBuilder();
+
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            String charStr = String.valueOf(c);
+
+            // 检查字符是否匹配允许的模式
+            if (!ALLOWED_CHARS_PATTERN.matcher(charStr).matches()) {
+                if (specialChars.length() > 0) {
+                    specialChars.append(", ");
+                    positions.append(", ");
+                }
+                specialChars.append(String.format("'%c' (Unicode: 0x%04X)", c, (int) c));
+                positions.append(i);
+            }
+        }
+
+        if (specialChars.length() > 0) {
+            return "检测到特殊字符: " + specialChars + "，位置: " + positions;
+        }
+        return null;
+    }
+
+    /**
+     * 检查字符是否是 XML 1.0 中的非法字符
+     * XML 1.0 规范允许：#x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
+     * 注意：char 类型是 16 位，最大值为 0xFFFF，所以不需要检查 0x10000-0x10FFFF 范围
+     */
+    @SuppressWarnings("unused")
+    private static boolean isInvalidXmlChar(char c) {
+        return !(
+            c == 0x9 || c == 0xA || c == 0xD ||  // Tab, LF, CR
+            (c >= 0x20 && c <= 0xD7FF) ||
+            (c >= 0xE000 && c <= 0xFFFD)
+        );
+    }
+
+    /**
+     * 检测需要转义的 XML 特殊字符
+     * @param content 要检测的内容
+     * @return 如果存在未转义的特殊字符，返回描述；否则返回 null
+     */
+    public static String detectUnescapedSpecialChars(String content) {
+        if (content == null || content.isEmpty()) {
+            return null;
+        }
+
+        StringBuilder warnings = new StringBuilder();
+
+        // 检查未转义的 & 符号（但排除合法的实体引用）
+        int ampIndex = 0;
+        while ((ampIndex = content.indexOf('&', ampIndex)) != -1) {
+            // 检查是否是合法的实体引用
+            if (!isValidEntityReference(content, ampIndex)) {
+                if (warnings.length() > 0) {
+                    warnings.append(", ");
+                }
+                warnings.append("发现未转义的 '&' 符号在位置 ").append(ampIndex);
+            }
+            ampIndex++;
+        }
+
+        // 检查未转义的 < 符号
+        int ltIndex = 0;
+        while ((ltIndex = content.indexOf('<', ltIndex)) != -1) {
+            if (!isValidTagStart(content, ltIndex)) {
+                if (warnings.length() > 0) {
+                    warnings.append(", ");
+                }
+                warnings.append("发现未转义的 '<' 符号在位置 ").append(ltIndex);
+            }
+            ltIndex++;
+        }
+
+        // 检查未转义的 ]]> 序列（在 CDATA 中会导致问题）
+        int cdataEndIndex = content.indexOf("]]>");
+        if (cdataEndIndex != -1 && !content.contains("<![CDATA[")) {
+            if (warnings.length() > 0) {
+                warnings.append(", ");
+            }
+            warnings.append("发现未转义的 ']]>' 序列在位置 ").append(cdataEndIndex);
+        }
+
+        return warnings.length() > 0 ? warnings.toString() : null;
+    }
+
+    /**
+     * 检查 & 符号是否是合法的实体引用
+     */
+    private static boolean isValidEntityReference(String content, int ampIndex) {
+        int endIndex = content.indexOf(';', ampIndex);
+        if (endIndex == -1 || endIndex - ampIndex > 10) {
+            return false;
+        }
+
+        String entity = content.substring(ampIndex + 1, endIndex);
+        // 检查是否是预定义实体或数字字符引用
+        return entity.matches("amp|lt|gt|quot|apos|#\\d+|#x[0-9a-fA-F]+");
+    }
+
+    /**
+     * 检查 < 符号是否是合法的标签开始
+     */
+    private static boolean isValidTagStart(String content, int ltIndex) {
+        if (ltIndex + 1 >= content.length()) {
+            return false;
+        }
+
+        char nextChar = content.charAt(ltIndex + 1);
+        // 允许的标签开始字符：字母、下划线、问号（XML声明）、感叹号（注释/CDATA）
+        return Character.isLetter(nextChar) || nextChar == '_' || nextChar == '?' ||
+               nextChar == '!' || nextChar == '/';
+    }
 
     /**
      * 翻译XSD验证错误消息
@@ -138,14 +299,14 @@ public class XsdErrorTranslator {
         }
 
         // cvc-complex-type.2.3: 元素出现次数不符合要求
-        matcher = CVc_ELEMENT_MINIMAX_OCCURS.matcher(message);
+        matcher = CVC_ELEMENT_MINIMAX_OCCURS.matcher(message);
         if (matcher.find()) {
             String elementName = matcher.group(1);
             return "元素 '" + extractLocalName(elementName) + "' 的出现次数不符合schema定义的要求";
         }
 
         // cvc-datatype-valid.1.2.3: 数据类型验证失败
-        matcher = CVc_DATATYPE_VALID_1_2_3.matcher(message);
+        matcher = CVC_DATATYPE_VALID_1_2_3.matcher(message);
         if (matcher.find()) {
             String value = matcher.group(1);
             String dataType = matcher.group(2);
@@ -153,14 +314,14 @@ public class XsdErrorTranslator {
         }
 
         // cvc-type.3.1.3: 元素值为空但不应为空
-        matcher = CVc_TYPE_3_1_3.matcher(message);
+        matcher = CVC_TYPE_3_1_3.matcher(message);
         if (matcher.find()) {
             String elementName = matcher.group(1);
             return "元素 '" + extractLocalName(elementName) + "' 的值不能为空";
         }
 
         // cvc-elt.3.2.2: 元素内容验证失败
-        matcher = CVc_ELT_CONTENT_VALID.matcher(message);
+        matcher = CVC_ELT_CONTENT_VALID.matcher(message);
         if (matcher.find()) {
             String elementName = matcher.group(1);
             return "元素 '" + extractLocalName(elementName) + "' 的内容不符合schema定义";
@@ -174,7 +335,7 @@ public class XsdErrorTranslator {
         }
 
         // cvc-datatype-valid.1.2.1: 数据类型格式无效(如空值)
-        matcher = CVc_DATATYPE_VALID_1_2_1.matcher(message);
+        matcher = CVC_DATATYPE_VALID_1_2_1.matcher(message);
         if (matcher.find()) {
             String value = matcher.group(1);
             String dataType = matcher.group(2);
@@ -187,7 +348,7 @@ public class XsdErrorTranslator {
         }
 
         // cvc-enumeration-valid: 枚举值验证失败
-        matcher = CVc_ENUMERATION_VALID.matcher(message);
+        matcher = CVC_ENUMERATION_VALID.matcher(message);
         if (matcher.find()) {
             String invalidValue = matcher.group(1);
             String validValues = matcher.group(2);
@@ -195,7 +356,7 @@ public class XsdErrorTranslator {
         }
 
         // cvc-identity-constraint.4.1: 唯一性约束冲突
-        matcher = CVc_IDENTITY_CONSTRAINT_4_1.matcher(message);
+        matcher = CVC_IDENTITY_CONSTRAINT_4_1.matcher(message);
         if (matcher.find()) {
             String duplicateValue = matcher.group(1);
             String constraintName = matcher.group(2);
@@ -230,7 +391,7 @@ public class XsdErrorTranslator {
         }
 
         // cvc-minLength-valid: 最小长度验证失败
-        matcher = CVc_MIN_LENGTH_VALID.matcher(message);
+        matcher = CVC_MIN_LENGTH_VALID.matcher(message);
         if (matcher.find()) {
             String value = matcher.group(1);
             String actualLength = matcher.group(2);
@@ -244,7 +405,7 @@ public class XsdErrorTranslator {
         }
 
         // cvc-length-valid: 固定长度验证失败
-        matcher = CVc_LENGTH_VALID.matcher(message);
+        matcher = CVC_LENGTH_VALID.matcher(message);
         if (matcher.find()) {
             String value = matcher.group(1);
             String actualLength = matcher.group(2);
@@ -257,6 +418,59 @@ public class XsdErrorTranslator {
             }
         }
 
+
+        // 特殊字符相关错误翻译
+
+        // 无效的 XML 字符
+        matcher = INVALID_XML_CHARACTER.matcher(message);
+        if (matcher.find()) {
+            String charCode = matcher.group(1);
+            return "XML 中包含非法字符 (Unicode: " + charCode + ")，该字符不符合 XML 1.0 规范";
+        }
+
+        // 元素内容中的无效字符
+        matcher = INVALID_CHARACTER_IN_ELEMENT.matcher(message);
+        if (matcher.find()) {
+            String charCode = matcher.group(1);
+            if (charCode != null) {
+                return "元素内容中包含非法字符 (Unicode: 0x" + charCode + ")";
+            }
+            return "元素内容中包含非法字符，请检查是否包含控制字符或其他无效字符";
+        }
+
+        // 非法 XML 字符
+        matcher = ILLEGAL_CHARACTER.matcher(message);
+        if (matcher.find()) {
+            String charCode = matcher.group(1);
+            String charLiteral = matcher.group(2);
+            if (charCode != null) {
+                return "字符 0x" + charCode + " 不是合法的 XML 字符";
+            }
+            if (charLiteral != null) {
+                return "字符 '" + charLiteral + "' 不是合法的 XML 字符";
+            }
+            return "包含非法的 XML 字符";
+        }
+
+        // 实体引用错误
+        matcher = INVALID_CHARACTER_ENTITY.matcher(message);
+        if (matcher.find()) {
+            return "XML 中引用了未声明的实体，请检查实体引用是否正确或需要在 DTD 中声明";
+        }
+
+        // 通用特殊字符错误检测
+        String lowerMessage = message.toLowerCase();
+        if (lowerMessage.contains("invalid character") || lowerMessage.contains("illegal character")) {
+            if (lowerMessage.contains("unicode")) {
+                return "XML 中包含非法字符，该字符不符合 XML 规范要求";
+            }
+            return "XML 中包含无效字符，请检查内容";
+        }
+
+        if (lowerMessage.contains("entity") && lowerMessage.contains("not declared")) {
+            return "XML 中引用了未声明的实体，请检查实体引用";
+        }
+
         return null;
     }
 
@@ -265,6 +479,21 @@ public class XsdErrorTranslator {
      */
     private static String translateGeneral(String message) {
         String lowerMessage = message.toLowerCase();
+
+
+        // 特殊字符相关错误优先处理
+        if (lowerMessage.contains("invalid character") || lowerMessage.contains("illegal character")) {
+            return message.replaceAll("(?i)invalid character", "非法字符")
+                         .replaceAll("(?i)illegal character", "非法字符")
+                         .replaceAll("(?i)was found", "被发现")
+                         .replaceAll("(?i)in the element", "在元素中");
+        }
+
+        if (lowerMessage.contains("entity") && lowerMessage.contains("not declared")) {
+            return message.replaceAll("(?i)entity", "实体")
+                         .replaceAll("(?i)not declared", "未声明")
+                         .replaceAll("(?i)was referenced", "被引用");
+        }
 
         // 常见关键字翻译
         if (lowerMessage.contains("not a valid")) {
@@ -299,7 +528,7 @@ public class XsdErrorTranslator {
 
     /**
      * 从带命名空间的名称中提取本地名称
-     * 例如: {http://example.com}localName -> localName
+     * 例如: {@code {http://example.com}localName} -> localName
      */
     private static String extractLocalName(String qualifiedName) {
         if (qualifiedName == null) {

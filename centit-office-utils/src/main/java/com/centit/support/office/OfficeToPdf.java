@@ -144,7 +144,6 @@ public abstract class OfficeToPdf {
             Workbook wb = WorkbookFactory.create(inWExcelStream);
             int nSheetSize = wb.getNumberOfSheets();
 
-
             //Single one
             if (nSheetSize > 1) {
                 Excel2PdfUtils.toCreateContentIndexes(document, nSheetSize);
