@@ -70,7 +70,6 @@
 | 国密 SM2/SM3/SM4 | `AGENTS-centit-utils-security.md` | `SM2Util`, `SM3Util`, `SM4Util` |
 | MD5/SHA1 哈希 | `AGENTS-centit-utils-security.md` | `Md5Encoder`, `Sha1Encoder` |
 | 数据脱敏(手机号/身份证/邮箱) | `AGENTS-centit-utils-security.md` | `DesensitizeOptUtils` |
-| XSS 过滤 | `AGENTS-centit-utils-security.md` | `HTMLFilter` |
 | XML 解析、序列化 | `AGENTS-centit-utils-xml.md` | `XmlUtils`, `XMLObject` |
 | XML Schema 验证 | `AGENTS-centit-utils-xml.md` | `XMLSchemaValidationUtil` |
 | 防XXE攻击 | `AGENTS-centit-utils-xml.md` | `IgnoreDTDEntityResolver` |
