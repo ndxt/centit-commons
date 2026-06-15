@@ -2,6 +2,7 @@ package com.centit.support.security;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -19,7 +20,7 @@ public abstract class SecurityOptUtils {
 
     public static Pair<byte[], byte[]> makeCbcKey(String password, String algorithm){
         if(StringUtils.isBlank(password)){
-            if(StringUtils.equalsIgnoreCase("SM4", algorithm)){
+            if(Strings.CI.equals("SM4", algorithm)){
                 return new MutablePair<>(SM4Util.SM4_SECRET_KEY_SPEC.getBytes(),
                     SM4Util.SM4_IV_PARAMETER_SPEC.getBytes());
             } else { //AES
@@ -66,20 +67,15 @@ public abstract class SecurityOptUtils {
     public static String encodeSecurityString(String sStr, String encType){
         if(sStr==null)
             return "";
-        switch (encType){
-            case "cipher":
-                return "cipher:" + AESSecurityUtils.encryptAndBase64(
-                    sStr, AESSecurityUtils.AES_DEFAULT_KEY);
-            case "base64":
-                return "encode:" + Base64.encodeBase64String(sStr.getBytes(StandardCharsets.UTF_8));
-            case "aescbc":
-                return "aescbc:" + AESSecurityUtils.encryptAsCBCTypeAsBase64(sStr,
-                    AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC);
-            case "sm4cbc":
-                return "sm4cbc:" + SM4Util.encryptAsCBCTypeAsBase64(sStr,
-                    SM4Util.SM4_SECRET_KEY_SPEC, SM4Util.SM4_IV_PARAMETER_SPEC);
-            default:
-                return sStr;
-        }
+        return switch (encType) {
+            case "cipher" -> "cipher:" + AESSecurityUtils.encryptAndBase64(
+                sStr, AESSecurityUtils.AES_DEFAULT_KEY);
+            case "base64" -> "encode:" + Base64.encodeBase64String(sStr.getBytes(StandardCharsets.UTF_8));
+            case "aescbc" -> "aescbc:" + AESSecurityUtils.encryptAsCBCTypeAsBase64(sStr,
+                AESSecurityUtils.AES_SECRET_KEY_SPEC, AESSecurityUtils.AES_IV_PARAMETER_SPEC);
+            case "sm4cbc" -> "sm4cbc:" + SM4Util.encryptAsCBCTypeAsBase64(sStr,
+                SM4Util.SM4_SECRET_KEY_SPEC, SM4Util.SM4_IV_PARAMETER_SPEC);
+            default -> sStr;
+        };
     }
 }

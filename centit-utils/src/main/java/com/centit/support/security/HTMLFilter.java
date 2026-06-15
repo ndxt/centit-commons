@@ -9,21 +9,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Refrence : https://github.com/finn-no/xss-html-filter
+ * Refrence : <a href="https://github.com/finn-no/xss-html-filter">...</a>
  * <p>
  * HTML filtering utility for protecting against XSS (Cross Site Scripting).
  * <p>
  * This code is licensed LGPLv3
  * <p>
  * This code is a Java port of the original work in PHP by Cal Hendersen.
- * http://code.iamcal.com/php/lib_filter/
+ * <a href="http://code.iamcal.com/php/lib_filter/">...</a>
  * <p>
  * The trickiest part of the translation was handling the differences in regex handling
  * between PHP and Java.  These resources were helpful in the process:
  * <p>
- * http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html
- * http://us2.php.net/manual/en/reference.pcre.pattern.modifiers.php
- * http://www.regular-expressions.info/modifiers.html
+ * <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html">...</a>
+ * <a href="http://us2.php.net/manual/en/reference.pcre.pattern.modifiers.php">...</a>
+ * <a href="http://www.regular-expressions.info/modifiers.html">...</a>
  * <p>
  * A note on naming conventions: instance variables are prefixed with a "v"; global
  * constants are in all caps.
@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  * <p>
  * If you find bugs or have suggestions on improvement (especially regarding
  * performance), please contact us.  The latest version of this
- * source, and our contact details, can be found at http://xss-html-filter.sf.net
+ * source, and our contact details, can be found at <a href="http://xss-html-filter.sf.net">...</a>
  *
  * @author Joseph O'Connell
  * @author Cal Hendersen
@@ -288,7 +288,7 @@ public final class HTMLFilter {
 
     private String escapeComments(final String s) {
         final Matcher m = P_COMMENTS.matcher(s);
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
         if (m.find()) {
             final String match = m.group(1); //(.*?)
             m.appendReplacement(buf, Matcher.quoteReplacement("<!--" + htmlSpecialChars(match) + "-->"));
@@ -328,7 +328,7 @@ public final class HTMLFilter {
     private String checkTags(String s) {
         Matcher m = P_TAGS.matcher(s);
 
-        final StringBuffer buf = new StringBuffer();
+        final StringBuilder buf = new StringBuilder();
         while (m.find()) {
             String replaceStr = m.group(1);
             replaceStr = processTag(replaceStr);
@@ -336,17 +336,15 @@ public final class HTMLFilter {
         }
         m.appendTail(buf);
 
-        s = buf.toString();
-
         // these get tallied in processTag
         // (remember to reset before subsequent calls to filter method)
+        StringBuilder sBuilder = new StringBuilder(buf.toString());
         for (String key : vTagCounts.keySet()) {
             for (int ii = 0; ii < vTagCounts.get(key); ii++) {
-                s += "</" + key + ">";
+                sBuilder.append("</").append(key).append(">");
             }
         }
-
-        return s;
+        return sBuilder.toString();
     }
 
     private String processRemoveBlanks(final String s) {
@@ -389,12 +387,12 @@ public final class HTMLFilter {
 
             //debug( "in a starting tag, name='" + name + "'; body='" + body + "'; ending='" + ending + "'" );
             if (allowed(name)) {
-                String params = "";
+                StringBuilder params = new StringBuilder();
 
                 final Matcher m2 = P_QUOTED_ATTRIBUTES.matcher(body);
                 final Matcher m3 = P_UNQUOTED_ATTRIBUTES.matcher(body);
-                final List<String> paramNames = new ArrayList<String>();
-                final List<String> paramValues = new ArrayList<String>();
+                final List<String> paramNames = new ArrayList<>();
+                final List<String> paramValues = new ArrayList<>();
                 while (m2.find()) {
                     paramNames.add(m2.group(1)); //([a-z0-9]+)
                     paramValues.add(m2.group(3)); //(.*?)
@@ -408,16 +406,14 @@ public final class HTMLFilter {
                 for (int ii = 0; ii < paramNames.size(); ii++) {
                     paramName = paramNames.get(ii).toLowerCase();
                     paramValue = paramValues.get(ii);
-
 //          debug( "paramName='" + paramName + "'" );
 //          debug( "paramValue='" + paramValue + "'" );
 //          debug( "allowed? " + vAllowed.get( name ).contains( paramName ) );
-
                     if (allowedAttribute(name, paramName)) {
                         if (inArray(paramName, vProtocolAtts)) {
                             paramValue = processParamProtocol(paramValue);
                         }
-                        params += " " + paramName + "=\"" + paramValue + "\"";
+                        params.append(" ").append(paramName).append("=\"").append(paramValue).append("\"");
                     }
                 }
 
@@ -429,7 +425,7 @@ public final class HTMLFilter {
                     ending = "";
                 }
 
-                if (ending == null || ending.length() < 1) {
+                if (ending == null || ending.isEmpty()) {
                     if (vTagCounts.containsKey(name)) {
                         vTagCounts.put(name, vTagCounts.get(name) + 1);
                     } else {
@@ -460,9 +456,9 @@ public final class HTMLFilter {
             final String protocol = m.group(1);
             if (!inArray(protocol, vAllowedProtocols)) {
                 // bad protocol, turn into local anchor link instead
-                s = "#" + s.substring(protocol.length() + 1, s.length());
+                s = "#" + s.substring(protocol.length() + 1);
                 if (s.startsWith("#//")) {
-                    s = "#" + s.substring(3, s.length());
+                    s = "#" + s.substring(3);
                 }
             }
         }
@@ -471,32 +467,32 @@ public final class HTMLFilter {
     }
 
     private String decodeEntities(String s) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         Matcher m = P_ENTITY.matcher(s);
         while (m.find()) {
             final String match = m.group(1);
-            final int decimal = Integer.decode(match).intValue();
+            final int decimal = Integer.decode(match);
             m.appendReplacement(buf, Matcher.quoteReplacement(chr(decimal)));
         }
         m.appendTail(buf);
         s = buf.toString();
 
-        buf = new StringBuffer();
+        buf = new StringBuilder();
         m = P_ENTITY_UNICODE.matcher(s);
         while (m.find()) {
             final String match = m.group(1);
-            final int decimal = Integer.valueOf(match, 16).intValue();
+            final int decimal = Integer.valueOf(match, 16);
             m.appendReplacement(buf, Matcher.quoteReplacement(chr(decimal)));
         }
         m.appendTail(buf);
         s = buf.toString();
 
-        buf = new StringBuffer();
+        buf = new StringBuilder();
         m = P_ENCODE.matcher(s);
         while (m.find()) {
             final String match = m.group(1);
-            final int decimal = Integer.valueOf(match, 16).intValue();
+            final int decimal = Integer.valueOf(match, 16);
             m.appendReplacement(buf, Matcher.quoteReplacement(chr(decimal)));
         }
         m.appendTail(buf);
@@ -507,7 +503,7 @@ public final class HTMLFilter {
     }
 
     private String validateEntities(final String s) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         // validate entities throughout the string
         Matcher m = P_VALID_ENTITIES.matcher(s);
@@ -523,7 +519,7 @@ public final class HTMLFilter {
 
     private String encodeQuotes(final String s) {
         if (encodeQuotes) {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             Matcher m = P_VALID_QUOTES.matcher(s);
             while (m.find()) {
                 final String one = m.group(1); //(>|^)

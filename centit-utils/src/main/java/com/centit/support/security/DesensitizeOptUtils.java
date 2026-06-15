@@ -2,6 +2,7 @@ package com.centit.support.security;
 
 import com.centit.support.algorithm.StringBaseOpt;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.Map;
 /**
  * @author codefan
  * 脱敏操作类
- * https://blog.51cto.com/u_15895329/5894220
+ * <a href="https://blog.51cto.com/u_15895329/5894220">...</a>
  * 算法重新设计
  */
 public abstract class DesensitizeOptUtils {
@@ -69,69 +70,32 @@ public abstract class DesensitizeOptUtils {
     public static SensitiveTypeEnum mapSensitiveType(String sensitiveType){
         if(StringUtils.isBlank(sensitiveType))
             return SensitiveTypeEnum.NONE;
-        switch (sensitiveType.toLowerCase()){
-            case "chinesename":
-            case "chinese_name": {
-                return SensitiveTypeEnum.CHINESE_NAME;
-            }
-            case "idcard":
-            case "id_card":{
-                return SensitiveTypeEnum.ID_CARD;
-            }
-            case "phone": {
-                return SensitiveTypeEnum.PHONE;
-            }
-            case "address": {
-                return SensitiveTypeEnum.ADDRESS;
-            }
-            case "email": {
-                return SensitiveTypeEnum.EMAIL;
-            }
-            case "bankcard":
-            case "bank_card":{
-                return SensitiveTypeEnum.BANK_CARD;
-            }
-            case "password": {
-                return SensitiveTypeEnum.PASSWORD;
-            }
-            case "account":{
-                return SensitiveTypeEnum.ACCOUNT;
-            }
-            default:
-                return SensitiveTypeEnum.NONE;
-        }
+        return switch (sensitiveType.toLowerCase()) {
+            case "chinesename", "chinese_name" -> SensitiveTypeEnum.CHINESE_NAME;
+            case "idcard", "id_card" -> SensitiveTypeEnum.ID_CARD;
+            case "phone" -> SensitiveTypeEnum.PHONE;
+            case "address" -> SensitiveTypeEnum.ADDRESS;
+            case "email" -> SensitiveTypeEnum.EMAIL;
+            case "bankcard", "bank_card" -> SensitiveTypeEnum.BANK_CARD;
+            case "password" -> SensitiveTypeEnum.PASSWORD;
+            case "account" -> SensitiveTypeEnum.ACCOUNT;
+            default -> SensitiveTypeEnum.NONE;
+        };
     }
 
     public static String desensitize(String sensitive, SensitiveTypeEnum sensitiveType){
 
-        switch (sensitiveType) {
-            case CHINESE_NAME: {
-                return DesensitizeOptUtils.chineseName(sensitive, 3);
-            }
-            case ID_CARD: {
-                return DesensitizeOptUtils.idCardNum(sensitive);
-            }
-            case PHONE: {
-                return DesensitizeOptUtils.phone(sensitive);
-            }
-            case ADDRESS: {
-                return DesensitizeOptUtils.address(sensitive, ADDRESS_SENSITIVE_SIZE);
-            }
-            case EMAIL: {
-                return DesensitizeOptUtils.email(sensitive);
-            }
-            case BANK_CARD: {
-                return DesensitizeOptUtils.bankCard(sensitive);
-            }
-            case PASSWORD: {
-                return DesensitizeOptUtils.password(sensitive);
-            }
-            case ACCOUNT:{
-                return DesensitizeOptUtils.account(sensitive);
-            }
-            default:
-                return sensitive;
-        }
+        return switch (sensitiveType) {
+            case CHINESE_NAME -> DesensitizeOptUtils.chineseName(sensitive, 3);
+            case ID_CARD -> DesensitizeOptUtils.idCardNum(sensitive);
+            case PHONE -> DesensitizeOptUtils.phone(sensitive);
+            case ADDRESS -> DesensitizeOptUtils.address(sensitive, ADDRESS_SENSITIVE_SIZE);
+            case EMAIL -> DesensitizeOptUtils.email(sensitive);
+            case BANK_CARD -> DesensitizeOptUtils.bankCard(sensitive);
+            case PASSWORD -> DesensitizeOptUtils.password(sensitive);
+            case ACCOUNT -> DesensitizeOptUtils.account(sensitive);
+            default -> sensitive;
+        };
     }
 
     /**
@@ -216,7 +180,7 @@ public abstract class DesensitizeOptUtils {
         if (StringUtils.isBlank(num)) {
             return "";
         }
-        int header = StringUtils.startsWithAny(num, "0", "+", "1" )?3:0;
+        int header = Strings.CS.startsWithAny(num, "0", "+", "1" )?3:0;
         return showHeadAndTail(num, header,
             4);
     }
@@ -246,7 +210,7 @@ public abstract class DesensitizeOptUtils {
         if (StringUtils.isBlank(email)) {
             return "";
         }
-        int index = StringUtils.indexOf(email, "@");
+        int index = Strings.CS.indexOf(email, "@");
         if (index <= 1)
             return email;
         else
@@ -299,6 +263,7 @@ public abstract class DesensitizeOptUtils {
         return data;
     }
 
+    @SuppressWarnings("unchecked")
     public static Collection<Object> desensitize(Collection<Object> data, Map<String, DesensitizeOptUtils.SensitiveTypeEnum> desenDesc){
         if(! desenDesc.isEmpty()) {
             for (Object obj : data) {
