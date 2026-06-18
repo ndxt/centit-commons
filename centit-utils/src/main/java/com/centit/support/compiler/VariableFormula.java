@@ -8,6 +8,15 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 
+/**
+ * 变量公式表达式引擎：解析并计算形如 {@code func(a, b) + ${var}} 的表达式。
+ *
+ * <p><b>字符串字面量转义注意</b>：表达式中的单引号字符串会对反斜杠做转义处理——
+ * 每两个 {@code \\} 在解析后对应一个 {@code \}。因此<b>正则、文件路径等含反斜杠的内容，
+ * 反斜杠必须双写</b>，否则会被吞掉。例如要得到正则 {@code \w+}，表达式里应写成
+ * {@code '\\w+'}（两个反斜杠），对应的 Java 字符串字面量为 {@code "'\\\\w+'"}（四个反斜杠）。
+ * 正则相关函数 {@code regexmatch} / {@code regexmatchvalue} / {@code regexmatchgroups} 尤需留意。
+ */
 @SuppressWarnings("unused")
 public class VariableFormula {
 
