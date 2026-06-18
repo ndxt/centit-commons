@@ -23,7 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 80;
+    public static final int functionsSum = 81;
     protected static final FunctionInfo[] functionsList = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -34,23 +34,24 @@ public abstract class EmbedFunc {
         new FunctionInfo("match", 2, ConstDefine.FUNC_MATCH, ConstDefine.TYPE_NUM), //匹配*?为通配符 match ("a??d","abcd")=1
         new FunctionInfo("regexmatch", 2, ConstDefine.FUNC_REG_MATCH, ConstDefine.TYPE_NUM), //正则表达式 regexMatch("^1[3-9]\\d(9)$"，"13901390139"）= true
         new FunctionInfo("regexmatchvalue", 2, ConstDefine.FUNC_REG_MATCH_VALUES, ConstDefine.TYPE_ANY), //正则表达式匹配部分 regexMatchValue('a\\S','abcdacda2ef') = ['ab', 'ac', 'a2']
+        new FunctionInfo("regexmatchgroups", -1, ConstDefine.FUNC_REG_MATCH_GROUPS, ConstDefine.TYPE_ANY), //正则多分组匹配,names也可数组/List整体传入 regexMatchGroups('(\\w+)=(\\w+)','a=1&b=2','key','value')=[{key=a,value=1},{key=b,value=2}]
         new FunctionInfo("max", -1, ConstDefine.FUNC_MAX, ConstDefine.TYPE_ANY),   // 求最大值 max (1,2,3,5,4) = 5
         new FunctionInfo("min", -1, ConstDefine.FUNC_MIN, ConstDefine.TYPE_ANY),    // 求最小值 min (1,2,3,5,4) = 1
         new FunctionInfo("ave", -1, ConstDefine.FUNC_AVE, ConstDefine.TYPE_NUM),    //求均值  ave (1,2,3)=2
         new FunctionInfo("count", -1, ConstDefine.FUNC_COUNT, ConstDefine.TYPE_NUM),    // 计数 count(1,"2",3,"5",1,1,4) = 7
-        new FunctionInfo("countnotnull", -1, ConstDefine.FUNC_COUNTNOTNULL, ConstDefine.TYPE_NUM),    // 计数 非空参数 countnotnull(1,,"2",,,,1,1,4) = 5
-        new FunctionInfo("countnull", -1, ConstDefine.FUNC_COUNTNULL, ConstDefine.TYPE_NUM),    // 计数空参数  countnull(1,,"2",,,,1,1,4) = 4
+        new FunctionInfo("countnotnull", -1, ConstDefine.FUNC_COUNT_NOT_NULL, ConstDefine.TYPE_NUM),    // 计数 非空参数 countnotnull(1,,"2",,,,1,1,4) = 5
+        new FunctionInfo("countnull", -1, ConstDefine.FUNC_COUNT_NULL, ConstDefine.TYPE_NUM),    // 计数空参数  countnull(1,,"2",,,,1,1,4) = 4
         new FunctionInfo("sum", -1, ConstDefine.FUNC_SUM, ConstDefine.TYPE_NUM),    // 求和 sum (1,2,3,4,5) = 15
-        new FunctionInfo("stddev", -1, ConstDefine.FUNC_STDDEV, ConstDefine.TYPE_NUM),    // 求标准偏差
+        new FunctionInfo("stddev", -1, ConstDefine.FUNC_STD_DEV, ConstDefine.TYPE_NUM),    // 求标准偏差
         new FunctionInfo("distinct", -1, ConstDefine.FUNC_DISTINCT, ConstDefine.TYPE_ANY),    // 去重
         new FunctionInfo("round", -1, ConstDefine.FUNC_ROUND, ConstDefine.TYPE_NUM),    // 四舍五入
         new FunctionInfo("floor", -1, ConstDefine.FUNC_FLOOR, ConstDefine.TYPE_NUM),    // 四舍五入
         new FunctionInfo("ceil", -1, ConstDefine.FUNC_CEIL, ConstDefine.TYPE_NUM),    // 四舍五入
         new FunctionInfo("strlen", -1, ConstDefine.FUNC_STRLEN, ConstDefine.TYPE_NUM),    // 求字符串长度 strlen ("123456")=6
-        new FunctionInfo("concat", -1, ConstDefine.FUNC_STRCAT, ConstDefine.TYPE_STR),    // 连接字符串 concat ("12","34","56")="123456"
-        new FunctionInfo("strcat", -1, ConstDefine.FUNC_STRCAT, ConstDefine.TYPE_STR),    // 连接字符串 strcat ("12","34","56")="123456"
-        new FunctionInfo("isempty", 1, ConstDefine.FUNC_ISEMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 isempty("")=1
-        new FunctionInfo("isnotempty", 1, ConstDefine.FUNC_NOTEMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 notempty("")=0
+        new FunctionInfo("concat", -1, ConstDefine.FUNC_STR_CAT, ConstDefine.TYPE_STR),    // 连接字符串 concat ("12","34","56")="123456"
+        new FunctionInfo("strcat", -1, ConstDefine.FUNC_STR_CAT, ConstDefine.TYPE_STR),    // 连接字符串 strcat ("12","34","56")="123456"
+        new FunctionInfo("isempty", 1, ConstDefine.FUNC_IS_EMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 isempty("")=1
+        new FunctionInfo("isnotempty", 1, ConstDefine.FUNC_NOT_EMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 notempty("")=0
         new FunctionInfo("log", 1, ConstDefine.FUNC_LOG, ConstDefine.TYPE_NUM),    // 求以10为底的对数
         new FunctionInfo("ln", 1, ConstDefine.FUNC_LN, ConstDefine.TYPE_NUM),        // 求自然对数
         new FunctionInfo("sin", 1, ConstDefine.FUNC_SIN, ConstDefine.TYPE_NUM),    // 求正弦
@@ -59,13 +60,13 @@ public abstract class EmbedFunc {
         new FunctionInfo("ctan", 1, ConstDefine.FUNC_CTAN, ConstDefine.TYPE_NUM),    // 求余切
         new FunctionInfo("exp", 1, ConstDefine.FUNC_EXP, ConstDefine.TYPE_NUM),    // 求以e为底的指数
         new FunctionInfo("sqrt", 1, ConstDefine.FUNC_SQRT, ConstDefine.TYPE_NUM),    // 求平方根
-        new FunctionInfo("upcase", 1, ConstDefine.FUNC_UPCASE, ConstDefine.TYPE_STR), // 字符串大写
-        new FunctionInfo("lowcase", 1, ConstDefine.FUNC_LOWCASE, ConstDefine.TYPE_STR), // 字符串小写
+        new FunctionInfo("upcase", 1, ConstDefine.FUNC_UPPER_CASE, ConstDefine.TYPE_STR), // 字符串大写
+        new FunctionInfo("lowcase", 1, ConstDefine.FUNC_LOWER_CASE, ConstDefine.TYPE_STR), // 字符串小写
         new FunctionInfo("substr", 2, ConstDefine.FUNC_SUBSTR, ConstDefine.TYPE_STR), // 求字符串子串 substr ("123456",2,3)="345"
         new FunctionInfo("lpad", 1, ConstDefine.FUNC_LPAD, ConstDefine.TYPE_STR), // 左侧补充字符串
         new FunctionInfo("rpad", 1, ConstDefine.FUNC_RPAD, ConstDefine.TYPE_STR), // 右侧补充字符串
         new FunctionInfo("find", 2, ConstDefine.FUNC_FIND, ConstDefine.TYPE_NUM),  //求子串位置 find ("123456","34")=2  find ("123456","35")=-1
-        new FunctionInfo("frequence", 2, ConstDefine.FUNC_FREQUENCE, ConstDefine.TYPE_NUM), // 求子串个数 find ("12345236","23")=2
+        new FunctionInfo("frequence", 2, ConstDefine.FUNC_FREQUENCY, ConstDefine.TYPE_NUM), // 求子串个数 find ("12345236","23")=2
         new FunctionInfo("split", 1, ConstDefine.FUNC_SPLIT_STR, ConstDefine.TYPE_STR),
         new FunctionInfo("replace", -1, ConstDefine.FUNC_REPLACE, ConstDefine.TYPE_STR), // 字符串替换
         new FunctionInfo("int", 1, ConstDefine.FUNC_INT, ConstDefine.TYPE_NUM), // 求整数部分 int (12.34)=12 int -12.34)=-12
@@ -96,7 +97,7 @@ public abstract class EmbedFunc {
         new FunctionInfo("toUrlString", 1, ConstDefine.FUNC_TO_URL_STRING, ConstDefine.TYPE_STR),//转换为JSONString
         new FunctionInfo("toObject", 1, ConstDefine.FUNC_TO_OBJECT, ConstDefine.TYPE_ANY),//转换为json 对象
         new FunctionInfo("toNumber", 1, ConstDefine.FUNC_TO_NUMBER, ConstDefine.TYPE_NUM),//转换为数字
-        new FunctionInfo("toByteArray", 1, ConstDefine.FUNC_TOBYTEARRAY, ConstDefine.TYPE_ANY),//转换为数字
+        new FunctionInfo("toByteArray", 1, ConstDefine.FUNC_TO_BYTE_ARRAY, ConstDefine.TYPE_ANY),//转换为数字
         new FunctionInfo("attr", 2, ConstDefine.FUNC_GET_ATTR, ConstDefine.TYPE_ANY),//获取对象属性
         new FunctionInfo("setAttr", 3, ConstDefine.FUNC_SET_ATTR, ConstDefine.TYPE_ANY),//设置对象属性
         new FunctionInfo("getpy", 1, ConstDefine.FUNC_GET_PY, ConstDefine.TYPE_STR),//取汉字拼音
@@ -277,6 +278,44 @@ public abstract class EmbedFunc {
                     return matchValues.get(0);
                 return matchValues;
             }
+            case ConstDefine.FUNC_REG_MATCH_GROUPS: {
+                // regexMatchGroups(pattern, str, name1, name2, ...) 多分组匹配；names 也可整体以数组/List 传入
+                // name1 对应 group(1)，name2 对应 group(2)……；未命名的分组用 g1/g2……；无捕获组时整匹配放入 name1 或 "match"
+                // 返回 Map(单匹配) / List<Map>(多匹配) / null(无匹配)
+                LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
+                if (opt.getLeft() < 2)
+                    return null;
+                String regPatternStr = StringBaseOpt.castObjectToString(opt.getRight().get(0), "");
+                if (StringUtils.isBlank(regPatternStr)) {
+                    return null;
+                }
+                String inputValue = StringBaseOpt.castObjectToString(opt.getRight().get(1), "");
+                List<String> groupNames = new ArrayList<>();
+                for (int i = 2; i < opt.getLeft(); i++) {
+                    groupNames.add(StringBaseOpt.castObjectToString(opt.getRight().get(i), ""));
+                }
+                Matcher m = Pattern.compile(regPatternStr).matcher(inputValue);
+                List<Map<String, String>> matchList = new ArrayList<>();
+                while (m.find()) {
+                    int gc = m.groupCount();
+                    Map<String, String> row = new LinkedHashMap<>();
+                    if (gc == 0) {
+                        row.put(groupNames.isEmpty() ? "match" : groupNames.get(0), m.group());
+                    } else {
+                        for (int g = 1; g <= gc; g++) {
+                            String name = (g - 1) < groupNames.size() && StringUtils.isNotBlank(groupNames.get(g - 1))
+                                ? groupNames.get(g - 1) : ("g" + g);
+                            row.put(name, m.group(g));
+                        }
+                    }
+                    matchList.add(row);
+                }
+                if (matchList.isEmpty())
+                    return null;
+                if (matchList.size() == 1)
+                    return matchList.get(0);
+                return matchList;
+            }
             case ConstDefine.FUNC_CAPITAL:// 102
             {
                 if (nOpSum < 1) return null;
@@ -315,7 +354,7 @@ public abstract class EmbedFunc {
                 LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
                 return opt.getLeft();
             }
-            case ConstDefine.FUNC_COUNTNOTNULL:// 145
+            case ConstDefine.FUNC_COUNT_NOT_NULL:// 145
             {
                 LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
                 int nc = 0;
@@ -329,7 +368,7 @@ public abstract class EmbedFunc {
                 }
                 return nc;
             }
-            case ConstDefine.FUNC_COUNTNULL:// 144
+            case ConstDefine.FUNC_COUNT_NULL:// 144
             {
                 LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
                 int nc = 0;
@@ -349,7 +388,7 @@ public abstract class EmbedFunc {
                 LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
                 return GeneralAlgorithm.sumObjects(opt.getRight());
             }
-            case ConstDefine.FUNC_STDDEV:// 133
+            case ConstDefine.FUNC_STD_DEV:// 133
             {
                 LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
                 if (opt.getLeft() < 2)
@@ -375,7 +414,7 @@ public abstract class EmbedFunc {
 
                 return Math.sqrt(dbtemp / (numberSum - 1));
             }
-            case ConstDefine.FUNC_STRCAT:// 106
+            case ConstDefine.FUNC_STR_CAT:// 106
             {
                 if (nOpSum < 1)
                     return null;
@@ -490,17 +529,17 @@ public abstract class EmbedFunc {
                     tempStr , StringBaseOpt.objectToString(slOperand.get(1)), nStart);
             }
 
-            case ConstDefine.FUNC_UPCASE://upcase
+            case ConstDefine.FUNC_UPPER_CASE://upcase
             {
                 if (nOpSum < 1) return null;
                 return StringUtils.upperCase(StringBaseOpt.objectToString(slOperand.get(0)));
             }
-            case ConstDefine.FUNC_LOWCASE://lowcase
+            case ConstDefine.FUNC_LOWER_CASE://lowcase
             {
                 if (nOpSum < 1) return null;
                 return StringUtils.lowerCase(StringBaseOpt.objectToString(slOperand.get(0)));
             }
-            case ConstDefine.FUNC_FREQUENCE: {
+            case ConstDefine.FUNC_FREQUENCY: {
                 if (nOpSum < 2) return -1;
                 if (slOperand.get(0) == null || slOperand.get(1) == null)
                     return 0;
@@ -613,7 +652,7 @@ public abstract class EmbedFunc {
                 return Double.valueOf(Math.ceil(tempDouble)).longValue();
             }
 
-            case ConstDefine.FUNC_ISEMPTY: //判断参数是否为空
+            case ConstDefine.FUNC_IS_EMPTY: //判断参数是否为空
                 if (nOpSum < 1)
                     return true;
                 for(int i=0; i<nOpSum; i++){
@@ -623,7 +662,7 @@ public abstract class EmbedFunc {
                 }
                 return true;
 
-            case ConstDefine.FUNC_NOTEMPTY: //判断参数是否为空
+            case ConstDefine.FUNC_NOT_EMPTY: //判断参数是否为空
                 if (nOpSum < 1)
                     return false;
                 for(int i=0; i<nOpSum; i++){
@@ -930,7 +969,7 @@ public abstract class EmbedFunc {
                 return UrlOptUtils.objectToUrlString(slOperand.get(0));
             }
 
-            case ConstDefine.FUNC_TOBYTEARRAY:{
+            case ConstDefine.FUNC_TO_BYTE_ARRAY:{
                 if (nOpSum < 1) {
                     return null;
                 }

@@ -13,7 +13,7 @@ public abstract class ConstDefine {
     public static final int FUNC_MAX = 103;
     public static final int FUNC_MIN = 104;
     public static final int FUNC_SUM = 105;
-    public static final int FUNC_STRCAT = 106;
+    public static final int FUNC_STR_CAT = 106;
     public static final int FUNC_ROUND = 107;
     public static final int FUNC_IF = 108;
     public static final int FUNC_PRECISION = 109;
@@ -24,15 +24,15 @@ public abstract class ConstDefine {
     public static final int FUNC_EXP = 114;
     public static final int FUNC_SQRT = 115;
     public static final int FUNC_CASE = 116;
-    public static final int FUNC_UPCASE = 142;
-    public static final int FUNC_LOWCASE = 143;
+    public static final int FUNC_UPPER_CASE = 142;
+    public static final int FUNC_LOWER_CASE = 143;
     public static final int FUNC_LOG = 117;
     public static final int FUNC_SIN = 118;
     public static final int FUNC_COS = 119;
     public static final int FUNC_TAN = 120;
     public static final int FUNC_CTAN = 121;
     public static final int FUNC_FIND = 122;
-    public static final int FUNC_FREQUENCE = 123;
+    public static final int FUNC_FREQUENCY = 123;
 
     public static final int FUNC_INT = 124;
     public static final int FUNC_FRAC = 125;
@@ -50,14 +50,14 @@ public abstract class ConstDefine {
     public static final int FUNC_ADD_YEARS = 139;
     public static final int FUNC_TRUNC_DATE = 140;
     public static final int FUNC_LAST_OF_MONTH = 141;
-    public static final int FUNC_STDDEV = 133;
+    public static final int FUNC_STD_DEV = 133;
     public static final int FUNC_GET_STR = 134;
     public static final int FUNC_GET_PY = 135;
     public static final int FUNC_PRINT = 136;
-    public static final int FUNC_COUNTNULL = 144;
-    public static final int FUNC_COUNTNOTNULL = 145;
-    public static final int FUNC_ISEMPTY = 146;
-    public static final int FUNC_NOTEMPTY = 147;
+    public static final int FUNC_COUNT_NULL = 144;
+    public static final int FUNC_COUNT_NOT_NULL = 145;
+    public static final int FUNC_IS_EMPTY = 146;
+    public static final int FUNC_NOT_EMPTY = 147;
     public static final int FUNC_GET_AT = 148;
     public static final int FUNC_LPAD = 150;
     public static final int FUNC_RPAD = 151;
@@ -69,6 +69,7 @@ public abstract class ConstDefine {
     public static final int FUNC_ADD_DATE = 158;
     public static final int FUNC_REG_MATCH = 159;
     public static final int FUNC_REG_MATCH_VALUES = 160;
+    public static final int FUNC_REG_MATCH_GROUPS = 182;
     public static final int FUNC_WEEK = 161;
     public static final int FUNC_WEEK_DAY = 162;
     public static final int FUNC_FORMAT_DATE = 163;
@@ -84,7 +85,7 @@ public abstract class ConstDefine {
     public static final int FUNC_HASH = 173;
     public static final int FUNC_NVL = 174;
     public static final int FUNC_REPLACE = 175;
-    public static final int FUNC_TOBYTEARRAY = 176;
+    public static final int FUNC_TO_BYTE_ARRAY = 176;
     public static final int FUNC_EVAL = 177;
     public static final int FUNC_TO_JSON_STRING = 178;
     public static final int FUNC_ENCODE = 179;
