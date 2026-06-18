@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * 变量公式表达式引擎：解析并计算形如 {@code func(a, b) + ${var}} 的表达式。
@@ -175,7 +174,7 @@ public class VariableFormula {
         return formula.checkFormula();
     }
 
-    public static Set<String> attainFormulaVariable(String szExpress, Map<String, Function<Object[], Object>> extendFuncMap) {
+    public static Set<String> attainFormulaVariable(String szExpress, Map<String, ExtendFunc> extendFuncMap) {
         Lexer lex = new Lexer(szExpress);
         Set<String> variables = new HashSet<>();
         while(true){
