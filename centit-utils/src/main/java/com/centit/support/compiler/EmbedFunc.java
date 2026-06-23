@@ -681,12 +681,14 @@ public abstract class EmbedFunc {
                 if (nOpSum < 1) return null;
                 if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
                 double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                if (af <= 0) return null;
                 return Math.log(af);
             }
             case ConstDefine.FUNC_LOG: {
                 if (nOpSum < 1) return null;
                 if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
                 double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                if (af <= 0) return null;
                 return Math.log10(af);
             }
             case ConstDefine.FUNC_SIN: {//sin
@@ -731,6 +733,7 @@ public abstract class EmbedFunc {
                 if (nOpSum < 1) return null;
                 if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
                 double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                if (af < 0) return null;
                 return Math.sqrt(af);
             }
 
@@ -1144,6 +1147,9 @@ public abstract class EmbedFunc {
                     default:
                         hashData = Md5Encoder.rawEncode(ByteBaseOpt.castObjectToBytes(slOperand.get(0)));
                         break;
+                }
+                if(hashData == null){
+                    return null;
                 }
                 switch (encodeType){
                     case "BASE64URL":
