@@ -18,12 +18,14 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class EmbedFunc {
-    public static final int functionsSum = 81;
+    public static final int functionsSum = 83;
     protected static final FunctionInfo[] functionsList = {
         new FunctionInfo("getat", -1, ConstDefine.FUNC_GET_AT, ConstDefine.TYPE_ANY),//求数组中的一个值  getat (0,"2","3")= "2"  getat (0,2,3)= 2
         new FunctionInfo("byte", 2, ConstDefine.FUNC_BYTE, ConstDefine.TYPE_NUM),    //求位值  byte (4321.789,0)=1
@@ -105,7 +107,9 @@ public abstract class EmbedFunc {
         new FunctionInfo("hash", 1, ConstDefine.FUNC_HASH, ConstDefine.TYPE_STR), // 计算hash值
         new FunctionInfo("eval", -1, ConstDefine.FUNC_EVAL, ConstDefine.TYPE_ANY), // 和 eval在外层运行
         new FunctionInfo("encode", 1, ConstDefine.FUNC_ENCODE, ConstDefine.TYPE_STR), // 编码 目前仅支持 HEX base64 base64UrlSafe
-        new FunctionInfo("decode", 1, ConstDefine.FUNC_DECODE, ConstDefine.TYPE_ANY)// 解码 目前仅支持 HEX base64 base64UrlSafe
+        new FunctionInfo("decode", 1, ConstDefine.FUNC_DECODE, ConstDefine.TYPE_ANY), // 解码 目前仅支持 HEX base64 base64UrlSafe
+        new FunctionInfo("nextValue", 1, ConstDefine.FUNC_NEXT_VALUE, ConstDefine.TYPE_ANY), // 求下一个值 数字+1 日期+1天 其他字符串走nextCode
+        new FunctionInfo("prevValue", 1, ConstDefine.FUNC_PREV_VALUE, ConstDefine.TYPE_ANY) // 求上一个值 数字-1 日期-1天 其他字符串走prevCode
     };
     private static final double COMPARE_MIN_DOUBLE = 0.0000001;
     private EmbedFunc() {
@@ -167,17 +171,17 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_AVE:// 100
             {
                 LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
-                nOpSum = 0;
+                int dataCount = 0;
                 for (int i = 0; i < opt.getLeft(); i++) {
                     Double db = NumberBaseOpt.castObjectToDouble(
                         opt.getRight().get(i));
                     if (db != null) {
                         dbtemp += db;
-                        nOpSum++;
+                        dataCount++;
                     }
                 }
-                if (nOpSum > 0)
-                    return dbtemp / nOpSum;//"%f",
+                if (dataCount > 0)
+                    return dbtemp / dataCount;//"%f",
                 else
                     return null;
             }
@@ -235,8 +239,9 @@ public abstract class EmbedFunc {
                 return null;
 
             case ConstDefine.FUNC_MATCH: {
-                if (nOpSum < 2)
+                if (nOpSum < 2) {
                     return false;
+                }
                 int wildcardType = 2;
                 if(nOpSum>2){
                     wildcardType = NumberBaseOpt.castObjectToInteger(slOperand.get(2), 2);
@@ -572,14 +577,14 @@ public abstract class EmbedFunc {
             }
 
             case ConstDefine.FUNC_REPLACE:{ // 字符串替换
-                if (nOpSum ==0) {
+                if (nOpSum == 0) {
                     return null;
                 }
-                if(nOpSum == 1){
+                if (nOpSum == 1){
                     return slOperand.get(0);
                 }
 
-                if(nOpSum == 2){
+                if (nOpSum == 2){
                     if(slOperand.get(1) instanceof Map){
                         String resStr = StringBaseOpt.castObjectToString(slOperand.get(0));
                         for(Map.Entry<Object, Object> ent : ((Map<Object, Object>)slOperand.get(1)).entrySet()){
@@ -1197,6 +1202,33 @@ public abstract class EmbedFunc {
                             return "";
                         }
                 }
+            }
+            //nextValue(x) 数字+1 日期+1天 其他字符串走 StringBaseOpt.nextCode
+            case ConstDefine.FUNC_NEXT_VALUE:
+            case ConstDefine.FUNC_PREV_VALUE: {
+                if (nOpSum < 1) return null;
+                Object obj = slOperand.get(0);
+                if (obj == null) return null;
+                boolean isNext = (funcID == ConstDefine.FUNC_NEXT_VALUE);
+                int step = isNext ? 1 : -1;
+                // 数字 +-1
+                if (NumberBaseOpt.isNumber(obj)) {
+                    Number num = NumberBaseOpt.castObjectToNumber(obj);
+                    if (num instanceof Float || num instanceof Double || num instanceof BigDecimal) {
+                        return num.doubleValue() + step;
+                    }
+                    return num.longValue() + step;
+                }
+                if(obj instanceof Date || obj instanceof LocalDateTime || obj instanceof LocalDate) {
+                    // 日期 +-1天
+                    Date dt = DatetimeOpt.castObjectToDate(obj);
+                    if (dt != null) {
+                        return DatetimeOpt.addDays(dt, step);
+                    }
+                }
+                // 其他类型 转字符串走 nextCode / prevCode
+                String sCode = StringBaseOpt.objectToString(obj);
+                return isNext ? StringBaseOpt.nextCode(sCode) : StringBaseOpt.prevCode(sCode);
             }
             default:
                 break;
