@@ -685,7 +685,7 @@ public abstract class EmbedFunc {
                 return Math.log(af);
             }
             case ConstDefine.FUNC_LOG: {
-                if (nOpSum ==1) {
+                if (nOpSum == 1) {
                     if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
                     double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
                     if (af <= 0) return null;
@@ -735,12 +735,12 @@ public abstract class EmbedFunc {
                 return new BigDecimal(af.toString()).subtract(new BigDecimal(af.intValue())).doubleValue();
             }
             case ConstDefine.FUNC_EXP: {
-                if (nOpSum ==1) {
+                if (nOpSum == 1) {
                     if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
                     double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
                     return Math.exp(af);
                 }
-                if(nOpSum >2){
+                if(nOpSum >= 2){
                     if (!NumberBaseOpt.isNumber(slOperand.get(0)) || !NumberBaseOpt.isNumber(slOperand.get(1))) return null;
                     double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
                     double bf = NumberBaseOpt.castObjectToDouble(slOperand.get(1));
