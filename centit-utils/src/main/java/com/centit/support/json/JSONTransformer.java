@@ -39,9 +39,8 @@ public abstract class JSONTransformer {
      * 一、value（模板值为字符串时）的前缀约定：
      *   '@' + 常量      → 字符串常量，直接返回 '@' 之后的内容，不做任何计算
      *   '=' + 表达式    → 调用 attainExpressionValue 计算表达式并返回结果
-     *   '$' + JSONPath  → 调用 extractJSONPathValue 按 JSONPath 提取数据
-     *   '#' + 模板      → 先对模板字符串做 mapTemplateString 变量替换，再递归调用 transformer
-     *   其他            → 调用 mapTemplateString 做变量替换后返回
+     *   '#' + JSONPath  → 调用 extractJSONPathValue 按 JSONPath 提取数据
+     *   其他 默认为  模板      → 调用 mapTemplateString 做变量替换后返回
      * 二、key（模板为 Map 时，每个 entry 的 key）的前缀约定：
      *   '=' + 表达式    → 动态 key：用表达式的计算结果作为实际的 key 名，
      *                      value 正常递归转换。常与 '$' 循环合并配合将列表转为 Map
@@ -75,10 +74,7 @@ public abstract class JSONTransformer {
             return switch (value.charAt(0)) {
                 case '@' -> value.substring(1);
                 case '=' -> dataSupport.attainExpressionValue(value.substring(1));
-                case '$' -> dataSupport.extractJSONPathValue(value); // JSONPath
-                case '#' ->// 两次计算 map-> formula ； eval 函数也可以实现同样的功能
-                    transformer(
-                        dataSupport.mapTemplateString(value.substring(1)), dataSupport);
+                case '#' -> dataSupport.extractJSONPathValue(value.substring(1)); // JSONPath
                 default -> dataSupport.mapTemplateString(value);
             };
         } else if(templateObj instanceof Map){
