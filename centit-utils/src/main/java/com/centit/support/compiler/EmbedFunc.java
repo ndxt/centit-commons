@@ -56,13 +56,13 @@ public abstract class EmbedFunc {
         new FunctionInfo("strcat", -1, ConstDefine.FUNC_STR_CAT, ConstDefine.TYPE_STR),    // 连接字符串 strcat ("12","34","56")="123456"
         new FunctionInfo("isempty", 1, ConstDefine.FUNC_IS_EMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 isempty("")=1
         new FunctionInfo("isnotempty", 1, ConstDefine.FUNC_NOT_EMPTY, ConstDefine.TYPE_NUM),    // 判断参数是否为空 notempty("")=0
-        new FunctionInfo("log", 1, ConstDefine.FUNC_LOG, ConstDefine.TYPE_NUM),    // 求以10为底的对数
+        new FunctionInfo("log", -1, ConstDefine.FUNC_LOG, ConstDefine.TYPE_NUM),    // 如果参数只有一个求以10为底的对数，如果参数两个，则求以a为低b的对数
         new FunctionInfo("ln", 1, ConstDefine.FUNC_LN, ConstDefine.TYPE_NUM),        // 求自然对数
         new FunctionInfo("sin", 1, ConstDefine.FUNC_SIN, ConstDefine.TYPE_NUM),    // 求正弦
         new FunctionInfo("cos", 1, ConstDefine.FUNC_COS, ConstDefine.TYPE_NUM),    // 求余弦
         new FunctionInfo("tan", 1, ConstDefine.FUNC_TAN, ConstDefine.TYPE_NUM),    // 求正切
         new FunctionInfo("ctan", 1, ConstDefine.FUNC_CTAN, ConstDefine.TYPE_NUM),    // 求余切
-        new FunctionInfo("exp", 1, ConstDefine.FUNC_EXP, ConstDefine.TYPE_NUM),    // 求以e为底的指数
+        new FunctionInfo("exp", -1, ConstDefine.FUNC_EXP, ConstDefine.TYPE_NUM),    // 如果参数只有一个，则求以e为底的指数，两个参数，则求a的b次幂
         new FunctionInfo("sqrt", 1, ConstDefine.FUNC_SQRT, ConstDefine.TYPE_NUM),    // 求平方根
         new FunctionInfo("upcase", 1, ConstDefine.FUNC_UPPER_CASE, ConstDefine.TYPE_STR), // 字符串大写
         new FunctionInfo("lowcase", 1, ConstDefine.FUNC_LOWER_CASE, ConstDefine.TYPE_STR), // 字符串小写
@@ -681,13 +681,26 @@ public abstract class EmbedFunc {
                 if (nOpSum < 1) return null;
                 if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
                 double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                if (af <= 0) return null;
                 return Math.log(af);
             }
             case ConstDefine.FUNC_LOG: {
-                if (nOpSum < 1) return null;
-                if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
-                double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
-                return Math.log10(af);
+                if (nOpSum ==1) {
+                    if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                    double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                    if (af <= 0) return null;
+                    return Math.log10(af);
+                }
+                if(nOpSum >= 2){
+                    if (!NumberBaseOpt.isNumber(slOperand.get(0)) || !NumberBaseOpt.isNumber(slOperand.get(1))) return null;
+                    double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                    double bf = NumberBaseOpt.castObjectToDouble(slOperand.get(1));
+                    // 以 af 为底 bf 的对数：换底公式 log_af(bf) = ln(bf) / ln(af)
+                    // 底数必须 > 0 且 ≠ 1，真数必须 > 0
+                    if (af <= 0 || af == 1 || bf <= 0) return null;
+                    return Math.log(bf) / Math.log(af);
+                }
+                return null;
             }
             case ConstDefine.FUNC_SIN: {//sin
                 if (nOpSum < 1) return null;
@@ -722,10 +735,18 @@ public abstract class EmbedFunc {
                 return new BigDecimal(af.toString()).subtract(new BigDecimal(af.intValue())).doubleValue();
             }
             case ConstDefine.FUNC_EXP: {
-                if (nOpSum < 1) return null;
-                if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
-                double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
-                return Math.exp(af);
+                if (nOpSum ==1) {
+                    if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
+                    double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                    return Math.exp(af);
+                }
+                if(nOpSum >2){
+                    if (!NumberBaseOpt.isNumber(slOperand.get(0)) || !NumberBaseOpt.isNumber(slOperand.get(1))) return null;
+                    double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                    double bf = NumberBaseOpt.castObjectToDouble(slOperand.get(1));
+                    return Math.pow(af,bf);
+                }
+                return null;
             }
             case ConstDefine.FUNC_SQRT: {
                 if (nOpSum < 1) return null;
