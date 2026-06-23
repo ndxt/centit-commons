@@ -447,27 +447,28 @@ public abstract class EmbedFunc {
                     return null;
                 int nStart = 0, nLength;
                 if (NumberBaseOpt.isNumber(slOperand.get(1)))
-                    nStart = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
+                    nStart = NumberBaseOpt.castObjectToInteger(slOperand.get(1), 0);
                 String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
-                int slen = tempStr.length();
+                int strLen = tempStr.length();
                 // 起始位置越界保护，避免 substring 抛 StringIndexOutOfBoundsException
                 if (nStart < 0) {
+                    nStart = strLen + nStart;
+                }
+                if (nStart < 0) {
                     nStart = 0;
-                } else if (nStart >= slen) {
+                }
+                // 长度裁剪到字符串末尾，避免 substring 越界
+                if (nOpSum > 2 && NumberBaseOpt.isNumber(slOperand.get(2))) {
+                    nLength = NumberBaseOpt.castObjectToInteger(slOperand.get(2));
+                    if (nStart + nLength > strLen) {
+                        nLength = strLen - nStart;
+                    }
+                } else {
+                    nLength = strLen - nStart;
+                }
+                if (nLength <= 0) {
                     return "";
                 }
-                if (nOpSum > 2 && NumberBaseOpt.isNumber(slOperand.get(2)))
-                    nLength = NumberBaseOpt.castObjectToInteger(slOperand.get(2));
-                else
-                    nLength = slen - nStart;
-
-                if (nLength <= 0)
-                    nLength = 1;
-                // 长度裁剪到字符串末尾，避免 substring 越界
-                if (nStart + nLength > slen) {
-                    nLength = slen - nStart;
-                }
-
                 return tempStr.substring(nStart, nStart + nLength);
             }
             case ConstDefine.FUNC_LPAD: {
@@ -556,7 +557,7 @@ public abstract class EmbedFunc {
                 return StringUtils.lowerCase(StringBaseOpt.objectToString(slOperand.get(0)));
             }
             case ConstDefine.FUNC_FREQUENCY: {
-                if (nOpSum < 2) return -1;
+                if (nOpSum < 2) return 0;
                 if (slOperand.get(0) == null || slOperand.get(1) == null)
                     return 0;
                 String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
@@ -581,10 +582,8 @@ public abstract class EmbedFunc {
                     return null;
                 }
                 String splitStr = nOpSum > 1 ? StringBaseOpt.castObjectToString(slOperand.get(1),","):",";
-                if(StringUtils.equalsAny(splitStr, ".","*","?","$","+","|","\\")){
-                    splitStr = String.format("\\%s", splitStr);
-                }
-                return str.split(splitStr);
+                // 单字符分隔符按字面匹配（Pattern.quote 规避 ( ) [ ] 等正则元字符导致的异常），多字符分隔符仍按正则
+                return str.split(splitStr.length()==1 ? Pattern.quote(splitStr) : splitStr);
             }
 
             case ConstDefine.FUNC_REPLACE:{ // 字符串替换
@@ -650,7 +649,7 @@ public abstract class EmbedFunc {
                 if (pos != 0) {
                     return NumberBaseOpt.floor(tempDouble, pos);
                 }
-                //四舍五入
+                //向下取整
                 return Double.valueOf(Math.floor(tempDouble)).longValue();
             }
             case ConstDefine.FUNC_CEIL: {
