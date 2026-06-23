@@ -449,13 +449,24 @@ public abstract class EmbedFunc {
                 if (NumberBaseOpt.isNumber(slOperand.get(1)))
                     nStart = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
                 String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
+                int slen = tempStr.length();
+                // 起始位置越界保护，避免 substring 抛 StringIndexOutOfBoundsException
+                if (nStart < 0) {
+                    nStart = 0;
+                } else if (nStart >= slen) {
+                    return "";
+                }
                 if (nOpSum > 2 && NumberBaseOpt.isNumber(slOperand.get(2)))
                     nLength = NumberBaseOpt.castObjectToInteger(slOperand.get(2));
                 else
-                    nLength = tempStr.length() - nStart;
+                    nLength = slen - nStart;
 
                 if (nLength <= 0)
                     nLength = 1;
+                // 长度裁剪到字符串末尾，避免 substring 越界
+                if (nStart + nLength > slen) {
+                    nLength = slen - nStart;
+                }
 
                 return tempStr.substring(nStart, nStart + nLength);
             }
@@ -710,11 +721,13 @@ public abstract class EmbedFunc {
                 return Math.tan(af);
 
             }
-            case ConstDefine.FUNC_CTAN: {//ctan
+            case ConstDefine.FUNC_CTAN: {//ctan 余切 cot(x) = 1/tan(x)
                 if (nOpSum < 1) return null;
                 if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
                 double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
-                return Math.atan(af);
+                double t = Math.tan(af);
+                if (t == 0) return null;  // 余切在 sin(af)=0（af=0,π,2π…）处无定义
+                return 1.0 / t;
             }
 
             case ConstDefine.FUNC_FRAC: {//取小数
