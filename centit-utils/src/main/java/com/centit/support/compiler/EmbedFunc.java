@@ -225,7 +225,7 @@ public abstract class EmbedFunc {
                 if (nOpSum < 2 || !NumberBaseOpt.isNumber(slOperand.get(1)))
                     return null;
                 Object objTemp = slOperand.get(0);
-                int nbit = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
+                int nbit = NumberBaseOpt.castObjectToInteger(slOperand.get(1), 0);
                 if (NumberBaseOpt.isNumber(objTemp)) {
                     return String.valueOf(
                         NumberBaseOpt.getNumByte(
@@ -398,7 +398,7 @@ public abstract class EmbedFunc {
             {
                 LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
                 if (opt.getLeft() < 2)
-                    return 0;
+                    return null;
                 int numberSum = 0;
                 for (int i = 0; i < opt.getLeft(); i++) {
                     if (NumberBaseOpt.isNumber(opt.getRight().get(i))) {
@@ -407,7 +407,7 @@ public abstract class EmbedFunc {
                     }
                 }
                 if (numberSum < 2) {
-                    return 0;
+                    return null;
                 }
                 double dbAvg = dbtemp / numberSum;
                 dbtemp = 0.0;
@@ -448,16 +448,28 @@ public abstract class EmbedFunc {
                     return null;
                 int nStart = 0, nLength;
                 if (NumberBaseOpt.isNumber(slOperand.get(1)))
-                    nStart = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
+                    nStart = NumberBaseOpt.castObjectToInteger(slOperand.get(1), 0);
                 String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
-                if (nOpSum > 2 && NumberBaseOpt.isNumber(slOperand.get(2)))
+                int strLen = tempStr.length();
+                // 起始位置越界保护，避免 substring 抛 StringIndexOutOfBoundsException
+                if (nStart < 0) {
+                    nStart = strLen + nStart;
+                }
+                if (nStart < 0) {
+                    nStart = 0;
+                }
+                // 长度裁剪到字符串末尾，避免 substring 越界
+                if (nOpSum > 2 && NumberBaseOpt.isNumber(slOperand.get(2))) {
                     nLength = NumberBaseOpt.castObjectToInteger(slOperand.get(2));
-                else
-                    nLength = tempStr.length() - nStart;
-
-                if (nLength <= 0)
-                    nLength = 1;
-
+                    if (nStart + nLength > strLen) {
+                        nLength = strLen - nStart;
+                    }
+                } else {
+                    nLength = strLen - nStart;
+                }
+                if (nLength <= 0) {
+                    return "";
+                }
                 return tempStr.substring(nStart, nStart + nLength);
             }
             case ConstDefine.FUNC_LPAD: {
@@ -545,7 +557,7 @@ public abstract class EmbedFunc {
                 return StringUtils.lowerCase(StringBaseOpt.objectToString(slOperand.get(0)));
             }
             case ConstDefine.FUNC_FREQUENCY: {
-                if (nOpSum < 2) return -1;
+                if (nOpSum < 2) return 0;
                 if (slOperand.get(0) == null || slOperand.get(1) == null)
                     return 0;
                 String tempStr = StringBaseOpt.objectToString(slOperand.get(0));
@@ -570,10 +582,8 @@ public abstract class EmbedFunc {
                     return null;
                 }
                 String splitStr = nOpSum > 1 ? StringBaseOpt.castObjectToString(slOperand.get(1),","):",";
-                if(Strings.CS.equalsAny(splitStr, ".","*","?","$","+","|","\\")){
-                    splitStr = String.format("\\%s", splitStr);
-                }
-                return str.split(splitStr);
+                // 单字符分隔符按字面匹配（Pattern.quote 规避 ( ) [ ] 等正则元字符导致的异常），多字符分隔符仍按正则
+                return str.split(splitStr.length()==1 ? Pattern.quote(splitStr) : splitStr);
             }
 
             case ConstDefine.FUNC_REPLACE:{ // 字符串替换
@@ -639,7 +649,7 @@ public abstract class EmbedFunc {
                 if (pos != 0) {
                     return NumberBaseOpt.floor(tempDouble, pos);
                 }
-                //四舍五入
+                //向下取整
                 return Double.valueOf(Math.floor(tempDouble)).longValue();
             }
             case ConstDefine.FUNC_CEIL: {
@@ -721,11 +731,13 @@ public abstract class EmbedFunc {
                 return Math.tan(af);
 
             }
-            case ConstDefine.FUNC_CTAN: {//ctan
+            case ConstDefine.FUNC_CTAN: {//ctan 余切 cot(x) = 1/tan(x)
                 if (nOpSum < 1) return null;
                 if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
                 double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
-                return Math.atan(af);
+                double t = Math.tan(af);
+                if (t == 0) return null;  // 余切在 sin(af)=0（af=0,π,2π…）处无定义
+                return 1.0 / t;
             }
 
             case ConstDefine.FUNC_FRAC: {//取小数
@@ -752,6 +764,7 @@ public abstract class EmbedFunc {
                 if (nOpSum < 1) return null;
                 if (!NumberBaseOpt.isNumber(slOperand.get(0))) return null;
                 double af = NumberBaseOpt.castObjectToDouble(slOperand.get(0));
+                if (af < 0) return null;
                 return Math.sqrt(af);
             }
 
@@ -859,6 +872,9 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_DATE_INFO: {//
                 if (nOpSum < 1) return null;
                 int field = NumberBaseOpt.castObjectToInteger(slOperand.get(0), 0);
+                if (field < 0 || field >= Calendar.FIELD_COUNT) {
+                    return null;
+                }
                 Date dt = (nOpSum > 1) ? DatetimeOpt.castObjectToDate(slOperand.get(1)) : null;
                 if (dt == null)
                     dt = DatetimeOpt.currentUtilDate();
@@ -925,7 +941,7 @@ public abstract class EmbedFunc {
             }
 
             case ConstDefine.FUNC_TRUNC_DATE: {//
-                Date dt = null;
+                Date dt = DatetimeOpt.currentUtilDate();
                 Object ti = null;
                 if (nOpSum == 1) {
                     dt = DatetimeOpt.currentUtilDate();
@@ -1081,6 +1097,9 @@ public abstract class EmbedFunc {
                 if (nOpSum < 2) {
                     Random rand = new Random();
                     int nInd = NumberBaseOpt.castObjectToInteger(slOperand.get(0), 10000);
+                    if(nInd < 1){
+                        nInd = 1;
+                    }
                     return rand.nextInt(nInd);
                 }
                 if(Strings.CI.equalsAny(StringBaseOpt.castObjectToString(slOperand.get(0)),"str","string")){
