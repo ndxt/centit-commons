@@ -224,7 +224,7 @@ public abstract class EmbedFunc {
                 if (nOpSum < 2 || !NumberBaseOpt.isNumber(slOperand.get(1)))
                     return null;
                 Object objTemp = slOperand.get(0);
-                int nbit = NumberBaseOpt.castObjectToInteger(slOperand.get(1));
+                int nbit = NumberBaseOpt.castObjectToInteger(slOperand.get(1), 0);
                 if (NumberBaseOpt.isNumber(objTemp)) {
                     return String.valueOf(
                         NumberBaseOpt.getNumByte(
@@ -397,7 +397,7 @@ public abstract class EmbedFunc {
             {
                 LeftRightPair<Integer, List<Object>> opt = flatOperands(slOperand);
                 if (opt.getLeft() < 2)
-                    return 0;
+                    return null;
                 int numberSum = 0;
                 for (int i = 0; i < opt.getLeft(); i++) {
                     if (NumberBaseOpt.isNumber(opt.getRight().get(i))) {
@@ -406,7 +406,7 @@ public abstract class EmbedFunc {
                     }
                 }
                 if (numberSum < 2) {
-                    return 0;
+                    return null;
                 }
                 double dbAvg = dbtemp / numberSum;
                 dbtemp = 0.0;
@@ -853,6 +853,9 @@ public abstract class EmbedFunc {
             case ConstDefine.FUNC_DATE_INFO: {//
                 if (nOpSum < 1) return null;
                 int field = NumberBaseOpt.castObjectToInteger(slOperand.get(0), 0);
+                if (field < 0 || field >= Calendar.FIELD_COUNT) {
+                    return null;
+                }
                 Date dt = (nOpSum > 1) ? DatetimeOpt.castObjectToDate(slOperand.get(1)) : null;
                 if (dt == null)
                     dt = DatetimeOpt.currentUtilDate();
@@ -914,7 +917,7 @@ public abstract class EmbedFunc {
             }
 
             case ConstDefine.FUNC_TRUNC_DATE: {//
-                Date dt = null;
+                Date dt = DatetimeOpt.currentUtilDate();
                 Object ti = null;
                 if (nOpSum == 1) {
                     dt = DatetimeOpt.currentUtilDate();
@@ -1071,6 +1074,9 @@ public abstract class EmbedFunc {
                 if (nOpSum < 2) {
                     Random rand = new Random();
                     int nInd = NumberBaseOpt.castObjectToInteger(slOperand.get(0), 10000);
+                    if(nInd < 1){
+                        nInd = 1;
+                    }
                     return rand.nextInt(nInd);
                 }
                 if(StringUtils.equalsAnyIgnoreCase(StringBaseOpt.castObjectToString(slOperand.get(0)),"str","string")){
