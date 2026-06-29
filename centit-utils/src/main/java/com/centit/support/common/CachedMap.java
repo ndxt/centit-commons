@@ -23,7 +23,7 @@ import static java.lang.Thread.sleep;
 public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
 
     protected Logger logger = LoggerFactory.getLogger(CachedMap.class);
-    private ConcurrentMap<K, CachedIdentifiedObject> targetMap;
+    private final ConcurrentMap<K, CachedIdentifiedObject> targetMap;
     private long freshPeriod;
     private Function<K, T> refresher;
 
@@ -75,6 +75,9 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     }
 
     public void evictIdentifiedCache(K key) {
+        if(key == null){ //ConcurrentHashMap.get() 不允许null key和value
+            return;
+        }
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject != null) {
             identifiedObject.evictCache();
@@ -88,6 +91,9 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     }
 
     public AbstractCachedObject<T> getCachedObject(K key) {
+        if(key == null){ //ConcurrentHashMap.get() 不允许null key和value
+            return null;
+        }
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject == null) {
             identifiedObject = new CachedIdentifiedObject(key);
@@ -102,6 +108,9 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     }
 
     public T getCachedValue(K key) {
+        if(key == null){ //ConcurrentHashMap.get() 不允许null key和value
+            return null;
+        }
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject != null) {
             return identifiedObject.getCachedTarget();
@@ -122,6 +131,9 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     }
 
     public T getFreshValue(K key) {
+        if(key == null){ //ConcurrentHashMap.get() 不允许null key和value
+            return null;
+        }
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject != null) {
             return identifiedObject.getFreshTarget();
@@ -136,6 +148,9 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     }
 
     public boolean isFreshData(K key) {
+        if(key == null){ //ConcurrentHashMap.get() 不允许null key和value
+            return false;
+        }
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject != null) {
             return identifiedObject.evicted;
@@ -156,6 +171,9 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     }
 
     public void setFreshData(K key, T freshData) {
+        if(key == null || freshData == null){ //ConcurrentHashMap.get() 不允许null key和value
+            return;
+        }
         CachedIdentifiedObject identifiedObject = targetMap.get(key);
         if (identifiedObject != null) {
             identifiedObject.setFreshData(freshData);
@@ -166,8 +184,8 @@ public class CachedMap<K, T> extends AbstractCachedObject<Map<K, T>> {
     }
 
     class CachedIdentifiedObject extends AbstractCachedObject<T> {
-        private K key;
-        private ReentrantLock freshLock;
+        private final K key;
+        private final ReentrantLock freshLock;
         CachedIdentifiedObject(K key, T target) {
             this.key = key;
             this.target = CollectionsOpt.unmodifiableObject(target);
