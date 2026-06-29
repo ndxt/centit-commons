@@ -1241,8 +1241,7 @@ public abstract class EmbedFunc {
                 boolean isNext = (funcID == ConstDefine.FUNC_NEXT_VALUE);
                 int step = isNext ? 1 : -1;
                 // 数字 +-1
-                if (obj instanceof Number ) {
-                    Number num = (Number)obj;
+                if (obj instanceof Number num) {
                     if (num instanceof Float || num instanceof Double || num instanceof BigDecimal) {
                         return num.doubleValue() + step;
                     }
