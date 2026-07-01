@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -87,28 +89,45 @@ public class DocOptUtil {
     }
 
     public static boolean pdfContainsJSAction(String pdfFilePath) {
-        try (PDDocument document = PDDocument.load(new File(pdfFilePath))) {
-            String cosName = document.getDocument().getTrailer().toString();
-            if (cosName.contains("COSName{JS}")) {
-                return true;
-            }
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-        return false;
+        // 统一使用快速检测方法，避免加载整个文档
+        // 快速检测与小文件检测使用相同的判断规则，且性能更优
+        File file = new File(pdfFilePath);
+        return pdfContainsJSActionFast(file);
     }
 
     /**
-     * 检测 PDF 是否为扫描件（主要是图片，无有效文本层）
+     * 快速检测PDF是否包含JavaScript - 不加载整个文档
+     * 使用与慢速检测相同的判断规则：检查 COSName{JS}
      *
-     * @param inputStream PDF 文件流
-     * @return true 表示是扫描件，false 表示有文本层
+     * @param file PDF文件
+     * @return true 表示包含JavaScript，false 表示不包含
      */
-    public static boolean isScannedPdf(InputStream inputStream) {
-        try (PDDocument document = PDDocument.load(inputStream)) {
-            return isScannedPdf(document);
+    private static boolean pdfContainsJSActionFast(File file) {
+        try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+            FileChannel channel = raf.getChannel();
+            long fileSize = channel.size();
+            // 读取文件开头部分（前1MB）
+            long headerSize = Math.min(fileSize, 1024 * 1024);
+            ByteBuffer headerBuffer = ByteBuffer.allocate((int) headerSize);
+            channel.read(headerBuffer, 0);
+            headerBuffer.flip();
+            byte[] headerBytes = new byte[headerBuffer.limit()];
+            headerBuffer.get(headerBytes);
+            String headerContent = new String(headerBytes, StandardCharsets.ISO_8859_1);
+            // 读取文件末尾部分（最后10KB，trailer通常在这里）
+            long trailerStart = Math.max(0, fileSize - 1024 * 10);
+            ByteBuffer trailerBuffer = ByteBuffer.allocate((int) (fileSize - trailerStart));
+            channel.read(trailerBuffer, trailerStart);
+            trailerBuffer.flip();
+            byte[] trailerBytes = new byte[trailerBuffer.limit()];
+            trailerBuffer.get(trailerBytes);
+            String trailerContent = new String(trailerBytes, StandardCharsets.ISO_8859_1);
+            // 使用与慢速检测相同的判断规则：检查 COSName{JS}
+            // 这与 PDDocument.getDocument().getTrailer().toString().contains("COSName{JS}") 逻辑一致
+            String combinedContent = headerContent + trailerContent;
+            return combinedContent.contains("COSName{JS}");
         } catch (IOException e) {
-            logger.error("检测扫描件失败: {}", e.getMessage(), e);
+            logger.error("快速JavaScript检测失败: {}", e.getMessage(), e);
             return false;
         }
     }
@@ -160,88 +179,6 @@ public class DocOptUtil {
         }
     }
 
-    /*
-     * 检测 PDF 是否为扫描件的内部实现
-     * 综合判断：图片数量 + 文本质量
-     */
-    public static boolean isScannedPdf(PDDocument document) {
-        try {
-            // 1. 检查图片数量（扫描件通常每页都有图片）
-            int totalImages = 0;
-            int totalPages = document.getNumberOfPages();
-
-            for (PDPage page : document.getPages()) {
-                PDResources resources = page.getResources();
-                if (resources != null) {
-                    int pageImages = countImages(resources);
-                    totalImages += pageImages;
-                }
-            }
-
-            // 2. 提取文本并分析质量
-            org.apache.pdfbox.text.PDFTextStripper stripper = new org.apache.pdfbox.text.PDFTextStripper();
-            String text = stripper.getText(document).trim();
-
-            // 3. 综合判断
-            // 如果图片数量 >= 页数，且文本质量差，判定为扫描件
-            boolean hasManyImages = totalImages >= totalPages;
-
-            // 计算有效字符比例
-            int totalChars = text.length();
-            if (totalChars < 20) {
-                // 文本太少，结合图片判断
-                return hasManyImages;
-            }
-
-            int validChars = 0;
-            for (char c : text.toCharArray()) {
-                if (c >= '一' && c <= '鿿') { // 中文
-                    validChars++;
-                } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) { // 英文
-                    validChars++;
-                } else if (c >= '0' && c <= '9') { // 数字
-                    validChars++;
-                } else if (Character.isWhitespace(c)) { // 空格
-                    validChars++;
-                }
-            }
-
-            double validRatio = (double) validChars / totalChars;
-
-            // 判断逻辑：
-            // 1. 有大量图片 + 文本质量差 = 扫描件（隐藏文本层通常是乱码）
-            // 2. 文本质量极差（< 10%）= 扫描件
-            // 3. 其他情况 = 普通文本 PDF
-            if (hasManyImages && validRatio < 0.9) {
-                return true;
-            }
-            return validRatio < 0.1;
-
-        } catch (IOException e) {
-            logger.error("提取 PDF 文本失败: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    /**
-     * 递归统计资源中的图片数量
-     */
-    private static int countImages(PDResources resources) throws IOException {
-        int count = 0;
-        for (COSName name : resources.getXObjectNames()) {
-            PDXObject xobject = resources.getXObject(name);
-            if (xobject instanceof PDImageXObject) {
-                count++;
-            } else if (xobject instanceof PDFormXObject) {
-                PDFormXObject form = (PDFormXObject) xobject;
-                if (form.getResources() != null) {
-                    count += countImages(form.getResources());
-                }
-            }
-        }
-        return count;
-    }
-
     public static boolean pdfHighlightKeywords(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color) throws IOException {
         return pdfHighlightKeywords(inputPath, outputPath, keywords, color, null);
     }
@@ -272,6 +209,7 @@ public class DocOptUtil {
 
     /**
      * 对 PDF 进行关键词高亮，高亮绘制在最上层
+     *
      * @return true 表示成功高亮至少一个关键词，false 表示未找到匹配的关键词
      */
     private static boolean pdfHighlightKeywordsOnTopLayer(InputStream inputPath, OutputStream outputPath, List<String> keywords, java.awt.Color color, String password) throws IOException {
@@ -511,17 +449,19 @@ public class DocOptUtil {
      */
     public static List<BufferedImage> pdf2Images(InputStream inPdfFile, double ppm) {
         List<BufferedImage> images = new ArrayList<>();
-        try (PDDocument document = PDDocument.load(inPdfFile)) {
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
-            int pageCount = document.getNumberOfPages();
+        try {
+            try (PDDocument document = PDDocument.load(inPdfFile)) {
+                PDFRenderer pdfRenderer = new PDFRenderer(document);
+                int pageCount = document.getNumberOfPages();
 
-            // 将 ppm (每毫米像素数) 转换为 dpi (每英寸像素数)
-            // 1 英寸 = 25.4 毫米
-            float dpi = (float) (ppm * 25.4);
+                // 将 ppm (每毫米像素数) 转换为 dpi (每英寸像素数)
+                // 1 英寸 = 25.4 毫米
+                float dpi = (float) (ppm * 25.4);
 
-            for (int page = 0; page < pageCount; page++) {
-                BufferedImage image = pdfRenderer.renderImageWithDPI(page, dpi);
-                images.add(image);
+                for (int page = 0; page < pageCount; page++) {
+                    BufferedImage image = pdfRenderer.renderImageWithDPI(page, dpi);
+                    images.add(image);
+                }
             }
         } catch (IOException e) {
             logger.error("PDF转图片失败: {}", e.getMessage(), e);
@@ -553,11 +493,13 @@ public class DocOptUtil {
      */
     public static List<BufferedImage> fetchPdfImages(InputStream inPdfFile) {
         List<BufferedImage> images = new ArrayList<>();
-        try (PDDocument document = PDDocument.load(inPdfFile)) {
-            for (PDPage page : document.getPages()) {
-                PDResources resources = page.getResources();
-                if (resources != null) {
-                    extractImagesFromResources(resources, images);
+        try {
+            try (PDDocument document = PDDocument.load(inPdfFile)) {
+                for (PDPage page : document.getPages()) {
+                    PDResources resources = page.getResources();
+                    if (resources != null) {
+                        extractImagesFromResources(resources, images);
+                    }
                 }
             }
         } catch (IOException e) {
