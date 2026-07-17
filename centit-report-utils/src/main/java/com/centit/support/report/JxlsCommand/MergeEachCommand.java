@@ -150,13 +150,23 @@ public class MergeEachCommand extends AbstractCommand {
 
     /**
      * 检查并合并单元格
+     * 按照顺序进行合并：如果前面列没有合并，后面列不能合并
      */
     private void mergeCellsIfNeeded(Sheet sheet, int currentRow, int startRow,
                                     int startCol, int[] mergeCols, int width) {
+        // 记录前一列是否合并成功，用于顺序依赖检查
+        boolean prevColMerged = true; // 第一列没有前置依赖，初始为true
+
         for (int colIndex : mergeCols) {
             int absoluteCol = startCol + colIndex;
             if (absoluteCol >= startCol + width) {
-                continue; // 超出范围，跳过
+                prevColMerged = false; // 超出范围，后续列不能合并
+                continue;
+            }
+
+            // 如果前面列没有合并，后面列不能合并
+            if (!prevColMerged) {
+                continue;
             }
 
             // 查找包含上一行的合并区域
@@ -166,24 +176,35 @@ public class MergeEachCommand extends AbstractCommand {
             Row prevRow = sheet.getRow(currentRow - 1);
             Row currRow = sheet.getRow(currentRow);
 
-            if (prevRow == null || currRow == null) continue;
+            if (prevRow == null || currRow == null) {
+                prevColMerged = false;
+                continue;
+            }
 
             Cell prevCell = prevRow.getCell(absoluteCol);
             Cell currCell = currRow.getCell(absoluteCol);
 
-            if (prevCell == null || currCell == null) continue;
+            if (prevCell == null || currCell == null) {
+                prevColMerged = false;
+                continue;
+            }
 
             String prevValue = getCellValueAsString(prevCell);
             String currValue = getCellValueAsString(currCell);
 
-            if (prevValue == null || !prevValue.equals(currValue)) continue;
+            if (prevValue == null || !prevValue.equals(currValue)) {
+                prevColMerged = false;
+                continue;
+            }
 
+            // 合并单元格
             if (existingRegion != null) {
                 expandMergedRegion(sheet, existingRegion, currentRow);
             } else {
                 sheet.addMergedRegion(new CellRangeAddress(
                         currentRow - 1, currentRow, absoluteCol, absoluteCol));
             }
+            // 当前列合并成功，继续检查下一列
         }
     }
 
