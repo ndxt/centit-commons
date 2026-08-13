@@ -25,7 +25,7 @@ public abstract class DesensitizeOptUtils {
      */
     public enum SensitiveTypeEnum {
         /**
-         * 无
+         * 无，不操作
          */
         NONE,
         /**
@@ -59,7 +59,12 @@ public abstract class DesensitizeOptUtils {
         /**
          * 密码
          */
-        PASSWORD;
+        PASSWORD,
+
+        /**
+         * 不可见的，直接返回null
+         */
+        INVISIBLE;
     }
 
     /**
@@ -79,6 +84,7 @@ public abstract class DesensitizeOptUtils {
             case "bankcard", "bank_card" -> SensitiveTypeEnum.BANK_CARD;
             case "password" -> SensitiveTypeEnum.PASSWORD;
             case "account" -> SensitiveTypeEnum.ACCOUNT;
+            case "invisible" -> SensitiveTypeEnum.INVISIBLE;
             default -> SensitiveTypeEnum.NONE;
         };
     }
@@ -94,7 +100,8 @@ public abstract class DesensitizeOptUtils {
             case BANK_CARD -> DesensitizeOptUtils.bankCard(sensitive);
             case PASSWORD -> DesensitizeOptUtils.password(sensitive);
             case ACCOUNT -> DesensitizeOptUtils.account(sensitive);
-            default -> sensitive;
+            case INVISIBLE -> null;
+            default -> sensitive; //NONE do nothing
         };
     }
 
