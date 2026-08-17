@@ -1,6 +1,6 @@
 # centit-utils 模块概览
 
-> Maven 坐标: `com.centit.support:centit-utils:JDK21-SNAPSHOT`
+> Maven 坐标: `com.centit.support:centit-utils:JDK17-SNAPSHOT`
 > 根包: `com.centit.support`
 > 本文件为 centit-utils 模块的索引文件，详细 API 文档按子包拆分在独立文件中。
 

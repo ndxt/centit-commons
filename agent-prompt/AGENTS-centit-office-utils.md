@@ -1,6 +1,6 @@
 # centit-office-utils 模块
 
-> Maven 坐标: `com.centit.support:centit-office-utils:JDK21-SNAPSHOT`
+> Maven 坐标: `com.centit.support:centit-office-utils:JDK17-SNAPSHOT`
 > 根包: `com.centit.support.office`
 > Office 文档格式转换和处理工具库。
 

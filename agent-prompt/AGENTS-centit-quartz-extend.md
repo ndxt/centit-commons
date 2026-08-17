@@ -1,6 +1,6 @@
 # centit-quartz-extend 模块
 
-> Maven 坐标: `com.centit.support:centit-quartz-extend:JDK21-SNAPSHOT`
+> Maven 坐标: `com.centit.support:centit-quartz-extend:JDK17-SNAPSHOT`
 > 根包: `com.centit.support.quartz`
 > 基于 Quartz 的定时任务扩展模块。
 

@@ -1,6 +1,6 @@
 # centit-report-utils 模块
 
-> Maven 坐标: `com.centit.support:centit-report-utils:JDK21-SNAPSHOT`
+> Maven 坐标: `com.centit.support:centit-report-utils:JDK17-SNAPSHOT`
 > 根包: `com.centit.support.report`
 > 基于 Apache POI、JXLS、XDocReport、XChart 的报表工具库。
 

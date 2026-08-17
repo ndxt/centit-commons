@@ -9,7 +9,7 @@
 
 | 项目 | 值 |
 |------|-----|
-| 坐标 | `com.centit.support:centit-commons:JDK21-SNAPSHOT` |
+| 坐标 | `com.centit.support:centit-commons:JDK17-SNAPSHOT` |
 | JDK | 17+（目标 21） |
 | 包前缀 | `com.centit.support.*` |
 | 构建 | `mvn clean compile` / `mvn test` / `mvn clean install` |

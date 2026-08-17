@@ -87,7 +87,7 @@ mvn clean install
 
 **centit-report-utils** - 报表工具
 - `ExcelExportUtil`: Excel导出，支持模板和大数据量流式导出
-- `ExcelImportUtil`: Excel导入，支持类型转换和合并单元格处理  
+- `ExcelImportUtil`: Excel导入，支持类型转换和合并单元格处理
 - `LargeExcelImportUtil`: 大文件Excel流式导入处理
 - `WordReportUtil`: Word报表生成，支持Freemarker模板和PDF转换
 - `ChartImageUtils`: 图表生成（柱状图、折线图、饼图）
@@ -116,7 +116,7 @@ mvn clean install
 
 项目使用父POM管理依赖版本：
 - 父项目：`com.centit.framework:centit-framework-dependencies`
-- 版本：JDK21-SNAPSHOT
+- 版本：JDK17-SNAPSHOT
 - 最低JDK要求：17
 
 主要外部依赖：
@@ -167,5 +167,5 @@ mvn test -pl centit-office-utils -Dtest=TestPdfUtils
 
 - **目标 JDK 版本**: JDK 21
 - **最低 JDK 要求**: JDK 17
-- **当前版本**: JDK21-SNAPSHOT
+- **当前版本**: JDK17-SNAPSHOT
 - **父 POM**: `com.centit.framework:centit-framework-dependencies`

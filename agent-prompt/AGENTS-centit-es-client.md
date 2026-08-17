@@ -1,6 +1,6 @@
 # centit-es-client 模块
 
-> Maven 坐标: `com.centit.support:centit-es-client:JDK21-SNAPSHOT`
+> Maven 坐标: `com.centit.support:centit-es-client:JDK17-SNAPSHOT`
 > 根包: `com.centit.search`
 > 基于 Elasticsearch Java Client 7.17.29 的全文搜索客户端库。
 
