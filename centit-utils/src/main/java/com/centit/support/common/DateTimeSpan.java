@@ -69,7 +69,7 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
             second * SECOND_MILLISECONDS +
             millisecond;
         if ("-".equals(sign))
-            timeSpan = 0 - timeSpan;
+            timeSpan = -timeSpan;
     }
 
     public DateTimeSpan(long days, long hours,
@@ -149,7 +149,7 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
         long nSecond = 0;
         long nMillisecond = 0;
 
-        if (sTimeSpan == null || "".equals(sTimeSpan))
+        if (sTimeSpan == null || sTimeSpan.isEmpty())
             return;
 
         char[] sc = sTimeSpan.toCharArray();
@@ -266,7 +266,7 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
     }
 
     private long toAbsNumberAsMillisecond() {
-        return this.timeSpan>0? this.timeSpan: 0 - this.timeSpan;
+        return this.timeSpan>0? this.timeSpan: -this.timeSpan;
     }
 
     public long toNumberAsMillisecond() {
@@ -314,7 +314,7 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
     }
 
     public DateTimeSpan changeSign() {
-        timeSpan = 0 - timeSpan;
+        timeSpan = -timeSpan;
         return this;
     }
 
@@ -355,12 +355,12 @@ public class DateTimeSpan extends Number implements java.io.Serializable, Compar
 
     public long getDays() {
         return timeSpan > 0 ? timeSpan / DAY_MILLISECONDS
-            : (0 - timeSpan) / DAY_MILLISECONDS;
+            : (-timeSpan) / DAY_MILLISECONDS;
     }
 
     private long getRemainderMilliseconds() {
         return timeSpan > 0 ? timeSpan % DAY_MILLISECONDS
-            : (0 - timeSpan) % DAY_MILLISECONDS;
+            : (-timeSpan) % DAY_MILLISECONDS;
     }
 
     public long getHours() {
