@@ -104,7 +104,7 @@ public class XsdErrorTranslator {
      */
     private static final Pattern ALLOWED_CHARS_PATTERN = Pattern.compile(
         "^[\\p{IsHan}a-zA-Z0-9\\u3000-\\u303F\\s;:'\"()\\[\\]{}!@#$%^&*~`|<>=+_,./\\\\"
-        + "\\uFF0C\\uFF1B\\uFF1A\\uFF1F\\uFF01\\uFF08\\uFF09"  // ，；：？！（）
+        + "\\uFF0C\\uFF0D\\uFF1B\\uFF1A\\uFF1F\\uFF01\\uFF08\\uFF09"  // ，－；：？！（）
         + "\\u201C\\u201D\\u2018\\u2019\\u2014\\u2026\\u00B7\\uFF5E\\uFFE5\\-]+$"  // ""''—…·～￥-
     );
 
