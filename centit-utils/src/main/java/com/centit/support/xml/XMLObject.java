@@ -5,14 +5,18 @@ import com.centit.support.common.JavaBeanField;
 import com.centit.support.common.JavaBeanMetaData;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.*;
+import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -47,11 +51,29 @@ public abstract class XMLObject {
     }
 
     public static Element createArrayXMLElement(Element paraentElement, String elementName, Collection<Object> values, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray, HashSet<Object> hasSerialized) {
+        return createArrayXMLElement(paraentElement, elementName, values, addTypeAttr, fieldAsKeyAttr,
+            flattenArray, false, true, hasSerialized);
+    }
+
+    /**
+     *
+     * @param paraentElement 父节点
+     * @param elementName 节点名称
+     * @param values 数组
+     * @param addTypeAttr 是否添加类型属性
+     * @param fieldAsKeyAttr 是否将字段名作为key属性
+     * @param flattenArray 是否扁平化数组
+     * @param ignoreNullValue 是否忽略 null 值，true 时数组中的 null 项不生成标签
+     * @param prettyFormat 是否格式化输出，单个属性一行，复合属性或对象标签单独一行，便于阅读
+     * @param hasSerialized 已序列化对象缓存，防止循环引用
+     * @return xml元素
+     */
+    public static Element createArrayXMLElement(Element paraentElement, String elementName, Collection<Object> values, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray, boolean ignoreNullValue, boolean prettyFormat, HashSet<Object> hasSerialized) {
         if(flattenArray && paraentElement != null){
             for (Object obj : values) {
-                if (obj != null) {
+                if (obj != null || !ignoreNullValue) {
                     paraentElement.add(createXMLElementFromObject(null, elementName, obj,
-                        addTypeAttr, fieldAsKeyAttr, true, hasSerialized));
+                        addTypeAttr, fieldAsKeyAttr, true, ignoreNullValue, prettyFormat, hasSerialized));
                 }
             }
             return null;
@@ -65,10 +87,10 @@ public abstract class XMLObject {
             element.addAttribute("class", values.iterator().next().getClass().getName());
         }
         for (Object obj : values) {
-            if (obj != null) {
+            if (obj != null || !ignoreNullValue) {
                 Pair<String, Object> keyAndValue = extraKeyAndValue(obj);
                 Element entry = createXMLElementFromObject(element, keyAndValue.getKey(), keyAndValue.getValue(),
-                    addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
+                    addTypeAttr, fieldAsKeyAttr, flattenArray, ignoreNullValue, prettyFormat, hasSerialized);
                 if(entry!=null) {
                     element.add(entry);
                 }
@@ -89,8 +111,33 @@ public abstract class XMLObject {
         return Pair.of(XML_ARRAY_ITEM_TAG,  obj);
     }
 
-    @SuppressWarnings("unchecked")
     public static Element createXMLElementFromObject(Element paraentElement, String elementName, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray, HashSet<Object> hasSerialized) {
+        return createXMLElementFromObject(paraentElement, elementName, object, addTypeAttr, fieldAsKeyAttr,
+            flattenArray, false, true, hasSerialized);
+    }
+
+    /**
+     *
+     * @param paraentElement 父节点
+     * @param elementName 节点名称
+     * @param object 对象
+     * @param addTypeAttr 是否添加类型属性
+     * @param fieldAsKeyAttr 是否将字段名作为key属性
+     * @param flattenArray 是否扁平化数组
+     * @param ignoreNullValue 是否忽略 null 值，true 时值为 null 的字段不生成标签；false 时输出空标签（addTypeAttr 为 true 时带 type="Null" 属性）
+     * @param prettyFormat 是否格式化输出，单个属性一行，复合属性或对象标签单独一行，便于阅读
+     * @param hasSerialized 已序列化对象缓存，防止循环引用
+     * @return xml元素
+     */
+    @SuppressWarnings("unchecked")
+    public static Element createXMLElementFromObject(Element paraentElement, String elementName, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray, boolean ignoreNullValue, boolean prettyFormat, HashSet<Object> hasSerialized) {
+        if (object == null) {
+            Element element = createElement(elementName, fieldAsKeyAttr);
+            if(addTypeAttr) {
+                element.addAttribute("type", "Null");
+            }
+            return element;
+        }
         if (object instanceof String) {
             return createXMLElement(elementName, "String", object, addTypeAttr, fieldAsKeyAttr);
         }
@@ -119,9 +166,9 @@ public abstract class XMLObject {
                 element.addAttribute("class", object.getClass().getName());
             }
             for (Map.Entry<Object, Object> jo : ((Map<Object, Object>) object).entrySet()) {
-                if (jo.getValue() != null) {
+                if (jo.getValue() != null || !ignoreNullValue) {
                     String keyName = StringBaseOpt.objectToString(jo.getKey());
-                    Element entry = createXMLElementFromObject(element, keyName, jo.getValue(), addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
+                    Element entry = createXMLElementFromObject(element, keyName, jo.getValue(), addTypeAttr, fieldAsKeyAttr, flattenArray, ignoreNullValue, prettyFormat, hasSerialized);
                     if(entry!=null) {
                         element.add(entry);
                     }
@@ -131,9 +178,9 @@ public abstract class XMLObject {
         }
 
         if (object instanceof Collection) {
-            return createArrayXMLElement(paraentElement, elementName, (Collection<Object>) object, addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
+            return createArrayXMLElement(paraentElement, elementName, (Collection<Object>) object, addTypeAttr, fieldAsKeyAttr, flattenArray, ignoreNullValue, prettyFormat, hasSerialized);
         } else if (object instanceof Object[]) {
-            return createArrayXMLElement(paraentElement, elementName, CollectionsOpt.arrayToList((Object[]) object), addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
+            return createArrayXMLElement(paraentElement, elementName, CollectionsOpt.arrayToList((Object[]) object), addTypeAttr, fieldAsKeyAttr, flattenArray, ignoreNullValue, prettyFormat, hasSerialized);
         }
 
         if (ReflectionOpt.isScalarType(object.getClass())) {
@@ -155,8 +202,8 @@ public abstract class XMLObject {
             }
             for (Map.Entry<String, JavaBeanField> field : fields.entrySet()) {
                 Object obj = field.getValue().getObjectFieldValue(object);
-                if (obj != null) {
-                    Element entry = createXMLElementFromObject(element, field.getKey(), obj, addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
+                if (obj != null || !ignoreNullValue) {
+                    Element entry = createXMLElementFromObject(element, field.getKey(), obj, addTypeAttr, fieldAsKeyAttr, flattenArray, ignoreNullValue, prettyFormat, hasSerialized);
                     if(entry!=null) {
                         element.add(entry);
                     }
@@ -176,9 +223,25 @@ public abstract class XMLObject {
      * @return xml字符串
      */
     public static String objectToXMLString(String rootName, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray) {
+        return objectToXMLString(rootName, object, addTypeAttr, fieldAsKeyAttr, flattenArray, false, true);
+    }
+
+    /**
+     *
+     * @param rootName 跟节点名称
+     * @param object 对象
+     * @param addTypeAttr 是否添加类型属性
+     * @param fieldAsKeyAttr 是否将字段名作为key属性
+     * @param flattenArray 是否扁平化数组
+     * @param ignoreNullValue 是否忽略 null 值，true 时值为 null 的字段不生成标签；false 时输出空标签（addTypeAttr 为 true 时带 type="Null" 属性）
+     * @param prettyFormat 是否格式化输出，单个属性一行，复合属性或对象标签单独一行，便于阅读
+     * @return xml字符串
+     */
+    public static String objectToXMLString(String rootName, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray, boolean ignoreNullValue, boolean prettyFormat) {
         HashSet<Object> hasSerialized = new HashSet<>();
-        Element element = createXMLElementFromObject(null, rootName, object, addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
-        return element.asXML();
+        Element element = createXMLElementFromObject(null, rootName, object, addTypeAttr, fieldAsKeyAttr,
+            flattenArray, ignoreNullValue, prettyFormat, hasSerialized);
+        return elementToXMLString(element, prettyFormat);
     }
 
     /**
@@ -193,11 +256,53 @@ public abstract class XMLObject {
      * @return xml字符串
      */
     public static String objectToXMLString(String rootName, String nameSpacePrefix, String namespace, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray) {
+        return objectToXMLString(rootName, nameSpacePrefix, namespace, object, addTypeAttr, fieldAsKeyAttr,
+            flattenArray, false, true);
+    }
+
+    /**
+     *
+     * @param rootName 跟节点名称
+     * @param nameSpacePrefix 命名空间前缀
+     * @param namespace 命名空间
+     * @param object 对象
+     * @param addTypeAttr 是否添加类型属性
+     * @param fieldAsKeyAttr 是否将字段名作为key属性
+     * @param flattenArray 是否扁平化数组
+     * @param ignoreNullValue 是否忽略 null 值，true 时值为 null 的字段不生成标签；false 时输出空标签（addTypeAttr 为 true 时带 type="Null" 属性）
+     * @param prettyFormat 是否格式化输出，单个属性一行，复合属性或对象标签单独一行，便于阅读
+     * @return xml字符串
+     */
+    public static String objectToXMLString(String rootName, String nameSpacePrefix, String namespace, Object object, boolean addTypeAttr, boolean fieldAsKeyAttr, boolean flattenArray, boolean ignoreNullValue, boolean prettyFormat) {
         HashSet<Object> hasSerialized = new HashSet<>();
         Element element = createXMLElementFromObject(null,nameSpacePrefix+":"+rootName,
-            object, addTypeAttr, fieldAsKeyAttr, flattenArray, hasSerialized);
+            object, addTypeAttr, fieldAsKeyAttr, flattenArray, ignoreNullValue, prettyFormat, hasSerialized);
         element.add(new Namespace(nameSpacePrefix, namespace));
-        return element.asXML();
+        return elementToXMLString(element, prettyFormat);
+    }
+
+    /**
+     * 将 xml 元素转换为字符串，支持格式化输出
+     * @param element xml元素
+     * @param prettyFormat 是否格式化输出，true 时单个属性一行，复合属性或对象标签单独一行
+     * @return xml字符串
+     */
+    private static String elementToXMLString(Element element, boolean prettyFormat) {
+        if (!prettyFormat) {
+            return element.asXML();
+        }
+        OutputFormat format = OutputFormat.createPrettyPrint();
+        StringWriter stringWriter = new StringWriter();
+        try {
+            XMLWriter xmlWriter = new XMLWriter(stringWriter, format);
+            xmlWriter.write(element);
+            xmlWriter.close();
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            return element.asXML();
+        }
+        // XMLWriter 写独立的 Element 时会在首部输出一个换行，这里去掉首尾空白
+        return stringWriter.toString().trim();
     }
 
     public static String objectToXMLString(String rootName, Object object) {
@@ -225,6 +330,8 @@ public abstract class XMLObject {
             return StringRegularOpt.isTrue(element.getTextTrim());
         } else if ("BigDecimal".equals(sType)) {
             return new BigDecimal(element.getTextTrim());
+        } else if ("Null".equals(sType)) {
+            return null;
         } else if ("Array".equals(sType)) {
             List<Element> subElements = element.elements();
             if (subElements == null)

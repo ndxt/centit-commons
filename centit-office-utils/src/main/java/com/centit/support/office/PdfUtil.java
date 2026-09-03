@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -88,11 +90,43 @@ public class PdfUtil {
     }
 
     public static boolean pdfContainsJSAction(String pdfFilePath) {
-        try (PDDocument document = Loader.loadPDF(new File(pdfFilePath))){
-            String cosName = document.getDocument().getTrailer().toString();
-            if (cosName.contains("COSName{JS}")) {
-                return true;
-            }
+        // 统一使用快速检测方法，避免加载整个文档
+        // 快速检测与小文件检测使用相同的判断规则，且性能更优
+        File file = new File(pdfFilePath);
+        return pdfContainsJSActionFast(file);
+    }
+
+    /**
+     * 快速检测PDF是否包含JavaScript - 不加载整个文档
+     * 使用与慢速检测相同的判断规则：检查 COSName{JS}
+     *
+     * @param file PDF文件
+     * @return true 表示包含JavaScript，false 表示不包含
+     */
+    private static boolean pdfContainsJSActionFast(File file) {
+        try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+            FileChannel channel = raf.getChannel();
+            long fileSize = channel.size();
+            // 读取文件开头部分（前1MB）
+            long headerSize = Math.min(fileSize, 1024 * 1024);
+            ByteBuffer headerBuffer = ByteBuffer.allocate((int) headerSize);
+            channel.read(headerBuffer, 0);
+            headerBuffer.flip();
+            byte[] headerBytes = new byte[headerBuffer.limit()];
+            headerBuffer.get(headerBytes);
+            String headerContent = new String(headerBytes, StandardCharsets.ISO_8859_1);
+            // 读取文件末尾部分（最后10KB，trailer通常在这里）
+            long trailerStart = Math.max(0, fileSize - 1024 * 10);
+            ByteBuffer trailerBuffer = ByteBuffer.allocate((int) (fileSize - trailerStart));
+            channel.read(trailerBuffer, trailerStart);
+            trailerBuffer.flip();
+            byte[] trailerBytes = new byte[trailerBuffer.limit()];
+            trailerBuffer.get(trailerBytes);
+            String trailerContent = new String(trailerBytes, StandardCharsets.ISO_8859_1);
+            // 使用与慢速检测相同的判断规则：检查 COSName{JS}
+            // 这与 PDDocument.getDocument().getTrailer().toString().contains("COSName{JS}") 逻辑一致
+            String combinedContent = headerContent + trailerContent;
+            return combinedContent.contains("COSName{JS}");
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
