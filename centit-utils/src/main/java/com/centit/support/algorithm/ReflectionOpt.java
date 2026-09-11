@@ -10,10 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -54,9 +51,7 @@ public abstract class ReflectionOpt {
         //Assert.hasText(propertyName);
         for (Class<?> superClass = clazz; superClass != Object.class; superClass = superClass.getSuperclass()) {
             try {
-                Field f = superClass.getDeclaredField(propertyName);
-                if (f != null)
-                    return f;
+                return superClass.getDeclaredField(propertyName);
             } catch (NoSuchFieldException e) {
                 logger.debug(e.getMessage());
                 // Field不在当前类定义,继续向上转型
@@ -75,7 +70,7 @@ public abstract class ReflectionOpt {
     public static Object forceGetFieldValue(Object object, Field field) {
         assert (object != null);
 
-        boolean accessible = field.isAccessible();
+        boolean accessible = field.canAccess(object);//.isAccessible();
         if(!accessible)
             field.setAccessible(true);
 
@@ -83,10 +78,10 @@ public abstract class ReflectionOpt {
         try {
             result = field.get(object);
         } catch (IllegalAccessException e) {
-            logger.info("error wont' happen." + e.getMessage());
+            logger.info("error wont' happen.{}", e.getMessage());
         }
         if(!accessible)
-            field.setAccessible(accessible);
+            field.setAccessible(false);
         return result;
     }
 
@@ -215,17 +210,17 @@ public abstract class ReflectionOpt {
             log.debug("property not found. (没有找到对应的属性) 对象：" + object.toString() +" 属性 ："+ propertyName);
             return;
         }*/
-        boolean accessible = field.isAccessible();
+        boolean accessible = field.canAccess(object);//.isAccessible();
         if (!accessible) {
             field.setAccessible(true);
         }
         try {
             field.set(object, newValue);
         } catch (IllegalAccessException e) {
-            logger.error("Error won't happen." + e.getMessage(), e);
+            logger.error("Error won't happen.{}", e.getMessage(), e);
         }
         if (!accessible) {
-            field.setAccessible(accessible);
+            field.setAccessible(false);
         }
     }
 
@@ -373,14 +368,10 @@ public abstract class ReflectionOpt {
     }
 
     private static void innerAddListItem(List<Object> objList, Object obj) {
-        if (obj instanceof Collection) {
-            Collection<?> templist = (Collection<?>) obj;
+        if (obj instanceof Collection<?> templist) {
             objList.addAll(templist);
-        } else if (obj instanceof Object[]) {
-            Object[] objs = (Object[]) obj;
-            for (Object tobj : objs) {
-                objList.add(tobj);
-            }
+        } else if (obj instanceof Object[] objs) {
+            Collections.addAll(objList, objs);
         } else {
             objList.add(obj);
         }
@@ -455,9 +446,8 @@ public abstract class ReflectionOpt {
                 retObj =  sourceObj;
             }
         } else {
-             if(sourceObj instanceof Collection){
-                Collection<?> objlist = (Collection<?>) sourceObj;
-                int objSize = objlist.size();
+             if(sourceObj instanceof Collection<?> objlist){
+                 int objSize = objlist.size();
                 if(StringRegularOpt.isDigit(fieldValue)){
                     int index = NumberBaseOpt.castObjectToInteger(fieldValue);
                     if(index>=objSize){
@@ -479,8 +469,7 @@ public abstract class ReflectionOpt {
                     }
                     retObj = retList;
                 }
-            } else if(sourceObj instanceof Object[]){
-                Object[] objs = (Object[]) sourceObj;
+            } else if(sourceObj instanceof Object[] objs){
                  if(StringRegularOpt.isDigit(fieldValue)){
                      int index = NumberBaseOpt.castObjectToInteger(fieldValue);
                      if(index >= objs.length){
@@ -505,13 +494,12 @@ public abstract class ReflectionOpt {
             }
         }
 
-        if(retObj instanceof Supplier){
-            retObj = ((Supplier)retObj).get();
+        if(retObj instanceof Supplier<?> supplier){
+            retObj = supplier.get();
         }
         /* if (retObj == null || StringUtils.isBlank(restExpression)) {
             return retObj;
         }*/
-
         return attainExpressionValue(retObj, restExpression);
     }
 
@@ -521,8 +509,6 @@ public abstract class ReflectionOpt {
     public static Boolean getBooleanFieldValue(Object obj, String fieldName) {
         try {
             Method md = obj.getClass().getMethod("is" + StringUtils.capitalize(fieldName));
-            if (md == null)
-                return null;
             Object objValue = md.invoke(obj);
             if (objValue == null)
                 return null;
@@ -641,7 +627,7 @@ public abstract class ReflectionOpt {
     /*
      * 调用相同类型的类之间的二元操作
      */
-    public static <T extends Object> Object invokeBinaryOpt(T demander, String smethod, T param) {
+    public static <T> Object invokeBinaryOpt(T demander, String smethod, T param) {
         try {
             Method setV = demander.getClass().getMethod(smethod, demander.getClass());
             return setV.invoke(demander, param);
@@ -682,7 +668,7 @@ public abstract class ReflectionOpt {
         if (method == null)
             throw new NoSuchMethodException("No Such Method:" + clazz.getSimpleName() + methodName);
 
-        boolean accessible = method.isAccessible();
+        boolean accessible = method.canAccess(object);//.isAccessible();
         if(!accessible)
             method.setAccessible(true);
         Object result = null;
@@ -694,7 +680,7 @@ public abstract class ReflectionOpt {
             logger.error(e.getMessage(), e);//logger.error(e.getMessage(), e);
         }
         if(!accessible)
-            method.setAccessible(accessible);
+            method.setAccessible(false);
         return result;
     }
 
@@ -774,7 +760,6 @@ public abstract class ReflectionOpt {
             return true;
         if (java.util.UUID.class.isAssignableFrom(tp))// "java.util.UUID".equals(tp.getName()))
             return true;
-
         return false;
     }
 
