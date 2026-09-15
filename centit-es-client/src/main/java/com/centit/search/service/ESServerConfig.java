@@ -105,7 +105,10 @@ public class ESServerConfig {
             .getClusterName() != null
             && castOther.getClusterName() != null && this
             .getClusterName().equals(castOther.getClusterName())))
-            && this.getServerHostPort() == castOther.getServerHostPort() ;
+            && ((this.getServerHostPort() == castOther.getServerHostPort()) || (this
+            .getServerHostPort() != null
+            && castOther.getServerHostPort() != null && this
+            .getServerHostPort().equals(castOther.getServerHostPort())));
     }
 
     @Override
@@ -114,7 +117,7 @@ public class ESServerConfig {
         result = 37 * result
             + (this.getServerHostIp() == null ? 0 : this.getServerHostIp().hashCode());
         result = 37 * result
-            +  Integer.valueOf(this.getServerHostPort()).hashCode();
+            + (this.getServerHostPort() == null ? 0 : this.getServerHostPort().hashCode());
         result = 37 * result
             + (this.getClusterName() == null ? 0 : this.getClusterName().hashCode());
         return result;
